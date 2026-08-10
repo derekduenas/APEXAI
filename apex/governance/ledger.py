@@ -57,6 +57,8 @@ import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from apex.dev.namespace import require_confirmatory
+
 GENESIS = "0" * 64
 SPEND = "spend"
 RESULT = "result"
@@ -97,6 +99,10 @@ def _require_dataset_hash(dataset_hash: str, experiment_id: str, period: str) ->
     and therefore is not evidence. Enforced at the ledger boundary so it cannot
     be forgotten by a caller.
     """
+    # ORDER MATTERS. The missing-fingerprint case is the ledger's own error and
+    # callers distinguish it by type, so it is checked FIRST. Running the
+    # development guard ahead of it silently changed the exception type for an
+    # empty fingerprint -- caught by test_research_ledger.
     if not dataset_hash or not str(dataset_hash).strip():
         raise MissingDatasetFingerprint(
             f"'{experiment_id}' addressed period '{period}' with no dataset "
@@ -105,6 +111,10 @@ def _require_dataset_hash(dataset_hash: str, experiment_id: str, period: str) ->
             f"not a result. Pass the snapshot manifest digest -- section 31 "
             f"requires every result to trace to a data snapshot."
         )
+
+    # A development dataset is refused outright: the ledger is the record of
+    # confirmatory evidence, and dev data is definitionally not that.
+    require_confirmatory(dataset_hash, context=f"ledger entry for '{experiment_id}' ({period})")
 
 
 # Protocol section 7: "The holdout is not opened until validation has passed."

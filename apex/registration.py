@@ -30,6 +30,7 @@ import re
 from pathlib import Path
 
 from apex.config import REPO_ROOT, Config, file_hash, git_sha
+from apex.dev.namespace import require_confirmatory
 from apex.governance.ledger import ResearchLedger
 
 PLACEHOLDER = re.compile(r"_{3,}")
@@ -170,7 +171,14 @@ def require_unlocked(
     root = repo_root or REPO_ROOT
     spec = config.period(period)
     if not spec.get("locked", True):
+        # in-sample is unlocked, free, and has no statistical standing. Running
+        # DEVELOPMENT data here is the entire point of the development path, so
+        # it is deliberately NOT refused.
         return
+
+    # Every BUDGETED period refuses development data, before the token is even
+    # looked at.
+    require_confirmatory(dataset_hash, context=f"opening locked period '{period}'")
 
     token = (root / "results" / "_unlocks" / f"{period}.unlock").resolve()
     if not token.exists():

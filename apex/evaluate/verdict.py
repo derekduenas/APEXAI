@@ -36,6 +36,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from apex.dev.namespace import require_confirmatory
+
 PASS = "PASS"
 FAIL = "FAIL"
 INCONCLUSIVE = "INCONCLUSIVE"
@@ -199,3 +201,24 @@ def full_report(verdict: ExperimentVerdict, interpretation: Interpretation, prog
             "programme_inference says what it is worth given everything else tested",
         ],
     }
+
+
+# ---------------------------------------------------------------------------
+# the development refusal
+# ---------------------------------------------------------------------------
+
+
+def experiment_verdict_for_dataset(*, dataset_fingerprint: str, **kwargs) -> ExperimentVerdict:
+    """`experiment_verdict` with a dataset gate in front of it.
+
+    `experiment_verdict` itself deliberately takes no dataset argument -- it is a
+    pure function of the measured statistics and the frozen thresholds, and
+    test_verdict.py asserts by signature that nothing else can reach it.
+
+    The dataset check therefore lives HERE, in a wrapper, rather than inside the
+    pre-registered decision. Development data cannot produce a promotion verdict,
+    and the purity of the verdict function is preserved. Callers that want a
+    verdict from real data go through this door and pass their fingerprint.
+    """
+    require_confirmatory(dataset_fingerprint, context="promotion verdict")
+    return experiment_verdict(**kwargs)
