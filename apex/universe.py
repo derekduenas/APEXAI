@@ -59,7 +59,24 @@ def build_universe(panel: Panel, config: Config) -> UniverseSnapshot:
 
     # -- level filters (unadjusted, as-of-date) ------------------------------
     pass_flags["close"] = panel.close_unadj >= float(settings["min_close_usd"])
-    pass_flags["market_cap"] = panel.market_cap >= float(settings["min_market_cap_usd"])
+
+    # PIT establishment, then the size test -- deliberately two filters.
+    # User ruling 2026-08-09: "If a security-date cannot be established PIT from
+    # the required source data, it is excluded and the exclusion is reported. Do
+    # not fill missing PIT information with today's shares, today's market cap,
+    # current ticker mappings, or later-revised fundamentals."
+    #
+    # Shares outstanding come from the PIT vendor; where they are absent, market
+    # cap is UNKNOWABLE at T, which is a different exclusion from being small.
+    market_cap = panel.market_cap
+    pass_flags["pit_market_cap"] = market_cap.notna()
+    # Where market cap is UNKNOWN the size test passes vacuously, so the
+    # security-date fails exactly one filter (pit_market_cap) instead of two.
+    # Eligibility is unaffected -- it is the AND of every flag -- but the
+    # section 9 counts stay non-overlapping and mean what they say.
+    pass_flags["market_cap"] = (
+        market_cap >= float(settings["min_market_cap_usd"])
+    ) | market_cap.isna()
 
     addv = panel.dollar_volume.rolling(
         int(settings["addv_window_days"]),

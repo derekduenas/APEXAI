@@ -201,6 +201,12 @@ FILTER_NAMES = (
     "history",
     "bars_in_prior_252",
     "close",
+    # PIT establishment is a SEPARATE filter from the size test (user ruling,
+    # 2026-08-09). "We know it was a $400m company" and "we do not know what it
+    # was worth" are different facts, and collapsing them hides how much of the
+    # universe is lost to missing point-in-time data -- the number that says
+    # whether the dual-vendor join is actually working.
+    "pit_market_cap",
     "market_cap",
     "addv",
 )

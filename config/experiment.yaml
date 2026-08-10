@@ -6,6 +6,22 @@ experiment:
   id: APEX-001
   protocol_file: APEX-Research-Protocol-v1.0-Experiment-001.md
   conventions_file: CONVENTIONS.md
+  hypothesis: >-
+    A fixed equal-weighted composite of four price/volume factor categories ranks
+    US equities such that higher-ranked stocks earn higher forward 20-trading-day
+    excess returns, net of realistic costs.
+
+governance:
+  # Directive section 4, as ruled 2026-08-09. This SUPERSEDES protocol section 7's
+  # "one evaluation, once, ever" for the holdout: five lifetime confirmatory
+  # evaluations, with mandatory multiplicity correction so the family-wise error
+  # rate stays at the level a single test implies.
+  research_budget: 5
+  family_alpha: 0.05
+  ledger_file: results/research_ledger.jsonl
+  # CONVENTIONS.md pins the protocol's SHA-256 in its header. If the protocol is
+  # edited after freezing, that pin stops matching and every gate refuses.
+  enforce_protocol_pin: true
 
 calendar:
   # C7: the lake starts here; the feature-computability anchor is measured from
@@ -55,6 +71,9 @@ universe:
     - history
     - bars_in_prior_252
     - close
+    # pit_market_cap precedes market_cap: "we could not establish what it was
+    # worth" is the more specific and more actionable label of the two.
+    - pit_market_cap
     - market_cap
     - addv
     - missing_feature

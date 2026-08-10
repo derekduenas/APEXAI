@@ -20,7 +20,7 @@ from apex.evaluate.deciles import DecileResult, evaluate_deciles
 from apex.evaluate.ic import ICResult, evaluate_ic
 from apex.features import compute_features
 from apex.features.composite import build_scores
-from apex.registration import require_signed, require_unlocked
+from apex.registration import require_protocol_unmodified, require_signed, require_unlocked
 from apex.returns import compute_forward_returns
 from apex.universe import apply_feature_completeness, build_universe
 
@@ -109,6 +109,7 @@ def run_period(
     """
     if source.requires_signed_registration:
         require_signed(config)
+        require_protocol_unmodified(config)
     require_unlocked(config, period)
 
     spec = config.period(period)

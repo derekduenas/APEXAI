@@ -102,6 +102,102 @@ def reference_for(config, n_obs: int):
     )
 
 
+def patched(config, overrides: dict):
+    """A copy of `config` with dotted keys replaced.
+
+    Unit tests for a filter need thresholds a ten-row panel can actually reach.
+    Patching is explicit and returns a NEW Config -- the loaded one is never
+    mutated, so a patched threshold cannot leak into another test.
+    """
+    import copy
+
+    from apex.config import Config
+
+    data = copy.deepcopy(config.data)
+    for dotted, value in overrides.items():
+        node = data
+        parts = dotted.split(".")
+        for part in parts[:-1]:
+            node = node[part]
+        node[parts[-1]] = value
+    return Config(data=data, sources=config.sources + ("patched",))
+
+
+def hand_panel(
+    dates,
+    close_adj: dict,
+    *,
+    close_unadj: dict | None = None,
+    shares_out: dict | None = None,
+    volume: dict | None = None,
+    high_adj: dict | None = None,
+    low_adj: dict | None = None,
+    meta: dict | None = None,
+    benchmark: list | None = None,
+    vix: list | None = None,
+):
+    """A hand-specified `Panel`, so tests can assert exact arithmetic.
+
+    Defaults are chosen to clear every protocol section 3 filter, so a test only
+    has to specify the one quantity it is actually about. `security_id` is
+    deliberately distinct from `ticker`, which `Panel` requires -- tickers are
+    recycled and joining on them reintroduces survivorship contamination.
+    """
+    from apex.contracts import SECURITY_META_COLUMNS, Panel
+
+    index = pd.DatetimeIndex(pd.to_datetime(dates))
+    securities = pd.Index(sorted(close_adj), name="security_id")
+
+    def frame(source: dict | None, default) -> pd.DataFrame:
+        if source is None:
+            source = {s: [default] * len(index) for s in securities}
+        return pd.DataFrame(
+            {s: pd.Series(source[s], index=index, dtype="float64") for s in securities},
+            index=index,
+            columns=securities,
+        )
+
+    adjusted = frame(close_adj, np.nan)
+    unadjusted = frame(close_unadj, np.nan) if close_unadj else adjusted.copy()
+
+    rows = []
+    for security in securities:
+        overrides = (meta or {}).get(security, {})
+        rows.append(
+            {
+                "security_id": security,
+                "ticker": overrides.get("ticker", f"T{security}"),
+                "exchange": overrides.get("exchange", "NYSE"),
+                "security_type": overrides.get("security_type", "common"),
+                "sector": overrides.get("sector", "tech"),
+                "first_date": overrides.get("first_date", index[0]),
+                "last_date": overrides.get("last_date", index[-1]),
+                "delist_date": overrides.get("delist_date", pd.NaT),
+                "delist_reason": overrides.get("delist_reason", None),
+            }
+        )
+    meta_frame = pd.DataFrame(rows, index=securities)[list(SECURITY_META_COLUMNS)]
+
+    return Panel(
+        dates=index,
+        securities=securities,
+        close_adj=adjusted,
+        high_adj=frame(high_adj, np.nan) if high_adj else adjusted * 1.01,
+        low_adj=frame(low_adj, np.nan) if low_adj else adjusted * 0.99,
+        close_unadj=unadjusted,
+        # Defaults must clear every filter by a wide margin even at a low price,
+        # so a test that cares about ONE filter is not silently failing on a
+        # different one. At the $5 boundary these give $5B cap and $50m ADDV.
+        shares_out=frame(shares_out, 1e9),
+        volume=frame(volume, 1e7),
+        meta=meta_frame,
+        benchmark_tr=pd.Series(
+            benchmark if benchmark is not None else [100.0] * len(index), index=index
+        ),
+        vol_index=pd.Series(vix if vix is not None else [20.0] * len(index), index=index),
+    )
+
+
 def tiny_frame(values, dates=None, securities=None) -> pd.DataFrame:
     array = np.asarray(values, dtype="float64")
     index = dates if dates is not None else pd.bdate_range("2020-01-01", periods=array.shape[0])
