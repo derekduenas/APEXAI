@@ -2,6 +2,21 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# Evaluation artefacts. `results/*/` ignores generated subdirectories while
+# keeping the research ledger and its head anchor -- which live directly in
+# results/ -- under version control, because the ledger IS the audit trail.
 results/*/
 results/_unlocks/
-data/
+
+# Raw vendor snapshots: large, and reproducible from the manifest.
+#
+# ANCHORED with a leading slash. A bare `data/` also matches `apex/data/`, and
+# it silently excluded the ENTIRE data-adapter package -- base, synthetic,
+# sharadar, identity, crosscheck -- from every commit up to b15b410. A clean
+# clone could not import apex.data at all. Do not un-anchor this.
+/data/
+
+# Never commit a credential.
+.env
+*.key
