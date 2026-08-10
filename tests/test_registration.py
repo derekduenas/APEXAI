@@ -91,9 +91,13 @@ def _pass_validation(repo, config, experiment_id=None):
         protocol_hash="p" * 64,
         conventions_hash="v" * 64,
         git_sha="abc",
+        dataset_hash="d" * 64,
         reason="validation",
     )
-    ledger.record_result(eid, "validation", p_value=0.001, t_stat=3.2, verdict="PASS")
+    ledger.record_result(
+        eid, "validation", p_value=0.001, t_stat=3.2, verdict="PASS",
+        dataset_hash="d" * 64,
+    )
 
 
 def _unlock_token(repo, period, reason="pre-registered confirmatory evaluation"):
@@ -175,8 +179,8 @@ def test_an_unmodified_protocol_passes_the_pin_check(repo, config):
 
 def test_in_sample_is_unlocked_and_free(repo, config):
     """Section 7: in-sample is for pipeline verification and has no standing."""
-    require_unlocked(config, "in_sample", repo_root=repo)
-    require_unlocked(config, "in_sample", repo_root=repo)
+    require_unlocked(config, "in_sample", "d" * 64, repo_root=repo)
+    require_unlocked(config, "in_sample", "d" * 64, repo_root=repo)
 
     ledger = ResearchLedger(repo / config.get("governance.ledger_file"), budget=5)
     assert ledger.credits_spent() == 0
@@ -184,7 +188,7 @@ def test_in_sample_is_unlocked_and_free(repo, config):
 
 def test_the_holdout_refuses_to_open_without_a_hand_made_token(repo, config):
     with pytest.raises(RegistrationError) as excinfo:
-        require_unlocked(config, "holdout", repo_root=repo)
+        require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
 
     message = str(excinfo.value)
     assert "LOCKED" in message
@@ -195,7 +199,7 @@ def test_the_holdout_opens_once_with_a_token_and_spends_a_credit(repo, config):
     _pass_validation(repo, config)
     _unlock_token(repo, "holdout")
 
-    require_unlocked(config, "holdout", repo_root=repo)
+    require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
 
     ledger = ResearchLedger(repo / config.get("governance.ledger_file"), budget=5)
     assert ledger.credits_spent() == 1
@@ -210,22 +214,22 @@ def test_the_holdout_opens_once_with_a_token_and_spends_a_credit(repo, config):
 def test_the_same_experiment_cannot_reopen_the_holdout(repo, config):
     _pass_validation(repo, config)
     _unlock_token(repo, "holdout")
-    require_unlocked(config, "holdout", repo_root=repo)
+    require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
 
     with pytest.raises(AlreadyEvaluated):
-        require_unlocked(config, "holdout", repo_root=repo)
+        require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
 
 
 def test_deleting_the_token_does_not_restore_the_credit(repo, config):
     """The token is a deliberate act, not the accounting. The ledger is."""
     _pass_validation(repo, config)
     _unlock_token(repo, "holdout")
-    require_unlocked(config, "holdout", repo_root=repo)
+    require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
     (repo / "results" / "_unlocks" / "holdout.unlock").unlink()
     _unlock_token(repo, "holdout", reason="second look, surely fine")
 
     with pytest.raises(AlreadyEvaluated):
-        require_unlocked(config, "holdout", repo_root=repo)
+        require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
 
 
 def test_one_experiment_costs_one_credit_across_both_its_periods(repo, config):
@@ -237,12 +241,13 @@ def test_one_experiment_costs_one_credit_across_both_its_periods(repo, config):
     _unlock_token(repo, "validation")
     _unlock_token(repo, "holdout")
 
-    require_unlocked(config, "validation", repo_root=repo)
+    require_unlocked(config, "validation", "d" * 64, repo_root=repo)
     ledger = ResearchLedger(repo / config.get("governance.ledger_file"), budget=5)
     ledger.record_result(
-        config.get("experiment.id"), "validation", p_value=0.001, t_stat=3.2, verdict="PASS"
+        config.get("experiment.id"), "validation", p_value=0.001, t_stat=3.2,
+        verdict="PASS", dataset_hash="d" * 64,
     )
-    require_unlocked(config, "holdout", repo_root=repo)
+    require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
 
     reloaded = ResearchLedger(repo / config.get("governance.ledger_file"), budget=5)
     assert reloaded.credits_spent() == 1
@@ -266,13 +271,14 @@ def test_the_budget_runs_out(repo, config):
             protocol_hash="p" * 64,
             conventions_hash="v" * 64,
             git_sha="abc",
+            dataset_hash="d" * 64,
             reason="historical",
         )
     _unlock_token(repo, "validation")
 
     # APEX-001 would be the sixth experiment.
     with pytest.raises(BudgetExhausted):
-        require_unlocked(config, "validation", repo_root=repo)
+        require_unlocked(config, "validation", "d" * 64, repo_root=repo)
 
 
 def test_a_tampered_ledger_blocks_the_holdout(repo, config):
@@ -288,6 +294,7 @@ def test_a_tampered_ledger_blocks_the_holdout(repo, config):
             protocol_hash="p" * 64,
             conventions_hash="v" * 64,
             git_sha="abc",
+            dataset_hash="d" * 64,
             reason="historical",
         )
     lines = ledger_path.read_text().splitlines()
@@ -295,7 +302,7 @@ def test_a_tampered_ledger_blocks_the_holdout(repo, config):
     _unlock_token(repo, "holdout")
 
     with pytest.raises(Exception) as excinfo:
-        require_unlocked(config, "holdout", repo_root=repo)
+        require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
     assert "tamper" in str(excinfo.value).lower() or "removed" in str(excinfo.value).lower()
 
 

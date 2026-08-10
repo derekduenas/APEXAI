@@ -110,7 +110,7 @@ def run_period(
     if source.requires_signed_registration:
         require_signed(config)
         require_protocol_unmodified(config)
-    require_unlocked(config, period)
+    require_unlocked(config, period, source.dataset_fingerprint)
 
     spec = config.period(period)
     output = build_panel_pipeline(source.load(), config)

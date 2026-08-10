@@ -158,7 +158,9 @@ def open_ledger(config: Config, repo_root: Path | None = None) -> ResearchLedger
     )
 
 
-def require_unlocked(config: Config, period: str, repo_root: Path | None = None) -> None:
+def require_unlocked(
+    config: Config, period: str, dataset_hash: str, repo_root: Path | None = None
+) -> None:
     """Gate execution against a locked evaluation period.
 
     Unlocked periods (in-sample) return immediately and cost nothing. A locked
@@ -192,5 +194,6 @@ def require_unlocked(config: Config, period: str, repo_root: Path | None = None)
         protocol_hash=status["protocol_hash"],
         conventions_hash=status["conventions_hash"],
         git_sha=git_sha(root),
+        dataset_hash=dataset_hash,
         reason=token.read_text(encoding="utf-8").strip(),
     )

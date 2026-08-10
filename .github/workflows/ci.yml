@@ -76,8 +76,11 @@ jobs:
 
       # --- the suite --------------------------------------------------------
 
-      - name: Lookahead auditor
-        run: pytest tests/test_lookahead_audit.py -v
+      - name: Leakage auditors (lookahead + cross-sectional)
+        run: pytest tests/test_lookahead_audit.py tests/test_cross_sectional_audit.py -v
+
+      - name: Smoke-run harness self-test
+        run: python scripts/run_smoke.py --synthetic --out /tmp/smoke_synth.txt
 
       - name: Holdout protection and research governance
         run: pytest tests/test_registration.py tests/test_research_ledger.py tests/test_verdict.py -v

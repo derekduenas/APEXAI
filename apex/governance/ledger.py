@@ -86,6 +86,27 @@ class ValidationNotPassed(LedgerError):
     """The holdout was addressed before this experiment passed validation."""
 
 
+class MissingDatasetFingerprint(LedgerError):
+    """An evaluation was recorded without identifying the data it ran on."""
+
+
+def _require_dataset_hash(dataset_hash: str, experiment_id: str, period: str) -> None:
+    """Ruling 1, 2026-08-09: "A result without a dataset fingerprint is not a result."
+
+    A p-value that cannot be tied to an exact, hashed snapshot is unreproducible
+    and therefore is not evidence. Enforced at the ledger boundary so it cannot
+    be forgotten by a caller.
+    """
+    if not dataset_hash or not str(dataset_hash).strip():
+        raise MissingDatasetFingerprint(
+            f"'{experiment_id}' addressed period '{period}' with no dataset "
+            f"fingerprint.\n"
+            f"  Ruling 1 (2026-08-09): a result without a dataset fingerprint is "
+            f"not a result. Pass the snapshot manifest digest -- section 31 "
+            f"requires every result to trace to a data snapshot."
+        )
+
+
 # Protocol section 7: "The holdout is not opened until validation has passed."
 # Only this verdict opens it. INCONCLUSIVE does not -- section 10 routes that to
 # "no further capital or effort".
@@ -111,6 +132,7 @@ class LedgerEntry:
     protocol_hash: str = ""
     conventions_hash: str = ""
     git_sha: str = ""
+    dataset_hash: str = ""
     reason: str = ""
     p_value: float | None = None
     t_stat: float | None = None
@@ -324,6 +346,7 @@ class ResearchLedger:
                     "p_value": entry.p_value,
                     "t_stat": entry.t_stat,
                     "verdict": entry.verdict,
+                    "dataset_hash": entry.dataset_hash,
                     "timestamp": entry.timestamp,
                 }
         return out
@@ -352,10 +375,12 @@ class ResearchLedger:
         protocol_hash: str,
         conventions_hash: str,
         git_sha: str,
+        dataset_hash: str,
         reason: str,
     ) -> LedgerEntry:
         """Consume a research credit. Called BEFORE the evaluation runs."""
         self.verify_chain()
+        _require_dataset_hash(dataset_hash, experiment_id, period)
 
         # The no-second-look rule binds only on BUDGETED periods. In-sample
         # exists to debug the pipeline and is run many times; blocking a repeat
@@ -397,6 +422,7 @@ class ResearchLedger:
                 protocol_hash=protocol_hash,
                 conventions_hash=conventions_hash,
                 git_sha=git_sha,
+                dataset_hash=dataset_hash,
                 reason=reason,
             )
         )
@@ -446,9 +472,11 @@ class ResearchLedger:
         p_value: float,
         t_stat: float,
         verdict: str,
+        dataset_hash: str,
     ) -> LedgerEntry:
         """Close out an evaluation. Write-once."""
         self.verify_chain()
+        _require_dataset_hash(dataset_hash, experiment_id, period)
 
         if self.already_evaluated(experiment_id, period) is None:
             raise LedgerError(
@@ -469,6 +497,7 @@ class ResearchLedger:
                 p_value=float(p_value),
                 t_stat=float(t_stat),
                 verdict=verdict,
+                dataset_hash=dataset_hash,
             )
         )
 
@@ -515,6 +544,7 @@ class ResearchLedger:
                     "p_value": p,
                     "t_stat": result.get("t_stat"),
                     "verdict": result.get("verdict"),
+                    "dataset_hash": entry.dataset_hash,
                     "passes_sequential_bonferroni": (p is not None and p <= sequential),
                     "passes_holm_retrospective": holm.get(entry.experiment_id),
                 }

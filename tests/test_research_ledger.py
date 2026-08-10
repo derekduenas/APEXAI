@@ -31,6 +31,7 @@ from apex.governance.ledger import (
     AlreadyEvaluated,
     BudgetExhausted,
     LedgerTampered,
+    MissingDatasetFingerprint,
     ResearchLedger,
     ValidationNotPassed,
     holm_rejections,
@@ -51,7 +52,8 @@ def _qualify(ledger, experiment_id):
     """
     _spend(ledger, experiment_id, period="validation")
     ledger.record_result(
-        experiment_id, "validation", p_value=0.001, t_stat=3.2, verdict="PASS"
+        experiment_id, "validation", p_value=0.001, t_stat=3.2, verdict="PASS",
+        dataset_hash="d" * 64,
     )
 
 
@@ -64,6 +66,7 @@ def _spend(ledger, experiment_id, period="validation", **kw):
         protocol_hash="p" * 64,
         conventions_hash="v" * 64,
         git_sha="deadbeef",
+        dataset_hash=kw.get("dataset_hash", "d" * 64),
         reason=kw.get("reason", "pre-registered evaluation"),
     )
 
@@ -220,6 +223,7 @@ def test_truncation_does_not_refund_a_credit(ledger, tmp_path):
             protocol_hash="p" * 64,
             conventions_hash="v" * 64,
             git_sha="deadbeef",
+            dataset_hash="d" * 64,
             reason="the budget looked fine to me",
         )
 
@@ -251,7 +255,7 @@ def test_the_holdout_cannot_be_opened_before_validation_has_run(ledger):
 def test_the_holdout_cannot_be_opened_after_validation_failed(ledger):
     """Section 7: "If validation fails, the holdout remains untouched."""
     _spend(ledger, "APEX-001", period="validation")
-    ledger.record_result("APEX-001", "validation", p_value=0.40, t_stat=0.8, verdict="FAIL")
+    ledger.record_result("APEX-001", "validation", p_value=0.40, t_stat=0.8, verdict="FAIL", dataset_hash="d" * 64)
 
     with pytest.raises(ValidationNotPassed):
         _spend(ledger, "APEX-001", period="holdout")
@@ -261,7 +265,8 @@ def test_an_inconclusive_validation_does_not_unlock_the_holdout(ledger):
     """Section 10 routes INCONCLUSIVE to "no further capital or effort"."""
     _spend(ledger, "APEX-001", period="validation")
     ledger.record_result(
-        "APEX-001", "validation", p_value=0.06, t_stat=1.9, verdict="INCONCLUSIVE"
+        "APEX-001", "validation", p_value=0.06, t_stat=1.9, verdict="INCONCLUSIVE",
+        dataset_hash="d" * 64,
     )
 
     with pytest.raises(ValidationNotPassed):
@@ -279,7 +284,7 @@ def test_validation_started_but_never_recorded_does_not_unlock_the_holdout(ledge
 
 def test_a_passing_validation_unlocks_the_holdout_once(ledger):
     _spend(ledger, "APEX-001", period="validation")
-    ledger.record_result("APEX-001", "validation", p_value=0.002, t_stat=3.1, verdict="PASS")
+    ledger.record_result("APEX-001", "validation", p_value=0.002, t_stat=3.1, verdict="PASS", dataset_hash="d" * 64)
 
     _spend(ledger, "APEX-001", period="holdout")
 
@@ -293,7 +298,7 @@ def test_a_passing_validation_unlocks_the_holdout_once(ledger):
 def test_another_experiments_validation_does_not_unlock_this_one(ledger):
     """The gate is per experiment. Borrowing a sibling's pass is not a pass."""
     _spend(ledger, "APEX-001", period="validation")
-    ledger.record_result("APEX-001", "validation", p_value=0.001, t_stat=3.4, verdict="PASS")
+    ledger.record_result("APEX-001", "validation", p_value=0.001, t_stat=3.4, verdict="PASS", dataset_hash="d" * 64)
 
     with pytest.raises(ValidationNotPassed):
         _spend(ledger, "APEX-002", period="holdout")
@@ -307,7 +312,7 @@ def test_validation_itself_needs_no_precondition(ledger):
 def test_a_result_is_recorded_against_its_spend(ledger):
     _qualify(ledger, "APEX-001")
     _spend(ledger, "APEX-001", period="holdout")
-    ledger.record_result("APEX-001", "holdout", p_value=0.004, t_stat=2.71, verdict="PASS")
+    ledger.record_result("APEX-001", "holdout", p_value=0.004, t_stat=2.71, verdict="PASS", dataset_hash="d" * 64)
 
     results = ledger.results()
     assert results[("APEX-001", "holdout")]["p_value"] == 0.004
@@ -316,16 +321,16 @@ def test_a_result_is_recorded_against_its_spend(ledger):
 
 def test_a_result_cannot_be_recorded_without_spending_a_credit(ledger):
     with pytest.raises(Exception):
-        ledger.record_result("APEX-999", "holdout", p_value=0.01, t_stat=2.6, verdict="PASS")
+        ledger.record_result("APEX-999", "holdout", p_value=0.01, t_stat=2.6, verdict="PASS", dataset_hash="d" * 64)
 
 
 def test_a_result_cannot_be_overwritten(ledger):
     """Directive section 34.14: no changing thresholds -- or numbers -- after results."""
     _spend(ledger, "APEX-001", period="validation")
-    ledger.record_result("APEX-001", "validation", p_value=0.30, t_stat=1.0, verdict="FAIL")
+    ledger.record_result("APEX-001", "validation", p_value=0.30, t_stat=1.0, verdict="FAIL", dataset_hash="d" * 64)
 
     with pytest.raises(Exception):
-        ledger.record_result("APEX-001", "validation", p_value=0.004, t_stat=2.9, verdict="PASS")
+        ledger.record_result("APEX-001", "validation", p_value=0.004, t_stat=2.9, verdict="PASS", dataset_hash="d" * 64)
 
 
 def test_sequential_threshold_is_bonferroni_over_the_whole_budget(ledger):
@@ -379,7 +384,7 @@ def test_holm_on_the_recorded_family(ledger):
     for i, p in enumerate([0.002, 0.30, 0.9]):
         _qualify(ledger, f"APEX-{i:03d}")
         _spend(ledger, f"APEX-{i:03d}", period="holdout")
-        ledger.record_result(f"APEX-{i:03d}", "holdout", p_value=p, t_stat=1.0, verdict="X")
+        ledger.record_result(f"APEX-{i:03d}", "holdout", p_value=p, t_stat=1.0, verdict="X", dataset_hash="d" * 64)
 
     verdicts = ledger.holm(alpha=0.05)
 
@@ -423,7 +428,7 @@ def test_required_tstat_under_the_budget_exceeds_the_preregistered_hurdle():
 def test_budget_report_states_every_number_a_reviewer_needs(ledger):
     _qualify(ledger, "APEX-001")
     _spend(ledger, "APEX-001", period="holdout")
-    ledger.record_result("APEX-001", "holdout", p_value=0.004, t_stat=2.71, verdict="PASS")
+    ledger.record_result("APEX-001", "holdout", p_value=0.004, t_stat=2.71, verdict="PASS", dataset_hash="d" * 64)
 
     report = ledger.report(family_alpha=0.05)
 
@@ -437,3 +442,73 @@ def test_budget_report_states_every_number_a_reviewer_needs(ledger):
     ):
         assert key in report, f"budget report is missing '{key}'"
     assert report["chain_verified"] is True
+
+
+# ---------------------------------------------------------------------------
+# RULING 1 -- a result without a dataset fingerprint is not a result
+# ---------------------------------------------------------------------------
+
+
+def test_an_evaluation_without_a_dataset_fingerprint_is_refused(ledger):
+    """Section 31: every result must trace to an exact, hashed snapshot."""
+    with pytest.raises(MissingDatasetFingerprint):
+        ledger.spend(
+            experiment_id="APEX-001",
+            hypothesis="unfingerprinted",
+            period="validation",
+            config_hash="c" * 64,
+            protocol_hash="p" * 64,
+            conventions_hash="v" * 64,
+            git_sha="deadbeef",
+            dataset_hash="",
+            reason="forgot to say what data this ran on",
+        )
+
+
+def test_a_result_without_a_dataset_fingerprint_is_refused(ledger):
+    _spend(ledger, "APEX-001", period="validation")
+
+    with pytest.raises(MissingDatasetFingerprint) as excinfo:
+        ledger.record_result(
+            "APEX-001", "validation", p_value=0.01, t_stat=2.6, verdict="PASS",
+            dataset_hash="   ",
+        )
+    assert "not a result" in str(excinfo.value)
+
+
+def test_the_dataset_fingerprint_is_persisted_with_the_result(ledger):
+    _spend(ledger, "APEX-001", period="validation", dataset_hash="snapshot-abc123")
+    ledger.record_result(
+        "APEX-001", "validation", p_value=0.01, t_stat=2.6, verdict="PASS",
+        dataset_hash="snapshot-abc123",
+    )
+
+    assert ledger.result_for("APEX-001", "validation")["dataset_hash"] == "snapshot-abc123"
+    assert ledger.report()["experiments"][0]["dataset_hash"] == "snapshot-abc123"
+
+
+def test_the_fingerprint_is_covered_by_the_tamper_chain(ledger, tmp_path):
+    """Swapping the recorded dataset after the fact must break the chain."""
+    _spend(ledger, "APEX-001", period="validation", dataset_hash="snapshot-real")
+
+    path = tmp_path / "research_ledger.jsonl"
+    entry = json.loads(path.read_text().splitlines()[0])
+    entry["dataset_hash"] = "snapshot-something-else"
+    path.write_text(json.dumps(entry) + "\n")
+
+    with pytest.raises(LedgerTampered):
+        ResearchLedger(path=path, budget=5).verify_chain()
+
+
+def test_every_source_can_name_its_own_data():
+    """Ruling 1 is only enforceable if sources actually carry a fingerprint."""
+    from apex.config import load_config
+    from apex.data.synthetic import SyntheticSource
+
+    config = load_config("experiment", "costs", "synthetic")
+    first = SyntheticSource(config=config, seed=1, alpha=0.0).dataset_fingerprint
+    same = SyntheticSource(config=config, seed=1, alpha=0.0).dataset_fingerprint
+    other = SyntheticSource(config=config, seed=2, alpha=0.0).dataset_fingerprint
+
+    assert first == same, "the same synthetic world must fingerprint identically"
+    assert first != other, "a different world must fingerprint differently"
