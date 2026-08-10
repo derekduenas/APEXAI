@@ -10,3 +10,10 @@ testpaths = ["tests"]
 markers = ["slow: full 40-seed calibration sweep; run before every merge"]
 addopts = "-ra"
 filterwarnings = ["error::RuntimeWarning"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["apex*"]

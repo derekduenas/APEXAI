@@ -82,6 +82,18 @@ class AlreadyEvaluated(LedgerError):
     """This experiment has already been evaluated against this period."""
 
 
+class ValidationNotPassed(LedgerError):
+    """The holdout was addressed before this experiment passed validation."""
+
+
+# Protocol section 7: "The holdout is not opened until validation has passed."
+# Only this verdict opens it. INCONCLUSIVE does not -- section 10 routes that to
+# "no further capital or effort".
+PASSING_VERDICT = "PASS"
+HOLDOUT = "holdout"
+VALIDATION = "validation"
+
+
 # ---------------------------------------------------------------------------
 # entries
 # ---------------------------------------------------------------------------
@@ -277,7 +289,16 @@ class ResearchLedger:
         return tuple(e for e in self._entries if e.kind == SPEND)
 
     def credits_spent(self) -> int:
-        return sum(1 for e in self._spends() if e.period in BUDGETED_PERIODS)
+        """Credits count EXPERIMENTS, not evaluations (CONVENTIONS A-003).
+
+        The budget is "five separate pre-registered experiments", and each
+        experiment gets its own validation pass plus one holdout evaluation.
+        Charging validation and holdout separately would halve the programme for
+        no statistical reason: it is the number of distinct hypotheses put to
+        out-of-sample data that inflates family-wise error, not the number of
+        times a single one is measured along its own pre-registered path.
+        """
+        return len({e.experiment_id for e in self._spends() if e.period in BUDGETED_PERIODS})
 
     def credits_remaining(self) -> int:
         return max(0, self.budget - self.credits_spent())
@@ -288,11 +309,17 @@ class ResearchLedger:
                 return entry
         return None
 
-    def results(self) -> dict[str, dict]:
-        out: dict[str, dict] = {}
+    def results(self) -> dict:
+        """Keyed by (experiment_id, period).
+
+        An experiment now carries BOTH a validation and a holdout result, so a
+        key of experiment_id alone would let the second silently overwrite the
+        first -- and the validation verdict is exactly what gates the holdout.
+        """
+        out: dict = {}
         for entry in self._entries:
             if entry.kind == RESULT:
-                out[entry.experiment_id] = {
+                out[(entry.experiment_id, entry.period)] = {
                     "period": entry.period,
                     "p_value": entry.p_value,
                     "t_stat": entry.t_stat,
@@ -300,6 +327,18 @@ class ResearchLedger:
                     "timestamp": entry.timestamp,
                 }
         return out
+
+    def result_for(self, experiment_id: str, period: str) -> dict | None:
+        return self.results().get((experiment_id, period))
+
+    def holdout_results(self) -> dict:
+        """Holdout results by experiment id -- the family programme-level
+        inference is drawn over. Validation is a screen, not a finding."""
+        return {
+            eid: value
+            for (eid, period), value in self.results().items()
+            if period == HOLDOUT
+        }
 
     # -- writing -------------------------------------------------------------
 
@@ -333,6 +372,12 @@ class ResearchLedger:
                     f"and consuming another credit."
                 )
 
+        # Protocol section 7 / CONVENTIONS A-003: each experiment gets its own
+        # validation pass and then ONE holdout evaluation. Checked BEFORE the
+        # budget so a refused holdout never consumes a credit.
+        if period == HOLDOUT:
+            self._require_validation_passed(experiment_id)
+
         if period in BUDGETED_PERIODS and self.credits_remaining() == 0:
             spent = [e.experiment_id for e in self._spends() if e.period in BUDGETED_PERIODS]
             raise BudgetExhausted(
@@ -356,6 +401,43 @@ class ResearchLedger:
             )
         )
 
+    def _require_validation_passed(self, experiment_id: str) -> None:
+        """Refuse the holdout unless THIS experiment has a recorded validation PASS.
+
+        Three distinct refusals, because the remedy differs for each:
+        never ran validation, ran it but recorded no result, or recorded a
+        result that was not a pass.
+        """
+        if self.already_evaluated(experiment_id, VALIDATION) is None:
+            raise ValidationNotPassed(
+                f"experiment '{experiment_id}' has never run a validation pass, so "
+                f"the holdout may not be opened.\n"
+                f"  Protocol section 7: 'The holdout is not opened until validation "
+                f"has passed.' Each experiment gets its own validation pass and then "
+                f"one -- and only one -- holdout evaluation. Skipping validation "
+                f"would spend that single irreplaceable look on an unscreened "
+                f"hypothesis."
+            )
+
+        result = self.result_for(experiment_id, VALIDATION)
+        if result is None:
+            raise ValidationNotPassed(
+                f"experiment '{experiment_id}' spent a validation credit but "
+                f"recorded no result, so the holdout may not be opened.\n"
+                f"  Spending the credit is not the same as passing. Record the "
+                f"validation verdict first."
+            )
+        if str(result["verdict"]).upper() != PASSING_VERDICT:
+            raise ValidationNotPassed(
+                f"experiment '{experiment_id}' recorded validation verdict "
+                f"'{result['verdict']}', not {PASSING_VERDICT}, so the holdout "
+                f"remains untouched.\n"
+                f"  Protocol section 7: 'If validation fails, the holdout remains "
+                f"untouched and available for a future experiment.' Section 10 "
+                f"routes INCONCLUSIVE the same way -- no further capital or effort. "
+                f"A modified specification is a NEW experiment id."
+            )
+
     def record_result(
         self,
         experiment_id: str,
@@ -373,10 +455,10 @@ class ResearchLedger:
                 f"no credit was spent for experiment '{experiment_id}' against "
                 f"period '{period}'; a result cannot exist without an evaluation"
             )
-        if experiment_id in self.results():
+        if self.result_for(experiment_id, period) is not None:
             raise LedgerError(
-                f"a result for '{experiment_id}' is already recorded and cannot be "
-                f"overwritten (directive section 34.14)"
+                f"a result for '{experiment_id}' against period '{period}' is "
+                f"already recorded and cannot be overwritten (directive 34.14)"
             )
 
         return self._append(
@@ -401,7 +483,9 @@ class ResearchLedger:
     def holm(self, alpha: float) -> dict[str, bool]:
         """Retrospective Holm over the recorded family. Never an authorisation."""
         p_values = {
-            eid: r["p_value"] for eid, r in self.results().items() if r["p_value"] is not None
+            eid: r["p_value"]
+            for eid, r in self.holdout_results().items()
+            if r["p_value"] is not None
         }
         return holm_rejections(p_values, alpha)
 
@@ -419,7 +503,7 @@ class ResearchLedger:
 
         experiments = []
         for entry in self._spends():
-            result = results.get(entry.experiment_id, {})
+            result = results.get((entry.experiment_id, entry.period), {})
             p = result.get("p_value")
             experiments.append(
                 {

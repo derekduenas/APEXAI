@@ -28,9 +28,11 @@ import json
 import pytest
 
 from apex.governance.ledger import (
+    AlreadyEvaluated,
     BudgetExhausted,
     LedgerTampered,
     ResearchLedger,
+    ValidationNotPassed,
     holm_rejections,
     required_tstat,
 )
@@ -41,7 +43,19 @@ def ledger(tmp_path):
     return ResearchLedger(path=tmp_path / "research_ledger.jsonl", budget=5)
 
 
-def _spend(ledger, experiment_id, period="holdout", **kw):
+def _qualify(ledger, experiment_id):
+    """Run an experiment's validation pass and record a PASS.
+
+    Protocol section 7 requires this before the holdout may be opened, so any
+    test about holdout mechanics has to get here first.
+    """
+    _spend(ledger, experiment_id, period="validation")
+    ledger.record_result(
+        experiment_id, "validation", p_value=0.001, t_stat=3.2, verdict="PASS"
+    )
+
+
+def _spend(ledger, experiment_id, period="validation", **kw):
     return ledger.spend(
         experiment_id=experiment_id,
         hypothesis=kw.get("hypothesis", f"{experiment_id}: a fixed composite ranks forward returns"),
@@ -70,7 +84,7 @@ def test_spending_a_credit_decrements_the_budget(ledger):
     assert ledger.credits_remaining() == 4
 
 
-def test_budget_is_exhausted_after_five_holdout_evaluations(ledger):
+def test_budget_is_exhausted_after_five_experiments(ledger):
     for i in range(5):
         _spend(ledger, f"APEX-{i:03d}")
 
@@ -215,13 +229,89 @@ def test_truncation_does_not_refund_a_credit(ledger, tmp_path):
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# VALIDATION MUST PRECEDE THE HOLDOUT (protocol section 7, ruling A-003)
+# ---------------------------------------------------------------------------
+
+
+def test_the_holdout_cannot_be_opened_before_validation_has_run(ledger):
+    """Section 7: "The holdout is not opened until validation has passed."
+
+    Every experiment gets its own validation pass and then one -- and only one --
+    holdout evaluation. Skipping straight to the holdout would spend the single
+    irreplaceable look on a hypothesis nothing has screened.
+    """
+    with pytest.raises(ValidationNotPassed) as excinfo:
+        _spend(ledger, "APEX-001", period="holdout")
+
+    assert "validation" in str(excinfo.value).lower()
+    assert ledger.credits_spent() == 0, "a refused holdout must not consume a credit"
+
+
+def test_the_holdout_cannot_be_opened_after_validation_failed(ledger):
+    """Section 7: "If validation fails, the holdout remains untouched."""
+    _spend(ledger, "APEX-001", period="validation")
+    ledger.record_result("APEX-001", "validation", p_value=0.40, t_stat=0.8, verdict="FAIL")
+
+    with pytest.raises(ValidationNotPassed):
+        _spend(ledger, "APEX-001", period="holdout")
+
+
+def test_an_inconclusive_validation_does_not_unlock_the_holdout(ledger):
+    """Section 10 routes INCONCLUSIVE to "no further capital or effort"."""
+    _spend(ledger, "APEX-001", period="validation")
+    ledger.record_result(
+        "APEX-001", "validation", p_value=0.06, t_stat=1.9, verdict="INCONCLUSIVE"
+    )
+
+    with pytest.raises(ValidationNotPassed):
+        _spend(ledger, "APEX-001", period="holdout")
+
+
+def test_validation_started_but_never_recorded_does_not_unlock_the_holdout(ledger):
+    """Spending the validation credit is not the same as passing validation."""
+    _spend(ledger, "APEX-001", period="validation")
+
+    with pytest.raises(ValidationNotPassed) as excinfo:
+        _spend(ledger, "APEX-001", period="holdout")
+    assert "no result" in str(excinfo.value).lower()
+
+
+def test_a_passing_validation_unlocks_the_holdout_once(ledger):
+    _spend(ledger, "APEX-001", period="validation")
+    ledger.record_result("APEX-001", "validation", p_value=0.002, t_stat=3.1, verdict="PASS")
+
+    _spend(ledger, "APEX-001", period="holdout")
+
+    # ONE credit, not two: the budget counts experiments, and this is one
+    # hypothesis walking its own pre-registered path (CONVENTIONS A-003).
+    assert ledger.credits_spent() == 1
+    with pytest.raises(AlreadyEvaluated):
+        _spend(ledger, "APEX-001", period="holdout")
+
+
+def test_another_experiments_validation_does_not_unlock_this_one(ledger):
+    """The gate is per experiment. Borrowing a sibling's pass is not a pass."""
+    _spend(ledger, "APEX-001", period="validation")
+    ledger.record_result("APEX-001", "validation", p_value=0.001, t_stat=3.4, verdict="PASS")
+
+    with pytest.raises(ValidationNotPassed):
+        _spend(ledger, "APEX-002", period="holdout")
+
+
+def test_validation_itself_needs_no_precondition(ledger):
+    _spend(ledger, "APEX-001", period="validation")
+    assert ledger.credits_spent() == 1
+
+
 def test_a_result_is_recorded_against_its_spend(ledger):
-    _spend(ledger, "APEX-001")
+    _qualify(ledger, "APEX-001")
+    _spend(ledger, "APEX-001", period="holdout")
     ledger.record_result("APEX-001", "holdout", p_value=0.004, t_stat=2.71, verdict="PASS")
 
     results = ledger.results()
-    assert results["APEX-001"]["p_value"] == 0.004
-    assert results["APEX-001"]["verdict"] == "PASS"
+    assert results[("APEX-001", "holdout")]["p_value"] == 0.004
+    assert results[("APEX-001", "holdout")]["verdict"] == "PASS"
 
 
 def test_a_result_cannot_be_recorded_without_spending_a_credit(ledger):
@@ -231,11 +321,11 @@ def test_a_result_cannot_be_recorded_without_spending_a_credit(ledger):
 
 def test_a_result_cannot_be_overwritten(ledger):
     """Directive section 34.14: no changing thresholds -- or numbers -- after results."""
-    _spend(ledger, "APEX-001")
-    ledger.record_result("APEX-001", "holdout", p_value=0.30, t_stat=1.0, verdict="FAIL")
+    _spend(ledger, "APEX-001", period="validation")
+    ledger.record_result("APEX-001", "validation", p_value=0.30, t_stat=1.0, verdict="FAIL")
 
     with pytest.raises(Exception):
-        ledger.record_result("APEX-001", "holdout", p_value=0.004, t_stat=2.9, verdict="PASS")
+        ledger.record_result("APEX-001", "validation", p_value=0.004, t_stat=2.9, verdict="PASS")
 
 
 def test_sequential_threshold_is_bonferroni_over_the_whole_budget(ledger):
@@ -287,7 +377,8 @@ def test_holm_stops_at_the_first_failure():
 
 def test_holm_on_the_recorded_family(ledger):
     for i, p in enumerate([0.002, 0.30, 0.9]):
-        _spend(ledger, f"APEX-{i:03d}")
+        _qualify(ledger, f"APEX-{i:03d}")
+        _spend(ledger, f"APEX-{i:03d}", period="holdout")
         ledger.record_result(f"APEX-{i:03d}", "holdout", p_value=p, t_stat=1.0, verdict="X")
 
     verdicts = ledger.holm(alpha=0.05)
@@ -330,7 +421,8 @@ def test_required_tstat_under_the_budget_exceeds_the_preregistered_hurdle():
 
 
 def test_budget_report_states_every_number_a_reviewer_needs(ledger):
-    _spend(ledger, "APEX-001")
+    _qualify(ledger, "APEX-001")
+    _spend(ledger, "APEX-001", period="holdout")
     ledger.record_result("APEX-001", "holdout", p_value=0.004, t_stat=2.71, verdict="PASS")
 
     report = ledger.report(family_alpha=0.05)

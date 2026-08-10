@@ -1,0 +1,89 @@
+name: APEX research integrity
+
+# The lookahead auditor, the null rig and the holdout guards are only worth
+# anything if they run on every change. Locally they can be skipped; here they
+# cannot.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . pytest
+
+      # --- gates that must hold before any test result is meaningful --------
+
+      - name: Pre-registration is intact
+        run: |
+          python - <<'PY'
+          from apex.config import load_config
+          from apex.registration import protocol_pin_status, signature_status
+
+          config = load_config("experiment", "costs", "synthetic")
+
+          pin = protocol_pin_status(config)
+          assert pin["matches"], (
+              f"the protocol no longer hashes to the value CONVENTIONS pins.\n"
+              f"  pinned: {pin['pinned_hash']}\n"
+              f"  actual: {pin['actual_hash']}\n"
+              f"  The pre-registration was modified after freezing."
+          )
+          print(f"protocol pin OK: {pin['actual_hash'][:16]}")
+
+          # Reported, not enforced: signing is a deliberate act, and CI must not
+          # be the thing that notices it happened.
+          print(f"pre-registration signed: {signature_status(config)['signed']}")
+          PY
+
+      - name: The holdout has not been opened
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          from apex.config import load_config
+          from apex.governance.ledger import ResearchLedger
+
+          config = load_config("experiment", "costs", "synthetic")
+          path = Path(config.get("governance.ledger_file"))
+
+          if not path.exists():
+              print("no research ledger yet -- no credit has ever been spent")
+              raise SystemExit(0)
+
+          ledger = ResearchLedger(path, budget=int(config.get("governance.research_budget")))
+          ledger.verify_chain()   # raises if an entry was edited, deleted or truncated
+
+          report = ledger.report(family_alpha=float(config.get("governance.family_alpha")))
+          print(f"ledger chain verified; {report['credits_spent']}/{report['budget']} credits spent")
+          for row in report["experiments"]:
+              print(f"  {row['experiment_id']:<12} {row['period']:<11} {row['verdict'] or '(open)'}")
+          PY
+
+      # --- the suite --------------------------------------------------------
+
+      - name: Lookahead auditor
+        run: pytest tests/test_lookahead_audit.py -v
+
+      - name: Holdout protection and research governance
+        run: pytest tests/test_registration.py tests/test_research_ledger.py tests/test_verdict.py -v
+
+      - name: Point-in-time universe, timing and vendor adapters
+        run: pytest tests/test_universe_pit.py tests/test_returns_timing.py tests/test_sharadar.py tests/test_identity.py tests/test_crosscheck.py -v
+
+      - name: Full suite including the slow null-rig merge gate
+        run: pytest -q -ra

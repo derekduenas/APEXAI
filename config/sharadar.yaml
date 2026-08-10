@@ -1,0 +1,72 @@
+# Sharadar snapshot adapter -- PRIMARY and AUTHORITATIVE (CONVENTIONS A-002).
+#
+# Every schema assumption this adapter makes is declared here and VALIDATED on
+# load. The adapter was written without live vendor access, so a snapshot that
+# does not match must produce a loud, specific error -- never quietly wrong
+# numbers. If a column name or a unit below turns out to be wrong for the real
+# export, the fix is one line here plus a note in the CONVENTIONS amendment log.
+
+sharadar:
+  # Tables required in the frozen bulk export. A missing table is an error.
+  required_tables:
+    TICKERS.csv:
+      - permaticker      # STABLE surrogate key -- the security_id. Never the ticker.
+      - ticker
+      - exchange
+      - isdelisted
+      - category
+      - sector
+      - firstpricedate   # the window in which THIS company held THIS ticker
+      - lastpricedate
+    SEP.csv:
+      - ticker
+      - date
+      - high
+      - low
+      - close
+      - volume
+      - closeadj         # split + dividend adjusted -> RATIO quantities
+      - closeunadj       # as printed -> LEVEL quantities ($5 filter, market cap)
+    DAILY.csv:
+      - ticker
+      - date
+      - marketcap        # point-in-time, in the units declared below
+    ACTIONS.csv:
+      - date
+      - action
+      - ticker
+      - contraticker     # populated on M&A; the acquirer
+
+  # DAILY.marketcap is understood to be denominated in USD MILLIONS.
+  # This is an ASSUMPTION and is sanity-checked on every load: if the median
+  # market cap of the snapshot falls outside the plausible band below, the load
+  # FAILS rather than silently admitting nobody to a $1B universe.
+  marketcap_scale: 1000000.0
+  marketcap_sanity_min_usd: 10000000.0        # $10m
+  marketcap_sanity_max_usd: 10000000000000.0  # $10t
+
+  # C4: the S&P 500 TOTAL RETURN basis. SPXTR is not in Sharadar, so SPY's
+  # dividend-adjusted close is the total-return proxy the ruling permits.
+  benchmark_ticker: SPY
+  # B5 regime reporting only; not an input to any pass/fail criterion.
+  vol_index_file: VIX.csv
+
+  # TICKERS.category -> the security_type the section 3 filter consumes.
+  # Anything not listed here is typed 'other' and excluded by the universe
+  # filter. Unlisted is EXCLUDED, never admitted by default.
+  common_categories:
+    - Domestic Common Stock
+    - Domestic Common Stock Primary Class
+    - Domestic Common Stock Secondary Class
+
+  # ACTIONS.action values that affirmatively identify a non-performance exit.
+  # CONVENTIONS section 1 item 1: anything NOT affirmatively M&A or voluntary is
+  # treated as performance-related and takes the -30% Shumway haircut.
+  merger_actions:
+    - merger
+    - acquisition
+    - voluntary
+    - tenderoffer
+  # A populated contraticker means an acquirer exists, which is M&A evidence
+  # even when the action label itself is generic.
+  contraticker_implies_merger: true

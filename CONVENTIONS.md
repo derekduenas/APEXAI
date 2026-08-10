@@ -14,6 +14,16 @@ This document resolves every specification gap identified in the Stage-0 review.
 
 ## 1. Data Vendor (resolves A1, A2)
 
+> **Amended 2026-08-09 (A-002). See §7.** Sharadar is confirmed **primary and
+> authoritative for every universe filter**. Norgate is admitted as an
+> **optional secondary source for prices and cross-checking only**, and may
+> never be authoritative for a universe filter, for shares outstanding, for
+> market capitalisation, or for security identity. Where the two disagree on a
+> price, Sharadar governs and the disagreement is reported. A security-date that
+> cannot be established point-in-time from Sharadar is **excluded and reported** —
+> never filled from Norgate, from today's shares, from today's market cap, from
+> a current ticker mapping, or from a later-revised fundamental.
+
 **Primary source: Sharadar, via Nasdaq Data Link.**
 
 | Table | Use |
@@ -114,4 +124,6 @@ Both the protocol and this document are committed and SHA-256 pinned before the 
 
 | Date | Item | Change | Reason | Before/after results |
 |---|---|---|---|---|
-| | | | | |
+| 2026-08-09 | A-001 — §2 B2, evaluation | None to the protocol or to this document. Recorded for completeness: the pre-registered Newey-West Bartlett lag-25 estimator was measured to be over-dispersed on the MA(19) autocorrelation that overlapping 20-day windows produce (Bartlett weight at lag 19 is 0.27, discarding ~73% of the relevant autocovariance). sd(t) ≈ 1.21 and the pre-registered `t ≥ 2.5` hurdle carries a **true one-sided size of ~1.9%** against 0.621% nominal. **The protocol is NOT amended**: Bartlett-25 and t ≥ 2.5 both stand exactly as written. The true size is a **disclosed property** reported with every result, and a simulation-calibrated reference distribution is used for **test-harness calibration and for interpretation only** — never as a pass/fail criterion. | Ruling: do not repair a pre-registered statistic after measuring its properties. Disclosure preserves both integrity and interpretability; retroactive correction would destroy the first to buy the second. | **BEFORE** any result. Holdout unopened; validation unopened. |
+| 2026-08-09 | A-002 — §1, data vendor | Sharadar **confirmed primary and authoritative for all universe filters**. Norgate admitted as **optional secondary for prices and cross-check only**, never authoritative for a universe filter, shares outstanding, market cap, or identity. An earlier working design that made Norgate the identity spine is **withdrawn**. | Point-in-time market cap is non-negotiable for §3's ≥$1B filter, and Norgate does not supply it. A clean PIT implementation outranks convenience or prior preference. | **BEFORE** any result and before any data load. |
+| 2026-08-09 | A-003 — §7 holdout usage | Clarification, not a change. Protocol §7 stands: **one holdout evaluation per experiment, never reused.** The "five" figure is a budget of **five separate pre-registered experiments**, each with its own validation pass and one and only one holdout evaluation. There is **no shared holdout reuse across hypotheses.** Family-wise error inflation across the programme is tracked in the research ledger, not absorbed by re-looking at the same holdout. | Separates experiment validity (governed by the protocol) from programme-level inference (governed by the ledger). | **BEFORE** any result. |

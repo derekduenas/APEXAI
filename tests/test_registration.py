@@ -70,6 +70,32 @@ def _sign(repo, config):
         path.write_text(text, encoding="utf-8")
 
 
+def _pass_validation(repo, config, experiment_id=None):
+    """Seed the ledger with a PASSING validation for this experiment.
+
+    Protocol section 7 gates the holdout on it, so every holdout test here has
+    to establish it first.
+    """
+    from apex.governance.ledger import ResearchLedger
+
+    ledger = ResearchLedger(
+        repo / config.get("governance.ledger_file"),
+        budget=int(config.get("governance.research_budget")),
+    )
+    eid = experiment_id or config.get("experiment.id")
+    ledger.spend(
+        experiment_id=eid,
+        hypothesis="validation pass",
+        period="validation",
+        config_hash="c" * 64,
+        protocol_hash="p" * 64,
+        conventions_hash="v" * 64,
+        git_sha="abc",
+        reason="validation",
+    )
+    ledger.record_result(eid, "validation", p_value=0.001, t_stat=3.2, verdict="PASS")
+
+
 def _unlock_token(repo, period, reason="pre-registered confirmatory evaluation"):
     directory = repo / "results" / "_unlocks"
     directory.mkdir(parents=True, exist_ok=True)
@@ -166,6 +192,7 @@ def test_the_holdout_refuses_to_open_without_a_hand_made_token(repo, config):
 
 
 def test_the_holdout_opens_once_with_a_token_and_spends_a_credit(repo, config):
+    _pass_validation(repo, config)
     _unlock_token(repo, "holdout")
 
     require_unlocked(config, "holdout", repo_root=repo)
@@ -173,13 +200,15 @@ def test_the_holdout_opens_once_with_a_token_and_spends_a_credit(repo, config):
     ledger = ResearchLedger(repo / config.get("governance.ledger_file"), budget=5)
     assert ledger.credits_spent() == 1
     assert ledger.credits_remaining() == 4
-    entry = ledger.entries()[0]
+    holdout_entries = [e for e in ledger.entries() if e.period == "holdout"]
+    assert len(holdout_entries) == 1
+    entry = holdout_entries[0]
     assert entry.experiment_id == config.get("experiment.id")
-    assert entry.period == "holdout"
     assert entry.protocol_hash and entry.conventions_hash
 
 
 def test_the_same_experiment_cannot_reopen_the_holdout(repo, config):
+    _pass_validation(repo, config)
     _unlock_token(repo, "holdout")
     require_unlocked(config, "holdout", repo_root=repo)
 
@@ -189,6 +218,7 @@ def test_the_same_experiment_cannot_reopen_the_holdout(repo, config):
 
 def test_deleting_the_token_does_not_restore_the_credit(repo, config):
     """The token is a deliberate act, not the accounting. The ledger is."""
+    _pass_validation(repo, config)
     _unlock_token(repo, "holdout")
     require_unlocked(config, "holdout", repo_root=repo)
     (repo / "results" / "_unlocks" / "holdout.unlock").unlink()
@@ -198,36 +228,51 @@ def test_deleting_the_token_does_not_restore_the_credit(repo, config):
         require_unlocked(config, "holdout", repo_root=repo)
 
 
-def test_validation_and_holdout_are_separately_budgeted(repo, config):
+def test_one_experiment_costs_one_credit_across_both_its_periods(repo, config):
+    """CONVENTIONS A-003: the budget counts EXPERIMENTS, not evaluations.
+
+    One hypothesis taken along its own pre-registered path -- validation then a
+    single holdout look -- is one draw on the programme's credibility, not two.
+    """
     _unlock_token(repo, "validation")
     _unlock_token(repo, "holdout")
 
     require_unlocked(config, "validation", repo_root=repo)
+    ledger = ResearchLedger(repo / config.get("governance.ledger_file"), budget=5)
+    ledger.record_result(
+        config.get("experiment.id"), "validation", p_value=0.001, t_stat=3.2, verdict="PASS"
+    )
     require_unlocked(config, "holdout", repo_root=repo)
 
-    ledger = ResearchLedger(repo / config.get("governance.ledger_file"), budget=5)
-    assert ledger.credits_spent() == 2
+    reloaded = ResearchLedger(repo / config.get("governance.ledger_file"), budget=5)
+    assert reloaded.credits_spent() == 1
 
 
 def test_the_budget_runs_out(repo, config):
-    """Five lifetime confirmatory evaluations, then nothing."""
+    """Five lifetime pre-registered experiments, then nothing.
+
+    The sixth experiment cannot even begin its validation pass, which is the
+    right place to stop it: refusing only at the holdout would let a sixth
+    hypothesis consume real effort before discovering it can never be confirmed.
+    """
     ledger_path = repo / config.get("governance.ledger_file")
     ledger = ResearchLedger(ledger_path, budget=int(config.get("governance.research_budget")))
     for i in range(5):
         ledger.spend(
             experiment_id=f"PRIOR-{i:03d}",
             hypothesis="prior experiment",
-            period="holdout",
+            period="validation",
             config_hash="c" * 64,
             protocol_hash="p" * 64,
             conventions_hash="v" * 64,
             git_sha="abc",
             reason="historical",
         )
-    _unlock_token(repo, "holdout")
+    _unlock_token(repo, "validation")
 
+    # APEX-001 would be the sixth experiment.
     with pytest.raises(BudgetExhausted):
-        require_unlocked(config, "holdout", repo_root=repo)
+        require_unlocked(config, "validation", repo_root=repo)
 
 
 def test_a_tampered_ledger_blocks_the_holdout(repo, config):
@@ -238,7 +283,7 @@ def test_a_tampered_ledger_blocks_the_holdout(repo, config):
         ledger.spend(
             experiment_id=f"PRIOR-{i:03d}",
             hypothesis="prior",
-            period="holdout",
+            period="validation",
             config_hash="c" * 64,
             protocol_hash="p" * 64,
             conventions_hash="v" * 64,
