@@ -53,6 +53,10 @@ def main() -> int:
         help="required for --fetch; acknowledges the estimated download volume",
     )
     parser.add_argument("--root", type=Path, default=Path("data/snapshots/sharadar"))
+    parser.add_argument(
+        "--no-wait", action="store_true",
+        help="do not back off and retry on HTTP 429 (answer now, even if throttled)",
+    )
     args = parser.parse_args()
 
     config = load_config("experiment", "costs", "synthetic", "sharadar")
@@ -67,11 +71,22 @@ def main() -> int:
 
     print(f"probing entitlement for {list(REQUIRED_TABLES)} ...", flush=True)
     try:
-        report = client.require_entitled(REQUIRED_TABLES)
+        report = client.require_entitled(
+            REQUIRED_TABLES, retry_on_429=not args.no_wait
+        )
     except (NotEntitled, RateLimited) as exc:
+        throttled = isinstance(exc, RateLimited)
         print("\nDATA ACCESS RESULT")
-        print(f"Status: BLOCKED")
+        print("Status: BLOCKED")
         print(exc)
+        if throttled:
+            print(
+                "\n  IMPORTANT: HTTP 429 is an ACCOUNT STATE, not an entitlement\n"
+                "  verdict. Whether this subscription includes Sharadar is UNKNOWN\n"
+                "  and remains unknown until the account answers. Do not buy a\n"
+                "  subscription, and do not conclude the free tier is insufficient,\n"
+                "  on the strength of this."
+            )
         print("\nResearch credit consumed: 0")
         print("Holdout opened: No")
         return 3
