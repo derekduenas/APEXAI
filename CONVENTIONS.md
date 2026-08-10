@@ -1,0 +1,117 @@
+# CONVENTIONS.md
+## Binding Resolutions — APEX Research Protocol v1.0, Experiment #001
+
+**Status:** Signed / frozen
+**Date:** 2026-08-07
+**Author:** _______________
+**Governs:** `APEX-Research-Protocol-v1.0-Experiment-001.md`, SHA-256 `a569c718b39b9cacc8d799060117668ccf24db01b5c109b9ec27e916f5de2248`
+
+This document resolves every specification gap identified in the Stage-0 review. It has the same force as the protocol itself. Nothing here may change after data is first loaded, except by dated amendment recorded in §7 below.
+
+**No amendment to the protocol is required.** The vendor decision below allows §3 and §4 to execute as originally written. This document specifies; it does not modify.
+
+---
+
+## 1. Data Vendor (resolves A1, A2)
+
+**Primary source: Sharadar, via Nasdaq Data Link.**
+
+| Table | Use |
+|---|---|
+| `SEP` | Daily OHLCV, unadjusted and adjusted, survivorship-free incl. delisted |
+| `DAILY` | Point-in-time market capitalization at each date |
+| `TICKERS` | Security metadata, exchange, security type, sector, `isdelisted`, first/last price date |
+| `ACTIONS` | Splits, dividends, delisting and corporate-action events |
+
+`SF1` (fundamentals) is **not** used. Experiment #001 has no fundamental features, and pulling it now creates the temptation to peek.
+
+Rationale: Sharadar supplies survivorship-free point-in-time market cap, which Norgate does not, allowing §3's ≥$1B filter and §4's "shares outstanding as known at formation date" to execute literally. It is a plain HTTP/CSV API, which also resolves A2 — no Windows VM, no Norgate Data Updater.
+
+**Two items to verify empirically before Stage 4 begins, and to report the findings of:**
+
+1. **Delisting reason coverage.** §3's −30% convention applies only to *performance-related* delistings; M&A delistings use the final traded price. Confirm whether `ACTIONS` and `TICKERS` together permit a reliable performance-vs-M&A classification. If they do not, the fallback rule is: **treat any delisting not affirmatively identifiable as M&A or voluntary as performance-related** and apply −30%. This is the conservative direction and is hereby pre-registered as the fallback.
+2. **Sector taxonomy.** Sharadar's `TICKERS.sector` is its own classification scheme, not GICS. C3 below is amended accordingly. Confirm bucket count and stability.
+
+---
+
+## 2. Rulings on Blocking Ambiguities (B1–B6)
+
+**B1 — F3 sign convention.** **Both components are negated.** Lower ATR(14)÷Close is hypothesized favorable, as is a lower 20d/100d volatility ratio. F3 is therefore a low-volatility category, and this is accepted rather than worked around. Rationale: the low-volatility anomaly is well documented and directionally consistent with the compression hypothesis; leaving ATR un-negated would cause the two components to partially cancel and contribute noise.
+
+**B2 — IC sampling.** Confirmed as read. **Daily cross-sectional IC is the primary test**, with Newey-West HAC standard errors at lag 25. **Every-20th-trading-day is the non-overlapping robustness subset and the portfolio rebalance schedule.** The two are distinct tests with distinct N.
+
+**B3 — F4 skip.** **F4 applies the same 5-trading-day skip as F1.** Rationale: without it, F4 absorbs short-term reversal in the opposite direction from F1 and the two partially cancel.
+
+*Consequence, logged and accepted:* with the skip applied, F1b (63-day excess vs. universe) and F4b (63-day vs. S&P 500) become near-duplicates, differing only in benchmark. This is a genuine weakness in the pre-registered feature set. It is **implemented as specified and not corrected.** Feature-set redundancy is a candidate hypothesis for a future experiment, not a mid-flight repair.
+
+**B4 — Delisting return compounding.** **Reading (b), the Shumway (1997) convention:**
+
+```
+R = (P_last / P_entry) × 0.70 − 1
+```
+
+The −30% is applied to the terminal value on top of the realized partial-period return, not as the total window return.
+
+**B5 — Regime definitions.** Defined blind, before any results exist:
+
+- **Bull / Bear:** S&P 500 close at the formation date above / below its 200-day simple moving average
+- **High-volatility:** VIX close at the formation date in the **top tercile of its trailing 1,260-trading-day distribution**
+
+The trailing window is mandatory. A full-sample percentile would be lookahead and would silently contaminate every regime-conditioned result.
+
+**B6 — Sector-exclusion attribution.** **Full re-rank.** Remove the sector from the universe at each formation date and recompute winsorization, cross-sectional z-scores, category scores, ranking, and deciles from scratch. Removing names from the P&L while holding the original ranking fixed is the weaker test and is not what §9 requires.
+
+---
+
+## 3. Conventions (C1–C11)
+
+Approved as proposed, with **C3 and C4 amended**:
+
+| # | Convention |
+|---|---|
+| C1 | F1's universe benchmark = cross-sectional **mean** of individual window returns, over the eligible universe as constituted at T (fixed membership, measured backwards) |
+| C2 | F4a sector benchmark **excludes self**; requires ≥10 eligible names in the sector, else the security is excluded at that date |
+| C3 | **AMENDED:** Sector taxonomy = **Sharadar `TICKERS.sector`**, not GICS. Non-point-in-time contamination disclosed per §4 of the protocol. Bucket count reported. |
+| C4 | **AMENDED:** F4b benchmark = **S&P 500 total return** (SPXTR, or SPY total return if unavailable) — **not** the price index. Rationale: F1 and the securities' own returns are total-return based; subtracting a price-return benchmark would build in a systematic tilt toward high-dividend names. Both sides of every comparison must use the same return basis. |
+| C5 | Realized volatility = standard deviation of **daily log returns**, `ddof=1`, not annualized (cancels in the ratio) |
+| C6 | ATR(14) = **Wilder's smoothing**, standard true range |
+| C7 | Data lake loads from 2004-01-01; first formation date 2005-01-03. §9's "200 trading days after start of available data" refers to the **data lake**, not the in-sample period |
+| C8 | Costs = 10 bps per side applied to **realized one-way turnover**, on **both legs** of the spread |
+| C9 | Annualization = **geometric**, 12.6 periods/year |
+| C10 | Deciles = equal-count by rank, `method='first'` on ties, after a deterministic secondary sort on `security_id` |
+| C11 | Excess-return median computed over the **post-filter, post-missing-data eligible** universe at T |
+
+---
+
+## 4. Observations Acknowledged, Implemented As Written
+
+Recorded so that none is later mistaken for a bug or used as post-hoc justification.
+
+1. **The true cost hurdle.** 20 bps round trip at full turnover is ~2.5% annualized per leg; the decile spread carries two legs, so ~5% at 1× and ~10% at 2×. §10's PASS criteria therefore require roughly **9% gross annualized spread at 1×** and **~12% gross** to clear the 2× fragility check. Realized turnover below 100% lowers this — a realistic hurdle is **7–8% gross**. This is a demanding bar for a four-factor price composite, and it is acknowledged **before** results exist.
+2. **−30% understates NASDAQ delistings.** Shumway (1997) estimates ~−30% for NYSE/AMEX; Shumway & Warther (1999) estimate roughly −55% for NASDAQ. The protocol specifies a flat −30%. Implemented as written; the direction of the resulting bias (understating losses on NASDAQ delistings, i.e. flattering results) is disclosed with every result.
+3. **Category equal-weighting is not equal risk-weighting.** The variance of a two-z-score average depends on the correlation between its components, so F1 (two highly correlated momentum windows) receives more effective weight than 0.25. Implemented literally as specified.
+4. **Adjustment factors and level filters.** Cumulative split/dividend adjustment factors do not create lookahead in *returns* (the factor cancels in any within-window ratio) but do in *level* quantities. The $5 price filter and the $1B market cap filter must therefore use **as-of-date unadjusted** prices. The lookahead auditor enforces this specifically.
+
+---
+
+## 5. Expected Outcome, Stated Before Results
+
+The most probable outcome of Experiment #001 is **INCONCLUSIVE** — a small but real information coefficient, with a decile spread insufficient to clear the cost hurdle in §4.1 above.
+
+This is recorded now so that, if it happens, the §10 routing is followed rather than relitigated. **The cost model in §8 is not reopened after results are seen.** Any argument that costs were set too conservatively, made after the numbers are visible, is motivated reasoning and is pre-emptively rejected here.
+
+---
+
+## 6. Repository
+
+`~/apex-equities`. `~/apex` is an unrelated project and is not to be modified.
+
+Both the protocol and this document are committed and SHA-256 pinned before the first data load. The pinned hashes are recorded in the header of each results run.
+
+---
+
+## 7. Amendment Log
+
+| Date | Item | Change | Reason | Before/after results |
+|---|---|---|---|---|
+| | | | | |

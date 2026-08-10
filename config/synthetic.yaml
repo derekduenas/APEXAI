@@ -1,0 +1,127 @@
+# Stage 1 synthetic panel generator.
+#
+# This panel is a NULL WORLD by construction: every security shares the same
+# log-drift, so no cross-sectional feature can predict forward returns. Only
+# volatility is heterogeneous, which gives F3 something to rank without creating
+# rank-predictability -- the median of a lognormal is exp(nu), independent of
+# sigma, so P(R > median) = 0.5 for every security whatever its vol.
+#
+# That property is load-bearing. Do NOT add cross-sectionally persistent drift
+# here: a per-security mu would make past return predict future return and the
+# null test would fail for a reason that has nothing to do with the pipeline.
+
+panel:
+  n_securities: 600
+  start: "2004-01-01"
+  end: "2012-12-31"
+
+returns:
+  annual_log_drift: 0.05          # shared by every security -- the null property
+  trading_days_per_year: 252
+  annual_vol_min: 0.15            # heterogeneous, constant per security
+  annual_vol_max: 0.75
+
+prices:
+  initial_price_min: 3.0
+  initial_price_max: 400.0
+  intraday_range_multiple: 1.6    # High/Low spread as a multiple of daily vol
+
+market_cap:
+  # Drawn log-uniform, then shares_out is implied by price. Spans the protocol
+  # section 3 $1B threshold in both directions so the filter actually bites.
+  initial_min_usd: 150000000.0
+  initial_max_usd: 500000000000.0
+  annual_share_drift_sd: 0.03     # buybacks / issuance
+
+liquidity:
+  # Dollar volume as a turnover fraction of market cap, so the $10M ADDV filter
+  # correlates with size the way it does in real data.
+  daily_turnover_min: 0.0015
+  daily_turnover_max: 0.02
+  noise_log_sd: 0.45
+
+corporate_actions:
+  split_annual_prob: 0.04
+  split_ratios: [2.0, 3.0, 1.5, 0.1]   # 0.1 == a 1-for-10 reverse split
+  dividend_payer_fraction: 0.45
+  dividend_quarterly_yield: 0.005
+  dividend_period_days: 63
+
+listing:
+  late_listing_fraction: 0.18     # IPOs, so the 252-day history filter bites
+  delist_fraction: 0.22           # so survivorship handling is exercised
+  delist_reason_weights:
+    merger: 0.45
+    bankruptcy: 0.25
+    rule_violation: 0.10
+    voluntary: 0.10
+    unknown: 0.10
+
+missing_bars:
+  # Halts, so the no-forward-fill rule is exercised. Kept low: a $1B+ name with
+  # $10M ADDV rarely halts, and F2/F3 require COMPLETE windows, so an inflated
+  # halt rate would silently shrink the cross-section for a reason that has
+  # nothing to do with the protocol.
+  daily_prob: 0.0003
+
+security_types:
+  # Non-common types are emitted so the exclusion path is exercised, not assumed.
+  common: 0.80
+  etf: 0.07
+  reit: 0.06
+  adr: 0.04
+  spac: 0.03
+
+exchanges:
+  NYSE: 0.42
+  NASDAQ: 0.45
+  NYSEAMERICAN: 0.08
+  OTC: 0.05                       # excluded by the section 3 exchange filter
+
+sectors:
+  n_sectors: 11
+  tiny_sector_size: 6             # exercises the C2 >=10-names sector rule
+
+benchmark:
+  vix_window: 20
+  vix_scale: 100.0
+
+positive_control:
+  # The counterpart to the null. A rig that reports IC ~ 0 because the pipeline
+  # is DEAD passes a null test just as happily as a correct one. This injects
+  # known momentum predictability and asserts the pipeline recovers it, and that
+  # recovery scales with the injected size.
+  signal_window: 126
+  signal_skip: 5
+  alpha_levels: [0.0, 0.0006, 0.0018]
+
+null_rig:
+  # Compact panels for the Stage 2 calibration sweep: many independent worlds
+  # matter more than one long one.
+  n_seeds: 40
+  n_seeds_fast: 8
+  n_securities: 400
+  start: "2004-01-01"
+  end: "2007-06-30"
+  base_seed: 90210
+  # Fewer sectors than the 11 a real taxonomy carries. C2 requires >=10 eligible
+  # names in a sector; a compact panel yields ~130 eligible names, which across
+  # 11 sectors would leave ~12 per sector and make the sector rule -- not the
+  # null -- the thing under test. Fewer, larger sectors preserve the structure
+  # being exercised (leave-one-out benchmark plus a minimum-count gate) at a
+  # scale where it functions. Full-size panels keep the realistic 11.
+  n_sectors: 5
+
+  # Assertion thresholds. Deliberately SELF-CALIBRATING rather than hardcoded
+  # bands: the grand-mean test uses the observed dispersion across seeds, so it
+  # cannot be loosened by quietly widening a constant until the suite goes
+  # green.
+  z_threshold: 3.0              # grand mean IC must sit within 3 standard errors of 0
+  max_tstat_dispersion: 2.0     # sd of NW t-stats; >1 means the HAC lag under-corrects
+  max_rejection_rate: 0.25      # vs 0.05 expected; catches gross miscalibration
+  single_panel_max_abs_t: 2.5   # the protocol's own H1 threshold, on a random walk
+  # The decile spread is tested for SIGNIFICANCE, not magnitude. A ~150-name
+  # panel puts ~15 names in a decile, so a single seed's annualised spread is
+  # extremely noisy; a fixed magnitude band would fail honest seeds and pass a
+  # rigged one with low variance.
+  single_panel_max_abs_spread_t: 2.5

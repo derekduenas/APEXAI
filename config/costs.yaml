@@ -1,0 +1,22 @@
+# Cost model — protocol section 8, C8.
+# Never hardcoded in the code body. `2x` is the section 8 sensitivity profile.
+#
+# Applied as: cost_bps_per_side * realised one-way turnover, on BOTH legs of the
+# decile spread (C8). Commission is zero per section 8 but stays a parameter so
+# the sensitivity surface can move it without a code change.
+
+default_profile: "1x"
+
+profiles:
+  "1x":
+    commission_bps: 0.0
+    half_spread_bps: 5.0
+    slippage_bps: 5.0
+  "2x":
+    commission_bps: 0.0
+    half_spread_bps: 10.0
+    slippage_bps: 10.0
+
+tax:
+  # protocol section 8 — reported for context only, never a pass/fail input.
+  short_term_rate: 0.35

@@ -1,0 +1,140 @@
+# APEX Experiment #001 — every parameter in the pipeline.
+# Zero magic numbers live in the code body. If a number matters, it is here.
+# Provenance column records which protocol section or CONVENTIONS ruling fixes it.
+
+experiment:
+  id: APEX-001
+  protocol_file: APEX-Research-Protocol-v1.0-Experiment-001.md
+  conventions_file: CONVENTIONS.md
+
+calendar:
+  # C7: the lake starts here; the feature-computability anchor is measured from
+  # the lake start, NOT from the start of any evaluation period.
+  lake_start: "2004-01-01"
+  lake_end: "2026-06-30"
+  # protocol section 9: formation grid anchor = 200 trading days after lake start
+  anchor_trading_days: 200
+
+periods:
+  # protocol section 7. `locked` periods refuse to run without an unlock token.
+  in_sample:
+    start: "2005-01-01"
+    end: "2017-12-31"
+    locked: false
+  validation:
+    start: "2018-01-01"
+    end: "2021-12-31"
+    locked: true
+  holdout:
+    start: "2022-01-01"
+    end: "2026-06-30"
+    locked: true
+
+universe:
+  # protocol section 3
+  min_market_cap_usd: 1000000000.0
+  min_addv_usd: 10000000.0
+  addv_window_days: 60
+  # "60-day average daily dollar volume" = mean over the bars PRESENT in the
+  # trailing 60 trading days. The protocol states its own gap tolerance
+  # separately (>=200 bars in the prior 252); imposing a stricter implicit
+  # 60-of-60 rule here would invent a filter section 3 does not specify.
+  addv_min_periods: 1
+  min_close_usd: 5.0
+  min_history_trading_days: 252
+  min_bars_in_prior_252: 200
+  prior_bars_window: 252
+  allowed_exchanges: [NYSE, NASDAQ, NYSEAMERICAN]
+  allowed_security_types: [common]
+  # order in which a security's first failing filter is reported. Per-filter
+  # counts are emitted independently and may overlap; this only fixes the
+  # single `exclusion_reason` label so the section 9 log is deterministic.
+  reason_priority:
+    - security_type
+    - exchange
+    - history
+    - bars_in_prior_252
+    - close
+    - market_cap
+    - addv
+    - missing_feature
+
+features:
+  f1:                        # protocol section 5 F1 — momentum
+    windows: [126, 63]
+    skip_days: 5
+    benchmark: universe_mean # C1
+  f2:                        # F2 — trend strength
+    sma_long: 200
+    sma_short: 50
+    lookback_days: 63
+  f3:                        # F3 — volatility structure
+    vol_short: 20
+    vol_long: 100
+    atr_period: 14
+    return_type: log         # C5
+    ddof: 1                  # C5
+    atr_smoothing: wilder    # C6
+  f4:                        # F4 — relative strength
+    window: 63
+    skip_days: 5             # B3
+    min_sector_names: 10     # C2
+    exclude_self: true       # C2
+    market_benchmark: SPXTR  # C4
+
+composite:
+  # protocol section 5, steps 1-5
+  z_ddof: 1
+  winsorize_lower: 0.01
+  winsorize_upper: 0.99
+  categories: [f1, f2, f3, f4]
+  category_weights:
+    f1: 0.25
+    f2: 0.25
+    f3: 0.25
+    f4: 0.25
+  # B1: BOTH F3 components are negated. Compression (low 20d/100d ratio) and low
+  # ATR/Close are hypothesised favourable, so F3 is a low-volatility category.
+  negate_components: [f3_vol_ratio, f3_atr_over_close]
+  score_min: 0.0
+  score_max: 100.0
+
+horizon:
+  # protocol section 4 timing firewall: features through close T, form at close
+  # T+1, measure close T+1 -> close T+21.
+  signal_to_formation_lag: 1
+  forward_trading_days: 20
+
+schedule:
+  # B2: daily IC is primary; this grid is the non-overlapping robustness subset
+  # AND the portfolio rebalance schedule.
+  rebalance_step_days: 20
+
+delisting:
+  # B4, Shumway (1997): R = (P_last / P_entry) * (1 + terminal) - 1
+  performance_terminal_return: -0.30
+  # CONVENTIONS section 1, item 1 — pre-registered fallback
+  unknown_reason_is_performance: true
+  merger_reasons: [merger, acquisition, voluntary]
+  performance_reasons: [bankruptcy, rule_violation, performance]
+
+evaluation:
+  ic_method: spearman
+  min_names_for_ic: 30
+  newey_west_lag: 25         # protocol section 7
+  n_deciles: 10
+  periods_per_year: 12.6     # C9
+  annualization: geometric   # C9
+  rank_tie_method: first     # C10
+
+regimes:
+  # B5 — defined blind, before results exist.
+  trend_benchmark: SPXTR
+  trend_sma: 200
+  vol_index: VIX
+  vol_trailing_window: 1260
+  vol_high_quantile: 0.6667  # top tercile of the trailing distribution
+
+determinism:
+  seed: 20260807
+  float_output_decimals: 12
