@@ -69,6 +69,39 @@ def null_sweep(config, n_seeds: int) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def null_ic_series(config, seed_offset: int = 0) -> pd.Series:
+    """One null world's DAILY IC series, for autocorrelation-structure checks."""
+    base = int(config.get("null_rig.base_seed"))
+    _, evaluation = _run(base + seed_offset, 0.0)
+    return evaluation.ic_daily.series.dropna()
+
+
+@lru_cache(maxsize=8)
+def _reference(n_obs: int, overlap: int, lag: int, kernel: str, reps: int, seed: int):
+    from apex.evaluate.reference import simulate_null_tstats
+
+    return simulate_null_tstats(
+        n_obs=n_obs,
+        overlap=overlap,
+        lag=lag,
+        kernel=kernel,
+        n_replications=reps,
+        seed=seed,
+    )
+
+
+def reference_for(config, n_obs: int):
+    """The null reference matching the estimator the pipeline actually reports."""
+    return _reference(
+        int(n_obs),
+        int(config.get("horizon.forward_trading_days")),
+        int(config.get("evaluation.newey_west_lag")),
+        "bartlett",
+        int(config.get("null_rig.reference_replications")),
+        int(config.get("null_rig.reference_seed")),
+    )
+
+
 def tiny_frame(values, dates=None, securities=None) -> pd.DataFrame:
     array = np.asarray(values, dtype="float64")
     index = dates if dates is not None else pd.bdate_range("2020-01-01", periods=array.shape[0])

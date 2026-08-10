@@ -117,9 +117,23 @@ null_rig:
   # cannot be loosened by quietly widening a constant until the suite goes
   # green.
   z_threshold: 3.0              # grand mean IC must sit within 3 standard errors of 0
-  max_tstat_dispersion: 2.0     # sd of NW t-stats; >1 means the HAC lag under-corrects
-  max_rejection_rate: 0.25      # vs 0.05 expected; catches gross miscalibration
   single_panel_max_abs_t: 2.5   # the protocol's own H1 threshold, on a random walk
+
+  # REMOVED 2026-08-09 (ruling: disclose, do not amend):
+  #   max_tstat_dispersion: 2.0
+  #   max_rejection_rate: 0.25
+  # Both encoded the expectation that a correctly-built pipeline rejects at ~5%
+  # under a Bartlett-25 HAC. That expectation is wrong for this estimator. The
+  # Bartlett weight at lag 19 is 1 - 19/26 = 0.27, so the estimator discards ~73%
+  # of the autocovariance produced by overlapping 20-day windows; sd(t) is ~1.2
+  # and the true rejection rate is ~10-12%. The gate now compares the pipeline's
+  # t-distribution against a reference SIMULATED FROM THE NULL MODEL at the same
+  # estimator and sample length -- see apex/evaluate/reference.py.
+  reference_replications: 20000
+  reference_seed: 20260809
+  consistency_z_threshold: 3.0     # two-sided, on both location and dispersion
+  consistency_min_power: 0.50      # below this the sweep must declare itself underpowered
+  autocorrelation_tolerance: 0.20  # mean |ACF| beyond the overlap horizon
   # The decile spread is tested for SIGNIFICANCE, not magnitude. A ~150-name
   # panel puts ~15 names in a decile, so a single seed's annualised spread is
   # extremely noisy; a fixed magnitude band would fail honest seeds and pass a
