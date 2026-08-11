@@ -42,6 +42,7 @@ import numpy as np
 import pandas as pd
 
 SEP_COLS = ["ticker", "date", "high", "low", "close", "volume", "closeadj", "closeunadj"]
+ACTIONS_COLS = ["date", "action", "ticker", "contraticker"]
 LEVEL_COLS = ["ticker", "date", "closeunadj", "volume"]
 DAILY_COLS = ["ticker", "date", "marketcap"]
 
@@ -80,6 +81,14 @@ def load_master(root: Path, config) -> pd.DataFrame:
     frame = frame[frame["category"].isin(common)]
     frame["exchange_apex"] = frame["exchange"].map(labels)
     frame = frame[frame["exchange_apex"].notna()]
+
+    # Protocol section 3 EXCLUDES REITs. Sharadar's `category` describes SHARE
+    # CLASS ("Domestic Common Stock Primary Class"), not REIT status -- that
+    # lives in `sector`. Filtering on category alone admitted 628 REITs,
+    # including AIV (siccode 6798). Typed non-common so the EXISTING
+    # security_type filter excludes them and the count shows in the section 9 log.
+    frame["is_reit"] = frame["sector"].eq("Real Estate")
+    frame["security_type_apex"] = np.where(frame["is_reit"], "reit", "common")
 
     for column in ("firstpricedate", "lastpricedate"):
         frame[column] = pd.to_datetime(frame[column], errors="coerce")
@@ -157,3 +166,53 @@ def load_marketcap(root: Path, master: pd.DataFrame, keep: set, start, end,
             parts.append(chunk[["permaticker", "date", "mcap_usd"]])
     out = pd.concat(parts, ignore_index=True)
     return out.drop_duplicates(subset=["permaticker", "date"], keep="last")
+
+
+def adjust_high_low(prices: pd.DataFrame) -> pd.DataFrame:
+    """Put high/low on the ADJUSTED scale.
+
+    Sharadar SEP publishes `high` and `low` UNADJUSTED -- there is no `highadj`
+    or `lowadj` column -- while `closeadj` is adjusted. Feeding raw high/low and
+    an adjusted close into ATR mixes scales: measured on AIV 2008-10-01, high
+    45.251 against closeadj 0.928, a 37x mismatch that drove ATR/Close to 89.
+
+    The cumulative adjustment factor is closeadj/close, and applying it to
+    high/low puts every leg of the true range on one scale. This corrects a
+    DATA MAPPING error; the F3 formula in features/f3_volatility.py is untouched.
+    """
+    factor = prices["closeadj"] / prices["close"].where(prices["close"] > 0)
+    out = prices.copy()
+    out["high_adj"] = out["high"] * factor
+    out["low_adj"] = out["low"] * factor
+    return out
+
+
+def load_delist_reasons(root: Path, master: pd.DataFrame, config) -> dict:
+    """permaticker -> 'merger' | 'performance', from ACTIONS.
+
+    CONVENTIONS section 1 item 1: affirmatively M&A or voluntary -> merger and
+    the final traded price. EVERYTHING ELSE, including anything ambiguous, keeps
+    the pre-registered performance fallback and its -30% haircut.
+    """
+    settings = config.section("sharadar")
+    merger_actions = {a.lower() for a in settings["merger_actions"]}
+    use_contra = bool(settings["contraticker_implies_merger"])
+
+    windows = master[["ticker", "permaticker", "firstpricedate", "lastpricedate"]]
+    merger_pt: set = set()
+    for path in _slices(root, "ACTIONS"):
+        chunk = pd.read_csv(path, usecols=ACTIONS_COLS, dtype=str, keep_default_na=False)
+        chunk["date"] = pd.to_datetime(chunk["date"], errors="coerce")
+        chunk = chunk[chunk["date"].notna()]
+        label = chunk["action"].str.lower()
+        is_merger = label.isin(merger_actions)
+        if use_contra:
+            contra = chunk["contraticker"].str.strip()
+            is_merger = is_merger | (contra.ne("") & contra.ne("N/A") & contra.ne("nan"))
+        hits = chunk.loc[is_merger]
+        if hits.empty:
+            continue
+        merger_pt.update(_attribute(hits, windows)["permaticker"].unique().tolist())
+
+    delisted = master.loc[master["isdelisted"] == "Y", "permaticker"]
+    return {pt: ("merger" if pt in merger_pt else "performance") for pt in delisted}
