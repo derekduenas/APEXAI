@@ -283,6 +283,23 @@ def _decile_block(output: PipelineOutput, config: Config, dates, report: SmokeRe
 def _audit_block(output: PipelineOutput, config: Config, dates, report: SmokeReport) -> None:
     scored = output.scores.apex_score.loc[dates].notna().any(axis=1)
     usable = output.scores.apex_score.loc[dates].index[scored]
+
+    # An unscored panel cannot be audited -- and must be REPORTED as a failure
+    # rather than crashing with an IndexError, which tells the operator nothing
+    # about why. Hit for real on the first development run.
+    if len(usable) < 6:
+        report.blocks["5. LEAKAGE AUDITS"] = (
+            f"  NOT RUN -- only {len(usable)} scored dates in the period.\n"
+            f"  The audits need a populated cross-section; auditing an empty one\n"
+            f"  would compare NaN against NaN and pass vacuously."
+        )
+        report.add(
+            "panel is scoreable at all", False,
+            f"{len(usable)} dates carry any APEX Score -- feature completeness or "
+            f"universe size is the binding constraint, not the audits",
+        )
+        return
+
     probes = pd.DatetimeIndex([usable[2], usable[len(usable) // 2], usable[-3]])
 
     lookahead = audit_lookahead(output.panel, config, probes)

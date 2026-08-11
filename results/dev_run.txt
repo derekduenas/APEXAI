@@ -1,0 +1,474 @@
+==============================================================================
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  dataset: dev-edgar+stooq-546a721e57b1eea6fdaa7909cc56be6ed971fd88adc28f36
+
+  This run exercises the APEX machinery against real-world data.
+  It is NOT evidence about Experiment #001 and cannot become so.
+
+  The universe is survivorship-contaminated to an UNMEASURABLE degree.
+  Prices are not corporate-action adjusted. Sector is a non-PIT proxy.
+  Any information coefficient below is MEANINGLESS as a finding.
+
+  Limitations: DATA_LIMITATIONS.md
+  No research credit consumed. No verdict produced. Holdout untouched.
+==============================================================================
+
+--- DATASET CONSTRUCTION ----------------------------------------------------
+  stooq files indexed      : 13,245
+  securities in panel      : 876
+  price rows loaded        : 2,133,646
+  date range               : 2005-02-25 .. 2017-12-29
+  EDGAR requests           : 1,936
+
+  IDENTITY (EDGAR CIK <- Stooq ticker; NO price cross-verification possible)
+    matched                : 876
+    excluded, no CIK       : 656
+    excluded, ambiguous    : 2
+    excluded, no overlap   : 963
+
+  POINT-IN-TIME SHARES OUTSTANDING (knowledge date = SEC filing date)
+    issuers with XBRL data : 716
+    issuers with none      : 160
+    total observations     : 35,340
+
+  DELISTING
+    detected (corroborated): 0
+    Form 25 but still listed: 240
+
+  CONTAMINATION FLAGS
+    price adjustment       : back-adjusted (split + dividend) -- NOT raw
+    unadjusted available   : False  <-- $5 close and $1B mcap filters run on ADJUSTED prices (CONVENTIONS 4.4 violation)
+    VIX available          : False  <-- B5 regime reporting DISABLED
+    adapter failures       : 3
+      DYORU: EmptyDataError: No columns to parse from file
+      NTWOU: EmptyDataError: No columns to parse from file
+      OCLT: EmptyDataError: No columns to parse from file
+
+==============================================================================
+APEX EXPERIMENT #001 -- IN-SAMPLE SMOKE RUN
+structural and unit validation only; NOT a performance judgement
+==============================================================================
+dataset fingerprint : dev-edgar+stooq-546a721e57b1eea6fdaa7909cc56be6ed971fd88adc28f36
+period              : in_sample (2005-01-01 to 2017-12-31)
+
+--- 1. UNIVERSE COUNTS OVER TIME ----------------------------------------------
+            eligible  tradable  excluded_security_type  excluded_exchange  excluded_history  excluded_bars_in_prior_252  excluded_close  excluded_pit_market_cap  excluded_market_cap  excluded_addv  excluded_missing_feature
+2005-12-09         0       506                       0                  0               506                          76              71                      506                    0            335                       506
+2006-12-11         0       538                       0                  0                30                          31              57                      538                    0            337                       538
+2007-12-12         0       565                       0                  0                25                          28              69                      565                    0            326                       565
+2008-12-11         0       568                       0                  0                15                          27             189                      568                    0            349                       568
+2009-12-11         0       584                       0                  0                 9                          22             115                      510                    6            378                       584
+2010-12-13        33       624                       0                  0                36                          41              98                      447                   36            394                       537
+2011-12-13        47       651                       0                  0                31                          34             107                      238                  218            408                       531
+2012-12-14        51       670                       0                  0                24                          32              86                      228                  223            425                       541
+2013-12-16        53       713                       0                  0                35                          46              71                      251                  210            430                       579
+2014-12-16        74       754                       0                  0                43                          48              70                      258                  222            445                       556
+2015-12-16        94       791                       0                  0                31                          39              90                      268                  232            485                       518
+2016-12-15       100       822                       0                  0                30                          39              64                      283                  231            499                       535
+2017-12-15       122       866                       0                  0                46                          52              74                      291                  236            500                       546
+
+  eligible: min=0  median=46  max=123  over 3034 dates
+
+--- 2. FEATURE DISTRIBUTIONS --------------------------------------------------
+           component  nan_rate     min     p50     max  xs_sd_p50  flat_dates
+          f1_mom_126       0.0 -1.0632 -0.0020 13.4251     0.2189        1170
+           f1_mom_63       0.0 -1.0176 -0.0009  7.0919     0.1467        1170
+f2_close_over_sma200       0.0 -0.8247  0.0650  6.2255     0.1496        1170
+ f2_frac_above_sma50       0.0  0.0000  0.6508  1.0000     0.2522        1170
+        f3_vol_ratio       0.0  0.0966  0.9196  2.1954     0.2357        1170
+   f3_atr_over_close       0.0  0.0070  0.0211  0.8380     0.0116        1170
+        f4_vs_sector       0.0 -1.0065 -0.0061  7.1101     0.1493        1170
+        f4_vs_market       0.0 -0.9989  0.0083  7.1702     0.1467        1170
+
+--- 3. IC TIME SERIES ---------------------------------------------------------
+  observations   : 1780
+  mean           : +0.00760
+  sd             : 0.20554
+  min / max      : -0.7923 / +0.5621
+  |IC| > 0.5     : 24 dates
+  autocorr lag 1 : +0.927   (overlap implies strongly positive)
+  by year:
+      count     mean      std
+2010     41  0.04396  0.19218
+2011    251  0.02017  0.29925
+2012    250 -0.00356  0.19158
+2013    252  0.01279  0.20763
+2014    252 -0.00578  0.17808
+2015    252  0.04665  0.17925
+2016    252 -0.03881  0.17880
+2017    230  0.01653  0.16406
+
+--- 4. DECILE MEMBERSHIP ------------------------------------------------------
+  rebalance periods      : 152
+  top-decile size (median): 5
+  bottom-decile size      : 4
+  distinct names ever top : 120
+
+  most persistent top-decile members:
+ticker  top_decile_share
+   BHC             0.164
+    EA             0.158
+  BMRN             0.125
+  REGN             0.125
+  PBYI             0.112
+  NBIX             0.112
+   DDD             0.105
+    MU             0.099
+  MYGN             0.092
+  AMBA             0.092
+
+--- 5. LEAKAGE AUDITS (measured on this dataset) ------------------------------
+lookahead audit: 66 comparisons over 3 dates x 2 modes x 11 components
+  CLEAN -- nothing known at T changed when the future was destroyed
+
+cross-sectional audit: 18 comparisons over 3 probe dates x 6 components
+  CLEAN -- every scored value at T is independent of every other date, so winsorisation, z-scoring and ranking are strictly cross-sectional (ruling 5)
+
+--- STRUCTURAL CHECKS --------------------------------------------------------
+  [FAIL] universe is never empty: smallest cross-section is 0 names
+  [FAIL] universe is large enough to rank: median 46 names (a decile needs a workable count)
+  [PASS] universe does not collapse day to day: largest single-day contraction is x0.55
+  [FAIL] no feature is constant within a cross-section: constant on some dates: ['f1_mom_126', 'f1_mom_63', 'f2_close_over_sma200', 'f2_frac_above_sma50', 'f3_vol_ratio', 'f3_atr_over_close', 'f4_vs_sector', 'f4_vs_market']
+  [PASS] feature NaN rates are plausible: all components below 25% missing
+  [PASS] all feature values are finite: no infinities or overflow in the medians
+  [PASS] IC series is populated: 1780 scored dates
+  [PASS] IC series is not flat: sd = 0.20554
+  [PASS] IC series is not exploding: max |IC| = 0.7923 (a correlation cannot exceed 1)
+  [PASS] IC autocorrelation matches the 20-day overlap: lag-1 autocorrelation +0.927
+  [FAIL] both deciles are populated at every rebalance: smallest top decile 0, bottom 0
+  [PASS] no single security dominates the top decile: most persistent name appears in 16% of rebalances
+  [PASS] top-decile turnover is not zero: 120 distinct names appear in the top decile
+  [PASS] no lookahead on this dataset: protocol section 4, measured
+  [PASS] preprocessing is strictly cross-sectional: ruling 5, measured
+
+==============================================================================
+STOP -- structural problems above must be resolved first. No partial fixes carried into validation.
+==============================================================================
+
+==============================================================================
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  DEVELOPMENT / NON-CONFIRMATORY
+=
+  dataset: dev-edgar+stooq-546a721e57b1eea6fdaa7909cc56be6ed971fd88adc28f36
+
+  This run exercises the APEX machinery against real-world data.
+  It is NOT evidence about Experiment #001 and cannot become so.
+
+  The universe is survivorship-contaminated to an UNMEASURABLE degree.
+  Prices are not corporate-action adjusted. Sector is a non-PIT proxy.
+  Any information coefficient below is MEANINGLESS as a finding.
+
+  Limitations: DATA_LIMITATIONS.md
+  No research credit consumed. No verdict produced. Holdout untouched.
+==============================================================================
+
+NO verdict computed. NO ledger entry. NO credit spent. Holdout untouched.
+GROSS ONLY -- COST SIMULATION NOT YET EXECUTED (Stage 6 unbuilt).

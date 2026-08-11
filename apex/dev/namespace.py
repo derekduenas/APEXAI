@@ -95,20 +95,30 @@ def development_banner(fingerprint: str) -> str:
             f"'{fingerprint}' is not a development dataset; the "
             f"DEVELOPMENT / NON-CONFIRMATORY banner must not be applied to it"
         )
-    return (
-        "=" * 78 + "\n"
-        "  DEVELOPMENT / NON-CONFIRMATORY\n"
-        "=" * 78 + "\n"
-        f"  dataset: {fingerprint}\n"
-        "\n"
-        "  This run exercises the APEX machinery against real-world data.\n"
-        "  It is NOT evidence about Experiment #001 and cannot become so.\n"
-        "\n"
-        "  The universe is survivorship-contaminated to an UNMEASURABLE degree.\n"
-        "  Prices are not corporate-action adjusted. Sector is a non-PIT proxy.\n"
-        "  Any information coefficient below is MEANINGLESS as a finding.\n"
-        "\n"
-        f"  Limitations: {LIMITATIONS_DOC}\n"
-        "  No research credit consumed. No verdict produced. Holdout untouched.\n"
-        + "=" * 78
+    rule = "=" * 78
+    # NOTE: build this with an explicit list, not adjacent string literals.
+    # `"=" * 78 + "\n" "  TEXT\n" "=" * 78` concatenates the literals FIRST and
+    # then multiplies the whole thing by 78 -- which printed the banner 40 times
+    # on the first real development run.
+    return "\n".join(
+        [
+            rule,
+            "  DEVELOPMENT / NON-CONFIRMATORY",
+            rule,
+            f"  dataset: {fingerprint}",
+            "",
+            "  This run exercises the APEX machinery against real-world data.",
+            "  It is NOT evidence about Experiment #001 and cannot become so.",
+            "",
+            "  Prices are BACK-ADJUSTED, so the $5 close and $1B market-cap level",
+            "  filters violate CONVENTIONS 4.4. The universe contains ZERO delisted",
+            "  securities. Sector is a non-PIT SIC proxy. VIX is absent, so B5",
+            "  regime reporting is disabled.",
+            "",
+            "  Any information coefficient below is MEANINGLESS as a finding.",
+            "",
+            f"  Limitations: {LIMITATIONS_DOC}",
+            "  No research credit consumed. No verdict produced. Holdout untouched.",
+            rule,
+        ]
     )

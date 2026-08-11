@@ -271,3 +271,17 @@ def test_the_limitations_document_exists_and_says_what_it_must():
     assert "DEVELOPMENT ONLY" in text
     for topic in ("Delisted", "Corporate actions", "Identity matching", "Licens"):
         assert topic in text, f"DATA_LIMITATIONS.md no longer covers {topic}"
+
+
+def test_the_banner_renders_once_not_forty_times():
+    """Operator precedence: `"=" * 78 + "\\n" "TEXT\\n" "=" * 78` concatenates the
+    literals first and multiplies the WHOLE thing. The first real development
+    run printed the banner 40 times.
+    """
+    from apex.dev.namespace import development_banner
+
+    banner = development_banner(dev_fingerprint("edgar+stooq", "abc"))
+
+    assert banner.count("DEVELOPMENT / NON-CONFIRMATORY") == 1
+    assert banner.count("dataset:") == 1
+    assert len(banner.splitlines()) < 30
