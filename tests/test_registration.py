@@ -51,6 +51,25 @@ def repo(tmp_path, config):
     return tmp_path
 
 
+def _unsign(repo, config):
+    """Restore the placeholder fields on a COPY.
+
+    The live pre-registration is signed, so a test of the refusal path has to
+    create its own unsigned document rather than relying on the shipped one.
+    """
+    for key, replacements in (
+        ("experiment.protocol_file",
+         {"**Registered:** 2026-08-11": "**Registered:** _______________",
+          "**Author:** Derek Duenas": "**Author:** _______________"}),
+        ("experiment.conventions_file", {"**Author:** Derek Duenas": "**Author:** _______________"}),
+    ):
+        path = repo / config.get(key)
+        text = path.read_text(encoding="utf-8")
+        for old, new in replacements.items():
+            text = text.replace(old, new)
+        path.write_text(text, encoding="utf-8")
+
+
 def _sign(repo, config):
     """Fill the placeholder fields, as a real registration would."""
     for key, replacements in (
@@ -111,16 +130,25 @@ def _unlock_token(repo, period, reason="pre-registered confirmatory evaluation")
 # ---------------------------------------------------------------------------
 
 
-def test_the_shipped_pre_registration_is_unsigned(config):
-    """Standing check on the live repository, not the copy.
+def test_the_shipped_pre_registration_is_signed(config):
+    """SIGNED 2026-08-11 by Derek Duenas -- a deliberate, dated act.
 
-    If this ever passes, someone signed the pre-registration -- which is a real
-    event that should be deliberate, not a thing noticed later.
+    This assertion is inverted from its original form, which asserted UNSIGNED.
+    That earlier version existed so that signing could not happen unnoticed; it
+    did its job, and the event has now occurred. From here the standing check is
+    that the signature REMAINS and is not quietly reverted or altered.
     """
-    assert signature_status(config)["signed"] is False
+    status = signature_status(config)
+    assert status["signed"] is True, status["unsigned_fields"]
+
+    protocol = (REPO / config.get("experiment.protocol_file")).read_text(encoding="utf-8")
+    assert "**Registered:** 2026-08-11" in protocol
+    assert "**Author:** Derek Duenas" in protocol
 
 
 def test_unsigned_registration_refuses_real_data(repo, config):
+    _unsign(repo, config)
+
     with pytest.raises(RegistrationError) as excinfo:
         require_signed(config, repo_root=repo)
 
@@ -308,6 +336,7 @@ def test_a_tampered_ledger_blocks_the_holdout(repo, config):
 
 def test_an_unsigned_registration_cannot_open_the_holdout_either(repo, config):
     """Belt and braces: the two gates are independent and both must hold."""
+    _unsign(repo, config)
     _unlock_token(repo, "holdout")
 
     with pytest.raises(RegistrationError):

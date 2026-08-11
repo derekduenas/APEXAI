@@ -27,12 +27,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from apex.config import git_sha, load_config  # noqa: E402
-from apex.data.sharadar import SharadarSnapshot  # noqa: E402
+from apex.data.production_source import ProductionSource  # noqa: E402
 from apex.evaluate.reference import simulate_null_tstats  # noqa: E402
 from apex.evaluate.verdict import experiment_verdict, full_report, interpret  # noqa: E402
 from apex.pipeline import run_period  # noqa: E402
 from apex.registration import open_ledger, signature_status  # noqa: E402
 from apex.report.attribution import attribute  # noqa: E402
+
+
+def spec_end(config):
+    """Lake must extend to the end of the period being evaluated."""
+    return config.period(PERIOD)["end"]
 
 PERIOD = "validation"
 
@@ -48,7 +53,7 @@ def main() -> int:
     # Cheapest precondition first: refuse before touching the vendor snapshot,
     # so "you skipped the smoke run" is the message rather than a schema error
     # about a path that was never going to be read.
-    smoke = Path("results/smoke_in_sample.txt")
+    smoke = Path("results/production_smoke.txt")
     if not smoke.exists():
         print(
             "REFUSED: the mandatory in-sample smoke run has not been completed.\n"
@@ -65,7 +70,12 @@ def main() -> int:
         )
         return 2
 
-    source = SharadarSnapshot(args.snapshot, config)
+    # Slice-aware, universe-first -- the SAME path the production smoke test
+    # exercised. The monolithic SharadarSnapshot adapter cannot read a
+    # chunked snapshot and is not used here.
+    source = ProductionSource(
+        args.snapshot, config, config.get("calendar.lake_start"), spec_end(config)
+    )
 
     # run_period enforces signature, protocol pin, unlock token and credit.
     output, evaluation = run_period(source, config, PERIOD)

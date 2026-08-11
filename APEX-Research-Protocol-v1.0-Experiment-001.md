@@ -2,9 +2,9 @@
 ## Experiment #001 — Price-Based Swing Ranking Signal
 
 **Status:** Pre-registered / unexecuted
-**Registered:** _______________ (fill and freeze before any code touches data)
+**Registered:** 2026-08-11
 **Research budget:** Consumes 1 of 5 confirmatory experiments against the locked holdout
-**Author:** _______________
+**Author:** Derek Duenas
 
 > This document is written before results exist. Any change after registration must be recorded as an amendment with a date and a reason, and any amendment made after seeing validation results disqualifies the holdout test.
 
