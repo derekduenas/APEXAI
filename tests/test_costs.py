@@ -31,9 +31,10 @@ import pytest
 
 from apex.config import ConfigError, load_config
 
+# Stage 6 shipped 2026-08-11 (apex/evaluate/turnover.py, tests/test_turnover_costs.py):
+# realised one-way turnover on both legs, and annualised turnover, are now
+# computed from the simulated holdings path rather than deferred.
 DEFERRED_UNTIL_STAGE_6 = [
-    "net decile spread after realised one-way turnover on both legs (C8)",
-    "annualised turnover of the top-decile portfolio (section 9)",
     "after-tax figures at the 35% short-term rate (section 8)",
 ]
 
@@ -137,7 +138,29 @@ def test_the_stage_6_gap_is_declared():
     assert DEFERRED_UNTIL_STAGE_6
 
 
-@pytest.mark.skip(reason=f"DEFERRED until Stage 6: {DEFERRED_UNTIL_STAGE_6[0]}")
-def test_net_spread_applies_costs_to_realised_turnover_on_both_legs():
-    """C8. Cannot be written before the portfolio simulator exists."""
-    raise AssertionError("no turnover simulation is built yet")
+def test_net_spread_applies_costs_to_realised_turnover_on_both_legs(config):
+    """C8, no longer deferred -- Stage 6 shipped.
+
+    Kept here (rather than only in test_turnover_costs.py) because this file is
+    the register of what the cost model owes the protocol, and this line is the
+    one that was outstanding longest.
+    """
+    import pandas as pd
+
+    from apex.evaluate.turnover import net_decile_result
+
+    dates = pd.DatetimeIndex(["2020-01-31", "2020-02-28"])
+    securities = pd.Index(["A", "B"], name="security_id")
+    top = pd.DataFrame([[True, False], [False, True]], index=dates, columns=securities)
+    returns = pd.DataFrame(0.0, index=dates, columns=securities)
+
+    result = net_decile_result(
+        top, ~top,
+        returns,
+        bps_per_side=config.cost_bps_per_side("1x"),
+        periods_per_year=float(config.get("evaluation.periods_per_year")),
+    )
+
+    assert result.long_cost_per_period > 0 and result.short_cost_per_period > 0
+    assert result.net_spread_per_period < result.gross_spread_per_period
+    assert "No turnover was assumed" in result.as_dict()["basis"]
