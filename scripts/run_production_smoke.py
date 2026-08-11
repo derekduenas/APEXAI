@@ -29,67 +29,16 @@ def main() -> int:
     start, end = cfg.get("calendar.lake_start"), cfg.period("in_sample")["end"]
     scale = float(cfg.get("sharadar.marketcap_scale"))
     min_mc = float(cfg.get("universe.min_market_cap_usd"))
-    rep = LoadReport()
+    # DRY RUN OF THE VALIDATION PATH.
+    # Panel construction now goes through the SAME build_production_panel that
+    # scripts/run_validation.py uses. If this smoke run and validation built
+    # their panels by different code, the smoke run would be evidence about
+    # something other than the thing being validated.
+    from apex.data.production_source import build_production_panel
 
-    master = load_master(ROOT, cfg)
-    rep.master_securities = len(master)
-    rep.candidates_after_category = len(master)
-    print(f"[{time.time()-t0:6.0f}s] master (common, 3 exchanges): {len(master):,}", flush=True)
-
-    keep = find_candidates(ROOT, master, min_mc, scale, rep)
-    print(f"[{time.time()-t0:6.0f}s] ever >= $1B mcap: {len(keep):,} "
-          f"(scanned {rep.daily_rows_scanned:,} DAILY rows)", flush=True)
-
-    prices = load_prices(ROOT, master, keep, start, end, rep)
-    print(f"[{time.time()-t0:6.0f}s] SEP kept {rep.sep_rows_kept:,} of {rep.sep_rows_scanned:,} "
-          f"(dupes dropped {rep.duplicates_dropped})", flush=True)
-
-    prices = adjust_high_low(prices)          # FIX 1: high/low onto the adjusted scale
-    reasons = load_delist_reasons(ROOT, master, cfg)   # FIX 3: ACTIONS -> merger/performance
-    print(f"[{time.time()-t0:6.0f}s] delist reasons: "
-          f"{sum(v=='merger' for v in reasons.values()):,} merger / "
-          f"{sum(v=='performance' for v in reasons.values()):,} performance", flush=True)
-
-    mcap = load_marketcap(ROOT, master, keep, start, end, scale)
-    print(f"[{time.time()-t0:6.0f}s] marketcap rows {len(mcap):,}", flush=True)
-
-    dates = pd.DatetimeIndex(sorted(prices["date"].unique()))
-    secs = pd.Index(sorted(prices["permaticker"].unique()), name="security_id")
-    print(f"[{time.time()-t0:6.0f}s] panel {len(secs):,} securities x {len(dates):,} dates", flush=True)
-
-    def wide(df, col):
-        return df.pivot_table(index="date", columns="permaticker", values=col, aggfunc="last") \
-                 .reindex(index=dates, columns=secs).astype("float64")
-    close_adj  = wide(prices, "closeadj")
-    close_unadj= wide(prices, "closeunadj")
-    mc         = wide(mcap, "mcap_usd")
-    with np.errstate(invalid="ignore", divide="ignore"):
-        shares = mc / close_unadj.where(close_unadj > 0)
-
-    m = master.set_index("permaticker").loc[secs]
-    delisted = m["isdelisted"].eq("Y")
-    meta = pd.DataFrame({
-        "security_id": secs, "ticker": m["ticker"].values, "exchange": m["exchange_apex"].values,
-        "security_type": m["security_type_apex"].values,
-        "sector": m["sector"].replace("", "UNKNOWN").values,
-        "first_date": m["firstpricedate"].values, "last_date": m["lastpricedate"].values,
-        "delist_date": np.where(delisted, m["lastpricedate"], pd.NaT),
-        "delist_reason": [reasons.get(pt) for pt in secs],
-    }, index=secs)[list(SECURITY_META_COLUMNS)]
-
-    # C4: S&P 500 TOTAL RETURN, SPY permitted when SPXTR is unavailable.
-    # SPY is NOT in SEP -- SEP is equities only; ETF prices live in SFP.
-    # Discovered on real data 2026-08-11.
-    bench = pd.read_csv(ROOT / "raw" / "SFP" / "SFP_SPY.csv", usecols=["ticker", "date", "closeadj"])
-    bench["date"] = pd.to_datetime(bench["date"])
-    bser = bench.set_index("date")["closeadj"].reindex(dates).ffill().bfill()
-
-    panel = Panel(dates=dates, securities=secs, close_adj=close_adj,
-                  high_adj=wide(prices, "high_adj"), low_adj=wide(prices, "low_adj"),
-                  close_unadj=close_unadj, volume=wide(prices, "volume"),
-                  shares_out=shares, meta=meta, benchmark_tr=bser,
-                  vol_index=pd.Series(20.0, index=dates))
-    print(f"[{time.time()-t0:6.0f}s] panel built", flush=True)
+    panel, rep = build_production_panel(ROOT, cfg, start, end)
+    print(f"[{time.time()-t0:6.0f}s] panel {len(panel.securities):,} securities "
+          f"x {len(panel.dates):,} dates  (via build_production_panel)", flush=True)
 
     fp = dev_fingerprint("sharadar-prod-smoke",
                          json.loads((ROOT/"MANIFEST.json").read_text())["dataset_fingerprint"])

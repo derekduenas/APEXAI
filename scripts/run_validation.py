@@ -120,7 +120,7 @@ def main() -> int:
         "experiment_id": config.get("experiment.id"),
         "period": PERIOD,
         "dataset_manifest_hash": source.dataset_fingerprint,
-        "snapshot_manifest": source.manifest.as_dict(),
+        "snapshot_root": str(args.snapshot),
         "protocol_hash": signature_status(config)["protocol_hash"],
         "conventions_hash": signature_status(config)["conventions_hash"],
         "config_hash": config.hash,
