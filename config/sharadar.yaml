@@ -54,10 +54,22 @@ sharadar:
   # TICKERS.category -> the security_type the section 3 filter consumes.
   # Anything not listed here is typed 'other' and excluded by the universe
   # filter. Unlisted is EXCLUDED, never admitted by default.
+  # EXACT matches only. Substring matching on "Domestic Common Stock" also
+  # catches "Domestic Common Stock Warrant" (917 securities), which protocol
+  # section 3 explicitly EXCLUDES. Caught on real data 2026-08-11.
   common_categories:
     - Domestic Common Stock
     - Domestic Common Stock Primary Class
     - Domestic Common Stock Secondary Class
+
+  # Sharadar labels NYSE American as NYSEMKT. Protocol section 3 names the
+  # exchange "NYSE American" and config/experiment.yaml encodes NYSEAMERICAN.
+  # This is a VENDOR LABEL TRANSLATION, not a protocol change -- without it all
+  # 1,275 NYSE American securities are silently dropped from the universe.
+  exchange_labels:
+    NYSE: NYSE
+    NASDAQ: NASDAQ
+    NYSEMKT: NYSEAMERICAN
 
   # ACTIONS.action values that affirmatively identify a non-performance exit.
   # CONVENTIONS section 1 item 1: anything NOT affirmatively M&A or voluntary is
