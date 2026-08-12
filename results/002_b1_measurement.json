@@ -1,0 +1,210 @@
+{
+  "corporate_actions": {
+    "considered_pairs": 537927,
+    "excluded_pairs": 10008,
+    "rate": 0.01860475492
+  },
+  "coverage": {
+    "per_date_max": 1417,
+    "per_date_median": 1192.0,
+    "per_date_min": 63,
+    "ratio_max": 0.997594226143,
+    "ratio_median": 0.992029301726,
+    "ratio_min": 0.061224489796
+  },
+  "coverage_by_year": {
+    "2005": {
+      "coverage": 0.78853811149,
+      "eligible_median": 1082.0,
+      "formation_dates": 13,
+      "nsi_median": 999.0
+    },
+    "2006": {
+      "coverage": 0.978544646577,
+      "eligible_median": 1204.0,
+      "formation_dates": 12,
+      "nsi_median": 1180.5
+    },
+    "2007": {
+      "coverage": 0.987722748674,
+      "eligible_median": 1315.0,
+      "formation_dates": 13,
+      "nsi_median": 1297.0
+    },
+    "2008": {
+      "coverage": 0.988246390481,
+      "eligible_median": 1201.0,
+      "formation_dates": 12,
+      "nsi_median": 1186.0
+    },
+    "2009": {
+      "coverage": 0.992363983455,
+      "eligible_median": 977.0,
+      "formation_dates": 13,
+      "nsi_median": 969.0
+    },
+    "2010": {
+      "coverage": 0.992268041237,
+      "eligible_median": 1110.0,
+      "formation_dates": 13,
+      "nsi_median": 1102.0
+    },
+    "2011": {
+      "coverage": 0.993729067199,
+      "eligible_median": 1164.0,
+      "formation_dates": 12,
+      "nsi_median": 1157.0
+    },
+    "2012": {
+      "coverage": 0.994771863118,
+      "eligible_median": 1133.0,
+      "formation_dates": 13,
+      "nsi_median": 1126.0
+    },
+    "2013": {
+      "coverage": 0.994686648501,
+      "eligible_median": 1233.5,
+      "formation_dates": 12,
+      "nsi_median": 1228.0
+    },
+    "2014": {
+      "coverage": 0.992840909091,
+      "eligible_median": 1365.0,
+      "formation_dates": 13,
+      "nsi_median": 1355.0
+    },
+    "2015": {
+      "coverage": 0.992579781299,
+      "eligible_median": 1383.0,
+      "formation_dates": 13,
+      "nsi_median": 1372.0
+    },
+    "2016": {
+      "coverage": 0.992817886585,
+      "eligible_median": 1333.5,
+      "formation_dates": 12,
+      "nsi_median": 1326.0
+    },
+    "2017": {
+      "coverage": 0.993670534673,
+      "eligible_median": 1383.0,
+      "formation_dates": 13,
+      "nsi_median": 1373.0
+    }
+  },
+  "coverage_worst_dates": [
+    {
+      "coverage": 0.061224489796,
+      "date": "2005-01-13",
+      "eligible": 1029,
+      "with_nsi": 63
+    },
+    {
+      "coverage": 0.187380497132,
+      "date": "2005-02-11",
+      "eligible": 1046,
+      "with_nsi": 196
+    },
+    {
+      "coverage": 0.612933458294,
+      "date": "2005-03-14",
+      "eligible": 1067,
+      "with_nsi": 654
+    },
+    {
+      "coverage": 0.875700934579,
+      "date": "2005-04-12",
+      "eligible": 1070,
+      "with_nsi": 937
+    },
+    {
+      "coverage": 0.912676056338,
+      "date": "2005-05-10",
+      "eligible": 1065,
+      "with_nsi": 972
+    },
+    {
+      "coverage": 0.918139534884,
+      "date": "2005-06-08",
+      "eligible": 1075,
+      "with_nsi": 987
+    },
+    {
+      "coverage": 0.923290203327,
+      "date": "2005-07-07",
+      "eligible": 1082,
+      "with_nsi": 999
+    },
+    {
+      "coverage": 0.929292929293,
+      "date": "2005-08-04",
+      "eligible": 1089,
+      "with_nsi": 1012
+    },
+    {
+      "coverage": 0.94128440367,
+      "date": "2005-09-01",
+      "eligible": 1090,
+      "with_nsi": 1026
+    },
+    {
+      "coverage": 0.943327239488,
+      "date": "2005-09-30",
+      "eligible": 1094,
+      "with_nsi": 1032
+    }
+  ],
+  "determinism": {
+    "dataset_fingerprint": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+    "float_output_decimals": 12
+  },
+  "exclusion_set": [
+    "acquisitionby",
+    "acquisitionof",
+    "conversion",
+    "mergerfrom",
+    "mergerto",
+    "recapitalisation",
+    "recapitalization",
+    "spinoff",
+    "spinoffdividend",
+    "spunofffrom"
+  ],
+  "measurement_digest": "ad4e3e750f89c44c0703628e4390642ad63b7ea82fd9c3363ec3b623e9c20206",
+  "nsi_distribution": {
+    "max": 4.587481311153,
+    "mean": 0.011734725723,
+    "min": -0.840708121651,
+    "observations": 194355,
+    "p1": -0.153945413466,
+    "p25": -0.022911813133,
+    "p50": 0.002435559521,
+    "p75": 0.017663192824,
+    "p99": 0.415120504346
+  },
+  "pit": {
+    "compliant": 194355,
+    "lag_days_median": 48.0,
+    "lag_days_min": 0.0,
+    "missing_knowability_date": 0,
+    "pct": 1.0,
+    "populated": 194355,
+    "violations": 0
+  },
+  "sf1_depth": {
+    "earliest_filing": "2004-01-02",
+    "earliest_reportperiod": "2002-12-28"
+  },
+  "ties": {
+    "exact_zero": 1589,
+    "pct": 0.00817576085
+  },
+  "universe": {
+    "eligible_security_dates": 198944,
+    "formation_dates": 164,
+    "per_date_max": 1429,
+    "per_date_median": 1210.5,
+    "per_date_min": 800,
+    "securities_ever_eligible": 2837
+  }
+}

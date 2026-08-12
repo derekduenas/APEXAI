@@ -63,6 +63,12 @@ LOAD_BEARING = {
         "test_counterexample_the_isolation_scan_detects_an_injected_001_reference",
         "test_counterexample_the_isolation_scan_detects_a_composite_import",
     ],
+    # Added for B1. The "100% PIT-compliant" figure is only evidence if the
+    # measure is capable of reporting less than 100%.
+    "test_pit_holds_on_every_populated_cell": [
+        "test_counterexample_a_future_filing_is_not_used_before_it_exists",
+        "test_counterexample_the_pit_measure_flags_a_deliberately_late_filing",
+    ],
 }
 
 # Ordinary assertions: failure is intrinsic to the assertion. Ruled 2026-08-11.
@@ -77,6 +83,10 @@ ORDINARY = {
     ),
     "test_ties_are_broken_deterministically": (
         "deterministic expected output; non-determinism fails the comparison"
+    ),
+    "test_the_knowability_date_is_the_later_of_the_two_filings": (
+        "asserts one expected date against a hand-computed fixture; a wrong "
+        "date fails the comparison directly"
     ),
 }
 

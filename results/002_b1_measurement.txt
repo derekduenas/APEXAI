@@ -1,0 +1,122 @@
+==============================================================================
+APEX-002 -- B1 MEASUREMENT-ONLY PRE-PASS
+==============================================================================
+protocol   : APEX-002-Protocol-Net-Share-Issuance.md
+period     : 2004-01-01 .. 2017-12-31  (in-sample; validation+holdout NOT read)
+computes   : NSI distribution, ties, coverage, exclusions, PIT
+does NOT   : forward returns, IC, deciles, t-stats, portfolios
+
+[   234s] panel 4,288 securities x 3,524 dates
+[   249s] formation grid 164 dates (2005-01-13 .. 2017-12-26)
+[   272s] SF1 as-filed 469,407 rows (18,297 revisions dropped)
+[   285s] NSI panel built
+
+--- 1. SECTION-3 ELIGIBLE UNIVERSE (breadth) ---
+  eligible security-dates      : 198,944
+  securities ever eligible     : 2,837
+  per formation date  min      : 800
+                      median   : 1,210
+                      max      : 1,429
+
+--- 2. NSI DISTRIBUTION (eligible AND NSI-present) ---
+  observations                 : 194,355
+  p1                           : -0.153945
+  p25                          : -0.022912
+  p50                          : +0.002436
+  p75                          : +0.017663
+  p99                          : +0.415121
+  mean                         : +0.011735
+  min                          : -0.840708
+  max                          : +4.587481
+
+  prior broader-population reference (NOT a conformance target):
+    p1 -0.171  p25 -0.001  p50 +0.0075  p75 +0.045  p99 +1.739
+
+--- 3. TIES AT EXACTLY ZERO ---
+  NSI == 0 exactly             : 1,589  (0.8176%)
+  prior reference              : ~4.63%  (broader population)
+
+--- 4. COVERAGE (eligible securities with valid NSI) ---
+  per formation date  min      : 63
+                      median   : 1,192
+                      max      : 1,417
+  coverage ratio      min      : 6.1224%
+                      median   : 99.2029%
+                      max      : 99.7594%
+
+  by year:
+    year    dates  elig(med)   nsi(med)       cov
+    2005       13      1,082        999   78.85%
+    2006       12      1,204      1,180   97.85%
+    2007       13      1,315      1,297   98.77%
+    2008       12      1,201      1,186   98.82%
+    2009       13        977        969   99.24%
+    2010       13      1,110      1,102   99.23%
+    2011       12      1,164      1,157   99.37%
+    2012       13      1,133      1,126   99.48%
+    2013       12      1,233      1,228   99.47%
+    2014       13      1,365      1,355   99.28%
+    2015       13      1,383      1,372   99.26%
+    2016       12      1,333      1,326   99.28%
+    2017       13      1,383      1,373   99.37%
+
+  ten worst formation dates by coverage:
+    date          eligible  with NSI  coverage
+    2005-01-13       1,029        63    6.12%
+    2005-02-11       1,046       196   18.74%
+    2005-03-14       1,067       654   61.29%
+    2005-04-12       1,070       937   87.57%
+    2005-05-10       1,065       972   91.27%
+    2005-06-08       1,075       987   91.81%
+    2005-07-07       1,082       999   92.33%
+    2005-08-04       1,089     1,012   92.93%
+    2005-09-01       1,090     1,026   94.13%
+    2005-09-30       1,094     1,032   94.33%
+
+  SF1 as-filed history depth (why early dates are thin):
+    earliest filing date        : 2004-01-02
+    earliest reportperiod       : 2002-12-28
+    ARQ rows filed before 2004  : 0
+    ARQ rows filed before 2005  : 22,745
+    ARQ rows filed before 2006  : 45,181
+
+--- 5. CORPORATE-ACTION EXCLUSIONS ---
+  security-quarter pairs excluded : 10,008
+  pairs considered                : 537,927
+  exclusion rate                  : 1.8605%
+  prior reference                 : ~3.04%  (broader population)
+
+  frozen exclusion set (specification section 6):
+    acquisitionby
+    acquisitionof
+    conversion
+    mergerfrom
+    mergerto
+    recapitalisation
+    recapitalization
+    spinoff
+    spinoffdividend
+    spunofffrom
+  NOTE: splits deliberately absent -- sharesbas is retroactively
+        split-rebased; re-adjusting would double-count.
+
+--- 6. PIT COMPLIANCE (filing_date <= formation_date) ---
+  populated observations       : 194,355
+  with knowability date        : 194,355
+  filing_date <= formation     : 194,355
+  PIT COMPLIANCE               : 100.000000%   <-- must be exactly 100%
+  violations                   : 0
+  knowledge lag (days) p50     : 48.0
+                       min     : 0.0
+  same-day (lag == 0)          : 3,198  (1.6454%)
+    Specification section 8 admits `date <= T`, so a filing dated T is
+    inside the information set BY THE FROZEN RULE. Reported, not changed.
+
+--- 7. DETERMINISM ---
+  dataset fingerprint          : 6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f
+  B1 measurement digest        : ad4e3e750f89c44c0703628e4390642ad63b7ea82fd9c3363ec3b623e9c20206
+  float decimals               : 12
+
+==============================================================================
+B1 COMPLETE -- measurement only. No credit spent. Holdout SEALED.
+==============================================================================

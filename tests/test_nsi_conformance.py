@@ -594,3 +594,96 @@ def test_counterexample_the_isolation_scan_detects_a_composite_import():
     assert "build_scores" in found and "composite" in found, (
         f"an import of #001's scorer was not detected; scan returned {found}"
     )
+
+
+# --- GUARD 6: PIT compliance is MEASURED, not assumed -----------------------
+
+def _panel_with_pit(shares, filings, periods, dates, events=None):
+    """Same construction as _panel, but capturing the knowability dates."""
+    frame = pd.DataFrame({
+        "ticker": ["AAA"] * len(shares),
+        "date": pd.to_datetime(filings),
+        "reportperiod": pd.to_datetime(periods),
+        "sharesbas": shares,
+    })
+    idx = pd.DatetimeIndex(pd.to_datetime(dates))
+    known = pd.DataFrame(pd.NaT, index=idx, columns=pd.Index(["SEC1"]), dtype="datetime64[ns]")
+    out = nsi.build_nsi_panel(
+        frame, events or {}, {"AAA": "SEC1"}, idx, pd.Index(["SEC1"]),
+        nsi.NSIReport(), known_from_out=known,
+    )
+    return out, known
+
+
+_PERIODS = ["2020-03-31", "2020-06-30", "2020-09-30", "2020-12-31", "2021-03-31"]
+_FILINGS = ["2020-05-01", "2020-08-01", "2020-11-01", "2021-02-01", "2021-05-01"]
+_SHARES = [1_000_000, 990_000, 980_000, 970_000, 900_000]
+
+
+def test_the_knowability_date_is_the_later_of_the_two_filings():
+    """NSI needs BOTH endpoints. It becomes knowable when the SECOND arrives."""
+    _, known = _panel_with_pit(_SHARES, _FILINGS, _PERIODS, ["2021-06-01"])
+
+    # pairs q1-2021 with q1-2020: filed 2021-05-01 and 2020-05-01 -> the later
+    assert known.loc[pd.Timestamp("2021-06-01"), "SEC1"] == pd.Timestamp("2021-05-01")
+
+
+def test_pit_holds_on_every_populated_cell():
+    dates = ["2021-04-01", "2021-05-15", "2021-06-01", "2021-12-31"]
+    out, known = _panel_with_pit(_SHARES, _FILINGS, _PERIODS, dates)
+
+    populated = out.notna()
+    assert populated.to_numpy().any(), "vacuous: nothing was populated"
+
+    # NOTE: .stack() RETAINS NaT on datetime columns, unlike NaN on float
+    # columns. Counting PIT compliance off a stacked frame would silently
+    # include unpopulated cells. Mask explicitly instead.
+    kf, pop = known.to_numpy(), populated.to_numpy()
+    formation = np.repeat(known.index.to_numpy()[:, None], known.shape[1], axis=1)
+
+    assert not pd.isna(kf[pop]).any(), "a populated cell has no knowability date"
+    assert (kf[pop] <= formation[pop]).all()
+
+
+def test_counterexample_a_future_filing_is_not_used_before_it_exists():
+    """The violation the PIT measure exists to catch.
+
+    The 2021-05-01 filing must be invisible on 2021-04-01. If the signal were
+    populated there, the knowability date would exceed the formation date --
+    which is exactly what the B1 PIT percentage measures.
+    """
+    out, known = _panel_with_pit(_SHARES, _FILINGS, _PERIODS, ["2021-04-01"])
+
+    assert pd.isna(out.loc[pd.Timestamp("2021-04-01"), "SEC1"]), (
+        "a filing dated 2021-05-01 was used to form a signal on 2021-04-01"
+    )
+    assert pd.isna(known.loc[pd.Timestamp("2021-04-01"), "SEC1"])
+
+
+def test_counterexample_the_pit_measure_flags_a_deliberately_late_filing():
+    """Prove the MEASURE can report < 100%, not merely that it reports 100%.
+
+    A measure that structurally cannot fail is not evidence. Here the filing
+    dates are rewritten so the data is knowable only AFTER the formation date,
+    and the same comparison the B1 report performs must flag it.
+    """
+    dates = pd.DatetimeIndex(pd.to_datetime(["2021-06-01"]))
+    # Honest panel first, to establish the cell IS populated.
+    honest, known_ok = _panel_with_pit(_SHARES, _FILINGS, _PERIODS, dates)
+    assert honest.notna().to_numpy().any()
+
+    pop = honest.notna().to_numpy()
+    formation = np.repeat(known_ok.index.to_numpy()[:, None], known_ok.shape[1], axis=1)
+    assert (known_ok.to_numpy()[pop] <= formation[pop]).all(), (
+        "the honest case should be 100% PIT-clean"
+    )
+
+    # Now break it: pretend the knowability date is one day after formation.
+    broken = known_ok.copy()
+    broken.loc[pd.Timestamp("2021-06-01"), "SEC1"] = pd.Timestamp("2021-06-02")
+
+    violations = int((broken.to_numpy()[pop] > formation[pop]).sum())
+    assert violations == 1, (
+        "the PIT comparison did not flag a knowability date after the formation "
+        "date; the B1 '100%' figure would be meaningless"
+    )

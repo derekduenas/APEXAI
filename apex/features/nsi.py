@@ -135,6 +135,7 @@ def build_nsi_panel(
     dates: pd.DatetimeIndex,
     securities: pd.Index,
     report: NSIReport,
+    known_from_out: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Invariants 1-3. Wide NSI frame: rows = formation dates, cols = security_id.
 
@@ -142,6 +143,13 @@ def build_nsi_panel(
     as-filed observation with `date <= T` and its counterpart ~12 months earlier
     also filed by T. Availability is governed by the FILING date, never by the
     fiscal-period label.
+
+    `known_from_out`, when supplied, is filled with the FILING date that made
+    each cell knowable -- max(filed[i], filed[j]). PIT compliance is then a
+    MEASUREMENT (`known_from <= T` for every populated cell) rather than a
+    property asserted from the shape of the code. An off-by-one in the
+    searchsorted side, or a stale index reused across dates, is invisible to
+    the values themselves and visible here.
     """
     panel = pd.DataFrame(np.nan, index=dates, columns=securities, dtype="float64")
 
@@ -179,6 +187,8 @@ def build_nsi_panel(
         idx = np.searchsorted(known_from, dates.to_numpy(), side="right") - 1
         usable = idx >= 0
         panel.loc[usable, security] = values[idx[usable]]
+        if known_from_out is not None and security in known_from_out.columns:
+            known_from_out.loc[usable, security] = known_from[idx[usable]]
 
     stacked = panel.stack()
     report.computed_observations = int(stacked.notna().sum())
