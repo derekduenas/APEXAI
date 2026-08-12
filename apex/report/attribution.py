@@ -28,7 +28,6 @@ import pandas as pd
 
 from apex.config import Config
 from apex.evaluate.deciles import evaluate_deciles
-from apex.features.composite import build_scores
 
 
 @dataclass(frozen=True)
@@ -127,7 +126,9 @@ def attribute(output, config: Config, start, end) -> Attribution:
         members = sectors[sectors == largest].index
         excluded[excluded.columns.intersection(members)] = False
 
-    rescored = build_scores(output.features, excluded, config)
+    # INCIDENT-001 D1: was `build_scores(output.features, ...)`, which assumed
+    # #001's four-component FeaturePanel. The output rescores itself.
+    rescored = output.rescore(excluded, config)
     without = evaluate_deciles(
         rescored.decile, output.forward_returns.excess, excluded, config, grid
     )

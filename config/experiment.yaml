@@ -142,6 +142,30 @@ delisting:
   merger_reasons: [merger, acquisition, voluntary]
   performance_reasons: [bankruptcy, rule_violation, performance]
 
+success_criteria:
+  # APEX-002 section 13, TRANSCRIBED. Not chosen here, and not defaulted by the
+  # runner. INCIDENT-001 D3: run_validation.py hardcoded APEX-001's hurdles
+  # (mean_ic 0.015, t 2.5, robustness_t 2.0) and would have applied them to
+  # APEX-002. Criteria now live with every other registered number.
+  #
+  # "SUCCESS -- mean IC positive, Newey-West t (Bartlett-25) >= the one-sided
+  #  alpha = 1% critical value from the simulated null at that period's length
+  #  (~2.92 validation, ~2.88 holdout), and the non-overlapping robustness test
+  #  agrees in sign."
+  mean_ic:
+    rule: positive
+  t_stat:
+    rule: at_least
+    # The protocol states these numerically. Registered CONSTANTS, so the
+    # decision is a function of the frozen document and not of anything
+    # computed at runtime -- CONVENTIONS A-001 bars the simulated null from
+    # the decision path. The null is still reported alongside as disclosure.
+    by_period:
+      validation: 2.92
+      holdout: 2.88
+  robustness:
+    rule: same_sign
+
 evaluation:
   ic_method: spearman
   min_names_for_ic: 30

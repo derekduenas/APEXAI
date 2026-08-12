@@ -25,7 +25,9 @@ from pathlib import Path
 
 import pytest
 
+from apex.audit.execution_path import executable_source
 from apex.config import load_config
+from apex.evaluate.criteria import SuccessCriteria
 from apex.experiments.apex002 import NSIOutput
 from apex.governance.ledger import ResearchLedger
 
@@ -34,95 +36,187 @@ SCRIPT = REPO / "scripts" / "run_validation.py"
 CFG = load_config("experiment", "costs", "synthetic", "sharadar")
 
 
-# --- D1: the crash that happened --------------------------------------------
+# --- D1: fixed -- each output rescores itself ------------------------------
 
-def test_attribution_requires_a_field_nsi_output_does_not_have():
-    """INCIDENT-001's proximate cause, pinned as a known defect.
-
-    `attribute()` reads `output.features` and calls #001's composite scorer.
-    NSIOutput has no `features` -- #002 has one signal, not four components.
-    This test DOCUMENTS the incompatibility; it does not assert it is fine.
-    """
-    assert not hasattr(NSIOutput, "features")
-    assert "features" not in NSIOutput.__dataclass_fields__
-
+def test_attribution_no_longer_reaches_into_apex_001():
+    """INCIDENT-001 D1, fixed. `attribute()` called
+    `build_scores(output.features, ...)`, which assumed #001's four-component
+    FeaturePanel and crashed on NSIOutput."""
     from apex.report import attribution
 
-    src = inspect.getsource(attribution)
-    assert "output.features" in src, (
-        "attribute() no longer reads output.features -- if that was fixed, "
-        "update this test and INCIDENT-001 rather than deleting the record"
-    )
-    assert "from apex.features.composite import build_scores" in src, (
-        "the #001 composite import is gone -- same instruction as above"
-    )
+    # EXECUTABLE code only. The module's own comment records what the line
+    # used to be, so a raw scan matches the very string it is checking for --
+    # the fifth recurrence of this trap in this codebase.
+    code = executable_source(inspect.getsource(attribution))
+
+    assert "output.features" not in code
+    assert "build_scores" not in code
+    assert "output.rescore(" in code, "attribution must delegate rescoring"
 
 
-# --- D2: the next crash, never reached --------------------------------------
+def test_both_experiment_outputs_can_rescore_themselves():
+    from apex.pipeline import PipelineOutput
 
-def test_the_payload_calls_a_source_method_production_source_lacks():
-    """INCIDENT-001 D2. Latent: the run died at D1 before reaching it."""
+    for cls in (PipelineOutput, NSIOutput):
+        assert hasattr(cls, "rescore"), f"{cls.__name__} cannot rescore"
+
+
+def test_counterexample_nsi_output_still_has_no_features_field():
+    """The shape that caused the crash is unchanged -- the fix is that nothing
+    depends on it any more, not that NSIOutput grew an #001 field."""
+    assert "features" not in NSIOutput.__dataclass_fields__
+    assert not hasattr(NSIOutput, "features")
+
+
+def test_counterexample_rescore_narrows_the_universe(tmp_path):
+    """Prove rescore actually re-ranks rather than returning the input."""
+    import numpy as np
+    import pandas as pd
+
+    from apex.features.nsi_scores import build_nsi_scores
+
+    dates = pd.DatetimeIndex(["2021-06-01"])
+    secs = pd.Index([f"S{i:02d}" for i in range(10)], name="security_id")
+    nsi = pd.DataFrame([list(np.linspace(-0.5, 0.5, 10))], index=dates, columns=secs)
+    full = pd.DataFrame([[True] * 10], index=dates, columns=secs)
+    narrowed = full.copy()
+    narrowed.iloc[0, :5] = False
+
+    a = build_nsi_scores(nsi, full, CFG).apex_score
+    b = build_nsi_scores(nsi, narrowed, CFG).apex_score
+
+    assert not a.equals(b), "narrowing the universe did not change the ranking"
+    assert int(b.notna().sum(axis=1).iloc[0]) == 5
+
+
+# --- D2: fixed -- ProductionSource exposes exclusions ----------------------
+
+def test_production_source_exposes_exclusions():
+    """INCIDENT-001 D2, fixed. Latent before: the run died at D1 first."""
     from apex.data.production_source import ProductionSource
 
-    src = SCRIPT.read_text()
-    assert "source.exclusions()" in src, "payload no longer calls exclusions()"
-    assert not hasattr(ProductionSource, "exclusions"), (
-        "ProductionSource gained exclusions() -- update INCIDENT-001 D2"
-    )
+    assert hasattr(ProductionSource, "exclusions")
+    assert "source.exclusions()" in SCRIPT.read_text()
 
 
-# --- D3: the wrong success criteria, never reached --------------------------
+def test_counterexample_the_payload_would_fail_without_it():
+    """Prove the payload really depends on the method that was missing."""
+    from apex.data.production_source import ProductionSource
+
+    class _Stripped(ProductionSource):
+        exclusions = None
+
+    assert _Stripped.exclusions is None
+    with pytest.raises(TypeError):
+        _Stripped.exclusions()          # what the payload line would hit
+
+
+# --- D3: fixed -- criteria read from the registered experiment -------------
 
 def _verdict_kwargs() -> dict:
-    """The literal thresholds run_validation.py passes to experiment_verdict."""
+    """Literal constants passed to any verdict call in the runner."""
     tree = ast.parse(SCRIPT.read_text())
+    out = {}
     for node in ast.walk(tree):
-        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
-                and node.func.id == "experiment_verdict"):
-            return {kw.arg: getattr(kw.value, "value", None)
-                    for kw in node.keywords if isinstance(kw.value, ast.Constant)}
-    raise AssertionError("experiment_verdict call not found in run_validation.py")
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if node.func.attr == "evaluate":
+                out = {kw.arg: getattr(kw.value, "value", None)
+                       for kw in node.keywords if isinstance(kw.value, ast.Constant)}
+    return out
 
 
-def test_the_hardcoded_thresholds_are_apex_001s_not_apex_002s():
-    """INCIDENT-001 D3, the most serious of the three.
+def test_the_runner_hardcodes_no_success_thresholds():
+    """INCIDENT-001 D3, fixed. 0.015 / 2.5 / 2.0 were APEX-001's hurdles."""
+    src = SCRIPT.read_text()
 
-    Had D1 and D2 not fired, this would have produced an APEX-002 verdict
-    against APEX-001's hurdles and recorded it as the experiment's result.
-    APEX-002 section 13 registers: mean IC POSITIVE, t >= the one-sided
-    alpha=1% critical value from the simulated null (~2.92 validation),
-    robustness AGREES IN SIGN.
-    """
-    applied = _verdict_kwargs()
-
-    assert applied["min_mean_ic"] == 0.015
-    assert applied["min_t_stat"] == 2.5
-    assert applied["min_robustness_t"] == 2.0
-
-    protocol = (REPO / "APEX-002-Protocol-Net-Share-Issuance.md").read_text()
-    section13 = protocol[protocol.index("## 13."):protocol.index("## 14.")]
-    assert "mean IC positive" in section13
-    assert "one-sided" in section13 and "critical value" in section13
-    assert "agrees in sign" in section13
-
-    # The registered criterion is not the applied one. Stated as an
-    # incompatibility, not tolerated as an equivalence.
-    assert applied["min_t_stat"] != 2.92, (
-        "if the threshold now matches APEX-002's registered critical value, "
-        "D3 has been addressed -- update INCIDENT-001"
+    assert "min_mean_ic=0.015" not in src
+    assert "min_t_stat=2.5" not in src
+    assert "min_robustness_t=2.0" not in src
+    assert "SuccessCriteria.from_config(" in src
+    assert not _verdict_kwargs(), (
+        f"the verdict call still passes literals: {_verdict_kwargs()}"
     )
 
 
-def test_the_script_hardcodes_thresholds_rather_than_reading_the_protocol():
-    """Root cause of D3: the criteria are literals, not configuration.
+def test_the_criteria_layer_knows_no_experiment_ids():
+    """A per-experiment branch is the same defect with a lookup table."""
+    from apex.evaluate import criteria
 
-    A per-experiment transaction cannot be correct while its success criteria
-    are baked into the runner.
+    code = executable_source(inspect.getsource(criteria))
+
+    for banned in ("APEX-001", "APEX-002", "Experiment-001"):
+        assert banned not in code, f"criteria.py branches on {banned}"
+
+
+def test_the_registered_criteria_are_apex_002s():
+    criteria = SuccessCriteria.from_config(CFG, "validation")
+
+    assert criteria.mean_ic.rule == "positive"
+    assert criteria.t_stat.rule == "at_least" and criteria.t_stat.threshold == 2.92
+    assert criteria.robustness.rule == "same_sign"
+
+
+def test_counterexample_apex_002_cannot_pass_on_apex_001s_criteria():
+    """THE requirement. A result that clears #001's hurdles but not #002's must
+    be a FAILURE under #002.
+
+    t = 2.60 clears APEX-001's 2.5. It does not clear APEX-002's 2.92.
     """
-    applied = _verdict_kwargs()
+    criteria = SuccessCriteria.from_config(CFG, "validation")
 
-    assert all(isinstance(v, float) for v in applied.values())
-    assert "governance.success" not in SCRIPT.read_text()
+    borderline = criteria.evaluate(mean_ic=0.02, t_stat=2.60, robustness_t=1.20)
+
+    assert borderline.verdict == "FAILURE", (
+        "a t-statistic of 2.60 passed under APEX-002; that is APEX-001's hurdle"
+    )
+    assert any("2.92" in f for f in borderline.failures)
+
+    # and prove the counterexample is not inert: it WOULD pass #001's rule.
+    assert 2.60 >= 2.5
+
+
+def test_counterexample_mean_ic_rule_differs_from_apex_001s(tmp_path):
+    """#001 required mean IC >= 0.015. #002 requires only positive.
+
+    A mean IC of 0.005 fails #001 and satisfies #002 -- so the rules are not
+    interchangeable in either direction.
+    """
+    criteria = SuccessCriteria.from_config(CFG, "validation")
+
+    verdict = criteria.evaluate(mean_ic=0.005, t_stat=3.10, robustness_t=1.20)
+
+    assert verdict.verdict == "SUCCESS"
+    assert 0.005 < 0.015, "the counterexample is inert"
+
+
+def test_counterexample_robustness_uses_sign_agreement_not_a_threshold():
+    """#001 required robustness_t >= 2.0. #002 requires it to agree in sign."""
+    criteria = SuccessCriteria.from_config(CFG, "validation")
+
+    weak_but_agreeing = criteria.evaluate(mean_ic=0.02, t_stat=3.1, robustness_t=0.4)
+    strong_but_opposed = criteria.evaluate(mean_ic=0.02, t_stat=3.1, robustness_t=-2.5)
+
+    assert weak_but_agreeing.verdict == "SUCCESS", "0.4 agrees in sign; #001 would fail it"
+    assert strong_but_opposed.verdict == "FAILURE", "-2.5 opposes; #001 would also fail it"
+
+
+def test_criteria_refuse_to_default_a_missing_threshold():
+    """An unregistered criterion must raise, not fall back."""
+    from apex.evaluate.criteria import CriteriaError
+
+    stripped = {k: v for k, v in CFG.data.items()}
+    stripped["success_criteria"] = {"mean_ic": {"rule": "positive"}}
+    cfg = type(CFG)(data=stripped, sources=CFG.sources)
+
+    with pytest.raises(CriteriaError, match="no registered success criterion"):
+        SuccessCriteria.from_config(cfg, "validation")
+
+
+def test_the_verdict_takes_no_reference_distribution():
+    """CONVENTIONS A-001: the simulated null stays off the decision path."""
+    sig = inspect.signature(SuccessCriteria.evaluate)
+
+    assert set(sig.parameters) == {"self", "mean_ic", "t_stat", "robustness_t"}
 
 
 # --- the invariant that matters: no partial result -------------------------
@@ -215,7 +309,7 @@ def test_the_result_artifact_is_written_after_everything_that_can_fail():
     src = SCRIPT.read_text()
     order = [src.index(marker) for marker in (
         "attribution = attribute(",
-        "verdict = experiment_verdict(",
+        "verdict = criteria.evaluate(",
         "reference = simulate_null_tstats(",
         "ledger.record_result(",
         "args.out.write_text(",

@@ -140,7 +140,60 @@ Holdout    SEALED
 Hypothesis UNTESTED — no predictive conclusion
 ```
 
-## 8. Open governance question — operator ruling required
+## 8. Remediation (2026-08-12)
+
+All three defects fixed. `tests/test_validation_transaction.py`, 19 tests.
+
+**D1** — `attribute()` no longer reads `output.features` and no longer imports
+`build_scores`. Each output rescores itself: `PipelineOutput.rescore` calls
+#001's composite, `NSIOutput.rescore` calls `build_nsi_scores`. The attribution
+layer needs no branch and no import from either experiment. `NSIOutput` still
+has no `features` field — the fix is that nothing depends on it, not that #002
+grew an #001-shaped attribute.
+
+**D2** — `ProductionSource.exclusions()` added, returning the `LoadReport` the
+section 9 payload expects.
+
+**D3** — success criteria moved out of the runner entirely, into
+`config/experiment.yaml: success_criteria`, transcribed from §13:
+
+```yaml
+mean_ic:    {rule: positive}
+t_stat:     {rule: at_least, by_period: {validation: 2.92, holdout: 2.88}}
+robustness: {rule: same_sign}
+```
+
+`apex/evaluate/criteria.py` applies named rules and **knows no experiment
+ids** — a test asserts the string `APEX-001` and `APEX-002` appear nowhere in
+its executable code, because a per-experiment branch is the same defect with a
+lookup table. `SuccessCriteria.from_config` raises rather than defaulting a
+missing threshold. `interpret()` also carried a literal 2.5; it now takes the
+registered value.
+
+**A-001 preserved.** §13's threshold is null-derived, and A-001 bars the
+simulated null from the decision path. The registered per-period constants
+(2.92 / 2.88), which §13 states numerically, are used instead, so the decision
+is a function of the frozen document alone. `SuccessCriteria.evaluate` takes no
+reference argument — a test pins its signature. The simulated null is still
+computed, after the decision, and the report now discloses the registered
+threshold beside the null's 1% quantile at the actual observation count, so a
+divergence is visible rather than absorbed.
+
+**The required proof** — APEX-002 cannot pass on APEX-001's criteria:
+
+| case | #001 | #002 | test |
+|---|---|---|---|
+| t = 2.60 | passes (≥2.5) | **FAILURE** (<2.92) | `..._cannot_pass_on_apex_001s_criteria` |
+| mean IC = 0.005 | fails (<0.015) | SUCCESS (positive) | `..._mean_ic_rule_differs...` |
+| robustness t = 0.4 | fails (<2.0) | SUCCESS (agrees in sign) | `..._robustness_uses_sign_agreement...` |
+| robustness t = −2.5 | fails | **FAILURE** (opposes) | same |
+
+Each counterexample also asserts the #001 comparison it inverts, so none is
+inert. The rules are non-interchangeable in both directions.
+
+---
+
+## 9. Open governance question — RULED 2026-08-12
 
 Does the protocol permit a **replacement execution** of the same registered
 experiment after an execution failure, without treating it as a new hypothesis
@@ -156,5 +209,29 @@ The relevant facts, and nothing beyond them:
 - the budget is a count of experiments, not of executions (CONVENTIONS A-003),
   which is what makes this genuinely ambiguous rather than obviously settled.
 
-This is a governance decision. The implementation must not invent an answer,
-and this document does not propose one.
+**RULING (operator, 2026-08-12):** a replacement execution is permitted under
+the same Credit 2 allocation.
+
+> An execution failure that occurs before a result is recorded does not
+> constitute a second experimental observation.
+
+Not a refund. The ledger continues to show the original spend.
+
+```
+APEX-002
+Original credit:            Credit 2
+Original execution:         FAILED — INCIDENT-001
+Result recorded:            NO
+Result observed:            NO
+Replacement:                AUTHORIZED
+Reason:                     remediation of execution failure
+Hypothesis/protocol changed: NO
+Additional credit:          NO
+```
+
+Conditions: same frozen protocol, same data snapshot, repaired transaction
+only. No changed thresholds, dates, universe or methodology; no inspection of
+the failed run's in-memory statistics; no alternative implementation chosen
+because the first failed; no additional dry runs after seeing results.
+
+The replacement token has NOT been created and nothing has been run.

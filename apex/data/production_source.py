@@ -120,3 +120,12 @@ class ProductionSource:
 
     def load(self) -> Panel:
         return self._panel
+
+    def exclusions(self) -> LoadReport:
+        """Universe-construction exclusions, for the section 9 payload.
+
+        INCIDENT-001 D2: `run_validation.py` called this and ProductionSource
+        did not define it. Latent because the run crashed on D1 first; fixing
+        D1 alone would have crashed here, after spending another credit.
+        """
+        return self.report

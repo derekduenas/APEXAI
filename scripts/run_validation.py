@@ -29,7 +29,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from apex.config import git_sha, load_config  # noqa: E402
 from apex.data.production_source import ProductionSource  # noqa: E402
 from apex.evaluate.reference import simulate_null_tstats  # noqa: E402
-from apex.evaluate.verdict import experiment_verdict, full_report, interpret  # noqa: E402
+from apex.evaluate.criteria import SuccessCriteria  # noqa: E402
+from apex.evaluate.verdict import full_report, interpret  # noqa: E402
 from apex.pipeline import run_period  # noqa: E402
 from apex.registration import open_ledger, signature_status  # noqa: E402
 from apex.report.attribution import attribute  # noqa: E402
@@ -87,15 +88,18 @@ def main() -> int:
     robustness = evaluation.ic_non_overlapping
     deciles = evaluation.deciles
 
-    verdict = experiment_verdict(
-        mean_ic=ic.mean,
-        t_stat=ic.t_stat,
-        robustness_t=robustness.t_stat,
-        min_mean_ic=0.015,
-        min_t_stat=2.5,
-        min_robustness_t=2.0,
+    # INCIDENT-001 D3. The criteria are READ from the registered experiment,
+    # never supplied here. The previous literals -- 0.015 / 2.5 / 2.0 -- are
+    # APEX-001's, and would have been applied to APEX-002.
+    criteria = SuccessCriteria.from_config(config, PERIOD)
+    verdict = criteria.evaluate(
+        mean_ic=ic.mean, t_stat=ic.t_stat, robustness_t=robustness.t_stat
     )
 
+    # Disclosure only. CONVENTIONS A-001 bars the simulated null from the
+    # decision path, and `criteria.evaluate` above takes no reference argument,
+    # so this cannot influence the verdict. It is computed AFTER the decision
+    # so that ordering makes the independence visible.
     reference = simulate_null_tstats(
         n_obs=ic.n_periods, overlap=20, lag=25, kernel="bartlett",
         n_replications=20000, seed=int(config.get("null_rig.reference_seed")),
@@ -113,7 +117,9 @@ def main() -> int:
 
     payload = full_report(
         verdict,
-        interpret(ic.t_stat, 2.5, reference),
+        # The registered threshold, not a literal. This line also carried
+        # APEX-001's 2.5 (INCIDENT-001 D3).
+        interpret(ic.t_stat, criteria.t_stat.threshold, reference),
         ledger.report(family_alpha=float(config.get("governance.family_alpha"))),
     )
     payload["raw"] = {
@@ -132,6 +138,15 @@ def main() -> int:
         "estimator_disclosure": reference.disclosure(),
     }
     payload["attribution"] = attribution.as_dict()
+    payload["success_criteria"] = criteria.as_dict()
+    payload["criteria_evaluation"] = verdict.as_dict()
+    # The registered constant beside the null at the ACTUAL observation count,
+    # so a divergence is visible rather than silently absorbed.
+    payload["threshold_disclosure"] = {
+        "registered_t_threshold": criteria.t_stat.threshold,
+        "simulated_null_one_percent_quantile": reference.quantile(0.99),
+        "n_obs": ic.n_periods,
+    }
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")

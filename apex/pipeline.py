@@ -53,6 +53,17 @@ class PipelineOutput:
     daily_dates: pd.DatetimeIndex
     grid_dates: pd.DatetimeIndex
 
+    def rescore(self, eligible: pd.DataFrame, config: Config) -> ScorePanel:
+        """Re-rank on a narrowed universe (section 9 B6 sector-exclusion test).
+
+        INCIDENT-001 D1: `attribute()` used to reach into `output.features` and
+        call #001's composite scorer directly, which crashed on APEX-002 and
+        put #001 machinery on #002's reporting path. Each experiment now
+        rescores itself, so the attribution layer needs no branch and no import
+        from either experiment.
+        """
+        return build_scores(self.features, eligible, config)
+
     def per_date_log(self) -> pd.DataFrame:
         """Protocol section 9's required per-rebalance log."""
         counts = self.universe.counts()

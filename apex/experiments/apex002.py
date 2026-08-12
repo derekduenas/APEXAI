@@ -61,6 +61,10 @@ class NSIOutput:
     daily_dates: pd.DatetimeIndex
     grid_dates: pd.DatetimeIndex
 
+    def rescore(self, eligible: pd.DataFrame, config: Config) -> ScorePanel:
+        """Re-rank NSI on a narrowed universe. The #002 half of INCIDENT-001 D1."""
+        return build_nsi_scores(self.nsi, eligible, config)
+
     def per_date_log(self) -> pd.DataFrame:
         """Section 9's per-rebalance log, with #002's decile orientation.
 
