@@ -119,7 +119,8 @@ def _pass_validation(repo, config, experiment_id=None):
     )
 
 
-def _unlock_token(repo, period, reason="pre-registered confirmatory evaluation"):
+def _unlock_token(repo, period, reason=None):
+    reason = reason if reason is not None else "APEX-002 pre-registered confirmatory evaluation"
     directory = repo / "results" / "_unlocks"
     directory.mkdir(parents=True, exist_ok=True)
     (directory / f"{period}.unlock").write_text(reason, encoding="utf-8")
@@ -262,7 +263,8 @@ def test_deleting_the_token_does_not_restore_the_credit(repo, config):
     _unlock_token(repo, "holdout")
     require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
     (repo / "results" / "_unlocks" / "holdout.unlock").unlink()
-    _unlock_token(repo, "holdout", reason="second look, surely fine")
+    # properly-named token, so the LEDGER is what refuses -- not the token guard
+    _unlock_token(repo, "holdout", reason=f"{config.get('experiment.id')} second look, surely fine")
 
     with pytest.raises(AlreadyEvaluated):
         require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
@@ -349,3 +351,40 @@ def test_an_unsigned_registration_cannot_open_the_holdout_either(repo, config):
 
     with pytest.raises(RegistrationError):
         require_signed(config, repo_root=repo)
+
+
+# ---------------------------------------------------------------------------
+# TOKEN / EXPERIMENT BINDING
+# ---------------------------------------------------------------------------
+
+
+def test_a_stale_token_from_another_experiment_does_not_unlock(repo, config):
+    """The hole this closes: results/_unlocks/validation.unlock SURVIVES the run
+    that spent it. A later experiment would find a token already present and the
+    token gate would wave it through. The ledger still blocks a repeat of the
+    same (experiment, period) -- but a DIFFERENT experiment had no such guard.
+    """
+    _pass_validation(repo, config)
+    _unlock_token(repo, "holdout", reason="2026-08-11 APEX-001 validation authorized")
+
+    with pytest.raises(RegistrationError) as excinfo:
+        require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
+
+    message = str(excinfo.value)
+    assert "does not authorise" in message
+    assert config.get("experiment.id") in message
+
+
+def test_a_token_naming_the_active_experiment_is_accepted(repo, config):
+    _pass_validation(repo, config)
+    _unlock_token(repo, "holdout", reason=f"2026-08-11 {config.get('experiment.id')} authorized")
+
+    require_unlocked(config, "holdout", "d" * 64, repo_root=repo)
+
+
+def test_an_empty_token_authorises_nothing(repo, config):
+    _pass_validation(repo, config)
+    _unlock_token(repo, "holdout", reason="")
+
+    with pytest.raises(RegistrationError):
+        require_unlocked(config, "holdout", "d" * 64, repo_root=repo)

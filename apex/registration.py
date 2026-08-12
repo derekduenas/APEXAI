@@ -200,6 +200,26 @@ def require_unlocked(
             f"decision with a date and a rationale, not a command-line flag."
         )
 
+    # The token must NAME the experiment it authorises.
+    #
+    # `results/_unlocks/validation.unlock` survives the run that spent it, so a
+    # later experiment finds a token already sitting there and the token gate
+    # waves it through. The ledger still refuses a repeat of the same
+    # (experiment, period), but a DIFFERENT experiment would sail past a stale
+    # token that was never written for it. Binding the token to the experiment
+    # id closes that, and keeps the token a deliberate act per experiment rather
+    # than a file that happens to exist.
+    experiment_id = config.get("experiment.id")
+    authorisation = token.read_text(encoding="utf-8")
+    if experiment_id not in authorisation:
+        raise RegistrationError(
+            f"the unlock token at {token} does not authorise '{experiment_id}'.\n"
+            f"  It reads: {authorisation.strip()!r}\n"
+            f"  A token is per-experiment. A stale token left behind by an\n"
+            f"  earlier experiment must not open a period for a later one.\n"
+            f"  Write a new token naming '{experiment_id}' and a dated reason."
+        )
+
     status = signature_status(config, repo_root)
     ledger = open_ledger(config, repo_root)
     ledger.spend(
