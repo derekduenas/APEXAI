@@ -3,13 +3,18 @@
 # Provenance column records which protocol section or CONVENTIONS ruling fixes it.
 
 experiment:
-  id: APEX-001
-  protocol_file: APEX-Research-Protocol-v1.0-Experiment-001.md
+  # APEX-001 is CLOSED (INCONCLUSIVE, t=0.302). Its protocol file is retained
+  # unchanged; the active experiment is now #002.
+  id: APEX-002
+  protocol_file: APEX-002-Protocol-Net-Share-Issuance.md
+  closed_experiments:
+    APEX-001: APEX-Research-Protocol-v1.0-Experiment-001.md
   conventions_file: CONVENTIONS.md
   hypothesis: >-
-    A fixed equal-weighted composite of four price/volume factor categories ranks
-    US equities such that higher-ranked stocks earn higher forward 20-trading-day
-    excess returns, net of realistic costs.
+    Companies that reduce share count through net repurchases outperform
+    companies that aggressively issue equity: the cross-sectional rank of
+    twelve-month net share issuance, ln(S_t / S_t-4q) on as-filed sharesbas,
+    predicts forward 20-trading-day excess returns. Lower issuance ranks higher.
 
 governance:
   # Directive section 4, as ruled 2026-08-09. This SUPERSEDES protocol section 7's

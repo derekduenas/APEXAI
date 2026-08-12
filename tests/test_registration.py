@@ -141,9 +141,15 @@ def test_the_shipped_pre_registration_is_signed(config):
     status = signature_status(config)
     assert status["signed"] is True, status["unsigned_fields"]
 
+    # Both pre-registrations are signed; the ACTIVE one is whatever config points
+    # at. #001 uses bold markdown fields, #002 plain -- assert the content, not
+    # the formatting, so this survives the experiment rolling forward.
     protocol = (REPO / config.get("experiment.protocol_file")).read_text(encoding="utf-8")
-    assert "**Registered:** 2026-08-11" in protocol
-    assert "**Author:** Derek Duenas" in protocol
+    assert "Registered:" in protocol and "2026-08-11" in protocol
+    assert "Author:" in protocol and "Derek Duenas" in protocol
+
+    closed = (REPO / "APEX-Research-Protocol-v1.0-Experiment-001.md").read_text(encoding="utf-8")
+    assert "**Registered:** 2026-08-11" in closed, "#001's signature was altered"
 
 
 def test_unsigned_registration_refuses_real_data(repo, config):
@@ -184,11 +190,13 @@ def test_the_live_protocol_matches_the_hash_conventions_pins(config):
 
 def test_editing_the_protocol_after_freezing_is_detected(repo, config):
     """The most damaging possible silent change, now caught mechanically."""
+    # Modify the ACTIVE protocol, whichever it is. An earlier version replaced a
+    # literal from #001's text; once #002 became active that string was absent,
+    # the edit silently did nothing, and the test failed for the wrong reason.
     path = repo / config.get("experiment.protocol_file")
-    text = path.read_text(encoding="utf-8")
-    edited = text.replace("≥ 0.015", "≥ 0.010")
-    assert edited != text, "the edit did not apply; this test would pass vacuously"
-    path.write_text(edited, encoding="utf-8")
+    before = path.read_bytes()
+    path.write_bytes(before + b"\n<!-- unauthorised post-freeze edit -->\n")
+    assert path.read_bytes() != before, "the edit did not apply; test would be vacuous"
 
     with pytest.raises(RegistrationError) as excinfo:
         require_protocol_unmodified(config, repo_root=repo)

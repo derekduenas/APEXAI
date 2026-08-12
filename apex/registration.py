@@ -34,8 +34,15 @@ from apex.dev.namespace import require_confirmatory
 from apex.governance.ledger import ResearchLedger
 
 PLACEHOLDER = re.compile(r"_{3,}")
-# CONVENTIONS.md header: "... SHA-256 `a569c718...`"
-PINNED_HASH = re.compile(r"SHA-256\s*`?([0-9a-f]{64})`?", re.IGNORECASE)
+# CONVENTIONS pins each experiment's protocol beside its FILENAME:
+#     **Governs:** `<file>.md`, SHA-256 `<64 hex>`
+# Keyed on the filename, not on "first hash in the document" -- CONVENTIONS now
+# pins more than one protocol (#001 in the header, #002 in section 8), and a
+# positional match would validate #002 against #001's pin.
+def _pin_pattern(filename: str) -> "re.Pattern":
+    return re.compile(
+        re.escape(filename) + r"`?,?\s*SHA-256\s*`?([0-9a-f]{64})`?", re.IGNORECASE
+    )
 
 
 class RegistrationError(RuntimeError):
@@ -111,7 +118,8 @@ def protocol_pin_status(config: Config, repo_root: Path | None = None) -> dict:
     if not conventions.exists():
         raise RegistrationError(f"conventions document not found at {conventions}")
 
-    match = PINNED_HASH.search(_header(conventions.read_text(encoding="utf-8")))
+    # Search the WHOLE document: #002's pin is in section 8, not the header.
+    match = _pin_pattern(protocol.name).search(conventions.read_text(encoding="utf-8"))
     pinned = match.group(1).lower() if match else None
     actual = file_hash(protocol)
 
