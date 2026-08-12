@@ -1,0 +1,149 @@
+{
+  "item_01": {
+    "evidence": [
+      ".first() present (executable code) : True",
+      ".last() absent  (executable code) : True",
+      ".last() appears in prose only     : True",
+      "ARQ rows in             : 488,635",
+      "revisions dropped       : 18,297",
+      "as-filed rows out       : 469,407",
+      "duplicate (ticker,period): 0   (must be 0)"
+    ],
+    "title": "SF1 as-filed, earliest filing per (ticker, reportperiod)",
+    "verdict": "MODULE"
+  },
+  "item_02": {
+    "evidence": [
+      "populated observations  : 194,355",
+      "PIT violations          : 0   (must be 0)",
+      "missing knowability date: 0   (must be 0)",
+      "impossible filings dropped at load: 17"
+    ],
+    "title": "Admission only where filing_date <= formation_date",
+    "verdict": "MODULE"
+  },
+  "item_03": {
+    "evidence": [
+      "literal log-ratio in executable code : True",
+      "shares column              : 'sharesbas'",
+      "dimension filter           : 'ARQ'"
+    ],
+    "title": "NSI = ln(S_t / S_t-4q)",
+    "verdict": "MODULE"
+  },
+  "item_04": {
+    "evidence": [
+      "WINDOW_QUARTERS  : 4   (registered 4)",
+      "MIN_WINDOW_DAYS  : 270 (registered 270)",
+      "MAX_WINDOW_DAYS  : 460 (registered 460)"
+    ],
+    "title": "Twelve-month window exactly as registered",
+    "verdict": "MODULE"
+  },
+  "item_05": {
+    "evidence": [
+      "set matches frozen      : True",
+      "split actions absent    : True  (rebasing already removed them)",
+      "pairs excluded          : 10,008",
+      "exclusion rate          : 1.8605%"
+    ],
+    "title": "Frozen corporate-action exclusion set",
+    "verdict": "MODULE"
+  },
+  "item_06": {
+    "evidence": [
+      "banned constructs in apex.features.nsi: none",
+      "BUT the gated path runs apex.features.composite, which defines: ['winsorise', 'zscore', 'percentile_rank']",
+      "  config composite.winsorize_lower = 0.01",
+      "  config composite.winsorize_upper = 0.99",
+      "  the executed path therefore DOES winsorise and z-score"
+    ],
+    "title": "No winsorization, clipping, smoothing, z-scoring, transformation",
+    "verdict": "FAILED"
+  },
+  "item_07": {
+    "evidence": [
+      "nsi.where(eligible) precedes rank : True",
+      "ranked-but-ineligible cells       : 0   (must be 0)"
+    ],
+    "title": "Eligibility applied before ranking",
+    "verdict": "MODULE"
+  },
+  "item_08": {
+    "evidence": [
+      "fillna/interpolate absent  : True",
+      "ranked with missing NSI    : 0   (must be 0)",
+      "eligible without NSI (excluded, not filled): 4,589"
+    ],
+    "title": "Missing NSI = exclude, never fill",
+    "verdict": "MODULE"
+  },
+  "item_09": {
+    "evidence": [
+      "ascending=True in source : True",
+      "tie method (C10)         : 'first'",
+      "lowest NSI  -0.840708 -> pct rank 0.00100301",
+      "highest NSI +4.587481 -> pct rank 1.00000000",
+      "lowest ranks first       : True",
+      "recomputation identical  : True"
+    ],
+    "title": "Ascending NSI ranking with deterministic C10 tie handling",
+    "verdict": "MODULE"
+  },
+  "item_10": {
+    "evidence": [
+      "decile mechanism in apex.features.nsi: False",
+      "the only equal-count decile mechanism in the repo is",
+      "  apex.features.composite.assign_deciles -- APEX-001 machinery",
+      "using it would satisfy item 10 and violate item 11;",
+      "#002 has no decile mechanism of its own to certify"
+    ],
+    "title": "Mechanical percentile conversion only as registered deciles",
+    "verdict": "BLOCKED"
+  },
+  "item_11": {
+    "evidence": [
+      "references in apex.features.nsi : none  (module is clean)",
+      "but apex.pipeline reaches apex.features.composite: True",
+      "and calls build_scores    : True"
+    ],
+    "title": "No calls into APEX-001 scoring/composite machinery",
+    "verdict": "FAILED"
+  },
+  "item_12": {
+    "evidence": [
+      "dates checked        : 164",
+      "ranked security-dates: 194,355",
+      "alignment            : EXACT \u2014 ranked set equals eligible AND NSI-present on every date"
+    ],
+    "title": "Per-date ranked set == {eligible AND NSI-present}",
+    "verdict": "MODULE"
+  },
+  "item_13": {
+    "evidence": [
+      "duplicate security_id columns : 0   (must be 0)",
+      "duplicate date rows           : 0   (must be 0)",
+      "panel shape                   : 164 x 4,288",
+      "index unique+monotonic        : True"
+    ],
+    "title": "No duplicate (security_id, date) observations",
+    "verdict": "MODULE"
+  },
+  "item_14": {
+    "evidence": [
+      "determinism.float_output_decimals : 12   (registered 12)",
+      "B1 JSON keys sorted               : True",
+      "security columns sorted           : True",
+      "date index sorted                 : True",
+      "NOTE: certifies the B1/module surface. The gated path emits no",
+      "      #002 artifact to serialize."
+    ],
+    "title": "Deterministic serialization: 12 decimals, explicit column order, sorted keys",
+    "verdict": "MODULE"
+  },
+  "wired": false,
+  "wiring_findings": [
+    "the gated execution path does not reach apex.features.nsi: the registered signal is never computed by the code that produces a recorded result",
+    "the gated execution path reaches apex.features.composite: a closed experiment's scoring machinery is inside the live path"
+  ]
+}
