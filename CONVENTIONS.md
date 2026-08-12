@@ -33,7 +33,15 @@ This document resolves every specification gap identified in the Stage-0 review.
 | `TICKERS` | Security metadata, exchange, security type, sector, `isdelisted`, first/last price date |
 | `ACTIONS` | Splits, dividends, delisting and corporate-action events |
 
-`SF1` (fundamentals) is **not** used. Experiment #001 has no fundamental features, and pulling it now creates the temptation to peek.
+`SF1` (fundamentals) is **not** used **for Experiment #001**. Experiment #001 has no fundamental features, and pulling it now creates the temptation to peek.
+
+> **Amended 2026-08-11 (A-005). See §7.** `SF1` is permitted **for APEX-002 ONLY**,
+> and **solely** as a source of as-filed shares outstanding (`sharesbas` /
+> `sharewa`) keyed on `datekey`. It may **not** be used for Experiment #001,
+> which is closed, and it does **not** open the wider fundamental field set to
+> any experiment. The restriction's original purpose — removing the temptation
+> to peek at fundamentals — is preserved by limiting the permission to a single
+> named quantity for a single named experiment.
 
 Rationale: Sharadar supplies survivorship-free point-in-time market cap, which Norgate does not, allowing §3's ≥$1B filter and §4's "shares outstanding as known at formation date" to execute literally. It is a plain HTTP/CSV API, which also resolves A2 — no Windows VM, no Norgate Data Updater.
 
@@ -124,6 +132,7 @@ Both the protocol and this document are committed and SHA-256 pinned before the 
 
 | Date | Item | Change | Reason | Before/after results |
 |---|---|---|---|---|
+| 2026-08-11 | A-005 — §1, SF1 scope | `SF1` permitted for **APEX-002 only**, and only for as-filed shares outstanding (`sharesbas`/`sharewa`) keyed on `datekey`. Experiment #001 is closed and unaffected. No other fundamental field is unlocked for any experiment. | The #002 measurement audit established that `DAILY.marketcap` carries no vintage — 100% of rows were rewritten after their own date, median 1,246 days — so a share-count DIFFERENCE derived from it may embed restatements. Restatements concentrate in firms with accounting problems, which is plausibly correlated with subsequent returns, making this a lookahead channel pointed at the dependent variable. §4 requires shares "as known at formation date". SF1's `datekey` is the filing date and is the only as-filed source available. | **BEFORE** #002 is registered, and before any #002 predictive analysis of any kind. |
 | 2026-08-11 | A-004 — signature + re-pin | Pre-registration SIGNED (Registered 2026-08-11, Author Derek Duenas). Signing edits the protocol file, so its SHA-256 necessarily changes; the CONVENTIONS pin is updated from `a569c718b39b9cac…` to `8f3396f70cf426a7…`. **No clause, threshold, feature, filter or statistical rule was altered — only the two signature fields.** | A pre-registration must be signed to be one, and the pin must track the signed document. | **BEFORE** any validation or holdout result. |
 | 2026-08-09 | A-001 — §2 B2, evaluation | None to the protocol or to this document. Recorded for completeness: the pre-registered Newey-West Bartlett lag-25 estimator was measured to be over-dispersed on the MA(19) autocorrelation that overlapping 20-day windows produce (Bartlett weight at lag 19 is 0.27, discarding ~73% of the relevant autocovariance). sd(t) ≈ 1.21 and the pre-registered `t ≥ 2.5` hurdle carries a **true one-sided size of ~1.9%** against 0.621% nominal. **The protocol is NOT amended**: Bartlett-25 and t ≥ 2.5 both stand exactly as written. The true size is a **disclosed property** reported with every result, and a simulation-calibrated reference distribution is used for **test-harness calibration and for interpretation only** — never as a pass/fail criterion. | Ruling: do not repair a pre-registered statistic after measuring its properties. Disclosure preserves both integrity and interpretability; retroactive correction would destroy the first to buy the second. | **BEFORE** any result. Holdout unopened; validation unopened. |
 | 2026-08-09 | A-002 — §1, data vendor | Sharadar **confirmed primary and authoritative for all universe filters**. Norgate admitted as **optional secondary for prices and cross-check only**, never authoritative for a universe filter, shares outstanding, market cap, or identity. An earlier working design that made Norgate the identity spine is **withdrawn**. | Point-in-time market cap is non-negotiable for §3's ≥$1B filter, and Norgate does not supply it. A clean PIT implementation outranks convenience or prior preference. | **BEFORE** any result and before any data load. |

@@ -51,6 +51,9 @@ TABLES = {
     "DAILY":   {"table": "daily",   "chunk_days": 14,  "dated": True},
     "ACTIONS": {"table": "actions", "chunk_days": 365, "dated": True},
     "TICKERS": {"table": "tickers", "chunk_days": None, "dated": False},
+    # A-005: as-filed shares outstanding for APEX-002 only. `date` is the FILING
+    # date, so date-range chunking selects on knowledge date, not period end.
+    "SF1": {"table": "sf1", "chunk_days": 180, "dated": True},
 }
 MAX_SPLIT_DEPTH = 6
 
