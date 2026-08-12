@@ -129,9 +129,20 @@ def build_nsi_signal(
     )
 
 
-def build_nsi_output(panel: Panel, config: Config, snapshot_root: Path):
-    """Run the #002 computational core over a loaded panel."""
-    signal = build_nsi_signal(panel, config, snapshot_root)
+def build_nsi_output(
+    panel: Panel,
+    config: Config,
+    snapshot_root: Path,
+    known_from_out: pd.DataFrame | None = None,
+):
+    """Run the #002 computational core over a loaded panel.
+
+    `known_from_out` is passed straight through to the signal builder so the
+    dry run can measure PIT compliance while calling THIS function -- the real
+    production entry point -- rather than assembling its two halves itself.
+    """
+    signal = build_nsi_signal(panel, config, snapshot_root,
+                              known_from_out=known_from_out)
     forward_returns = compute_forward_returns(panel, signal.universe.eligible, config)
 
     output = NSIOutput(

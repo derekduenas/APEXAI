@@ -1,0 +1,148 @@
+==============================================================================
+APEX-002 -- DRY-RUN CERTIFICATION
+A specification validator. Not a predictive research run.
+==============================================================================
+
+==============================================================================
+SECTION 1. PROTOCOL / GOVERNANCE
+==============================================================================
+  [PASS] registered experiment is APEX-002   APEX-002
+  [PASS] frozen protocol hash intact
+  [PASS] pre-registration is signed
+         protocol file                          APEX-002-Protocol-Net-Share-Issuance.md
+         SHA-256                                63703d1020893a59a4b43ed9698c4920ccb392e7f76bc77030ef019693ea9bda
+  [PASS] validation period still locked
+  [PASS] holdout period still locked
+  [PASS] no validation unlock token exists
+         evaluation period                      2005-01-01 .. 2017-12-31  (in_sample, unlocked)
+         dataset fingerprint                    6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f
+  [PASS] execution path wiring conforms   8 modules from apex.experiments.apex002
+  [PASS] no APEX-001 scoring machinery on the path   none
+
+==============================================================================
+SECTION 2. PIT / SF1 VERIFICATION
+==============================================================================
+  [PASS] filing_date <= formation_date is EXACTLY 100%   100.000000%
+         observations checked                   194,355
+         PIT violations                         0   (must be 0)
+         missing knowability date               0   (must be 0)
+  [PASS] earliest filing selected per (ticker, reportperiod)   18,297 later revisions discarded
+         ARQ rows read                          488,635
+         as-filed rows retained                 469,407
+         impossible filings excluded            17   (date <= reportperiod)
+         non-positive sharesbas excluded        914
+         knowledge lag p50 (days)               48.0
+
+==============================================================================
+SECTION 3. CORPORATE-ACTION MEASUREMENT
+==============================================================================
+         security-quarter pairs excluded        10,008
+         security-quarter pairs accepted        206,385
+         pairs considered                       216,393
+         EXCLUSION RATE (pairs/pairs)           4.6249%
+
+         breakdown of excluding ACTION EVENTS by type:
+           acquisitionby             5,687
+           acquisitionof             5,687
+           mergerfrom                  109
+           mergerto                    109
+           spinoff                     468
+           spinoffdividend             431
+           spunofffrom                 468
+         total excluding events                 12,959
+         (event counts, not pair attributions: one action can void
+          several pairs, and several actions can void one pair)
+
+  [PASS] splits are NOT in the exclusion set   present in vendor data: ['adrratiosplit', 'split']
+         sharesbas is retroactively split-rebased; excluding splits
+         would double-count an adjustment already applied.
+
+         eligible security-dates                198,944
+         eligible WITHOUT usable NSI            4,589  (2.3067%)
+         (this cell-level figure mixes corporate-action exclusions
+          with insufficient filing history; it is NOT the pair rate)
+
+==============================================================================
+SECTION 4. NSI CONSTRUCTION
+==============================================================================
+         observations                           194,355
+         p1                                     -0.153945413
+         p25                                    -0.022911813
+         p50                                    +0.002435560
+         p75                                    +0.017663193
+         p99                                    +0.415120504
+         mean                                   +0.011734726
+         min / max                              -0.840708122 / +4.587481311
+
+         positive (net issuance)                107,787  (55.4588%)
+         negative (net repurchase)              84,979  (43.7236%)
+         exactly zero (tie rate)                1,589  (0.8176%)
+  [PASS] positive + negative + zero == observations
+
+  [PASS] B1 distribution reproduced exactly
+           p1  B1 / dry run                     -0.153945413 / -0.153945413
+           p25  B1 / dry run                    -0.022911813 / -0.022911813
+           p50  B1 / dry run                    +0.002435560 / +0.002435560
+           p75  B1 / dry run                    +0.017663193 / +0.017663193
+           p99  B1 / dry run                    +0.415120504 / +0.415120504
+  [PASS] B1 observation count reproduced   194,355 / 194,355
+
+==============================================================================
+SECTION 5. UNIVERSE / JOIN ALIGNMENT
+==============================================================================
+         formation dates                        164
+         eligible per date  min/med/max         800 / 1,210 / 1,429
+         with NSI per date  min/med/max         63 / 1,192 / 1,417
+         coverage  min/med/max                  6.1224% / 99.2029% / 99.7594%
+         missingness (1 - coverage) median      0.7971%
+
+  [PASS] join alignment is SYMMETRIC on every date   0 ranked-but-ineligible, 0 eligible-but-unranked
+  [PASS] zero duplicate (security_id, date)
+  [PASS] no silent drop in the SF1 -> universe join   signal and universe share the security axis
+  [PASS] NSI availability is not the binding constraint   median coverage 99.2029%
+
+==============================================================================
+SECTION 6. RANKING / DECILE CONSTRUCTION
+==============================================================================
+         tie method (C10)                       'first'
+         lowest NSI                             -0.840708122 -> score 100.000000, decile 1
+         highest NSI                            +4.587481311 -> score 0.071839, decile 10
+  [PASS] re-running the same dates gives identical ordering
+  [PASS] tie-break is stable under column permutation   security_id-sorted ranking view
+  [PASS] lowest NSI scores highest (section 13 IC orientation)
+  [PASS] lowest NSI is DECILE 1 (section 9 top decile)
+  [PASS] highest NSI is the bottom decile
+  [PASS] decile labels are exactly 1..n   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  [PASS] deciles are equal-count (max imbalance <= 1)   max within-date imbalance 1
+  [PASS] decile set equals score set
+
+==============================================================================
+SECTION 7. DETERMINISM / CONFORMANCE
+==============================================================================
+  [PASS] no transformation construct in executable code   none
+  [PASS] runtime distribution is unbounded (not winsorised)   tails extend beyond p1/p99: -0.840708 .. +4.587481
+  [PASS] no implicit NA filling
+
+  [PASS] panel built end-to-end
+         panel shape                            3,524 dates x 4,288 securities
+         signal frame shape                     164 x 4,288
+  [PASS] no shape drift across signal/score/decile
+  [PASS] forward returns constructed (shape only; no statistic derived)   3,524 x 4,288
+         apex.pipeline.evaluate was NOT called. No IC, no spread,
+         no t-statistic, no moment of any forward return appears
+         anywhere in this report.
+
+         float_output_decimals                  12
+         config hash                            7b1b3e5bdd96b50df6e312608d08f5d5fe68a6ae8c2bc1806fea296cdc543bb0
+
+         measurement digest                     2dbd3cba5ec1632cc9e497175c91f1db77f0f1dab6c4cd28c247bdb38e20b809
+
+==============================================================================
+CERTIFICATION SUMMARY
+==============================================================================
+  CERTIFICATION STATUS: PASS
+  Every registered check passed on the executed pipeline.
+
+  No unlock token created. Credit 2 UNSPENT. Holdout SEALED.
+  Two-run bit-for-bit equality is verified OUTSIDE this script.
+==============================================================================
