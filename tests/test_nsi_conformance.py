@@ -143,16 +143,14 @@ def test_a_uniform_rebasing_factor_cancels():
     ), "a 28x split rebasing changed the signal; the ratio is not cancelling"
 
 
-def test_no_winsorisation_clipping_or_smoothing_anywhere():
-    """Scan EXECUTABLE code only.
+def _executable_only(raw: str) -> str:
+    """Strip docstrings and comments, leaving only code that runs.
 
-    A naive scan of the raw source matches this module's own docstring, which
-    states the prohibition in words -- the prohibition would flag itself.
-    Docstrings and comments are stripped so the test reads what actually runs.
+    Shared by the real scan and its counterexample so the counterexample proves
+    the ACTUAL mechanism detects a violation, not a lookalike.
     """
     import ast, io, tokenize
 
-    raw = inspect.getsource(nsi)
     tree = ast.parse(raw)
     docstrings = set()
     for node in ast.walk(tree):
@@ -160,19 +158,45 @@ def test_no_winsorisation_clipping_or_smoothing_anywhere():
             doc = ast.get_docstring(node, clean=False)
             if doc:
                 docstrings.add(doc)
-
-    code = "".join(
+    return "".join(
         tok.string
         for tok in tokenize.generate_tokens(io.StringIO(raw).readline)
         if tok.type != tokenize.COMMENT
         and not (tok.type == tokenize.STRING and tok.string.strip("\"'") in docstrings)
     )
 
-    for banned in ("clip(", "winsor", "rolling(", "ewm(", ".quantile(", "fillna("):
-        assert banned not in code, f"'{banned}' is EXECUTED in the NSI implementation"
 
+BANNED_TRANSFORMS = ("clip(", "winsor", "rolling(", "ewm(", ".quantile(", "fillna(")
+
+BANNED_001_REFERENCES = ("APEX-001", "Experiment-001", "build_scores", "composite")
+
+
+def forbidden_transforms_in(source: str) -> list:
+    """THE transformation scan. One definition, used by the guard AND its
+    counterexample -- a counterexample against a second copy proves nothing."""
+    code = _executable_only(source)
+    return [b for b in BANNED_TRANSFORMS if b in code]
+
+
+def references_to_001_in(source: str) -> list:
+    """THE isolation scan. One definition, shared with its counterexample."""
+    return [b for b in BANNED_001_REFERENCES if b in source]
+
+
+def test_no_winsorisation_clipping_or_smoothing_anywhere():
+    """Scan EXECUTABLE code only.
+
+    A naive scan of the raw source matches this module's own docstring, which
+    states the prohibition in words -- the prohibition would flag itself.
+    Docstrings and comments are stripped so the test reads what actually runs.
+    """
+    raw = inspect.getsource(nsi)
+
+    assert not forbidden_transforms_in(raw), (
+        f"{forbidden_transforms_in(raw)} EXECUTED in the NSI implementation"
+    )
     # and prove the scan is not vacuous
-    assert "np.log(" in code, "the scan stripped the code it was meant to read"
+    assert "np.log(" in _executable_only(raw), "the scan stripped the code it was meant to read"
 
 
 def test_an_extreme_value_survives_untouched():
@@ -293,9 +317,14 @@ def test_the_frozen_protocol_hash_is_intact():
 
 
 def test_the_nsi_module_cannot_reach_experiment_001():
-    source = inspect.getsource(nsi)
-    assert "APEX-001" not in source
-    assert "Experiment-001" not in source
+    """#002 must not import or reference the closed experiment.
+
+    The specific coupling that matters: importing #001's composite scorer would
+    apply its winsorisation to #002 and still look like a working pipeline.
+    """
+    found = references_to_001_in(inspect.getsource(nsi))
+
+    assert not found, f"NSI reaches the closed experiment via {found}"
 
 
 # --- JOIN CORRECTNESS UNDER MISSINGNESS -------------------------------------
@@ -473,3 +502,95 @@ def test_counterexample_a_modified_protocol_is_detected(tmp_path):
                 tmp_path / config.get("experiment.conventions_file"))
     with pytest.raises(RegistrationError):
         require_protocol_unmodified(config, repo_root=tmp_path)
+
+
+# --- GUARD 4: the transformation scan (counterexample) ----------------------
+#
+# These drive `forbidden_transforms_in` / `references_to_001_in` -- the SAME
+# functions the guards above call. An earlier version of these counterexamples
+# re-implemented the scan locally, which proved only that the copy worked.
+
+def test_counterexample_the_transformation_scan_detects_an_injected_clip():
+    """Proves the scan MECHANISM catches a violation.
+
+    A source scan can be inert for several reasons: it reads the wrong source,
+    an empty or wrapped function, a pattern that does not match the real
+    construct, or code outside the scanned scope. Asserting "clip( is absent"
+    proves none of that. Here the identical mechanism is pointed at a
+    deliberately mutated source and MUST flag it.
+    """
+    real = inspect.getsource(nsi)
+    assert not forbidden_transforms_in(real)
+
+    mutated = real + "\n\ndef _injected(x):\n    return x.clip(-1, 1)\n"
+
+    assert "clip(" in forbidden_transforms_in(mutated), (
+        "the scan did NOT flag injected executable clip(); it is inert and "
+        "proves nothing about the real module"
+    )
+
+
+def test_counterexample_the_scan_detects_a_winsorisation_inside_a_real_function():
+    """Injection at the point it would actually be written -- inside the
+    computation -- not merely appended at module scope."""
+    import ast as _ast
+
+    real = inspect.getsource(nsi)
+    lines = real.splitlines(keepends=True)
+
+    target = next(
+        (n for n in _ast.walk(_ast.parse(real))
+         if isinstance(n, _ast.FunctionDef) and n.name == "build_nsi_panel"),
+        None,
+    )
+    assert target is not None, "build_nsi_panel moved; this counterexample is inert"
+
+    # first real statement of the body, skipping the docstring
+    body = target.body[1:] if isinstance(target.body[0], _ast.Expr) else target.body
+    at = body[0].lineno - 1
+    indent = " " * (len(lines[at]) - len(lines[at].lstrip()))
+
+    mutated = "".join(
+        lines[:at] + [f"{indent}_w = frame['value'].quantile(0.99)\n"] + lines[at:]
+    )
+    assert mutated != real, "the injection did nothing"
+
+    assert ".quantile(" in forbidden_transforms_in(mutated), (
+        "the scan missed a winsorisation injected inside the computation"
+    )
+
+
+def test_the_transformation_scan_ignores_prose_not_code():
+    """The scan must not be tripped by documentation.
+
+    An earlier version matched this module's own docstring, which states the
+    prohibition in words: the prohibition flagged itself.
+    """
+    prose_only = 'def f():\n    """We never clip( or winsorise here."""\n    return 1\n'
+
+    assert not forbidden_transforms_in(prose_only)
+
+
+# --- GUARD 5: the APEX-001 isolation scan (counterexample) ------------------
+
+def test_counterexample_the_isolation_scan_detects_an_injected_001_reference():
+    """Proves the #001-isolation scan can actually fail."""
+    real = inspect.getsource(nsi)
+    assert not references_to_001_in(real)
+
+    mutated = real + '\nFROM_001 = "APEX-001-Research-Protocol"\n'
+
+    assert "APEX-001" in references_to_001_in(mutated), (
+        "the isolation scan cannot detect coupling to the closed experiment"
+    )
+
+
+def test_counterexample_the_isolation_scan_detects_a_composite_import():
+    """The coupling that would silently violate the spec: importing #001's
+    composite scorer applies its winsorisation to #002 and still runs."""
+    mutated = "from apex.features.composite import build_scores\n" + inspect.getsource(nsi)
+
+    found = references_to_001_in(mutated)
+    assert "build_scores" in found and "composite" in found, (
+        f"an import of #001's scorer was not detected; scan returned {found}"
+    )
