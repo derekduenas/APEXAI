@@ -9,6 +9,7 @@ real prices -- not a parallel implementation that happens to resemble it.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 import pandas as pd
 
@@ -18,11 +19,27 @@ from apex.contracts import FeaturePanel, ForwardReturns, Panel, ScorePanel, Univ
 from apex.data.base import PriceSource
 from apex.evaluate.deciles import DecileResult, evaluate_deciles
 from apex.evaluate.ic import ICResult, evaluate_ic
+# The dispatcher below routes to one of two experiments, so this module
+# necessarily imports both. `apex.audit.execution_path` therefore certifies
+# ISOLATION per experiment from that experiment's OWN entry module, not from
+# here: apex.experiments.apex002 must not reach #001's scorer, and it does not.
+# Note the closure walk is AST-based and sees imports inside function bodies,
+# so moving this import into the branch would not have hidden it.
+from apex.experiments.apex002 import build_nsi_output
 from apex.features import compute_features
 from apex.features.composite import build_scores
 from apex.registration import require_protocol_unmodified, require_signed, require_unlocked
 from apex.returns import compute_forward_returns
 from apex.universe import apply_feature_completeness, build_universe
+
+
+class UnregisteredExperiment(RuntimeError):
+    """The configured experiment has no execution path.
+
+    Raised instead of falling back to a default. Step 3's certification found
+    APEX-002 registered in config while APEX-001's composite was what actually
+    ran; a silent default is precisely how that survived five commits.
+    """
 
 
 @dataclass(frozen=True)
@@ -113,5 +130,31 @@ def run_period(
     require_unlocked(config, period, source.dataset_fingerprint)
 
     spec = config.period(period)
-    output = build_panel_pipeline(source.load(), config)
+    experiment = config.get("experiment.id")
+
+    # Resolve the execution path BEFORE loading, like the gates above. An
+    # unregistered experiment must refuse without touching vendor data, so the
+    # message is "no path for APEX-999" rather than a schema error from a load
+    # that was never going to be used.
+    if experiment not in ("APEX-001", "APEX-002"):
+        # The failure this refusal exists to prevent: an unrecognised
+        # experiment id silently running whatever path happens to be first.
+        # Step 3 found APEX-002 registered while #001's composite executed.
+        raise UnregisteredExperiment(
+            f"no execution path is registered for {experiment!r}. Refusing to "
+            f"run rather than defaulting to another experiment's signal."
+        )
+    if experiment == "APEX-002" and getattr(source, "root", None) is None:
+        raise UnregisteredExperiment(
+            f"{type(source).__name__} exposes no `root`; APEX-002 needs the "
+            f"snapshot path to read SF1 as-filed shares"
+        )
+
+    panel = source.load()
+
+    if experiment == "APEX-001":
+        output = build_panel_pipeline(panel, config)
+    else:
+        output, _ = build_nsi_output(panel, config, Path(source.root))
+
     return output, evaluate(output, config, spec["start"], spec["end"])

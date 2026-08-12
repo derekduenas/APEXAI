@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from apex.audit.execution_path import executable_source
 from apex.features import nsi
 
 REPO = Path(__file__).resolve().parent.parent
@@ -144,26 +145,12 @@ def test_a_uniform_rebasing_factor_cancels():
 
 
 def _executable_only(raw: str) -> str:
-    """Strip docstrings and comments, leaving only code that runs.
+    """Delegates to the single shared definition in apex.audit.execution_path.
 
-    Shared by the real scan and its counterexample so the counterexample proves
-    the ACTUAL mechanism detects a violation, not a lookalike.
+    This used to be a local copy. A counterexample written against a copy
+    proves the copy works, which is not the claim being made.
     """
-    import ast, io, tokenize
-
-    tree = ast.parse(raw)
-    docstrings = set()
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.Module, ast.FunctionDef, ast.ClassDef)):
-            doc = ast.get_docstring(node, clean=False)
-            if doc:
-                docstrings.add(doc)
-    return "".join(
-        tok.string
-        for tok in tokenize.generate_tokens(io.StringIO(raw).readline)
-        if tok.type != tokenize.COMMENT
-        and not (tok.type == tokenize.STRING and tok.string.strip("\"'") in docstrings)
-    )
+    return executable_source(raw)
 
 
 BANNED_TRANSFORMS = ("clip(", "winsor", "rolling(", "ewm(", ".quantile(", "fillna(")

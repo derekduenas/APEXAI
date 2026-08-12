@@ -61,6 +61,55 @@ def module_closure(root: Path, entry: str) -> set[str]:
     return seen
 
 
+# Each registered experiment's entry module, the signal it MUST compute, and
+# the machinery it must NOT reach. #001 is closed; its entry is retained so a
+# change to the live path cannot quietly alter the code that produced its
+# recorded result.
+EXPERIMENT_ENTRY = {
+    "APEX-001": "apex.pipeline",
+    "APEX-002": "apex.experiments.apex002",
+}
+
+EXPERIMENT_REQUIRES = {
+    "APEX-001": frozenset({"apex.features.composite"}),
+    "APEX-002": frozenset({"apex.features.nsi", "apex.features.nsi_scores"}),
+}
+
+EXPERIMENT_FORBIDS = {
+    "APEX-001": frozenset(),
+    "APEX-002": frozenset({
+        "apex.features.composite",
+        "apex.features.f1_momentum",
+        "apex.features.f2_trend",
+        "apex.features.f3_volatility",
+        "apex.features.f4_relative_strength",
+    }),
+}
+
+
+def certify_experiment(root: Path, experiment: str) -> list[str]:
+    """Findings for one experiment's execution path. Empty when it conforms."""
+    if experiment not in EXPERIMENT_ENTRY:
+        return [f"no execution path is registered for {experiment!r}"]
+
+    closure = module_closure(root, EXPERIMENT_ENTRY[experiment])
+    findings = []
+
+    for required in sorted(EXPERIMENT_REQUIRES[experiment]):
+        if required not in closure:
+            findings.append(
+                f"{experiment}: entry {EXPERIMENT_ENTRY[experiment]} does not "
+                f"reach {required}; the registered signal is never computed"
+            )
+    for forbidden in sorted(EXPERIMENT_FORBIDS[experiment]):
+        if forbidden in closure:
+            findings.append(
+                f"{experiment}: entry {EXPERIMENT_ENTRY[experiment]} reaches "
+                f"{forbidden}, which belongs to another experiment"
+            )
+    return findings
+
+
 def certify_signal_wiring(closure: set[str], required: str, forbidden: str) -> list[str]:
     """Findings, empty when the wiring conforms.
 
@@ -80,3 +129,32 @@ def certify_signal_wiring(closure: set[str], required: str, forbidden: str) -> l
             f"scoring machinery is inside the live path"
         )
     return findings
+
+
+def executable_source(source: str) -> str:
+    """Source with docstrings and comments removed, leaving only what runs.
+
+    THE single definition. Three separate scans have now been written that
+    matched a module's own prose: `nsi.py` documents why `.last()` is
+    forbidden, `nsi_scores.py` documents that it does not call `build_scores`,
+    and the Step 3 certification read both. A scan that reads documentation
+    reports the prohibition as a violation of itself.
+
+    Note the token join drops original whitespace, so multi-token literals must
+    be matched whitespace-normalised.
+    """
+    import io
+    import tokenize
+
+    tree = ast.parse(source)
+    docstrings = {
+        ast.get_docstring(node, clean=False)
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.Module, ast.FunctionDef, ast.ClassDef))
+    }
+    return "".join(
+        tok.string
+        for tok in tokenize.generate_tokens(io.StringIO(source).readline)
+        if tok.type != tokenize.COMMENT
+        and not (tok.type == tokenize.STRING and tok.string.strip("\"'") in docstrings)
+    )
