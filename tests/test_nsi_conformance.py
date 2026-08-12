@@ -674,3 +674,68 @@ def test_counterexample_the_pit_measure_flags_a_deliberately_late_filing():
         "the PIT comparison did not flag a knowability date after the formation "
         "date; the B1 '100%' figure would be meaningless"
     )
+
+
+# --- GUARD 7: the corporate-action rate must be grid-invariant --------------
+
+def test_the_exclusion_rate_is_pairs_over_pairs():
+    """Excluded and accepted are both PAIR counts, so the rate is a real rate."""
+    periods = ["2020-03-31", "2020-06-30", "2020-09-30", "2020-12-31",
+               "2021-03-31", "2021-06-30"]
+    filings = ["2020-05-01", "2020-08-01", "2020-11-01", "2021-02-01",
+               "2021-05-01", "2021-08-01"]
+    shares = [1_000_000, 990_000, 980_000, 970_000, 900_000, 890_000]
+
+    frame = pd.DataFrame({
+        "ticker": ["AAA"] * len(shares),
+        "date": pd.to_datetime(filings),
+        "reportperiod": pd.to_datetime(periods),
+        "sharesbas": shares,
+    })
+    report = nsi.NSIReport()
+    nsi.build_nsi_panel(
+        frame, {}, {"AAA": "SEC1"},
+        pd.DatetimeIndex(pd.to_datetime(["2021-09-01"])), pd.Index(["SEC1"]),
+        report,
+    )
+
+    # two pairs are formable: (q1-21 vs q1-20) and (q2-21 vs q2-20)
+    assert report.accepted_corporate_action == 2
+    assert report.excluded_corporate_action == 0
+
+
+def test_counterexample_a_cell_denominator_moves_with_the_date_grid():
+    """The defect this counter exists to prevent.
+
+    `computed_observations` counts panel CELLS. Widening the formation grid
+    multiplies it while the number of corporate-action pairs is unchanged, so
+    a rate built on it drifts for a reason that has nothing to do with
+    corporate actions. The pair counter must NOT drift.
+    """
+    periods = ["2020-03-31", "2020-06-30", "2020-09-30", "2020-12-31", "2021-03-31"]
+    filings = ["2020-05-01", "2020-08-01", "2020-11-01", "2021-02-01", "2021-05-01"]
+    shares = [1_000_000, 990_000, 980_000, 970_000, 900_000]
+    frame = pd.DataFrame({
+        "ticker": ["AAA"] * len(shares),
+        "date": pd.to_datetime(filings),
+        "reportperiod": pd.to_datetime(periods),
+        "sharesbas": shares,
+    })
+
+    def run(dates):
+        report = nsi.NSIReport()
+        nsi.build_nsi_panel(
+            frame, {}, {"AAA": "SEC1"},
+            pd.DatetimeIndex(pd.to_datetime(dates)), pd.Index(["SEC1"]), report,
+        )
+        return report
+
+    narrow = run(["2021-06-01"])
+    wide = run(pd.date_range("2021-06-01", periods=40, freq="D").strftime("%Y-%m-%d"))
+
+    assert wide.computed_observations > narrow.computed_observations, (
+        "the counterexample is inert: widening the grid did not add cells"
+    )
+    assert wide.accepted_corporate_action == narrow.accepted_corporate_action, (
+        "the PAIR counter moved with the date grid; it is not grid-invariant"
+    )

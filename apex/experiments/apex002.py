@@ -79,8 +79,31 @@ class NSIOutput:
         return counts
 
 
-def build_nsi_output(panel: Panel, config: Config, snapshot_root: Path):
-    """Run the #002 computational core over a loaded panel."""
+@dataclass(frozen=True)
+class NSISignal:
+    """Everything #002 computes BEFORE forward returns enter the picture.
+
+    Split out so certification can exercise the real production code without
+    calculating a single forward return. `build_nsi_output` calls this and adds
+    returns; nothing else computes the signal, so a certification run against
+    `build_nsi_signal` is a certification of the production path, not of a
+    parallel reimplementation that happens to resemble it.
+    """
+
+    calendar: FormationCalendar
+    universe: UniverseSnapshot
+    nsi: pd.DataFrame
+    scores: ScorePanel
+    report: NSIReport
+
+
+def build_nsi_signal(
+    panel: Panel,
+    config: Config,
+    snapshot_root: Path,
+    known_from_out: pd.DataFrame | None = None,
+) -> NSISignal:
+    """Universe -> as-filed shares -> NSI -> score + deciles. No returns."""
     calendar = build_calendar(panel.dates, config)
     universe = build_universe(panel, config)
 
@@ -92,6 +115,7 @@ def build_nsi_output(panel: Panel, config: Config, snapshot_root: Path):
     nsi = build_nsi_panel(
         as_filed, exclusions, ticker_to_security,
         panel.dates, panel.securities, report,
+        known_from_out=known_from_out,
     )
 
     # Section 10: NSI never redefines the universe. A security with no
@@ -99,16 +123,25 @@ def build_nsi_output(panel: Panel, config: Config, snapshot_root: Path):
     # eligible at later dates -- the existing `missing_feature` path. The
     # eligibility frame is therefore NOT narrowed here.
     scores = build_nsi_scores(nsi, universe.eligible, config)
-    forward_returns = compute_forward_returns(panel, universe.eligible, config)
+
+    return NSISignal(
+        calendar=calendar, universe=universe, nsi=nsi, scores=scores, report=report
+    )
+
+
+def build_nsi_output(panel: Panel, config: Config, snapshot_root: Path):
+    """Run the #002 computational core over a loaded panel."""
+    signal = build_nsi_signal(panel, config, snapshot_root)
+    forward_returns = compute_forward_returns(panel, signal.universe.eligible, config)
 
     output = NSIOutput(
         panel=panel,
-        calendar=calendar,
-        universe=universe,
-        nsi=nsi,
-        scores=scores,
+        calendar=signal.calendar,
+        universe=signal.universe,
+        nsi=signal.nsi,
+        scores=signal.scores,
         forward_returns=forward_returns,
-        daily_dates=calendar.computable_days(),
-        grid_dates=calendar.grid(),
+        daily_dates=signal.calendar.computable_days(),
+        grid_dates=signal.calendar.grid(),
     )
-    return output, report
+    return output, signal.report

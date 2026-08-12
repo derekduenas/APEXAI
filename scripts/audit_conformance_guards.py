@@ -63,6 +63,11 @@ LOAD_BEARING = {
         "test_counterexample_the_isolation_scan_detects_an_injected_001_reference",
         "test_counterexample_the_isolation_scan_detects_a_composite_import",
     ],
+    # Added at Step 3 re-certification. The corporate-action rate is only
+    # meaningful if its denominator counts the same objects as its numerator.
+    "test_the_exclusion_rate_is_pairs_over_pairs": [
+        "test_counterexample_a_cell_denominator_moves_with_the_date_grid",
+    ],
     # Added for B1. The "100% PIT-compliant" figure is only evidence if the
     # measure is capable of reporting less than 100%.
     "test_pit_holds_on_every_populated_cell": [

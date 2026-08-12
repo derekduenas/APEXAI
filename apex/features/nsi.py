@@ -71,6 +71,12 @@ class NSIReport:
     as_filed_rows: int = 0
     securities_with_history: int = 0
     excluded_corporate_action: int = 0
+    # Security-quarter PAIRS that survived the corporate-action filter. The
+    # exclusion RATE is pairs/pairs; `computed_observations` counts CELLS in
+    # the wide panel and scales with the date grid, so using it as the
+    # denominator produces a figure that changes when the formation schedule
+    # changes while nothing about corporate actions has changed at all.
+    accepted_corporate_action: int = 0
     computed_observations: int = 0
     exact_zero_nsi: int = 0
     notes: list = field(default_factory=list)
@@ -177,6 +183,7 @@ def build_nsi_panel(
             if any(period[j] < np.datetime64(e) <= period[i] for e in events):
                 report.excluded_corporate_action += 1
                 continue
+            report.accepted_corporate_action += 1
             pairs.append((max(filed[i], filed[j]), np.log(shares[i] / shares[j])))
 
         if not pairs:

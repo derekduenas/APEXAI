@@ -1,5 +1,5 @@
 ==============================================================================
-APEX-002 -- STEP 3 EXECUTION-PATH CERTIFICATION
+APEX-002 -- STEP 3 EXECUTION-PATH CERTIFICATION (wired path)
 ==============================================================================
 registered experiment : APEX-002
 protocol              : APEX-002-Protocol-Net-Share-Issuance.md
@@ -10,144 +10,168 @@ does NOT              : forward returns, IC, spreads, t-stats,
 ==============================================================================
 GATE -- does the gated path compute the registered signal?
 ==============================================================================
-  entry point                     : apex.pipeline.build_panel_pipeline
-  modules reachable               : 18
-  reaches apex.features.nsi       : False
-  reaches apex.features.composite : True
-  FINDING: the gated execution path does not reach apex.features.nsi: the registered signal is never computed by the code that produces a recorded result
-  FINDING: the gated execution path reaches apex.features.composite: a closed experiment's scoring machinery is inside the live path
+  entry module      : apex.experiments.apex002
+  dispatcher        : apex.pipeline.run_period -> build_nsi_output
+  signal builder    : apex002.build_nsi_signal
+  modules reachable : 8
+      apex.calendar
+      apex.config
+      apex.contracts
+      apex.experiments.apex002
+      apex.features.nsi
+      apex.features.nsi_scores
+      apex.returns
+      apex.universe
+  WIRING: CONFORMS
 
-  The signal modules the gated path DOES reach:
-    apex.features
-    apex.features.composite
-    apex.features.f1_momentum
-    apex.features.f2_trend
-    apex.features.f3_volatility
-    apex.features.f4_relative_strength
-
-[   459s] real-data construction complete
+[   531s] production signal path executed
+[   531s] 164 formation dates, 194,355 scored observations
 
 ==============================================================================
 REGISTERED ITEMS
 ==============================================================================
 --- ITEM  1. SF1 as-filed, earliest filing per (ticker, reportperiod)
-    VERDICT: MODULE
-      .first() present (executable code) : True
-      .last() absent  (executable code) : True
-      .last() appears in prose only     : True
-      ARQ rows in             : 488,635
-      revisions dropped       : 18,297
-      as-filed rows out       : 469,407
-      duplicate (ticker,period): 0   (must be 0)
+    VERDICT   : CERTIFIED
+    PROVENANCE: apex.features.nsi.load_as_filed, called by build_nsi_signal
+      .first() in executable code : True
+      .last() absent              : True
+      ARQ rows in                 : 488,635
+      revisions dropped           : 18,297
+      as-filed rows out           : 469,407
+      impossible filings dropped  : 17
+      non-positive shares dropped : 914
 
 --- ITEM  2. Admission only where filing_date <= formation_date
-    VERDICT: MODULE
-      populated observations  : 194,355
-      PIT violations          : 0   (must be 0)
-      missing knowability date: 0   (must be 0)
-      impossible filings dropped at load: 17
+    VERDICT   : CERTIFIED
+    PROVENANCE: apex.features.nsi.build_nsi_panel known_from_out -- measured, not asserted
+      populated observations   : 194,355
+      PIT violations           : 0   (must be 0)
+      missing knowability date : 0   (must be 0)
+      PIT compliance           : 100.000000%
+      knowledge lag p50 (days) : 48.0
 
 --- ITEM  3. NSI = ln(S_t / S_t-4q)
-    VERDICT: MODULE
+    VERDICT   : CERTIFIED
+    PROVENANCE: apex.features.nsi.build_nsi_panel
       literal log-ratio in executable code : True
-      shares column              : 'sharesbas'
-      dimension filter           : 'ARQ'
+      shares column : 'sharesbas'
+      dimension     : 'ARQ'
+      panel cells populated : 10,533,765   (cells, not pairs -- scales with the date grid)
 
 --- ITEM  4. Twelve-month window exactly as registered
-    VERDICT: MODULE
-      WINDOW_QUARTERS  : 4   (registered 4)
-      MIN_WINDOW_DAYS  : 270 (registered 270)
-      MAX_WINDOW_DAYS  : 460 (registered 460)
+    VERDICT   : CERTIFIED
+    PROVENANCE: apex.features.nsi module constants, enforced in build_nsi_panel
+      WINDOW_QUARTERS : 4   (registered 4)
+      MIN_WINDOW_DAYS : 270 (registered 270)
+      MAX_WINDOW_DAYS : 460 (registered 460)
 
 --- ITEM  5. Frozen corporate-action exclusion set
-    VERDICT: MODULE
-      set matches frozen      : True
-      split actions absent    : True  (rebasing already removed them)
-      pairs excluded          : 10,008
-      exclusion rate          : 1.8605%
+    VERDICT   : CERTIFIED
+    PROVENANCE: apex.features.nsi.EXCLUDING_ACTIONS + load_exclusions
+      set matches frozen   : True
+      split actions absent : True  (rebasing already removed them)
+      pairs excluded       : 10,008
+      pairs accepted       : 206,385
+      pairs considered     : 216,393
+      exclusion rate       : 4.6249%   (pairs/pairs, grid-invariant)
 
 --- ITEM  6. No winsorization, clipping, smoothing, z-scoring, transformation
-    VERDICT: FAILED
-      banned constructs in apex.features.nsi: none
-      BUT the gated path runs apex.features.composite, which defines: ['winsorise', 'zscore', 'percentile_rank']
-        config composite.winsorize_lower = 0.01
-        config composite.winsorize_upper = 0.99
-        the executed path therefore DOES winsorise and z-score
+    VERDICT   : CERTIFIED
+    PROVENANCE: executable-source scan across nsi, nsi_scores, experiments.apex002
+      banned constructs across the #002 path : none
+      np.clip occurrences in nsi_scores      : 1
+      sole clip bounds the DECILE INDEX 1..n : True
+        clipping a bucket number is the decile mechanism;
+        clipping the signal would be winsorisation
 
 --- ITEM  7. Eligibility applied before ranking
-    VERDICT: MODULE
+    VERDICT   : CERTIFIED
+    PROVENANCE: apex.features.nsi_scores._ascending_ordinal_rank
       nsi.where(eligible) precedes rank : True
-      ranked-but-ineligible cells       : 0   (must be 0)
+      scored-but-ineligible cells       : 0   (must be 0)
+      eligible security-dates           : 198,944
 
 --- ITEM  8. Missing NSI = exclude, never fill
-    VERDICT: MODULE
-      fillna/interpolate absent  : True
-      ranked with missing NSI    : 0   (must be 0)
-      eligible without NSI (excluded, not filled): 4,589
+    VERDICT   : CERTIFIED
+    PROVENANCE: apex.features.nsi_scores + nsi -- no imputation on the path
+      fillna/interpolate absent : True
+      scored with missing NSI   : 0   (must be 0)
+      eligible without NSI      : 4,589  (excluded, not filled)
 
 --- ITEM  9. Ascending NSI ranking with deterministic C10 tie handling
-    VERDICT: MODULE
-      ascending=True in source : True
-      tie method (C10)         : 'first'
-      lowest NSI  -0.840708 -> pct rank 0.00100301
-      highest NSI +4.587481 -> pct rank 1.00000000
-      lowest ranks first       : True
-      recomputation identical  : True
+    VERDICT   : CERTIFIED
+    PROVENANCE: apex.features.nsi_scores._ascending_ordinal_rank on a security_id-sorted view
+      tie method (C10)        : 'first'
+      lowest NSI  -0.840708 -> score 100.0000, decile 1
+      highest NSI +4.587481 -> score  0.0718, decile 10
+      lowest NSI scores 100   : True
+      recomputation identical : True
+      column-order invariant  : True
 
 --- ITEM 10. Mechanical percentile conversion only as registered deciles
-    VERDICT: BLOCKED
-      decile mechanism in apex.features.nsi: False
-      the only equal-count decile mechanism in the repo is
-        apex.features.composite.assign_deciles -- APEX-001 machinery
-      using it would satisfy item 10 and violate item 11;
-      #002 has no decile mechanism of its own to certify
+    VERDICT   : CERTIFIED
+    PROVENANCE: apex.features.nsi_scores.equal_count_deciles -- independent of #001
+      decile labels present     : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      max within-date imbalance : 1   (equal-count permits <= 1)
+      decile 1 = lowest NSI     : True   (section 9, ruled 2026-08-11)
+      does not use #001 assign_deciles : True
+      dates checked             : 164
 
 --- ITEM 11. No calls into APEX-001 scoring/composite machinery
-    VERDICT: FAILED
-      references in apex.features.nsi : none  (module is clean)
-      but apex.pipeline reaches apex.features.composite: True
-      and calls build_scores    : True
+    VERDICT   : CERTIFIED
+    PROVENANCE: static import closure of apex.experiments.apex002 + source scan
+      APEX-001 modules in #002 closure : none
+      APEX-001 symbols in #002 source  : none
+      #002 closure size                : 8 modules
 
 --- ITEM 12. Per-date ranked set == {eligible AND NSI-present}
-    VERDICT: MODULE
-      dates checked        : 164
-      ranked security-dates: 194,355
-      alignment            : EXACT — ranked set equals eligible AND NSI-present on every date
+    VERDICT   : CERTIFIED
+    PROVENANCE: set comparison on the production ScorePanel, both directions
+      dates checked             : 164
+      ranked security-dates     : 194,355
+      ranked but ineligible     : 0   (must be 0)
+      eligible+NSI but unranked : 0   (must be 0)
+      decile set == score set   : True
 
 --- ITEM 13. No duplicate (security_id, date) observations
-    VERDICT: MODULE
+    VERDICT   : CERTIFIED
+    PROVENANCE: index/column uniqueness on every production frame
       duplicate security_id columns : 0   (must be 0)
       duplicate date rows           : 0   (must be 0)
+      nsi/score/decile all unique   : True
       panel shape                   : 164 x 4,288
-      index unique+monotonic        : True
+      index monotonic increasing    : True
 
---- ITEM 14. Deterministic serialization: 12 decimals, explicit column order, sorted keys
-    VERDICT: MODULE
-      determinism.float_output_decimals : 12   (registered 12)
-      B1 JSON keys sorted               : True
-      security columns sorted           : True
-      date index sorted                 : True
-      NOTE: certifies the B1/module surface. The gated path emits no
-            #002 artifact to serialize.
+--- ITEM 14. Deterministic serialization: 12 decimals, column order, sorted keys
+    VERDICT   : CERTIFIED
+    PROVENANCE: config determinism.float_output_decimals + canonical JSON
+      float_output_decimals   : 12   (registered 12)
+      security columns sorted : True
+      date index sorted       : True
+      canonical payload       : {"nsi_p50":0.002435559521,"observations":194355,"score_p50":50.041701417848}
+      digest                  : 5da91592fba1f4f8902713087ec2183ec8241c0306262635fdf1b5ba6cd2d6c9
 
 ==============================================================================
-B1 ANCHOR CROSS-CHECK (reproduction, not reinterpretation)
+B1 ANCHOR CROSS-CHECK (reproduction through the WIRED path)
 ==============================================================================
-  p1   B1 -0.153945   now -0.153945   MATCH
-  p25  B1 -0.022912   now -0.022912   MATCH
-  p50  B1 +0.002436   now +0.002436   MATCH
-  p75  B1 +0.017663   now +0.017663   MATCH
-  p99  B1 +0.415121   now +0.415121   MATCH
-  observations  B1 194,355   now 194,355
+  p1   B1 -0.153945   wired -0.153945   MATCH
+  p25  B1 -0.022912   wired -0.022912   MATCH
+  p50  B1 +0.002436   wired +0.002436   MATCH
+  p75  B1 +0.017663   wired +0.017663   MATCH
+  p99  B1 +0.415121   wired +0.415121   MATCH
+  observations  B1 194,355   wired 194,355   MATCH
+
+  B1 measured the signal module directly; this run measured the
+  production path. Identical values mean the wiring changed the
+  CALLER, not the computation.
 
 ==============================================================================
 CERTIFICATION SUMMARY
 ==============================================================================
-  MODULE     11
-  BLOCKED     1
-  FAILED      2
+  CERTIFIED  14 / 14
 
-  RESULT: NOT CERTIFIED
-  The gated execution path does not implement APEX-002.
-  No validation unlock. Credit 2 must not be spent.
+  RESULT: CERTIFIED -- 14/14, wiring conforms, B1 anchors reproduce
+
+  Credit 2 UNSPENT. Holdout SEALED. No unlock token. No ledger write.
+  Dry run NOT run and NOT authorised by this script.
 ==============================================================================

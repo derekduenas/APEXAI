@@ -191,3 +191,27 @@ def test_counterexample_an_unknown_experiment_id_raises_rather_than_defaulting()
 
     with pytest.raises(UnregisteredExperiment, match="APEX-999"):
         run_period(_Source(), config, "in_sample")
+
+
+def test_the_production_path_computes_its_signal_through_build_nsi_signal():
+    """Certification runs `build_nsi_signal`. That is only evidence about
+    production if production runs it too -- otherwise certification would be
+    exercising a bypassed branch."""
+    import ast
+    import inspect
+
+    from apex.experiments import apex002
+
+    src = inspect.getsource(apex002.build_nsi_output)
+    called = {n.func.id for n in ast.walk(ast.parse(src.lstrip()))
+              if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)}
+
+    assert "build_nsi_signal" in called, (
+        "build_nsi_output does not call build_nsi_signal; the certified path "
+        "and the production path have diverged"
+    )
+    # and prove build_nsi_output does not recompute the signal itself
+    for bypass in ("build_nsi_panel", "build_nsi_scores", "load_as_filed"):
+        assert bypass not in called, (
+            f"build_nsi_output calls {bypass} directly, bypassing the certified path"
+        )

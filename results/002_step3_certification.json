@@ -1,149 +1,168 @@
 {
+  "all_certified": true,
+  "b1_reproduces": true,
   "item_01": {
     "evidence": [
-      ".first() present (executable code) : True",
-      ".last() absent  (executable code) : True",
-      ".last() appears in prose only     : True",
-      "ARQ rows in             : 488,635",
-      "revisions dropped       : 18,297",
-      "as-filed rows out       : 469,407",
-      "duplicate (ticker,period): 0   (must be 0)"
+      ".first() in executable code : True",
+      ".last() absent              : True",
+      "ARQ rows in                 : 488,635",
+      "revisions dropped           : 18,297",
+      "as-filed rows out           : 469,407",
+      "impossible filings dropped  : 17",
+      "non-positive shares dropped : 914"
     ],
+    "provenance": "apex.features.nsi.load_as_filed, called by build_nsi_signal",
     "title": "SF1 as-filed, earliest filing per (ticker, reportperiod)",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_02": {
     "evidence": [
-      "populated observations  : 194,355",
-      "PIT violations          : 0   (must be 0)",
-      "missing knowability date: 0   (must be 0)",
-      "impossible filings dropped at load: 17"
+      "populated observations   : 194,355",
+      "PIT violations           : 0   (must be 0)",
+      "missing knowability date : 0   (must be 0)",
+      "PIT compliance           : 100.000000%",
+      "knowledge lag p50 (days) : 48.0"
     ],
+    "provenance": "apex.features.nsi.build_nsi_panel known_from_out -- measured, not asserted",
     "title": "Admission only where filing_date <= formation_date",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_03": {
     "evidence": [
       "literal log-ratio in executable code : True",
-      "shares column              : 'sharesbas'",
-      "dimension filter           : 'ARQ'"
+      "shares column : 'sharesbas'",
+      "dimension     : 'ARQ'",
+      "panel cells populated : 10,533,765   (cells, not pairs -- scales with the date grid)"
     ],
+    "provenance": "apex.features.nsi.build_nsi_panel",
     "title": "NSI = ln(S_t / S_t-4q)",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_04": {
     "evidence": [
-      "WINDOW_QUARTERS  : 4   (registered 4)",
-      "MIN_WINDOW_DAYS  : 270 (registered 270)",
-      "MAX_WINDOW_DAYS  : 460 (registered 460)"
+      "WINDOW_QUARTERS : 4   (registered 4)",
+      "MIN_WINDOW_DAYS : 270 (registered 270)",
+      "MAX_WINDOW_DAYS : 460 (registered 460)"
     ],
+    "provenance": "apex.features.nsi module constants, enforced in build_nsi_panel",
     "title": "Twelve-month window exactly as registered",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_05": {
     "evidence": [
-      "set matches frozen      : True",
-      "split actions absent    : True  (rebasing already removed them)",
-      "pairs excluded          : 10,008",
-      "exclusion rate          : 1.8605%"
+      "set matches frozen   : True",
+      "split actions absent : True  (rebasing already removed them)",
+      "pairs excluded       : 10,008",
+      "pairs accepted       : 206,385",
+      "pairs considered     : 216,393",
+      "exclusion rate       : 4.6249%   (pairs/pairs, grid-invariant)"
     ],
+    "provenance": "apex.features.nsi.EXCLUDING_ACTIONS + load_exclusions",
     "title": "Frozen corporate-action exclusion set",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_06": {
     "evidence": [
-      "banned constructs in apex.features.nsi: none",
-      "BUT the gated path runs apex.features.composite, which defines: ['winsorise', 'zscore', 'percentile_rank']",
-      "  config composite.winsorize_lower = 0.01",
-      "  config composite.winsorize_upper = 0.99",
-      "  the executed path therefore DOES winsorise and z-score"
+      "banned constructs across the #002 path : none",
+      "np.clip occurrences in nsi_scores      : 1",
+      "sole clip bounds the DECILE INDEX 1..n : True",
+      "  clipping a bucket number is the decile mechanism;",
+      "  clipping the signal would be winsorisation"
     ],
+    "provenance": "executable-source scan across nsi, nsi_scores, experiments.apex002",
     "title": "No winsorization, clipping, smoothing, z-scoring, transformation",
-    "verdict": "FAILED"
+    "verdict": "CERTIFIED"
   },
   "item_07": {
     "evidence": [
       "nsi.where(eligible) precedes rank : True",
-      "ranked-but-ineligible cells       : 0   (must be 0)"
+      "scored-but-ineligible cells       : 0   (must be 0)",
+      "eligible security-dates           : 198,944"
     ],
+    "provenance": "apex.features.nsi_scores._ascending_ordinal_rank",
     "title": "Eligibility applied before ranking",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_08": {
     "evidence": [
-      "fillna/interpolate absent  : True",
-      "ranked with missing NSI    : 0   (must be 0)",
-      "eligible without NSI (excluded, not filled): 4,589"
+      "fillna/interpolate absent : True",
+      "scored with missing NSI   : 0   (must be 0)",
+      "eligible without NSI      : 4,589  (excluded, not filled)"
     ],
+    "provenance": "apex.features.nsi_scores + nsi -- no imputation on the path",
     "title": "Missing NSI = exclude, never fill",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_09": {
     "evidence": [
-      "ascending=True in source : True",
-      "tie method (C10)         : 'first'",
-      "lowest NSI  -0.840708 -> pct rank 0.00100301",
-      "highest NSI +4.587481 -> pct rank 1.00000000",
-      "lowest ranks first       : True",
-      "recomputation identical  : True"
+      "tie method (C10)        : 'first'",
+      "lowest NSI  -0.840708 -> score 100.0000, decile 1",
+      "highest NSI +4.587481 -> score  0.0718, decile 10",
+      "lowest NSI scores 100   : True",
+      "recomputation identical : True",
+      "column-order invariant  : True"
     ],
+    "provenance": "apex.features.nsi_scores._ascending_ordinal_rank on a security_id-sorted view",
     "title": "Ascending NSI ranking with deterministic C10 tie handling",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_10": {
     "evidence": [
-      "decile mechanism in apex.features.nsi: False",
-      "the only equal-count decile mechanism in the repo is",
-      "  apex.features.composite.assign_deciles -- APEX-001 machinery",
-      "using it would satisfy item 10 and violate item 11;",
-      "#002 has no decile mechanism of its own to certify"
+      "decile labels present     : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+      "max within-date imbalance : 1   (equal-count permits <= 1)",
+      "decile 1 = lowest NSI     : True   (section 9, ruled 2026-08-11)",
+      "does not use #001 assign_deciles : True",
+      "dates checked             : 164"
     ],
+    "provenance": "apex.features.nsi_scores.equal_count_deciles -- independent of #001",
     "title": "Mechanical percentile conversion only as registered deciles",
-    "verdict": "BLOCKED"
+    "verdict": "CERTIFIED"
   },
   "item_11": {
     "evidence": [
-      "references in apex.features.nsi : none  (module is clean)",
-      "but apex.pipeline reaches apex.features.composite: True",
-      "and calls build_scores    : True"
+      "APEX-001 modules in #002 closure : none",
+      "APEX-001 symbols in #002 source  : none",
+      "#002 closure size                : 8 modules"
     ],
+    "provenance": "static import closure of apex.experiments.apex002 + source scan",
     "title": "No calls into APEX-001 scoring/composite machinery",
-    "verdict": "FAILED"
+    "verdict": "CERTIFIED"
   },
   "item_12": {
     "evidence": [
-      "dates checked        : 164",
-      "ranked security-dates: 194,355",
-      "alignment            : EXACT \u2014 ranked set equals eligible AND NSI-present on every date"
+      "dates checked             : 164",
+      "ranked security-dates     : 194,355",
+      "ranked but ineligible     : 0   (must be 0)",
+      "eligible+NSI but unranked : 0   (must be 0)",
+      "decile set == score set   : True"
     ],
+    "provenance": "set comparison on the production ScorePanel, both directions",
     "title": "Per-date ranked set == {eligible AND NSI-present}",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_13": {
     "evidence": [
       "duplicate security_id columns : 0   (must be 0)",
       "duplicate date rows           : 0   (must be 0)",
+      "nsi/score/decile all unique   : True",
       "panel shape                   : 164 x 4,288",
-      "index unique+monotonic        : True"
+      "index monotonic increasing    : True"
     ],
+    "provenance": "index/column uniqueness on every production frame",
     "title": "No duplicate (security_id, date) observations",
-    "verdict": "MODULE"
+    "verdict": "CERTIFIED"
   },
   "item_14": {
     "evidence": [
-      "determinism.float_output_decimals : 12   (registered 12)",
-      "B1 JSON keys sorted               : True",
-      "security columns sorted           : True",
-      "date index sorted                 : True",
-      "NOTE: certifies the B1/module surface. The gated path emits no",
-      "      #002 artifact to serialize."
+      "float_output_decimals   : 12   (registered 12)",
+      "security columns sorted : True",
+      "date index sorted       : True",
+      "canonical payload       : {\"nsi_p50\":0.002435559521,\"observations\":194355,\"score_p50\":50.041701417848}",
+      "digest                  : 5da91592fba1f4f8902713087ec2183ec8241c0306262635fdf1b5ba6cd2d6c9"
     ],
-    "title": "Deterministic serialization: 12 decimals, explicit column order, sorted keys",
-    "verdict": "MODULE"
+    "provenance": "config determinism.float_output_decimals + canonical JSON",
+    "title": "Deterministic serialization: 12 decimals, column order, sorted keys",
+    "verdict": "CERTIFIED"
   },
-  "wired": false,
-  "wiring_findings": [
-    "the gated execution path does not reach apex.features.nsi: the registered signal is never computed by the code that produces a recorded result",
-    "the gated execution path reaches apex.features.composite: a closed experiment's scoring machinery is inside the live path"
-  ]
+  "wired": true
 }
