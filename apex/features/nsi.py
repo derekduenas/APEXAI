@@ -195,3 +195,49 @@ def rank_ascending(nsi: pd.DataFrame, eligible: pd.DataFrame, tie_method: str = 
     """
     restricted = nsi.where(eligible)
     return restricted.rank(axis=1, method=tie_method, ascending=True, pct=True)
+
+
+class CrossSectionMisaligned(AssertionError):
+    """A date's ranked set is not exactly eligible AND NSI-present."""
+
+
+def assert_cross_section_alignment(
+    ranks: pd.DataFrame, nsi: pd.DataFrame, eligible: pd.DataFrame
+) -> dict:
+    """The last place a clean-looking run can still be wrong.
+
+    Global distributions can be correct while individual dates are misaligned --
+    a silent row drop before ranking, or an inconsistent reindex across dates,
+    leaves every summary statistic intact and the per-date cross-sections wrong.
+    Summary stats cannot see it; only a per-date set comparison can.
+
+    For every formation date:
+
+        {securities ranked at T}  ==  {eligible at T}  AND  {NSI present at T}
+
+    Exact set equality, both directions. A ranked security that is not eligible
+    is a universe breach; an eligible security with an NSI that went unranked is
+    a silent drop. Both raise.
+    """
+    ranked_any = ranks.notna()
+    expected = eligible & nsi.notna()
+
+    extra = ranked_any & ~expected      # ranked but should not be
+    missing = expected & ~ranked_any    # should be ranked but is not
+
+    if extra.to_numpy().any() or missing.to_numpy().any():
+        bad_dates = (extra | missing).any(axis=1)
+        first = bad_dates[bad_dates].index[0]
+        raise CrossSectionMisaligned(
+            f"cross-section misaligned on {len(bad_dates[bad_dates])} date(s); "
+            f"first {first.date()}: "
+            f"{int(extra.loc[first].sum())} ranked-but-ineligible, "
+            f"{int(missing.loc[first].sum())} eligible-with-NSI-but-unranked.\n"
+            f"  Every date must satisfy: ranked == eligible AND nsi_present."
+        )
+
+    return {
+        "dates_checked": int(len(ranks)),
+        "ranked_security_dates": int(ranked_any.to_numpy().sum()),
+        "alignment": "EXACT — ranked set equals eligible AND NSI-present on every date",
+    }

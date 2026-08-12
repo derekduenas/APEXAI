@@ -296,3 +296,65 @@ def test_the_nsi_module_cannot_reach_experiment_001():
     source = inspect.getsource(nsi)
     assert "APEX-001" not in source
     assert "Experiment-001" not in source
+
+
+# --- JOIN CORRECTNESS UNDER MISSINGNESS -------------------------------------
+
+def _frames(nsi_vals, elig_vals):
+    dates = pd.DatetimeIndex(["2021-06-01", "2021-06-02"])
+    secs = pd.Index(["A", "B", "C"])
+    return (pd.DataFrame(nsi_vals, index=dates, columns=secs),
+            pd.DataFrame(elig_vals, index=dates, columns=secs))
+
+
+def test_ranked_set_equals_eligible_and_nsi_present():
+    signal, eligible = _frames(
+        [[-0.1, np.nan, 0.2], [0.3, -0.4, np.nan]],
+        [[True, True, True], [True, True, True]],
+    )
+    ranks = nsi.rank_ascending(signal, eligible)
+
+    out = nsi.assert_cross_section_alignment(ranks, signal, eligible)
+
+    assert out["alignment"].startswith("EXACT")
+    assert out["ranked_security_dates"] == 4   # 2 per date
+
+
+def test_an_ineligible_security_that_got_ranked_is_caught():
+    """Universe breach: NSI availability must never widen the cross-section."""
+    signal, eligible = _frames(
+        [[-0.1, 0.2, 0.3], [-0.1, 0.2, 0.3]],
+        [[True, False, True], [True, False, True]],
+    )
+    ranks = nsi.rank_ascending(signal, eligible)
+    ranks.iloc[0, 1] = 0.5    # simulate a leaked ineligible name
+
+    with pytest.raises(nsi.CrossSectionMisaligned) as excinfo:
+        nsi.assert_cross_section_alignment(ranks, signal, eligible)
+    assert "ranked-but-ineligible" in str(excinfo.value)
+
+
+def test_a_silently_dropped_eligible_security_is_caught():
+    """The subtle one: a row dropped before ranking leaves global stats intact."""
+    signal, eligible = _frames(
+        [[-0.1, 0.2, 0.3], [-0.1, 0.2, 0.3]],
+        [[True, True, True], [True, True, True]],
+    )
+    ranks = nsi.rank_ascending(signal, eligible)
+    ranks.iloc[1, 2] = np.nan   # simulate a silent drop on the second date
+
+    with pytest.raises(nsi.CrossSectionMisaligned) as excinfo:
+        nsi.assert_cross_section_alignment(ranks, signal, eligible)
+    assert "unranked" in str(excinfo.value)
+
+
+def test_alignment_holds_when_eligibility_changes_between_dates():
+    """Cross-sections legitimately differ day to day; alignment is PER DATE."""
+    signal, eligible = _frames(
+        [[-0.1, 0.2, np.nan], [np.nan, 0.2, 0.3]],
+        [[True, True, True], [False, True, True]],
+    )
+    ranks = nsi.rank_ascending(signal, eligible)
+
+    out = nsi.assert_cross_section_alignment(ranks, signal, eligible)
+    assert out["ranked_security_dates"] == 4
