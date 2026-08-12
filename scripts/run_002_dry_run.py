@@ -50,7 +50,11 @@ from apex.data.production_source import build_production_panel  # noqa: E402
 from apex.experiments import apex002  # noqa: E402
 from apex.features import nsi as nsi_mod  # noqa: E402
 from apex.features import nsi_scores as scores_mod  # noqa: E402
-from apex.registration import protocol_pin_status, signature_status  # noqa: E402
+from apex.registration import (  # noqa: E402
+    protocol_pin_status,
+    signature_status,
+    unlock_token_status,
+)
 
 REPO = Path(__file__).resolve().parent.parent
 ROOT = Path("data/snapshots/sharadar/current")
@@ -99,6 +103,9 @@ def q(x) -> float:
 def main() -> int:  # noqa: C901
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True, help="report path (txt)")
+    ap.add_argument("--governance-only", action="store_true",
+                    help="Section 1 only; skip the pipeline. Re-certifies the "
+                         "governance section without a full rebuild.")
     args = ap.parse_args()
 
     r = Report()
@@ -133,8 +140,20 @@ def main() -> int:  # noqa: C901
             cfg.period("validation").get("locked") is True)
     r.check("holdout period still locked",
             cfg.period("holdout").get("locked") is True)
-    r.check("no validation unlock token exists",
-            not (REPO / "validation.unlock").exists())
+    # Resolved through apex.registration.unlock_token_path -- the SAME
+    # function require_unlocked uses. An earlier version computed
+    # `REPO/validation.unlock` here, a path nothing writes, so this check could
+    # not fail and reported clean while a real token existed.
+    unlock = unlock_token_status("validation", REPO)
+    r.check("no validation unlock token authorises APEX-002",
+            not (unlock["present"] and EXPERIMENT in (unlock["authorises"] or "")),
+            "token PRESENT" if unlock["present"] else "no token")
+    r.fact("unlock token path", unlock["path"])
+    r.fact("unlock token present", unlock["present"])
+    if unlock["present"]:
+        r.fact("token authorises", repr(unlock["authorises"]))
+        r.say("         a token exists but does not name APEX-002; require_unlocked")
+        r.say("         refuses a stale token from another experiment.")
     r.fact("evaluation period", f"{cfg.period(period)['start']} .. "
                                 f"{cfg.period(period)['end']}  ({period}, unlocked)")
     r.fact("dataset fingerprint", fingerprint)
@@ -156,6 +175,25 @@ def main() -> int:  # noqa: C901
         "experiment": cfg.get("experiment.id"), "protocol_sha256": digest,
         "dataset_fingerprint": fingerprint, "closure_modules": len(closure),
     }
+
+    if args.governance_only:
+        r.say("=" * 78)
+        r.say("GOVERNANCE-ONLY RUN -- sections 2-7 not executed")
+        r.say("=" * 78)
+        if r.failures:
+            r.say(f"  SECTION 1 STATUS: FAIL   ({len(r.failures)} check(s) failed)")
+            for f in r.failures:
+                r.say(f"    - {f}")
+        else:
+            r.say("  SECTION 1 STATUS: PASS")
+        r.say()
+        r.say("  No pipeline run. No unlock token created. Credit 2 UNSPENT.")
+        r.say("=" * 78)
+        out = Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(r.text())
+        progress(f"wrote {out} (governance only)")
+        return 1 if r.failures else 0
 
     # ==================================================================
     # RUN THE FULL PRODUCTION PIPELINE (returns included)

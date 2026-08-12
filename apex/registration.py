@@ -167,6 +167,35 @@ def open_ledger(config: Config, repo_root: Path | None = None) -> ResearchLedger
     )
 
 
+def unlock_token_path(period: str, repo_root: Path | None = None) -> Path:
+    """THE canonical location of a period's unlock token.
+
+    One definition, because the alternative was tried and failed. The dry-run
+    certification computed this path independently as `REPO/validation.unlock`,
+    which is not where tokens live. Its "no unlock token exists" check therefore
+    read a location that can never exist, passed vacuously, and reported clean
+    governance while a real token sat at the true path. A guard that cannot
+    fail is not a guard.
+
+    Every caller -- the gate that enforces the lock and any report that
+    describes it -- must resolve the path through here, so the two cannot drift
+    apart again.
+    """
+    root = repo_root or REPO_ROOT
+    return (root / "results" / "_unlocks" / f"{period}.unlock").resolve()
+
+
+def unlock_token_status(period: str, repo_root: Path | None = None) -> dict:
+    """Report-facing view of the token. Reads; never creates."""
+    token = unlock_token_path(period, repo_root)
+    present = token.exists()
+    return {
+        "path": str(token),
+        "present": present,
+        "authorises": token.read_text(encoding="utf-8").strip() if present else None,
+    }
+
+
 def require_unlocked(
     config: Config, period: str, dataset_hash: str, repo_root: Path | None = None
 ) -> None:
@@ -188,7 +217,7 @@ def require_unlocked(
     # looked at.
     require_confirmatory(dataset_hash, context=f"opening locked period '{period}'")
 
-    token = (root / "results" / "_unlocks" / f"{period}.unlock").resolve()
+    token = unlock_token_path(period, repo_root)
     if not token.exists():
         raise RegistrationError(
             f"period '{period}' ({spec['start']} to {spec['end']}) is LOCKED.\n"

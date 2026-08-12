@@ -40,7 +40,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-CONFORMANCE = Path(__file__).resolve().parents[1] / "tests" / "test_nsi_conformance.py"
+_TESTS = Path(__file__).resolve().parents[1] / "tests"
+CONFORMANCE = _TESTS / "test_nsi_conformance.py"
+
+# Guards live in more than one file. Scanning only the conformance file is how
+# a load-bearing governance guard could sit outside the audit entirely -- which
+# is adjacent to the defect that produced the vacuous unlock check.
+AUDITED_FILES = [CONFORMANCE, _TESTS / "test_governance_unlock.py"]
 
 # Guard -> the counterexample(s) that demonstrate it can fail.
 LOAD_BEARING = {
@@ -74,6 +80,21 @@ LOAD_BEARING = {
         "test_counterexample_a_future_filing_is_not_used_before_it_exists",
         "test_counterexample_the_pit_measure_flags_a_deliberately_late_filing",
     ],
+    # Added 2026-08-12 after the dry-run certification reported "no validation
+    # unlock token exists" while one sat at the true path. The check read
+    # REPO/validation.unlock, which nothing writes, so it could not fail.
+    "test_the_token_path_is_where_tokens_are_actually_written": [
+        "test_counterexample_the_repo_root_path_is_the_one_that_never_exists",
+    ],
+    "test_the_status_reports_absent_when_no_token_exists": [
+        "test_counterexample_the_status_reports_present_when_a_token_exists",
+    ],
+    "test_the_report_check_passes_when_no_token_exists": [
+        "test_counterexample_the_report_check_FAILS_on_a_token_naming_this_experiment",
+    ],
+    "test_a_locked_period_without_a_token_is_refused": [
+        "test_counterexample_a_stale_token_naming_another_experiment_is_refused",
+    ],
 }
 
 # Ordinary assertions: failure is intrinsic to the assertion. Ruled 2026-08-11.
@@ -104,10 +125,12 @@ REQUIRED_NEGATIVE_CASES = [
 
 
 def main() -> int:
-    source = CONFORMANCE.read_text()
-    defined = {
-        n.name for n in ast.walk(ast.parse(source)) if isinstance(n, ast.FunctionDef)
-    }
+    defined = set()
+    for path in AUDITED_FILES:
+        defined |= {
+            n.name for n in ast.walk(ast.parse(path.read_text()))
+            if isinstance(n, ast.FunctionDef)
+        }
 
     print("=" * 78)
     print("APEX-002 GUARD AUDIT -- demonstrated detection")
@@ -149,9 +172,9 @@ def main() -> int:
     if orphans:
         failures.append(f"counterexamples not tied to any guard: {orphans}")
 
-    print("\nRunning the conformance suite")
+    print("\nRunning the audited suites")
     proc = subprocess.run(
-        [sys.executable, "-m", "pytest", str(CONFORMANCE), "-q"],
+        [sys.executable, "-m", "pytest", *[str(p) for p in AUDITED_FILES], "-q"],
         capture_output=True,
         text=True,
     )

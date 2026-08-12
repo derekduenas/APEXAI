@@ -1,0 +1,33 @@
+==============================================================================
+APEX-002 -- DRY-RUN CERTIFICATION
+A specification validator. Not a predictive research run.
+==============================================================================
+
+==============================================================================
+SECTION 1. PROTOCOL / GOVERNANCE
+==============================================================================
+  [PASS] registered experiment is APEX-002   APEX-002
+  [PASS] frozen protocol hash intact
+  [PASS] pre-registration is signed
+         protocol file                          APEX-002-Protocol-Net-Share-Issuance.md
+         SHA-256                                63703d1020893a59a4b43ed9698c4920ccb392e7f76bc77030ef019693ea9bda
+  [PASS] validation period still locked
+  [PASS] holdout period still locked
+  [PASS] no validation unlock token authorises APEX-002   token PRESENT
+         unlock token path                      /Users/derekduenas/apex-equities/results/_unlocks/validation.unlock
+         unlock token present                   True
+         token authorises                       '2026-08-11 APEX-001 validation authorized'
+         a token exists but does not name APEX-002; require_unlocked
+         refuses a stale token from another experiment.
+         evaluation period                      2005-01-01 .. 2017-12-31  (in_sample, unlocked)
+         dataset fingerprint                    6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f
+  [PASS] execution path wiring conforms   8 modules from apex.experiments.apex002
+  [PASS] no APEX-001 scoring machinery on the path   none
+
+==============================================================================
+GOVERNANCE-ONLY RUN -- sections 2-7 not executed
+==============================================================================
+  SECTION 1 STATUS: PASS
+
+  No pipeline run. No unlock token created. Credit 2 UNSPENT.
+==============================================================================
