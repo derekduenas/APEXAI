@@ -1,8 +1,25 @@
 # APEX Experiment #002 — Net Share Issuance
-## Research Specification (DRAFT — unsigned, unregistered)
+## Pre-Registration — FROZEN
 
-**Status:** awaiting approval. Not a pre-registration until signed and hash-pinned.
-**Credit:** would be 2 of 5. **Not spent.** Holdout sealed. No predictive analysis performed.
+**Status:** SIGNED / FROZEN
+Registered: 2026-08-11
+Author: Derek Duenas
+
+**Experiment ID:** APEX-002
+**Credit:** 2 of 5. **NOT YET SPENT.** Holdout sealed. No predictive analysis performed.
+**Governs:** APEX Research Protocol v1.0 is inherited unchanged for the timing
+firewall, universe, cost model and evaluation machinery. This document specifies
+only what is new to #002.
+
+> Frozen 2026-08-11 after the measurement-coverage gate cleared: 3.04% lost to
+> corporate-action exclusions, 88.7% with four-quarter PIT history, 3,743-5,107
+> securities per year. Those diagnostics established MEASURABILITY only. They did
+> not test predictive power, and nothing in them altered the hypothesis, window,
+> formula, ranking or exclusion rules.
+>
+> **The 12-month window and the corporate-action exclusion rule may not change
+> after any predictive result is observed.** A modified specification is a new
+> hypothesis requiring a new experiment id and another credit.
 
 ---
 

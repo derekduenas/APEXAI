@@ -128,10 +128,33 @@ Both the protocol and this document are committed and SHA-256 pinned before the 
 
 ---
 
+## 8. Experiment #002 Registration (added 2026-08-11)
+
+**APEX-002 — Net Share Issuance.** SIGNED and FROZEN 2026-08-11, Author Derek Duenas.
+
+**Governs:** `APEX-002-Protocol-Net-Share-Issuance.md`, SHA-256 `63703d1020893a59a4b43ed9698c4920ccb392e7f76bc77030ef019693ea9bda`
+
+APEX Research Protocol v1.0 is inherited unchanged for the timing firewall, the
+§3 universe, the cost model and the evaluation machinery. #002 adds one
+cross-sectional ranking variable and nothing else. Experiment #001 is closed and
+is not affected by this registration.
+
+Binding constraint carried from the specification: the twelve-month measurement
+window and the corporate-action exclusion rule **may not be altered after any
+predictive result is observed**.
+
+The measurement-coverage gate that preceded freezing established measurability
+only — 3.04% excluded by corporate actions, 88.7% with four-quarter PIT history,
+3,743–5,107 securities per year. It tested no predictive power. #002's
+hypothesis is entirely untested.
+
+---
+
 ## 7. Amendment Log
 
 | Date | Item | Change | Reason | Before/after results |
 |---|---|---|---|---|
+| 2026-08-11 | A-006 — §8, #002 registration | APEX-002 pre-registration SIGNED and FROZEN; its SHA-256 `63703d1020893a59…` pinned in the new §8. Experiment #001, its protocol and its closed result are untouched. | A pre-registration must be signed and pinned to be one. Recorded before implementation begins and before any #002 predictive analysis. | **BEFORE** any #002 result. |
 | 2026-08-11 | A-005 — §1, SF1 scope | `SF1` permitted for **APEX-002 only**, and only for as-filed shares outstanding (`sharesbas`/`sharewa`) keyed on `datekey`. Experiment #001 is closed and unaffected. No other fundamental field is unlocked for any experiment. | The #002 measurement audit established that `DAILY.marketcap` carries no vintage — 100% of rows were rewritten after their own date, median 1,246 days — so a share-count DIFFERENCE derived from it may embed restatements. Restatements concentrate in firms with accounting problems, which is plausibly correlated with subsequent returns, making this a lookahead channel pointed at the dependent variable. §4 requires shares "as known at formation date". SF1's `datekey` is the filing date and is the only as-filed source available. | **BEFORE** #002 is registered, and before any #002 predictive analysis of any kind. |
 | 2026-08-11 | A-004 — signature + re-pin | Pre-registration SIGNED (Registered 2026-08-11, Author Derek Duenas). Signing edits the protocol file, so its SHA-256 necessarily changes; the CONVENTIONS pin is updated from `a569c718b39b9cac…` to `8f3396f70cf426a7…`. **No clause, threshold, feature, filter or statistical rule was altered — only the two signature fields.** | A pre-registration must be signed to be one, and the pin must track the signed document. | **BEFORE** any validation or holdout result. |
 | 2026-08-09 | A-001 — §2 B2, evaluation | None to the protocol or to this document. Recorded for completeness: the pre-registered Newey-West Bartlett lag-25 estimator was measured to be over-dispersed on the MA(19) autocorrelation that overlapping 20-day windows produce (Bartlett weight at lag 19 is 0.27, discarding ~73% of the relevant autocovariance). sd(t) ≈ 1.21 and the pre-registered `t ≥ 2.5` hurdle carries a **true one-sided size of ~1.9%** against 0.621% nominal. **The protocol is NOT amended**: Bartlett-25 and t ≥ 2.5 both stand exactly as written. The true size is a **disclosed property** reported with every result, and a simulation-calibrated reference distribution is used for **test-harness calibration and for interpretation only** — never as a pass/fail criterion. | Ruling: do not repair a pre-registered statistic after measuring its properties. Disclosure preserves both integrity and interpretability; retroactive correction would destroy the first to buy the second. | **BEFORE** any result. Holdout unopened; validation unopened. |
