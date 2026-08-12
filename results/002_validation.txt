@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Users/derekduenas/apex-equities/scripts/run_validation.py", line 150, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/Users/derekduenas/apex-equities/scripts/run_validation.py", line 84, in main
+    attribution = attribute(output, config, spec["start"], spec["end"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/derekduenas/apex-equities/apex/report/attribution.py", line 130, in attribute
+    rescored = build_scores(output.features, excluded, config)
+                            ^^^^^^^^^^^^^^^
+AttributeError: 'NSIOutput' object has no attribute 'features'
+EXIT=1
