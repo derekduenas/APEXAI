@@ -358,3 +358,118 @@ def test_alignment_holds_when_eligibility_changes_between_dates():
 
     out = nsi.assert_cross_section_alignment(ranks, signal, eligible)
     assert out["ranked_security_dates"] == 4
+
+
+# ===========================================================================
+# STEP 1A -- COUNTEREXAMPLES FOR THE THREE LOAD-BEARING GUARDS
+#
+# Audit provenance, kept deliberately: on 2026-08-11 the conformance suite was
+# audited against the rule "a test is trusted only after it has been shown to
+# fail on a deliberate violation." THREE load-bearing guards FAILED that audit --
+# the PIT `.last()` scan, the ratio-vs-level invariant, and the frozen-hash
+# check. All three passed, but none had ever been shown capable of failing.
+# The counterexamples below supply that demonstration. Do not delete this note:
+# the fact that these guards were initially unproven is audit history.
+# ===========================================================================
+
+
+# --- GUARD 1: PIT earliest-filing selection --------------------------------
+
+def test_counterexample_last_would_select_the_restatement(tmp_path):
+    """Demonstrates WHAT the `.last()` guard prevents.
+
+    The scan test asserts `.last()` is absent from the loader. That is only
+    meaningful if using `.last()` would actually produce a wrong answer. Here it
+    does: the same fixture resolved with `.last()` returns the RESTATED share
+    count, which is post-formation information.
+    """
+    (tmp_path / "raw" / "SF1").mkdir(parents=True)
+    _sf1([
+        ["AAA", "ARQ", "2020-05-01", "2020-03-31", 1_000_000],   # as-filed
+        ["AAA", "ARQ", "2021-08-01", "2020-03-31", 1_250_000],   # restatement
+    ]).to_csv(tmp_path / "raw" / "SF1" / "a.csv", index=False)
+
+    raw = pd.read_csv(tmp_path / "raw" / "SF1" / "a.csv")
+    raw["date"] = pd.to_datetime(raw["date"])
+
+    broken = raw.sort_values("date").groupby(["ticker", "reportperiod"]).last()
+    correct = nsi.load_as_filed(tmp_path, nsi.NSIReport())
+
+    assert broken["sharesbas"].iloc[0] == 1_250_000, "fixture does not exercise the bug"
+    assert correct.iloc[0]["sharesbas"] == 1_000_000
+    assert broken["sharesbas"].iloc[0] != correct.iloc[0]["sharesbas"], (
+        "the .last() guard protects nothing: both spellings agree on this fixture"
+    )
+
+
+def test_the_last_scan_is_not_vacuous():
+    """The scan must be shown to be reading real executable code.
+
+    Same failure mode as the two decorative assertions found earlier: a source
+    scan over an empty or wrong string passes trivially.
+    """
+    source = inspect.getsource(nsi.load_as_filed)
+
+    assert len(source) > 500, "the scan is reading a stub, not the loader"
+    for anchor in ("groupby", "sort_values", "reportperiod", "dropped_revisions"):
+        assert anchor in source, f"the scan is not reading the real loader ({anchor} absent)"
+    assert ".last()" not in source
+    assert ".first()" in source
+
+
+# --- GUARD 2: the ratio mandate --------------------------------------------
+
+def test_counterexample_a_level_measure_breaks_under_rebasing():
+    """The specification's central claim is RATIO MANDATORY, LEVEL FORBIDDEN.
+
+    The existing test proves the ratio survives a 28x rebasing. It never proved
+    the other half -- that a level-based measure does NOT. Without this, the
+    invariant is only half tested and the mandate looks like a style choice.
+    """
+    base = np.array([1000.0, 990.0, 980.0, 970.0, 900.0])
+    rebased = base * 28.0                      # AAPL: 7:1 (2014) x 4:1 (2020)
+
+    # RATIO -- what the specification mandates
+    ratio_plain = np.log(base[-1] / base[0])
+    ratio_rebased = np.log(rebased[-1] / rebased[0])
+
+    # LEVEL -- a forbidden construction, e.g. shares differenced or scaled raw
+    level_plain = base[-1] - base[0]
+    level_rebased = rebased[-1] - rebased[0]
+
+    assert ratio_plain == pytest.approx(ratio_rebased), "the ratio must be invariant"
+    assert level_plain != pytest.approx(level_rebased), (
+        "the counterexample is inert: the level measure did not break, so this "
+        "test cannot demonstrate why the ratio form is mandatory"
+    )
+    assert abs(level_rebased / level_plain) == pytest.approx(28.0), (
+        "a level measure scales with the rebasing factor -- which embeds splits "
+        "occurring AFTER the formation date. That is the lookahead the ratio "
+        "form exists to avoid."
+    )
+
+
+# --- GUARD 3: the frozen protocol hash -------------------------------------
+
+def test_counterexample_a_modified_protocol_is_detected(tmp_path):
+    """The hash check asserts equality against a literal. Show it can FAIL."""
+    original = (REPO / "APEX-002-Protocol-Net-Share-Issuance.md").read_bytes()
+
+    tampered = tmp_path / "APEX-002-Protocol-Net-Share-Issuance.md"
+    tampered.write_bytes(original + b"\n<!-- unauthorised post-freeze edit -->\n")
+
+    assert hashlib.sha256(original).hexdigest() == FROZEN_HASH
+    assert hashlib.sha256(tampered.read_bytes()).hexdigest() != FROZEN_HASH, (
+        "a modified protocol produced the frozen hash; the integrity check "
+        "cannot detect tampering"
+    )
+    # and the real registration gate must refuse it
+    from apex.config import load_config
+    from apex.registration import RegistrationError, require_protocol_unmodified
+    import shutil
+
+    config = load_config("experiment", "costs", "synthetic")
+    shutil.copy(REPO / config.get("experiment.conventions_file"),
+                tmp_path / config.get("experiment.conventions_file"))
+    with pytest.raises(RegistrationError):
+        require_protocol_unmodified(config, repo_root=tmp_path)
