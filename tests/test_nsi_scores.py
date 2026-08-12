@@ -64,17 +64,57 @@ def test_counterexample_an_inverted_score_is_detected():
     )
 
 
-def test_the_largest_repurchaser_lands_in_the_best_decile():
-    """Section 9: rank 1 = top decile, under 1-worst..10-best numbering."""
+def test_the_largest_repurchaser_lands_in_decile_one():
+    """Section 9, ruled 2026-08-11: rank 1 = TOP decile = decile 1.
+
+    The opposite of #001's numbering. Inheriting #001's convention here would
+    silently relabel every reported bucket.
+    """
     values = list(np.linspace(-0.5, 0.5, 100))
     nsi, elig = _frames(values)
 
-    decile = nsi_scores.equal_count_deciles(
-        nsi_scores.nsi_percentile_score(nsi, elig), 10
-    ).iloc[0]
+    decile = nsi_scores.equal_count_deciles(nsi, elig, 10).iloc[0]
 
-    assert decile.iloc[0] == 10.0, "largest repurchaser must be in the best decile"
-    assert decile.iloc[-1] == 1.0, "largest issuer must be in the worst decile"
+    assert decile.iloc[0] == 1.0, "largest repurchaser must be in the TOP decile (1)"
+    assert decile.iloc[-1] == 10.0, "largest issuer must be in the bottom decile (10)"
+
+
+def test_the_score_and_the_decile_point_in_opposite_directions_deliberately():
+    """The resolution, pinned so it cannot be 'tidied' into agreement.
+
+    Score 100 and decile 1 both mean 'largest net repurchaser'. Section 13's
+    IC reads the SCORE; section 9's wording governs the LABEL. A future editor
+    aligning the two numerically would break one of them.
+    """
+    values = list(np.linspace(-0.5, 0.5, 50))
+    nsi, elig = _frames(values)
+
+    score = nsi_scores.nsi_percentile_score(nsi, elig).iloc[0]
+    decile = nsi_scores.equal_count_deciles(nsi, elig, 10).iloc[0]
+
+    best = score.idxmax()
+    assert decile.loc[best] == 1.0, "the highest-scoring name is not in decile 1"
+    assert decile.loc[score.idxmin()] == 10.0
+
+
+def test_counterexample_the_apex_001_numbering_would_be_detected():
+    """Prove the decile orientation check can fail.
+
+    #001's `assign_deciles` maps the best name to decile 10. If #002 adopted
+    it, the top decile would be mislabelled on every date.
+    """
+    values = list(np.linspace(-0.5, 0.5, 100))
+    nsi, elig = _frames(values)
+
+    score = nsi_scores.nsi_percentile_score(nsi, elig)
+    apex001_style = np.ceil(score.to_numpy() / 100.0 * 10).clip(1, 10)
+
+    assert apex001_style[0][0] == 10.0, "the counterexample is inert"
+    correct = nsi_scores.equal_count_deciles(nsi, elig, 10).to_numpy()
+    assert correct[0][0] == 1.0
+    assert not np.array_equal(correct, apex001_style), (
+        "#001's numbering and #002's are indistinguishable; the guard is inert"
+    )
 
 
 # --- EQUAL COUNT ------------------------------------------------------------
@@ -83,9 +123,7 @@ def test_deciles_are_equal_count():
     values = list(np.linspace(-1.0, 1.0, 200))
     nsi, elig = _frames(values)
 
-    decile = nsi_scores.equal_count_deciles(
-        nsi_scores.nsi_percentile_score(nsi, elig), 10
-    ).iloc[0]
+    decile = nsi_scores.equal_count_deciles(nsi, elig, 10).iloc[0]
 
     counts = decile.value_counts()
     assert set(counts.index) == set(float(d) for d in range(1, 11))
@@ -185,7 +223,7 @@ def test_missing_nsi_is_excluded_never_filled():
     nsi, elig = _frames([-0.5, np.nan, 0.0, 0.5])
 
     score = nsi_scores.nsi_percentile_score(nsi, elig).iloc[0]
-    decile = nsi_scores.equal_count_deciles(score.to_frame().T, 10).iloc[0]
+    decile = nsi_scores.equal_count_deciles(nsi, elig, 10).iloc[0]
 
     assert pd.isna(score.loc["S01"]) and pd.isna(decile.loc["S01"])
     assert int(score.notna().sum()) == 3, "a missing NSI was filled"
@@ -265,9 +303,7 @@ def test_deciles_are_balanced_for_awkward_counts(n):
     be BALANCED -- no bucket may differ from another by more than one name."""
     nsi, elig = _frames(list(np.linspace(-1, 1, n)))
 
-    decile = nsi_scores.equal_count_deciles(
-        nsi_scores.nsi_percentile_score(nsi, elig), 10
-    ).iloc[0]
+    decile = nsi_scores.equal_count_deciles(nsi, elig, 10).iloc[0]
 
     counts = decile.value_counts()
     assert counts.max() - counts.min() <= 1, f"n={n} unbalanced: {dict(counts)}"

@@ -64,15 +64,17 @@ class NSIOutput:
     def per_date_log(self) -> pd.DataFrame:
         """Section 9's per-rebalance log, with #002's decile orientation.
 
-        Decile `n_deciles` is the best -- the largest net repurchasers. See
-        `nsi_scores` for why that numbering follows from sections 9, 12 and 13
-        together.
+        DECILE 1 IS THE TOP DECILE (section 9, ruled 2026-08-11) -- the largest
+        net repurchasers. This is the OPPOSITE of #001's `PipelineOutput`,
+        where `top_decile` counts decile `n_deciles`. The two logs share column
+        names and mean opposite things, which is why #002 has its own method
+        rather than inheriting one.
         """
         counts = self.universe.counts()
         deciles = self.scores.decile
         n = int(deciles.max().max()) if deciles.notna().any().any() else 0
-        counts["top_decile"] = (deciles == n).sum(axis=1)
-        counts["bottom_decile"] = (deciles == 1).sum(axis=1)
+        counts["top_decile"] = (deciles == 1).sum(axis=1)
+        counts["bottom_decile"] = (deciles == n).sum(axis=1)
         counts["ranked"] = deciles.notna().sum(axis=1)
         return counts
 
