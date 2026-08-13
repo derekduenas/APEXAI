@@ -105,6 +105,15 @@ LOAD_BEARING = {
     "test_a_complete_dossier_is_accepted": [
         "test_counterexample_an_incomplete_dossier_cannot_be_screened",
     ],
+    # S1 amendment 2026-08-12: the field list is transcribed from the protocol,
+    # not invented by the implementation.
+    "test_the_required_fields_are_transcribed_from_the_protocol": [
+        "test_counterexample_the_transcription_check_would_notice_an_added_field",
+    ],
+    # S13: a screening outcome is an eligibility decision, never evidence.
+    "test_the_evaluation_path_cannot_read_the_screen_log": [
+        "test_counterexample_the_s13_isolation_check_detects_a_reachable_screen",
+    ],
     "test_the_hash_is_content_addressed_not_order_dependent": [
         "test_counterexample_a_changed_dossier_gets_a_different_hash",
     ],

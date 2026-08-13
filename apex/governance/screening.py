@@ -1,4 +1,4 @@
-"""The Phase 2 cheap screen. APEX Screening Protocol v1.0, rules S1-S12.
+"""The Phase 2 cheap screen. APEX Screening Protocol v1.0, rules S1-S13.
 
 A filter that can reject an idea and is structurally incapable of improving
 one. Every rule the protocol states is enforced by a type or a refusal here,
@@ -12,6 +12,14 @@ would therefore change the hash of every entry already written and break the
 live six-entry research ledger. `tests/test_screening.py` demonstrates this
 rather than asserting it. Screening gets its own append-only chained log, and
 the research ledger is not touched at all (S10, S12).
+
+S13 -- A SCREENING OUTCOME IS NOT EVIDENCE
+------------------------------------------
+A verdict here is an ELIGIBILITY decision. It carries no evidentiary weight
+toward the eventual experiment and may never enter its statistics, verdict,
+multiplicity accounting or interpretation. Enforced structurally in the only
+way available: nothing in the evaluation path imports this module, and a test
+asserts that. "It already looked good in screening" has nowhere to enter from.
 
 WHY THE RETURN TYPE IS SO NARROW
 --------------------------------
@@ -37,21 +45,34 @@ REJECT = "REJECT"
 SURVIVE = "SURVIVE"
 VERDICTS = (REJECT, SURVIVE)
 
-# S1: a dossier is complete or it is not screenable. No partial submissions,
-# no "we'll fill that in later" -- an incomplete hypothesis cannot be rejected
-# for the right reason.
-REQUIRED_FIELDS = (
-    "title",
+# S1. These are TRANSCRIBED from the protocol's "What a dossier must contain",
+# not chosen here. The earlier version of this module enforced a ten-field list
+# the protocol never specified, which made the definition of a valid hypothesis
+# an undocumented implementation choice -- a hidden selection criterion inside
+# a system built to eliminate hidden selection criteria. `prior_literature` and
+# `why_it_might_fail` were inventions and have been removed.
+#
+# The two groups are kept apart on purpose. Only the first is a statement about
+# the science; the second is bookkeeping, and a reader must be able to see at a
+# glance that a missing `title` is an administrative defect and not a
+# scientific one.
+SCIENTIFIC_FIELDS = (
     "hypothesis",
     "economic_rationale",
     "signal_definition",
+    "directional_prediction",
+    "timing",
     "data_requirements",
     "universe",
     "horizon",
-    "prior_literature",
-    "why_it_might_fail",
-    "author",
+    "falsification_criterion",
 )
+
+# Provenance and a readable log. NOT scientific criteria: their absence makes a
+# dossier unadministrable, never unscientific.
+GOVERNANCE_FIELDS = ("title", "author", "date")
+
+REQUIRED_FIELDS = SCIENTIFIC_FIELDS + GOVERNANCE_FIELDS
 
 
 class ScreeningError(RuntimeError):
@@ -94,11 +115,20 @@ class Dossier:
     content: dict
 
     def __post_init__(self) -> None:
-        missing = [f for f in REQUIRED_FIELDS if not str(self.content.get(f, "")).strip()]
-        if missing:
+        def absent(fields):
+            return [f for f in fields if not str(self.content.get(f, "")).strip()]
+
+        science, admin = absent(SCIENTIFIC_FIELDS), absent(GOVERNANCE_FIELDS)
+        if science or admin:
+            parts = []
+            if science:
+                parts.append(f"scientific requirements missing: {science}")
+            if admin:
+                parts.append(f"governance metadata missing: {admin}")
             raise DossierIncomplete(
-                f"dossier is missing required field(s): {missing}. S1: a "
-                f"hypothesis must be complete before it can be screened."
+                f"dossier is incomplete -- {'; '.join(parts)}. S1: the required "
+                f"content is stated in APEX-SCREENING-PROTOCOL-v1.0.md, not "
+                f"here; this module transcribes it and may not add to it."
             )
 
     def canonical(self) -> str:

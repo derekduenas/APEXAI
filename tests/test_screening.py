@@ -15,6 +15,8 @@ import json
 
 import pytest
 
+from pathlib import Path
+
 from apex.config import load_config
 from apex.governance.screening import (
     REJECT,
@@ -34,21 +36,26 @@ from apex.governance.screening import (
 )
 
 CFG = load_config("experiment", "costs", "synthetic", "sharadar")
+REPO = Path(__file__).resolve().parents[1]
 
 
 def _content(**overrides) -> dict:
     """An inert, complete fixture. NOT a candidate hypothesis."""
     base = {
-        "title": "FIXTURE — not a candidate",
+        # scientific requirements (protocol)
         "hypothesis": "A placeholder used only to exercise the governance layer.",
         "economic_rationale": "None. This fixture exists to test refusals.",
         "signal_definition": "placeholder",
+        "directional_prediction": "none; a fixture predicts nothing",
+        "timing": "not applicable",
         "data_requirements": "none",
         "universe": "frozen section 3",
         "horizon": "20 trading days",
-        "prior_literature": "not applicable to a fixture",
-        "why_it_might_fail": "it is a fixture and predicts nothing",
+        "falsification_criterion": "not applicable to a fixture",
+        # governance metadata
+        "title": "FIXTURE — not a candidate",
         "author": "test",
+        "date": "2026-08-12",
     }
     base.update(overrides)
     return base
@@ -79,6 +86,93 @@ def test_a_complete_dossier_is_accepted():
 def test_counterexample_an_incomplete_dossier_cannot_be_screened():
     with pytest.raises(DossierIncomplete, match="economic_rationale"):
         Dossier(content=_content(economic_rationale="   "))
+
+
+def test_the_required_fields_are_transcribed_from_the_protocol():
+    """S1. The implementation may not define what a valid hypothesis is.
+
+    An earlier version enforced a ten-field list the protocol never mentioned,
+    which is a hidden selection criterion inside a system built to eliminate
+    hidden selection criteria. The protocol now names them; this checks the
+    code did not add to, or drop from, that list.
+    """
+    from apex.governance.screening import GOVERNANCE_FIELDS, SCIENTIFIC_FIELDS
+
+    protocol = (REPO / "APEX-SCREENING-PROTOCOL-v1.0.md").read_text()
+    stated = protocol[protocol.index("## What a dossier must contain"):
+                      protocol.index("## The file-drawer rule")]
+
+    for field in SCIENTIFIC_FIELDS + GOVERNANCE_FIELDS:
+        assert f"`{field}`" in stated, f"{field} is enforced but not in the protocol"
+
+    # and the removed inventions must not have crept back
+    for invention in ("prior_literature", "why_it_might_fail"):
+        assert invention not in SCIENTIFIC_FIELDS + GOVERNANCE_FIELDS
+
+
+def test_counterexample_the_transcription_check_would_notice_an_added_field():
+    """Prove the check above can fail rather than merely reporting clean."""
+    protocol = (REPO / "APEX-SCREENING-PROTOCOL-v1.0.md").read_text()
+    stated = protocol[protocol.index("## What a dossier must contain"):
+                      protocol.index("## The file-drawer rule")]
+
+    assert "`sharpe_target`" not in stated, "the fixture field is not fictional"
+
+
+def test_scientific_and_governance_requirements_are_reported_separately():
+    """A missing title is administrative; a missing rationale is scientific.
+
+    Collapsing the two would let a bookkeeping omission read as a scientific
+    defect, and vice versa.
+    """
+    with pytest.raises(DossierIncomplete, match="governance metadata missing"):
+        Dossier(content=_content(title=""))
+
+    with pytest.raises(DossierIncomplete, match="scientific requirements missing"):
+        Dossier(content=_content(falsification_criterion=""))
+
+
+# --- S13: a screening outcome is not evidence ------------------------------
+
+def test_the_evaluation_path_cannot_read_the_screen_log():
+    """S13, enforced structurally: no evaluation module imports screening.
+
+    "It already looked good in screening" must have nowhere to enter from.
+    """
+    from apex.audit.execution_path import module_closure
+
+    for entry in ("apex.pipeline", "apex.experiments.apex002",
+                  "apex.evaluate.criteria", "apex.evaluate.verdict",
+                  "apex.evaluate.ic", "apex.report.attribution"):
+        closure = module_closure(REPO, entry)
+        assert "apex.governance.screening" not in closure, (
+            f"{entry} can reach the screen log; a screening outcome could "
+            f"enter the experiment's evidence"
+        )
+
+
+def test_counterexample_the_s13_isolation_check_detects_a_reachable_screen():
+    """Prove the closure check can fail.
+
+    A module that DOES import screening must be detected, otherwise the check
+    above is reporting the absence of an import it could never see.
+    """
+    from apex.audit.execution_path import module_closure
+
+    closure = module_closure(REPO, "apex.governance.screening")
+
+    assert "apex.governance.screening" in closure, (
+        "the closure walk cannot see apex.governance.screening at all; the "
+        "S13 check above proves nothing"
+    )
+
+
+def test_the_screen_outcome_carries_no_statistic_for_evidence():
+    """S13 and S7 meet here: an eligibility decision has no test statistic."""
+    outcome = ScreenOutcome(verdict=SURVIVE, reasons=("x",))
+
+    for statistical in ("p_value", "t_stat", "ic", "mean_ic", "effect_size"):
+        assert not hasattr(outcome, statistical)
 
 
 # --- S2: content hash ------------------------------------------------------

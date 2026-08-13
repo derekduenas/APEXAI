@@ -2,6 +2,8 @@
 
 **Status:** governance layer, ratified 2026-08-12
 **Scope:** hypothesis screening between idea generation and pre-registration
+**Amended:** 2026-08-12 — S13 added; dossier requirements moved from
+implementation into protocol
 **Credits consumed:** zero, always
 
 ---
@@ -20,11 +22,13 @@ anything.
 > **The cheap screen can reject an idea, but it cannot be used to optimise an
 > idea until that idea becomes a registered experiment.**
 
-## The twelve rules
+## The thirteen rules
 
 **S1 — Frozen dossier first.** A hypothesis must exist as a complete, frozen
 dossier before it may be screened. There is no screening of an idea held in a
-conversation, a notebook, or someone's head.
+conversation, a notebook, or someone's head. "Complete" means the semantic
+requirements in §"What a dossier must contain" below, which are stated here so
+that no implementation can define them silently.
 
 **S2 — Content hash.** Every dossier is identified by the SHA-256 of its
 canonical content. The hash is the identity; the filename is not.
@@ -66,6 +70,63 @@ holdout data. The screening window is bounded by the in-sample period.
 **S12 — No mutation of the experimental record.** A screen may not alter the
 registered experiment, the protocol, the ledger, the validation period, or any
 success criterion.
+
+**S13 — A screening outcome is not evidence.** A screening result is an
+ELIGIBILITY decision only. It is not evidence for or against the hypothesis,
+it carries no evidentiary weight toward the eventual experiment, and it may
+never enter that experiment's statistical evidence, its verdict, its
+multiplicity accounting, or its interpretation. "It already looked good in
+screening" is not a research finding and is not admissible anywhere.
+
+The screen eliminates obvious non-starters. That is the whole of its
+authority. Anything more and the multiple-comparisons problem has simply been
+relocated into the layer that was made free precisely so it would not carry
+weight.
+
+## What a dossier must contain
+
+The protocol states these; the implementation may not add to them. An earlier
+version of `apex/governance/screening.py` enforced a ten-field list that the
+protocol never specified, which made the definition of a valid hypothesis an
+undocumented implementation choice — a hidden selection criterion inside a
+system built to eliminate hidden selection criteria.
+
+**Scientific requirements.** A dossier is incomplete without each of these,
+and each is a property of the HYPOTHESIS, not of any particular parameter
+value it happens to propose:
+
+| Requirement | Field |
+|---|---|
+| Unique hypothesis statement | `hypothesis` |
+| Economic rationale | `economic_rationale` |
+| Signal definition | `signal_definition` |
+| Directional prediction | `directional_prediction` |
+| Formation / measurement timing | `timing` |
+| Required data | `data_requirements` |
+| Intended universe | `universe` |
+| Proposed evaluation horizon | `horizon` |
+| Falsification criterion | `falsification_criterion` |
+
+`universe` and `horizon` require a STATED INTENT, not a specific admissible
+value. The protocol does not prescribe which universe or which horizon; it
+requires that the dossier say which it means, because a hypothesis that leaves
+them open cannot be frozen and therefore cannot be screened.
+
+**Governance metadata.** Required for provenance and for a readable log, and
+explicitly NOT scientific criteria. Their absence makes a dossier
+unadministrable, never unscientific:
+
+| Field | Purpose |
+|---|---|
+| `title` | a human-readable label in the screen log |
+| `author` | provenance |
+| `date` | provenance |
+
+**Deliberately not required.** `prior_literature` was removed: an idea with no
+published precedent is not thereby a worse hypothesis, and requiring citation
+biases the funnel toward well-trodden ground. `why_it_might_fail` was removed
+as a narrative duplicate of `falsification_criterion`, which is the testable
+version of the same obligation.
 
 ## The file-drawer rule (S3, restated because it is the one that erodes)
 
