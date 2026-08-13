@@ -50,6 +50,7 @@ AUDITED_FILES = [
     CONFORMANCE,
     _TESTS / "test_governance_unlock.py",
     _TESTS / "test_screening.py",
+    _TESTS / "test_feature_factory.py",
 ]
 
 # Guard -> the counterexample(s) that demonstrate it can fail.
@@ -150,6 +151,27 @@ LOAD_BEARING = {
     "test_the_screen_log_chain_verifies_after_many_events": [
         "test_counterexample_extending_ledgerentry_would_break_the_live_chain",
     ],
+    # Feature factory / registry, added 2026-08-12. Redundancy detection is a
+    # control born from the f1_mom_63 / f4_vs_market identity, so its guards
+    # join the audit from the start rather than becoming an unaudited surface.
+    "test_the_registry_has_no_duplicate_ids": [
+        "test_counterexample_two_features_with_the_same_formula_are_detected",
+    ],
+    "test_the_real_registry_contains_no_identical_formulas": [
+        "test_counterexample_reciprocal_ratios_are_flagged_algebraic",
+    ],
+    "test_a_per_date_scalar_difference_is_identical_information": [
+        "test_counterexample_correlated_features_are_not_called_identical",
+    ],
+    "test_positive_control_ratio_is_computed_exactly": [
+        "test_counterexample_a_zero_denominator_is_excluded_not_infinite",
+    ],
+    "test_pit_a_future_filing_is_not_used_before_it_exists": [
+        "test_counterexample_the_pit_validator_flags_a_late_knowability_date",
+    ],
+    "test_roe_roa_are_built_from_raw_not_the_empty_vendor_field": [
+        "test_data_gaps_are_marked_not_faked",
+    ],
 }
 
 # Ordinary assertions: failure is intrinsic to the assertion. Ruled 2026-08-11.
@@ -168,6 +190,18 @@ ORDINARY = {
     "test_the_knowability_date_is_the_later_of_the_two_filings": (
         "asserts one expected date against a hand-computed fixture; a wrong "
         "date fails the comparison directly"
+    ),
+    "test_positive_control_growth_pairs_across_four_quarters": (
+        "hand-computed growth (150/100-1) against a fixture; wrong arithmetic "
+        "fails the comparison directly"
+    ),
+    "test_accruals_subtracts_in_the_right_order": (
+        "hand-computed (50-30)/100 against a fixture; a swapped subtraction "
+        "fails the comparison directly"
+    ),
+    "test_every_built_spec_has_complete_metadata": (
+        "asserts required metadata fields are non-empty; a blank field fails "
+        "the assertion directly"
     ),
 }
 

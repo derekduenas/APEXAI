@@ -1,0 +1,228 @@
+{
+  "effective_new_dimensions": 12,
+  "factory_report": {
+    "as_filed_rows": 470238,
+    "dropped_impossible_filing": 17,
+    "dropped_revisions": 18380,
+    "features_built": [
+      "accr_total_accruals",
+      "bs_leverage",
+      "cap_net_buyback_yield",
+      "grow_asset_growth",
+      "grow_sales_growth",
+      "prof_gross_margin",
+      "prof_gross_profitability",
+      "prof_net_margin",
+      "prof_operating_profitability",
+      "prof_return_on_assets",
+      "prof_return_on_equity",
+      "val_book_to_market",
+      "val_earnings_yield",
+      "val_sales_to_price"
+    ],
+    "raw_arq_rows": 488635
+  },
+  "feature_count": 23,
+  "new_features": [
+    "accr_total_accruals",
+    "bs_leverage",
+    "cap_net_buyback_yield",
+    "grow_asset_growth",
+    "grow_sales_growth",
+    "prof_gross_margin",
+    "prof_gross_profitability",
+    "prof_net_margin",
+    "prof_operating_profitability",
+    "prof_return_on_assets",
+    "prof_return_on_equity",
+    "val_book_to_market",
+    "val_earnings_yield",
+    "val_sales_to_price"
+  ],
+  "pit": {
+    "accr_total_accruals": {
+      "compliant": true,
+      "feature_id": "accr_total_accruals",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198158,
+      "violations": 0
+    },
+    "bs_leverage": {
+      "compliant": true,
+      "feature_id": "bs_leverage",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198857,
+      "violations": 0
+    },
+    "cap_net_buyback_yield": {
+      "compliant": true,
+      "feature_id": "cap_net_buyback_yield",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198146,
+      "violations": 0
+    },
+    "grow_asset_growth": {
+      "compliant": true,
+      "feature_id": "grow_asset_growth",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 196118,
+      "violations": 0
+    },
+    "grow_sales_growth": {
+      "compliant": true,
+      "feature_id": "grow_sales_growth",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 194474,
+      "violations": 0
+    },
+    "prof_gross_margin": {
+      "compliant": true,
+      "feature_id": "prof_gross_margin",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 197697,
+      "violations": 0
+    },
+    "prof_gross_profitability": {
+      "compliant": true,
+      "feature_id": "prof_gross_profitability",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198308,
+      "violations": 0
+    },
+    "prof_net_margin": {
+      "compliant": true,
+      "feature_id": "prof_net_margin",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 197697,
+      "violations": 0
+    },
+    "prof_operating_profitability": {
+      "compliant": true,
+      "feature_id": "prof_operating_profitability",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198308,
+      "violations": 0
+    },
+    "prof_return_on_assets": {
+      "compliant": true,
+      "feature_id": "prof_return_on_assets",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198308,
+      "violations": 0
+    },
+    "prof_return_on_equity": {
+      "compliant": true,
+      "feature_id": "prof_return_on_equity",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198302,
+      "violations": 0
+    },
+    "val_book_to_market": {
+      "compliant": true,
+      "feature_id": "val_book_to_market",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198857,
+      "violations": 0
+    },
+    "val_earnings_yield": {
+      "compliant": true,
+      "feature_id": "val_earnings_yield",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198317,
+      "violations": 0
+    },
+    "val_sales_to_price": {
+      "compliant": true,
+      "feature_id": "val_sales_to_price",
+      "missing_knowability": 0,
+      "pct": 100.0,
+      "populated": 198317,
+      "violations": 0
+    }
+  },
+  "redundancy": {
+    "correlated_information": [
+      {
+        "detail": "rank rho +0.5521 -- related, NOT flagged for removal",
+        "left": "grow_asset_growth",
+        "right": "grow_sales_growth"
+      },
+      {
+        "detail": "rank rho -0.6828 -- related, NOT flagged for removal",
+        "left": "prof_gross_margin",
+        "right": "val_sales_to_price"
+      },
+      {
+        "detail": "rank rho +0.6329 -- related, NOT flagged for removal",
+        "left": "prof_gross_profitability",
+        "right": "prof_operating_profitability"
+      },
+      {
+        "detail": "rank rho +0.5898 -- related, NOT flagged for removal",
+        "left": "prof_gross_profitability",
+        "right": "prof_return_on_assets"
+      },
+      {
+        "detail": "rank rho -0.5446 -- related, NOT flagged for removal",
+        "left": "prof_gross_profitability",
+        "right": "val_book_to_market"
+      },
+      {
+        "detail": "rank rho +0.6088 -- related, NOT flagged for removal",
+        "left": "prof_net_margin",
+        "right": "prof_return_on_assets"
+      },
+      {
+        "detail": "rank rho +0.5443 -- related, NOT flagged for removal",
+        "left": "prof_net_margin",
+        "right": "prof_return_on_equity"
+      },
+      {
+        "detail": "rank rho +0.5361 -- related, NOT flagged for removal",
+        "left": "prof_net_margin",
+        "right": "val_earnings_yield"
+      },
+      {
+        "detail": "rank rho +0.9151 -- related, NOT flagged for removal",
+        "left": "prof_operating_profitability",
+        "right": "prof_return_on_assets"
+      },
+      {
+        "detail": "rank rho +0.7167 -- related, NOT flagged for removal",
+        "left": "prof_operating_profitability",
+        "right": "prof_return_on_equity"
+      },
+      {
+        "detail": "rank rho +0.7725 -- related, NOT flagged for removal",
+        "left": "prof_return_on_assets",
+        "right": "prof_return_on_equity"
+      },
+      {
+        "detail": "rank rho +0.5043 -- related, NOT flagged for removal",
+        "left": "prof_return_on_assets",
+        "right": "val_earnings_yield"
+      },
+      {
+        "detail": "rank rho +0.5965 -- related, NOT flagged for removal",
+        "left": "prof_return_on_equity",
+        "right": "val_earnings_yield"
+      }
+    ],
+    "identical_information": [],
+    "n_correlated": 13,
+    "n_identical": 0
+  }
+}
