@@ -52,6 +52,7 @@ AUDITED_FILES = [
     _TESTS / "test_screening.py",
     _TESTS / "test_feature_factory.py",
     _TESTS / "test_research_discovery.py",
+    _TESTS / "test_architecture_firewalls.py",
 ]
 
 # Guard -> the counterexample(s) that demonstrate it can fail.
@@ -209,6 +210,15 @@ LOAD_BEARING = {
     ],
     "test_the_discovery_layer_cannot_reach_registration": [
         "test_counterexample_the_no_registration_check_can_detect_a_breach",
+    ],
+    # --- Architectural firewalls (2026-08-12) -------------------------------
+    # Arms every planned layer's boundary before its engine exists, reusing the
+    # audited module_closure walk. A new governance surface must be audited.
+    "test_layer_closure_obeys_its_forbidden_set": [
+        "test_counterexample_the_firewall_detects_a_forbidden_import",
+    ],
+    "test_every_contract_that_is_a_new_hypothesis_consumes_a_credit_or_is_free_discovery": [
+        "test_counterexample_a_new_hypothesis_layer_with_no_governance_is_rejected",
     ],
 }
 
