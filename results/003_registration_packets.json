@@ -1,0 +1,143 @@
+{
+  "results": [
+    {
+      "dossier_hash": "97da989ad49aa1863c9bc43fc1e027b2bbafaf874d00aef801e99e22a89512fe",
+      "novelty": "NOVEL",
+      "registration_packet": {
+        "contamination": {
+          "descendant_of_failure": false,
+          "epoch": "BEFORE_APEX_002"
+        },
+        "dossier_hash": "97da989ad49aa1863c9bc43fc1e027b2bbafaf874d00aef801e99e22a89512fe",
+        "economic_mechanism": "Novy-Marx (2013): gross profitability is the cleanest productivity measure; the signal sits above the line and is incorporated slowly.",
+        "falsification_criterion": "mean daily Spearman IC not reliably positive at the section-13 hurdle over the validation period",
+        "features": {
+          "prof_gross_profitability": {
+            "definition": "gp / assets",
+            "directionality": "higher_better",
+            "pit_rule": "earliest filing per (ticker, reportperiod); admit where date<=T",
+            "source_fields": [
+              "gp",
+              "assets"
+            ]
+          }
+        },
+        "hypothesis": "High gross-profits/assets earns higher forward excess return than low.",
+        "portfolio_policy": {
+          "construction": "long top decile / short bottom decile",
+          "note": "evaluated by the monetisation projector ONLY after validation",
+          "rebalance": "monthly (fixed)",
+          "weighting": "equal weight"
+        },
+        "proposed_experiment_id": "APEX-003-H1",
+        "robustness_declared_before_validation": {
+          "block_size": 20,
+          "block_size_rationale": "matches the 20-day forward-return overlap (MA(19) autocorrelation); DECLARED, not searched",
+          "bootstrap": "moving-block bootstrap of the mean daily IC",
+          "n_permutations": 2000,
+          "n_resamples": 2000,
+          "permutation": "block sign-permutation null",
+          "seed": 20260807,
+          "subperiod_diagnostics": [
+            "calendar_year",
+            "calendar_quarter"
+          ],
+          "subperiod_note": "DIAGNOSTIC ONLY; never used to select a subperiod"
+        },
+        "signal_construction": {
+          "composite": "single ranked feature",
+          "no_tuning": "no winsorisation, no parameter selection, no weight search",
+          "ranking": "ascending cross-sectional rank on the eligible \u00a73 universe"
+        },
+        "status": "PRE-REGISTERED PACKET \u2014 not yet registered; no credit spent; validation NOT run",
+        "success_criteria_section_13": {
+          "mean_ic": "positive",
+          "robustness": "non-overlapping test agrees in sign",
+          "source": "config/experiment.yaml success_criteria; NOT re-derived",
+          "t_stat": ">= 2.92 (validation critical value, unchanged)"
+        }
+      },
+      "screen_reasons": [
+        "1 PIT-safe fundamental feature(s), coverage confirmed in the feature census; economic rationale present; not redundant with a closed experiment. Survival is on economic and data grounds, not on any performance measure."
+      ],
+      "screen_verdict": "SURVIVE",
+      "title": "APEX-003-H1 gross profitability"
+    },
+    {
+      "dossier_hash": "123f67fa844d3e8d9627ee93a13a841c640ec77131acabe34ec1917ec7028b05",
+      "novelty": "NOVEL",
+      "registration_packet": {
+        "contamination": {
+          "descendant_of_failure": false,
+          "epoch": "BEFORE_APEX_002"
+        },
+        "dossier_hash": "123f67fa844d3e8d9627ee93a13a841c640ec77131acabe34ec1917ec7028b05",
+        "economic_mechanism": "Novy-Marx (2013) / Asness-Frazzini-Pedersen (2019): value and quality are complementary mispricings; conditioning value on profitability separates bargains from distress.",
+        "falsification_criterion": "composite IC not reliably positive, OR it fails to exceed either component alone in sign, at the section-13 hurdle",
+        "features": {
+          "prof_gross_profitability": {
+            "definition": "gp / assets",
+            "directionality": "higher_better",
+            "pit_rule": "earliest filing per (ticker, reportperiod); admit where date<=T",
+            "source_fields": [
+              "gp",
+              "assets"
+            ]
+          },
+          "val_book_to_market": {
+            "definition": "equity(as-filed) / marketcap(T)",
+            "directionality": "higher_better",
+            "pit_rule": "book equity from earliest filing with date<=T; market cap is the value AT T (a price, knowable at T); knowable at the filing date",
+            "source_fields": [
+              "equity",
+              "marketcap"
+            ]
+          }
+        },
+        "hypothesis": "Among cheap stocks, profitable ones outperform cheap-and-unprofitable ones.",
+        "portfolio_policy": {
+          "construction": "long top decile / short bottom decile",
+          "note": "evaluated by the monetisation projector ONLY after validation",
+          "rebalance": "monthly (fixed)",
+          "weighting": "equal weight"
+        },
+        "proposed_experiment_id": "APEX-003-H3",
+        "robustness_declared_before_validation": {
+          "block_size": 20,
+          "block_size_rationale": "matches the 20-day forward-return overlap (MA(19) autocorrelation); DECLARED, not searched",
+          "bootstrap": "moving-block bootstrap of the mean daily IC",
+          "n_permutations": 2000,
+          "n_resamples": 2000,
+          "permutation": "block sign-permutation null",
+          "seed": 20260807,
+          "subperiod_diagnostics": [
+            "calendar_year",
+            "calendar_quarter"
+          ],
+          "subperiod_note": "DIAGNOSTIC ONLY; never used to select a subperiod"
+        },
+        "signal_construction": {
+          "composite": "equal pre-committed weight rank composite",
+          "no_tuning": "no winsorisation, no parameter selection, no weight search",
+          "ranking": "ascending cross-sectional rank on the eligible \u00a73 universe"
+        },
+        "status": "PRE-REGISTERED PACKET \u2014 not yet registered; no credit spent; validation NOT run",
+        "success_criteria_section_13": {
+          "mean_ic": "positive",
+          "robustness": "non-overlapping test agrees in sign",
+          "source": "config/experiment.yaml success_criteria; NOT re-derived",
+          "t_stat": ">= 2.92 (validation critical value, unchanged)"
+        }
+      },
+      "screen_reasons": [
+        "2 PIT-safe fundamental feature(s), coverage confirmed in the feature census; economic rationale present; not redundant with a closed experiment. Survival is on economic and data grounds, not on any performance measure."
+      ],
+      "screen_verdict": "SURVIVE",
+      "title": "APEX-003-H3 quality-conditioned value"
+    }
+  ],
+  "screen_window": {
+    "end": "2017-12-31",
+    "start": "2005-01-01"
+  }
+}
