@@ -51,6 +51,7 @@ AUDITED_FILES = [
     _TESTS / "test_governance_unlock.py",
     _TESTS / "test_screening.py",
     _TESTS / "test_feature_factory.py",
+    _TESTS / "test_research_discovery.py",
 ]
 
 # Guard -> the counterexample(s) that demonstrate it can fail.
@@ -171,6 +172,43 @@ LOAD_BEARING = {
     ],
     "test_roe_roa_are_built_from_raw_not_the_empty_vendor_field": [
         "test_data_gaps_are_marked_not_faked",
+    ],
+    # --- Research discovery layer (2026-08-12) ------------------------------
+    # A new governance surface must not sit outside the audit -- that is the
+    # blind spot the unlock check already demonstrated.
+    "test_the_screenable_content_is_a_certified_dossier": [
+        "test_counterexample_an_incomplete_hypothesis_is_refused_by_the_shared_definition",
+        "test_counterexample_a_hypothesis_with_no_features_is_refused",
+    ],
+    "test_provenance_is_not_part_of_the_scientific_identity": [
+        "test_counterexample_changing_the_science_changes_the_hash",
+    ],
+    "test_a_before_002_hypothesis_needs_no_rejustification": [
+        "test_counterexample_a_postmortem_hypothesis_is_flagged_as_descendant",
+        "test_counterexample_an_explicit_descendant_is_flagged_even_if_epoch_is_clean",
+        "test_counterexample_an_invalid_epoch_is_refused",
+    ],
+    "test_a_twin_state_is_deterministic": [
+        "test_counterexample_a_twin_that_uses_a_future_filing_is_refused",
+    ],
+    "test_a_new_feature_set_is_novel": [
+        "test_counterexample_the_same_feature_set_as_a_closed_experiment_is_a_modification",
+        "test_counterexample_a_subset_of_a_closed_experiment_is_redundant",
+        "test_counterexample_an_identical_prior_dossier_is_a_duplicate",
+    ],
+    "test_a_combination_requires_an_economic_reason": [
+        "test_counterexample_a_combination_without_a_reason_is_refused",
+        "test_counterexample_a_single_feature_is_not_a_combination",
+    ],
+    "test_disagreement_is_preserved_not_averaged": [
+        "test_counterexample_a_dossier_without_the_adversary_is_refused",
+        "test_counterexample_a_dossier_without_replication_is_refused",
+    ],
+    "test_a_survivor_reaches_a_review_packet_that_decides_nothing": [
+        "test_counterexample_a_redundant_hypothesis_never_reaches_the_screen",
+    ],
+    "test_the_discovery_layer_cannot_reach_registration": [
+        "test_counterexample_the_no_registration_check_can_detect_a_breach",
     ],
 }
 
