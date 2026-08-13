@@ -46,7 +46,11 @@ CONFORMANCE = _TESTS / "test_nsi_conformance.py"
 # Guards live in more than one file. Scanning only the conformance file is how
 # a load-bearing governance guard could sit outside the audit entirely -- which
 # is adjacent to the defect that produced the vacuous unlock check.
-AUDITED_FILES = [CONFORMANCE, _TESTS / "test_governance_unlock.py"]
+AUDITED_FILES = [
+    CONFORMANCE,
+    _TESTS / "test_governance_unlock.py",
+    _TESTS / "test_screening.py",
+]
 
 # Guard -> the counterexample(s) that demonstrate it can fail.
 LOAD_BEARING = {
@@ -94,6 +98,48 @@ LOAD_BEARING = {
     ],
     "test_a_locked_period_without_a_token_is_refused": [
         "test_counterexample_a_stale_token_naming_another_experiment_is_refused",
+    ],
+    # APEX Screening Protocol v1.0, added 2026-08-12. A new governance surface
+    # outside the audit is the blind spot the unlock check already
+    # demonstrated, so the screen's guards are registered here from the start.
+    "test_a_complete_dossier_is_accepted": [
+        "test_counterexample_an_incomplete_dossier_cannot_be_screened",
+    ],
+    "test_the_hash_is_content_addressed_not_order_dependent": [
+        "test_counterexample_a_changed_dossier_gets_a_different_hash",
+    ],
+    "test_a_rejection_is_logged_as_permanently_as_a_survival": [
+        "test_counterexample_an_unlogged_rejection_cannot_silently_disappear",
+        "test_counterexample_editing_a_logged_reason_is_detected",
+    ],
+    "test_the_outcome_type_cannot_express_tuning_information": [
+        "test_counterexample_a_score_is_not_a_verdict",
+        "test_counterexample_a_screen_returning_optimisation_data_is_refused",
+    ],
+    "test_a_changed_dossier_after_rejection_is_a_new_event": [
+        "test_counterexample_a_rejected_dossier_cannot_be_screened_again",
+    ],
+    "test_survive_grants_eligibility_only": [
+        "test_counterexample_a_survivor_creates_no_experiment_and_spends_no_credit",
+        "test_counterexample_an_unregistered_survivor_cannot_enter_validation",
+    ],
+    "test_re_screening_the_same_frozen_dossier_is_deterministic": [
+        "test_counterexample_a_flip_flopping_screen_is_refused",
+    ],
+    "test_the_default_window_is_in_sample": [
+        "test_counterexample_a_window_touching_the_holdout_is_refused",
+        "test_counterexample_a_window_touching_validation_is_refused",
+        "test_counterexample_a_window_merely_overlapping_the_holdout_is_refused",
+        "test_counterexample_run_screen_refuses_a_locked_window",
+    ],
+    "test_a_screen_does_not_touch_the_protocol_or_criteria": [
+        "test_counterexample_a_screen_cannot_mutate_the_dossier",
+    ],
+    "test_the_screening_module_never_writes_to_the_research_ledger": [
+        "test_counterexample_the_ledger_isolation_scan_detects_an_injected_reference",
+    ],
+    "test_the_screen_log_chain_verifies_after_many_events": [
+        "test_counterexample_extending_ledgerentry_would_break_the_live_chain",
     ],
 }
 
