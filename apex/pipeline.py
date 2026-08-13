@@ -123,7 +123,8 @@ def evaluate(output: PipelineOutput, config: Config, start, end) -> Evaluation:
     return Evaluation(
         ic_daily=evaluate_ic(scores, excess, eligible, config, daily, "daily_newey_west"),
         ic_non_overlapping=evaluate_ic(scores, excess, eligible, config, grid, "non_overlapping"),
-        deciles=evaluate_deciles(output.scores.decile, excess, eligible, config, grid),
+        deciles=evaluate_deciles(output.scores.decile, excess, eligible, config, grid,
+                                 output.scores.top_decile_label),
     )
 
 

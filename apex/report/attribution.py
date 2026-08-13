@@ -116,7 +116,7 @@ def attribute(output, config: Config, start, end) -> Attribution:
 
     baseline = evaluate_deciles(
         output.scores.decile, output.forward_returns.excess, output.universe.eligible,
-        config, grid,
+        config, grid, output.scores.top_decile_label,
     )
 
     # B6: FULL re-rank with the sector removed, not a P&L subtraction.
@@ -130,7 +130,8 @@ def attribute(output, config: Config, start, end) -> Attribution:
     # #001's four-component FeaturePanel. The output rescores itself.
     rescored = output.rescore(excluded, config)
     without = evaluate_deciles(
-        rescored.decile, output.forward_returns.excess, excluded, config, grid
+        rescored.decile, output.forward_returns.excess, excluded, config, grid,
+        rescored.top_decile_label,
     )
 
     full = float(baseline.spread_annualised_gross)

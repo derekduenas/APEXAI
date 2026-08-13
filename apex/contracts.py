@@ -331,12 +331,32 @@ class ScorePanel:
     category_scores: dict[str, pd.DataFrame]
     apex_score: pd.DataFrame
     decile: pd.DataFrame
+    # WHICH LABEL IS THE LONG LEG. Carried by the panel because the SCORER
+    # assigns the labels, so only the scorer knows which end is best.
+    # Previously the decile evaluator assumed APEX-001's 10-is-best, which
+    # sign-inverted every decile figure in APEX-002's recorded validation
+    # artifact (APEX-002-ERRATUM-001). Putting it in configuration was tried
+    # and rejected: that is a second source of truth, and the null rig -- which
+    # scores with #001's composite -- immediately disagreed with it.
+    top_decile_label: int = 0
 
     def __post_init__(self) -> None:
         for name, frame in self.category_scores.items():
             _require_aligned(frame, self.dates, self.securities, f"ScorePanel.category[{name}]")
         _require_aligned(self.apex_score, self.dates, self.securities, "ScorePanel.apex_score")
         _require_aligned(self.decile, self.dates, self.securities, "ScorePanel.decile")
+
+        # The panel can only check the convention was STATED. Which end is
+        # valid depends on n_deciles, which the panel does not carry, and a
+        # sparse cross-section legitimately leaves some labels unpopulated --
+        # 5 eligible names over 10 buckets yields {2,4,6,8,10} and no decile 1.
+        # `evaluate_deciles` makes the strict 1-or-n check, where n is known.
+        _require(
+            int(self.top_decile_label) >= 1,
+            f"ScorePanel.top_decile_label={self.top_decile_label} is unset. The "
+            f"scorer assigns the labels, so it must state which end is the long "
+            f"leg; there is no default.",
+        )
 
         scored = self.apex_score.to_numpy()
         present = np.isfinite(scored)

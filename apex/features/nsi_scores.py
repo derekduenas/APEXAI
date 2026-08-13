@@ -140,6 +140,8 @@ def build_nsi_scores(nsi: pd.DataFrame, eligible: pd.DataFrame, config: Config) 
     decile = equal_count_deciles(nsi, eligible, n_deciles, tie_method)
 
     return ScorePanel(
+        # APEX-002 section 9, ruled 2026-08-11: decile 1 is the TOP decile.
+        top_decile_label=1,
         dates=nsi.index,
         securities=nsi.columns,
         # The raw signal is carried through unmodified for the section 9 log.

@@ -85,18 +85,37 @@ def evaluate_deciles(
     eligible: pd.DataFrame,
     config: Config,
     dates: pd.DatetimeIndex,
+    top_decile_label: int,
 ) -> DecileResult:
     n_deciles = int(config.get("evaluation.n_deciles"))
     periods_per_year = float(config.get("evaluation.periods_per_year"))
     method = config.get("evaluation.annualization")
 
+    # WHICH END IS THE LONG LEG is a registered convention, not an assumption.
+    # This function hardcoded `per_period[n_deciles] - per_period[1]`, i.e.
+    # APEX-001's 10-is-best. APEX-002 ruled decile 1 = top, so every decile
+    # figure in its recorded artifact is sign-inverted -- APEX-002-ERRATUM-001.
+    # Read, never inferred, and never branched on an experiment id.
+    top_label = int(top_decile_label)
+    if top_label not in (1, n_deciles):
+        raise ValueError(
+            f"top_decile_label must be 1 or {n_deciles}; got {top_label}. "
+            f"The top portfolio is one end of the ranking."
+        )
+    bottom_label = n_deciles if top_label == 1 else 1
+
     per_period = decile_returns(decile, returns, eligible, dates, n_deciles)
-    spread = per_period[n_deciles] - per_period[1]
+    spread = per_period[top_label] - per_period[bottom_label]
     clean = spread.dropna()
 
     mean_by_decile = per_period.mean()
-    top = mean_by_decile.loc[n_deciles - 2 : n_deciles].mean()
-    bottom = mean_by_decile.loc[1:3].mean()
+    # The three deciles at each end, oriented the same way as the spread.
+    if top_label == 1:
+        top = mean_by_decile.loc[1:3].mean()
+        bottom = mean_by_decile.loc[n_deciles - 2 : n_deciles].mean()
+    else:
+        top = mean_by_decile.loc[n_deciles - 2 : n_deciles].mean()
+        bottom = mean_by_decile.loc[1:3].mean()
 
     spread_mean = float(clean.mean()) if len(clean) else float("nan")
     spread_t, _ = simple_tstat(spread)

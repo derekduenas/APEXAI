@@ -109,6 +109,8 @@ def build_scores(
     decile = assign_deciles(apex_score, n_deciles, score_max)
 
     return ScorePanel(
+        # APEX-001: assign_deciles maps the best name to `n_deciles`.
+        top_decile_label=n_deciles,
         dates=features.dates,
         securities=features.securities,
         category_scores=category_scores,
