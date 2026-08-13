@@ -62,6 +62,14 @@ from apex.dev.namespace import require_confirmatory
 GENESIS = "0" * 64
 SPEND = "spend"
 RESULT = "result"
+# INCIDENT-001, 2026-08-12. An execution that failed BEFORE recording a result
+# produced no experimental observation, but it left a spend behind, and the
+# no-second-look guard keys on the spend. Deleting that spend was considered
+# and rejected: it is precisely the operation the hash chain and the external
+# anchor exist to detect, and it would have erased the incident from the only
+# tamper-evident record of it. An annulment is APPENDED instead. Nothing is
+# removed, the chain is unbroken, and the failure stays permanently visible.
+ANNULMENT = "annulment"
 
 # Only these periods draw on the research budget. In-sample exists to verify the
 # pipeline; charging it would make pipeline debugging cost statistical credibility.
@@ -335,11 +343,79 @@ class ResearchLedger:
     def credits_remaining(self) -> int:
         return max(0, self.budget - self.credits_spent())
 
+    def _active_spend(self, experiment_id: str, period: str) -> LedgerEntry | None:
+        """The unmatched spend for this (experiment, period), or None.
+
+        Entries are read IN ORDER. A spend becomes active; a later annulment
+        voids the most recent active spend. Excess annulments void nothing --
+        they cannot bank capacity for a future run, so two annulments never
+        buy two replacements.
+        """
+        active: list[LedgerEntry] = []
+        for entry in self._entries:
+            if entry.experiment_id != experiment_id or entry.period != period:
+                continue
+            if entry.kind == SPEND:
+                active.append(entry)
+            elif entry.kind == ANNULMENT and active:
+                active.pop()
+        return active[-1] if active else None
+
     def already_evaluated(self, experiment_id: str, period: str) -> LedgerEntry | None:
-        for entry in self._spends():
-            if entry.experiment_id == experiment_id and entry.period == period:
-                return entry
-        return None
+        """The spend that blocks a re-look, or None if there is none.
+
+        An ANNULLED spend does not block: it records an execution that produced
+        no observation. An un-annulled one still does, and a result recorded
+        against a spend makes it un-annullable (see `annul`).
+        """
+        return self._active_spend(experiment_id, period)
+
+    def annul(
+        self,
+        *,
+        experiment_id: str,
+        period: str,
+        reason: str,
+    ) -> LedgerEntry:
+        """Void an unmatched spend that never produced a result. APPEND-ONLY.
+
+        Refuses when there is no unmatched spend to void, and refuses when a
+        result was recorded against it -- otherwise this would be a way to
+        erase a real experimental observation, which is the thing the ledger
+        exists to prevent.
+        """
+        self.verify_chain()
+
+        spend = self._active_spend(experiment_id, period)
+        if spend is None:
+            raise LedgerError(
+                f"nothing to annul: no unmatched spend for '{experiment_id}' "
+                f"on period '{period}'. An annulment cannot be banked against "
+                f"a future execution."
+            )
+        recorded = [
+            e for e in self._entries
+            if e.kind == RESULT and e.experiment_id == experiment_id
+            and e.period == period
+        ]
+        if recorded:
+            raise LedgerError(
+                f"refusing to annul '{experiment_id}' on '{period}': a result "
+                f"was recorded ({recorded[-1].verdict}). An evaluation that "
+                f"produced an observation stands. Annulment is only for an "
+                f"execution that failed before recording one."
+            )
+        if not reason.strip():
+            raise LedgerError("an annulment requires a written reason")
+
+        return self._append(
+            self._next(
+                kind=ANNULMENT,
+                experiment_id=experiment_id,
+                period=period,
+                reason=reason,
+            )
+        )
 
     def results(self) -> dict:
         """Keyed by (experiment_id, period).

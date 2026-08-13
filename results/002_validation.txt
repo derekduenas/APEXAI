@@ -1,12 +1,15 @@
 Traceback (most recent call last):
-  File "/Users/derekduenas/apex-equities/scripts/run_validation.py", line 150, in <module>
+  File "/Users/derekduenas/apex-equities/scripts/run_validation.py", line 165, in <module>
     raise SystemExit(main())
                      ^^^^^^
-  File "/Users/derekduenas/apex-equities/scripts/run_validation.py", line 84, in main
-    attribution = attribute(output, config, spec["start"], spec["end"])
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/derekduenas/apex-equities/apex/report/attribution.py", line 130, in attribute
-    rescored = build_scores(output.features, excluded, config)
-                            ^^^^^^^^^^^^^^^
-AttributeError: 'NSIOutput' object has no attribute 'features'
-EXIT=1
+  File "/Users/derekduenas/apex-equities/scripts/run_validation.py", line 82, in main
+    output, evaluation = run_period(source, config, PERIOD)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/derekduenas/apex-equities/apex/pipeline.py", line 141, in run_period
+    require_unlocked(config, period, source.dataset_fingerprint)
+  File "/Users/derekduenas/apex-equities/apex/registration.py", line 254, in require_unlocked
+    ledger.spend(
+  File "/Users/derekduenas/apex-equities/apex/governance/ledger.py", line 402, in spend
+    raise AlreadyEvaluated(
+apex.governance.ledger.AlreadyEvaluated: experiment 'APEX-002' has already been evaluated against period 'validation' on 2026-08-12T14:19:56.871704+00:00.
+  A second look is not available. Protocol section 10: a modified specification is a NEW hypothesis requiring a new experiment id and consuming another credit.

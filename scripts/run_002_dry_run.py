@@ -467,6 +467,47 @@ def main() -> int:  # noqa: C901
     r.say("         no t-statistic, no moment of any forward return appears")
     r.say("         anywhere in this report.")
     r.say()
+    # --- repaired transaction layer (INCIDENT-001 D1/D2/D3) ---------------
+    # Exercised for EXECUTION, not for values. Nothing derived from a forward
+    # return is emitted below: only whether each repaired layer ran.
+    r.say()
+    from apex.data.production_source import ProductionSource
+    from apex.evaluate.criteria import SuccessCriteria
+    from apex.report.attribution import attribute
+
+    criteria = SuccessCriteria.from_config(cfg, "validation")
+    r.check("D3 criteria load from the registered experiment",
+            criteria.t_stat.threshold == 2.92 and criteria.mean_ic.rule == "positive")
+    r.fact("registered mean_ic rule", criteria.mean_ic.describe())
+    r.fact("registered t_stat rule", criteria.t_stat.describe())
+    r.fact("registered robustness rule", criteria.robustness.describe())
+    r.check("D3 no APEX-001 thresholds in the runner",
+            all(x not in (REPO / "scripts" / "run_validation.py").read_text()
+                for x in ("min_mean_ic=0.015", "min_t_stat=2.5", "min_robustness_t=2.0")))
+
+    r.check("D2 ProductionSource exposes exclusions()",
+            hasattr(ProductionSource, "exclusions"))
+
+    # D1: the call that crashed INCIDENT-001. Executed on the in-sample period.
+    # Only the fact of completion is recorded; no figure it produced is read.
+    attribution = attribute(output, cfg, cfg.period(period)["start"],
+                            cfg.period(period)["end"])
+    r.check("D1 attribution executes on NSIOutput",
+            type(attribution).__name__ == "Attribution",
+            "the call that raised AttributeError in INCIDENT-001")
+    r.check("D1 attribution reached #002's rescorer, not #001's",
+            "build_scores" not in executable_source(
+                (REPO / "apex/report/attribution.py").read_text()))
+    r.say("         attribution ran to completion; no value it computed is")
+    r.say("         read, reported or hashed anywhere in this report.")
+
+    # Runtime confirmation, distinct from the static closure above.
+    import sys as _sys
+    composite_loaded = "apex.features.composite" in _sys.modules
+    r.check("no APEX-001 scoring module loaded at runtime", not composite_loaded,
+            "sys.modules after the full run")
+    r.say()
+
     r.fact("float_output_decimals", DEC)
     r.fact("config hash", cfg.hash)
     r.say()

@@ -13,7 +13,9 @@ SECTION 1. PROTOCOL / GOVERNANCE
          SHA-256                                63703d1020893a59a4b43ed9698c4920ccb392e7f76bc77030ef019693ea9bda
   [PASS] validation period still locked
   [PASS] holdout period still locked
-  [PASS] no validation unlock token exists
+  [PASS] no validation unlock token authorises APEX-002   no token
+         unlock token path                      /Users/derekduenas/apex-equities/results/_unlocks/validation.unlock
+         unlock token present                   False
          evaluation period                      2005-01-01 .. 2017-12-31  (in_sample, unlocked)
          dataset fingerprint                    6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f
   [PASS] execution path wiring conforms   8 modules from apex.experiments.apex002
@@ -132,8 +134,21 @@ SECTION 7. DETERMINISM / CONFORMANCE
          no t-statistic, no moment of any forward return appears
          anywhere in this report.
 
+
+  [PASS] D3 criteria load from the registered experiment
+         registered mean_ic rule                mean_ic > 0
+         registered t_stat rule                 t_stat >= 2.92
+         registered robustness rule             robustness agrees in sign with the primary statistic
+  [PASS] D3 no APEX-001 thresholds in the runner
+  [PASS] D2 ProductionSource exposes exclusions()
+  [PASS] D1 attribution executes on NSIOutput   the call that raised AttributeError in INCIDENT-001
+  [PASS] D1 attribution reached #002's rescorer, not #001's
+         attribution ran to completion; no value it computed is
+         read, reported or hashed anywhere in this report.
+  [PASS] no APEX-001 scoring module loaded at runtime   sys.modules after the full run
+
          float_output_decimals                  12
-         config hash                            7b1b3e5bdd96b50df6e312608d08f5d5fe68a6ae8c2bc1806fea296cdc543bb0
+         config hash                            af2429de62082a4bbfc22d878a371b6be1b42b2cc924833375b11e6ee6c9cad1
 
          measurement digest                     2dbd3cba5ec1632cc9e497175c91f1db77f0f1dab6c4cd28c247bdb38e20b809
 
