@@ -54,6 +54,7 @@ AUDITED_FILES = [
     _TESTS / "test_research_discovery.py",
     _TESTS / "test_architecture_firewalls.py",
     _TESTS / "test_research_engines.py",
+    _TESTS / "test_component_registry.py",
 ]
 
 # Guard -> the counterexample(s) that demonstrate it can fail.
@@ -280,6 +281,13 @@ ORDINARY = {
     "test_every_built_spec_has_complete_metadata": (
         "asserts required metadata fields are non-empty; a blank field fails "
         "the assertion directly"
+    ),
+    "test_built_and_certified_components_have_a_real_module": (
+        "reconciles registry state against disk; a wrong claim fails the "
+        "os.path check intrinsically"
+    ),
+    "test_no_component_claims_holdout_access": (
+        "boolean assertion over the registry; a True value fails it directly"
     ),
 }
 

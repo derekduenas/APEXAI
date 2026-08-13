@@ -1,0 +1,236 @@
+"""The canonical component registry: every architectural component, as data.
+
+WHY THIS OWNS COMPLETENESS
+--------------------------
+The operator should not have to remember missing components one conversation at
+a time. This registry is the single machine-readable list of every component
+from raw data to live P&L, each with its lifecycle state and governance facts.
+`tests/test_component_registry.py` reconciles the `state` claims against what is
+actually on disk and against the firewall contracts, so the registry cannot
+quietly drift from reality: a component claimed BUILT must have a module, a
+PLANNED one must not, and every firewall layer must appear here.
+
+It is a DECLARATION, not an engine. It imports nothing but the firewall table it
+cross-checks against, and it changes no behaviour.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+# Lifecycle states, in maturity order.
+ABSENT = "ABSENT"
+PLANNED = "PLANNED"
+UNDER_CONSTRUCTION = "UNDER_CONSTRUCTION"
+BUILT = "BUILT"
+CERTIFIED = "CERTIFIED"                 # BUILT + audited guards
+ACTIVE = "ACTIVE"                       # running in production
+RETIRED = "RETIRED"
+STATES = (ABSENT, PLANNED, UNDER_CONSTRUCTION, BUILT, CERTIFIED, ACTIVE, RETIRED)
+
+
+@dataclass(frozen=True)
+class Component:
+    """One architectural component with all 18 governance facts."""
+
+    name: str
+    state: str
+    purpose: str
+    module: str                         # the apex.* module, or "" if not built
+    inputs: tuple
+    outputs: tuple
+    allowed_deps: tuple
+    forbidden_deps: tuple
+    pit_required: bool
+    holdout_access: bool                # only the ONE validation look is True-adjacent
+    is_new_hypothesis: bool
+    consumes_credit: bool
+    optimize_allowed: bool
+    provenance: tuple                   # required stamps
+    tests_required: tuple
+    activation_prereqs: tuple
+    downstream: tuple
+    failure_behavior: str
+
+    def __post_init__(self) -> None:
+        if self.state not in STATES:
+            raise ValueError(f"{self.name}: bad state {self.state!r}")
+
+
+_PROV_MIN = ("dataset_fingerprint", "protocol_hash", "config_hash", "repo_sha")
+
+
+def _c(**kw) -> Component:
+    kw.setdefault("inputs", ())
+    kw.setdefault("outputs", ())
+    kw.setdefault("allowed_deps", ())
+    kw.setdefault("forbidden_deps", ())
+    kw.setdefault("pit_required", False)
+    kw.setdefault("holdout_access", False)
+    kw.setdefault("is_new_hypothesis", False)
+    kw.setdefault("consumes_credit", False)
+    kw.setdefault("optimize_allowed", False)
+    kw.setdefault("provenance", _PROV_MIN)
+    kw.setdefault("tests_required", ())
+    kw.setdefault("activation_prereqs", ())
+    kw.setdefault("downstream", ())
+    kw.setdefault("failure_behavior", "raise; never degrade silently")
+    return Component(**kw)
+
+
+# The whole system. Grouped by layer in comments; one flat registry.
+REGISTRY: dict[str, Component] = {c.name: c for c in [
+
+    # ---- LAYER 0: data / research substrate --------------------------------
+    _c(name="pit_data", state=CERTIFIED, module="apex.data.snapshot_loader",
+       purpose="point-in-time frozen vendor data with known_from",
+       pit_required=True, downstream=("universe", "feature_factory"),
+       tests_required=("lookahead audit", "fingerprint")),
+    _c(name="universe", state=CERTIFIED, module="apex.universe",
+       purpose="section-3 eligibility, survivorship-safe", pit_required=True,
+       downstream=("feature_factory", "digital_twin")),
+    _c(name="feature_registry", state=CERTIFIED, module="apex.features.registry",
+       purpose="canonical FeatureSpecs, lifecycle, 23 features"),
+    _c(name="feature_factory", state=CERTIFIED, module="apex.features.factory",
+       purpose="PIT-safe feature builders", pit_required=True),
+    _c(name="feature_redundancy", state=CERTIFIED, module="apex.features.redundancy",
+       purpose="structural + empirical redundancy detection"),
+    _c(name="feature_pit_validation", state=CERTIFIED,
+       module="apex.features.pit_validation", purpose="per-feature PIT checks",
+       pit_required=True),
+    _c(name="digital_twin", state=CERTIFIED, module="apex.research.twin",
+       purpose="deterministic PIT state at T; v1 = eligibility+features",
+       pit_required=True, failure_behavior="refuse future feeds, never drop"),
+    _c(name="digital_twin_multifacet", state=PLANNED, module="",
+       purpose="market/regime/portfolio/model state facets on the twin",
+       pit_required=True, activation_prereqs=("regime_engine", "portfolio")),
+    _c(name="event_data", state=ABSENT, module="",
+       purpose="earnings ANNOUNCEMENT dates for PEAD",
+       failure_behavior="DATA GAP: vendor gives filing dates only"),
+    _c(name="alternative_data", state=ABSENT, module="",
+       purpose="sentiment / attention / positioning",
+       failure_behavior="DATA GAP: not in vendor"),
+
+    # ---- LAYER 1: discovery ------------------------------------------------
+    _c(name="hypothesis_dossier", state=CERTIFIED, module="apex.research.hypothesis",
+       purpose="frozen hypothesis wrapping the certified screening Dossier",
+       is_new_hypothesis=True, downstream=("novelty", "screen")),
+    _c(name="research_swarm", state=CERTIFIED, module="apex.research.swarm",
+       purpose="8 epistemic roles; disagreement preserved; no score",
+       forbidden_deps=("apex.pipeline", "apex.registration", "apex.governance.ledger"),
+       is_new_hypothesis=True),
+    _c(name="novelty_engine", state=CERTIFIED, module="apex.research.novelty",
+       purpose="NOVEL/RECOMBINATION/REDUNDANT/MODIFICATION/DUPLICATE, no score"),
+    _c(name="combination_engine", state=UNDER_CONSTRUCTION, module="apex.research.novelty",
+       purpose="bounded CombinationProposal (object built); marginal-IC testing PLANNED",
+       is_new_hypothesis=True, consumes_credit=True),
+    _c(name="contamination_control", state=CERTIFIED, module="apex.research.hypothesis",
+       purpose="provenance epochs; descendant-of-failure flagging"),
+    _c(name="human_gate", state=CERTIFIED, module="apex.research.gate",
+       purpose="presents; decides nothing; cannot register"),
+    _c(name="research_manifest", state=CERTIFIED, module="apex.research.manifest",
+       purpose="content-addressed science identity; science!=provenance!=presentation"),
+    _c(name="research_memory", state=PLANNED, module="",
+       purpose="durable cumulative record of every hypothesis/rejection/lineage/"
+               "abandonment reason, unifying ledger + screen_log + dossiers",
+       activation_prereqs=(), downstream=("novelty_engine",),
+       failure_behavior="GAP: today memory is split across ledger + screen_log + git"),
+
+    # ---- governance substrate ----------------------------------------------
+    _c(name="screening", state=CERTIFIED, module="apex.governance.screening",
+       purpose="reject-only, S1-S13, tamper-evident log",
+       forbidden_deps=("apex.pipeline", "apex.registration", "apex.governance.ledger")),
+    _c(name="registration", state=CERTIFIED, module="apex.registration",
+       purpose="signing, protocol pin, unlock tokens", consumes_credit=True),
+    _c(name="research_ledger", state=CERTIFIED, module="apex.governance.ledger",
+       purpose="hash-chained credit ledger with annulment", consumes_credit=True),
+    _c(name="success_criteria", state=CERTIFIED, module="apex.evaluate.criteria",
+       purpose="per-experiment registered criteria; never hardcoded"),
+    _c(name="firewalls", state=CERTIFIED, module="apex.governance.firewalls",
+       purpose="layer-boundary contracts armed before their engines"),
+    _c(name="auditors", state=CERTIFIED, module="apex.audit.execution_path",
+       purpose="lookahead, cross-sectional, import-closure isolation"),
+
+    # ---- LAYER 2: validation + in-experiment research ----------------------
+    _c(name="ic_engine", state=CERTIFIED, module="apex.evaluate.ic",
+       purpose="Spearman IC, Newey-West HAC t"),
+    _c(name="null_simulation", state=CERTIFIED, module="apex.evaluate.reference",
+       purpose="simulated HAC dispersion null"),
+    _c(name="decile_engine", state=CERTIFIED, module="apex.evaluate.deciles",
+       purpose="equal-count deciles, orientation-aware"),
+    _c(name="stats_robustness", state=CERTIFIED, module="apex.stats.robustness",
+       purpose="block bootstrap, permutation null, subperiod, multiple-comparison"),
+    _c(name="research_attribution", state=CERTIFIED, module="apex.report.attribution",
+       purpose="section-9 sector attribution of a decile spread"),
+    _c(name="ml_search_accounting", state=CERTIFIED, module="apex.ml.search_ledger",
+       purpose="file-drawer denominator; select_best refuses; NO fitting"),
+    _c(name="ml_estimator", state=UNDER_CONSTRUCTION, module="",
+       purpose="supervised/nonlinear models, nested purged walk-forward CV",
+       is_new_hypothesis=True, consumes_credit=True, optimize_allowed=True,
+       forbidden_deps=("apex.governance.screening", "apex.research.swarm"),
+       activation_prereqs=("ml governance declaration",),
+       failure_behavior="first .fit() prohibited until governance satisfied"),
+    _c(name="model_registry", state=PLANNED, module="",
+       purpose="versioned model artifacts, family accounting, drift",
+       activation_prereqs=("ml_estimator",)),
+    _c(name="causal_claim", state=CERTIFIED, module="apex.causal.claim",
+       purpose="claim object; refuses 'confirmed' w/o rung+assumptions+placebo",
+       is_new_hypothesis=True, consumes_credit=True),
+    _c(name="causal_executors", state=UNDER_CONSTRUCTION, module="",
+       purpose="placebo / neutralised-re-test runners",
+       activation_prereqs=("a validated or in-sample signal",)),
+    _c(name="regime_engine", state=CERTIFIED, module="apex.regime.engine",
+       purpose="deterministic PIT regime assignment from declared def",
+       pit_required=True, is_new_hypothesis=True, consumes_credit=True),
+    _c(name="regime_state_builders", state=UNDER_CONSTRUCTION, module="",
+       purpose="PIT builders for trailing-vol/breadth/trend state series",
+       pit_required=True, activation_prereqs=("digital_twin_multifacet",)),
+
+    # ---- LAYER 3: monetisation (gated on validated alpha) ------------------
+    _c(name="portfolio_construction", state=PLANNED, module="",
+       purpose="signal->policy separation; sizing/neutralisation/limits",
+       forbidden_deps=("apex.pipeline", "apex.registration", "apex.governance.ledger"),
+       activation_prereqs=("a VALIDATED_ALPHA",),
+       failure_behavior="policy versioned, never fitted to validation"),
+    _c(name="risk_engine", state=PLANNED, module="",
+       purpose="exposure/drawdown/tail limits; independent of alpha",
+       activation_prereqs=("portfolio_construction",)),
+    _c(name="backtest_engine", state=PLANNED, module="",
+       purpose="evaluator of signal+policy+costs; never an optimiser",
+       activation_prereqs=("portfolio_construction",)),
+    _c(name="capacity_engine", state=PLANNED, module="",
+       purpose="ADV/participation/impact/borrow -> capacity curves, net alpha",
+       activation_prereqs=("backtest_engine",)),
+    _c(name="cost_model", state=BUILT, module="apex.evaluate.turnover",
+       purpose="drift-aware turnover + per-side cost (decile-spread scope)",
+       failure_behavior="borrow cost documented as omission"),
+
+    # ---- LAYER 4: deployment ------------------------------------------------
+    _c(name="paper_shadow", state=PLANNED, module="",
+       purpose="RESEARCH->VALIDATED->PAPER->SHADOW->LIVE state machine",
+       activation_prereqs=("capacity_engine",),
+       failure_behavior="no automatic promotion; human-authorised transitions"),
+    _c(name="execution", state=PLANNED, module="",
+       purpose="consume approved weights, emit fills; generates no research",
+       forbidden_deps=("apex.pipeline", "apex.registration", "apex.governance.ledger",
+                       "apex.evaluate", "apex.features"),
+       activation_prereqs=("paper_shadow", "risk_engine")),
+    _c(name="live_monitoring", state=PLANNED, module="",
+       purpose="drift/decay detection; REVIEW/PAUSE/KILL, never retune",
+       activation_prereqs=("execution",),
+       failure_behavior="alert is a request for human judgement, never an action"),
+    _c(name="lifecycle_attribution", state=PLANNED, module="",
+       purpose="feature/factor/model/regime/portfolio/cost/execution attribution",
+       activation_prereqs=("backtest_engine",)),
+]}
+
+
+def by_state(state: str) -> tuple:
+    return tuple(c for c in REGISTRY.values() if c.state == state)
+
+
+def maturity_summary() -> dict:
+    out = {s: 0 for s in STATES}
+    for c in REGISTRY.values():
+        out[c.state] += 1
+    return {s: n for s, n in out.items() if n}
