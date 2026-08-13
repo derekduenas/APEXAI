@@ -1,0 +1,92 @@
+"""The minimal monetisation evaluator: fixed policy, no optimisation.
+
+Proves the evaluator is an evaluator: deterministic, cost-monotone, and
+structurally incapable of tuning or selecting. Viability thresholds are declared
+constants, asserted present before any use. No candidate data is touched.
+"""
+
+from __future__ import annotations
+
+import pytest
+
+from apex.portfolio import projection as P
+from apex.portfolio import viability as V
+
+
+def test_projection_is_deterministic():
+    a = P.project(gross_spread_annualised=0.08, breadth_median_names=1000)
+    b = P.project(gross_spread_annualised=0.08, breadth_median_names=1000)
+    assert a.as_dict() == b.as_dict()
+
+
+def test_higher_cost_lowers_net_return():
+    lo = P.project(gross_spread_annualised=0.08, breadth_median_names=1000,
+                   cost_bps_one_way=10)
+    hi = P.project(gross_spread_annualised=0.08, breadth_median_names=1000,
+                   cost_bps_one_way=40)
+    assert hi.net_spread_annualised < lo.net_spread_annualised
+
+
+def test_higher_turnover_lowers_net_return():
+    lo = P.project(gross_spread_annualised=0.08, breadth_median_names=1000,
+                   monthly_turnover=0.1)
+    hi = P.project(gross_spread_annualised=0.08, breadth_median_names=1000,
+                   monthly_turnover=0.5)
+    assert hi.net_spread_annualised < lo.net_spread_annualised
+
+
+def test_positive_control_a_strong_wide_factor_is_viable():
+    r = P.project(gross_spread_annualised=0.08, breadth_median_names=1200)
+    assert V.assess(r).viable is True
+
+
+def test_negative_control_a_weak_factor_is_not_viable():
+    r = P.project(gross_spread_annualised=0.01, breadth_median_names=1200)
+    verdict = V.assess(r)
+    assert verdict.viable is False
+    assert any("net spread" in f for f in verdict.failures)
+
+
+def test_counterexample_a_narrow_factor_fails_the_breadth_gate():
+    r = P.project(gross_spread_annualised=0.08, breadth_median_names=100)
+    verdict = V.assess(r)
+    assert verdict.viable is False
+    assert any("breadth" in f for f in verdict.failures)
+
+
+def test_the_evaluator_exposes_no_optimiser():
+    for banned in ("optimise", "optimize", "best_policy", "select", "search",
+                   "tune", "argmax"):
+        assert not hasattr(P, banned), f"projection exposes {banned}"
+
+
+def test_the_policy_is_fixed_and_declared():
+    assert P.POLICY["construction"] == "long_top_decile_short_bottom_decile"
+    assert P.POLICY["rebalance"] == "monthly"
+    # the policy is a constant, not a function argument that could be searched
+    import inspect
+    sig = inspect.signature(P.project)
+    assert "policy" not in sig.parameters
+
+
+def test_viability_thresholds_are_declared_constants():
+    """Declared BEFORE use, versioned like the section-13 criteria."""
+    assert V.MIN_NET_SPREAD_ANNUALISED == 0.02
+    assert V.MAX_MONTHLY_TURNOVER == 0.50
+    assert V.MAX_DEGRADATION_FRACTION == 0.60
+    assert V.MIN_BREADTH_MEDIAN_NAMES == 400
+
+
+def test_counterexample_a_bad_breadth_is_refused():
+    with pytest.raises(P.ProjectionError):
+        P.project(gross_spread_annualised=0.05, breadth_median_names=0)
+
+
+def test_the_projection_touches_no_candidate_or_forward_return():
+    """It consumes a NUMBER (gross spread), never a signal or returns -- so it
+    cannot pre-empt the one paid validation look."""
+    import inspect
+    from apex.audit.execution_path import executable_source
+    code = executable_source(inspect.getsource(P))   # docstrings excluded
+    for leak in ("forward_return", "compute_ic", "validation", "holdout"):
+        assert leak not in code, f"projection executes against {leak}"

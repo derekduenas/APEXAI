@@ -138,7 +138,7 @@ CONTRACTS: dict[str, LayerContract] = {
         name="portfolio construction",
         package="apex.portfolio",
         purpose="turn a signal into an investable policy; signal != policy",
-        status="PLANNED",
+        status="UNDER_CONSTRUCTION",
         forbidden=REGISTRATION_CORE | SCREEN | DISCOVERY_LAYER,
         is_new_hypothesis=False,       # a policy is not a new predictive claim
         consumes_credit=False,         # monetisation research, not a credit test

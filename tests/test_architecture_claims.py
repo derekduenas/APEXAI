@@ -117,7 +117,7 @@ def test_the_absent_layers_the_audit_claims_have_no_module():
     """§3 class-C claims: the layers the audit calls ABSENT have no directory,
     so the audit cannot be quietly falsified by a stub appearing."""
     # Genuinely absent engines (need a validated alpha or a broker first).
-    for absent_dir in ("portfolio", "execution", "backtest", "risk", "monitoring"):
+    for absent_dir in ("execution", "backtest", "risk", "monitoring"):
         assert not (APEX / absent_dir).exists(), (
             f"apex/{absent_dir}/ exists but the audit classifies it ABSENT/planned; "
             f"reconcile the audit before building further"
@@ -125,7 +125,7 @@ def test_the_absent_layers_the_audit_claims_have_no_module():
     # UNDER_CONSTRUCTION governance substrate (ml/causal/regime) may exist, but
     # the real invariant holds: NO model-fitting library, and no .fit() in it.
     from apex.audit.execution_path import executable_source
-    for uc_dir in ("ml", "causal", "regime"):
+    for uc_dir in ("ml", "causal", "regime", "portfolio"):
         # executable code only -- the search-ledger docstring legitimately names
         # ".fit()" to say it is prohibited (the prose-vs-code trap, guarded).
         code = "\n".join(

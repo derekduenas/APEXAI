@@ -55,6 +55,7 @@ AUDITED_FILES = [
     _TESTS / "test_architecture_firewalls.py",
     _TESTS / "test_research_engines.py",
     _TESTS / "test_component_registry.py",
+    _TESTS / "test_portfolio_projection.py",
 ]
 
 # Guard -> the counterexample(s) that demonstrate it can fail.
@@ -250,6 +251,16 @@ LOAD_BEARING = {
     "test_regime_assignment_is_deterministic": [
         "test_counterexample_a_future_state_value_is_refused",
         "test_counterexample_a_mismatched_label_count_is_refused",
+    ],
+    # --- Minimal monetisation evaluator (2026-08-12) ------------------------
+    # A fixed-policy evaluator that cannot tune or select; viability thresholds
+    # declared before use.
+    "test_positive_control_a_strong_wide_factor_is_viable": [
+        "test_negative_control_a_weak_factor_is_not_viable",
+        "test_counterexample_a_narrow_factor_fails_the_breadth_gate",
+    ],
+    "test_the_policy_is_fixed_and_declared": [
+        "test_counterexample_a_bad_breadth_is_refused",
     ],
 }
 

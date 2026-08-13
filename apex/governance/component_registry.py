@@ -187,11 +187,14 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
        pit_required=True, activation_prereqs=("digital_twin_multifacet",)),
 
     # ---- LAYER 3: monetisation (gated on validated alpha) ------------------
-    _c(name="portfolio_construction", state=PLANNED, module="",
-       purpose="signal->policy separation; sizing/neutralisation/limits",
+    _c(name="portfolio_construction", state=UNDER_CONSTRUCTION,
+       module="apex.portfolio.projection",
+       purpose="minimal monetisation evaluator (fixed policy); full construction PLANNED",
        forbidden_deps=("apex.pipeline", "apex.registration", "apex.governance.ledger"),
-       activation_prereqs=("a VALIDATED_ALPHA",),
+       activation_prereqs=("a VALIDATED_ALPHA to exercise on real spread",),
        failure_behavior="policy versioned, never fitted to validation"),
+    _c(name="economic_viability", state=CERTIFIED, module="apex.portfolio.viability",
+       purpose="declared net/turnover/degradation/breadth thresholds, before use"),
     _c(name="risk_engine", state=PLANNED, module="",
        purpose="exposure/drawdown/tail limits; independent of alpha",
        activation_prereqs=("portfolio_construction",)),
