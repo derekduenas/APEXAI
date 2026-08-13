@@ -1,0 +1,104 @@
+==============================================================================
+APEX FEATURE LIBRARY AUDIT -- inventory and redundancy only
+==============================================================================
+  window   : 2005-01-01 .. 2017-12-31  (in-sample; no statistical standing)
+  computes : feature-to-feature rank correlation
+  does NOT : forward returns, IC, performance, ranking, combination
+
+==============================================================================
+1. DECLARED FEATURE LIBRARY
+==============================================================================
+  APEX-001 components : 8
+    f1: f1_mom_126, f1_mom_63
+    f2: f2_close_over_sma200, f2_frac_above_sma50
+    f3: f3_vol_ratio, f3_atr_over_close
+    f4: f4_vs_sector, f4_vs_market
+  APEX-002 features   : 1  (nsi)
+  TOTAL implemented   : 9
+
+==============================================================================
+2. COVERAGE ON THE ELIGIBLE CROSS-SECTION
+==============================================================================
+  feature                           obs   coverage
+  f1_mom_126                    198,944   100.00%
+  f1_mom_63                     198,944   100.00%
+  f2_close_over_sma200          198,944   100.00%
+  f2_frac_above_sma50           198,944   100.00%
+  f3_atr_over_close             198,944   100.00%
+  f3_vol_ratio                  198,944   100.00%
+  f4_vs_market                  198,944   100.00%
+  f4_vs_sector                  198,944   100.00%
+  nsi                           194,355    97.69%
+  (eligible security-dates)      198,944
+
+==============================================================================
+3. FEATURE-TO-FEATURE REDUNDANCY
+==============================================================================
+  Mean cross-sectional Spearman correlation between FEATURES, over
+  formation dates, on eligible names. No returns are involved.
+
+                        f1_mom_1  f1_mom_6  f2_close  f2_frac_  f3_atr_o  f3_vol_r  f4_vs_ma  f4_vs_se       nsi
+  f1_mom_126                1.00      0.66      0.89      0.67     -0.06     -0.03      0.66      0.62      0.05
+  f1_mom_63                 0.66      1.00      0.76      0.78     -0.07     -0.08      1.00      0.92      0.01
+  f2_close_over_sma200      0.89      0.76      1.00      0.72     -0.09     -0.04      0.76      0.70      0.04
+  f2_frac_above_sma50       0.67      0.78      0.72      1.00     -0.17     -0.05      0.78      0.72     -0.01
+  f3_atr_over_close        -0.06     -0.07     -0.09     -0.17      1.00      0.18     -0.07     -0.06      0.29
+  f3_vol_ratio             -0.03     -0.08     -0.04     -0.05      0.18      1.00     -0.08     -0.06     -0.01
+  f4_vs_market              0.66      1.00      0.76      0.78     -0.07     -0.08      1.00      0.92      0.01
+  f4_vs_sector              0.62      0.92      0.70      0.72     -0.06     -0.06      0.92      1.00      0.02
+  nsi                       0.05      0.01      0.04     -0.01      0.29     -0.01      0.01      0.02      1.00
+
+  strongly related pairs (|rho| >= 0.50):
+    +1.000   f1_mom_63  <->  f4_vs_market
+    +0.920   f4_vs_market  <->  f4_vs_sector
+    +0.920   f1_mom_63  <->  f4_vs_sector
+    +0.887   f1_mom_126  <->  f2_close_over_sma200
+    +0.779   f2_frac_above_sma50  <->  f4_vs_market
+    +0.779   f1_mom_63  <->  f2_frac_above_sma50
+    +0.758   f2_close_over_sma200  <->  f4_vs_market
+    +0.758   f1_mom_63  <->  f2_close_over_sma200
+    +0.719   f2_close_over_sma200  <->  f2_frac_above_sma50
+    +0.715   f2_frac_above_sma50  <->  f4_vs_sector
+    +0.703   f2_close_over_sma200  <->  f4_vs_sector
+    +0.672   f1_mom_126  <->  f2_frac_above_sma50
+    +0.664   f1_mom_126  <->  f4_vs_market
+    +0.664   f1_mom_126  <->  f1_mom_63
+    +0.615   f1_mom_126  <->  f4_vs_sector
+
+  weakly related pairs (|rho| < 0.10):
+    -0.008   f3_vol_ratio  <->  nsi
+    -0.012   f2_frac_above_sma50  <->  nsi
+    +0.014   f1_mom_63  <->  nsi
+    +0.014   f4_vs_market  <->  nsi
+    +0.018   f4_vs_sector  <->  nsi
+    -0.031   f1_mom_126  <->  f3_vol_ratio
+    -0.039   f2_close_over_sma200  <->  f3_vol_ratio
+    +0.042   f2_close_over_sma200  <->  nsi
+    +0.049   f1_mom_126  <->  nsi
+    -0.055   f2_frac_above_sma50  <->  f3_vol_ratio
+    -0.056   f1_mom_126  <->  f3_atr_over_close
+    -0.063   f3_vol_ratio  <->  f4_vs_sector
+    -0.064   f3_atr_over_close  <->  f4_vs_sector
+    -0.066   f1_mom_63  <->  f3_atr_over_close
+    -0.066   f3_atr_over_close  <->  f4_vs_market
+    -0.079   f1_mom_63  <->  f3_vol_ratio
+    -0.079   f3_vol_ratio  <->  f4_vs_market
+    -0.094   f2_close_over_sma200  <->  f3_atr_over_close
+
+==============================================================================
+4. IS APEX-002's SIGNAL DISTINCT FROM APEX-001's?
+==============================================================================
+  This is an INDEPENDENCE question about the inputs, not a claim
+  about predictive power.
+
+    nsi <-> f1_mom_126               +0.049
+    nsi <-> f1_mom_63                +0.014
+    nsi <-> f2_close_over_sma200     +0.042
+    nsi <-> f2_frac_above_sma50      -0.012
+    nsi <-> f3_atr_over_close        +0.287
+    nsi <-> f3_vol_ratio             -0.008
+    nsi <-> f4_vs_market             +0.014
+    nsi <-> f4_vs_sector             +0.018
+
+  largest absolute correlation with any #001 component: 0.287 (f3_atr_over_close)
+
