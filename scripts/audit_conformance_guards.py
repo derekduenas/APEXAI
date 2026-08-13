@@ -53,6 +53,7 @@ AUDITED_FILES = [
     _TESTS / "test_feature_factory.py",
     _TESTS / "test_research_discovery.py",
     _TESTS / "test_architecture_firewalls.py",
+    _TESTS / "test_research_engines.py",
 ]
 
 # Guard -> the counterexample(s) that demonstrate it can fail.
@@ -219,6 +220,35 @@ LOAD_BEARING = {
     ],
     "test_every_contract_that_is_a_new_hypothesis_consumes_a_credit_or_is_free_discovery": [
         "test_counterexample_a_new_hypothesis_layer_with_no_governance_is_rejected",
+    ],
+    # --- Reusable research engines (2026-08-12) -----------------------------
+    # stats/manifest/ml-accounting/causal/regime: each evaluates a declared
+    # question and structurally cannot search or select.
+    "test_positive_control_bootstrap_ci_excludes_zero": [
+        "test_negative_control_bootstrap_ci_includes_zero",
+        "test_counterexample_the_stats_engine_exposes_no_select_best",
+        "test_counterexample_a_bad_block_size_is_refused",
+    ],
+    "test_positive_control_permutation_rejects_null": [
+        "test_negative_control_permutation_does_not_reject",
+    ],
+    "test_manifest_science_id_is_stable_across_presentation_changes": [
+        "test_counterexample_a_science_change_changes_identity",
+        "test_counterexample_a_manifest_missing_a_science_key_is_refused",
+        "test_counterexample_a_freeform_science_field_is_refused",
+    ],
+    "test_the_search_denominator_counts_distinct_specs": [
+        "test_counterexample_a_different_hyperparameter_grid_is_a_new_comparison",
+        "test_counterexample_select_best_is_refused",
+    ],
+    "test_a_descriptive_claim_needs_no_placebo": [
+        "test_counterexample_a_causal_hypothesis_without_a_placebo_is_refused",
+        "test_counterexample_a_causal_hypothesis_without_assumptions_is_refused",
+        "test_counterexample_an_unsupported_identification_strategy_is_refused",
+    ],
+    "test_regime_assignment_is_deterministic": [
+        "test_counterexample_a_future_state_value_is_refused",
+        "test_counterexample_a_mismatched_label_count_is_refused",
     ],
 }
 

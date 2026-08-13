@@ -116,8 +116,25 @@ def test_the_certified_layers_the_audit_claims_are_actually_present():
 def test_the_absent_layers_the_audit_claims_have_no_module():
     """§3 class-C claims: the layers the audit calls ABSENT have no directory,
     so the audit cannot be quietly falsified by a stub appearing."""
-    for absent_dir in ("ml", "portfolio", "execution", "backtest", "causal", "regime"):
+    # Genuinely absent engines (need a validated alpha or a broker first).
+    for absent_dir in ("portfolio", "execution", "backtest", "risk", "monitoring"):
         assert not (APEX / absent_dir).exists(), (
             f"apex/{absent_dir}/ exists but the audit classifies it ABSENT/planned; "
             f"reconcile the audit before building further"
         )
+    # UNDER_CONSTRUCTION governance substrate (ml/causal/regime) may exist, but
+    # the real invariant holds: NO model-fitting library, and no .fit() in it.
+    from apex.audit.execution_path import executable_source
+    for uc_dir in ("ml", "causal", "regime"):
+        # executable code only -- the search-ledger docstring legitimately names
+        # ".fit()" to say it is prohibited (the prose-vs-code trap, guarded).
+        code = "\n".join(
+            executable_source(f.read_text()) for f in (APEX / uc_dir).rglob("*.py")
+            if "__pycache__" not in str(f)
+        ).lower()
+        for lib in ("import sklearn", "import xgboost", "import lightgbm",
+                    "import torch", ".fit("):
+            assert lib not in code, (
+                f"apex/{uc_dir}/ contains {lib!r}: a model is being fit before the "
+                f"ML governance contract is satisfied"
+            )
