@@ -1,15 +1,116 @@
-Traceback (most recent call last):
-  File "/Users/derekduenas/apex-equities/scripts/run_validation.py", line 165, in <module>
-    raise SystemExit(main())
-                     ^^^^^^
-  File "/Users/derekduenas/apex-equities/scripts/run_validation.py", line 82, in main
-    output, evaluation = run_period(source, config, PERIOD)
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/derekduenas/apex-equities/apex/pipeline.py", line 141, in run_period
-    require_unlocked(config, period, source.dataset_fingerprint)
-  File "/Users/derekduenas/apex-equities/apex/registration.py", line 254, in require_unlocked
-    ledger.spend(
-  File "/Users/derekduenas/apex-equities/apex/governance/ledger.py", line 402, in spend
-    raise AlreadyEvaluated(
-apex.governance.ledger.AlreadyEvaluated: experiment 'APEX-002' has already been evaluated against period 'validation' on 2026-08-12T14:19:56.871704+00:00.
-  A second look is not available. Protocol section 10: a modified specification is a NEW hypothesis requiring a new experiment id and consuming another credit.
+{
+  "experiment_id": "APEX-002",
+  "period": "validation",
+  "dataset_manifest_hash": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+  "snapshot_root": "data/snapshots/sharadar/current",
+  "protocol_hash": "63703d1020893a59a4b43ed9698c4920ccb392e7f76bc77030ef019693ea9bda",
+  "conventions_hash": "9ea9c94c0f1703c032b40b96cbf397e18c16baedf6cdd85ae204863e5ce44656",
+  "config_hash": "af2429de62082a4bbfc22d878a371b6be1b42b2cc924833375b11e6ee6c9cad1",
+  "git_sha": "e7ae0c2fa91490c2ad8d8d560956b2e5477b7a5b-DIRTY",
+  "ic_daily_newey_west": {
+    "mean_ic": 0.011654821132463208,
+    "std_ic": 0.14888923608826476,
+    "ic_information_ratio": 0.07827846685675771,
+    "t_stat": 0.6538268625254211,
+    "p_value": 0.5132233578752777,
+    "n_periods": 987,
+    "mean_names_per_period": 1477.112462006079,
+    "method": "daily_newey_west"
+  },
+  "ic_non_overlapping": {
+    "mean_ic": 0.015950225388291838,
+    "std_ic": 0.1438269273214607,
+    "ic_information_ratio": 0.1108987425744155,
+    "t_stat": 0.7762911980209083,
+    "p_value": 0.44138561666707465,
+    "n_periods": 49,
+    "mean_names_per_period": 1476.6326530612246,
+    "method": "non_overlapping"
+  },
+  "deciles_gross": {
+    "spread_mean_per_period": 0.0011299248130176207,
+    "spread_annualised_gross": 0.014330729595350755,
+    "spread_t_stat": 0.14543156129703774,
+    "hit_rate": 0.5510204081632653,
+    "monotonic_top_over_bottom": true,
+    "n_periods": 49,
+    "mean_by_decile": {
+      "1": 0.0036145748739188186,
+      "2": 0.0059117842587541455,
+      "3": 0.00434212369032297,
+      "4": 0.004195420526345107,
+      "5": 0.0023728070626897997,
+      "6": 9.459333101339379e-05,
+      "7": 0.002451210121709283,
+      "8": 0.005450878993631335,
+      "9": 0.008068535781644154,
+      "10": 0.004744499686936437
+    }
+  },
+  "exclusions": {
+    "master_securities": 17002,
+    "candidates_after_category": 17002,
+    "candidates_after_marketcap": 5470,
+    "eligible_ever": 0,
+    "sep_rows_scanned": 34890722,
+    "sep_rows_kept": 12688347,
+    "daily_rows_scanned": 31394671,
+    "duplicates_dropped": 0,
+    "unmapped_ticker_dates": 0,
+    "recycled_tickers": 0,
+    "notes": []
+  },
+  "estimator_disclosure": {
+    "estimator": "newey-west bartlett lag 25",
+    "overlap_trading_days": 20,
+    "n_obs": 987,
+    "reference_replications": 20000,
+    "reference_digest": "b1687cbf2c358047",
+    "sd_of_t_under_null": 1.2203,
+    "nominal_5pct_test_actual_size": 0.109,
+    "threshold_2p5_nominal_one_sided_size": 0.00621,
+    "threshold_2p5_measured_one_sided_size": 0.021,
+    "note": "Bartlett HAC under-weights the MA(overlap-1) autocovariance of overlapping forward windows, so the pre-registered t >= 2.5 hurdle is less stringent than its nominal size implies. Pre-registration NOT amended (ruling 2026-08-09); disclosed here."
+  }
+}
+
+--- ATTRIBUTION (protocol section 9) ---
+  contribution by sector (annualised spread points):
+sector
+Healthcare                0.00334
+Technology                0.00136
+Communication Services    0.00078
+Industrials               0.00056
+Basic Materials           0.00026
+Utilities                 0.00009
+Consumer Cyclical         0.00003
+Real Estate               0.00000
+Consumer Defensive       -0.00011
+Financial Services       -0.00033
+Energy                   -0.00133
+
+  top 5 winners:
+ticker      sector  contribution
+  ENPH  Technology       0.00042
+  IMMU  Healthcare       0.00034
+  PLUG Industrials       0.00033
+  NVAX  Healthcare       0.00033
+  MYOK  Healthcare       0.00030
+
+  top 5 losers:
+ticker      sector  contribution
+  PTLA  Healthcare      -0.00020
+ NKLAQ Industrials      -0.00020
+  VXRT  Healthcare      -0.00022
+  ANAB  Healthcare      -0.00023
+ VALPQ      Energy      -0.00028
+
+  largest contributing sector : Healthcare
+  spread, all sectors         : +1.4331%
+  spread, that sector removed : +1.5311%
+  share of spread from it     : -6.8%
+
+VERDICT: FAILURE
+  - t-statistic +0.653827 fails t_stat >= 2.92
+
+written to results/validation_APEX-002.json

@@ -1,0 +1,179 @@
+==============================================================================
+APEX-002 VALIDATION POST-MORTEM -- DIAGNOSIS ONLY
+==============================================================================
+  recorded verdict : FAILURE (unchanged; this script records nothing)
+  period           : 2018-01-01 .. 2021-12-31
+  no ledger write, no credit, no unlock, no holdout, no new verdict
+
+==============================================================================
+REPRODUCTION GATE
+==============================================================================
+  mean IC        recomputed +0.011654821132   recorded +0.011654821132   MATCH
+  std IC         recomputed +0.148889236088   recorded +0.148889236088   MATCH
+  t-statistic    recomputed +0.653826862525   recorded +0.653826862525   MATCH
+  p-value        recomputed +0.513223357875   recorded +0.513223357875   MATCH
+  n_periods      recomputed +987.000000000000   recorded +987.000000000000   MATCH
+  robustness t   recomputed +0.776291198021   recorded +0.776291198021   MATCH
+
+  The series below IS the series the recorded verdict came from.
+
+==============================================================================
+1. DISTRIBUTION OF DAILY ICs
+==============================================================================
+  p1                          -0.293803
+  p5                          -0.199962
+  p10                         -0.160145
+  p25                         -0.096108
+  p50                         -0.008354
+  p75                         +0.109613
+  p90                         +0.214125
+  p95                         +0.291121
+  p99                         +0.375856
+  mean                         +0.011655
+  std                          +0.148889
+  min / max                    -0.355896 / +0.438859
+  skew                         +0.411431
+  kurtosis (excess)            -0.199755
+
+  mean / std (information ratio) : +0.078278
+  observations                   : 987
+
+==============================================================================
+2. IS THE POSITIVE MEAN CONCENTRATED IN A FEW DATES?
+==============================================================================
+  sum of all daily ICs           : +11.503308
+
+  top-k dates                 sum   share of total
+  top 1                 +0.438859            3.8%
+  top 5                 +2.050738           17.8%
+  top 10                +4.013553           34.9%
+  top 25                +9.451547           82.2%
+  top 50               +17.340309          150.7%
+  top 100              +29.781004          258.9%
+
+  bottom-k dates              sum   share of total
+  bottom 1              -0.355896           -3.1%
+  bottom 5              -1.626513          -14.1%
+  bottom 10             -3.121451          -27.1%
+  bottom 25             -7.195499          -62.6%
+  bottom 50            -12.702358         -110.4%
+  bottom 100           -21.653412         -188.2%
+
+  dates that must be removed for the mean to reach zero: 32  (3.2% of 987)
+
+==============================================================================
+3. SIGN STABILITY ACROSS THE VALIDATION PERIODS
+==============================================================================
+  positive IC dates              :   468  (47.42%)
+  negative IC dates              :   519  (52.58%)
+  exactly zero                   :     0  (0.00%)
+  mean of positive dates         : +0.138280
+  mean of negative dates         : -0.102528
+
+  sign changes between consecutive dates : 98 of 986  (9.9%)
+  lag-1 autocorrelation of IC            : +0.952489
+  lag-20 autocorrelation of IC           : -0.059948
+
+==============================================================================
+4. YEAR BY YEAR
+==============================================================================
+  year       n     mean IC        std   t (NW-25)         p    % pos
+  2018     251   -0.006900   0.099676     -0.2920    0.7703   45.0%
+  2019     252   +0.005941   0.121277     +0.2112    0.8327   42.5%
+  2020     253   -0.048929   0.120157     -2.0946    0.0362   33.6%
+  2021     231   +0.104404   0.198180     +2.3214    0.0203   70.6%
+
+  contribution to the full-period mean:
+    2018   -15.1% of the total
+    2019    13.0% of the total
+    2020  -107.6% of the total
+    2021   209.7% of the total
+
+==============================================================================
+5. CALENDAR AND REGIME CONCENTRATION
+==============================================================================
+  by quarter:
+    quarter        n     mean IC    % pos
+    2018Q1        61   -0.033153   36.1%
+    2018Q2        64   -0.074810   12.5%
+    2018Q3        63   +0.044333   69.8%
+    2018Q4        63   +0.036275   61.9%
+    2019Q1        61   +0.014110   37.7%
+    2019Q2        63   -0.024093   42.9%
+    2019Q3        64   +0.093614   64.1%
+    2019Q4        64   -0.059954   25.0%
+    2020Q1        62   -0.119329    1.6%
+    2020Q2        63   -0.061232   31.7%
+    2020Q3        64   -0.002932   48.4%
+    2020Q4        64   -0.014617   51.6%
+    2021Q1        61   +0.153520   73.8%
+    2021Q2        63   +0.048958   55.6%
+    2021Q3        64   +0.063660   73.4%
+    2021Q4        43   +0.176601   83.7%
+
+  by calendar month (pooled across years):
+    month      n     mean IC
+    1         82   -0.056506
+    2         76   +0.018302
+    3         87   +0.046520
+    4         84   -0.013372
+    5         84   -0.062058
+    6         85   -0.008738
+    7         86   +0.071010
+    8         88   +0.020350
+    9         81   +0.058930
+    10        89   +0.076087
+    11        82   +0.027194
+    12        63   -0.061825
+
+  by trailing 20-day benchmark direction:
+    benchmark up     n= 706  mean +0.017285  t +0.8163
+    benchmark down   n= 281  mean -0.002491  t -0.1026
+
+==============================================================================
+6. CROSS-SECTIONAL BREADTH vs IC MAGNITUDE
+==============================================================================
+  names per date  min/median/max : 1246 / 1444 / 1674
+  correlation(count, IC)         : +0.337181
+  correlation(count, |IC|)       : +0.400648
+
+  breadth quintile         n   mean names     mean IC     std IC
+  Q1                     200       1384.8   +0.021173   0.128579
+  Q2                     201       1421.6   -0.048676   0.112522
+  Q3                     192       1447.6   -0.029520   0.109532
+  Q4                     199       1505.9   +0.008256   0.125343
+  Q5                     195       1628.6   +0.108090   0.199770
+
+  1/sqrt(breadth) reference: a cross-sectional correlation on N names
+  has sampling standard error near 1/sqrt(N).
+    median N                     : 1444
+    1/sqrt(median N)             : 0.026316
+    observed std of daily IC     : 0.148889
+
+==============================================================================
+7. PRIMARY (DAILY) vs ROBUSTNESS (NON-OVERLAPPING)
+==============================================================================
+                                  daily    non-overlapping
+  n periods                         987                 49
+  mean IC                     +0.011655          +0.015950
+  std IC                       0.148889           0.143827
+  t-statistic                   +0.6538            +0.7763
+  p-value                        0.5132             0.4414
+  % positive                     47.4%             46.9%
+
+  difference in mean IC          : +0.004295
+  daily std / sqrt(n_daily)      : 0.004739
+  the grid dates are a subset of the daily dates: True
+
+==============================================================================
+8. STRUCTURE, NOISE, OR SUBPERIOD CONCENTRATION -- OBSERVATIONS
+==============================================================================
+  Observations only. Interpretation is reported separately below.
+
+    first half     n= 493  mean +0.002875  t +0.1582  p 0.8743
+    second half    n= 494  mean +0.020417  t +0.6762  p 0.4989
+
+  years with positive mean IC    : 2 of 4
+  years with t >= 2.92           : 0 of 4
+  HAC inflation factor (std of t under null, recorded) : 1.2203
+

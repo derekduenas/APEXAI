@@ -1,0 +1,249 @@
+{
+  "experiment_validity": {
+    "verdict": "FAILURE",
+    "failures": [
+      "t-statistic +0.653827 fails t_stat >= 2.92"
+    ],
+    "criteria_applied": [
+      "mean_ic > 0",
+      "t_stat >= 2.92",
+      "robustness agrees in sign with the primary statistic"
+    ]
+  },
+  "interpretation": {
+    "pre_registered_t": 0.6538,
+    "pre_registered_threshold": 2.92,
+    "nominal_one_sided_size_at_threshold": 0.00621,
+    "measured_one_sided_size_at_threshold": 0.00925,
+    "observed_t_percentile_under_null": 0.71045,
+    "tstat_that_would_give_the_nominal_size": 3.1,
+    "authority": "INTERPRETATION ONLY. Does not determine promotion. The protocol is not amended (CONVENTIONS A-001); the pre-registered estimator and threshold stand, and this states what they are worth."
+  },
+  "programme_inference": {
+    "budget": 5,
+    "credits_spent": 2,
+    "credits_remaining": 3,
+    "family_alpha": 0.05,
+    "sequential_alpha": 0.01,
+    "chain_verified": true,
+    "experiments": [
+      {
+        "experiment_id": "APEX-001",
+        "hypothesis": "A fixed equal-weighted composite of four price/volume factor categories ranks US equities such that higher-ranked stocks earn higher forward 20-trading-day excess returns, net of realistic costs.",
+        "period": "validation",
+        "evaluated": "2026-08-11T19:24:36.019881+00:00",
+        "budgeted": true,
+        "p_value": 0.7626650991639228,
+        "t_stat": 0.3019828992574129,
+        "verdict": "INCONCLUSIVE",
+        "dataset_hash": "08167684b48949454ebf722f276add7389f8f431d4d299fa3253dfae56a3b9a4",
+        "passes_sequential_bonferroni": false,
+        "passes_holm_retrospective": null
+      },
+      {
+        "experiment_id": "APEX-002",
+        "hypothesis": "Companies that reduce share count through net repurchases outperform companies that aggressively issue equity: the cross-sectional rank of twelve-month net share issuance, ln(S_t / S_t-4q) on as-filed sharesbas, predicts forward 20-trading-day excess returns. Lower issuance ranks higher.",
+        "period": "validation",
+        "evaluated": "2026-08-12T14:19:56.871704+00:00",
+        "budgeted": true,
+        "p_value": 0.5132233578752777,
+        "t_stat": 0.6538268625254211,
+        "verdict": "FAILURE",
+        "dataset_hash": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+        "passes_sequential_bonferroni": false,
+        "passes_holm_retrospective": null
+      },
+      {
+        "experiment_id": "APEX-002",
+        "hypothesis": "Companies that reduce share count through net repurchases outperform companies that aggressively issue equity: the cross-sectional rank of twelve-month net share issuance, ln(S_t / S_t-4q) on as-filed sharesbas, predicts forward 20-trading-day excess returns. Lower issuance ranks higher.",
+        "period": "validation",
+        "evaluated": "2026-08-13T00:34:32.084128+00:00",
+        "budgeted": true,
+        "p_value": 0.5132233578752777,
+        "t_stat": 0.6538268625254211,
+        "verdict": "FAILURE",
+        "dataset_hash": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+        "passes_sequential_bonferroni": false,
+        "passes_holm_retrospective": null
+      }
+    ],
+    "authority": "ledger. Family-wise context across the research budget. Does not alter any individual experiment's pre-registered verdict."
+  },
+  "reading_order": [
+    "experiment_validity decides promotion, on pre-registered criteria alone",
+    "interpretation says what that t-statistic is actually worth",
+    "programme_inference says what it is worth given everything else tested"
+  ],
+  "raw": {
+    "experiment_id": "APEX-002",
+    "period": "validation",
+    "dataset_manifest_hash": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+    "snapshot_root": "data/snapshots/sharadar/current",
+    "protocol_hash": "63703d1020893a59a4b43ed9698c4920ccb392e7f76bc77030ef019693ea9bda",
+    "conventions_hash": "9ea9c94c0f1703c032b40b96cbf397e18c16baedf6cdd85ae204863e5ce44656",
+    "config_hash": "af2429de62082a4bbfc22d878a371b6be1b42b2cc924833375b11e6ee6c9cad1",
+    "git_sha": "e7ae0c2fa91490c2ad8d8d560956b2e5477b7a5b-DIRTY",
+    "ic_daily_newey_west": {
+      "mean_ic": 0.011654821132463208,
+      "std_ic": 0.14888923608826476,
+      "ic_information_ratio": 0.07827846685675771,
+      "t_stat": 0.6538268625254211,
+      "p_value": 0.5132233578752777,
+      "n_periods": 987,
+      "mean_names_per_period": 1477.112462006079,
+      "method": "daily_newey_west"
+    },
+    "ic_non_overlapping": {
+      "mean_ic": 0.015950225388291838,
+      "std_ic": 0.1438269273214607,
+      "ic_information_ratio": 0.1108987425744155,
+      "t_stat": 0.7762911980209083,
+      "p_value": 0.44138561666707465,
+      "n_periods": 49,
+      "mean_names_per_period": 1476.6326530612246,
+      "method": "non_overlapping"
+    },
+    "deciles_gross": {
+      "spread_mean_per_period": 0.0011299248130176207,
+      "spread_annualised_gross": 0.014330729595350755,
+      "spread_t_stat": 0.14543156129703774,
+      "hit_rate": 0.5510204081632653,
+      "monotonic_top_over_bottom": true,
+      "n_periods": 49,
+      "mean_by_decile": {
+        "1": 0.0036145748739188186,
+        "2": 0.0059117842587541455,
+        "3": 0.00434212369032297,
+        "4": 0.004195420526345107,
+        "5": 0.0023728070626897997,
+        "6": 9.459333101339379e-05,
+        "7": 0.002451210121709283,
+        "8": 0.005450878993631335,
+        "9": 0.008068535781644154,
+        "10": 0.004744499686936437
+      }
+    },
+    "exclusions": {
+      "master_securities": 17002,
+      "candidates_after_category": 17002,
+      "candidates_after_marketcap": 5470,
+      "eligible_ever": 0,
+      "sep_rows_scanned": 34890722,
+      "sep_rows_kept": 12688347,
+      "daily_rows_scanned": 31394671,
+      "duplicates_dropped": 0,
+      "unmapped_ticker_dates": 0,
+      "recycled_tickers": 0,
+      "notes": []
+    },
+    "estimator_disclosure": {
+      "estimator": "newey-west bartlett lag 25",
+      "overlap_trading_days": 20,
+      "n_obs": 987,
+      "reference_replications": 20000,
+      "reference_digest": "b1687cbf2c358047",
+      "sd_of_t_under_null": 1.2203,
+      "nominal_5pct_test_actual_size": 0.109,
+      "threshold_2p5_nominal_one_sided_size": 0.00621,
+      "threshold_2p5_measured_one_sided_size": 0.021,
+      "note": "Bartlett HAC under-weights the MA(overlap-1) autocovariance of overlapping forward windows, so the pre-registered t >= 2.5 hurdle is less stringent than its nominal size implies. Pre-registration NOT amended (ruling 2026-08-09); disclosed here."
+    }
+  },
+  "attribution": {
+    "by_sector": {
+      "Healthcare": 0.0033390917951866624,
+      "Technology": 0.0013600561831072677,
+      "Communication Services": 0.0007821184347593204,
+      "Industrials": 0.0005603094338570237,
+      "Basic Materials": 0.0002594328047096452,
+      "Utilities": 9.365687112157505e-05,
+      "Consumer Cyclical": 2.7718850070369993e-05,
+      "Real Estate": 0.0,
+      "Consumer Defensive": -0.00011277772837958353,
+      "Financial Services": -0.00033027331071799903,
+      "Energy": -0.0013272070984204512
+    },
+    "top_winners": [
+      {
+        "ticker": "ENPH",
+        "sector": "Technology",
+        "contribution": 0.00041833525463715694
+      },
+      {
+        "ticker": "IMMU",
+        "sector": "Healthcare",
+        "contribution": 0.0003388109978836268
+      },
+      {
+        "ticker": "PLUG",
+        "sector": "Industrials",
+        "contribution": 0.0003253184750608216
+      },
+      {
+        "ticker": "NVAX",
+        "sector": "Healthcare",
+        "contribution": 0.00032509064435298426
+      },
+      {
+        "ticker": "MYOK",
+        "sector": "Healthcare",
+        "contribution": 0.0003007532757204757
+      }
+    ],
+    "top_losers": [
+      {
+        "ticker": "PTLA",
+        "sector": "Healthcare",
+        "contribution": -0.00020050354564738965
+      },
+      {
+        "ticker": "NKLAQ",
+        "sector": "Industrials",
+        "contribution": -0.0002024489940395724
+      },
+      {
+        "ticker": "VXRT",
+        "sector": "Healthcare",
+        "contribution": -0.0002246552169847393
+      },
+      {
+        "ticker": "ANAB",
+        "sector": "Healthcare",
+        "contribution": -0.0002309487592493579
+      },
+      {
+        "ticker": "VALPQ",
+        "sector": "Energy",
+        "contribution": -0.0002800567182821507
+      }
+    ],
+    "largest_sector": "Healthcare",
+    "spread_with_all_sectors": 0.014330729595350755,
+    "spread_excluding_largest": 0.015311474301750172,
+    "share_from_largest_sector": -0.0684364811905735
+  },
+  "success_criteria": {
+    "experiment_id": "APEX-002",
+    "period": "validation",
+    "source": "config/experiment.yaml: success_criteria",
+    "mean_ic": "mean_ic > 0",
+    "t_stat": "t_stat >= 2.92",
+    "robustness": "robustness agrees in sign with the primary statistic"
+  },
+  "criteria_evaluation": {
+    "verdict": "FAILURE",
+    "failures": [
+      "t-statistic +0.653827 fails t_stat >= 2.92"
+    ],
+    "criteria_applied": [
+      "mean_ic > 0",
+      "t_stat >= 2.92",
+      "robustness agrees in sign with the primary statistic"
+    ]
+  },
+  "threshold_disclosure": {
+    "registered_t_threshold": 2.92,
+    "simulated_null_one_percent_quantile": 2.875940807861864,
+    "n_obs": 987
+  }
+}
