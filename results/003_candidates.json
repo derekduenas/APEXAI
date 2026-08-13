@@ -1,0 +1,335 @@
+{
+  "candidates": [
+    {
+      "candidate": "H1",
+      "combinations": [],
+      "descends_from_failure": false,
+      "dissent": [
+        "adversarial_researcher: profitability loads on sector; the signal may be a sector bet in disguise, and quality underperformed for much of the 2010s.",
+        "regime_researcher: quality is conditional -- it pays in downturns and lags in momentum-driven melt-ups; an unconditional test may wash out."
+      ],
+      "dossier_hash": "caedad3de70e20dfb8d9438d59479fc760f419c8a8e4894ffc7dc1e88ba43610",
+      "dossier_hash_short": "caedad3de70e",
+      "economic_mechanism": "risk-adjusted mispricing of productivity (quality)",
+      "feature_set": [
+        "prof_gross_profitability"
+      ],
+      "novelty": {
+        "classification": "NOVEL",
+        "nearest_prior": "",
+        "reasons": [
+          "no prior experiment or dossier uses this feature set"
+        ]
+      },
+      "provenance_hash": "74b236fb88d15485ff48d18348c004149c252d941bfc2460df3f1486c88e9625",
+      "role_views": [
+        {
+          "objections": [],
+          "reasoning": "Gross profitability is the most robust quality proxy; the mechanism is well-identified.",
+          "role": "economic_theorist",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "gp and assets are 96%+ populated as-filed; the accounting is clean above the line.",
+          "role": "fundamental_analyst",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "a single ranked ratio; no transformation to tune.",
+          "role": "quantitative_researcher",
+          "supports": true
+        },
+        {
+          "objections": [
+            "sector confounding",
+            "documented post-2010 decay"
+          ],
+          "reasoning": "profitability loads on sector; the signal may be a sector bet in disguise, and quality underperformed for much of the 2010s.",
+          "role": "adversarial_researcher",
+          "supports": false
+        },
+        {
+          "objections": [],
+          "reasoning": "orthogonal to the momentum block and to NSI in the feature audit; genuinely new information here.",
+          "role": "replication_researcher",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "low turnover, quarterly fundamentals; tradable at this universe's liquidity.",
+          "role": "portfolio_constructor",
+          "supports": true
+        },
+        {
+          "objections": [
+            "regime dependence unmodelled"
+          ],
+          "reasoning": "quality is conditional -- it pays in downturns and lags in momentum-driven melt-ups; an unconditional test may wash out.",
+          "role": "regime_researcher",
+          "supports": false
+        },
+        {
+          "objections": [],
+          "reasoning": "20-day horizon, large caps; no microstructure obstacle.",
+          "role": "microstructure_analyst",
+          "supports": true
+        }
+      ],
+      "unrebutted_adversary_objections": true
+    },
+    {
+      "candidate": "H2",
+      "combinations": [],
+      "descends_from_failure": false,
+      "dissent": [
+        "quantitative_researcher: accruals correlate with growth and profitability; the marginal information over H1/H3 is unclear.",
+        "adversarial_researcher: the accrual anomaly has decayed sharply post-2004 in published replications; this may already be arbitraged.",
+        "replication_researcher: risk of overlap with growth features; is this distinct from asset growth?"
+      ],
+      "dossier_hash": "515821e23d2eff491492590946a55d46a4213fb6f82865c4ad378b645baf9e95",
+      "dossier_hash_short": "515821e23d2e",
+      "economic_mechanism": "earnings-quality / functional fixation on headline EPS",
+      "feature_set": [
+        "accr_total_accruals"
+      ],
+      "novelty": {
+        "classification": "NOVEL",
+        "nearest_prior": "",
+        "reasons": [
+          "no prior experiment or dossier uses this feature set"
+        ]
+      },
+      "provenance_hash": "cb7b7cb6698c8ba75e5291681d22b0ecd4d711dbb07180c72dee5ec8293ea00e",
+      "role_views": [
+        {
+          "objections": [],
+          "reasoning": "Functional fixation on headline EPS is a durable behavioural mechanism.",
+          "role": "economic_theorist",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "netinc and ncfo both ~95% populated; the accrual is a clean difference.",
+          "role": "fundamental_analyst",
+          "supports": true
+        },
+        {
+          "objections": [
+            "collinearity with growth and quality"
+          ],
+          "reasoning": "accruals correlate with growth and profitability; the marginal information over H1/H3 is unclear.",
+          "role": "quantitative_researcher",
+          "supports": false
+        },
+        {
+          "objections": [
+            "documented decay post-publication"
+          ],
+          "reasoning": "the accrual anomaly has decayed sharply post-2004 in published replications; this may already be arbitraged.",
+          "role": "adversarial_researcher",
+          "supports": false
+        },
+        {
+          "objections": [
+            "possible redundancy with grow_asset_growth"
+          ],
+          "reasoning": "risk of overlap with growth features; is this distinct from asset growth?",
+          "role": "replication_researcher",
+          "supports": false
+        },
+        {
+          "objections": [],
+          "reasoning": "quarterly, low turnover, tradable.",
+          "role": "portfolio_constructor",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "the mechanism is not obviously regime-specific.",
+          "role": "regime_researcher",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "no obstacle at this horizon.",
+          "role": "microstructure_analyst",
+          "supports": true
+        }
+      ],
+      "unrebutted_adversary_objections": true
+    },
+    {
+      "candidate": "H3",
+      "combinations": [
+        {
+          "class": "rank_composite",
+          "economic_reason": "value and quality are distinct mispricings; conditioning value on profitability separates bargains from distress. Equal weight is pre-committed.",
+          "features": [
+            "val_book_to_market",
+            "prof_gross_profitability"
+          ]
+        }
+      ],
+      "descends_from_failure": false,
+      "dissent": [
+        "quantitative_researcher: a composite is one step toward a model; the equal weight is pre-committed, but a composite can mask which leg carries the signal.",
+        "adversarial_researcher: two features means two chances to fit; the recombination could look better than either leg by construction even with fixed weights."
+      ],
+      "dossier_hash": "2bf4d0712061b0df276e884b60457036b4c4e43883fb01ad973e78ad8a2e604a",
+      "dossier_hash_short": "2bf4d0712061",
+      "economic_mechanism": "joint value + quality mispricing",
+      "feature_set": [
+        "prof_gross_profitability",
+        "val_book_to_market"
+      ],
+      "novelty": {
+        "classification": "NOVEL",
+        "nearest_prior": "",
+        "reasons": [
+          "no prior experiment or dossier uses this feature set"
+        ]
+      },
+      "provenance_hash": "20c948deba9fbb7df1fed7f755e118181c61a752ac247a80873cc2ac140a5852",
+      "role_views": [
+        {
+          "objections": [],
+          "reasoning": "Value and quality capture DIFFERENT mispricings; combining them is the textbook quality-value case.",
+          "role": "economic_theorist",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "both inputs are well-populated as-filed.",
+          "role": "fundamental_analyst",
+          "supports": true
+        },
+        {
+          "objections": [
+            "attribution ambiguity in a composite"
+          ],
+          "reasoning": "a composite is one step toward a model; the equal weight is pre-committed, but a composite can mask which leg carries the signal.",
+          "role": "quantitative_researcher",
+          "supports": false
+        },
+        {
+          "objections": [
+            "multiple-comparisons pressure from combining"
+          ],
+          "reasoning": "two features means two chances to fit; the recombination could look better than either leg by construction even with fixed weights.",
+          "role": "adversarial_researcher",
+          "supports": false
+        },
+        {
+          "objections": [],
+          "reasoning": "the two components are near-orthogonal; this is a real recombination, not a relabelled single factor.",
+          "role": "replication_researcher",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "the joint sort is standard and tradable.",
+          "role": "portfolio_constructor",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "value and quality are somewhat counter-cyclical to each other, which is the point.",
+          "role": "regime_researcher",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "no obstacle.",
+          "role": "microstructure_analyst",
+          "supports": true
+        }
+      ],
+      "unrebutted_adversary_objections": true
+    },
+    {
+      "candidate": "H4",
+      "combinations": [],
+      "descends_from_failure": false,
+      "dissent": [
+        "quantitative_researcher: empirically this may correlate highly with NSI; without measuring it we cannot claim independence, and measuring it is a redundancy check, not a performance test.",
+        "adversarial_researcher: this is APEX-002 with a dollar numerator. Even with a clean provenance epoch, a skeptic will read it as NSI re-run, and the burden is on us to show the mechanism differs.",
+        "replication_researcher: until a redundancy pass shows net buyback yield is not rank-close to NSI, novelty is unproven."
+      ],
+      "dossier_hash": "6f9a09d4992e510fdfa11c5216113d04c8c42ebbee2fdd651e1d10bfcf62055a",
+      "dossier_hash_short": "6f9a09d4992e",
+      "economic_mechanism": "capital-return / payout yield",
+      "feature_set": [
+        "cap_net_buyback_yield"
+      ],
+      "novelty": {
+        "classification": "NOVEL",
+        "nearest_prior": "",
+        "reasons": [
+          "no prior experiment or dossier uses this feature set"
+        ]
+      },
+      "provenance_hash": "73f8018ee6b5bc2f8db4345f0d17a0dde0fdc31f9287bbf9c4b002bc150d06bd",
+      "role_views": [
+        {
+          "objections": [],
+          "reasoning": "Capital return is a distinct mechanism from dilution; dollars returned, not shares counted.",
+          "role": "economic_theorist",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "ncfcommon is 93% populated; it is the financing cash flow, economically different from a share-count ratio.",
+          "role": "fundamental_analyst",
+          "supports": true
+        },
+        {
+          "objections": [
+            "possible high correlation with nsi"
+          ],
+          "reasoning": "empirically this may correlate highly with NSI; without measuring it we cannot claim independence, and measuring it is a redundancy check, not a performance test.",
+          "role": "quantitative_researcher",
+          "supports": false
+        },
+        {
+          "objections": [
+            "mechanistically adjacent to a FAILED experiment",
+            "risk of being a #002 modification"
+          ],
+          "reasoning": "this is APEX-002 with a dollar numerator. Even with a clean provenance epoch, a skeptic will read it as NSI re-run, and the burden is on us to show the mechanism differs.",
+          "role": "adversarial_researcher",
+          "supports": false
+        },
+        {
+          "objections": [
+            "novelty vs nsi not established"
+          ],
+          "reasoning": "until a redundancy pass shows net buyback yield is not rank-close to NSI, novelty is unproven.",
+          "role": "replication_researcher",
+          "supports": false
+        },
+        {
+          "objections": [],
+          "reasoning": "tradable, low turnover.",
+          "role": "portfolio_constructor",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "payout is mildly pro-cyclical; not disqualifying.",
+          "role": "regime_researcher",
+          "supports": true
+        },
+        {
+          "objections": [],
+          "reasoning": "no obstacle.",
+          "role": "microstructure_analyst",
+          "supports": true
+        }
+      ],
+      "unrebutted_adversary_objections": true
+    }
+  ],
+  "note": "records, not experiments; no credit spent"
+}
