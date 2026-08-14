@@ -69,6 +69,23 @@ HOLDOUT_END = pd.Timestamp("2026-06-30")   # protocol section 7; the seal
 PORTFOLIOS = ("H1-A", "H1-B", "H1-E", "H3-QV-T", "H3-QV-B", "CONTROL")
 REBALANCE_EVERY = 3                        # grid steps (~quarterly)
 
+# The tracker loads a SHORT panel -- the full 22-year lake was OOM-killed on
+# this machine (exit 137, 2026-08-14), and live marking only needs enough
+# trailing history for the 252-day universe filters. The LOCKED grid is still
+# reproduced exactly: its anchor counts trading days from the 2004 lake
+# start, and the merged SFP/SPY series spans the whole lake, so grid
+# membership is derived from SPY's trading-day index, never re-anchored.
+PAPER_PANEL_START = "2025-01-01"
+
+
+def locked_grid(root: Path, cfg) -> pd.DatetimeIndex:
+    """The section-9 grid, derived from the full-lake SPY calendar."""
+    spy = pd.read_csv(root / "raw" / "SFP" / "SFP_SPY.csv", usecols=["date"])
+    days = pd.DatetimeIndex(sorted(pd.to_datetime(spy["date"]).unique()))
+    anchor = int(cfg.get("calendar.anchor_trading_days"))
+    step = int(cfg.get("schedule.rebalance_step_days"))
+    return days[anchor::step]
+
 
 def progress(msg):
     print(f"  [{time.strftime('%H:%M:%S')}] {msg}", file=sys.stderr, flush=True)
@@ -156,14 +173,15 @@ def main() -> int:
     lake_through = json.loads((root / "MANIFEST.json").read_text())["lake_through"]
     progress(f"paper root built through {lake_through}")
 
-    panel, _ = build_production_panel(root, cfg, cfg.get("calendar.lake_start"),
-                                      lake_through)
+    panel, _ = build_production_panel(root, cfg, PAPER_PANEL_START, lake_through)
     output, _ = apex003.build_gp_output(panel, cfg, root)
     comp = composite_scores(output.scores.apex_score, cfg, panel)
 
-    # LIVE dates only: strictly after the sealed holdout's end.
-    grid = [d for d in output.calendar.grid() if d > HOLDOUT_END]
-    live_days = [d for d in panel.dates if d > HOLDOUT_END]
+    # LIVE dates only, on the LOCKED grid (derived from the full-lake SPY
+    # calendar, not the short panel's re-anchored one): strictly after the
+    # sealed holdout's end, and present in the loaded panel.
+    grid = [d for d in locked_grid(root, cfg)
+            if d > HOLDOUT_END and d in panel.dates]
     if not grid:
         print(f"lake through {lake_through}: no live grid formation date yet "
               f"(first is 20 trading days past {HOLDOUT_END.date()}); "

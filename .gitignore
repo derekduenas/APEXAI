@@ -22,3 +22,5 @@ results/_unlocks/
 *.key
 logs/
 data/live/
+# ...except the live paper track: its chained ledger IS an audit trail.
+!results/paper/
