@@ -54,6 +54,14 @@ Before signing: a breadth census of the §3 universe on the in-sample period
 eligibility and data coverage only — NO signal values, NO returns joined.
 Output committed as `results/004_universe_census.json` and referenced here.
 
+**DONE 2026-08-13** (`scripts/census_004_universe.py`): median **1,250
+eligible names/day** (p10 1,140 / p90 1,605), GP availability **99.7%** of
+eligible names. 2005 medians are zero — the 252-day history warm-up of a
+panel loaded from 2005-01-01, not a data gap; 2006–2017 range 1,164–1,609.
+Breadth supports ~120+ names per decile: the floors in §3 are structurally
+adequate and are hereby FIRMED (no longer provisional). Remaining §5a-class
+work before signing: ADDV distribution detail if the gate requests it.
+
 ## 6. Success / failure criteria
 
 Mean daily cross-sectional Spearman IC positive; Newey-West (Bartlett,
