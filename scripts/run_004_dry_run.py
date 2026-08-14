@@ -40,7 +40,10 @@ from apex.experiments import apex003  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 ROOT = Path("data/snapshots/sharadar/current")
-PROTOCOL = REPO / "APEX-004-DRAFT-Protocol-Smallcap.md"
+# Renamed (DRAFT- prefix dropped) and signed at registration; the recorded
+# dry-run artifacts hashed the DRAFT text (b855d9da), signature added after --
+# the same draft->signed relationship as #003.
+PROTOCOL = REPO / "APEX-004-Protocol-Smallcap.md"
 MEMO = REPO / "SMALL-CAP-JUSTIFICATION.md"
 CENSUS = Path("results/004_universe_census.json")
 RECAL = Path("results/004_null_recalibration.json")

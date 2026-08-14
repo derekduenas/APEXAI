@@ -32,10 +32,18 @@ DATES = pd.bdate_range("2020-01-01", periods=12)
 
 @pytest.fixture(scope="module")
 def base():
-    """Thresholds a twelve-row panel can actually reach."""
+    """Thresholds a twelve-row panel can actually reach.
+
+    Pins the frozen #001-#003 large-cap universe explicitly: this module
+    documents the historical section-3 semantics ($1B floor, no ceiling), and
+    the live config now carries #004's registered small-cap band. The ceiling
+    tests below patch their own band on top of this base.
+    """
+    from tests.conftest import LEGACY_LARGE_CAP_UNIVERSE
     return patched(
         load_config("experiment", "costs", "synthetic"),
         {
+            **LEGACY_LARGE_CAP_UNIVERSE,
             "universe.min_history_trading_days": 3,
             "universe.prior_bars_window": 5,
             "universe.min_bars_in_prior_252": 3,

@@ -1,12 +1,13 @@
-# APEX Research Protocol — DRAFT Experiment #004: Small-Cap Universe
+# APEX Research Protocol — Experiment #004: Small-Cap Gross Profitability
 
-Registered: ____________
-Author: ____________
+Registered: 2026-08-13
+Author: Derek Duenas
 
-**DRAFT — UNSIGNED, UNREGISTERED, NO CREDIT ATTACHED.** This document
-becomes a protocol only when (1) the human gate rules on
-`SMALL-CAP-JUSTIFICATION.md`, (2) the structural calibration in §5a/§8a is
-complete, and (3) the operator signs the header. Until then it binds nothing.
+**Signed on operator authorization ("sign and run it", 2026-08-13), after all
+three preconditions were met on the record: the human gate ruling on
+`SMALL-CAP-JUSTIFICATION.md` (H-GP-SC at the stricter 2.92 bar), the §5a
+breadth census, and the §8a null recalibration. Dry-run certification PASSED
+twice bit-for-bit (digest 3daebc37…) BEFORE this signature.**
 
 ## 1. Hypothesis
 

@@ -5,17 +5,18 @@
 experiment:
   # APEX-001 is CLOSED (INCONCLUSIVE, t=0.302). Its protocol file is retained
   # unchanged; the active experiment is now #002.
-  id: APEX-003
-  protocol_file: APEX-003-Protocol-Gross-Profitability.md
+  id: APEX-004
+  protocol_file: APEX-004-Protocol-Smallcap.md
   closed_experiments:
     APEX-001: APEX-Research-Protocol-v1.0-Experiment-001.md
     APEX-002: APEX-002-Protocol-Net-Share-Issuance.md
+    APEX-003: APEX-003-Protocol-Gross-Profitability.md
   conventions_file: CONVENTIONS.md
   hypothesis: >-
-    Companies with high gross profitability outperform: the cross-sectional
-    rank of gross profits over assets (gp/assets, as-filed ARQ, earliest
-    filing) predicts forward 20-trading-day excess returns. Higher
-    profitability ranks higher.
+    Small-cap companies with high gross profitability outperform: within the
+    $100M-$2B universe, the cross-sectional rank of gross profits over assets
+    (gp/assets, as-filed ARQ, earliest filing) predicts forward 20-trading-day
+    excess returns. Higher profitability ranks higher.
 
 governance:
   # Directive section 4, as ruled 2026-08-09. This SUPERSEDES protocol section 7's
@@ -53,16 +54,21 @@ periods:
     locked: true
 
 universe:
-  # protocol section 3
-  min_market_cap_usd: 1000000000.0
-  min_addv_usd: 10000000.0
+  # APEX-004 protocol section 3 (the ONE experimental change vs #001-#003):
+  # the small-cap band. Registered 2026-08-13; values certified by the §5a
+  # census and the dry run (both runs bit-for-bit, digest 3daebc37…). The
+  # ceiling is EXCLUSIVE (mcap < 2e9). Closed experiments' universes live in
+  # git history with their own registrations.
+  min_market_cap_usd: 100000000.0
+  max_market_cap_usd: 2000000000.0
+  min_addv_usd: 1000000.0
   addv_window_days: 60
   # "60-day average daily dollar volume" = mean over the bars PRESENT in the
   # trailing 60 trading days. The protocol states its own gap tolerance
   # separately (>=200 bars in the prior 252); imposing a stricter implicit
   # 60-of-60 rule here would invent a filter section 3 does not specify.
   addv_min_periods: 1
-  min_close_usd: 5.0
+  min_close_usd: 2.0    # APEX-004 §3; was 5.0 for the large-cap experiments
   min_history_trading_days: 252
   min_bars_in_prior_252: 200
   prior_bars_window: 252

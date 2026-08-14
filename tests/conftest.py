@@ -119,8 +119,28 @@ def patched(config, overrides: dict):
         parts = dotted.split(".")
         for part in parts[:-1]:
             node = node[part]
-        node[parts[-1]] = value
+        if value is DELETE:
+            node.pop(parts[-1], None)
+        else:
+            node[parts[-1]] = value
     return Config(data=data, sources=config.sources + ("patched",))
+
+
+# Sentinel for patched(): remove a key entirely. Needed because "the key is
+# ABSENT" is itself a documented behavior (e.g. no market-cap ceiling for the
+# #001-#003 universe) and setting a value cannot express absence.
+DELETE = object()
+
+# The FROZEN #001-#003 large-cap universe (protocol v1.0 section 3). Tests
+# that document layer behavior against the historical universe pin these
+# explicitly instead of drifting with whatever experiment is currently
+# registered -- the live config now carries #004's small-cap band.
+LEGACY_LARGE_CAP_UNIVERSE = {
+    "universe.min_market_cap_usd": 1_000_000_000.0,
+    "universe.max_market_cap_usd": DELETE,
+    "universe.min_addv_usd": 10_000_000.0,
+    "universe.min_close_usd": 5.0,
+}
 
 
 def hand_panel(

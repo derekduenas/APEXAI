@@ -164,10 +164,29 @@ hypothesis is entirely untested.
 
 ---
 
+## 10. Experiment #004 Registration (added 2026-08-13)
+
+**APEX-004 — Small-Cap Gross Profitability.** SIGNED and FROZEN 2026-08-13, Author Derek Duenas.
+
+**Governs:** `APEX-004-Protocol-Smallcap.md`, SHA-256 `13eb9f8b30033f287696d72457fdc62b17cbe444ec6270b0d2a5e4383f08639b`
+
+The ONE experimental change vs #003 is the §3 universe: market cap in
+[$100M, $2B) (ceiling exclusive), 60-day ADDV >= $1M, close >= $2. The signal,
+timing, estimator and evaluation machinery are #003's, via the SAME certified
+execution path (`apex.experiments.apex003`). The §13 bar is the STRICTER
+legacy t >= 2.92 (true size 0.872% under the §8a-derived null; the exact-1%
+bar was 2.85 and the operator chose 2.92 on the record). Provenance:
+descendant-of-failure CONTESTED, RULED ADMISSIBLE 2026-08-13
+(`SMALL-CAP-JUSTIFICATION.md`); the disclosure is retained, not erased.
+Experiments #001–#003 are closed and are not affected.
+
+---
+
 ## 7. Amendment Log
 
 | Date | Item | Change | Reason | Before/after results |
 |---|---|---|---|---|
+| 2026-08-13 | A-008 — §10, #004 registration | APEX-004 pre-registration SIGNED (Registered 2026-08-13, Author Derek Duenas) and FROZEN; SHA-256 `13eb9f8b…` pinned in the new §10. Universe flipped in config to the registered small-cap band; §13 bar kept at the STRICTER 2.92 after the §8a derivation produced 2.85. Gate ruling and dry-run certification (digest 3daebc37…, twice bit-for-bit) both PRECEDED registration. Experiments #001–#003 and their closed results untouched. | A pre-registration must be signed and pinned to be one; the descendant-of-failure ruling had to be on the record before the signature, not after. | **BEFORE** any #004 predictive result. |
 | 2026-08-13 | A-007 — §9, #003 registration | APEX-003 pre-registration SIGNED (Registered 2026-08-13, Author Derek Duenas) and FROZEN; its SHA-256 pinned in the new §9. Dry run PASSED twice bit-for-bit (digest 18b2dee8…) BEFORE registration. Experiments #001/#002 and their closed results untouched. | A pre-registration must be signed and pinned to be one; certification preceded registration per the INCIDENT-001 lesson. | **BEFORE** any #003 predictive result. |
 | 2026-08-11 | A-006 — §8, #002 registration | APEX-002 pre-registration SIGNED and FROZEN; its SHA-256 `63703d1020893a59…` pinned in the new §8. Experiment #001, its protocol and its closed result are untouched. | A pre-registration must be signed and pinned to be one. Recorded before implementation begins and before any #002 predictive analysis. | **BEFORE** any #002 result. |
 | 2026-08-11 | A-005 — §1, SF1 scope | `SF1` permitted for **APEX-002 only**, and only for as-filed shares outstanding (`sharesbas`/`sharewa`) keyed on `datekey`. Experiment #001 is closed and unaffected. No other fundamental field is unlocked for any experiment. | The #002 measurement audit established that `DAILY.marketcap` carries no vintage — 100% of rows were rewritten after their own date, median 1,246 days — so a share-count DIFFERENCE derived from it may embed restatements. Restatements concentrate in firms with accounting problems, which is plausibly correlated with subsequent returns, making this a lookahead channel pointed at the dependent variable. §4 requires shares "as known at formation date". SF1's `datekey` is the filing date and is the only as-filed source available. | **BEFORE** #002 is registered, and before any #002 predictive analysis of any kind. |

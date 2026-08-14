@@ -47,7 +47,13 @@ SECURITIES = pd.Index([f"S{i}" for i in range(40)], name="security_id")
 
 @pytest.fixture(scope="module")
 def config():
-    return load_config("experiment", "costs", "synthetic")
+    # This module audits #001-era layer behavior on the synthetic panel; it
+    # pins the frozen large-cap universe rather than drifting with whatever
+    # experiment is currently registered (#004 flipped the live universe to
+    # the small-cap band, which the synthetic panel does not inhabit).
+    from tests.conftest import LEGACY_LARGE_CAP_UNIVERSE, patched
+    return patched(load_config("experiment", "costs", "synthetic"),
+                   LEGACY_LARGE_CAP_UNIVERSE)
 
 
 def _frame(seed: int) -> pd.DataFrame:

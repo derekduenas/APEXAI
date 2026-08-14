@@ -59,7 +59,12 @@ from apex.pipeline import build_panel_pipeline, evaluate
 
 @pytest.fixture(scope="module")
 def audit_config():
-    return load_config("experiment", "costs", "synthetic")
+    # Pins the frozen #001-#003 large-cap universe: this module audits layer
+    # behavior on the synthetic panel, which does not inhabit #004's
+    # registered small-cap band.
+    from tests.conftest import LEGACY_LARGE_CAP_UNIVERSE, patched
+    return patched(load_config("experiment", "costs", "synthetic"),
+                   LEGACY_LARGE_CAP_UNIVERSE)
 
 
 @pytest.fixture(scope="module")
