@@ -1,0 +1,32 @@
+{
+  "purpose": "APEX-004 draft section 8a null recalibration (validation bar)",
+  "derived_critical_value_1pct_one_sided": 2.85,
+  "raw_quantile_0_99": 2.8476640013020047,
+  "seed_stability_p99": {
+    "1": 2.857696871282591,
+    "2": 2.8760799564151025,
+    "3": 2.8721667495580854,
+    "42": 2.8647814710274555
+  },
+  "registered_002_003_bar": 2.92,
+  "true_size_of_2_92_under_this_null": 0.00872,
+  "true_size_of_2_85_under_this_null": 0.00997,
+  "note": "The derived exact-1% bar is LOWER than the registered 2.92 (which has true size ~0.87%). Deriving a lower bar immediately after a near-miss FAILURE is exactly when bar-shopping suspicion is warranted, so the choice between the derived 2.85 and the stricter legacy 2.92 is reserved to the human gate and recorded in the protocol at signing. Neither choice affects any closed experiment; APEX-003's t=2.525 is below both.",
+  "n_obs": 987,
+  "n_obs_source": "recorded validation_APEX-003.json estimator n_obs (calendar fact)",
+  "seed": 20260813,
+  "n_replications": 100000,
+  "disclosure": {
+    "estimator": "newey-west bartlett lag 25",
+    "overlap_trading_days": 20,
+    "n_obs": 987,
+    "reference_replications": 100000,
+    "reference_digest": "3568eebab750a5a5",
+    "sd_of_t_under_null": 1.2097,
+    "nominal_5pct_test_actual_size": 0.1049,
+    "threshold_2p5_nominal_one_sided_size": 0.00621,
+    "threshold_2p5_measured_one_sided_size": 0.01964,
+    "note": "Bartlett HAC under-weights the MA(overlap-1) autocovariance of overlapping forward windows, so the pre-registered t >= 2.5 hurdle is less stringent than its nominal size implies. Pre-registration NOT amended (ruling 2026-08-09); disclosed here."
+  },
+  "status": "DERIVED -- becomes binding only via config + signature"
+}

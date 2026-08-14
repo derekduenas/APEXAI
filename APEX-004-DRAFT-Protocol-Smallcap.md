@@ -65,18 +65,29 @@ work before signing: ADDV distribution detail if the gate requests it.
 ## 6. Success / failure criteria
 
 Mean daily cross-sectional Spearman IC positive; Newey-West (Bartlett,
-lag 25) t >= **[PENDING §8a — recalibrated]**; non-overlapping robustness
-agrees in sign. FAILURE and INVALID defined exactly as APEX-003 §8.
+lag 25) t >= **[GATE CHOICE — see §8a: derived 2.85 or legacy 2.92]**;
+non-overlapping robustness agrees in sign. FAILURE and INVALID defined
+exactly as APEX-003 §8.
 
 ### 8a. Null recalibration (REQUIRED, zero credit, before signing)
 
-The 2.92/2.88 critical values were calibrated to the LARGE-CAP universe's
-breadth and overlap structure. This universe has different breadth, so the
-1% critical value must be re-derived with the same permutation machinery on
-in-sample data — signal-free (permuted labels), performance-blind. The
-recalibrated constants are written into config BEFORE signing and never
-touched after. Reusing 2.92 unexamined would be a silent second source of
-truth; deriving it after seeing validation would be fraud.
+**DONE 2026-08-13** (`scripts/recalibrate_004_null.py`,
+`results/004_null_recalibration.json`). The null t-distribution depends only
+on (n_obs, overlap, lag, kernel) — the t-statistic is scale invariant, so
+breadth drops out. Derived at n=987 (the shared validation calendar), 100,000
+replications, declared seed 20260813, stable across four independent check
+seeds (p99 range 2.848–2.876):
+
+    exact-1% bar (derived):   t >= 2.85   (true size 0.997%)
+    legacy 002/003 bar:       t >= 2.92   (true size 0.872% — conservative)
+
+The derived bar is LOWER than the registered 2.92 — and this derivation
+arrives immediately after a near-miss FAILURE, which is precisely when
+bar-lowering must be suspect. The method and seed were declared before the
+number was seen, but the CHOICE between the exact-1% 2.85 and the stricter
+legacy 2.92 is reserved to the human gate and frozen into config at signing.
+Neither choice touches any closed experiment (APEX-003's 2.525 is below
+both). The holdout-length bar is derived by the same script at signing.
 
 ## 7. Robustness (declared)
 
