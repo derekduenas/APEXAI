@@ -1,0 +1,73 @@
+{
+  "candidate_denominator": 6,
+  "candidates": {
+    "A": {
+      "annual_cost_drag": 0.011654,
+      "degradation": null,
+      "gross_excess_annualised": -0.003279,
+      "measured_turnover_per_rebalance": 0.2761,
+      "median_names_held": 127,
+      "net_excess_annualised": -0.014934,
+      "period_excess_t_stat_naive": -0.2,
+      "rebalances_per_year": 4.22
+    },
+    "B": {
+      "annual_cost_drag": 0.008898,
+      "degradation": 1.6003,
+      "gross_excess_annualised": 0.00556,
+      "measured_turnover_per_rebalance": 0.2108,
+      "median_names_held": 381,
+      "net_excess_annualised": -0.003338,
+      "period_excess_t_stat_naive": 0.49,
+      "rebalances_per_year": 4.22
+    },
+    "C": {
+      "annual_cost_drag": 0.011554,
+      "degradation": null,
+      "gross_excess_annualised": -0.003254,
+      "measured_turnover_per_rebalance": 0.2737,
+      "median_names_held": 127,
+      "net_excess_annualised": -0.014808,
+      "period_excess_t_stat_naive": -0.2,
+      "rebalances_per_year": 4.22
+    },
+    "D": {
+      "annual_cost_drag": 0.00592,
+      "degradation": null,
+      "gross_excess_annualised": -0.007741,
+      "measured_turnover_per_rebalance": 0.1402,
+      "median_names_held": 192,
+      "net_excess_annualised": -0.013661,
+      "period_excess_t_stat_naive": -0.52,
+      "rebalances_per_year": 4.22
+    },
+    "E": {
+      "annual_cost_drag": 0.005722,
+      "degradation": 0.5609,
+      "gross_excess_annualised": 0.010203,
+      "measured_turnover_per_rebalance": 0.1356,
+      "median_names_held": 468,
+      "net_excess_annualised": 0.00448,
+      "period_excess_t_stat_naive": 0.96,
+      "rebalances_per_year": 4.22
+    },
+    "F": {
+      "annual_cost_drag": 0.013498,
+      "degradation": null,
+      "gross_excess_annualised": -0.006987,
+      "measured_turnover_per_rebalance": 0.3198,
+      "median_names_held": 30,
+      "net_excess_annualised": -0.020484,
+      "period_excess_t_stat_naive": -0.26,
+      "rebalances_per_year": 4.22
+    }
+  },
+  "contamination_disclosure": "Motivated by the recorded APEX-004 validation result; validation deciles were seen before this design. The final declared instrument is judged on the untouched holdout.",
+  "cost_one_way": 0.005,
+  "period": {
+    "end": "2017-12-26",
+    "locked": false,
+    "start": "2005-01-13"
+  },
+  "purpose": "APEX-004 in-sample instrument study (design, no standing)"
+}
