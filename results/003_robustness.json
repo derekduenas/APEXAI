@@ -1,0 +1,50 @@
+{
+  "bootstrap": {
+    "block_size": 20,
+    "ci_high": 0.06296520126589278,
+    "ci_level": 0.95,
+    "ci_low": 0.007178437807258673,
+    "method": "moving_block_bootstrap",
+    "n_obs": 987,
+    "n_resamples": 2000,
+    "point_estimate": 0.03611933371485495,
+    "seed": 20260807
+  },
+  "permutation": {
+    "block_size": 20,
+    "method": "block_sign_permutation",
+    "n_obs": 987,
+    "n_permutations": 2000,
+    "observed_mean": 0.03611933371485495,
+    "p_value_two_sided": 0.014492753623188406,
+    "seed": 20260807
+  },
+  "reproduction": "MATCH",
+  "subperiod_calendar_year": {
+    "n_subperiods": 4,
+    "per_subperiod": {
+      "2018": {
+        "mean": 0.052581772489236664,
+        "n": 251,
+        "share_of_total": 0.37021333693962527
+      },
+      "2019": {
+        "mean": 0.018781648230361585,
+        "n": 252,
+        "share_of_total": 0.13276309246596812
+      },
+      "2020": {
+        "mean": 0.03454292347424994,
+        "n": 253,
+        "share_of_total": 0.24514482435469168
+      },
+      "2021": {
+        "mean": 0.03887195882565833,
+        "n": 231,
+        "share_of_total": 0.25187874623971473
+      }
+    },
+    "scheme": "calendar_year"
+  },
+  "verdict_unchanged": "FAILURE (recorded)"
+}
