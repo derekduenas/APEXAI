@@ -36,10 +36,16 @@ Floors marked bold are PROVISIONAL until the §5a breadth census; they are
 calibrated on STRUCTURAL grounds only (breadth, tradability) — never on any
 signal's performance.
 
-## 4. Direction and orientation
+## 4. Direction and orientation (explicit — the erratum lesson)
 
-Inherited from the chosen hypothesis's certified execution path; explicit
-orientation block required as in APEX-003 §4 (the erratum lesson).
+HIGHER is better.
+
+    highest gross profitability -> rank 1 -> score 100 -> decile 1 (TOP)
+    lowest  gross profitability -> rank n -> score ~0  -> decile 10 (BOTTOM)
+
+Score and decile derive from ONE descending rank (`apex.experiments.apex003`,
+the certified shared path). Ties: `method='first'` on a security_id-sorted
+view (C10). Missing: excluded at that date, never imputed.
 
 ## 5. Periods (inherited)
 

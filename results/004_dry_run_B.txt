@@ -1,0 +1,97 @@
+==============================================================================
+APEX-004 -- DRY-RUN CERTIFICATION (gross profitability, SMALL-CAP)
+A specification validator. Not a predictive research run.
+==============================================================================
+
+==============================================================================
+SECTION 1. PROTOCOL / GOVERNANCE
+==============================================================================
+  [PASS] gate ruling recorded in the justification memo   descendant-of-failure CONTESTED disclosure retained
+  [PASS] draft protocol drafted
+         protocol SHA-256 (unsigned draft)      b855d9da32fa70d95fc919ced3f566ad42c1086f75370247dacd3ae4eff63bea
+  [PASS] protocol carries the ruled bar and explicit orientation
+  [PASS] section 5a census on disk and matches the declared floors
+  [PASS] section 8a recalibration on disk; ruled bar is the STRICTER one   derived 2.85 vs ruled 2.92
+  [PENDING] operator signature on the protocol   human act -- 'Registered/Author' lines are PENDING by design
+  [PENDING] config registration (experiment.id -> APEX-004) + CONVENTIONS pin   human-authorised registration act; config still names APEX-003
+  [PASS] validation period locked
+  [PASS] holdout period locked
+  [PASS] no token authorises APEX-004   token present: True -- authorises '2026-08-13 APEX-003 validation authorized' (STALE; delete before writing 004's)
+  [PASS] execution-path isolation certifies (shared certified GP path)   clean
+
+==============================================================================
+SECTION 2. PIT / SF1 VERIFICATION
+==============================================================================
+  [PASS] filing_date <= formation_date is EXACTLY 100%   100.000000%
+         observations checked                   221,317
+         PIT violations                         0   (must be 0)
+         missing knowability date               0   (must be 0)
+         knowledge lag p50 (days)               46.0
+
+==============================================================================
+SECTION 3. ORIENTATION -- higher profitability = top
+==============================================================================
+  [PASS] HIGHEST gp scores 100   gp +65.1229 -> score 100.00
+  [PASS] HIGHEST gp is DECILE 1 (top)
+  [PASS] LOWEST gp is decile 10   gp -166.0000 -> decile 10
+  [PASS] mean gp is strictly DECREASING across deciles 1..10   decile 1 holds the most profitable names on real data
+         decile 1 mean gp                       +0.386490
+         decile 10 mean gp                      -0.022362
+
+==============================================================================
+SECTION 4. SIGNAL CONSTRUCTION (distribution, no returns)
+==============================================================================
+         observations                           221,317
+         p1                                     -0.003168
+         p25                                    +0.034755
+         p50                                    +0.071749
+         p75                                    +0.115531
+         p99                                    +0.360558
+         min / max                              -166.000000 / +65.122877
+  [PASS] no transformation: tails are unbounded beyond p1/p99
+         negative gp/assets observations        2,841  (1.2837%)   (real losses; NOT clipped)
+
+==============================================================================
+SECTION 5. UNIVERSE / JOIN ALIGNMENT / MARKET-CAP BAND
+==============================================================================
+         formation dates                        164
+         eligible per date  min/med/max         1,106 / 1,282 / 1,721
+         coverage  min/med/max                  98.9500% / 99.6811% / 99.9188%
+  [PASS] every eligible market cap is BELOW the $2B ceiling   max eligible mcap $2.0000B
+  [PASS] every eligible market cap is AT/ABOVE the $100M floor   min eligible mcap $100.0M
+  [PASS] breadth is census-consistent (>= 800 median on the grid)   median 1,282 (census daily median 1,250 incl. warm-up years)
+  [PASS] join alignment SYMMETRIC on every date   0 ranked-but-ineligible, 0 eligible-but-unranked
+  [PASS] zero duplicate (security_id, date)
+  [PASS] coverage is not the binding constraint   median 99.6811%
+
+==============================================================================
+SECTION 6. RANKING / DECILE CONSTRUCTION
+==============================================================================
+  [PASS] re-running the same dates is identical
+  [PASS] column-order invariant (C10 tie-break)
+  [PASS] decile labels exactly 1..10   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  [PASS] equal-count (max within-date imbalance <= 1)   imbalance 1
+  [PASS] ScorePanel declares top_decile_label = 1
+
+==============================================================================
+SECTION 7. TRANSACTION LAYER / DETERMINISM
+==============================================================================
+  [PASS] criteria load from config: t >= 2.92 (the RULED bar), IC positive
+  [PASS] attribution executes on GPOutput (INCIDENT-001 class)   no value it computed is read or reported
+  [PASS] forward returns constructed (shape only)
+  [PASS] smoke gate already binds APEX-004 to THIS report   per-experiment SMOKE_EVIDENCE map (the 003 lesson, applied early)
+         apex.pipeline.evaluate NOT called. No IC, spread, or
+         t-statistic appears anywhere in this report.
+
+         measurement digest                     3daebc37f47f8df160d1b2dc8eeacf0001d2509c6023f1a68e1f21ad7bd28b6b
+
+==============================================================================
+CERTIFICATION SUMMARY
+==============================================================================
+  STATUS: PASS -- every mechanical check green
+  PENDING HUMAN ACTS: 2
+    * operator signature on the protocol
+    * config registration (experiment.id -> APEX-004) + CONVENTIONS pin
+
+  Credit NOT spent (3/5). Holdout SEALED. Registration NOT complete.
+==============================================================================

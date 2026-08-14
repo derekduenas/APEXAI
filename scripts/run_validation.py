@@ -61,6 +61,8 @@ def main() -> int:
         "APEX-002": (Path("results/production_smoke.txt"), "CLEAR TO PROCEED"),
         "APEX-003": (Path("results/003_dry_run_A.txt"),
                      "STATUS: PASS -- every mechanical check green"),
+        "APEX-004": (Path("results/004_dry_run_A.txt"),
+                     "STATUS: PASS -- every mechanical check green"),
     }
     experiment = config.get("experiment.id")
     if experiment not in SMOKE_EVIDENCE:

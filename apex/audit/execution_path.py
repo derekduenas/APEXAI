@@ -69,12 +69,16 @@ EXPERIMENT_ENTRY = {
     "APEX-001": "apex.pipeline",
     "APEX-002": "apex.experiments.apex002",
     "APEX-003": "apex.experiments.apex003",
+    # #004 deliberately shares #003's entry: same signal, same certified path;
+    # the protocols differ only in the config universe (section 3 + ceiling).
+    "APEX-004": "apex.experiments.apex003",
 }
 
 EXPERIMENT_REQUIRES = {
     "APEX-001": frozenset({"apex.features.composite"}),
     "APEX-002": frozenset({"apex.features.nsi", "apex.features.nsi_scores"}),
     "APEX-003": frozenset({"apex.experiments.apex003", "apex.features.factory"}),
+    "APEX-004": frozenset({"apex.experiments.apex003", "apex.features.factory"}),
 }
 
 EXPERIMENT_FORBIDS = {
@@ -87,6 +91,11 @@ EXPERIMENT_FORBIDS = {
         "apex.features.f4_relative_strength",
     }),
     "APEX-003": frozenset({
+        "apex.features.composite",       # #001 scorer
+        "apex.features.nsi_scores",      # #002 scorer
+        "apex.features.nsi",
+    }),
+    "APEX-004": frozenset({
         "apex.features.composite",       # #001 scorer
         "apex.features.nsi_scores",      # #002 scorer
         "apex.features.nsi",

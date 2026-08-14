@@ -1,0 +1,42 @@
+{
+  "failures": [],
+  "governance": {
+    "protocol_draft_sha256": "b855d9da32fa70d95fc919ced3f566ad42c1086f75370247dacd3ae4eff63bea",
+    "ruled_bar": 2.92
+  },
+  "measurement_digest": "3daebc37f47f8df160d1b2dc8eeacf0001d2509c6023f1a68e1f21ad7bd28b6b",
+  "orientation": {
+    "decile_10_mean_gp": -0.022361969887,
+    "decile_1_mean_gp": 0.386489735514,
+    "decile_2_mean_gp": 0.150869824685,
+    "decile_3_mean_gp": 0.116242309518,
+    "decile_4_mean_gp": 0.095353747345,
+    "decile_5_mean_gp": 0.079084767222,
+    "decile_6_mean_gp": 0.064637591173,
+    "decile_7_mean_gp": 0.050172057725,
+    "decile_8_mean_gp": 0.03494950545,
+    "decile_9_mean_gp": 0.017919086368
+  },
+  "pending": [
+    "operator signature on the protocol",
+    "config registration (experiment.id -> APEX-004) + CONVENTIONS pin"
+  ],
+  "pit": {
+    "observations": 221317,
+    "violations": 0
+  },
+  "signal": {
+    "observations": 221317,
+    "p1": -0.003167811288,
+    "p25": 0.034755134281,
+    "p50": 0.071749411848,
+    "p75": 0.115531017133,
+    "p99": 0.360558213161
+  },
+  "universe": {
+    "coverage_median_pct": 99.681092699196,
+    "eligible_median": 1282.0,
+    "mcap_max_eligible": 1999999999.9999998,
+    "mcap_min_eligible": 100000000.0
+  }
+}
