@@ -1,0 +1,41 @@
+{
+  "failures": [],
+  "governance": {
+    "dossier_hash": "97da989ad49aa1863c9bc43fc1e027b2bbafaf874d00aef801e99e22a89512fe",
+    "protocol_draft_sha256": "0c0bd2df5ce72223d8e652708bbe413b2dc67ea6f6245922af35af6b54716cdb"
+  },
+  "measurement_digest": "18b2dee892687cbbe332193fe5a6a9443a02240d8a7b3a9b26d3edf8357a6a64",
+  "orientation": {
+    "decile_10_mean_gp": 0.007259806738,
+    "decile_1_mean_gp": 0.345754744997,
+    "decile_2_mean_gp": 0.140123642555,
+    "decile_3_mean_gp": 0.109625179822,
+    "decile_4_mean_gp": 0.090070177746,
+    "decile_5_mean_gp": 0.074508567268,
+    "decile_6_mean_gp": 0.061448082766,
+    "decile_7_mean_gp": 0.049776413105,
+    "decile_8_mean_gp": 0.037585309276,
+    "decile_9_mean_gp": 0.024361450885
+  },
+  "pending": [
+    "operator signature on the protocol",
+    "config registration (experiment.id -> APEX-003) + CONVENTIONS pin",
+    "stale smoke-gate in run_validation.py"
+  ],
+  "pit": {
+    "observations": 198308,
+    "violations": 0
+  },
+  "signal": {
+    "observations": 198308,
+    "p1": 4.3890064e-05,
+    "p25": 0.037343650498,
+    "p50": 0.067523094688,
+    "p75": 0.109429012908,
+    "p99": 0.291712081785
+  },
+  "universe": {
+    "coverage_median_pct": 99.713466460592,
+    "eligible_median": 1210.5
+  }
+}
