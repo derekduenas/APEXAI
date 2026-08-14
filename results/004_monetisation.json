@@ -1,0 +1,32 @@
+{
+  "experiment": "APEX-004",
+  "inputs": {
+    "decile1_mean_per_period": 0.01232248823860936,
+    "periods_per_year": 12.25,
+    "universe_equal_weight_mean_per_period": 0.010642718957071591
+  },
+  "instrument": "protocol section 9/11",
+  "projection": {
+    "annual_cost_drag": 0.016,
+    "cost_bps_one_way": 50.0,
+    "degradation_fraction": 0.7775606229588173,
+    "gross_long_excess_annualised": 0.02057717369883766,
+    "names_held": 113,
+    "net_long_excess_annualised": 0.004577173698837658,
+    "policy": {
+      "construction": "long_top_decile_only",
+      "n_deciles": 10,
+      "rebalance": "quarterly",
+      "short_leg": "none -- nothing to borrow, no borrow fiction to disclose",
+      "weighting": "equal_weight"
+    },
+    "quarterly_turnover": 0.4
+  },
+  "viability": {
+    "failures": [
+      "net long excess 0.0046 < 0.02",
+      "degradation 0.78 > 0.6"
+    ],
+    "viable": false
+  }
+}

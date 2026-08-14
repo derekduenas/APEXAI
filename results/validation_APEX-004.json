@@ -1,0 +1,272 @@
+{
+  "experiment_validity": {
+    "verdict": "SUCCESS",
+    "failures": [],
+    "criteria_applied": [
+      "mean_ic > 0",
+      "t_stat >= 2.92",
+      "robustness agrees in sign with the primary statistic"
+    ]
+  },
+  "interpretation": {
+    "pre_registered_t": 3.278,
+    "pre_registered_threshold": 2.92,
+    "nominal_one_sided_size_at_threshold": 0.00621,
+    "measured_one_sided_size_at_threshold": 0.00925,
+    "observed_t_percentile_under_null": 0.99585,
+    "tstat_that_would_give_the_nominal_size": 3.1,
+    "authority": "INTERPRETATION ONLY. Does not determine promotion. The protocol is not amended (CONVENTIONS A-001); the pre-registered estimator and threshold stand, and this states what they are worth."
+  },
+  "programme_inference": {
+    "budget": 5,
+    "credits_spent": 4,
+    "credits_remaining": 1,
+    "family_alpha": 0.05,
+    "sequential_alpha": 0.01,
+    "chain_verified": true,
+    "experiments": [
+      {
+        "experiment_id": "APEX-001",
+        "hypothesis": "A fixed equal-weighted composite of four price/volume factor categories ranks US equities such that higher-ranked stocks earn higher forward 20-trading-day excess returns, net of realistic costs.",
+        "period": "validation",
+        "evaluated": "2026-08-11T19:24:36.019881+00:00",
+        "budgeted": true,
+        "p_value": 0.7626650991639228,
+        "t_stat": 0.3019828992574129,
+        "verdict": "INCONCLUSIVE",
+        "dataset_hash": "08167684b48949454ebf722f276add7389f8f431d4d299fa3253dfae56a3b9a4",
+        "passes_sequential_bonferroni": false,
+        "passes_holm_retrospective": null
+      },
+      {
+        "experiment_id": "APEX-002",
+        "hypothesis": "Companies that reduce share count through net repurchases outperform companies that aggressively issue equity: the cross-sectional rank of twelve-month net share issuance, ln(S_t / S_t-4q) on as-filed sharesbas, predicts forward 20-trading-day excess returns. Lower issuance ranks higher.",
+        "period": "validation",
+        "evaluated": "2026-08-12T14:19:56.871704+00:00",
+        "budgeted": true,
+        "p_value": 0.5132233578752777,
+        "t_stat": 0.6538268625254211,
+        "verdict": "FAILURE",
+        "dataset_hash": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+        "passes_sequential_bonferroni": false,
+        "passes_holm_retrospective": null
+      },
+      {
+        "experiment_id": "APEX-002",
+        "hypothesis": "Companies that reduce share count through net repurchases outperform companies that aggressively issue equity: the cross-sectional rank of twelve-month net share issuance, ln(S_t / S_t-4q) on as-filed sharesbas, predicts forward 20-trading-day excess returns. Lower issuance ranks higher.",
+        "period": "validation",
+        "evaluated": "2026-08-13T00:34:32.084128+00:00",
+        "budgeted": true,
+        "p_value": 0.5132233578752777,
+        "t_stat": 0.6538268625254211,
+        "verdict": "FAILURE",
+        "dataset_hash": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+        "passes_sequential_bonferroni": false,
+        "passes_holm_retrospective": null
+      },
+      {
+        "experiment_id": "APEX-003",
+        "hypothesis": "Companies with high gross profitability outperform: the cross-sectional rank of gross profits over assets (gp/assets, as-filed ARQ, earliest filing) predicts forward 20-trading-day excess returns. Higher profitability ranks higher.",
+        "period": "validation",
+        "evaluated": "2026-08-14T01:46:25.058622+00:00",
+        "budgeted": true,
+        "p_value": 0.01156034145606431,
+        "t_stat": 2.525288282285847,
+        "verdict": "FAILURE",
+        "dataset_hash": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+        "passes_sequential_bonferroni": false,
+        "passes_holm_retrospective": null
+      },
+      {
+        "experiment_id": "APEX-004",
+        "hypothesis": "Small-cap companies with high gross profitability outperform: within the $100M-$2B universe, the cross-sectional rank of gross profits over assets (gp/assets, as-filed ARQ, earliest filing) predicts forward 20-trading-day excess returns. Higher profitability ranks higher.",
+        "period": "validation",
+        "evaluated": "2026-08-14T04:12:53.038119+00:00",
+        "budgeted": true,
+        "p_value": 0.0010452965120049235,
+        "t_stat": 3.278042513401154,
+        "verdict": "SUCCESS",
+        "dataset_hash": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+        "passes_sequential_bonferroni": true,
+        "passes_holm_retrospective": null
+      }
+    ],
+    "authority": "ledger. Family-wise context across the research budget. Does not alter any individual experiment's pre-registered verdict."
+  },
+  "reading_order": [
+    "experiment_validity decides promotion, on pre-registered criteria alone",
+    "interpretation says what that t-statistic is actually worth",
+    "programme_inference says what it is worth given everything else tested"
+  ],
+  "raw": {
+    "experiment_id": "APEX-004",
+    "period": "validation",
+    "dataset_manifest_hash": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+    "snapshot_root": "data/snapshots/sharadar/current",
+    "protocol_hash": "13eb9f8b30033f287696d72457fdc62b17cbe444ec6270b0d2a5e4383f08639b",
+    "conventions_hash": "7d9772013bafd66183898486aea1f2a9d74716c65caf1615b70a41ba4201dd61",
+    "config_hash": "9947a5dddba89b0b82982e5b2326285559d9044815ff5d946d4a552839087d7a",
+    "git_sha": "05df4b3e1da40bd8373ce2eae33b316cdefbad2e-DIRTY",
+    "ic_daily_newey_west": {
+      "mean_ic": 0.029686728341260134,
+      "std_ic": 0.07655644562405534,
+      "ic_information_ratio": 0.3877756875892898,
+      "t_stat": 3.278042513401154,
+      "p_value": 0.0010452965120049235,
+      "n_periods": 987,
+      "mean_names_per_period": 1125.0891590678825,
+      "method": "daily_newey_west"
+    },
+    "ic_non_overlapping": {
+      "mean_ic": 0.030974369201348127,
+      "std_ic": 0.074833658991022,
+      "ic_information_ratio": 0.4139095912049979,
+      "t_stat": 2.8973671384349853,
+      "p_value": 0.005654276206567073,
+      "n_periods": 49,
+      "mean_names_per_period": 1126.3061224489795,
+      "method": "non_overlapping"
+    },
+    "deciles_gross": {
+      "spread_mean_per_period": 0.0018859295611812921,
+      "spread_annualised_gross": 0.024024378233576504,
+      "spread_t_stat": 0.2207210589459826,
+      "hit_rate": 0.5714285714285714,
+      "monotonic_top_over_bottom": true,
+      "n_periods": 49,
+      "mean_by_decile": {
+        "1": 0.01232248823860936,
+        "2": 0.014635610608697181,
+        "3": 0.013549655374501689,
+        "4": 0.010844951363476513,
+        "5": 0.008390665328624912,
+        "6": 0.014158769544804094,
+        "7": 0.008789524874746938,
+        "8": 0.010591964040230906,
+        "9": 0.002707001519596236,
+        "10": 0.010436558677428069
+      }
+    },
+    "exclusions": {
+      "master_securities": 17002,
+      "candidates_after_category": 17002,
+      "candidates_after_marketcap": 10352,
+      "eligible_ever": 0,
+      "sep_rows_scanned": 34890722,
+      "sep_rows_kept": 20135766,
+      "daily_rows_scanned": 31394671,
+      "duplicates_dropped": 0,
+      "unmapped_ticker_dates": 0,
+      "recycled_tickers": 0,
+      "notes": []
+    },
+    "estimator_disclosure": {
+      "estimator": "newey-west bartlett lag 25",
+      "overlap_trading_days": 20,
+      "n_obs": 987,
+      "reference_replications": 20000,
+      "reference_digest": "b1687cbf2c358047",
+      "sd_of_t_under_null": 1.2203,
+      "nominal_5pct_test_actual_size": 0.109,
+      "threshold_2p5_nominal_one_sided_size": 0.00621,
+      "threshold_2p5_measured_one_sided_size": 0.021,
+      "note": "Bartlett HAC under-weights the MA(overlap-1) autocovariance of overlapping forward windows, so the pre-registered t >= 2.5 hurdle is less stringent than its nominal size implies. Pre-registration NOT amended (ruling 2026-08-09); disclosed here."
+    }
+  },
+  "attribution": {
+    "by_sector": {
+      "Healthcare": 0.006419934306479537,
+      "Industrials": 0.0012309773904724815,
+      "Communication Services": 0.0009387343851311007,
+      "Technology": 0.0005149460115023526,
+      "Basic Materials": 0.0004925465481783264,
+      "Consumer Cyclical": 0.00045500644195310805,
+      "Financial Services": 0.00029022381431087696,
+      "Energy": 9.12142843147979e-05,
+      "UNKNOWN": 0.0,
+      "Real Estate": 0.0,
+      "Utilities": -5.376264140780899e-05,
+      "Consumer Defensive": -0.00013658466914462155
+    },
+    "top_winners": [
+      {
+        "ticker": "FLNA",
+        "sector": "Healthcare",
+        "contribution": 0.0015913277887725876
+      },
+      {
+        "ticker": "AXSM",
+        "sector": "Healthcare",
+        "contribution": 0.0008680517353134442
+      },
+      {
+        "ticker": "AVXL",
+        "sector": "Healthcare",
+        "contribution": 0.000552442283599685
+      },
+      {
+        "ticker": "MARA",
+        "sector": "Financial Services",
+        "contribution": 0.0005322094056053714
+      },
+      {
+        "ticker": "RARX",
+        "sector": "Healthcare",
+        "contribution": 0.0005225580321612602
+      }
+    ],
+    "top_losers": [
+      {
+        "ticker": "VALPQ",
+        "sector": "Energy",
+        "contribution": -0.00026550625691300594
+      },
+      {
+        "ticker": "SIOX",
+        "sector": "Healthcare",
+        "contribution": -0.0002746896871456552
+      },
+      {
+        "ticker": "SRNEQ",
+        "sector": "Healthcare",
+        "contribution": -0.0002853646641423245
+      },
+      {
+        "ticker": "ZYNE",
+        "sector": "Healthcare",
+        "contribution": -0.00028868825883330846
+      },
+      {
+        "ticker": "TCDAQ",
+        "sector": "Healthcare",
+        "contribution": -0.00029651717044441286
+      }
+    ],
+    "largest_sector": "Healthcare",
+    "spread_with_all_sectors": 0.024024378233576504,
+    "spread_excluding_largest": 0.09048282082926185,
+    "share_from_largest_sector": -2.766291886913557
+  },
+  "success_criteria": {
+    "experiment_id": "APEX-004",
+    "period": "validation",
+    "source": "config/experiment.yaml: success_criteria",
+    "mean_ic": "mean_ic > 0",
+    "t_stat": "t_stat >= 2.92",
+    "robustness": "robustness agrees in sign with the primary statistic"
+  },
+  "criteria_evaluation": {
+    "verdict": "SUCCESS",
+    "failures": [],
+    "criteria_applied": [
+      "mean_ic > 0",
+      "t_stat >= 2.92",
+      "robustness agrees in sign with the primary statistic"
+    ]
+  },
+  "threshold_disclosure": {
+    "registered_t_threshold": 2.92,
+    "simulated_null_one_percent_quantile": 2.875940807861864,
+    "n_obs": 987
+  }
+}
