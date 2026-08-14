@@ -139,6 +139,20 @@ APEX Research Protocol v1.0 is inherited unchanged for the timing firewall, the
 cross-sectional ranking variable and nothing else. Experiment #001 is closed and
 is not affected by this registration.
 
+---
+
+## 9. Experiment #003 Registration (added 2026-08-13)
+
+**APEX-003 — Gross Profitability.** SIGNED and FROZEN 2026-08-13, Author Derek Duenas.
+
+**Governs:** `APEX-003-Protocol-Gross-Profitability.md`, SHA-256 `6d3bebedf911cc4dfa8ebeb35394762cba8758af91aa1b430b76ff136b34697c`
+
+Inherited unchanged: timing firewall, §3 universe, cost model, evaluation
+machinery, §13 success criteria (t >= 2.92 validation / 2.88 holdout, read from
+config). #003 adds one HIGHER-is-better ranking variable
+(`prof_gross_profitability` = gp/assets, as-filed ARQ) and nothing else.
+Experiments #001 and #002 are closed and are not affected.
+
 Binding constraint carried from the specification: the twelve-month measurement
 window and the corporate-action exclusion rule **may not be altered after any
 predictive result is observed**.
@@ -154,6 +168,7 @@ hypothesis is entirely untested.
 
 | Date | Item | Change | Reason | Before/after results |
 |---|---|---|---|---|
+| 2026-08-13 | A-007 — §9, #003 registration | APEX-003 pre-registration SIGNED (Registered 2026-08-13, Author Derek Duenas) and FROZEN; its SHA-256 pinned in the new §9. Dry run PASSED twice bit-for-bit (digest 18b2dee8…) BEFORE registration. Experiments #001/#002 and their closed results untouched. | A pre-registration must be signed and pinned to be one; certification preceded registration per the INCIDENT-001 lesson. | **BEFORE** any #003 predictive result. |
 | 2026-08-11 | A-006 — §8, #002 registration | APEX-002 pre-registration SIGNED and FROZEN; its SHA-256 `63703d1020893a59…` pinned in the new §8. Experiment #001, its protocol and its closed result are untouched. | A pre-registration must be signed and pinned to be one. Recorded before implementation begins and before any #002 predictive analysis. | **BEFORE** any #002 result. |
 | 2026-08-11 | A-005 — §1, SF1 scope | `SF1` permitted for **APEX-002 only**, and only for as-filed shares outstanding (`sharesbas`/`sharewa`) keyed on `datekey`. Experiment #001 is closed and unaffected. No other fundamental field is unlocked for any experiment. | The #002 measurement audit established that `DAILY.marketcap` carries no vintage — 100% of rows were rewritten after their own date, median 1,246 days — so a share-count DIFFERENCE derived from it may embed restatements. Restatements concentrate in firms with accounting problems, which is plausibly correlated with subsequent returns, making this a lookahead channel pointed at the dependent variable. §4 requires shares "as known at formation date". SF1's `datekey` is the filing date and is the only as-filed source available. | **BEFORE** #002 is registered, and before any #002 predictive analysis of any kind. |
 | 2026-08-11 | A-004 — signature + re-pin | Pre-registration SIGNED (Registered 2026-08-11, Author Derek Duenas). Signing edits the protocol file, so its SHA-256 necessarily changes; the CONVENTIONS pin is updated from `a569c718b39b9cac…` to `8f3396f70cf426a7…`. **No clause, threshold, feature, filter or statistical rule was altered — only the two signature fields.** | A pre-registration must be signed to be one, and the pin must track the signed document. | **BEFORE** any validation or holdout result. |

@@ -123,7 +123,9 @@ def test_counterexample_a_stale_token_naming_another_experiment_is_refused(tmp_p
         "2026-08-11 APEX-001 validation authorized\n"
     )
 
-    with pytest.raises(RegistrationError, match="does not authorise 'APEX-002'"):
+    live = CFG.get("experiment.id")   # tracks the registered experiment
+    with pytest.raises(RegistrationError,
+                       match=f"does not authorise '{live}'"):
         require_unlocked(CFG, "validation", _Source.dataset_fingerprint, tmp_path)
 
 

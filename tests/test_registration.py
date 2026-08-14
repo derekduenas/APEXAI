@@ -120,7 +120,12 @@ def _pass_validation(repo, config, experiment_id=None):
 
 
 def _unlock_token(repo, period, reason=None):
-    reason = reason if reason is not None else "APEX-002 pre-registered confirmatory evaluation"
+    # Derive from the live config so the fixture tracks the registered
+    # experiment -- the per-experiment token binding is the thing under test,
+    # not a hardcoded id.
+    from apex.config import load_config as _lc
+    _live = _lc("experiment", "costs", "synthetic").get("experiment.id")
+    reason = reason if reason is not None else f"{_live} pre-registered confirmatory evaluation"
     directory = repo / "results" / "_unlocks"
     directory.mkdir(parents=True, exist_ok=True)
     (directory / f"{period}.unlock").write_text(reason, encoding="utf-8")
@@ -145,8 +150,11 @@ def test_the_shipped_pre_registration_is_signed(config):
     # Both pre-registrations are signed; the ACTIVE one is whatever config points
     # at. #001 uses bold markdown fields, #002 plain -- assert the content, not
     # the formatting, so this survives the experiment rolling forward.
+    import re
     protocol = (REPO / config.get("experiment.protocol_file")).read_text(encoding="utf-8")
-    assert "Registered:" in protocol and "2026-08-11" in protocol
+    assert re.search(r"Registered:\*{0,2}\s*2026-\d{2}-\d{2}", protocol), (
+        "the active protocol carries no DATED signature"
+    )
     assert "Author:" in protocol and "Derek Duenas" in protocol
 
     closed = (REPO / "APEX-Research-Protocol-v1.0-Experiment-001.md").read_text(encoding="utf-8")

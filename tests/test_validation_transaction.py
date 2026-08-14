@@ -331,3 +331,24 @@ def test_counterexample_the_ordering_check_detects_a_reordering():
              ("ledger.record_result(", "args.out.write_text(")]
 
     assert order != sorted(order), "the ordering check cannot detect a swap"
+
+
+# --- the smoke gate is per-experiment (2026-08-13) --------------------------
+
+def test_the_smoke_gate_is_experiment_aware():
+    """The original gate read APEX-001's production_smoke.txt for EVERY
+    experiment -- a stale artifact from one experiment waving another through,
+    the same per-experiment-binding defect as the unlock token."""
+    src = SCRIPT.read_text()
+
+    assert "SMOKE_EVIDENCE" in src
+    assert "003_dry_run_A.txt" in src, "APEX-003 has no registered smoke evidence"
+    assert 'SMOKE_EVIDENCE[experiment]' in src, "the gate does not key on the experiment"
+
+
+def test_counterexample_an_unknown_experiment_has_no_smoke_evidence():
+    """An experiment absent from the map must be refused, not defaulted to
+    another experiment's artifact."""
+    src = SCRIPT.read_text()
+
+    assert "no smoke-run evidence is registered" in src

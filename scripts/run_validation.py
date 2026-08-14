@@ -51,22 +51,35 @@ def main() -> int:
 
     config = load_config("experiment", "costs", "synthetic", "sharadar")
 
-    # Cheapest precondition first: refuse before touching the vendor snapshot,
-    # so "you skipped the smoke run" is the message rather than a schema error
-    # about a path that was never going to be read.
-    smoke = Path("results/production_smoke.txt")
+    # Cheapest precondition first: refuse before touching the vendor snapshot.
+    # The smoke evidence is PER EXPERIMENT. The original check read the
+    # APEX-001-era production_smoke.txt for every experiment, so a stale
+    # artifact from one experiment would wave a DIFFERENT experiment through --
+    # the same per-experiment-binding lesson as the unlock token.
+    SMOKE_EVIDENCE = {
+        "APEX-001": (Path("results/production_smoke.txt"), "CLEAR TO PROCEED"),
+        "APEX-002": (Path("results/production_smoke.txt"), "CLEAR TO PROCEED"),
+        "APEX-003": (Path("results/003_dry_run_A.txt"),
+                     "STATUS: PASS -- every mechanical check green"),
+    }
+    experiment = config.get("experiment.id")
+    if experiment not in SMOKE_EVIDENCE:
+        print(f"REFUSED: no smoke-run evidence is registered for {experiment!r}.",
+              file=sys.stderr)
+        return 2
+    smoke, marker = SMOKE_EVIDENCE[experiment]
     if not smoke.exists():
         print(
-            "REFUSED: the mandatory in-sample smoke run has not been completed.\n"
-            "  Ruling 2 (2026-08-09): no exceptions. Run scripts/run_smoke.py first.",
+            f"REFUSED: the mandatory in-sample smoke/dry run for {experiment} "
+            f"has not been completed ({smoke} missing). Ruling 2: no exceptions.",
             file=sys.stderr,
         )
         return 2
-    if "CLEAR TO PROCEED" not in smoke.read_text():
+    if marker not in smoke.read_text():
         print(
-            "REFUSED: the smoke run did not clear. Ruling 2: if anything looks "
-            "structurally wrong we stop, and no partial fixes are carried into "
-            "validation.",
+            f"REFUSED: {experiment}'s smoke/dry-run evidence at {smoke} does "
+            f"not show a clean pass. Ruling 2: no partial fixes carried into "
+            f"validation.",
             file=sys.stderr,
         )
         return 2

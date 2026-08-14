@@ -5,16 +5,17 @@
 experiment:
   # APEX-001 is CLOSED (INCONCLUSIVE, t=0.302). Its protocol file is retained
   # unchanged; the active experiment is now #002.
-  id: APEX-002
-  protocol_file: APEX-002-Protocol-Net-Share-Issuance.md
+  id: APEX-003
+  protocol_file: APEX-003-Protocol-Gross-Profitability.md
   closed_experiments:
     APEX-001: APEX-Research-Protocol-v1.0-Experiment-001.md
+    APEX-002: APEX-002-Protocol-Net-Share-Issuance.md
   conventions_file: CONVENTIONS.md
   hypothesis: >-
-    Companies that reduce share count through net repurchases outperform
-    companies that aggressively issue equity: the cross-sectional rank of
-    twelve-month net share issuance, ln(S_t / S_t-4q) on as-filed sharesbas,
-    predicts forward 20-trading-day excess returns. Lower issuance ranks higher.
+    Companies with high gross profitability outperform: the cross-sectional
+    rank of gross profits over assets (gp/assets, as-filed ARQ, earliest
+    filing) predicts forward 20-trading-day excess returns. Higher
+    profitability ranks higher.
 
 governance:
   # Directive section 4, as ruled 2026-08-09. This SUPERSEDES protocol section 7's

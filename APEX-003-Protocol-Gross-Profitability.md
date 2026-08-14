@@ -1,5 +1,8 @@
 # APEX Research Protocol — Experiment #003: Gross Profitability
 
+Registered: 2026-08-13
+Author: Derek Duenas
+
 **Transcribed verbatim from the pre-registered packet
 (`results/003_registration_packets.json`, dossier `97da989ad49a…`), which
 survived the reject-only screen on structural grounds on 2026-08-12.**
@@ -98,7 +101,3 @@ Research Protocol v1.0 and its amendments (A-001 .. A-006), including A-001's
 bar on the simulated null entering the decision path (the registered constants
 in §8 govern).
 
----
-
-**Registered:** PENDING — awaiting operator signature
-**Author:** PENDING

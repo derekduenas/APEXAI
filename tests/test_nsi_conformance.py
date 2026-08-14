@@ -479,12 +479,20 @@ def test_counterexample_a_modified_protocol_is_detected(tmp_path):
         "a modified protocol produced the frozen hash; the integrity check "
         "cannot detect tampering"
     )
-    # and the real registration gate must refuse it
-    from apex.config import load_config
-    from apex.registration import RegistrationError, require_protocol_unmodified
+    # and the real registration gate must refuse it. This test is ABOUT the
+    # #002 pin, so it binds its config to APEX-002 explicitly -- the live
+    # config has since moved to APEX-003 and must not change what this proves.
+    import copy
     import shutil
 
-    config = load_config("experiment", "costs", "synthetic")
+    from apex.config import load_config
+    from apex.registration import RegistrationError, require_protocol_unmodified
+
+    base = load_config("experiment", "costs", "synthetic")
+    data = copy.deepcopy(base.data)
+    data["experiment"]["id"] = "APEX-002"
+    data["experiment"]["protocol_file"] = "APEX-002-Protocol-Net-Share-Issuance.md"
+    config = type(base)(data=data, sources=base.sources)
     shutil.copy(REPO / config.get("experiment.conventions_file"),
                 tmp_path / config.get("experiment.conventions_file"))
     with pytest.raises(RegistrationError):
