@@ -104,6 +104,18 @@ def _chain_append(log_path: Path, entry: dict) -> dict:
     return body
 
 
+def _pull_spy(client, root: Path, lo: str, hi: str) -> dict:
+    """SFP benchmark slice (SPY only). The panel builder needs the benchmark
+    series to extend with the lake; without it, live-paper marks would price
+    portfolios against a benchmark frozen at the snapshot end."""
+    columns, rows = client.fetch_table(
+        "sfp", {"ticker": "SPY", "date.gte": lo, "date.lte": hi},
+        limit=snap.MAX_LIMIT)
+    path = root / "raw" / "SFP" / f"SFP_SPY_{lo}_{hi}.csv"
+    digest = snap._write_slice(path, columns, rows)
+    return {"file": path.name, "rows": len(rows), "sha256": digest}
+
+
 def _refresh_tickers(client, root: Path, pull_date: str) -> dict:
     """TICKERS is a full nightly refresh, dated by pull date so history keeps.
 
@@ -151,6 +163,7 @@ def run_pull(client, root: Path, lo: str, hi: str) -> dict:
         tables[name] = records
 
     tickers = _refresh_tickers(client, root, hi)
+    spy = _pull_spy(client, root, lo, hi)
 
     # Fingerprint over EVERY slice sidecar in the lake, then deliberately
     # minted into the development namespace: this dataset must be refused by
@@ -178,6 +191,7 @@ def run_pull(client, root: Path, lo: str, hi: str) -> dict:
         "range": {"start": lo, "end": hi},
         "rows": {name: sum(r["rows"] for r in recs) for name, recs in tables.items()},
         "tickers_refresh": tickers,
+        "spy_benchmark": spy,
         "stats": stats,
         "dataset_fingerprint": fingerprint,
     })
