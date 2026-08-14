@@ -10,12 +10,12 @@ complete, and (3) the operator signs the header. Until then it binds nothing.
 
 ## 1. Hypothesis
 
-[PENDING GATE RULING — one of:]
-- **H-GP-SC**: High gross-profits-to-assets earns higher forward 20-day
-  excess return than low, within the small-cap universe. (Signal overlaps
-  APEX-003 — see justification memo §5, ruling required.)
-- **H3-SC**: Among cheap small-cap stocks, profitable ones outperform
-  cheap-and-unprofitable ones (dossier 123f67fa re-scoped to this universe).
+**H-GP-SC** (GATE-RULED 2026-08-13, see `SMALL-CAP-JUSTIFICATION.md`): High
+gross-profits-to-assets earns higher forward 20-trading-day excess return
+than low, within the small-cap universe. Single ranked feature
+`prof_gross_profitability`; no composite; no parameters. The signal overlaps
+APEX-003's; the ruling accepted that with the CONTESTED disclosure standing
+in the record and the stricter legacy bar retained (§6).
 
 ## 2. Economic mechanism
 
@@ -65,9 +65,11 @@ work before signing: ADDV distribution detail if the gate requests it.
 ## 6. Success / failure criteria
 
 Mean daily cross-sectional Spearman IC positive; Newey-West (Bartlett,
-lag 25) t >= **[GATE CHOICE — see §8a: derived 2.85 or legacy 2.92]**;
-non-overlapping robustness agrees in sign. FAILURE and INVALID defined
-exactly as APEX-003 §8.
+lag 25) t >= **2.92** (GATE-RULED 2026-08-13: the stricter legacy bar, true
+size 0.872% under the derived null — chosen over the exact-1% 2.85 so no
+reading of this experiment can allege a lowered bar); non-overlapping
+robustness agrees in sign. FAILURE and INVALID defined exactly as
+APEX-003 §8.
 
 ### 8a. Null recalibration (REQUIRED, zero credit, before signing)
 
@@ -91,8 +93,9 @@ both). The holdout-length bar is derived by the same script at signing.
 
 ## 7. Robustness (declared)
 
-Moving-block bootstrap + block sign-permutation, block 20, 2000/2000, fresh
-seed declared at signing. Subperiods diagnostic only.
+Moving-block bootstrap + block sign-permutation, block 20, 2000/2000, seed
+**20260814** (declared 2026-08-13, before any small-cap statistic exists).
+Subperiods diagnostic only.
 
 ## 9. Evaluation instrument
 
@@ -100,15 +103,18 @@ seed declared at signing. Subperiods diagnostic only.
 quarterly rebalance, evaluated post-validation by `project_long_only` against
 the DECLARED long-only viability gates (net >= 2% over benchmark, quarterly
 turnover <= 60%, degradation <= 60%, >= 20 names). Small-cap cost input uses
-a HIGHER declared one-way cost [PENDING: declared at signing, e.g. 40–60bp]
-— small caps are more expensive to trade and the gate must price that, not
-inherit the 20bp large-cap constant.
+a HIGHER declared one-way cost of **50bp** (declared 2026-08-13, before any
+small-cap result exists) — small caps are more expensive to trade and the
+gate must price that, not inherit the 20bp large-cap constant.
 
 ## 10. Contamination
 
 Provenance epoch: AFTER_APEX_003. **Descendant of failure: CONTESTED —
-human ruling required** (see `SMALL-CAP-JUSTIFICATION.md`, especially §3
-and §5). This protocol may not be signed until that ruling is recorded.
+RULED ADMISSIBLE by the operator 2026-08-13** (`SMALL-CAP-JUSTIFICATION.md`,
+ruling block). The CONTESTED disclosure is retained, not erased: any reader
+of this protocol sees that the signal choice postdates a near-miss on the
+same signal, and that the experiment answers with the stricter bar and the
+independent grounds of the memo's §2.
 
 ## 11. Budget
 

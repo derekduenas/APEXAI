@@ -72,4 +72,10 @@ tested-signal overlap.
 
 ---
 
-Gate ruling: ____________________  Date: ____________
+Gate ruling: **APPROVED — H-GP-SC (gross profitability, small-cap universe),
+with the STRICTER legacy bar t >= 2.92 retained** (true size 0.872% under the
+derived null — the operator chose credibility over the exact-1% 2.85). The
+CONTESTED descendant-of-failure disclosure in §5 is accepted as part of the
+record, not erased by this ruling. Ruled by the operator, 2026-08-13, via
+recorded selection; the protocol header signature at registration is the
+final human act and remains pending.

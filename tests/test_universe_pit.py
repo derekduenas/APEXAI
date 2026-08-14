@@ -319,3 +319,50 @@ def test_eligibility_is_boolean_and_covers_every_date(base):
 
     assert snapshot.eligible.dtypes.eq(bool).all()
     assert snapshot.eligible.index.equals(pd.DatetimeIndex(DATES))
+
+
+# ---------------------------------------------------------------------------
+# THE OPTIONAL MARKET-CAP CEILING (APEX-004 small-cap universe)
+# ---------------------------------------------------------------------------
+
+
+def test_absent_ceiling_key_changes_nothing(base):
+    """The closed experiments' configs carry no ceiling; a mega-cap must stay
+    eligible under them, bit-for-bit. If this fails, APEX-001/002/003 stopped
+    being reproducible."""
+    panel = hand_panel(
+        DATES, close_adj={"S1": [100.0] * 12}, shares_out={"S1": [5e9] * 12}
+    )
+    assert _eligible(panel, base)["S1"].iloc[-1], "$500B name must remain eligible"
+
+
+def test_counterexample_the_ceiling_excludes_a_large_cap(base):
+    """The new key must be able to do the one thing it exists to do."""
+    capped = patched(base, {"universe.max_market_cap_usd": 2e9})
+    panel = hand_panel(
+        DATES,
+        close_adj={"BIG": [100.0] * 12, "SML": [100.0] * 12},
+        shares_out={"BIG": [5e9] * 12, "SML": [20e6] * 12},
+    )
+    # BIG: 100 x 5e9  = $500B -> above ceiling, excluded
+    # SML: 100 x 20e6 = $2B   -> AT the ceiling, excluded (strict <)
+    eligible = _eligible(panel, capped)
+    assert not eligible["BIG"].iloc[-1]
+    assert not eligible["SML"].iloc[-1], "ceiling is exclusive: mcap < ceiling"
+
+
+def test_a_name_between_floor_and_ceiling_is_eligible(base):
+    capped = patched(base, {"universe.max_market_cap_usd": 2e9})
+    panel = hand_panel(
+        DATES, close_adj={"MID": [100.0] * 12}, shares_out={"MID": [15e6] * 12}
+    )
+    assert _eligible(panel, capped)["MID"].iloc[-1], "$1.5B sits inside [1B, 2B)"
+
+
+def test_unknowable_market_cap_still_fails_pit_not_the_ceiling(base):
+    """The PIT rule outranks the size rule in both directions: unknown market
+    cap is excluded as UNKNOWABLE, never as too big or too small."""
+    capped = patched(base, {"universe.max_market_cap_usd": 2e9})
+    panel = hand_panel(DATES, close_adj={"S1": [100.0] * 12})  # no shares_out
+    snapshot = build_universe(panel, capped)
+    assert not snapshot.eligible["S1"].iloc[-1]

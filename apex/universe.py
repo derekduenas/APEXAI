@@ -74,8 +74,15 @@ def build_universe(panel: Panel, config: Config) -> UniverseSnapshot:
     # security-date fails exactly one filter (pit_market_cap) instead of two.
     # Eligibility is unaffected -- it is the AND of every flag -- but the
     # section 9 counts stay non-overlapping and mean what they say.
+    # An OPTIONAL ceiling (APEX-004 small-cap universe). Absent key = no
+    # ceiling, bit-for-bit the historical behavior -- the closed experiments'
+    # configs carry no ceiling and must keep reproducing. The ceiling folds
+    # into the SAME size flag rather than adding a filter name, so the
+    # section 9 reason taxonomy and reason_priority are untouched.
+    ceiling = float(settings.get("max_market_cap_usd", float("inf")))
     pass_flags["market_cap"] = (
-        market_cap >= float(settings["min_market_cap_usd"])
+        (market_cap >= float(settings["min_market_cap_usd"]))
+        & (market_cap < ceiling)
     ) | market_cap.isna()
 
     addv = panel.dollar_volume.rolling(
