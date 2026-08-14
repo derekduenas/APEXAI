@@ -68,11 +68,13 @@ def module_closure(root: Path, entry: str) -> set[str]:
 EXPERIMENT_ENTRY = {
     "APEX-001": "apex.pipeline",
     "APEX-002": "apex.experiments.apex002",
+    "APEX-003": "apex.experiments.apex003",
 }
 
 EXPERIMENT_REQUIRES = {
     "APEX-001": frozenset({"apex.features.composite"}),
     "APEX-002": frozenset({"apex.features.nsi", "apex.features.nsi_scores"}),
+    "APEX-003": frozenset({"apex.experiments.apex003", "apex.features.factory"}),
 }
 
 EXPERIMENT_FORBIDS = {
@@ -83,6 +85,11 @@ EXPERIMENT_FORBIDS = {
         "apex.features.f2_trend",
         "apex.features.f3_volatility",
         "apex.features.f4_relative_strength",
+    }),
+    "APEX-003": frozenset({
+        "apex.features.composite",       # #001 scorer
+        "apex.features.nsi_scores",      # #002 scorer
+        "apex.features.nsi",
     }),
 }
 

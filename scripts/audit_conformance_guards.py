@@ -56,6 +56,7 @@ AUDITED_FILES = [
     _TESTS / "test_research_engines.py",
     _TESTS / "test_component_registry.py",
     _TESTS / "test_portfolio_projection.py",
+    _TESTS / "test_apex003_path.py",
 ]
 
 # Guard -> the counterexample(s) that demonstrate it can fail.
@@ -261,6 +262,15 @@ LOAD_BEARING = {
     ],
     "test_the_policy_is_fixed_and_declared": [
         "test_counterexample_a_bad_breadth_is_refused",
+    ],
+    # --- APEX-003-H1 gross profitability path (2026-08-12) ------------------
+    # Orientation is the erratum-class risk: higher profitability = score 100 =
+    # decile 1. Isolation from the #001/#002 scorers.
+    "test_highest_profitability_scores_100": [
+        "test_counterexample_the_nsi_lower_is_better_convention_would_invert",
+    ],
+    "test_the_gp_path_reaches_no_other_experiments_scorer": [
+        "test_counterexample_the_isolation_audit_flags_a_contaminated_entry",
     ],
 }
 

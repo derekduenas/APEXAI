@@ -148,7 +148,7 @@ def run_period(
     # unregistered experiment must refuse without touching vendor data, so the
     # message is "no path for APEX-999" rather than a schema error from a load
     # that was never going to be used.
-    if experiment not in ("APEX-001", "APEX-002"):
+    if experiment not in ("APEX-001", "APEX-002", "APEX-003"):
         # The failure this refusal exists to prevent: an unrecognised
         # experiment id silently running whatever path happens to be first.
         # Step 3 found APEX-002 registered while #001's composite executed.
@@ -156,7 +156,7 @@ def run_period(
             f"no execution path is registered for {experiment!r}. Refusing to "
             f"run rather than defaulting to another experiment's signal."
         )
-    if experiment == "APEX-002" and getattr(source, "root", None) is None:
+    if experiment in ("APEX-002", "APEX-003") and getattr(source, "root", None) is None:
         raise UnregisteredExperiment(
             f"{type(source).__name__} exposes no `root`; APEX-002 needs the "
             f"snapshot path to read SF1 as-filed shares"
@@ -166,7 +166,10 @@ def run_period(
 
     if experiment == "APEX-001":
         output = build_panel_pipeline(panel, config)
-    else:
+    elif experiment == "APEX-002":
         output, _ = build_nsi_output(panel, config, Path(source.root))
+    else:  # APEX-003
+        from apex.experiments.apex003 import build_gp_output
+        output, _ = build_gp_output(panel, config, Path(source.root))
 
     return output, evaluate(output, config, spec["start"], spec["end"])
