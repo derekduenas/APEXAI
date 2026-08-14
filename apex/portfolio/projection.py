@@ -121,3 +121,85 @@ def project(
         capacity_proxy=cap,
         policy=dict(POLICY),
     )
+
+
+# ---------------------------------------------------------------------------
+# SECOND declared policy: LONG-ONLY. Not a variant searched over, a different
+# deployment question answered with its own fixed constants.
+#
+# The long/short policy above prices a research construct whose short leg this
+# operation cannot actually run (borrow cost and availability are unmodelled,
+# and shorting is unaffordable at current capital -- 2026-08-13 audit). The
+# long-only sleeve is the DEPLOYABLE shape: hold the top-decile names, equal
+# weight, quarterly rebalance. Its gross input is the long leg's excess return
+# over benchmark -- a NUMBER, computed elsewhere, only ever supplied for a
+# VALIDATED_ALPHA. No function here or anywhere chooses between the two
+# policies; a test asserts that absence.
+# ---------------------------------------------------------------------------
+
+LONG_ONLY_POLICY = {
+    "construction": "long_top_decile_only",
+    "weighting": "equal_weight",
+    "rebalance": "quarterly",
+    "n_deciles": 10,
+    "short_leg": "none -- nothing to borrow, no borrow fiction to disclose",
+}
+
+# FIXED constants, declared before any use. Quarterly turnover 40% is
+# conservative for a slow fundamental signal on a 20-day formation grid.
+LONG_ONLY_COST_BPS_ONE_WAY = 20.0
+LONG_ONLY_QUARTERLY_TURNOVER = 0.40
+
+
+@dataclass(frozen=True)
+class LongOnlyProjection:
+    """Gross long-leg excess -> net, one-sided book, every assumption recorded."""
+
+    gross_long_excess_annualised: float
+    cost_bps_one_way: float
+    quarterly_turnover: float
+    annual_cost_drag: float
+    net_long_excess_annualised: float
+    degradation_fraction: float
+    names_held: int
+    policy: dict
+
+    def as_dict(self) -> dict:
+        return {k: getattr(self, k) for k in self.__dataclass_fields__}
+
+
+def project_long_only(
+    *,
+    gross_long_excess_annualised: float,
+    names_held: int,
+    cost_bps_one_way: float = LONG_ONLY_COST_BPS_ONE_WAY,
+    quarterly_turnover: float = LONG_ONLY_QUARTERLY_TURNOVER,
+) -> LongOnlyProjection:
+    """Net-of-cost long-only projection. Pure function, fixed policy.
+
+    `gross_long_excess_annualised` is the top-decile long leg's annualised
+    excess return over benchmark, already computed, supplied as a number. Four
+    quarterly rebalances; each turns over `quarterly_turnover` of a ONE-SIDED
+    book; each turned-over name pays a round trip.
+    """
+    if names_held <= 0:
+        raise ProjectionError("names_held must be positive")
+    if not (0.0 <= quarterly_turnover <= 2.0):
+        raise ProjectionError("quarterly_turnover out of plausible range")
+
+    annual_cost_drag = 4 * quarterly_turnover * 2.0 * (cost_bps_one_way / 1e4)
+    net = gross_long_excess_annualised - annual_cost_drag
+    degradation = (
+        (gross_long_excess_annualised - net) / gross_long_excess_annualised
+        if gross_long_excess_annualised > 0 else float("nan")
+    )
+    return LongOnlyProjection(
+        gross_long_excess_annualised=float(gross_long_excess_annualised),
+        cost_bps_one_way=float(cost_bps_one_way),
+        quarterly_turnover=float(quarterly_turnover),
+        annual_cost_drag=float(annual_cost_drag),
+        net_long_excess_annualised=float(net),
+        degradation_fraction=float(degradation),
+        names_held=int(names_held),
+        policy=dict(LONG_ONLY_POLICY),
+    )

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  NOT LOADED BY DEFAULT. The 2026-08-07 hard reset stopped all automation on
+  this machine; re-arming a daily job is a human decision. To arm:
+
+    cp ops/com.apex.nightly-pull.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.apex.nightly-pull.plist
+
+  Prerequisite: the API key in the Keychain (see ops/nightly_pull.sh header).
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.apex.nightly-pull</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/zsh</string>
+        <string>/Users/derekduenas/apex-equities/ops/nightly_pull.sh</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <!-- 02:30 local: after Sharadar's evening update window, before open -->
+        <key>Hour</key><integer>2</integer>
+        <key>Minute</key><integer>30</integer>
+    </dict>
+    <key>StandardErrorPath</key>
+    <string>/Users/derekduenas/apex-equities/logs/nightly_pull.launchd.log</string>
+</dict>
+</plist>

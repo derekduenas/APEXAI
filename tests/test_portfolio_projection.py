@@ -90,3 +90,60 @@ def test_the_projection_touches_no_candidate_or_forward_return():
     code = executable_source(inspect.getsource(P))   # docstrings excluded
     for leak in ("forward_return", "compute_ic", "validation", "holdout"):
         assert leak not in code, f"projection executes against {leak}"
+
+
+# --- the SECOND declared policy: long-only ----------------------------------
+
+def test_long_only_is_deterministic_and_costs_bite():
+    a = P.project_long_only(gross_long_excess_annualised=0.06, names_held=28)
+    b = P.project_long_only(gross_long_excess_annualised=0.06, names_held=28)
+    assert a == b
+    assert a.net_long_excess_annualised < a.gross_long_excess_annualised
+    # one-sided book: 4 * 0.40 * 2 * 20bp = 64bp/yr
+    assert abs(a.annual_cost_drag - 0.0064) < 1e-12
+
+
+def test_long_only_policy_is_fixed_and_declared():
+    assert P.LONG_ONLY_POLICY["construction"] == "long_top_decile_only"
+    assert P.LONG_ONLY_POLICY["rebalance"] == "quarterly"
+    import inspect
+    sig = inspect.signature(P.project_long_only)
+    assert "policy" not in sig.parameters
+
+
+def test_long_only_positive_control_a_strong_sleeve_is_viable():
+    proj = P.project_long_only(gross_long_excess_annualised=0.06, names_held=28)
+    assert V.assess_long_only(proj).viable
+
+
+def test_long_only_negative_control_a_weak_sleeve_is_not_viable():
+    proj = P.project_long_only(gross_long_excess_annualised=0.015, names_held=28)
+    verdict = V.assess_long_only(proj)
+    assert not verdict.viable
+    assert any("net long excess" in f for f in verdict.failures)
+
+
+def test_counterexample_a_sleeve_below_20_names_fails_the_gate():
+    proj = P.project_long_only(gross_long_excess_annualised=0.06, names_held=12)
+    verdict = V.assess_long_only(proj)
+    assert not verdict.viable
+    assert any("names held" in f for f in verdict.failures)
+
+
+def test_long_only_viability_thresholds_are_declared_constants():
+    assert V.MIN_NET_LONG_EXCESS_ANNUALISED == 0.02
+    assert V.MAX_QUARTERLY_TURNOVER == 0.60
+    assert V.MAX_LONG_ONLY_DEGRADATION == 0.60
+    assert V.MIN_NAMES_HELD == 20
+
+
+def test_no_function_evaluates_both_policies():
+    """The two policies answer different deployment questions. A function that
+    touched both would be a policy CHOOSER -- the search this module exists to
+    not contain."""
+    import inspect
+    for name, fn in inspect.getmembers(P, inspect.isfunction):
+        src = inspect.getsource(fn)
+        assert not ("dict(POLICY)" in src and "dict(LONG_ONLY_POLICY)" in src), (
+            f"{name} constructs results under BOTH declared policies"
+        )

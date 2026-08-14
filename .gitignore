@@ -20,3 +20,5 @@ results/_unlocks/
 # Never commit a credential.
 .env
 *.key
+logs/
+data/live/
