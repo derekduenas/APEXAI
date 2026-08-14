@@ -1,0 +1,113 @@
+{
+  "decile_curve": {
+    "adjacent_inversions_of_10": 3,
+    "bottom_minus_universe": 0.003772,
+    "decile_year_stability_std": {
+      "1": 0.019747,
+      "2": 0.015916,
+      "3": 0.007381,
+      "4": 0.0044,
+      "5": 0.00319,
+      "6": 0.00159,
+      "7": 0.004659,
+      "8": 0.008057,
+      "9": 0.009676,
+      "10": 0.021779
+    },
+    "mean_excess_per_period_by_decile": {
+      "1": 0.003772,
+      "2": -0.001096,
+      "3": -0.00281,
+      "4": -0.002287,
+      "5": -0.000616,
+      "6": 0.000152,
+      "7": 0.002023,
+      "8": 0.002158,
+      "9": 0.002527,
+      "10": 0.000236
+    },
+    "top_minus_universe": 0.000236
+  },
+  "decomposition": {
+    "gp_value_rank_correlation": -0.3815,
+    "h3_top_overlap_with_gp_top": 0.7656,
+    "h3_top_overlap_with_value_top": 0.7405,
+    "mean_ic_gp_alone": 0.015291,
+    "mean_ic_h3": 0.014334,
+    "mean_ic_value_alone": 0.002151,
+    "quadrant_mean_excess": {
+      "cheap_and_profitable": 0.00202,
+      "cheap_not_profitable": -0.000768,
+      "neither": -0.001011,
+      "profitable_not_cheap": 0.000263
+    }
+  },
+  "persistence": {
+    "rank_autocorr_12_periods_year": 0.8212,
+    "rank_autocorr_1_period_20d": 0.9644,
+    "rank_autocorr_3_periods_quarter": 0.9039,
+    "top_decile_retention_20d": 0.7668,
+    "top_decile_retention_quarter": 0.5959,
+    "top_decile_retention_year": 0.4012
+  },
+  "rank_breadth": {
+    "excess_by_ventile": {
+      "1": -0.002759,
+      "2": 0.008183,
+      "3": -0.000867,
+      "4": -0.001251,
+      "5": -0.003507,
+      "6": -0.002296,
+      "7": -0.002725,
+      "8": -0.001986,
+      "9": -0.001752,
+      "10": 0.000215,
+      "11": -0.000395,
+      "12": 0.000826,
+      "13": 0.002144,
+      "14": 0.00184,
+      "15": 0.001817,
+      "16": 0.002674,
+      "17": 0.004786,
+      "18": -0.001312,
+      "19": 0.002322,
+      "20": -0.00495
+    },
+    "gradient_bottom_half_v10_minus_v1": 0.002974,
+    "gradient_top_half_v20_minus_v11": -0.004555,
+    "ic_positive_fraction_of_dates": 0.5183,
+    "in_sample_mean_spearman_ic_descriptive": 0.014334
+  },
+  "regimes": {
+    "drawdown_gt_10pct": {
+      "dates_in": 44,
+      "dates_out": 120,
+      "ic_in": 0.028883,
+      "ic_out": 0.008955,
+      "top_decile_excess_in": 0.012786,
+      "top_decile_excess_out": -0.00676
+    },
+    "high_vol_top_half": {
+      "dates_in": 82,
+      "dates_out": 82,
+      "ic_in": 0.0187,
+      "ic_out": 0.009914,
+      "top_decile_excess_in": 0.004898,
+      "top_decile_excess_out": -0.007943
+    },
+    "trailing6m_up": {
+      "dates_in": 127,
+      "dates_out": 37,
+      "ic_in": 0.007738,
+      "ic_out": 0.036795,
+      "top_decile_excess_in": -0.006734,
+      "top_decile_excess_out": 0.016396
+    }
+  },
+  "universe": "registered small-cap band [100M, 2B)",
+  "window": {
+    "end": "2017-12-26",
+    "grid_dates": 164,
+    "start": "2005-01-13"
+  }
+}
