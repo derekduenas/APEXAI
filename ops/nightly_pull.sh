@@ -21,3 +21,5 @@ cd "$REPO"
 exec >> "$LOG_DIR/nightly_pull.log" 2>&1
 echo "=== $(date -u +%Y-%m-%dT%H:%M:%SZ) nightly pull ==="
 .venv/bin/python scripts/nightly_pull.py --run
+echo "=== $(date -u +%Y-%m-%dT%H:%M:%SZ) paper track ==="
+.venv/bin/python scripts/paper_track.py
