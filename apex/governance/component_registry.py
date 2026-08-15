@@ -320,6 +320,17 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
        purpose="abstract broker seam; live methods SEALED (subclass cannot "
                "re-enable; dated governance change only)",
        failure_behavior="live execution raises LiveExecutionDisabled"),
+    _c(name="intraday_foundation", state=BUILT, module="apex.intraday.contract",
+       purpose="P1A kernel: provider-neutral contract, PIT identity bridge "
+               "(ambiguity fails closed), three-meaning corporate actions, "
+               "DST-safe sessions, ReplayClock (no lookahead through bar "
+               "construction), deterministic streamed replay, manifests. "
+               "NOT CERTIFIED: gates B/J await the Massive subscription",
+       pit_required=True,
+       activation_prereqs=("MASSIVE_API_KEY (operator; licensing check)",
+                           "certification sample", "cross-source reconciliation"),
+       failure_behavior="unknown identity/stale/unresolved-CA fail closed; "
+                        "an unwired adapter refuses, never fabricates"),
     _c(name="hunter_intelligence", state=PLANNED, module="",
        purpose="intraday replay, scanner funnel, ChartState, playbook "
                "evaluation -- ALL gated on an intraday data source "
