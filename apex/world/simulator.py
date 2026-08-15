@@ -139,7 +139,10 @@ def _classify_branch(term_ret: float, path_min: float, path_max: float,
 def simulate(candidate: dict, snapshot: TwinSnapshot, bars: pd.DataFrame,
              history: pd.DataFrame, *, horizon_minutes: int = 60,
              n_paths: int = 200, atr_frac: float | None = None) -> WorldSimulationResult | None:
-    """None when there is no legal donor material (honest refusal)."""
+    """None when there is no legal donor material OR no vol scale (honest
+    refusal both times: a fabricated ATR would distort branch classes)."""
+    if not atr_frac:
+        return None
     t = pd.Timestamp(snapshot.as_of)
     vis = visible_bars(bars, t)                # THE choke point; future-blind
     if vis.empty:
@@ -152,7 +155,7 @@ def simulate(candidate: dict, snapshot: TwinSnapshot, bars: pd.DataFrame,
     entry = float(vis["close"].astype(float).iloc[-1])
     direction = candidate.get("direction", "LONG")
     stop, target = candidate.get("stop"), candidate.get("target")
-    scale = ((atr_frac or 0.02) * np.sqrt(horizon_minutes / 390.0))
+    scale = (atr_frac * np.sqrt(horizon_minutes / 390.0))
 
     cfg = {"h": horizon_minutes, "n": n_paths, "block": BLOCK_MINUTES,
            "tod": TOD_WINDOW_MINUTES, "src": SOURCE}
