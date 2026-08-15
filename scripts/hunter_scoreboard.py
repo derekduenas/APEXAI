@@ -126,6 +126,35 @@ def build_scoreboard(kinds: dict) -> dict:
         comparisons[pid] = {"n_subjects": len(subjects),
                             "baselines_on_identical_subjects": comp}
 
+    # the three frozen relationships (docs/HUNTER-GRADUATION-CRITERIA.md):
+    # R1 hunter-vs-scanner and R3 selected-vs-rejected isolate SELECTION by
+    # scoring both cohorts under the SAME naive instrument
+    # (BASELINE-MOMENTUM), so direction skill and subject-selection skill
+    # are never conflated. R2 is the identical-subject table above.
+    selected_subjects = {(d["session_date"], d["symbol"])
+                         for pid in playbook_ids for d in by_pid[pid]}
+    mom = by_pid.get("BASELINE-MOMENTUM", [])
+    sel_rows = merged([d for d in mom
+                       if (d["session_date"], d["symbol"])
+                       in selected_subjects])
+    rej_rows = merged([d for d in mom
+                       if (d["session_date"], d["symbol"])
+                       not in selected_subjects])
+    relationships = {
+        "instrument": "BASELINE-MOMENTUM on both cohorts",
+        "selected_subjects": len(selected_subjects),
+        "rejected_watchlist_subjects": len(
+            {(d["session_date"], d["symbol"]) for d in mom}
+            - selected_subjects),
+        "selected_cohort": {f"{h}m": horizon_stats(sel_rows, h)
+                            for h in HORIZONS_MINUTES},
+        "rejected_cohort": {f"{h}m": horizon_stats(rej_rows, h)
+                            for h in HORIZONS_MINUTES},
+        "note": ("DESCRIPTIVE until protocol §10 checkpoint; PRELIMINARY "
+                 "below 10 effective; separation is a finding to record, "
+                 "never a threshold to retune toward"),
+    }
+
     scans = kinds["scan"]
     sig_counts: Counter = Counter()
     for s in scans:
@@ -160,6 +189,7 @@ def build_scoreboard(kinds: dict) -> dict:
                              ">=2 regimes (protocol §10)",
         "scoreboard": board,
         "identical_subject_comparisons": comparisons,
+        "selected_vs_rejected": relationships,
         "funnel": funnel,
     }
 

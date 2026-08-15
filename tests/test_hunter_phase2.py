@@ -132,6 +132,34 @@ def test_scoreboard_scores_only_eligible_and_restricts_subjects():
     assert sb["no_trade_row"]["mean_ret"] == 0.0
 
 
+def test_selected_vs_rejected_same_instrument_cohorts():
+    """R3: both cohorts scored under BASELINE-MOMENTUM — selection skill
+    isolated from direction skill."""
+    kinds = {"forward_state": [], "scan": [], "decision": [], "realization": []}
+    kinds["decision"] = [
+        _entry("decision", decision_id="p1", session_date="2026-08-17",
+               symbol="AMD", playbook_id="HUNTER-001_v1", direction="LONG",
+               forward_eligibility="FORWARD_ELIGIBLE"),
+        _entry("decision", decision_id="m1", session_date="2026-08-17",
+               symbol="AMD", playbook_id="BASELINE-MOMENTUM",
+               direction="LONG", forward_eligibility="FORWARD_ELIGIBLE"),
+        _entry("decision", decision_id="m2", session_date="2026-08-17",
+               symbol="NVDA", playbook_id="BASELINE-MOMENTUM",
+               direction="LONG", forward_eligibility="FORWARD_ELIGIBLE"),
+    ]
+    kinds["realization"] = [
+        _entry("realization", decision_id="p1", resolvable=True, ret_60m=0.02),
+        _entry("realization", decision_id="m1", resolvable=True, ret_60m=0.015),
+        _entry("realization", decision_id="m2", resolvable=True, ret_60m=-0.004),
+    ]
+    r = build_scoreboard(kinds)["selected_vs_rejected"]
+    assert r["selected_subjects"] == 1
+    assert r["rejected_watchlist_subjects"] == 1
+    assert r["selected_cohort"]["60m"]["n"] == 1      # AMD momentum row
+    assert r["selected_cohort"]["60m"]["mean_ret"] == 0.015
+    assert r["rejected_cohort"]["60m"]["mean_ret"] == -0.004
+
+
 def test_scoreboard_refuses_mixed_evidence():
     import pytest
 
