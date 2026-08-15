@@ -60,6 +60,14 @@ def candidate_lineage(decision_id: str, ledger: Path = LEDGER) -> dict:
     return out
 
 
+def _regime_label(day_return) -> str | None:
+    if day_return is None:
+        return None
+    if day_return > 0:
+        return "UP"
+    return "DOWN" if day_return < 0 else "FLAT"
+
+
 def analog_memory_rows(as_of, ledger: Path = LEDGER,
                        horizon_minutes: int = 60) -> list:
     """Rows for the analog engine, ALL forward class, with the structural
@@ -87,9 +95,7 @@ def analog_memory_rows(as_of, ledger: Path = LEDGER,
                      "resolved_at": str(resolved_at),
                      "session_date": d["session_date"],
                      "symbol": d["symbol"],
-                     "regime": (d.get("market_state") or {}).get(
-                         "day_return") and (
-                         "UP" if d["market_state"]["day_return"] > 0
-                         else "DOWN")})
+                     "regime": _regime_label(
+                         (d.get("market_state") or {}).get("day_return"))})
     del horizon_minutes
     return rows
