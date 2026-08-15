@@ -1,7 +1,10 @@
-# CONVENTIONS — AMENDMENT A-010 (DRAFT, UNSIGNED, NOT IN FORCE)
+# CONVENTIONS — AMENDMENT A-010 (SIGNED 2026-08-15, IN FORCE)
 
-**Filed verbatim from the operator's 2026-08-14 draft. Nothing herein is
-executed or prepared. See the signature block: unsigned.**
+**Signed on operator instruction of 2026-08-15 ("Sign A-010 and run the
+anchor first"). The §4.5 constraint is unchanged and binding: the hand-made
+holdout token is the operator's own act — never automated, delegated,
+scripted, or scheduled — so execution halts at implementation step 4 until
+the operator writes it personally.**
 
 ## Standalone Holdout Evaluation of APEX-004
 
@@ -82,7 +85,8 @@ be spent into an uncertain state.
     Amendment:    A-010
     Title:        Standalone holdout evaluation of APEX-004
     Drafted:      2026-08-14
-    Operator:     ______________________
-    Date:         ______________________
+    Operator:     Derek Duenas
+    Date:         2026-08-15
 
-**Unsigned. Not in force. Do not execute.**
+**SIGNED and IN FORCE. Execution proceeds per §6, halting at step 4 for the
+operator's hand-made token.**
