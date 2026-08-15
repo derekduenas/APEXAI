@@ -1,0 +1,130 @@
+#!/usr/bin/env python
+"""Daily Reality Loop run: create predictions on live data, resolve, score.
+
+    python scripts/reality_run.py
+
+Runs after the nightly pull. On each LIVE grid formation date (strictly after
+2026-06-30 -- same boundary as the paper track), the frozen producer set
+states falsifiable claims; matured claims are resolved by their frozen rules;
+the calibration report is rewritten from the full chained record.
+
+Producer set (frozen; a new producer is a recorded amendment, and LLM
+producers join HERE when they exist -- v2.0 rule 17: they are never
+backtested, only run forward):
+  gp_rank / h3_rank        relative claims from the two live signals
+  blind_twin               same subjects, zero market data, p=0.5
+  baseline_base_rate       SPY direction at the unconditional base rate
+  baseline_momentum        SPY direction from trailing 60d sign
+
+Subjects per date: the H1 top-decile and bottom-decile names (deterministic,
+no sampling), peers = the whole eligible universe that date.
+"""
+from __future__ import annotations
+
+import datetime as dt
+import json
+import sys
+import time
+from pathlib import Path
+
+_SCRIPTS = Path(__file__).resolve().parent
+sys.path.insert(0, str(_SCRIPTS.parent))
+sys.path.insert(0, str(_SCRIPTS))
+
+import pandas as pd  # noqa: E402
+
+from paper_track import (HOLDOUT_END, PAPER_PANEL_START, build_paper_root,  # noqa: E402
+                         composite_scores, locked_grid)
+
+from apex.config import load_config  # noqa: E402
+from apex.data.production_source import build_production_panel  # noqa: E402
+from apex.experiments import apex003  # noqa: E402
+from apex.reality import producers as P  # noqa: E402
+from apex.reality.harness import PredictionLedger, resolve  # noqa: E402
+
+LEDGER = PredictionLedger(Path("results/reality/predictions.jsonl"))
+REPORT = Path("results/reality/calibration_report.json")
+
+
+def progress(msg):
+    print(f"  [{time.strftime('%H:%M:%S')}] {msg}", file=sys.stderr, flush=True)
+
+
+def main() -> int:
+    cfg = load_config("experiment", "costs", "synthetic", "sharadar")
+    root = build_paper_root()
+    lake_through = json.loads((root / "MANIFEST.json").read_text())["lake_through"]
+    panel, _ = build_production_panel(root, cfg, PAPER_PANEL_START, lake_through)
+    output, _ = apex003.build_gp_output(panel, cfg, root)
+    comp = composite_scores(output.scores.apex_score, cfg, panel)
+    now = dt.datetime.now(dt.timezone.utc).isoformat()
+
+    LEDGER.verify()
+    seen = {(p["producer"], p["trade_date"], p["subject"])
+            for p in LEDGER.predictions()}
+    grid = [d for d in locked_grid(root, cfg)
+            if d > HOLDOUT_END and d in panel.dates]
+
+    spy = pd.read_csv(root / "raw" / "SFP" / "SFP_SPY.csv",
+                      usecols=["date", "closeadj"], parse_dates=["date"]
+                      ).set_index("date")["closeadj"].astype(float).sort_index()
+    spy = spy[~spy.index.duplicated()]
+    prices = panel.close_adj.copy()
+    prices["SPY"] = spy.reindex(prices.index)
+
+    created = 0
+    for d in grid:
+        td = str(d.date())
+        elig = output.universe.eligible.loc[d]
+        deciles = output.scores.decile.loc[d].where(elig)
+        gp_pct = output.scores.apex_score.loc[d].where(elig) / 100.0  # score 100 = top
+        h3_pct = comp.loc[d].where(elig)
+        subjects = sorted(deciles[(deciles == 1) | (deciles == 10)].index)
+        peers = sorted(deciles.dropna().index)
+        batch = (
+            P.rank_producer("gp_rank", td, now, gp_pct, subjects, peers)
+            + P.rank_producer("h3_rank", td, now, h3_pct.fillna(0.5), subjects, peers)
+            + P.blind_producer("blind_twin", td, now, subjects, peers)
+        )
+        if d in spy.index:
+            past = spy[spy.index <= d]
+            if len(past) > 60:
+                batch.append(P.base_rate_producer(td, now, "SPY"))
+                batch.append(P.momentum_producer(
+                    td, now, "SPY", float(past.iloc[-1] / past.iloc[-61] - 1)))
+        for pred in batch:
+            if (pred.producer, pred.trade_date, pred.subject) not in seen:
+                LEDGER.append_prediction(pred)
+                seen.add((pred.producer, pred.trade_date, pred.subject))
+                created += 1
+
+    resolved = 0
+    resolutions = LEDGER.resolutions()
+    for p in LEDGER.predictions():
+        if p["prediction_id"] in resolutions:
+            continue
+        outcome = resolve(prices, p)
+        if outcome is not None:
+            LEDGER.append_resolution(p["prediction_id"], outcome, now)
+            resolved += 1
+
+    from apex.reality.harness import score_by_producer
+    report = {
+        "generated_at": now, "lake_through": lake_through,
+        "chain_entries": LEDGER.verify(),
+        "producers": score_by_producer(
+            LEDGER.predictions(), LEDGER.resolutions(), lake_through),
+    }
+    REPORT.parent.mkdir(parents=True, exist_ok=True)
+    REPORT.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    print(f"created {created} predictions, resolved {resolved}; "
+          f"chain {report['chain_entries']} entries verified")
+    for name, s in report["producers"].items():
+        print(f"  {name:<22} n={s['n_scored']:<5} brier={s['brier']:.4f} "
+              f"rel={s['reliability']:.4f} res={s['resolution']:.4f} "
+              f"penalised={s['n_penalised_unresolved']}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

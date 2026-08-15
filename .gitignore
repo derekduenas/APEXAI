@@ -24,3 +24,4 @@ logs/
 data/live/
 # ...except the live paper track: its chained ledger IS an audit trail.
 !results/paper/
+!results/reality/

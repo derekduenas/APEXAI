@@ -23,3 +23,5 @@ echo "=== $(date -u +%Y-%m-%dT%H:%M:%SZ) nightly pull ==="
 .venv/bin/python scripts/nightly_pull.py --run
 echo "=== $(date -u +%Y-%m-%dT%H:%M:%SZ) paper track ==="
 .venv/bin/python scripts/paper_track.py
+echo "=== $(date -u +%Y-%m-%dT%H:%M:%SZ) reality loop ==="
+.venv/bin/python scripts/reality_run.py

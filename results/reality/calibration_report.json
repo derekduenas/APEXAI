@@ -1,0 +1,114 @@
+{
+  "chain_entries": 2064,
+  "generated_at": "2026-08-15T00:52:13.218044+00:00",
+  "lake_through": "2026-08-13",
+  "producers": {
+    "baseline_base_rate": {
+      "base_rate": 1.0,
+      "brier": 0.2209,
+      "calibration": [
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 1,
+          "realized_freq": 1.0,
+          "stated_mean": 0.53
+        }
+      ],
+      "log_loss": 0.634878,
+      "n": 1,
+      "n_penalised_unresolved": 0,
+      "n_scored": 1,
+      "reliability": 0.2209,
+      "resolution": 0.0,
+      "uncertainty": 0.0
+    },
+    "baseline_momentum": {
+      "base_rate": 1.0,
+      "brier": 0.16,
+      "calibration": [
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 1,
+          "realized_freq": 1.0,
+          "stated_mean": 0.6
+        }
+      ],
+      "log_loss": 0.510826,
+      "n": 1,
+      "n_penalised_unresolved": 0,
+      "n_scored": 1,
+      "reliability": 0.16,
+      "resolution": 0.0,
+      "uncertainty": 0.0
+    },
+    "blind_twin": {
+      "base_rate": 0.4502,
+      "brier": 0.25,
+      "calibration": [
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 231,
+          "realized_freq": 0.4502,
+          "stated_mean": 0.5
+        }
+      ],
+      "log_loss": 0.693147,
+      "n": 231,
+      "n_penalised_unresolved": 1,
+      "n_scored": 231,
+      "reliability": 0.00248,
+      "resolution": 0.0,
+      "uncertainty": 0.247522
+    },
+    "gp_rank": {
+      "base_rate": 0.4545,
+      "brier": 0.239303,
+      "calibration": [
+        {
+          "bucket": "[0.4,0.5)",
+          "n": 116,
+          "realized_freq": 0.3448,
+          "stated_mean": 0.4101
+        },
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 115,
+          "realized_freq": 0.5652,
+          "stated_mean": 0.5901
+        }
+      ],
+      "log_loss": 0.671653,
+      "n": 231,
+      "n_penalised_unresolved": 1,
+      "n_scored": 231,
+      "reliability": 0.00245,
+      "resolution": 0.012144,
+      "uncertainty": 0.247934
+    },
+    "h3_rank": {
+      "base_rate": 0.4545,
+      "brier": 0.241899,
+      "calibration": [
+        {
+          "bucket": "[0.4,0.5)",
+          "n": 123,
+          "realized_freq": 0.3577,
+          "stated_mean": 0.4476
+        },
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 108,
+          "realized_freq": 0.5648,
+          "stated_mean": 0.5371
+        }
+      ],
+      "log_loss": 0.676897,
+      "n": 231,
+      "n_penalised_unresolved": 1,
+      "n_scored": 231,
+      "reliability": 0.004662,
+      "resolution": 0.010677,
+      "uncertainty": 0.247934
+    }
+  }
+}
