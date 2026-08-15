@@ -87,6 +87,17 @@ ARTIFACTS = {
                   "apex/analog/engine.py", "apex/hunter/memory.py",
                   "apex/hunter/swarm.py", "apex/hunter/contracts.py",
                   "apex/intraday/sessions.py")),
+    # Swarm chair activation — pre-authorized by HUNTER-EPOCH-1.md within
+    # Epoch 1: transport commissioned after operator CLI login + live
+    # smoke (results/SWARM-SMOKE.json). Assessments count prospectively
+    # from THIS birth; conservative-only downstream (flags -> caution).
+    "hunter_swarm_producer_v1": (
+        "model", ("apex/hunter/swarm.py",)),
+    # v1.5.1: per-tick swarm budget in the decision pass (archive outranks
+    # enrichment; over-budget candidates get honest NOT_REQUESTED). Part
+    # of the pre-authorized swarm commissioning, not an epoch break.
+    "hunter_rule_model_v1.5.1": (
+        "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py")),
 }
 
 

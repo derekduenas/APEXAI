@@ -29,6 +29,21 @@ The WEEK1-OBSERVATION-FREEZE remains in force on top of this: no
 predictive-logic changes at all in the first week, defect or no defect
 verdicts notwithstanding.
 
+## Dated amendment — Swarm chair activated (2026-08-15 ~21:05Z)
+
+As pre-authorized below: operator completed CLI login (subscription
+auth); transport commissioned (`hunter_swarm_producer_v1`, one subprocess
+per agent, strict JSON contract, defensive parse, 90s/agent timeout);
+live smoke passed (results/SWARM-SMOKE.json — synthetic candidate,
+attached to no decision); birth minted; ops/swarm_auth_ok created. V1
+active agents: MARKET_STATE_ANALYST + ADVERSARIAL_TRADER (the two that
+reason from quantitative context alone); catalyst/fundamental chairs
+DORMANT until timestamped event data. SwarmAssessments count
+prospectively from the producer's birth; downstream effect remains
+conservative-only (flags → disagreement → caution). This activation does
+NOT open Epoch 2 — it is the declared intra-epoch event, and it cannot
+make any Epoch 1 decision more aggressive.
+
 ## What runs during Epoch 1 in parallel (build ≠ deploy)
 
 Twin 2.0 (intraday regime PMF, per-facet freshness, correlation, event

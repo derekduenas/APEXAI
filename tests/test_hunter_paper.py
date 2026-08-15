@@ -167,7 +167,11 @@ def test_production_forward_path_monday_truth():
     fb = [r for r in records if r.get("kind") == "forecast_bundle"][0]
     cap = [r for r in records if r.get("kind") == "capital_decision"][0]
     assert fb["ml_view"]["status"] == "UNTRAINED"
-    assert fb["swarm_view"]["status"] == "BLOCKED_EXTERNAL_AUTH"
+    # swarm status depends on auth state: blocked pre-login, NOT_REQUESTED
+    # under the hermetic-test firewall post-login; never OK inside pytest
+    assert fb["swarm_view"]["status"] in ("BLOCKED_EXTERNAL_AUTH",
+                                          "NOT_REQUESTED")
+    assert not fb["swarm_view"]["claims"]   # tuple or list, empty
     assert fb["analog_view"]["status"] in ("NO_VALID_ANALOGS",
                                            "ANALOG_SUPPORT_LOW", "OK")
     assert fb["distribution_source_status"] in ("REFUSED", "ANALOG_FORWARD")

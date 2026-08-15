@@ -130,7 +130,7 @@ def test_bundle_monday_truth_and_no_fake_ensemble():
                          "t_utc": "2026-08-17T14:00:00+00:00"})
     assert b.distribution_source_status == "REFUSED"
     assert b.ml_view["status"] == "UNTRAINED"
-    assert b.swarm_view["status"] == "BLOCKED_EXTERNAL_AUTH"
+    assert b.swarm_view["status"] == "BLOCKED_EXTERNAL_AUTH"  # default absence
     assert b.disagreement["level"] == "UNMEASURABLE"
     r = b.as_record()
     assert "0.615" not in str(r)                     # no invented average

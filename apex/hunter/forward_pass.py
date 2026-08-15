@@ -231,6 +231,10 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
                                sleeve_correlations={})
     uncertain = intraday_market_uncertain(market_cs)
     capital_records = []
+    # the archive outranks enrichment: at most 2 swarm-enriched candidates
+    # per tick so LLM latency can never starve the 900s clock budget;
+    # beyond the cap the swarm view is an honest NOT_REQUESTED
+    swarm_budget = 2
     for d in decisions:
         meta = universe["symbols"].get(d["symbol"], {})
         cs = cs_by_symbol.get(d["symbol"])
@@ -247,7 +251,16 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
                             candidate_record=d),
                 analog_memory_rows(str(t)),
                 evidence_class=EvidenceClass.EODHD_FORWARD_OBSERVATION)
-            swarm = run_specialists(d, as_of=str(t))
+            if swarm_budget > 0:
+                swarm = run_specialists(d, as_of=str(t))
+                swarm_budget -= 1
+            else:
+                from apex.hunter.forecast import SwarmAssessment
+                swarm = SwarmAssessment(
+                    candidate_id=d.get("decision_id", "?"), as_of=str(t),
+                    status="NOT_REQUESTED",
+                    provenance={"reason": "per-tick swarm budget spent; "
+                                          "archive outranks enrichment"})
             bundle = assemble_bundle(d, analog_result=analog, swarm=swarm)
             disagreement_level = bundle.disagreement.get("level")
             # weak analogues are a caution signal; ABSENT analogues are

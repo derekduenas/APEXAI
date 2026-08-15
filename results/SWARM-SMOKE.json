@@ -1,0 +1,161 @@
+{
+ "note": "integration smoke, synthetic candidate, output attached to NO decision; engineering measurement only",
+ "candidate_id": "smoke-test-0001",
+ "as_of": "2026-08-15T21:05:00+00:00",
+ "status": "OK",
+ "agents_run": [
+  "MARKET_STATE_ANALYST",
+  "ADVERSARIAL_TRADER"
+ ],
+ "claims": [
+  [
+   "MARKET_STATE_ANALYST",
+   "The name's 60m outperformance is genuinely idiosyncratic rather than beta-borrowed: excess_market_60m (0.011) is nearly 3x the entire market's day return (0.004), so the move is not explained by riding a strong tape.",
+   "matched.excess_market_60m = 0.011 vs market.day_return = 0.004"
+  ],
+  [
+   "MARKET_STATE_ANALYST",
+   "Roughly two-thirds of the market-relative edge is name-specific rather than sector-wide, since sector excess (0.007) accounts for only part of market excess (0.011), leaving ~0.004 attributable to NVDA alone.",
+   "excess_market_60m = 0.011 minus excess_sector_60m = 0.007"
+  ],
+  [
+   "MARKET_STATE_ANALYST",
+   "A single-name-driven move is a weaker continuation mechanism than a sector-led one, because idiosyncratic impulses (headline, analyst action, block flow) decay or reverse rather than persist through the session.",
+   "excess_sector_60m (0.007) < excess_market_60m (0.011), combined with rvol_tod = 3.2"
+  ],
+  [
+   "MARKET_STATE_ANALYST",
+   "The market backdrop is mildly supportive but not confirming: +0.4% is a weak-tape day, not a risk-on regime, so the setup carries little index tailwind to fall back on if the name-specific bid fades.",
+   "market.day_return = 0.004"
+  ],
+  [
+   "MARKET_STATE_ANALYST",
+   "Realized annualized vol of 0.11 implies a typical daily move near 0.7%, so a 1.1% 60-minute excess is a multi-sigma dislocation relative to the prevailing regime \u2014 statistically loud, but also far above the regime's mean-reverting equilibrium.",
+   "market.realized_vol_ann = 0.11 vs excess_market_60m = 0.011"
+  ],
+  [
+   "MARKET_STATE_ANALYST",
+   "Trend-state confirmations are internally consistent: price is above VWAP, above the opening range, and in the 94th cross-sectional percentile, all describing the same directional condition.",
+   "market.above_vwap = true, position_in_or = 1.4, cross_sectional_pct = 0.94"
+  ],
+  [
+   "MARKET_STATE_ANALYST",
+   "Entry at position_in_or = 1.4 is by construction a chase \u2014 price is already 40% of the opening-range height beyond the breakout level, so any OR-anchored stop is wider than at trigger and the realized risk/reward is worse than the playbook's nominal geometry.",
+   "matched.position_in_or = 1.4"
+  ],
+  [
+   "MARKET_STATE_ANALYST",
+   "The apparent breadth of evidence is overstated: excess_market_60m, excess_sector_60m and market day return each appear twice across the 'matched' and 'relative_strength'/'market' blocks, so three independent-looking corroborations reduce to three underlying measurements.",
+   "matched.{excess_market_60m, excess_sector_60m, market_day_return} duplicate relative_strength.* and market.day_return"
+  ],
+  [
+   "MARKET_STATE_ANALYST",
+   "For a mega-cap of NVDA's index and sector weight, 'excess vs market' and especially 'excess vs sector' are partly self-referential \u2014 the name is a large component of both benchmarks, so measured excess understates true idiosyncratic move and the sector comparison is the more contaminated of the two.",
+   "symbol = NVDA with excess_market_60m and excess_sector_60m as the relative-strength inputs"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "The market backdrop is quiet and mildly positive, which is the regime where a single name's relative strength is most likely to be idiosyncratic rather than beta, mildly strengthening the stated mechanism.",
+   "market.day_return 0.004 with market.realized_vol_ann 0.11"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "Against 11% annualized market vol, a +1.1% 60-minute excess is a multi-sigma move for the ambient regime, which is more consistent with a discrete catalyst than with the gradual accumulation the momentum mechanism assumes.",
+   "excess_market_60m 0.011 vs market.realized_vol_ann 0.11"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "Roughly a third of the stock's excess return is sector-wide rather than name-specific, so part of the 'leadership' decays with any sector rotation reversal rather than persisting.",
+   "excess_sector_60m 0.007 vs excess_market_60m 0.011"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "For a mega-cap that is itself a large weight in the benchmark, excess-vs-market mechanically understates true idiosyncratic excess because the name's own move lifts the benchmark it is measured against.",
+   "symbol NVDA measured via excess_market_60m"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "Five of the matched conditions are near-collinear restatements of one 60-minute observation, so the setup presents as multi-factor confluence while resting on a single underlying event.",
+   "matched.rvol_tod, excess_market_60m, excess_sector_60m, position_in_or, relative_strength.cross_sectional_pct all derived from the same 60m window"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "Entry at 1.4x the opening range is a chase: the trade buys 40% of an OR-width above the breakout level, so any OR-referenced stop is already widened and the reward-to-risk stated by the playbook is not verifiable from these facts.",
+   "matched.position_in_or 1.4 with no stop distance given"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "The strongest single reason this fails is exhaustion-at-extension: RVOL 3.2 into a 94th-percentile cross-sectional move means the marginal buyer is late, and once catalyst-driven liquidity demand is filled the same extension that qualified the setup becomes the reversion distance.",
+   "rvol_tod 3.2, cross_sectional_pct 0.94, position_in_or 1.4"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "The calm index tape removes any market tailwind for continuation, so the position depends entirely on stock-specific flow that can stop without any change in the market-level facts that qualified it.",
+   "market.day_return 0.004, market.realized_vol_ann 0.11"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "The above_vwap flag is scoped to market state, not to the symbol, so it provides no confirmation that NVDA itself is trading above its own VWAP.",
+   "market.above_vwap true (nested under market, not relative_strength)"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "risk_frac 0.006 is stated without a stop distance, entry price, or spread, so it constrains notional exposure but says nothing about realized loss per trade at a 1.4 OR extension.",
+   "risk_frac 0.006 with no stop or price facts"
+  ]
+ ],
+ "disagreements": [],
+ "adversarial_flags": [
+  "MARKET_STATE_ANALYST: Volume-driven illusion: rvol_tod = 3.2 is equally consistent with one-off event flow (news, upgrade/downgrade, index/rebalance print, large block or opening auction imbalance) as with sustained accumu",
+  "MARKET_STATE_ANALYST: Regime mismatch: low realized vol (0.11 annualized) is precisely the environment where intraday breakouts fail most and mean reversion dominates; the setup requires a continuation regime while the onl",
+  "MARKET_STATE_ANALYST: Extension risk: position_in_or = 1.4 means the signal fires after the move, converting a breakout into a momentum chase with a stop that must sit back inside the opening range \u2014 a wider stop against a",
+  "MARKET_STATE_ANALYST: Crowding at the 94th percentile: cross_sectional_pct = 0.94 is simultaneously the top of the strength distribution and the highest-probability location for exhaustion and profit-taking; the same fact ",
+  "MARKET_STATE_ANALYST: Snapshot with no persistence data: nothing distinguishes a smooth 60-minute grind higher from a single vertical impulse followed by 45 minutes of drift, yet only the former supports the stated mechani",
+  "MARKET_STATE_ANALYST: Sector confirmation may be an artifact: if NVDA is a dominant weight in the sector benchmark, excess_sector_60m = 0.007 is measured against an index the name itself is pushing, so 'confirmed by sector",
+  "MARKET_STATE_ANALYST: Weak market corroboration cuts both ways: +0.4% is close enough to flat that the setup is effectively an unhedged single-name bet, with no index momentum to absorb a reversal.",
+  "MARKET_STATE_ANALYST: Asymmetric fragility: a name up sharply on 3.2x volume in a low-vol tape has the most to give back if the driver is a headline that gets faded, and the LONG side owns that gap risk with no stated cata",
+  "ADVERSARIAL_TRADER: collinear-confirmations: five matched fields encode one 60-minute observation, inflating apparent confluence",
+  "ADVERSARIAL_TRADER: chase-entry: position_in_or 1.4 means buying at extension, adverse selection against earlier participants",
+  "ADVERSARIAL_TRADER: catalyst-contamination: RVOL 3.2 in an 11%-vol tape suggests news/event flow, not a repeatable microstructure edge",
+  "ADVERSARIAL_TRADER: index-weight contamination of excess_market_60m for a mega-cap constituent",
+  "ADVERSARIAL_TRADER: sector component: ~36% of excess is sector-wide and decays with rotation, not name-specific persistence",
+  "ADVERSARIAL_TRADER: crowding: cross_sectional_pct 0.94 on the market's most-watched name is where intraday momentum is most arbitraged",
+  "ADVERSARIAL_TRADER: vwap flag scoped to market, not to symbol \u2014 no symbol-level trend confirmation present",
+  "ADVERSARIAL_TRADER: unverifiable sizing: risk_frac given without stop distance, so no R:R and no slippage assumption",
+  "ADVERSARIAL_TRADER: playbook v1 with no out-of-sample or threshold-selection evidence in the facts",
+  "ADVERSARIAL_TRADER: no time-of-day, catalyst, earnings-proximity, or halt-risk fields \u2014 the mechanism's decay profile cannot be assessed"
+ ],
+ "unresolved_questions": [
+  "MARKET_STATE_ANALYST: Is there a scheduled or unscheduled catalyst (earnings, product/GTC-type event, analyst action, index rebalance, macro print) behind the 3.2x relative volume, and does the playbook exclude event-drive",
+  "MARKET_STATE_ANALYST: What is the session clock at signal time, and does the 60-minute relative-strength window include the opening auction \u2014 where excess return is mechanically noisiest?",
+  "MARKET_STATE_ANALYST: Is the 60m excess monotonic or a single impulse, and what is its decay profile over the most recent 10\u201320 minutes?",
+  "MARKET_STATE_ANALYST: How are the 'market' and 'sector' benchmarks defined, and what is NVDA's weight in each \u2014 i.e. how much of the reported excess survives removing the name's own contribution?",
+  "MARKET_STATE_ANALYST: What is the opening-range width in ATR terms, and where does the stop sit given position_in_or = 1.4 \u2014 does risk_frac = 0.006 still permit the intended R multiple after the extension?",
+  "MARKET_STATE_ANALYST: How far above threshold is each matched condition? All five values are reported without the playbook's trigger levels, so marginal versus decisive matches are indistinguishable.",
+  "MARKET_STATE_ANALYST: What is the playbook's out-of-sample base rate for LONG entries at position_in_or > 1.0 specifically, and in low-realized-vol regimes specifically?",
+  "MARKET_STATE_ANALYST: Is the cross-sectional universe for the 0.94 percentile liquidity- and beta-comparable, or does a high-beta mega-cap mechanically rank near the top on any strong-move day?",
+  "MARKET_STATE_ANALYST: Is there any measure of how much of the 3.2x volume was buyer-initiated versus a single block or auction print?",
+  "ADVERSARIAL_TRADER: What is the stop distance and where is it referenced (OR low, ATR multiple, fixed %)? Without it, position_in_or 1.4 cannot be scored for R:R.",
+  "ADVERSARIAL_TRADER: Is there a known catalyst (news, earnings, guidance, index event) behind rvol_tod 3.2, and does the playbook condition on catalyst presence or absence?",
+  "ADVERSARIAL_TRADER: What time of day is this, and how much session remains for the mechanism to play out or revert?",
+  "ADVERSARIAL_TRADER: Is above_vwap available at the symbol level for NVDA, not just for the market?",
+  "ADVERSARIAL_TRADER: How is excess_market_60m computed for a benchmark constituent \u2014 is the symbol's own index weight netted out?",
+  "ADVERSARIAL_TRADER: What is the sector's own excess versus market, so the sector-rotation component can be separated from name leadership?",
+  "ADVERSARIAL_TRADER: What is the historical forward return distribution of HUNTER-001_v1 conditional on position_in_or > 1.3, versus entries at or below 1.0?",
+  "ADVERSARIAL_TRADER: Were the matched thresholds (rvol 3.2, cross-sectional 0.94, OR 1.4) selected in-sample, and is there out-of-sample or walk-forward evidence?",
+  "ADVERSARIAL_TRADER: What are the expected spread and slippage at this RVOL, and does risk_frac 0.006 account for them?"
+ ],
+ "latency_seconds": 154.6,
+ "provenance": {
+  "iface": "hunter_swarm_producer_v1",
+  "dormant_agents": [
+   "CATALYST_ANALYST",
+   "TECHNICAL_STRUCTURE_ANALYST",
+   "FUNDAMENTAL_EVENT_ANALYST",
+   "HISTORICAL_ANALOGUE_ANALYST",
+   "QUANT_ANALYST",
+   "RISK_ANALYST",
+   "IMPLEMENTATION_ANALYST"
+  ]
+ }
+}
