@@ -33,8 +33,18 @@ from apex.data.snapshot_loader import (
 )
 
 
-def build_production_panel(root: Path, config, start: str, end: str):
-    """Identical to the smoke path. Returns (Panel, LoadReport)."""
+def build_production_panel(root: Path, config, start: str, end: str,
+                           slim_high_low: bool = False):
+    """Identical to the smoke path. Returns (Panel, LoadReport).
+
+    `slim_high_low=True` (A-010 memory remediation): high/low are never
+    parsed, `adjust_high_low` is skipped, and Panel.high_adj / Panel.low_adj
+    are THE SAME OBJECT as close_adj -- zero additional memory, every
+    contract shape check satisfied. Valid ONLY for paths that never read
+    them; the proof is scripts/slim_source_proof.py reproducing the recorded
+    APEX-004 validation result in full at 1e-12 through this flag. Default
+    False: the certified path is byte-identical to before this flag existed.
+    """
     scale = float(config.get("sharadar.marketcap_scale"))
     min_mc = float(config.get("universe.min_market_cap_usd"))
     report = LoadReport()
@@ -44,7 +54,10 @@ def build_production_panel(root: Path, config, start: str, end: str):
     report.candidates_after_category = len(master)
 
     keep = find_candidates(root, master, min_mc, scale, report)
-    prices = adjust_high_low(load_prices(root, master, keep, start, end, report))
+    prices = load_prices(root, master, keep, start, end, report,
+                         drop_high_low=slim_high_low)
+    if not slim_high_low:
+        prices = adjust_high_low(prices)
     reasons = load_delist_reasons(root, master, config)
     mcap = load_marketcap(root, master, keep, start, end, scale)
 
@@ -84,12 +97,16 @@ def build_production_panel(root: Path, config, start: str, end: str):
     bench["date"] = pd.to_datetime(bench["date"])
     benchmark = bench.set_index("date")["closeadj"].reindex(dates).ffill().bfill()
 
+    close_adj = wide(prices, "closeadj")
     panel = Panel(
         dates=dates,
         securities=secs,
-        close_adj=wide(prices, "closeadj"),
-        high_adj=wide(prices, "high_adj"),
-        low_adj=wide(prices, "low_adj"),
+        close_adj=close_adj,
+        # Slim mode: SAME OBJECT as close_adj (no copy). Any path that read
+        # high/low under this flag would get closes -- which is exactly why
+        # the flag is only legal behind the 1e-12 reproduction proof.
+        high_adj=close_adj if slim_high_low else wide(prices, "high_adj"),
+        low_adj=close_adj if slim_high_low else wide(prices, "low_adj"),
         close_unadj=close_unadj,
         volume=wide(prices, "volume"),
         shares_out=shares,
@@ -108,11 +125,13 @@ class ProductionSource:
     name = "sharadar-production-snapshot"
     requires_signed_registration = True
 
-    def __init__(self, root: Path | str, config, start: str, end: str) -> None:
+    def __init__(self, root: Path | str, config, start: str, end: str,
+                 slim_high_low: bool = False) -> None:
         self.root = Path(root)
         manifest = json.loads((self.root / "MANIFEST.json").read_text())
         self._fingerprint = manifest["dataset_fingerprint"]
-        self._panel, self.report = build_production_panel(self.root, config, start, end)
+        self._panel, self.report = build_production_panel(
+            self.root, config, start, end, slim_high_low=slim_high_low)
 
     @property
     def dataset_fingerprint(self) -> str:

@@ -122,13 +122,22 @@ def find_candidates(root: Path, master: pd.DataFrame, min_market_cap: float,
 
 
 def load_prices(root: Path, master: pd.DataFrame, keep: set, start, end,
-                report: LoadReport) -> pd.DataFrame:
-    """Pass 2 -- SEP, restricted to candidate permatickers and the date window."""
+                report: LoadReport, drop_high_low: bool = False) -> pd.DataFrame:
+    """Pass 2 -- SEP, restricted to candidate permatickers and the date window.
+
+    `drop_high_low=True` is the A-010 pre-flight memory remediation: high/low
+    are parsed per-chunk and immediately discarded, so they never accumulate
+    in the long frame. Only paths that provably never read high_adj/low_adj
+    may use it, and the proof standard is full reproduction of a recorded
+    result at 1e-12 (scripts/slim_source_proof.py), not an assertion.
+    """
     windows = master[["ticker", "permaticker", "firstpricedate", "lastpricedate"]]
     lo, hi = pd.Timestamp(start), pd.Timestamp(end)
     parts = []
     for path in _slices(root, "SEP"):
         chunk = pd.read_csv(path, usecols=SEP_COLS)
+        if drop_high_low:
+            chunk = chunk.drop(columns=["high", "low"])
         report.sep_rows_scanned += len(chunk)
         chunk["date"] = pd.to_datetime(chunk["date"])
         chunk = chunk[(chunk["date"] >= lo) & (chunk["date"] <= hi)]

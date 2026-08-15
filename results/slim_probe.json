@@ -1,0 +1,8 @@
+{
+  "headroom_gb": 3.9,
+  "mode": "holdout_length_probe",
+  "peak_rss_gb": 4.69,
+  "physical_gb": 8.6,
+  "requirement": "peak < 70% of physical",
+  "verdict": "HEADROOM OK"
+}

@@ -1,0 +1,8 @@
+{
+  "failures": [],
+  "fields_checked_approx": 33,
+  "mode": "full_reproduction",
+  "peak_rss_gb": 4.76,
+  "tolerance": 1e-12,
+  "verdict": "MATCH"
+}
