@@ -66,7 +66,7 @@ def main() -> int:
     LEDGER.verify()
     seen = {(p["producer"], p["trade_date"], p["subject"])
             for p in LEDGER.predictions()}
-    seen |= {("llm_pair", p["trade_date"], p["subject"])
+    seen |= {("llm_pair", p["producer"].split("/")[1], p["trade_date"], p["subject"])
              for p in LEDGER.predictions() if p["producer"].startswith("llm_")}
     grid = [d for d in locked_grid(root, cfg)
             if d > HOLDOUT_END and d in panel.dates]
@@ -111,11 +111,11 @@ def main() -> int:
         import shutil as _sh
         if (_sh.which("claude") and "--no-llm" not in sys.argv
                 and days_elapsed < P.HORIZON):
-            from apex.reality.llm_producer import llm_predictions
+            from apex.reality.llm_producer import MODELS, llm_predictions
             top10 = sorted(deciles[deciles == 1].index)[:10]
             bot10 = sorted(deciles[deciles == 10].index)[:10]
-            for s in top10 + bot10:
-                if ("llm_pair", td, s) in seen:
+            for s, model in [(s, m) for s in top10 + bot10 for m in MODELS]:
+                if ("llm_pair", model, td, s) in seen:
                     continue
                 r20 = float(panel.close_adj.iloc[pos][s]
                             / panel.close_adj.iloc[max(0, pos - 20)][s] - 1)
@@ -129,12 +129,12 @@ def main() -> int:
                        "btm": float(btm_vals.loc[d, s])}
                 if any(v != v for v in ctx.values() if isinstance(v, float)):
                     continue          # a NaN in the context would prompt "nan"
-                pair = llm_predictions(ctx, peers, now)
+                pair = llm_predictions(ctx, peers, now, model)
                 for pred in pair:
                     LEDGER.append_prediction(pred)
                     created += 1
                 if pair:
-                    seen.add(("llm_pair", td, s))
+                    seen.add(("llm_pair", model, td, s))
         if d in spy.index:
             past = spy[spy.index <= d]
             if len(past) > 60:

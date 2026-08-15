@@ -239,11 +239,36 @@ def test_an_llm_pair_is_all_or_nothing():
            "close": 10.0, "mcap_m": 500.0, "r20": 0.01, "r60": 0.02,
            "r120": 0.03, "gp_assets": 0.2, "btm": 0.8}
     calls = iter(['{"probability": 0.7}', "MALFORMED"])
-    assert llm_predictions(ctx, ["S2"], NOW, run_fn=lambda _: next(calls)) == []
+    assert llm_predictions(ctx, ["S2"], NOW, "haiku",
+                           run_fn=lambda _p, _m: next(calls)) == []
     ok = iter(['{"probability": 0.7}', '{"probability": 0.5}'])
-    pair = llm_predictions(ctx, ["S2"], NOW, run_fn=lambda _: next(ok))
+    pair = llm_predictions(ctx, ["S2"], NOW, "haiku",
+                           run_fn=lambda _p, _m: next(ok))
     assert len(pair) == 2
     assert {p.producer.split("/")[0] for p in pair} == {"llm_full", "llm_stripped"}
+    assert all("/haiku/" in p.producer for p in pair)
+
+
+def test_parallel_models_are_distinct_producers_never_substitutes():
+    """v3.1 section 1.3: calibration does not transfer across models. Each
+    declared model is its own producer identity with its own record; an
+    undeclared model is refused rather than silently starting a new clock."""
+    import pytest as _pt
+    from apex.reality.llm_producer import MODELS, llm_predictions
+    assert len(MODELS) >= 2, "at least two parallel producer models required"
+    ctx = {"security_id": "S1", "ticker": "ACME", "trade_date": "2026-08-04",
+           "close": 10.0, "mcap_m": 500.0, "r20": 0.01, "r60": 0.02,
+           "r120": 0.03, "gp_assets": 0.2, "btm": 0.8}
+    ids = set()
+    for m in MODELS:
+        ok = iter(['{"probability": 0.7}', '{"probability": 0.5}'])
+        for p in llm_predictions(ctx, ["S2"], NOW, m,
+                                 run_fn=lambda _p, _m: next(ok)):
+            ids.add(p.producer)
+    assert len(ids) == 2 * len(MODELS), "each model must have its own pair identity"
+    with _pt.raises(ValueError, match="not a declared parallel producer"):
+        llm_predictions(ctx, ["S2"], NOW, "gpt-99",
+                        run_fn=lambda _p, _m: '{"probability": 0.5}')
 
 
 def test_scores_are_stamped_preliminary_until_ten_effective_dates():

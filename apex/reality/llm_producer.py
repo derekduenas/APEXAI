@@ -27,7 +27,13 @@ import subprocess
 
 from apex.reality.harness import Prediction, canonical_hash, make_prediction
 
-MODEL = "haiku"
+# PARALLEL producers, never substitution (v3.1 §1.3): calibration does not
+# transfer across models, and switching would reset the forward clock to
+# zero. Haiku answers "does the cheap model have edge"; the frontier model
+# answers "does the swarm CONCEPT have edge". Each model gets its own
+# full/stripped pair, its own producer identity, its own record. Removing or
+# swapping a model here is a clock-resetting act and needs a dated ruling.
+MODELS = ("haiku", "opus")
 HORIZON = 20
 TIER = 3                      # judgment claims, the lowest-authority tier
 CLAMP = (0.02, 0.98)          # certainty is never warranted, LLMs love 0.95
@@ -72,19 +78,21 @@ def parse_probability(text: str) -> float | None:
     return min(max(p, CLAMP[0]), CLAMP[1])
 
 
-def cli_runner(prompt: str) -> str:
+def cli_runner(prompt: str, model: str) -> str:
     """Headless call through the local Claude CLI. Never used in tests."""
     out = subprocess.run(
-        ["claude", "-p", prompt, "--model", MODEL],
-        capture_output=True, text=True, timeout=120)
+        ["claude", "-p", prompt, "--model", model],
+        capture_output=True, text=True, timeout=180)
     return out.stdout
 
 
-def llm_predictions(context: dict, peers, created_at: str,
+def llm_predictions(context: dict, peers, created_at: str, model: str,
                     run_fn=cli_runner) -> list[Prediction]:
-    """Emit the full/stripped PAIR for one subject. If either call fails to
-    parse, NEITHER is recorded -- an unpaired variant would bias the
-    comparison the pair exists to make."""
+    """Emit the full/stripped PAIR for one subject and ONE model. If either
+    call fails to parse, NEITHER is recorded -- an unpaired variant would
+    bias the comparison the pair exists to make."""
+    if model not in MODELS:
+        raise ValueError(f"{model!r} is not a declared parallel producer model")
     full_prompt, stripped_prompt = build_prompts(context)
     results = []
     for variant, prompt, inputs in (
@@ -92,15 +100,15 @@ def llm_predictions(context: dict, peers, created_at: str,
         ("llm_stripped", stripped_prompt,
          {"ticker": context["ticker"], "trade_date": context["trade_date"]}),
     ):
-        p = parse_probability(run_fn(prompt))
+        p = parse_probability(run_fn(prompt, model))
         if p is None:
             return []
-        producer = f"{variant}/{MODEL}/{canonical_hash(INSTRUCTIONS)[:8]}"
+        producer = f"{variant}/{model}/{canonical_hash(INSTRUCTIONS)[:8]}"
         results.append(make_prediction(
             trade_date=context["trade_date"], horizon_days=HORIZON,
             subject=context["security_id"], claim_type="relative",
             probability=p, epistemic_tier=TIER, producer=producer,
-            inputs=inputs, rationale={"variant": variant, "model": MODEL},
+            inputs=inputs, rationale={"variant": variant, "model": model},
             resolution_rule="relative_vs_peer_median",
             resolution_params={"peers": list(peers)}, created_at=created_at))
     return results
