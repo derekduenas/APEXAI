@@ -73,6 +73,20 @@ ARTIFACTS = {
                   "apex/hunter/capital.py", "apex/hunter/forecast.py",
                   "apex/analog/engine.py", "apex/hunter/memory.py",
                   "apex/hunter/swarm.py")),
+    # v1.5 (red-team remediation): torn-write-tolerant readers, analog
+    # v1.1 symbol-diversity support guard, FLAT regime label, deterministic
+    # content-derived decision ids, sovereign liquidity constants
+    # (contracts.py now in-artifact), 2026 calendar (sessions.py governs
+    # visibility, now in-artifact). Engineering defects only — no
+    # predicate, threshold, baseline, or criteria change.
+    "hunter_rule_model_v1.5": (
+        "model", ("apex/hunter/scanner.py", "apex/hunter/playbooks_v1.py",
+                  "apex/hunter/forward_pass.py", "apex/hunter/birth.py",
+                  "apex/hunter/baselines.py", "apex/hunter/neff.py",
+                  "apex/hunter/capital.py", "apex/hunter/forecast.py",
+                  "apex/analog/engine.py", "apex/hunter/memory.py",
+                  "apex/hunter/swarm.py", "apex/hunter/contracts.py",
+                  "apex/intraday/sessions.py")),
 }
 
 
