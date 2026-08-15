@@ -126,9 +126,18 @@ def _state_snapshot(now, gov, today, bars_etf) -> dict:
     idx = [s for s in states if s["symbol"] in INDEXES]
     sec = [s for s in states if s["symbol"] not in INDEXES]
     rets = [s["day_return"] for s in sec]
+    spy = ([s for s in idx if s["symbol"] == "SPY.US"] or [{}])[0]
+    # protocol §2 regime field (F-03): honest about what is wired — the
+    # daily classifier is not yet in the intraday loop; the proxy is the
+    # SAME conservative-only rule capital uses (one law, one source)
+    regime = {"daily_classifier": "NOT_WIRED_INTRADAY",
+              "intraday_vol_state": spy.get("realized_vol_ann"),
+              "uncertain_proxy": bool(
+                  bool(health) or spy.get("day_return") is None
+                  or abs(spy.get("day_return", 0.0)) >= 0.015)}
     return stamp({
         "kind": "forward_state", "timestamp_utc": str(now),
-        "session": "REGULAR",
+        "session": "REGULAR", "regime": regime,
         "indexes": {s["symbol"]: s for s in idx},
         "sectors": {s["symbol"]: s["day_return"] for s in sec},
         "sector_dispersion": round(float(np.std(rets)), 5) if rets else None,
