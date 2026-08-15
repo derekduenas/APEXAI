@@ -196,15 +196,20 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
        failure_behavior="policy versioned, never fitted to validation"),
     _c(name="economic_viability", state=CERTIFIED, module="apex.portfolio.viability",
        purpose="declared net/turnover/degradation/breadth thresholds, before use"),
-    _c(name="risk_engine", state=PLANNED, module="",
-       purpose="exposure/drawdown/tail limits; independent of alpha",
-       activation_prereqs=("portfolio_construction",)),
+    _c(name="risk_engine", state=BUILT, module="apex.portfolio.risk",
+       purpose="declared limits (position/sector/heat/corr/drawdown-budget/"
+               "defined-risk-only) with first-class reasoned REJECT; reads "
+               "no forecast, ranks nothing",
+       failure_behavior="limits are constraints, never hidden alpha selectors"),
     _c(name="backtest_engine", state=PLANNED, module="",
        purpose="evaluator of signal+policy+costs; never an optimiser",
        activation_prereqs=("portfolio_construction",)),
-    _c(name="capacity_engine", state=PLANNED, module="",
-       purpose="ADV/participation/impact/borrow -> capacity curves, net alpha",
-       activation_prereqs=("backtest_engine",)),
+    _c(name="capacity_engine", state=BUILT, module="apex.portfolio.capacity",
+       purpose="participation/sqrt-impact/spread -> capacity USD and NET-of-"
+               "implementation economics; costs flow INTO the ranking, never "
+               "reported beside it",
+       failure_behavior="an edge consumed by implementation is refused, not "
+                        "footnoted"),
     _c(name="cost_model", state=BUILT, module="apex.evaluate.turnover",
        purpose="drift-aware turnover + per-side cost (decile-spread scope)",
        failure_behavior="borrow cost documented as omission"),
@@ -267,19 +272,33 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
        failure_behavior="a candidate missing any receipt is refused, not "
                         "emitted with a warning"),
 
-    # ---- named-and-missing (the reconciliation's output, owned HERE) --------
-    _c(name="distribution_estimator", state=ABSENT, module="",
-       purpose="THE missing link alpha->money: turn signal + world state "
-               "into the calibrated return pmf the expression engine eats; "
-               "its calibration evidence is the reality loop (Group B, "
-               "forward only)",
-       activation_prereqs=("reality-loop calibration data", "world_state")),
-    _c(name="opportunity_engine", state=ABSENT, module="",
-       purpose="rank candidate opportunities net of cost/risk/capacity and "
-               "produce the governed TRADE/NO-TRADE opportunity report; "
-               "NO-TRADE is a first-class output",
-       activation_prereqs=("distribution_estimator", "risk_engine",
-                           "capacity_engine", "expression_engine")),
+    # ---- the decision chain (built 2026-08-15, end-to-end proven) ----------
+    _c(name="distribution_estimator", state=BUILT,
+       module="apex.distribution.estimator",
+       purpose="signal + conditioning -> provenance-preserving pmf; four "
+               "statuses never conflated; CALIBRATED minted ONLY against a "
+               "reality-loop report (>=10 effective dates, reliability "
+               "<=0.01); v1 = historical empirical conditional",
+       activation_prereqs=("reality-loop calibration data for the "
+                           "CALIBRATED stamp",),
+       failure_behavior="an uncalibrated pmf structurally cannot be treated "
+                        "as calibrated downstream"),
+    _c(name="opportunity_engine", state=BUILT, module="apex.opportunity.engine",
+       purpose="the machine's final sentence: distribution + expression + "
+               "risk + capacity -> governed TRADE/NO-TRADE + economic "
+               "ranking; 8 rejection paths each proven by adversarial test; "
+               "options demoted to stock without calibration; live_intent "
+               "refused without CALIBRATED",
+       failure_behavior="NO-TRADE is first-class and refusals are retained "
+                        "in the report"),
+    _c(name="discovery_exercise_runner", state=ABSENT, module="",
+       purpose="THE remaining gap this tranche exposed: the machine can "
+               "DECIDE on a fully-specified candidate but cannot yet FEED "
+               "itself candidates from real data -- the runner that walks "
+               "real in-sample signals + live state through the chain and "
+               "emits the historical opportunity report",
+       activation_prereqs=("distribution_estimator", "opportunity_engine",
+                           "real options chain data OR stock-only declared")),
 ]}
 
 

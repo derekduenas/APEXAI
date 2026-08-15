@@ -1,0 +1,37 @@
+SYNTHETIC DEMONSTRATION -- engineering_measurement, not evidence
+
+APEX OPPORTUNITY REPORT
+============================================================
+
+#1  B_modest_cheap  --  TRADE
+    lineage:     dossier 97da989a / APEX-004 line
+    state:       CALM_UP
+    expression:  common_stock
+    gross:       +15.35%/yr
+    impl. cost:  0.08%/yr
+    NET:         +15.27%/yr
+    risk:        heat +0.0075
+    capacity:    $10,000,000
+    confidence:  PAPER-GRADE (HISTORICAL_EMPIRICAL)
+    governance:  paper-grade
+
+#2  GP-topdecile-CALM_UP  --  TRADE
+    lineage:     dossier 97da989a / APEX-004 line
+    state:       CALM_UP
+    expression:  common_stock
+    gross:       +9.98%/yr
+    impl. cost:  0.21%/yr
+    NET:         +9.78%/yr
+    risk:        heat +0.0075
+    capacity:    $10,000,000
+    confidence:  PAPER-GRADE (HISTORICAL_EMPIRICAL)
+    governance:  paper-grade
+
+#3  thin-edge-candidate  --  NO-TRADE
+    refused: insufficient expected net edge: +1.58% < bar 2.00%
+
+#4  illiquid-microcap  --  NO-TRADE
+    refused: capacity/cost: notional 3,000,000 exceeds capacity 50,000 at 5% participation over 5d
+
+#5  untraceable-claim  --  NO-TRADE
+    refused: governance violation: no hypothesis lineage; an untraceable claim cannot be decided

@@ -88,6 +88,38 @@ and should we trade at all?" — **No.** It can answer every sub-question
 except the four X's above. Those four ARE the remaining build, and none of
 them requires a credit.
 
+## 4a. MVPM tranche outcome (2026-08-15, same day, later)
+
+All four X's are BUILT and the chain is PROVEN end-to-end on synthetic but
+structurally realistic candidates (tests/test_opportunity_chain.py, sample
+artifact results/sample_opportunity_report.txt): one reasoned TRADE, eight
+adversarial NO-TRADEs each through its own named rejection path
+(insufficient net edge / inadequate calibration / SYNTHETIC-never-trades /
+excessive risk / insufficient capacity / costs-consume-the-edge / regime
+uncertainty raising the bar / governance violation / insufficient evidence),
+options demoted to stock without calibration, ranking by net-of-everything
+economics (a big-gross costly candidate provably loses to a modest cheap
+one), and refusals retained in the report.
+
+**The §6 architecture question, answered honestly: "Can the machine now
+answer what should I trade today?" — the DECISION CHAIN can, on a fully
+specified candidate. The MACHINE cannot, because nothing yet FEEDS it real
+candidates.** The missing component is named and registry-owned:
+`discovery_exercise_runner` (ABSENT) — walk real in-sample signals + live
+state through the chain and emit the historical opportunity report. Also
+still real: no options-chain vendor (stock-only must be declared for the
+exercise), and CALIBRATED distributions await the reality loop (CLI login).
+
+## THE DEFINITION OF MVPM COMPLETE (so it cannot drift)
+
+MVPM is COMPLETE when — and only when — `discovery_exercise_runner` takes
+REAL in-sample data end-to-end with no synthetic inputs anywhere in the
+chain, and emits an opportunity report in the operator's format where every
+number is net-of-implementation, every refusal is named, NO-TRADE is
+reachable, and every claim is traceable to lineage. "All packages exist" is
+explicitly NOT the criterion. The registry may not say COMPLETE until that
+run exists as a committed artifact.
+
 ## 5. What remains before the first full-system historical discovery run
 
 1. `distribution_estimator` v1 — even a deliberately crude, DECLARED
