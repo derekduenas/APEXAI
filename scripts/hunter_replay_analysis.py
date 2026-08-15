@@ -138,8 +138,46 @@ def main() -> int:
             disagreement_level=None, analog_support_low=False)
         flips[f"{c['final_state']}->{cd.final_state}"] += 1
 
+    # A. REPLAY INTEGRITY FIRST — economics is not interpreted unless
+    # these are clean (operator law)
+    prev, chain_ok, torn = "GENESIS", True, 0
+    for r in rows:
+        if r.get("prev_hash") != prev:
+            chain_ok = False
+        if r.get("recovered_from_torn_tail"):
+            torn += 1
+        prev = r.get("entry_hash", prev)
+    classes = {r.get("evidence_class") for r in rows}
+    scan_by_day = Counter(r["session_date"] for r in by.get("scan", []))
+    expected_ticks = 26                     # 09:45..15:45 every 15m
+    short_days = {d: n for d, n in scan_by_day.items()
+                  if n < expected_ticks}
+    swarm_ok_views = sum(
+        1 for r in by.get("forecast_bundle", [])
+        if (r.get("swarm_view") or {}).get("status") == "OK")
+    prod_ledger = Path("results/hunter/forward_ledger.jsonl")
+    integrity = {
+        "sessions_replayed": f"{len(sessions)} (predeclared ~92)",
+        "scan_ticks_short_days": short_days or "none",
+        "ledger_chain_valid": chain_ok,
+        "torn_tail_recoveries": torn,
+        "rule_17_llm_views_in_replay": swarm_ok_views,
+        "evidence_classes_present": sorted(c for c in classes if c),
+        "class_pure_exploratory": classes <= {
+            "EODHD_HISTORICAL_EXPLORATORY", None},
+        "production_ledger_writes": (
+            "NONE (file absent)" if not prod_ledger.exists()
+            else f"file exists with {len(prod_ledger.read_text().splitlines())} lines — VERIFY none from replay"),
+    }
+    integrity["VERDICT"] = (
+        "CLEAN — economics may be interpreted"
+        if chain_ok and swarm_ok_views == 0
+        and integrity["class_pure_exploratory"]
+        else "NOT CLEAN — do NOT interpret economics below")
+
     report = {
         "campaign": "REPLAY-CAMPAIGN-V1 (preregistered)",
+        "0_integrity_first": integrity,
         "evidence": "EODHD_HISTORICAL_EXPLORATORY — laboratory only",
         "sessions": len(sessions),
         "regime_coverage": dict(Counter(regime_of.values())),

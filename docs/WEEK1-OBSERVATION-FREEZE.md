@@ -20,3 +20,23 @@ Swarm commissioning note: when CLI auth arrives, the transport requires a
 smoke test AND its own birth registration before any assessment may
 attach to a candidate; earlier candidates are never retroactively
 enriched. Swarm output gets a birth timestamp like everything else.
+
+## Pre-forward repair threshold (locked 2026-08-15 ~23:40Z)
+
+From now until Monday's first observation and through Week 1:
+
+ALLOWED: P0/P1 operational defects threatening the archive, PIT
+validity, evidence integrity, or system survival — repaired exactly as
+LAB-01 was: reproduce -> failing test -> minimal crash-only fix -> new
+append-only birth -> restart any affected lab run from zero.
+
+NOT ALLOWED: better features, better signals, better Twin variables,
+improved Assassin logic, threshold refinement, strategy improvement,
+replay-inspired optimization of ANY kind.
+
+## Asymmetric replay interpretation rule
+
+Strong historical performance does NOT prove APEX (exploratory class,
+survivorship-limited, non-PIT universe). Severe historical failure DOES
+warrant diagnostic investigation. Spectacular replay numbers are
+"interesting historical exploratory results" — never "APEX has alpha."
