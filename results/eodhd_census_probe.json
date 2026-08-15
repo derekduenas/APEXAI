@@ -1,0 +1,17 @@
+{
+  "active": {
+    "probed": 12,
+    "with_1m_data": 11,
+    "coverage": 0.92
+  },
+  "delisted_post2021": {
+    "probed": 12,
+    "with_1m_data": 6,
+    "coverage": 0.5
+  },
+  "delisted_pre2021": {
+    "probed": 12,
+    "with_1m_data": 0,
+    "coverage": 0.0
+  }
+}
