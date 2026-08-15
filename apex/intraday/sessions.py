@@ -22,10 +22,13 @@ class Session(Enum):
     CLOSED = "CLOSED"
 
 
-# early closes by date (extend from an authoritative calendar at ingestion;
-# fixture-grade seed here, marked as such)
-EARLY_CLOSES = {"2026-11-27": "13:00"}
-HOLIDAYS = set()   # populated from the vendor calendar at ingestion
+# NYSE calendar 2026 (F-08: populated; verify against the exchange notice
+# each January — a wrong calendar degrades to empty-fetch records, never
+# to corrupt ones)
+EARLY_CLOSES = {"2026-11-27": "13:00", "2026-12-24": "13:00"}
+HOLIDAYS = {"2026-01-01", "2026-01-19", "2026-02-16", "2026-04-03",
+            "2026-05-25", "2026-06-19", "2026-07-03", "2026-09-07",
+            "2026-11-26", "2026-12-25"}
 
 
 def classify(ts_utc, early_closes=None, holidays=None) -> Session:
