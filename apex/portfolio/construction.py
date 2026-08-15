@@ -152,7 +152,10 @@ def build_weights(rung: int, decile_row: pd.Series, sector: pd.Series,
 
 
 def run_rung(rung: int, label: str, grid, decile, sector, panel,
-             addv: pd.DataFrame) -> RungResult:
+             addv: pd.DataFrame, shortable_override=None) -> RungResult:
+    """`shortable_override(date, default_mask) -> mask` exists for SCRUTINY of
+    the borrow proxy (e.g. random exclusion at a matched rate) -- never for
+    production construction. It can only shrink or reshape the short book."""
     close, bench = panel.close_adj, panel.benchmark_tr
     prev_w = None
     rets, turns, nl, ns, exa_betas = [], [], [], [], []
@@ -165,6 +168,8 @@ def run_rung(rung: int, label: str, grid, decile, sector, panel,
                  else pd.Series(dtype=float))
         shortable = ((addv.loc[d] >= BORROW_MIN_ADDV)
                      & (panel.close_unadj.loc[d] >= BORROW_MIN_CLOSE))
+        if shortable_override is not None:
+            shortable = shortable_override(d, shortable)
         w, diag = build_weights(rung, decile_row, sector, betas, shortable)
         cap_hits += diag["beta_cap_hit"]
         borrow_excl += diag["borrow_excluded"]
