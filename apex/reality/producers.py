@@ -59,6 +59,25 @@ def blind_producer(name: str, trade_date: str, created_at: str,
             for s in subjects]
 
 
+def momentum_rank_producer(trade_date: str, created_at: str,
+                           trailing_60d: pd.Series, subjects, peers) -> list[Prediction]:
+    """Baseline 2 in the form that BITES: naive momentum as a cross-sectional
+    rank on the SAME subjects and peer set as the signal producers, through
+    the SAME frozen mapping. gp_rank must beat THIS, not just the coin flip --
+    profitability ranks are momentum-flavored, and this baseline is how that
+    flavor stops being creditable as signal."""
+    pct = trailing_60d.rank(pct=True)
+    out = []
+    for s in subjects:
+        p = 0.5 + RANK_SLOPE * (float(pct[s]) - 0.5)
+        out.append(_relative(
+            trade_date, created_at, s, peers, p, "baseline_momentum_rank",
+            inputs={"trailing_60d_return": float(trailing_60d[s]),
+                    "rank_pct": float(pct[s]), "trade_date": trade_date},
+            rationale={"rule": "naive momentum rank, frozen mapping"}))
+    return out
+
+
 def base_rate_producer(trade_date: str, created_at: str, subject: str) -> Prediction:
     return make_prediction(
         trade_date=trade_date, horizon_days=HORIZON, subject=subject,

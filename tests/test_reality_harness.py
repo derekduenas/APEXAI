@@ -194,3 +194,64 @@ def test_counterexample_the_rank_producer_hash_reflects_its_market_input():
         "different market inputs must produce different inputs hashes")
     assert a.probability == pytest.approx(0.58)
     assert b.probability == pytest.approx(0.42)
+
+
+# --- the harness fixes (operator review, 2026-08-15) ------------------------
+
+def test_momentum_rank_baseline_uses_the_same_frozen_mapping():
+    """Baseline 2 in biting form: same subjects, same mapping as gp_rank."""
+    mom = pd.Series({"S1": 0.30, "S2": -0.10, "S3": 0.05})
+    preds = P.momentum_rank_producer("2026-07-06", NOW, mom, ["S1", "S2"],
+                                     ["S1", "S2", "S3"])
+    by = {p.subject: p for p in preds}
+    assert by["S1"].probability == pytest.approx(0.5 + 0.2 * (1.0 - 0.5))
+    assert by["S2"].probability == pytest.approx(0.5 + 0.2 * (1 / 3 - 0.5))
+    assert by["S1"].claim_type == "relative"
+
+
+def test_the_stripped_prompt_contains_no_market_numbers():
+    from apex.reality.llm_producer import WITHHELD, build_prompts
+    ctx = {"security_id": "S1", "ticker": "ACME", "trade_date": "2026-08-04",
+           "close": 12.34, "mcap_m": 456.0, "r20": 0.0812, "r60": -0.043,
+           "r120": 0.221, "gp_assets": 0.317, "btm": 0.912}
+    full, stripped = build_prompts(ctx)
+    assert WITHHELD in stripped
+    # per-name VALUES must be absent (the universe description in the shared
+    # instructions legitimately says "market cap" -- that is not a leak)
+    for leak in ("12.34", "456", "8.1%", "0.317", "0.912", "market cap ($M):"):
+        assert leak not in stripped, f"stripped prompt leaks {leak!r}"
+        assert leak in full, f"the full prompt should carry {leak!r}"
+
+
+def test_probability_parsing_rejects_garbage_and_clamps_certainty():
+    from apex.reality.llm_producer import parse_probability
+    assert parse_probability('{"probability": 0.65}') == 0.65
+    assert parse_probability('noise {"probability": 0.999} noise') == 0.98
+    assert parse_probability('{"probability": 1.0}') is None
+    assert parse_probability("I think it will go up") is None
+
+
+def test_an_llm_pair_is_all_or_nothing():
+    """If either variant fails to parse, NEITHER is recorded -- an unpaired
+    variant would bias the exact comparison the pair exists to make."""
+    from apex.reality.llm_producer import llm_predictions
+    ctx = {"security_id": "S1", "ticker": "ACME", "trade_date": "2026-08-04",
+           "close": 10.0, "mcap_m": 500.0, "r20": 0.01, "r60": 0.02,
+           "r120": 0.03, "gp_assets": 0.2, "btm": 0.8}
+    calls = iter(['{"probability": 0.7}', "MALFORMED"])
+    assert llm_predictions(ctx, ["S2"], NOW, run_fn=lambda _: next(calls)) == []
+    ok = iter(['{"probability": 0.7}', '{"probability": 0.5}'])
+    pair = llm_predictions(ctx, ["S2"], NOW, run_fn=lambda _: next(ok))
+    assert len(pair) == 2
+    assert {p.producer.split("/")[0] for p in pair} == {"llm_full", "llm_stripped"}
+
+
+def test_scores_are_stamped_preliminary_until_ten_effective_dates():
+    from apex.reality.harness import score_by_producer
+    preds = [dict(_pred(trade_date="2026-01-05", subject=f"S{i}").__dict__)
+             for i in range(50)]
+    res = {p["prediction_id"]: {"outcome": 1.0} for p in preds}
+    rep = score_by_producer(preds, res, "2026-08-13")["t"]
+    assert rep["n_scored"] == 50 and rep["n_effective_dates"] == 1
+    assert rep["status"].startswith("PRELIMINARY"), (
+        "50 claims from one date must not read as n=50")

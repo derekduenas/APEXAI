@@ -282,13 +282,26 @@ def reliability_resolution(rows, n_buckets: int = 10) -> dict:
             "n": n}
 
 
+MIN_EFFECTIVE_DATES = 10
+
+
 def score_by_producer(preds, resolutions, data_through) -> dict:
+    """Per-producer scores, with EFFECTIVE sample honesty: claims sharing a
+    trade_date are cross-sectionally correlated, so the sample that matters is
+    the number of DATES, not the number of claims. Below MIN_EFFECTIVE_DATES
+    every number is stamped PRELIMINARY -- tables acquire authority they have
+    not earned, so the stamp is a field, not a footnote."""
     rows = scoreable(preds, resolutions, data_through)
     report = {}
     for producer in sorted({r["producer"] for r in rows}):
         sel = [r for r in rows if r["producer"] == producer]
+        n_dates = len({r["trade_date"] for r in sel})
         report[producer] = {
             "n_scored": len(sel),
+            "n_effective_dates": n_dates,
+            "status": ("PRELIMINARY -- effective n is the date count, "
+                       f"{n_dates} < {MIN_EFFECTIVE_DATES}"
+                       if n_dates < MIN_EFFECTIVE_DATES else "accruing"),
             "n_penalised_unresolved": sum(1 for r in sel if r["penalised"]),
             "brier": round(brier(sel), 6),
             "log_loss": round(log_loss(sel), 6),

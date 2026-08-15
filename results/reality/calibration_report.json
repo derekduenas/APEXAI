@@ -1,6 +1,6 @@
 {
-  "chain_entries": 2064,
-  "generated_at": "2026-08-15T00:52:13.218044+00:00",
+  "chain_entries": 2750,
+  "generated_at": "2026-08-15T01:24:57.668112+00:00",
   "lake_through": "2026-08-13",
   "producers": {
     "baseline_base_rate": {
@@ -16,10 +16,12 @@
       ],
       "log_loss": 0.634878,
       "n": 1,
+      "n_effective_dates": 1,
       "n_penalised_unresolved": 0,
       "n_scored": 1,
       "reliability": 0.2209,
       "resolution": 0.0,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
       "uncertainty": 0.0
     },
     "baseline_momentum": {
@@ -35,11 +37,40 @@
       ],
       "log_loss": 0.510826,
       "n": 1,
+      "n_effective_dates": 1,
       "n_penalised_unresolved": 0,
       "n_scored": 1,
       "reliability": 0.16,
       "resolution": 0.0,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
       "uncertainty": 0.0
+    },
+    "baseline_momentum_rank": {
+      "base_rate": 0.4502,
+      "brier": 0.259659,
+      "calibration": [
+        {
+          "bucket": "[0.4,0.5)",
+          "n": 66,
+          "realized_freq": 0.4394,
+          "stated_mean": 0.407
+        },
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 165,
+          "realized_freq": 0.4545,
+          "stated_mean": 0.5822
+        }
+      ],
+      "log_loss": 0.712736,
+      "n": 231,
+      "n_effective_dates": 1,
+      "n_penalised_unresolved": 1,
+      "n_scored": 231,
+      "reliability": 0.011948,
+      "resolution": 4.7e-05,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
+      "uncertainty": 0.247522
     },
     "blind_twin": {
       "base_rate": 0.4502,
@@ -54,10 +85,12 @@
       ],
       "log_loss": 0.693147,
       "n": 231,
+      "n_effective_dates": 1,
       "n_penalised_unresolved": 1,
       "n_scored": 231,
       "reliability": 0.00248,
       "resolution": 0.0,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
       "uncertainty": 0.247522
     },
     "gp_rank": {
@@ -79,10 +112,12 @@
       ],
       "log_loss": 0.671653,
       "n": 231,
+      "n_effective_dates": 1,
       "n_penalised_unresolved": 1,
       "n_scored": 231,
       "reliability": 0.00245,
       "resolution": 0.012144,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
       "uncertainty": 0.247934
     },
     "h3_rank": {
@@ -104,10 +139,12 @@
       ],
       "log_loss": 0.676897,
       "n": 231,
+      "n_effective_dates": 1,
       "n_penalised_unresolved": 1,
       "n_scored": 231,
       "reliability": 0.004662,
       "resolution": 0.010677,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
       "uncertainty": 0.247934
     }
   }

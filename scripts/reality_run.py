@@ -57,11 +57,17 @@ def main() -> int:
     panel, _ = build_production_panel(root, cfg, PAPER_PANEL_START, lake_through)
     output, _ = apex003.build_gp_output(panel, cfg, root)
     comp = composite_scores(output.scores.apex_score, cfg, panel)
+    from apex.features.factory import build_features
+    from apex.features.registry import built_specs
+    btm_spec = next(x for x in built_specs() if x.feature_id == "val_book_to_market")
+    btm_vals = build_features(root, panel, (btm_spec,))[0]["val_book_to_market"]
     now = dt.datetime.now(dt.timezone.utc).isoformat()
 
     LEDGER.verify()
     seen = {(p["producer"], p["trade_date"], p["subject"])
             for p in LEDGER.predictions()}
+    seen |= {("llm_pair", p["trade_date"], p["subject"])
+             for p in LEDGER.predictions() if p["producer"].startswith("llm_")}
     grid = [d for d in locked_grid(root, cfg)
             if d > HOLDOUT_END and d in panel.dates]
 
@@ -81,11 +87,54 @@ def main() -> int:
         h3_pct = comp.loc[d].where(elig)
         subjects = sorted(deciles[(deciles == 1) | (deciles == 10)].index)
         peers = sorted(deciles.dropna().index)
+        pos = panel.dates.searchsorted(d)
+        r60 = (panel.close_adj.iloc[pos] / panel.close_adj.iloc[max(0, pos - 60)]
+               - 1).where(elig)
         batch = (
             P.rank_producer("gp_rank", td, now, gp_pct, subjects, peers)
             + P.rank_producer("h3_rank", td, now, h3_pct.fillna(0.5), subjects, peers)
             + P.blind_producer("blind_twin", td, now, subjects, peers)
+            + P.momentum_rank_producer(td, now, r60.fillna(0.0), subjects, peers)
         )
+        # LLM pair on a FROZEN deterministic 20-name subset (10 top / 10
+        # bottom decile, ordered by security_id): the Group B clock. Never
+        # backtested (rule 17); pairs only, so the full/stripped comparison
+        # stays unbiased. Skipped cleanly when the CLI is unavailable.
+        # RULE 17 GUARD: an LLM prediction may only be created while its
+        # outcome does NOT yet exist. A pair minted for a grid date whose
+        # horizon has already elapsed would be a backdated claim scored as
+        # forward evidence. Mechanical producers are deterministic functions
+        # of as-of data (reproducible, so backfill is defensible and is
+        # labeled by created_at); the LLM's never is.
+        days_elapsed = int(panel.dates.searchsorted(pd.Timestamp(lake_through),
+                                                    side="right") - 1 - pos)
+        import shutil as _sh
+        if (_sh.which("claude") and "--no-llm" not in sys.argv
+                and days_elapsed < P.HORIZON):
+            from apex.reality.llm_producer import llm_predictions
+            top10 = sorted(deciles[deciles == 1].index)[:10]
+            bot10 = sorted(deciles[deciles == 10].index)[:10]
+            for s in top10 + bot10:
+                if ("llm_pair", td, s) in seen:
+                    continue
+                r20 = float(panel.close_adj.iloc[pos][s]
+                            / panel.close_adj.iloc[max(0, pos - 20)][s] - 1)
+                r120 = float(panel.close_adj.iloc[pos][s]
+                             / panel.close_adj.iloc[max(0, pos - 120)][s] - 1)
+                ctx = {"security_id": s, "ticker": s, "trade_date": td,
+                       "close": float(panel.close_unadj.loc[d, s]),
+                       "mcap_m": float(panel.market_cap.loc[d, s] / 1e6),
+                       "r20": r20, "r60": float(r60[s]), "r120": r120,
+                       "gp_assets": float(output.signal.loc[d, s]),
+                       "btm": float(btm_vals.loc[d, s])}
+                if any(v != v for v in ctx.values() if isinstance(v, float)):
+                    continue          # a NaN in the context would prompt "nan"
+                pair = llm_predictions(ctx, peers, now)
+                for pred in pair:
+                    LEDGER.append_prediction(pred)
+                    created += 1
+                if pair:
+                    seen.add(("llm_pair", td, s))
         if d in spy.index:
             past = spy[spy.index <= d]
             if len(past) > 60:
