@@ -210,6 +210,12 @@ def _post_tick(now, gov, today) -> None:
         e = _finalize(rec)
         print(f"REALIZATION {d['decision_id']} {sym} "
               f"tbs={rec.get('target_before_stop')} {e['entry_hash'][:12]}")
+    # the day self-reports: scoreboard + funnel diagnostics (read-only)
+    try:
+        from hunter_scoreboard import main as scoreboard_main
+        scoreboard_main()
+    except Exception as e:                                  # noqa: BLE001
+        print(f"scoreboard failed: {type(e).__name__}: {e}")
 
 
 def main() -> int:

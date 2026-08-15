@@ -42,6 +42,16 @@ ARTIFACTS = {
     "HUNTER-002_v1": (
         "playbook", ("docs/HUNTER-002-PLAYBOOK.md",
                      "apex/hunter/playbooks_v1.py")),
+    # Phase 2: frozen baselines are a dependency like any playbook —
+    # a baseline decision's forward evidence starts at THIS birth
+    "HUNTER-BASELINES_v1": (
+        "playbook", ("apex/hunter/baselines.py",)),
+    # v1.2: baselines wired into decision_pass, geometry-free realization,
+    # neff + scoreboard added. Append-only; v1/v1.1 stay.
+    "hunter_rule_model_v1.2": (
+        "model", ("apex/hunter/scanner.py", "apex/hunter/playbooks_v1.py",
+                  "apex/hunter/forward_pass.py", "apex/hunter/birth.py",
+                  "apex/hunter/baselines.py", "apex/hunter/neff.py")),
 }
 
 

@@ -25,6 +25,7 @@ from pathlib import Path
 import pandas as pd
 
 from apex.hunter import birth as birthlib
+from apex.hunter.baselines import baseline_decisions
 from apex.hunter.chartstate import (BAR, ChartState, DailyContext,
                                     compute_chart_state, visible_bars)
 from apex.hunter.contracts import HORIZONS_MINUTES
@@ -63,17 +64,24 @@ def extension_geometry(bars: pd.DataFrame, t_utc) -> dict:
         "leg_start_down": float(pre_lo.max()) if len(pre_lo) else None}
 
 
-def existing_decision_keys(date: str, ledger: Path = LEDGER) -> set:
-    keys = set()
+def existing_decision_keys(date: str, ledger: Path = LEDGER) -> tuple:
+    """(playbook_keys, baseline_keys) already minted this session. Playbooks
+    dedupe on (symbol, playbook, direction); baselines on (symbol, baseline)
+    — a baseline's direction input can flip tick to tick, and the first
+    formation still wins."""
+    pb, base = set(), set()
     if not ledger.exists():
-        return keys
+        return pb, base
     for line in ledger.read_text().splitlines():
         if not line.strip():
             continue
         r = json.loads(line)                     # chain entries are FLAT
         if r.get("kind") == "decision" and r.get("session_date") == date:
-            keys.add((r["symbol"], r["playbook_id"], r["direction"]))
-    return keys
+            if r["playbook_id"].startswith("BASELINE-"):
+                base.add((r["symbol"], r["playbook_id"]))
+            else:
+                pb.add((r["symbol"], r["playbook_id"], r["direction"]))
+    return pb, base
 
 
 def realized_decision_ids(ledger: Path = LEDGER) -> set:
@@ -160,7 +168,7 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
     scan_record["universe_limitation"] = universe.get("universe_limitation")
 
     births = birthlib.load_births()
-    seen = existing_decision_keys(date)
+    seen, seen_baseline = existing_decision_keys(date)
     decisions = []
     for sym, _sigs, _rv in result.watchlist:
         cs, rs = cs_by_symbol[sym], rs_by_symbol[sym]
@@ -196,6 +204,12 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
                 **bstamp,
             }, EvidenceClass.EODHD_FORWARD_OBSERVATION)
             decisions.append(rec)
+
+    # frozen baselines: same subjects, same ledger, same machinery —
+    # deliberately naive directions (protocol §6; no separate system)
+    decisions.extend(baseline_decisions(
+        t, date, tuple(s for s, _, _ in result.watchlist),
+        cs_by_symbol, rs_by_symbol, market_cs, births, seen_baseline))
     return scan_record, decisions
 
 
@@ -206,7 +220,11 @@ def resolve_decision(decision: dict, day_bars: pd.DataFrame) -> dict:
     f = day_bars[day_bars["event_time_utc"] + BAR > t0].reset_index(drop=True)
     entry = float(decision["entry"])
     sign = 1.0 if decision["direction"] == "LONG" else -1.0
-    stop, target = float(decision["stop"]), float(decision["target"])
+    # baselines carry no geometry: raw subject-horizon returns only
+    stop = (float(decision["stop"])
+            if decision.get("stop") is not None else None)
+    target = (float(decision["target"])
+              if decision.get("target") is not None else None)
     out = {"kind": "realization", "decision_id": decision["decision_id"],
            "session_date": decision["session_date"],
            "playbook_id": decision["playbook_id"],
@@ -233,22 +251,23 @@ def resolve_decision(decision: dict, day_bars: pd.DataFrame) -> dict:
         out[f"mae_{h}m"] = round(sign * (float(adv) / entry - 1), 6)
         out[f"truncated_{h}m"] = bool(
             times.iloc[-1] + BAR < t0 + pd.Timedelta(minutes=h))
-    if sign > 0:
-        stop_hits = f.index[lo <= stop]
-        tgt_hits = f.index[hi >= target]
-    else:
-        stop_hits = f.index[hi >= stop]
-        tgt_hits = f.index[lo <= target]
-    s_i = int(stop_hits[0]) if len(stop_hits) else None
-    t_i = int(tgt_hits[0]) if len(tgt_hits) else None
-    out["stop_hit"] = s_i is not None
-    out["target_hit"] = t_i is not None
-    out["target_before_stop"] = (t_i is not None
-                                 and (s_i is None or t_i < s_i))
-    out["stop_before_target"] = (s_i is not None
-                                 and (t_i is None or s_i <= t_i))
-    out["same_bar_ambiguous"] = (s_i is not None and t_i is not None
-                                 and s_i == t_i)
+    if stop is not None and target is not None:
+        if sign > 0:
+            stop_hits = f.index[lo <= stop]
+            tgt_hits = f.index[hi >= target]
+        else:
+            stop_hits = f.index[hi >= stop]
+            tgt_hits = f.index[lo <= target]
+        s_i = int(stop_hits[0]) if len(stop_hits) else None
+        t_i = int(tgt_hits[0]) if len(tgt_hits) else None
+        out["stop_hit"] = s_i is not None
+        out["target_hit"] = t_i is not None
+        out["target_before_stop"] = (t_i is not None
+                                     and (s_i is None or t_i < s_i))
+        out["stop_before_target"] = (s_i is not None
+                                     and (t_i is None or s_i <= t_i))
+        out["same_bar_ambiguous"] = (s_i is not None and t_i is not None
+                                     and s_i == t_i)
     out["closing_return"] = round(sign * (float(px.iloc[-1]) / entry - 1), 6)
     out["resolvable"] = True
     return stamp(out, EvidenceClass.EODHD_FORWARD_OBSERVATION)
