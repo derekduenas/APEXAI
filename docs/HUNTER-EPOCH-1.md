@@ -13,7 +13,7 @@ Epoch 1 begins with the first forward observation (Monday 2026-08-17
 | Hunter-002 | v1 | 18:43Z |
 | Baselines | v1 | 18:56Z |
 | Analog engine | v1.1 (in model artifact) | 20:35Z |
-| Decision model (scanner, playbooks, forward pass, birth law, capital, forecast, memory, swarm iface, contracts, calendar) | hunter_rule_model_v1.5 | 20:35Z |
+| Decision model (scanner, playbooks, forward pass, birth law, capital, forecast, memory, swarm, contracts, calendar) | hunter_rule_model_v1.5.2 (ordering law + swarm commissioning; predicates unchanged since v1) | 21:30Z |
 | Graduation criteria | frozen doc | committed pre-observation |
 | N_effective rules | protocol §8 | 18:43Z |
 | Simulation semantics | UNCALIBRATED_SCENARIO_WEIGHT, diagnostic | v1.4+ |

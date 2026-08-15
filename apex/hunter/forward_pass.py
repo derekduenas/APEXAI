@@ -123,8 +123,12 @@ def unrealized_decisions(date: str, ledger: Path = LEDGER) -> list:
 
 
 def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
-                  contexts: dict, market_symbol: str = "SPY.US") -> tuple:
-    """-> (scan_record, decision_records). Pure: caller appends to ledger."""
+                  contexts: dict, market_symbol: str = "SPY.US",
+                  enrich: bool = True) -> tuple:
+    """-> (scan_record, records). Pure: caller appends to ledger.
+    enrich=False returns ONLY scan + decisions so the caller can persist
+    them BEFORE any LLM/enrichment runs (the ordering law); it then calls
+    enrichment_pass(t, date, decisions, universe) separately."""
     t = pd.Timestamp(t_utc)
     date = str(t.tz_convert("America/New_York").date())
     market_bars = bars_by_symbol.get(market_symbol)
@@ -220,24 +224,49 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
             }, EvidenceClass.EODHD_FORWARD_OBSERVATION)
             decisions.append(rec)
 
-    # THE INTELLIGENCE SPINE (per candidate, each seat typed, each absence
-    # honest): analog -> ml -> swarm -> ForecastBundle -> APEX CAPITAL ->
-    # reasoned final state — all into the SAME ledger. Every enrichment is
-    # fault-isolated: if any seat fails, the candidate still reaches
-    # Capital and the archive never stops (Monday-safety law).
+    # frozen baselines: same subjects, same ledger, same machinery —
+    # deliberately naive directions (protocol §6; no separate system)
+    decisions.extend(baseline_decisions(
+        t, date, tuple(s for s, _, _ in result.watchlist),
+        cs_by_symbol, rs_by_symbol, market_cs, births, seen_baseline))
+
+    if not enrich:
+        # THE ORDERING LAW: the caller persists scan + decisions FIRST,
+        # then calls enrichment_pass — an LLM can therefore never delay
+        # or lose a canonical observation or candidate record
+        return scan_record, decisions
+    return scan_record, decisions + enrichment_pass(t, date, decisions,
+                                                    universe)
+
+
+def _uncertain_from_record(market_state: dict | None) -> bool:
+    """Dict-shaped twin of capital.intraday_market_uncertain, so the
+    enrichment pass depends only on PERSISTED records (replayable)."""
+    if not market_state or market_state.get("day_return") is None:
+        return True                                   # fail closed
+    if market_state.get("data_quality"):
+        return True
+    return abs(market_state["day_return"]) >= 0.015
+
+
+def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
+    """THE OPTIONAL INTELLIGENCE PASS — runs strictly AFTER candidates are
+    persistable, reading ONLY the decision records themselves (analog ->
+    swarm -> ForecastBundle -> APEX CAPITAL). Every seat is
+    fault-isolated: a hung subprocess, a rate limit, or a dead network
+    can cost enrichment, never the archive. Per-tick swarm budget of 2."""
+    t = pd.Timestamp(t)
     from apex.portfolio.risk import PortfolioState
     portfolio = PortfolioState(nav=100_000.0, positions={}, sector_weights={},
                                heat=0.0, drawdown_budget_left=1.0,
                                sleeve_correlations={})
-    uncertain = intraday_market_uncertain(market_cs)
-    capital_records = []
-    # the archive outranks enrichment: at most 2 swarm-enriched candidates
-    # per tick so LLM latency can never starve the 900s clock budget;
-    # beyond the cap the swarm view is an honest NOT_REQUESTED
+    out: list = []
     swarm_budget = 2
     for d in decisions:
+        if d.get("playbook_id", "").startswith("BASELINE-"):
+            continue
         meta = universe["symbols"].get(d["symbol"], {})
-        cs = cs_by_symbol.get(d["symbol"])
+        uncertain = _uncertain_from_record(d.get("market_state"))
         bundle_rec, disagreement_level, support_low = None, None, False
         try:
             from apex.analog.engine import AnalogQuery, retrieve
@@ -274,7 +303,7 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
         cd = evaluate_candidate(
             d, sector=meta.get("sector"),
             median_dollar_volume=meta.get("median_dollar_volume"),
-            ann_vol=cs.realized_vol_ann if cs is not None else None,
+            ann_vol=(d.get("chart_state") or {}).get("realized_vol_ann"),
             market_uncertain=uncertain, forecast=ForecastSlot(),
             portfolio=portfolio,
             disagreement_level=disagreement_level,
@@ -283,15 +312,9 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
         rec["session_date"] = date
         rec["t_utc"] = str(t)
         if bundle_rec is not None:
-            capital_records.append(bundle_rec)
-        capital_records.append(rec)
-
-    # frozen baselines: same subjects, same ledger, same machinery —
-    # deliberately naive directions (protocol §6; no separate system)
-    decisions.extend(baseline_decisions(
-        t, date, tuple(s for s, _, _ in result.watchlist),
-        cs_by_symbol, rs_by_symbol, market_cs, births, seen_baseline))
-    return scan_record, decisions + capital_records
+            out.append(bundle_rec)
+        out.append(rec)
+    return out
 
 
 def resolve_decision(decision: dict, day_bars: pd.DataFrame) -> dict:

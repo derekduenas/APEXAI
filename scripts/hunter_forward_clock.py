@@ -186,17 +186,32 @@ def _regular_tick(now, gov, today) -> None:
                         premarket_low=pm_lo)
             except Exception as e:                          # noqa: BLE001
                 print(f"fetch {sym}: {type(e).__name__}")
-        scan_record, decisions = decision_pass(now, universe, bars, contexts)
+        # THE ORDERING LAW: canonical records persist BEFORE any optional
+        # enrichment — an LLM hang, rate limit, or dead network can cost
+        # enrichment, never a market observation or a candidate
+        scan_record, decisions = decision_pass(now, universe, bars, contexts,
+                                               enrich=False)
         scan_record["quota_used_cumulative"] = gov.used
         _finalize(scan_record)
         for d in decisions:
             e = _finalize(d)
-            print(f"DECISION {d['symbol']} {d['playbook_id']} "
-                  f"{d['direction']} {d['forward_eligibility']} "
-                  f"{e['entry_hash'][:12]}")
+            if not d["playbook_id"].startswith("BASELINE-"):
+                print(f"DECISION {d['symbol']} {d['playbook_id']} "
+                      f"{d['direction']} {d['forward_eligibility']} "
+                      f"{e['entry_hash'][:12]}")
         print(f"scan: {scan_record['states_computed']} states, "
               f"{scan_record['abnormal']} abnormal, "
-              f"{len(decisions)} decisions")
+              f"{len(decisions)} decisions PERSISTED")
+        try:
+            from apex.hunter.forward_pass import enrichment_pass
+            for r in enrichment_pass(now, today, decisions, universe):
+                e = _finalize(r)
+                if r.get("kind") == "capital_decision":
+                    print(f"CAPITAL {r['symbol']} {r['final_state']} "
+                          f"{e['entry_hash'][:12]}")
+        except Exception as e:                              # noqa: BLE001
+            print(f"enrichment pass failed (archive intact): "
+                  f"{type(e).__name__}: {e}")
     except Exception as e:                                  # noqa: BLE001
         print(f"perception pass failed: {type(e).__name__}: {e}")
 

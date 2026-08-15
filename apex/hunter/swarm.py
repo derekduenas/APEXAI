@@ -68,6 +68,21 @@ Respond with ONLY a JSON object, no other text:
 Empty lists are acceptable and often correct."""
 
 
+_CLI_IDENTITY: list = []
+
+
+def _cli_identity() -> str:
+    """CLI version string, probed once per process (telemetry only)."""
+    if not _CLI_IDENTITY:
+        try:
+            r = subprocess.run([str(CLAUDE_BIN), "--version"],
+                               capture_output=True, text=True, timeout=10)
+            _CLI_IDENTITY.append(r.stdout.strip()[:60] or "unknown")
+        except Exception:                                   # noqa: BLE001
+            _CLI_IDENTITY.append("unknown")
+    return _CLI_IDENTITY[0]
+
+
 def auth_available() -> bool:
     return AUTH_MARKER.exists()
 
@@ -140,6 +155,7 @@ def run_specialists(candidate: dict, *, as_of: str,
     flags: list = []
     questions: list = []
     ran: list = []
+    agent_ms: dict = {}                       # ablation telemetry per agent
     for role in V1_ACTIVE_AGENTS:
         if time.monotonic() - start > deadline_seconds:
             return SwarmAssessment(
@@ -148,7 +164,9 @@ def run_specialists(candidate: dict, *, as_of: str,
                 latency_seconds=round(time.monotonic() - start, 1),
                 provenance={"iface": SWARM_VERSION, "agents_done": ran})
         try:
+            a0 = time.monotonic()
             c, f, q = _invoke_agent(role, facts, runner=runner)
+            agent_ms[role] = round((time.monotonic() - a0) * 1000)
             claims.extend(c); flags.extend(f); questions.extend(q)
             ran.append(role)
         except Exception as e:                              # noqa: BLE001
@@ -165,5 +183,8 @@ def run_specialists(candidate: dict, *, as_of: str,
         unresolved_questions=tuple(questions),
         latency_seconds=round(time.monotonic() - start, 1),
         provenance={"iface": SWARM_VERSION,
+                    "facts_supplied": facts,       # exact model input, for
+                    "agent_ms": agent_ms,          # the future ablation
+                    "cli": _cli_identity(),
                     "dormant_agents": tuple(s for s in SPECIALISTS
                                             if s not in V1_ACTIVE_AGENTS)})

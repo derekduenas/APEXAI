@@ -98,6 +98,12 @@ ARTIFACTS = {
     # of the pre-authorized swarm commissioning, not an epoch break.
     "hunter_rule_model_v1.5.1": (
         "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py")),
+    # v1.5.2 (the ordering law): scan + candidates persist BEFORE any
+    # optional enrichment (enrichment_pass reads only persisted records);
+    # swarm ablation telemetry (facts_supplied, per-agent ms, CLI id).
+    # The archive outranks Claude, structurally and tested.
+    "hunter_rule_model_v1.5.2": (
+        "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py")),
 }
 
 
