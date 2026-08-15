@@ -101,7 +101,11 @@ def test_ordering_law_candidates_persist_before_enrichment(tmp_path):
         _chain_append(led, d)                    # CRASH could happen here...
     enriched = enrichment_pass(t, "2026-08-17", decisions, uni)
     assert {r["kind"] for r in enriched} == {"forecast_bundle",
+                                             "assassin_review",
                                              "capital_decision"}
+    rev = [r for r in enriched if r["kind"] == "assassin_review"][0]
+    assert rev["verdict"] in ("SURVIVED_CLEAN", "SURVIVED_WOUNDED")
+    assert len(rev["attempts"]) >= 4              # every mechanism recorded
     cap = [r for r in enriched if r["kind"] == "capital_decision"][0]
     assert cap["final_state"] in ("OBSERVE", "WATCH", "NO_TRADE", "REFUSED")
     # enrichment reads ONLY persisted record fields (replayable)

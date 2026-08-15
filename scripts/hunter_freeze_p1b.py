@@ -121,6 +121,28 @@ ARTIFACTS = {
         "model", ("apex/hunter/swarm.py", "docs/SWARM-CHARTER.md")),
     "hunter_rule_model_v1.5.4": (
         "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py")),
+    # v1.5.5 (Profit Machine blueprint): the ASSASSIN as a formal recorded
+    # stage between Oracle and Capital — every kill attempt in the ledger,
+    # wounds feed the monotone caution law (identical semantics, now
+    # attributed); rejection-economics funnel in the scoreboard.
+    "hunter_assassin_v1": (
+        "model", ("apex/hunter/assassin.py",
+                  "docs/PROFIT-MACHINE-BLUEPRINT.md")),
+    "hunter_rule_model_v1.5.5": (
+        "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py",
+                  "apex/hunter/assassin.py")),
+    # DIGITAL WORLD v2 (observational, decision_power NONE in Epoch 1):
+    # correlation, leadership, risk-on/off, intraday structure facets,
+    # ONLINE daily regime (SFP+bridge, never revised), per-facet freshness.
+    "hunter_twin_v2": (
+        "model", ("apex/world/twin2.py",)),
+    # Alpha half-life + intelligence routing (scheduling only; can only
+    # REDUCE LLM spend; assassin always runs; conservative default).
+    "hunter_halflife_v1": (
+        "model", ("apex/hunter/halflife.py",)),
+    "hunter_rule_model_v1.5.6": (
+        "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py",
+                  "apex/hunter/assassin.py", "apex/hunter/halflife.py")),
 }
 
 

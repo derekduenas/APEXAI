@@ -205,6 +205,32 @@ def _regular_tick(now, gov, today) -> None:
                                   "t2_quant_s": t_stamps["t2_quant_s"]}
         scan_record["quota_used_cumulative"] = gov.used
         _finalize(scan_record)
+        # DIGITAL WORLD (Twin 2.0): the rich terrain record — observational
+        # in Epoch 1 (decision_power NONE), fault-isolated like every seat
+        try:
+            from apex.hunter.context_builder import CONTEXT_LOOKBACK_DAYS
+            from apex.world.twin2 import build_world, load_spy_daily
+            lo = str((pd.Timestamp(today)
+                      - pd.Timedelta(days=CONTEXT_LOOKBACK_DAYS)).date())
+            hi = str((pd.Timestamp(today) - pd.Timedelta(days=1)).date())
+            spy_rows, _src = fetch_intraday_chunk("SPY.US", lo, hi, gov)
+            spy_daily = load_spy_daily(today,
+                                       normalize_rows(spy_rows, "SPY.US"))
+            spy_ctx = contexts.get("SPY.US")
+            world = build_world(
+                {k: v for k, v in bars.items() if k.endswith(".US")},
+                now, today,
+                universe_facets=scan_record.get("universe_facets"),
+                spy_daily=spy_daily,
+                spy_atr_frac=getattr(spy_ctx, "atr_frac", None))
+            w = _finalize(stamp(world,
+                                EvidenceClass.EODHD_FORWARD_OBSERVATION))
+            print(f"WORLD regime="
+                  f"{world['transition_state'].get('regime', 'n/a')} "
+                  f"{w['entry_hash'][:12]}")
+        except Exception as e:                              # noqa: BLE001
+            print(f"twin2 world failed (archive intact): "
+                  f"{type(e).__name__}: {e}")
         for d in decisions:
             e = _finalize(d)
             if not d["playbook_id"].startswith("BASELINE-"):

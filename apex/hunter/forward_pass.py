@@ -178,6 +178,36 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
     scan_record = stamp(result.as_record(),
                         EvidenceClass.EODHD_FORWARD_OBSERVATION)
     scan_record["kind"] = "scan"
+    # Scout-level universe facets for the DIGITAL WORLD (Twin 2.0):
+    # observational aggregates over every computed state, typed absences
+    # when the universe is thin
+    if cs_by_symbol:
+        import numpy as _np
+        _states = list(cs_by_symbol.values())
+        _gaps = [c.gap_frac for c in _states if c.gap_frac is not None]
+        _rvols = [c.rvol_tod for c in _states if c.rvol_tod is not None]
+        scan_record["universe_facets"] = {
+            "n_states": len(_states),
+            "above_vwap_frac": round(float(_np.mean(
+                [bool(c.above_vwap) for c in _states
+                 if c.above_vwap is not None])), 2),
+            "gap_environment": {
+                "median_abs_gap": round(float(_np.median(
+                    [abs(g) for g in _gaps])), 4) if _gaps else None,
+                "material_gap_frac": round(float(_np.mean(
+                    [abs(g) >= 0.02 for g in _gaps])), 2) if _gaps else None},
+            "participation_median_rvol": round(float(_np.median(_rvols)), 2)
+            if _rvols else None,
+            "opening_behavior": {
+                "or_break_up_frac": round(float(_np.mean(
+                    [c.or_break_up for c in _states])), 2),
+                "or_break_down_frac": round(float(_np.mean(
+                    [c.or_break_down for c in _states])), 2)},
+            "breakout_success_environment": {"status":
+                                             "DORMANT_NEEDS_OUTCOMES"}}
+    else:
+        scan_record["universe_facets"] = {"status":
+                                          "SCOUT_FACETS_UNAVAILABLE"}
     scan_record["session_date"] = date
     scan_record["universe_limitation"] = universe.get("universe_limitation")
 
@@ -268,6 +298,7 @@ def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
         meta = universe["symbols"].get(d["symbol"], {})
         uncertain = _uncertain_from_record(d.get("market_state"))
         bundle_rec, disagreement_level, support_low = None, None, False
+        assassin_rec = None
         try:
             from apex.analog.engine import AnalogQuery, retrieve
             from apex.hunter.forecast import assemble_bundle
@@ -280,8 +311,23 @@ def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
                             candidate_record=d),
                 analog_memory_rows(str(t)),
                 evidence_class=EvidenceClass.EODHD_FORWARD_OBSERVATION)
+            from apex.hunter.halflife import estimate, route_intelligence
+            from apex.hunter.memory import _rows as _ledger_rows
+            realized = {r["decision_id"]: r for r in _ledger_rows()
+                        if r.get("kind") == "realization"
+                        and r.get("resolvable")}
+            scored = [{**dd, **realized[dd["decision_id"]]}
+                      for dd in _ledger_rows()
+                      if dd.get("kind") == "decision"
+                      and dd.get("playbook_id") == d["playbook_id"]
+                      and dd.get("forward_eligibility") == "FORWARD_ELIGIBLE"
+                      and dd.get("decision_id") in realized]
+            halflife = estimate(d["playbook_id"], scored)
+            routing = route_intelligence(halflife)
             if swarm_budget > 0:
-                swarm = run_specialists(d, as_of=str(t))
+                swarm = run_specialists(
+                    d, as_of=str(t),
+                    allow_deep=routing["allow_deep_swarm"])
                 swarm_budget -= 1
             else:
                 from apex.hunter.forecast import SwarmAssessment
@@ -291,14 +337,23 @@ def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
                     provenance={"reason": "per-tick swarm budget spent; "
                                           "archive outranks enrichment"})
             bundle = assemble_bundle(d, analog_result=analog, swarm=swarm)
-            disagreement_level = bundle.disagreement.get("level")
-            # weak analogues are a caution signal; ABSENT analogues are
-            # not (absence is already the NO_CALIBRATED_FORECAST state)
-            support_low = analog.status == "ANALOG_SUPPORT_LOW"
             bundle_rec = stamp(bundle.as_record(),
                                EvidenceClass.EODHD_FORWARD_OBSERVATION)
             bundle_rec["session_date"] = date
+            # THE ASSASSIN — the formal kill stage between Oracle and
+            # Capital: every attack attempted is recorded; wounds feed
+            # the monotone caution law (identical semantics, now a named
+            # stage with its own ledger record)
+            from apex.hunter.assassin import review as assassin_review
+            rev = assassin_review(d, bundle)
+            assassin_rec = stamp(rev.as_record(),
+                                 EvidenceClass.EODHD_FORWARD_OBSERVATION)
+            assassin_rec["session_date"] = date
+            assassin_rec["decision_id"] = d.get("decision_id")
+            disagreement_level = rev.disagreement_level
+            support_low = rev.analog_support_low
         except Exception as e:                              # noqa: BLE001
+            assassin_rec = None
             print(f"bundle {d['symbol']}: {type(e).__name__}: {e}")
         cd = evaluate_candidate(
             d, sector=meta.get("sector"),
@@ -311,8 +366,15 @@ def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
         rec = stamp(cd.as_record(), EvidenceClass.EODHD_FORWARD_OBSERVATION)
         rec["session_date"] = date
         rec["t_utc"] = str(t)
+        try:
+            rec["alpha_half_life"] = halflife
+            rec["intelligence_routing"] = routing
+        except NameError:
+            pass                                  # enrichment seat failed
         if bundle_rec is not None:
             out.append(bundle_rec)
+        if assassin_rec is not None:
+            out.append(assassin_rec)
         out.append(rec)
     return out
 

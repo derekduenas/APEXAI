@@ -191,6 +191,7 @@ def _std_views(role: str, obj: dict) -> tuple:
 
 def run_specialists(candidate: dict, *, as_of: str,
                     deadline_seconds: float = DEADLINE_SECONDS,
+                    allow_deep: bool = True,
                     runner=None) -> SwarmAssessment:
     """The trade-moment desk. Non-OK statuses carry NO claims
     (contract-enforced). `runner` is injectable for tests; production
@@ -228,7 +229,7 @@ def run_specialists(candidate: dict, *, as_of: str,
     for role in V2_ACTIVE_AGENTS:
         # tier gate: the committee convenes only if the assassin failed
         if role in TIER2_AGENTS:
-            if fast_kill:
+            if fast_kill or not allow_deep:
                 skipped = [r for r in TIER2_AGENTS if r not in ran]
                 break
             if time.monotonic() - start > deadline_seconds:
@@ -323,6 +324,7 @@ def run_specialists(candidate: dict, *, as_of: str,
                     "adversary_axes": adversary_axes_out,
                     "tier_completed": tier_completed,
                     "fast_kill": fast_kill,
+                    "deep_allowed_by_routing": allow_deep,
                     "agents_skipped": tuple(skipped),
                     "dormant_agents": tuple(s for s in SPECIALISTS
                                             if s not in V2_ACTIVE_AGENTS)})

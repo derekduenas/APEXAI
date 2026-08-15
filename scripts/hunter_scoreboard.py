@@ -37,7 +37,8 @@ PRELIMINARY_BELOW = 10
 
 def load_ledger(ledger: Path = LEDGER) -> dict:
     kinds: dict = {"forward_state": [], "scan": [], "decision": [],
-                   "realization": [], "capital_decision": []}
+                   "realization": [], "capital_decision": [],
+                   "assassin_review": []}
     if ledger.exists():
         for line in ledger.read_text().splitlines():
             if not line.strip():
@@ -174,6 +175,44 @@ def build_scoreboard(kinds: dict) -> dict:
                  "path; LIVE_ELIGIBLE does not exist"),
     }
 
+    # REJECTION ECONOMICS — the Profit Machine thesis: every funnel stage
+    # must make the surviving population harder and better. Each cohort is
+    # scored under the SAME naive instrument (BASELINE-MOMENTUM) so stage
+    # value is selection value, not direction skill. Values accrue with
+    # forward data; the shape of the report is frozen before the data.
+    reviews = kinds.get("assassin_review", [])
+    survived_clean = {r.get("decision_id") for r in reviews
+                      if r.get("verdict") == "SURVIVED_CLEAN"}
+    observe_ids = {r.get("decision_id") for r in kinds.get(
+        "capital_decision", []) if r.get("final_state") == "OBSERVE"}
+    id_to_subject = {d["decision_id"]: (d["session_date"], d["symbol"])
+                     for d in decisions}
+
+    def cohort_ev(subjects):
+        rows = merged([d for d in mom
+                       if (d["session_date"], d["symbol"]) in subjects])
+        h = horizon_stats(rows, 60)
+        return {"n_subjects": len(subjects),
+                "ev_60m": (h or {}).get("mean_ret"),
+                "n_scored": (h or {}).get("n", 0)}
+
+    watchlist_subjects = {(d["session_date"], d["symbol"]) for d in mom}
+    funnel_economics = {
+        "instrument": "BASELINE-MOMENTUM on every cohort",
+        "stages": {
+            "1_scanner_watchlist": cohort_ev(watchlist_subjects),
+            "2_playbook_matched": cohort_ev(selected_subjects),
+            "3_assassin_survived_clean": cohort_ev(
+                {id_to_subject[i] for i in survived_clean
+                 if i in id_to_subject}),
+            "4_capital_observe": cohort_ev(
+                {id_to_subject[i] for i in observe_ids
+                 if i in id_to_subject}),
+        },
+        "doctrine": ("each stage should raise EV of the survivors; a stage "
+                     "that does not is deleted prestige — findings, never "
+                     "knobs, until the frozen checkpoint")}
+
     scans = kinds["scan"]
     sig_counts: Counter = Counter()
     for s in scans:
@@ -209,6 +248,7 @@ def build_scoreboard(kinds: dict) -> dict:
         "scoreboard": board,
         "identical_subject_comparisons": comparisons,
         "selected_vs_rejected": relationships,
+        "funnel_economics": funnel_economics,
         "capital": capital,
         "funnel": funnel,
     }
