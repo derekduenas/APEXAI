@@ -263,6 +263,13 @@ LOAD_BEARING = {
     "test_the_policy_is_fixed_and_declared": [
         "test_counterexample_a_bad_breadth_is_refused",
     ],
+    # --- Long-only sleeve gate (2026-08-13, second DECLARED policy) ---------
+    # The deployable one-sided book's own declared thresholds; the names floor
+    # is the concentration guard, demonstrated failable by a 12-name sleeve.
+    "test_long_only_positive_control_a_strong_sleeve_is_viable": [
+        "test_long_only_negative_control_a_weak_sleeve_is_not_viable",
+        "test_counterexample_a_sleeve_below_20_names_fails_the_gate",
+    ],
     # --- APEX-003-H1 gross profitability path (2026-08-12) ------------------
     # Orientation is the erratum-class risk: higher profitability = score 100 =
     # decile 1. Isolation from the #001/#002 scorers.
