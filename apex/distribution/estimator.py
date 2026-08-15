@@ -80,6 +80,14 @@ def empirical_conditional(bucket_returns, horizon_days: int, *,
         raise EstimatorError(
             f"{len(r)} conditional observations is too few to call a "
             f"distribution; refuse rather than smooth")
+    # TYPE-CONFUSION GUARD: the inputs must be RETURNS (fractions). A rank,
+    # score, or percentile fed here would silently become a 'distribution'
+    # -- the exact identity slippage the calibration audit forbids.
+    if np.abs(r).max() > 3.0:
+        raise EstimatorError(
+            f"input values reach {np.abs(r).max():.1f}: these are not "
+            f"fractional returns. A rank or score must never become a "
+            f"probability distribution by passing through this function.")
     lo, hi = np.quantile(r, 0.005), np.quantile(r, 0.995)
     edges = np.linspace(lo, hi, n_bins + 1)
     counts, _ = np.histogram(np.clip(r, lo, hi), bins=edges)

@@ -137,7 +137,7 @@ def test_the_named_gaps_are_present_and_unbuilt():
     # it -- the machine decides but cannot yet feed itself.
     for gap in ("research_memory", "backtest_engine",
                 "execution", "live_monitoring", "model_registry",
-                "discovery_exercise_runner"):
+                "discovery_exercise_runner", "calibration_harness"):
         assert gap in REGISTRY, f"named gap {gap} is not in the registry"
         assert REGISTRY[gap].state in (PLANNED, ABSENT, UNDER_CONSTRUCTION)
 

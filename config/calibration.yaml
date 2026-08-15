@@ -1,0 +1,93 @@
+# SYSTEM CALIBRATION SCORECARD -- machine-readable, methodology FROZEN FIRST.
+#
+# GOVERNANCE (the most important rule): the sequence is declare -> freeze ->
+# forecast -> observe -> calculate -> decide -> freeze result. Never
+# forecast -> inspect -> modify -> re-test -> declare. A recalibrated model
+# is a NEW versioned model evaluated independently.
+#
+# Statuses: UNCALIBRATED | PARTIALLY_CALIBRATED | CALIBRATED |
+#           CALIBRATED_WITH_LIMITATIONS | REFUSED
+# "CALIBRATED" is never awarded because tests pass; only because declared
+# graduation criteria were met on observations that postdate the freeze.
+
+methodology:
+  declared: 2026-08-15
+  frozen: true
+  note: >-
+    Graduation criteria below were written BEFORE any calibration result was
+    calculated. Changing a criterion after any component has been scored is
+    a dated amendment, not an edit.
+
+graduation_criteria:
+  distribution_estimator:
+    target: PIT uniformity + interval coverage on FORWARD observations
+    metrics: [pit_tail_mass, interval_coverage_90, log_score_vs_climatology]
+    independent_observation: one formation date (cross-sectional claims are one draw)
+    minimum_sample: 20 effective formation dates
+    thresholds: {pit_tail_mass: [0.12, 0.28], coverage_90: [0.82, 0.97]}
+    on_insufficient: HISTORICAL_EMPIRICAL status; options expression demoted;
+      live_intent refused (already structural)
+  regime_classifier:
+    target: transition detection lag + uncertain-flag usefulness, forward
+    metrics: [median_detection_lag_days, false_transition_rate,
+              uncertain_frequency]
+    independent_observation: one durable transition
+    minimum_sample: 10 forward durable transitions (YEARS of clock time)
+    thresholds: {median_detection_lag_days: [0, 15]}
+    note: hindsight-reference agreement is DIAGNOSTIC ONLY, never accuracy
+    on_insufficient: state consumed with its uncertain flag; bar-raising
+      stays active (already structural)
+  llm_producers:
+    target: beat stripped twin on Brier with nonzero resolution
+    metrics: [brier_vs_stripped, reliability, resolution]
+    minimum_sample: 20 independent formation dates (SWARM-GRADUATION-CRITERION.md)
+    on_insufficient: no graduation, no committee, no twin
+  signal_rank_producers:
+    target: reliability of the frozen rank->probability mapping, forward
+    metrics: [reliability, resolution, n_effective_dates]
+    minimum_sample: 10 effective dates (PRELIMINARY stamp until then)
+  opportunity_engine:
+    target: P(positive net | TRADE) matches stated frequency; NO-TRADE value
+    metrics: [trade_probability_reliability, realized_net_given_trade,
+              rejection_value_estimate]
+    minimum_sample: 20 TRADE decisions with realized outcomes (paper track)
+    on_insufficient: decisions stamped PAPER-GRADE (already structural)
+  capacity_cost_models:
+    target: modeled vs realized implementation cost on paper fills
+    metrics: [cost_model_bias, impact_model_bias]
+    minimum_sample: 30 realized paper rebalances
+    note: theoretical != modeled != observed != validated; the report must
+      say which one every number is
+
+status:  # honest as of 2026-08-15, BEFORE any forward calibration exists
+  discovery_screening: {status: REFUSED, why: deterministic gate, no probabilistic claim}
+  signal_alpha_layer: {status: PARTIALLY_CALIBRATED,
+                       why: APEX-004 validated IC forward of registration;
+                            rank->probability mapping has 1 effective date (PRELIMINARY)}
+  regime_classifier: {status: PARTIALLY_CALIBRATED,
+                      why: online-ness PROVEN, lag measured vs contaminated
+                           reference only; zero forward durable transitions observed}
+  distribution_estimator: {status: UNCALIBRATED,
+                           why: v1 historical-empirical; zero forward PIT observations;
+                                structurally self-aware (status propagates)}
+  expression_engine: {status: REFUSED,
+                      why: deterministic given its input pmf; its honesty is
+                           inherited from the distribution status it refuses to upgrade}
+  risk_engine: {status: UNCALIBRATED,
+                why: limits are declared constants; vol/corr inputs are
+                     estimates without forward validation; conservative by construction}
+  capacity_engine: {status: UNCALIBRATED,
+                    why: modeled sqrt-impact, never observed; presented as
+                         MODELED capacity, never empirical fact}
+  cost_model: {status: PARTIALLY_CALIBRATED,
+               why: realized-turnover based (measured), cost-per-trade
+                    constants declared not observed}
+  opportunity_engine: {status: UNCALIBRATED,
+                       why: zero TRADE decisions with realized outcomes;
+                            all outputs stamped PAPER-GRADE}
+  trade_no_trade: {status: UNCALIBRATED,
+                   why: rejection-value and false-positive rates need the
+                        paper track's forward record}
+  paper_tracking: {status: CALIBRATED_WITH_LIMITATIONS,
+                   why: marks are mechanical/realized (no forecast); CONTROL
+                        drift +0.4pct flagged, delisting handling crude}

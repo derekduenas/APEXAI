@@ -291,6 +291,15 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
                "refused without CALIBRATED",
        failure_behavior="NO-TRADE is first-class and refusals are retained "
                         "in the report"),
+    _c(name="calibration_harness", state=PLANNED, module="",
+       purpose="walk-forward chain-calibration ledger: replayable "
+               "snapshot(T) -> decision -> outcome(T+h); computes PIT/"
+               "coverage/reliability per component ONCE per frozen "
+               "methodology (docs/SYSTEM-CALIBRATION-AUDIT.md section 4); "
+               "one design with the discovery runner",
+       activation_prereqs=("discovery_exercise_runner",),
+       failure_behavior="calibration is never recomputed after model "
+                        "inspection; a recalibrated model is a new version"),
     _c(name="discovery_exercise_runner", state=ABSENT, module="",
        purpose="THE remaining gap this tranche exposed: the machine can "
                "DECIDE on a fully-specified candidate but cannot yet FEED "
