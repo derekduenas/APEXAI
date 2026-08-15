@@ -1,0 +1,245 @@
+{
+ "note": "v2 desk smoke, synthetic candidate, attached to NO decision",
+ "candidate_id": "smoke-v2-0001",
+ "as_of": "2026-08-15T22:00:00+00:00",
+ "status": "OK",
+ "agents_run": [
+  "THESIS_ANALYST",
+  "MARKET_CONTEXT_ANALYST",
+  "ADVERSARIAL_TRADER",
+  "SYNTHESIS_ANALYST"
+ ],
+ "claims": [
+  [
+   "THESIS_ANALYST",
+   "The strongest coherent mechanism is idiosyncratic information repricing with incomplete flow: the name is outperforming both its market and its sector simultaneously, so the move is not beta or sector rotation but name-specific, and name-specific repricings are executed over hours rather than minute",
+   "excess_market_60m 0.011 and excess_sector_60m 0.007 both positive, with cross_sectional_pct 0.94"
+  ],
+  [
+   "THESIS_ANALYST",
+   "The 3.2x relative volume is the load-bearing fact for continuation, because repricing requires an order-flow imbalance large enough to overwhelm normal liquidity provision, and volume at 3.2x its time-of-day norm is what distinguishes a repricing from a drift.",
+   "rvol_tod 3.2"
+  ],
+  [
+   "THESIS_ANALYST",
+   "position_in_or of 1.4 says the opening auction resolved upward and found no restocking supply above the opening range, which is the observable signature of price discovery still searching for a clearing level rather than oscillating around one already found.",
+   "position_in_or 1.4, above_vwap true"
+  ],
+  [
+   "THESIS_ANALYST",
+   "The market backdrop is neutral-to-inert rather than supportive, so the entire move must be carried by the idiosyncratic bid, which makes the thesis stand or fall on the durability of the name-specific flow alone.",
+   "market_day_return 0.004 and market realized_vol_ann 0.11"
+  ],
+  [
+   "THESIS_ANALYST",
+   "The main fact undercutting continuation is that 1.3 ATRs of range have already been spent 52 minutes into the session, meaning the discovery distance likely remaining is compressed relative to the distance already travelled, which weakens the payoff side of the mechanism without falsifying the mecha",
+   "range_vs_atr 1.3 at minutes_into_session 52"
+  ],
+  [
+   "THESIS_ANALYST",
+   "The competing mechanism that fits the same facts is flow completion rather than repricing: a single large scheduled or forced buyer (index/rebalance/option-hedging/liquidation) produces exactly this pattern of high rvol, positive cross-sectional excess return, and OR extension, and then reverts once",
+   "no catalyst, news, or flow-composition field is present in the facts"
+  ],
+  [
+   "THESIS_ANALYST",
+   "Extension of 0.9% above VWAP is the reversion mechanism's foothold, because VWAP is the reference price against which the day's marginal execution is benchmarked, and distance from it is what a fill-improvement seller trades against.",
+   "distance_to_vwap 0.009"
+  ],
+  [
+   "MARKET_CONTEXT_ANALYST",
+   "Roughly a third of the symbol's market-relative move is sector beta and two thirds is idiosyncratic, so this is a leader inside a bid sector rather than a lone mover or a pure sector proxy.",
+   "excess_market_60m 0.011 vs excess_sector_60m 0.007, implying sector-over-market of about +0.004"
+  ],
+  [
+   "MARKET_CONTEXT_ANALYST",
+   "The index is contributing almost nothing: a +0.4% market day in an 11% annualized-vol regime is about 0.6 of a daily sigma, so the setup is not riding a risk-on beta lift and its edge stands or falls on the symbol/sector leg.",
+   "market.day_return 0.004 with market.realized_vol_ann 0.11"
+  ],
+  [
+   "MARKET_CONTEXT_ANALYST",
+   "Participation and displacement are both present and confirm each other \u2014 3.2x time-of-day volume with price 40% of an opening range beyond the OR high is volume-backed repricing, not a thin drift on low float turnover.",
+   "rvol_tod 3.2 combined with position_in_or 1.4"
+  ],
+  [
+   "MARKET_CONTEXT_ANALYST",
+   "The day has already consumed 1.3 ATR of range inside 52 minutes, so continuation now requires an above-average range day rather than ordinary follow-through of an average one.",
+   "range_vs_atr 1.3 at minutes_into_session 52"
+  ],
+  [
+   "MARKET_CONTEXT_ANALYST",
+   "Entry location is extended on two axes at once: beyond the OR and 0.9% from VWAP, which means a routine mean-revert to VWAP is itself a material adverse excursion and there is no proximate structural reference between price and VWAP.",
+   "distance_to_vwap 0.009 with position_in_or 1.4"
+  ],
+  [
+   "MARKET_CONTEXT_ANALYST",
+   "The apparent confluence is partly double-counted \u2014 the three relative_strength fields are transforms of a single 60-minute return window, and rvol_tod / position_in_or appear in both matched and chart, so the number of independent confirmations is smaller than the field count suggests.",
+   "relative_strength block duplicating matched.excess_market_60m / excess_sector_60m, and rvol_tod and position_in_or repeated across matched and chart"
+  ],
+  [
+   "MARKET_CONTEXT_ANALYST",
+   "A 94th-percentile cross-sectional rank is strong but regime-conditioned; in a low-dispersion tape the absolute excess return behind that rank can be small, and about 6% of the universe clears the same bar.",
+   "cross_sectional_pct 0.94 against market.realized_vol_ann 0.11"
+  ],
+  [
+   "MARKET_CONTEXT_ANALYST",
+   "Because excess is measured against a benchmark that is itself up and above VWAP, the relative-strength reading is flattered by a supportive tape, and a market reversal would likely retrace more of a high-beta name than its 1.1% excess cushions.",
+   "market.day_return 0.004 and market.above_vwap true, with excess_market_60m 0.011"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "PRIMARY_OBJECTION: At 52 minutes in with price already 1.4x beyond the opening range and the day's range at 1.3x ATR, the entry is buying the tail of a move that has largely already been paid out, not the start of one.",
+   "desk"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "The entry is late by construction: position_in_or of 1.4 means price is 40% of an opening range above the breakout level, so the cheap, defined-risk portion of the move is gone and any stop placed back inside the range is now wide relative to remaining upside.",
+   "chart.position_in_or = 1.4, chart.minutes_into_session = 52"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "The extension is already largely spent: a full session's worth of ATR plus 30% has been consumed in 52 minutes, so continuation requires an atypical range expansion rather than ordinary follow-through.",
+   "chart.range_vs_atr = 1.3 against minutes_into_session = 52"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "Sector confirmation is weak, not supportive: excess_sector_60m of 0.007 versus excess_market_60m of 0.011 implies the sector itself is contributing only ~40bps of the 110bps move, so roughly two-thirds of the relative strength is idiosyncratic single-name flow with no peer breadth behind it.",
+   "relative_strength.excess_market_60m = 0.011 vs excess_sector_60m = 0.007"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "The 3.2x relative volume is signature-ambiguous and is equally consistent with a short-covering squeeze or a single large index/basket print, both of which are non-repeating flows that vanish once filled, and no facts provided distinguish accumulation from forced buying.",
+   "matched.rvol_tod = 3.2 with no order-flow, borrow, or trade-size facts supplied"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "Market support is thin cover rather than a tailwind: a +0.4% index day in an 11% annualized-vol regime is roughly a one-sigma session, which cannot explain or sustain a 1.3-ATR single-name extension, so the name is carrying its own move and will unwind alone if the bid steps away.",
+   "market.day_return = 0.004 with market.realized_vol_ann = 0.11"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "Cross-sectional rank of 0.94 is a crowding warning as much as a strength signal, since the top ~6% of intraday movers is precisely where late momentum entries cluster and where mean reversion is most likely to be priced against the last buyer.",
+   "relative_strength.cross_sectional_pct = 0.94"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "The distance_to_vwap of 0.009 offers no cushion: the reference level that would define trend failure sits ~90bps below entry, so the invalidation point is far enough away that the 0.006 risk fraction is either stopped inside noise or forces a stop tighter than the instrument's demonstrated intraday ",
+   "chart.distance_to_vwap = 0.009 against risk_frac = 0.006 and range_vs_atr = 1.3"
+  ],
+  [
+   "ADVERSARIAL_TRADER",
+   "The single fragile assumption is that the 3.2x volume represents fresh, ongoing demand rather than terminal absorption, and every other fact in the setup is a consequence of that same flow rather than independent confirmation of it.",
+   "matched.rvol_tod, position_in_or, range_vs_atr, and cross_sectional_pct are all downstream of one 60-minute flow event"
+  ],
+  [
+   "SYNTHESIS_ANALYST",
+   "Directional thesis materially stronger than the entry thesis \u2014 no seat disputes that a real, volume-backed, name-specific bid exists; the entire live disagreement is whether 52 minutes and 1.3 ATR into the session is a participation point or a distri",
+   "desk views"
+  ],
+  [
+   "SYNTHESIS_ANALYST",
+   "All three seats agree on direction and on the reality of the order-flow imbalance, so the disagreement is timing-located, not thesis-located.",
+   "THESIS_ANALYST claim 2, MARKET_CONTEXT_ANALYST claim 3, and ADVERSARIAL_TRADER's primary_objection, which contests entry point rather than the move's existence."
+  ],
+  [
+   "SYNTHESIS_ANALYST",
+   "The idiosyncratic-versus-sector split is genuinely ambiguous at this granularity, because a ~0.4% implied sector-over-market leg is small enough to read as either leadership or measurement noise.",
+   "relative_strength.excess_market_60m 0.011 vs excess_sector_60m 0.007, read against MARKET_CONTEXT_ANALYST claim 1 and ADVERSARIAL_TRADER's SECTOR_CONFIRMATION: LOW."
+  ],
+  [
+   "SYNTHESIS_ANALYST",
+   "The market leg is inert on the facts, so the adversary's MODERATE market-support rating is the least fact-anchored axis in the panel.",
+   "market.day_return 0.004 with realized_vol_ann 0.11, plus MARKET_CONTEXT_ANALYST claim 2 and THESIS_ANALYST claim 4 both calling the backdrop neutral."
+  ],
+  [
+   "SYNTHESIS_ANALYST",
+   "The extension objection and the continuation thesis both draw on the same three chart facts and neither is falsifiable from a single static snapshot lacking volume trajectory, pullback behavior, or time-of-day decay.",
+   "chart block (rvol_tod, position_in_or, range_vs_atr, minutes_into_session 52) as the shared evidence base for THESIS_ANALYST claim 3 and ADVERSARIAL_TRADER's EXTENSION_RISK: HIGH."
+  ],
+  [
+   "SYNTHESIS_ANALYST",
+   "No seat relates its objection or its conviction to the risk_frac of 0.006, so the panel's disagreement is stated at full intensity without reference to how much is actually at stake.",
+   "risk_frac 0.006 present in FACTS but absent from all three views."
+  ],
+  [
+   "SYNTHESIS_ANALYST",
+   "The unresolved contradictions concentrate on entry quality and sector attribution, leaving the market-relative leadership fact (cross_sectional_pct 0.94, above_vwap true) as the least contested part of the record.",
+   "convergence of THESIS_ANALYST claims 1-2, MARKET_CONTEXT_ANALYST claim 3, and the absence of any adversary axis attacking relative strength itself."
+  ]
+ ],
+ "disagreements": [
+  "SYNTHESIS: THESIS_ANALYST calls the move purely name-specific and explicitly not sector rotation, while MARKET_CONTEXT_ANALYST attributes roughly a third of the market-relative move to sector beta \u2014 the facts (excess_market 0.011 vs excess_sector 0.007) support",
+  "SYNTHESIS: ADVERSARIAL_TRADER scores SECTOR_CONFIRMATION as LOW while MARKET_CONTEXT_ANALYST reads the same 0.7% sector excess as evidence of leadership inside a bid sector; the underlying number is one implied ~0.4% sector-over-market leg, and no seat resolves",
+  "SYNTHESIS: ADVERSARIAL_TRADER scores MARKET_SUPPORT as MODERATE while both analyst seats independently characterize the index as contributing almost nothing (+0.4% at ~0.6 daily sigma) \u2014 the adversary's axis is more generous than either constructive view, which",
+  "SYNTHESIS: The identical facts rvol_tod 3.2 and position_in_or 1.4 carry opposite signs across seats \u2014 incomplete repricing with no restocking supply for THESIS_ANALYST, an already-paid-out tail for ADVERSARIAL_TRADER \u2014 and the fact set contains no volume-traje",
+  "SYNTHESIS: MARKET_CONTEXT_ANALYST states that 1.3 ATR in 52 minutes makes continuation conditional on an above-average range day, while ADVERSARIAL_TRADER treats the same number as disqualifying extension; neither addresses that 1.3 ATR consumed in the first ho",
+  "SYNTHESIS: cross_sectional_pct of 0.94 is cited by no seat as a constraint on the idiosyncratic story, yet it means roughly 6% of the cross-section is behaving similarly, which sits uneasily with THESIS_ANALYST's claim of a lone name-specific repricing.",
+  "SYNTHESIS: EXTENSION_RISK is rated HIGH on opening-range and ATR grounds while distance_to_vwap of 0.009 \u2014 a modest stretch for a 1.3 ATR day \u2014 goes unmentioned by every seat, leaving the extension claim resting on two of three available extension measures."
+ ],
+ "adversarial_flags": [
+  "THESIS_ANALYST: rvol_tod and position_in_or appear identically in both 'matched' and 'chart', and excess_market_60m/excess_sector_60m appear identically in both 'matched' and 'relative_strength' \u2014 agreement across th",
+  "THESIS_ANALYST: cross_sectional_pct 0.94 is mechanically downstream of the same 60m excess returns already given, so it adds ranking context but no new information about the flow",
+  "THESIS_ANALYST: The facts contain no catalyst, news, or event field, which means repricing (continuation) and flow completion (reversion) are observationally identical here \u2014 the mechanism cannot be discriminated on ",
+  "THESIS_ANALYST: position_in_or 1.4 is dimensionless without the opening range width; a narrow OR makes 1.4 a trivial extension, a wide OR makes it a large one, and the facts do not distinguish these",
+  "THESIS_ANALYST: range_vs_atr 1.3 is already elevated at minute 52, so the setup is being evaluated after a material portion of the move rather than at its origin \u2014 late-stage entry risk is a property of the timestamp",
+  "THESIS_ANALYST: market realized_vol_ann of 0.11 is a low-volatility regime; single-name 3.2x rvol moves in low-vol index regimes are disproportionately event-driven, which raises the prior on discrete, completing flo",
+  "THESIS_ANALYST: The facts are a single 52-minute snapshot with no path history, so a name that already round-tripped to VWAP once today would be indistinguishable from one that has trended monotonically",
+  "MARKET_CONTEXT_ANALYST: A 60-minute lookback taken 52 minutes into the session cannot be fully intraday \u2014 it necessarily straddles the open, so the relative strength may be inherited from an overnight gap rather than earned ",
+  "MARKET_CONTEXT_ANALYST: range_vs_atr 1.3 before the first hour is complete is range-exhaustion context: the cheap part of the day's move is already spent.",
+  "MARKET_CONTEXT_ANALYST: Entry is extended \u2014 above the OR and 0.9% above VWAP \u2014 so adverse excursion to the most obvious magnet is large relative to typical intraday noise in an 11%-vol regime.",
+  "MARKET_CONTEXT_ANALYST: No catalyst, news, or event-proximity field is present; 3.2x rvol on a single name in an unusually quiet index tape is more consistent with a name-specific catalyst than with generic flow, and the two",
+  "MARKET_CONTEXT_ANALYST: Correlated inputs are presented as independent evidence (three relative-strength fields from one return window; rvol_tod and position_in_or duplicated across blocks), which inflates perceived confluen",
+  "MARKET_CONTEXT_ANALYST: cross_sectional_pct 0.94 is strong but not exceptional \u2014 roughly 6% of the universe qualifies, so the signal is not scarce and other participants are plausibly competing for the same move.",
+  "MARKET_CONTEXT_ANALYST: above_vwap is stated only for the market; distance_to_vwap 0.009 carries no sign, so 'symbol above its VWAP' is an inference from direction=LONG, not a given fact.",
+  "MARKET_CONTEXT_ANALYST: position_in_or 1.4 does not reveal whether the opening range was itself a gap-and-go or a balanced auction; identical OR extension means very different things in those two cases.",
+  "MARKET_CONTEXT_ANALYST: market.realized_vol_ann 0.11 is an unusually compressed index-vol regime; the low-vol backdrop is what makes the excess look large, and vol regime shifts would recalibrate every threshold here at once",
+  "MARKET_CONTEXT_ANALYST: risk_frac 0.006 is supplied with no stop distance or expected adverse excursion, so nothing in these facts bounds how much of the extension is being paid for.",
+  "ADVERSARIAL_TRADER: CHASE_RISK=HIGH",
+  "ADVERSARIAL_TRADER: SECTOR_CONFIRMATION=LOW",
+  "ADVERSARIAL_TRADER: EXTENSION_RISK=HIGH",
+  "ADVERSARIAL_TRADER: MATERIAL_OBJECTION"
+ ],
+ "unresolved_questions": [
+  "THESIS_ANALYST: Is there an identifiable catalyst (earnings, guidance, sector news, index event, large option expiry) \u2014 this is the single fact that would separate information repricing from flow completion",
+  "THESIS_ANALYST: Is the 3.2x volume broad participation across many prints or concentrated in a small number of large blocks, which distinguishes a durable repricing from one buyer finishing an order",
+  "THESIS_ANALYST: What is the opening range width in ATR units, without which position_in_or 1.4 cannot be scaled",
+  "THESIS_ANALYST: Has price already tested and held VWAP intraday, or is the 0.9% extension unretraced and untested",
+  "THESIS_ANALYST: What is HUNTER-001_v1's realized base rate conditional on range_vs_atr already exceeding ~1.2 at entry, versus its unconditional base rate",
+  "THESIS_ANALYST: Does the sector excess of 0.7% reflect the name leading its sector higher, or the sector being flat while the name moves alone \u2014 the two imply different breadth of the repricing",
+  "THESIS_ANALYST: What is the typical holding horizon this playbook assumes, since the continuation mechanism has a natural expiry when session volume normalizes",
+  "MARKET_CONTEXT_ANALYST: Was the 60-minute relative strength accumulated during regular-hours trading, or is it largely gap-inherited given the window straddles the open?",
+  "MARKET_CONTEXT_ANALYST: Is there a dated catalyst \u2014 earnings, product event, index or rebalance flow \u2014 inside the intended holding horizon?",
+  "MARKET_CONTEXT_ANALYST: Is the sector excess broad-based, or is it mechanically driven by this symbol's own weight in the sector index (which would make excess_sector_60m a partly circular measure)?",
+  "MARKET_CONTEXT_ANALYST: What is the historical continuation rate for HUNTER-001 conditioned on range_vs_atr above 1.2 before minute 60, versus the unconditional rate?",
+  "MARKET_CONTEXT_ANALYST: In a realized-vol regime this low, what absolute excess return does the 94th cross-sectional percentile actually correspond to?",
+  "MARKET_CONTEXT_ANALYST: Is the symbol above or below its own VWAP, and where did VWAP sit relative to the opening range high?",
+  "MARKET_CONTEXT_ANALYST: What is market and sector breadth beneath the +0.4% index return \u2014 is participation broad or concentrated in the same names this candidate belongs to?"
+ ],
+ "latency_seconds": 238.0,
+ "provenance": {
+  "iface": "hunter_swarm_producer_v2",
+  "facts_supplied": "{\"symbol\": \"NVDA\", \"playbook_id\": \"HUNTER-001_v1\", \"direction\": \"LONG\", \"matched\": {\"rvol_tod\": 3.2, \"excess_market_60m\": 0.011, \"excess_sector_60m\": 0.007, \"position_in_or\": 1.4, \"market_day_return\": 0.004}, \"risk_frac\": 0.006, \"market\": {\"day_return\": 0.004, \"realized_vol_ann\": 0.11, \"above_vwap\": true}, \"relative_strength\": {\"excess_market_60m\": 0.011, \"excess_sector_60m\": 0.007, \"cross_sectional_pct\": 0.94}, \"chart\": {\"rvol_tod\": 3.2, \"position_in_or\": 1.4, \"distance_to_vwap\": 0.009, \"range_vs_atr\": 1.3, \"minutes_into_session\": 52}}",
+  "agent_ms": {
+   "THESIS_ANALYST": 54614,
+   "MARKET_CONTEXT_ANALYST": 89372,
+   "ADVERSARIAL_TRADER": 43899,
+   "SYNTHESIS_ANALYST": 50085
+  },
+  "cli": "2.1.233 (Claude Code)",
+  "adversary_verdict": "MATERIAL_OBJECTION",
+  "adversary_axes": {
+   "CHASE_RISK": "HIGH",
+   "SECTOR_CONFIRMATION": "LOW",
+   "MARKET_SUPPORT": "MODERATE",
+   "EXTENSION_RISK": "HIGH"
+  },
+  "agents_skipped": [],
+  "dormant_agents": [
+   "CATALYST_ANALYST",
+   "TECHNICAL_STRUCTURE_ANALYST",
+   "FUNDAMENTAL_EVENT_ANALYST",
+   "HISTORICAL_ANALOGUE_ANALYST",
+   "RISK_ANALYST",
+   "IMPLEMENTATION_ANALYST"
+  ]
+ }
+}

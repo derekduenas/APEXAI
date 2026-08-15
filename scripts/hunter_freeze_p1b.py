@@ -104,6 +104,15 @@ ARTIFACTS = {
     # The archive outranks Claude, structurally and tested.
     "hunter_rule_model_v1.5.2": (
         "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py")),
+    # Swarm producer v2 (operator: "make the changes now"): the charter's
+    # trade-moment desk — per-role prompts, Thesis/MarketContext/
+    # Adversary(structured verdict+axes)/Synthesis, conservative-only
+    # wiring, partial-deadline honesty. Live 4-seat smoke:
+    # results/SWARM-SMOKE-V2.json.
+    "hunter_swarm_producer_v2": (
+        "model", ("apex/hunter/swarm.py", "docs/SWARM-CHARTER.md")),
+    "hunter_rule_model_v1.5.3": (
+        "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py")),
 }
 
 

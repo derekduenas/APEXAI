@@ -35,11 +35,12 @@ def test_ok_path_with_role_separated_calls(monkeypatch):
         return GOOD
     a = swarm.run_specialists(CAND, as_of="t", runner=runner)
     assert a.status == "OK"
-    assert a.agents_run == swarm.V1_ACTIVE_AGENTS
-    assert len(prompts) == 2                     # one call PER agent
-    assert prompts[0] != prompts[1]              # role separation
+    assert a.agents_run == swarm.V2_ACTIVE_AGENTS
+    assert len(prompts) == 4                     # one call PER seat
+    assert len(set(prompts)) == 4                # role separation
+    assert "other desk seats" in prompts[-1]     # only Synthesis sees views
+    assert all("other desk seats" not in x for x in prompts[:-1])
     assert all(c[2] for c in a.claims)           # every claim has a basis
-    assert any("ADVERSARIAL_TRADER" in f for f in a.adversarial_flags)
 
 
 def test_garbage_output_is_failed_never_partial(monkeypatch):
@@ -64,7 +65,8 @@ def test_facts_only_from_candidate_no_instructions_leak():
     facts = swarm._candidate_facts(CAND)
     parsed = json.loads(facts)
     assert set(parsed) <= {"symbol", "playbook_id", "direction", "matched",
-                           "risk_frac", "market", "relative_strength"}
+                           "risk_frac", "market", "relative_strength",
+                           "chart"}
 
 
 def test_ordering_law_candidates_persist_before_enrichment(tmp_path):
@@ -99,3 +101,44 @@ def test_ordering_law_candidates_persist_before_enrichment(tmp_path):
     assert cap["final_state"] in ("OBSERVE", "WATCH", "NO_TRADE", "REFUSED")
     # enrichment reads ONLY persisted record fields (replayable)
     assert cap["decision_id"] in {d["decision_id"] for d in decisions}
+
+
+ADVERSARY = json.dumps({
+    "flags": {"CHASE_RISK": "HIGH", "SECTOR_CONFIRMATION": "LOW",
+              "MARKET_SUPPORT": "MODERATE", "EXTENSION_RISK": "LOW"},
+    "primary_objection": "already 1.6x the normal opening-range extension",
+    "verdict": "MATERIAL_OBJECTION", "claims": []})
+SYNTH = json.dumps({"contradictions": ["quant strong vs adversary chase"],
+                    "synthesis": "good thesis, bad price", "claims": []})
+
+
+def _desk_runner(p):
+    if "OTHER SIDE" in p:
+        return ADVERSARY
+    if "other desk seats" in p:
+        return SYNTH
+    return GOOD
+
+
+def test_adversary_verdict_and_leveled_axes(monkeypatch):
+    monkeypatch.setattr(swarm, "auth_available", lambda: True)
+    a = swarm.run_specialists(CAND, as_of="t", runner=_desk_runner)
+    assert a.status == "OK"
+    assert a.provenance["adversary_verdict"] == "MATERIAL_OBJECTION"
+    # HIGH risk axis and LOW confirmation axis flag; LOW risk axis does not
+    assert any("CHASE_RISK=HIGH" in f for f in a.adversarial_flags)
+    assert any("SECTOR_CONFIRMATION=LOW" in f for f in a.adversarial_flags)
+    assert not any("EXTENSION_RISK=LOW" in f for f in a.adversarial_flags)
+    assert any("PRIMARY_OBJECTION" in c[1] for c in a.claims)
+    assert any("SYNTHESIS" in d for d in a.disagreements)
+    assert any(c[0] == "SYNTHESIS_ANALYST" and "bad price" in c[1]
+               for c in a.claims)
+
+
+def test_material_objection_raises_disagreement_to_high(monkeypatch):
+    monkeypatch.setattr(swarm, "auth_available", lambda: True)
+    from apex.hunter.forecast import assemble_bundle
+    a = swarm.run_specialists(CAND, as_of="t", runner=_desk_runner)
+    b = assemble_bundle({"decision_id": "d1", "direction": "LONG",
+                         "playbook_id": "HUNTER-001_v1"}, swarm=a)
+    assert b.disagreement["level"] == "HIGH"     # conservative-only path
