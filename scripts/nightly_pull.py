@@ -90,12 +90,21 @@ def _chain_append(log_path: Path, entry: dict) -> dict:
     """Append one hash-chained record. Same discipline as the research ledger:
     every night's pull is a fact with a position in a sequence, not a loose log
     line that can be edited."""
-    prev = "GENESIS"
+    # a torn write (crash mid-append) must never kill the archive: walk
+    # back to the last parseable entry, link past the tear, and RECORD the
+    # recovery in the new entry so the anomaly is visible, not hidden
+    prev, torn = "GENESIS", False
     if log_path.exists():
         lines = log_path.read_text().strip().splitlines()
-        if lines:
-            prev = json.loads(lines[-1])["entry_hash"]
+        for line in reversed(lines):
+            try:
+                prev = json.loads(line)["entry_hash"]
+                break
+            except (json.JSONDecodeError, KeyError):
+                torn = True
     body = {**entry, "prev_hash": prev}
+    if torn:
+        body["recovered_from_torn_tail"] = True
     body["entry_hash"] = hashlib.sha256(
         json.dumps(body, sort_keys=True).encode()
     ).hexdigest()

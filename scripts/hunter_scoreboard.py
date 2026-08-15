@@ -42,7 +42,10 @@ def load_ledger(ledger: Path = LEDGER) -> dict:
         for line in ledger.read_text().splitlines():
             if not line.strip():
                 continue
-            r = json.loads(line)                 # chain entries are FLAT
+            try:
+                r = json.loads(line)             # chain entries are FLAT
+            except json.JSONDecodeError:
+                continue                         # torn line: reader survives
             if r.get("kind") in kinds:
                 kinds[r["kind"]].append(r)
     return kinds

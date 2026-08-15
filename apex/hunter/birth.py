@@ -40,7 +40,10 @@ def load_births(registry: Path = REGISTRY) -> dict:
         if not line.strip():
             continue
         # chain entries are FLAT: {**record, prev_hash, entry_hash}
-        r = json.loads(line)
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue                             # torn line: reader survives
         if r.get("kind") != "birth":
             continue
         if r["name"] in births:

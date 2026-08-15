@@ -77,7 +77,10 @@ def existing_decision_keys(date: str, ledger: Path = LEDGER) -> tuple:
     for line in ledger.read_text().splitlines():
         if not line.strip():
             continue
-        r = json.loads(line)                     # chain entries are FLAT
+        try:
+            r = json.loads(line)                 # chain entries are FLAT
+        except json.JSONDecodeError:
+            continue                             # torn line: reader survives
         if r.get("kind") == "decision" and r.get("session_date") == date:
             if r["playbook_id"].startswith("BASELINE-"):
                 base.add((r["symbol"], r["playbook_id"]))
@@ -93,7 +96,10 @@ def realized_decision_ids(ledger: Path = LEDGER) -> set:
     for line in ledger.read_text().splitlines():
         if not line.strip():
             continue
-        r = json.loads(line)                     # chain entries are FLAT
+        try:
+            r = json.loads(line)                 # chain entries are FLAT
+        except json.JSONDecodeError:
+            continue                             # torn line: reader survives
         if r.get("kind") == "realization":
             ids.add(r["decision_id"])
     return ids
@@ -107,7 +113,10 @@ def unrealized_decisions(date: str, ledger: Path = LEDGER) -> list:
     for line in ledger.read_text().splitlines():
         if not line.strip():
             continue
-        r = json.loads(line)                     # chain entries are FLAT
+        try:
+            r = json.loads(line)                 # chain entries are FLAT
+        except json.JSONDecodeError:
+            continue                             # torn line: reader survives
         if (r.get("kind") == "decision" and r.get("session_date") == date
                 and r["decision_id"] not in done):
             out.append(r)

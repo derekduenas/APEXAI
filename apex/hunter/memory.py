@@ -25,8 +25,15 @@ LEDGER = Path("results/hunter/forward_ledger.jsonl")
 def _rows(ledger: Path = LEDGER) -> list:
     if not ledger.exists():
         return []
-    return [json.loads(x) for x in ledger.read_text().splitlines()
-            if x.strip()]
+    out = []
+    for x in ledger.read_text().splitlines():
+        if not x.strip():
+            continue
+        try:
+            out.append(json.loads(x))
+        except json.JSONDecodeError:
+            continue                             # torn line: reader survives
+    return out
 
 
 def candidate_lineage(decision_id: str, ledger: Path = LEDGER) -> dict:
