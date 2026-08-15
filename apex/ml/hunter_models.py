@@ -111,9 +111,9 @@ def build_dataset(decisions: list, realizations_by_id: dict,
         if not o or o.get(f"ret_{horizon_minutes}m") is None:
             continue
         v, missing = feature_vector(d)
-        if len(missing) > 4:
-            continue
-        X.append(np.nan_to_num(v, nan=0.0))
+        if missing:
+            continue          # F-05: a missing feature is excluded, never
+        X.append(v)           # coerced to a scaled-zero "typical" value
         y.append(1.0 if o[f"ret_{horizon_minutes}m"] > 0 else 0.0)
         dates.append(d["session_date"])
         pids.append(d["playbook_id"])
