@@ -1,0 +1,21 @@
+{
+ "frozen_at_utc": "2026-08-15 20:16:31.590783+00:00",
+ "git_commit": "58f8f5dd235f26338093ed7398f7e574ba53e5ce",
+ "working_tree_clean": true,
+ "protocol_hash": "bf4db43981fd611e",
+ "graduation_criteria_hash": "0b50e4cf99b24dbc",
+ "conventions_hash": "6ee06e4b2d89fbe5",
+ "birth_registry_hash": "52317c19336a0535",
+ "birth_count": 10,
+ "launchd_jobs": [
+  "-\t0\tcom.apex.hunter-clock",
+  "-\t0\tcom.apex.nightly-pull"
+ ],
+ "forward_ledger_exists": false,
+ "credit_state": "4/5 spent per experiment-keyed ledger; Credit 5 SEALED",
+ "holdout_state": "SEALED (no results/holdout entry; A-010 token absent)",
+ "config_hashes": {
+  "config/sharadar.yaml": "ca26e45a30942dcc",
+  "apex/config.py": "cccf78ecfe4a0280"
+ }
+}
