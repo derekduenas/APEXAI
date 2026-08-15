@@ -1,0 +1,14 @@
+# Track 3 (v4.0 section 1) -- options expression engine parameters.
+# The selection OBJECTIVE is declared here, never hardcoded (section 1.4).
+expression:
+  objective: exponential_utility
+  # risk aversion on P&L per share of underlying notional; higher = more
+  # penalty on left tails. Declared, not fitted.
+  risk_aversion: 3.0
+  # IV persistence at the horizon: remaining-life value is re-priced at the
+  # SAME implied vol (flat persistence). ASSUMPTION (v1.0 section 37), not
+  # evidence -- declared here so it is visible, versioned, and challengeable.
+  iv_persistence: flat
+  # liquidity floor: quotes wider than this fraction of mid are penalised
+  # into the cost, never ignored.
+  max_relative_spread_uncosted: 0.0
