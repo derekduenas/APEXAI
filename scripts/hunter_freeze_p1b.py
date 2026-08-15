@@ -113,6 +113,14 @@ ARTIFACTS = {
         "model", ("apex/hunter/swarm.py", "docs/SWARM-CHARTER.md")),
     "hunter_rule_model_v1.5.3": (
         "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py")),
+    # Swarm producer v3 (tiered scheduling): Tier-1 assassin
+    # (Adversary+Context, 120s) kills cheaply on MATERIAL_OBJECTION; the
+    # committee (Thesis+Synthesis) convenes for survivors only; partial
+    # honesty on blown budgets; terse-mode prompts; latency telemetry.
+    "hunter_swarm_producer_v3": (
+        "model", ("apex/hunter/swarm.py", "docs/SWARM-CHARTER.md")),
+    "hunter_rule_model_v1.5.4": (
+        "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py")),
 }
 
 

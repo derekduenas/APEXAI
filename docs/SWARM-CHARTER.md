@@ -80,3 +80,34 @@ Adversary objects to entry geometry, Synthesis says "good stock, good
 thesis, bad price," Capital says WATCH — and APEX re-evaluates when
 geometry improves. The Swarm earns its keep by discovering what the
 machine doesn't know and preventing it from fooling itself.
+
+## Amendment: tiered scheduling + the three clocks (2026-08-15, implemented)
+
+The Swarm is a scarce, expensive reasoning resource deployed in
+proportion to APEX's interest — never one large step every candidate
+waits on:
+
+- **TIER 1 — the assassin (~fast)**: ADVERSARIAL_TRADER +
+  MARKET_CONTEXT_ANALYST. Job: the fastest credible reason this trade is
+  deceptive. A MATERIAL_OBJECTION ends the desk (kill cheaply; the
+  objection already carries maximum caution). Budget 120s.
+- **TIER 2 — the committee (minutes)**: survivors only. THESIS +
+  SYNTHESIS join (CATALYST when event data exists). Total budget 300s.
+- **TIER 3 — forensics (after outcome, context-walled)**: error
+  classification into Research Memory; never touches prospective records.
+
+The three clocks: machine clock (seconds — feed/Twin/chart/scan/risk, no
+LLM), decision clock (tens of seconds — analogues/ML/sim/fast Swarm/
+Capital), research clock (minutes-hours — deep Swarm, events, forensics).
+Each intelligence works at the speed where it has an advantage.
+
+Latency is a first-class trading metric: tick records carry
+t0/t1(state)/t2(quant) stamps, capital records carry enrichment time and
+capital wall time, so edge decay during reasoning is computable from the
+bars at resolution. Future elite rule: match intelligence spend to the
+opportunity's alpha half-life. Future concept (recorded, not built):
+per-playbook declared intelligence requirements (REQUIRED / PREFERRED /
+OPTIONAL / NOT_REQUIRED seats), so mechanism dictates intelligence and
+architecture never becomes bureaucracy. Trade management stays
+deterministic and fast — Claude may enrich a thesis asynchronously; it
+never holds the steering wheel.

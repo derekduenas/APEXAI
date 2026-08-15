@@ -158,6 +158,8 @@ def _finalize(record: dict) -> dict:
 
 
 def _regular_tick(now, gov, today) -> None:
+    import time as _time
+    t_stamps = {"t0_tick_start": _time.monotonic()}
     sector_syms = tuple(sorted(set(SECTOR_ETF.values())))
     bars: dict = {}
     for sym in (*INDEXES, *sector_syms):
@@ -165,6 +167,8 @@ def _regular_tick(now, gov, today) -> None:
             bars[sym] = _fetch_today(sym, gov, today, bust_cache=True)
         except Exception as e:                              # noqa: BLE001
             print(f"fetch {sym}: {type(e).__name__}")
+    t_stamps["t1_state_s"] = round(_time.monotonic()
+                                   - t_stamps["t0_tick_start"], 1)
     entry = _finalize(_state_snapshot(now, gov, today, bars))
     print(f"forward state {entry['entry_hash'][:12]}")
 
@@ -191,6 +195,14 @@ def _regular_tick(now, gov, today) -> None:
         # enrichment, never a market observation or a candidate
         scan_record, decisions = decision_pass(now, universe, bars, contexts,
                                                enrich=False)
+        # decision-latency telemetry (a first-class trading metric): how
+        # long each stage of the funnel takes, so edge decay during
+        # reasoning is measurable against the bars later
+        t_stamps["t2_quant_s"] = round(_time.monotonic()
+                                       - t_stamps["t0_tick_start"], 1)
+        scan_record["latency"] = {"t0_wall_utc": str(now),
+                                  "t1_state_s": t_stamps["t1_state_s"],
+                                  "t2_quant_s": t_stamps["t2_quant_s"]}
         scan_record["quota_used_cumulative"] = gov.used
         _finalize(scan_record)
         for d in decisions:
@@ -204,7 +216,16 @@ def _regular_tick(now, gov, today) -> None:
               f"{len(decisions)} decisions PERSISTED")
         try:
             from apex.hunter.forward_pass import enrichment_pass
+            t3 = _time.monotonic()
             for r in enrichment_pass(now, today, decisions, universe):
+                if r.get("kind") == "capital_decision":
+                    # reasoning time from formation to capital verdict:
+                    # the edge-decay clock (price at each stamp is
+                    # recoverable from the day's bars at resolution)
+                    r["latency"] = {
+                        "t2_decisions_persisted_s": t_stamps["t2_quant_s"],
+                        "t3_enrichment_s": round(_time.monotonic() - t3, 1),
+                        "t4_capital_wall_utc": str(pd.Timestamp.now(tz="UTC"))}
                 e = _finalize(r)
                 if r.get("kind") == "capital_decision":
                     print(f"CAPITAL {r['symbol']} {r['final_state']} "

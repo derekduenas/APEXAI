@@ -37,7 +37,7 @@ from pathlib import Path
 
 from apex.hunter.forecast import SwarmAssessment
 
-SWARM_VERSION = "hunter_swarm_producer_v2"
+SWARM_VERSION = "hunter_swarm_producer_v3"
 AUTH_MARKER = Path("ops/swarm_auth_ok")          # operator-managed marker
 CLAUDE_BIN = Path.home() / ".local/bin/claude"
 
@@ -46,9 +46,17 @@ SPECIALISTS = ("CATALYST_ANALYST", "MARKET_CONTEXT_ANALYST",
                "HISTORICAL_ANALOGUE_ANALYST", "THESIS_ANALYST",
                "ADVERSARIAL_TRADER", "RISK_ANALYST",
                "IMPLEMENTATION_ANALYST", "SYNTHESIS_ANALYST")
-V2_ACTIVE_AGENTS = ("THESIS_ANALYST", "MARKET_CONTEXT_ANALYST",
-                    "ADVERSARIAL_TRADER", "SYNTHESIS_ANALYST")
+# TIERED SCHEDULING (charter refinement): Tier 1 is the ASSASSIN — the
+# fastest credible reason this trade is deceptive. A MATERIAL_OBJECTION
+# ends the desk right there (kill cheaply; the objection already carries
+# maximum caution downstream). Only survivors get the investment
+# committee. Claude is a scarce reasoning resource spent in proportion
+# to how interested APEX is.
+TIER1_AGENTS = ("ADVERSARIAL_TRADER", "MARKET_CONTEXT_ANALYST")
+TIER2_AGENTS = ("THESIS_ANALYST", "SYNTHESIS_ANALYST")
+V2_ACTIVE_AGENTS = TIER1_AGENTS + TIER2_AGENTS      # full desk, in tier order
 
+TIER1_DEADLINE_SECONDS = 120          # the assassin must be fast
 DEADLINE_SECONDS = 300                # total per-candidate desk budget
 AGENT_TIMEOUT_SECONDS = 90
 
@@ -60,7 +68,9 @@ _HEADER = """You are the {role} on the research desk of a systematic
 trading system. You receive ONLY the structured facts below about one
 intraday candidate the quantitative system has already selected. Do not
 assume any information beyond these facts. You do not pick stocks, set
-stops, size positions, or authorize trades.
+stops, size positions, or authorize trades. Time matters on a trading
+desk: think hard but answer tersely — every sentence tight, nothing
+beyond the requested JSON.
 
 FACTS:
 {facts}
@@ -213,10 +223,19 @@ def run_specialists(candidate: dict, *, as_of: str,
     adversary_axes_out: dict = {}
     prior_views: list = []
 
+    tier_completed = "NONE"
+    fast_kill = False
     for role in V2_ACTIVE_AGENTS:
-        if time.monotonic() - start > deadline_seconds:
-            skipped = [r for r in V2_ACTIVE_AGENTS
-                       if r not in ran and r != role] + [role]
+        # tier gate: the committee convenes only if the assassin failed
+        if role in TIER2_AGENTS:
+            if fast_kill:
+                skipped = [r for r in TIER2_AGENTS if r not in ran]
+                break
+            if time.monotonic() - start > deadline_seconds:
+                skipped = [r for r in TIER2_AGENTS if r not in ran]
+                break
+        elif time.monotonic() - start > TIER1_DEADLINE_SECONDS and ran:
+            skipped = [r for r in V2_ACTIVE_AGENTS if r not in ran]
             break
         prompt = (ROLE_PROMPTS[role].format(
             role=role, facts=facts,
@@ -259,6 +278,8 @@ def run_specialists(candidate: dict, *, as_of: str,
             claims.extend(c); flags.extend(f); questions.extend(q)
             prior_views[-1].update({"verdict": verdict,
                                     "primary_objection": po})
+            if verdict == "MATERIAL_OBJECTION":
+                fast_kill = True          # the assassin ends the desk
         elif role == "SYNTHESIS_ANALYST":
             for x in obj.get("contradictions", []):
                 disagreements.append(f"SYNTHESIS: {str(x)[:250]}")
@@ -273,6 +294,10 @@ def run_specialists(candidate: dict, *, as_of: str,
             prior_views.append({"role": role,
                                 "claims": [x[1] for x in c][:4]})
         ran.append(role)
+        tier_completed = ("TIER1" if all(r in ran for r in TIER1_AGENTS)
+                          and not all(r in ran for r in TIER2_AGENTS)
+                          else ("FULL_DESK" if all(r in ran
+                                for r in V2_ACTIVE_AGENTS) else "PARTIAL"))
 
     if not ran:
         return SwarmAssessment(
@@ -296,6 +321,8 @@ def run_specialists(candidate: dict, *, as_of: str,
                     "cli": _cli_identity(),
                     "adversary_verdict": verdict,
                     "adversary_axes": adversary_axes_out,
+                    "tier_completed": tier_completed,
+                    "fast_kill": fast_kill,
                     "agents_skipped": tuple(skipped),
                     "dormant_agents": tuple(s for s in SPECIALISTS
                                             if s not in V2_ACTIVE_AGENTS)})

@@ -34,7 +34,7 @@ def test_ok_path_with_role_separated_calls(monkeypatch):
         prompts.append(p)
         return GOOD
     a = swarm.run_specialists(CAND, as_of="t", runner=runner)
-    assert a.status == "OK"
+    assert a.status == "OK"                      # GOOD has no verdict: no kill
     assert a.agents_run == swarm.V2_ACTIVE_AGENTS
     assert len(prompts) == 4                     # one call PER seat
     assert len(set(prompts)) == 4                # role separation
@@ -54,11 +54,16 @@ def test_garbage_output_is_failed_never_partial(monkeypatch):
                         claims=(("A", "b", "c"),))
 
 
-def test_deadline_yields_not_available(monkeypatch):
+def test_blown_deadline_keeps_tier1_partial_honesty(monkeypatch):
+    """A blown total budget skips the committee but keeps the assassin's
+    completed work — partial honesty over wholesale loss."""
     monkeypatch.setattr(swarm, "auth_available", lambda: True)
     a = swarm.run_specialists(CAND, as_of="t", deadline_seconds=-1,
                               runner=lambda p: GOOD)
-    assert a.status == "NOT_AVAILABLE_IN_TIME" and a.claims == ()
+    assert a.status == "OK"
+    assert a.agents_run == swarm.TIER1_AGENTS
+    assert a.provenance["tier_completed"] == "TIER1"
+    assert set(a.provenance["agents_skipped"]) == set(swarm.TIER2_AGENTS)
 
 
 def test_facts_only_from_candidate_no_instructions_leak():
@@ -120,16 +125,45 @@ def _desk_runner(p):
     return GOOD
 
 
-def test_adversary_verdict_and_leveled_axes(monkeypatch):
+def test_tier1_fast_kill_skips_the_committee(monkeypatch):
+    """The assassin ends the desk: MATERIAL_OBJECTION -> Tier 2 never
+    convenes; the objection already carries maximum caution downstream."""
     monkeypatch.setattr(swarm, "auth_available", lambda: True)
     a = swarm.run_specialists(CAND, as_of="t", runner=_desk_runner)
     assert a.status == "OK"
     assert a.provenance["adversary_verdict"] == "MATERIAL_OBJECTION"
+    assert a.provenance["fast_kill"] is True
+    assert a.provenance["tier_completed"] == "TIER1"
+    assert a.agents_run == swarm.TIER1_AGENTS
+    assert "THESIS_ANALYST" in a.provenance["agents_skipped"]
     # HIGH risk axis and LOW confirmation axis flag; LOW risk axis does not
     assert any("CHASE_RISK=HIGH" in f for f in a.adversarial_flags)
     assert any("SECTOR_CONFIRMATION=LOW" in f for f in a.adversarial_flags)
     assert not any("EXTENSION_RISK=LOW" in f for f in a.adversarial_flags)
     assert any("PRIMARY_OBJECTION" in c[1] for c in a.claims)
+
+
+SURVIVOR = json.dumps({
+    "flags": {"CHASE_RISK": "LOW", "SECTOR_CONFIRMATION": "HIGH",
+              "MARKET_SUPPORT": "HIGH", "EXTENSION_RISK": "MODERATE"},
+    "primary_objection": "", "verdict": "NO_MATERIAL_OBJECTION",
+    "claims": []})
+
+
+def test_survivor_gets_the_full_desk(monkeypatch):
+    monkeypatch.setattr(swarm, "auth_available", lambda: True)
+
+    def runner(p):
+        if "OTHER SIDE" in p:
+            return SURVIVOR
+        if "other desk seats" in p:
+            return SYNTH
+        return GOOD
+    a = swarm.run_specialists(CAND, as_of="t", runner=runner)
+    assert a.provenance["fast_kill"] is False
+    assert a.provenance["tier_completed"] == "FULL_DESK"
+    assert a.agents_run == swarm.V2_ACTIVE_AGENTS
+    assert not any("CHASE_RISK=LOW" in f for f in a.adversarial_flags)
     assert any("SYNTHESIS" in d for d in a.disagreements)
     assert any(c[0] == "SYNTHESIS_ANALYST" and "bad price" in c[1]
                for c in a.claims)
