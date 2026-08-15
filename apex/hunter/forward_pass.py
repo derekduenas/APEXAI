@@ -207,27 +207,57 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
             }, EvidenceClass.EODHD_FORWARD_OBSERVATION)
             decisions.append(rec)
 
-    # APEX CAPITAL: every playbook candidate flows candidate -> risk ->
-    # cost -> capacity -> portfolio -> reasoned final state, into the SAME
-    # ledger (Phase 4 spine; baselines are measurement, not candidates)
+    # THE INTELLIGENCE SPINE (per candidate, each seat typed, each absence
+    # honest): analog -> ml -> swarm -> ForecastBundle -> APEX CAPITAL ->
+    # reasoned final state — all into the SAME ledger. Every enrichment is
+    # fault-isolated: if any seat fails, the candidate still reaches
+    # Capital and the archive never stops (Monday-safety law).
     from apex.portfolio.risk import PortfolioState
     portfolio = PortfolioState(nav=100_000.0, positions={}, sector_weights={},
-                       heat=0.0, drawdown_budget_left=1.0,
-                       sleeve_correlations={})
+                               heat=0.0, drawdown_budget_left=1.0,
+                               sleeve_correlations={})
     uncertain = intraday_market_uncertain(market_cs)
     capital_records = []
     for d in decisions:
         meta = universe["symbols"].get(d["symbol"], {})
         cs = cs_by_symbol.get(d["symbol"])
+        bundle_rec, disagreement_level, support_low = None, None, False
+        try:
+            from apex.analog.engine import AnalogQuery, retrieve
+            from apex.hunter.forecast import assemble_bundle
+            from apex.hunter.memory import analog_memory_rows
+            from apex.hunter.swarm import run_specialists
+            analog = retrieve(
+                AnalogQuery(as_of=str(t), security_id=d["symbol"],
+                            horizon_minutes=60,
+                            playbook_id=d["playbook_id"],
+                            candidate_record=d),
+                analog_memory_rows(str(t)),
+                evidence_class=EvidenceClass.EODHD_FORWARD_OBSERVATION)
+            swarm = run_specialists(d, as_of=str(t))
+            bundle = assemble_bundle(d, analog_result=analog, swarm=swarm)
+            disagreement_level = bundle.disagreement.get("level")
+            # weak analogues are a caution signal; ABSENT analogues are
+            # not (absence is already the NO_CALIBRATED_FORECAST state)
+            support_low = analog.status == "ANALOG_SUPPORT_LOW"
+            bundle_rec = stamp(bundle.as_record(),
+                               EvidenceClass.EODHD_FORWARD_OBSERVATION)
+            bundle_rec["session_date"] = date
+        except Exception as e:                              # noqa: BLE001
+            print(f"bundle {d['symbol']}: {type(e).__name__}: {e}")
         cd = evaluate_candidate(
             d, sector=meta.get("sector"),
             median_dollar_volume=meta.get("median_dollar_volume"),
             ann_vol=cs.realized_vol_ann if cs is not None else None,
             market_uncertain=uncertain, forecast=ForecastSlot(),
-            portfolio=portfolio)
+            portfolio=portfolio,
+            disagreement_level=disagreement_level,
+            analog_support_low=support_low)
         rec = stamp(cd.as_record(), EvidenceClass.EODHD_FORWARD_OBSERVATION)
         rec["session_date"] = date
         rec["t_utc"] = str(t)
+        if bundle_rec is not None:
+            capital_records.append(bundle_rec)
         capital_records.append(rec)
 
     # frozen baselines: same subjects, same ledger, same machinery —

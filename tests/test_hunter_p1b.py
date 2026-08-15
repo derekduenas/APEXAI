@@ -203,11 +203,11 @@ def test_hunter001_fails_closed_on_missing_input():
     assert match_hunter_001(no_rvol, rs, mkt) is None
 
 
-def failed_spike_frame():
+def failed_spike_frame(date="2026-08-10"):
     """Steady rise, sharp spike, then a ~2/3 giveback of the spike leg —
     the mechanism's textbook shape."""
     n = 110
-    t0 = pd.Timestamp("2026-08-10 09:30", tz=ET).tz_convert("UTC")
+    t0 = pd.Timestamp(f"{date} 09:30", tz=ET).tz_convert("UTC")
     times = pd.date_range(t0, periods=n, freq="1min")
     path = np.r_[np.linspace(100, 103.5, 60),       # steady rise (VWAP up)
                  np.linspace(103.5, 105.6, 15),     # spike leg

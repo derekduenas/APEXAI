@@ -60,6 +60,19 @@ ARTIFACTS = {
                   "apex/hunter/forward_pass.py", "apex/hunter/birth.py",
                   "apex/hunter/baselines.py", "apex/hunter/neff.py",
                   "apex/hunter/capital.py")),
+    # v1.4 (full spine): every DECISION-AFFECTING file in the intelligence
+    # pass — bundle assembly, analog retrieval (feeds capital caution),
+    # memory firewall, swarm interface, monotone-caution capital. The
+    # simulator/ML/paper modules are NOT decision-affecting in production
+    # (diagnostic / UNTRAINED / NOT_AUTHORIZED) and enter the artifact
+    # when they gain influence.
+    "hunter_rule_model_v1.4": (
+        "model", ("apex/hunter/scanner.py", "apex/hunter/playbooks_v1.py",
+                  "apex/hunter/forward_pass.py", "apex/hunter/birth.py",
+                  "apex/hunter/baselines.py", "apex/hunter/neff.py",
+                  "apex/hunter/capital.py", "apex/hunter/forecast.py",
+                  "apex/analog/engine.py", "apex/hunter/memory.py",
+                  "apex/hunter/swarm.py")),
 }
 
 

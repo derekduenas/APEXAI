@@ -114,6 +114,23 @@ def _hard_quality(cs_record: dict) -> tuple:
     return tuple(sorted(hard.intersection(cs_record.get("data_quality", ()))))
 
 
+def caution_scale(*, market_uncertain: bool,
+                  disagreement_level: str | None = None,
+                  analog_support_low: bool = False) -> float:
+    """MONOTONE CAUTION LAW: each uncertainty source can only multiply the
+    scale DOWN (each factor <= 1.0); nothing here can ever exceed 1.0, so
+    a more uncertain system can never become more aggressive. Simulation
+    output has NO factor: diagnostic sources cannot move size either way."""
+    s = 1.0
+    if market_uncertain:
+        s *= 0.5
+    if disagreement_level == "HIGH":
+        s *= 0.5
+    if analog_support_low:
+        s *= 0.75
+    return s
+
+
 def evaluate_candidate(candidate: dict, *, sector: str | None,
                        median_dollar_volume: float | None,
                        ann_vol: float | None,
@@ -121,12 +138,16 @@ def evaluate_candidate(candidate: dict, *, sector: str | None,
                        forecast: ForecastSlot,
                        portfolio: PortfolioState,
                        relative_spread: float | None = None,
+                       disagreement_level: str | None = None,
+                       analog_support_low: bool = False,
                        nav_usd: float = PAPER_NAV_USD) -> CapitalDecision:
     """candidate: a playbook DECISION record from the forward ledger.
     Deterministic; every stage's numbers land in `gates`."""
     codes: list = []
     detail: list = []
-    gates: dict = {"regime_uncertain": market_uncertain}
+    gates: dict = {"regime_uncertain": market_uncertain,
+                   "disagreement_level": disagreement_level,
+                   "analog_support_low": analog_support_low}
 
     def out(state: FinalState, weight=None, notional=None) -> CapitalDecision:
         return CapitalDecision(
@@ -175,15 +196,22 @@ def evaluate_candidate(candidate: dict, *, sector: str | None,
                       f"formally lit (no half-wired edge numbers)")
         return out(FinalState.REFUSED)
 
-    # 4. sizing from the declared template; regime uncertainty halves BOTH
-    #    the risk budget and the position cap (conservative in every
-    #    dimension, so caution survives whichever constraint binds)
-    scale = 0.5 if market_uncertain else 1.0
+    # 4. sizing from the declared template; the monotone caution law
+    #    scales BOTH the risk budget and the position cap down for every
+    #    uncertainty source, so caution survives whichever constraint binds
+    scale = caution_scale(market_uncertain=market_uncertain,
+                          disagreement_level=disagreement_level,
+                          analog_support_low=analog_support_low)
+    conservative = scale < 1.0
     if market_uncertain:
         codes.append(Reason.REGIME_UNCERTAIN)
-        detail.append("uncertain world state: risk budget and position cap "
-                      "halved, final state capped at WATCH "
-                      "(conservative-only rule)")
+    if disagreement_level == "HIGH":
+        codes.append(Reason.INSUFFICIENT_EDGE_EVIDENCE)
+        detail.append("forecast sources disagree (HIGH): caution scaled")
+    if conservative:
+        detail.append(f"caution scale {scale}: risk budget and position "
+                      f"cap reduced, final state capped at WATCH "
+                      f"(monotone conservative-only rule)")
     weight = min(PAPER_RISK_BUDGET_FRAC * scale / risk_frac,
                  MAX_POSITION_WEIGHT * scale)
     notional = weight * nav_usd
@@ -234,6 +262,6 @@ def evaluate_candidate(candidate: dict, *, sector: str | None,
     # 8. final state. PAPER_ELIGIBLE requires a commissioned forecast path,
     #    which v1 refuses above — so it is UNREACHABLE here by construction
     #    until Phase 3 lights the slot. That is the design, not a gap.
-    if market_uncertain:
+    if conservative:
         return out(FinalState.WATCH, weight, notional)
     return out(FinalState.OBSERVE, weight, notional)
