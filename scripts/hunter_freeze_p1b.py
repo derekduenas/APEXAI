@@ -150,6 +150,13 @@ ARTIFACTS = {
     "hunter_rule_model_v1.5.7": (
         "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py",
                   "apex/hunter/assassin.py", "apex/hunter/halflife.py")),
+    # v1.1 (LAB-01): empty-frame guard in visible_bars — a not-yet-listed
+    # symbol crashed the whole scan tick (found by the replay campaign's
+    # first minute; also a latent Monday robustness bug). Crash guard
+    # only; feature semantics unchanged.
+    "hunter_feature_schema_v1.1": (
+        "feature_schema", ("apex/hunter/chartstate.py",
+                           "apex/hunter/relstrength.py")),
 }
 
 

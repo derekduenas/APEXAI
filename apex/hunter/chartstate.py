@@ -41,6 +41,11 @@ def visible_bars(bars: pd.DataFrame, t_utc) -> pd.DataFrame:
     t = pd.Timestamp(t_utc)
     if t.tzinfo is None:
         raise ValueError("as-of time must be tz-aware")
+    if bars.empty:
+        # LAB-01: an empty frame (symbol not yet listed / vendor gap) has
+        # object-dtype columns; comparing would TypeError and kill the
+        # whole scan tick. No bars = no state, for one symbol only.
+        return bars
     f = bars[bars["event_time_utc"] + BAR <= t]
     return f[f["event_time_utc"].map(
         lambda x: classify(x) is Session.REGULAR)].reset_index(drop=True)

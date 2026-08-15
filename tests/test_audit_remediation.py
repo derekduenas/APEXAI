@@ -160,3 +160,28 @@ def test_f10_formed_after_but_resolved_before_refused():
     r = retrieve(QUERY, [hostile],
                  evidence_class=EvidenceClass.EODHD_FORWARD_OBSERVATION)
     assert r.status == "NO_VALID_ANALOGS"
+
+
+# LAB-01 (found by the replay campaign day 1): an empty bars frame (e.g.
+# a symbol that did not exist yet) must yield None state, never a
+# TypeError that kills the whole scan tick
+def test_lab01_empty_bars_symbol_cannot_kill_the_tick():
+    import pandas as pd
+
+    from apex.hunter.chartstate import compute_chart_state, visible_bars
+    from apex.hunter.forward_pass import decision_pass
+    from apex.intraday.eodhd import normalize_rows
+    from tests.test_hunter_p1b import T, bars, ctx
+    empty = normalize_rows([], "GHOST.US")        # object-dtype columns
+    assert visible_bars(empty, T).empty
+    assert compute_chart_state("GHOST", empty, T, ctx("GHOST")) is None
+    uni = {"symbols": {"GHOST": {"sector": "Technology", "sector_etf": None,
+                                 "median_dollar_volume": 500e6},
+                       "AAA": {"sector": "Technology", "sector_etf": None,
+                               "median_dollar_volume": 500e6}},
+           "universe_limitation": "test"}
+    scan_rec, decisions = decision_pass(
+        T, uni, {"GHOST": empty, "AAA": bars("AAA"),
+                 "SPY.US": bars("SPY")},
+        {"AAA": ctx("AAA"), "SPY.US": ctx("SPY")}, enrich=False)
+    assert scan_rec["states_computed"] == 1       # GHOST skipped, tick lives
