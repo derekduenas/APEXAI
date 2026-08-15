@@ -187,9 +187,10 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
        pit_required=True, activation_prereqs=("digital_twin_multifacet",)),
 
     # ---- LAYER 3: monetisation (gated on validated alpha) ------------------
-    _c(name="portfolio_construction", state=UNDER_CONSTRUCTION,
-       module="apex.portfolio.projection",
-       purpose="minimal monetisation evaluator (fixed policy); full construction PLANNED",
+    _c(name="portfolio_construction", state=BUILT,
+       module="apex.portfolio.construction",
+       purpose="L/S beta/sector-neutral attribution ladder rungs 0-5; "
+               "evidence_class enforced by test; borrow proxy = ASSUMPTION",
        forbidden_deps=("apex.pipeline", "apex.registration", "apex.governance.ledger"),
        activation_prereqs=("a VALIDATED_ALPHA to exercise on real spread",),
        failure_behavior="policy versioned, never fitted to validation"),
@@ -209,9 +210,11 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
        failure_behavior="borrow cost documented as omission"),
 
     # ---- LAYER 4: deployment ------------------------------------------------
-    _c(name="paper_shadow", state=PLANNED, module="",
-       purpose="RESEARCH->VALIDATED->PAPER->SHADOW->LIVE state machine",
-       activation_prereqs=("capacity_engine",),
+    _c(name="paper_shadow", state=ACTIVE, module="",
+       purpose="LIVE paper track (scripts/paper_track.py): 6 frozen portfolios "
+               "on the nightly lake, chained marks, holdout guard; "
+               "SHADOW and LIVE stages remain PLANNED",
+       activation_prereqs=("capacity_engine (for SHADOW/LIVE stages only)",),
        failure_behavior="no automatic promotion; human-authorised transitions"),
     _c(name="execution", state=PLANNED, module="",
        purpose="consume approved weights, emit fills; generates no research",
@@ -225,6 +228,58 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
     _c(name="lifecycle_attribution", state=PLANNED, module="",
        purpose="feature/factor/model/regime/portfolio/cost/execution attribution",
        activation_prereqs=("backtest_engine",)),
+
+    # ---- LAYER 5: forward evidence + intelligence (v2.0-v4.0) ---------------
+    _c(name="reality_harness", state=ACTIVE, module="apex.reality.harness",
+       purpose="chained+anchored prediction ledger, 4 resolution rules frozen "
+               "at creation, Brier/log-loss/calibration, Murphy decomposition, "
+               "unresolved-past-due scores as failure, PRELIMINARY stamps",
+       failure_behavior="silence is scored as failure, never as neutrality"),
+    _c(name="reality_producers", state=ACTIVE, module="apex.reality.producers",
+       purpose="mechanical producers + biting baselines + the blind twin "
+               "(signature cannot carry market data)"),
+    _c(name="llm_producers", state=BUILT, module="apex.reality.llm_producer",
+       purpose="full/stripped pairs, parallel models (haiku+opus) never "
+               "substitution, pair-atomic, rule-17 no-backdating guard",
+       activation_prereqs=("headless CLI login (operator, outstanding)",),
+       failure_behavior="an unpaired variant is discarded, never recorded"),
+    _c(name="expression_engine", state=BUILT, module="apex.expression.engine",
+       purpose="distribution + chain -> ranked defined-risk structures; "
+               "spread paid, theta integrated; only CALIBRATED may recommend",
+       activation_prereqs=("calibrated distributions from the reality loop",),
+       failure_behavior="as_recommendation() refuses non-CALIBRATED sources"),
+    _c(name="world_vintage", state=BUILT, module="apex.world.vintage",
+       purpose="as-released macro vintages; asof() returns the knowable, "
+               "REVISED_ONLY refused from confirmatory paths",
+       pit_required=True,
+       activation_prereqs=("FRED/ALFRED key for the live macro feed (operator)",)),
+    _c(name="world_state", state=ACTIVE, module="apex.world.state",
+       purpose="online-only state variables + classifier (median detection "
+               "lag 4d), labels never revised, staleness infectious; NO "
+               "notion of a profitable state exists (enforced by test)"),
+    _c(name="exploration_governance", state=BUILT, module="apex.exploration.cv",
+       purpose="purged CV + embargo (fails closed), walk-forward, trial "
+               "ledger with visible denominator, DSR at the TRUE trial "
+               "count, PBO/CSCV, candidate contract requiring correlation-"
+               "to-validated and regime-label provenance; in-sample only "
+               "structurally; no select_best exists",
+       forbidden_deps=("apex.registration", "apex.governance.ledger"),
+       failure_behavior="a candidate missing any receipt is refused, not "
+                        "emitted with a warning"),
+
+    # ---- named-and-missing (the reconciliation's output, owned HERE) --------
+    _c(name="distribution_estimator", state=ABSENT, module="",
+       purpose="THE missing link alpha->money: turn signal + world state "
+               "into the calibrated return pmf the expression engine eats; "
+               "its calibration evidence is the reality loop (Group B, "
+               "forward only)",
+       activation_prereqs=("reality-loop calibration data", "world_state")),
+    _c(name="opportunity_engine", state=ABSENT, module="",
+       purpose="rank candidate opportunities net of cost/risk/capacity and "
+               "produce the governed TRADE/NO-TRADE opportunity report; "
+               "NO-TRADE is a first-class output",
+       activation_prereqs=("distribution_estimator", "risk_engine",
+                           "capacity_engine", "expression_engine")),
 ]}
 
 

@@ -125,10 +125,16 @@ def test_firewall_and_registry_agree_on_under_construction_layers():
 
 def test_the_named_gaps_are_present_and_unbuilt():
     """The gaps the architecture audit prioritises must be IN the registry as
-    PLANNED/ABSENT, so 'what is missing' is data, not memory."""
-    for gap in ("research_memory", "portfolio_construction", "risk_engine",
-                "backtest_engine", "capacity_engine", "paper_shadow",
-                "execution", "live_monitoring", "model_registry"):
+    PLANNED/ABSENT, so 'what is missing' is data, not memory.
+
+    Updated 2026-08-15 (v4.0 reconciliation): portfolio_construction (BUILT,
+    attribution ladder) and paper_shadow (ACTIVE, nightly track) left the gap
+    list on evidence; distribution_estimator and opportunity_engine JOINED it
+    -- the two never-previously-named links between alpha and money."""
+    for gap in ("research_memory", "risk_engine",
+                "backtest_engine", "capacity_engine",
+                "execution", "live_monitoring", "model_registry",
+                "distribution_estimator", "opportunity_engine"):
         assert gap in REGISTRY, f"named gap {gap} is not in the registry"
         assert REGISTRY[gap].state in (PLANNED, ABSENT, UNDER_CONSTRUCTION)
 
