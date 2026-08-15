@@ -1,0 +1,181 @@
+{
+  "detection_lag_diagnostic": {
+    "detected_within_120d": 67,
+    "durable_transitions_in_reference": 105,
+    "mean_lag_days": 5.6,
+    "median_lag_days": 4.0,
+    "missed_within_120d": 38,
+    "note": "hindsight reference is deliberately contaminated and exists only inside this diagnostic; durable transitions (>=20d in new state) only"
+  },
+  "label_store": "results/world/labels.jsonl",
+  "labels_assigned": 938,
+  "live_state": {
+    "classification": {
+      "date": "2026-08-14",
+      "regime": "CALM_UP",
+      "stress": false,
+      "trend_vs_sma": 0.1047,
+      "uncertain": true,
+      "vol_20d": 0.1336,
+      "vol_threshold": 0.1448
+    },
+    "cross_sectional": {
+      "aggregate_addv": {
+        "as_of": "2026-08-14",
+        "name": "aggregate_addv",
+        "source": "sharadar-derived",
+        "stale": false,
+        "value": 645626632573.1603,
+        "vintage": "2026-08-14"
+      },
+      "breadth_above_50d": {
+        "as_of": "2026-08-14",
+        "name": "breadth_above_50d",
+        "source": "sharadar-derived",
+        "stale": false,
+        "value": 0.5719548699055952,
+        "vintage": "2026-08-14"
+      },
+      "dispersion_60d": {
+        "as_of": "2026-08-14",
+        "name": "dispersion_60d",
+        "source": "sharadar-derived",
+        "stale": false,
+        "value": 0.5106577092741631,
+        "vintage": "2026-08-14"
+      },
+      "mean_pairwise_corr": {
+        "as_of": "2026-08-14",
+        "name": "mean_pairwise_corr",
+        "source": "sharadar-derived",
+        "stale": false,
+        "value": 0.005981321389821399,
+        "vintage": "2026-08-14"
+      }
+    },
+    "index": {
+      "drawdown": {
+        "as_of": "2026-08-14",
+        "name": "drawdown",
+        "source": "sharadar-derived",
+        "stale": false,
+        "value": -0.001979739805625491,
+        "vintage": "2026-08-14"
+      },
+      "trend_vs_200d": {
+        "as_of": "2026-08-14",
+        "name": "trend_vs_200d",
+        "source": "sharadar-derived",
+        "stale": false,
+        "value": 0.10470433161449888,
+        "vintage": "2026-08-14"
+      },
+      "vol_20d": {
+        "as_of": "2026-08-14",
+        "name": "vol_20d",
+        "source": "sharadar-derived",
+        "stale": false,
+        "value": 0.13360211431337476,
+        "vintage": "2026-08-14"
+      },
+      "vol_term_20_over_60": {
+        "as_of": "2026-08-14",
+        "name": "vol_term_20_over_60",
+        "source": "sharadar-derived",
+        "stale": false,
+        "value": 0.959512165784,
+        "vintage": "2026-08-14"
+      }
+    }
+  },
+  "macro_variables": "PENDING vendor: first-release vintages require FRED/ALFRED (free key, operator signup). The vintage store and REVISED_ONLY guard are built and counterexampled; no macro series is faked meanwhile.",
+  "occupancy_by_year": {
+    "2007:VOL_DOWN": 0.5,
+    "2007:VOL_UP": 0.5,
+    "2008:CALM_DOWN": 0.12,
+    "2008:CALM_UP": 0.02,
+    "2008:VOL_DOWN": 0.86,
+    "2009:CALM_DOWN": 0.02,
+    "2009:CALM_UP": 0.588,
+    "2009:VOL_DOWN": 0.373,
+    "2009:VOL_UP": 0.02,
+    "2010:CALM_DOWN": 0.2,
+    "2010:CALM_UP": 0.68,
+    "2010:VOL_DOWN": 0.04,
+    "2010:VOL_UP": 0.08,
+    "2011:CALM_DOWN": 0.16,
+    "2011:CALM_UP": 0.62,
+    "2011:VOL_DOWN": 0.2,
+    "2011:VOL_UP": 0.02,
+    "2012:CALM_DOWN": 0.02,
+    "2012:CALM_UP": 0.98,
+    "2013:CALM_UP": 0.98,
+    "2013:VOL_UP": 0.02,
+    "2014:CALM_UP": 0.84,
+    "2014:VOL_DOWN": 0.02,
+    "2014:VOL_UP": 0.14,
+    "2015:CALM_UP": 0.588,
+    "2015:VOL_DOWN": 0.196,
+    "2015:VOL_UP": 0.216,
+    "2016:CALM_UP": 0.74,
+    "2016:VOL_DOWN": 0.18,
+    "2016:VOL_UP": 0.08,
+    "2017:CALM_UP": 1.0,
+    "2018:CALM_UP": 0.54,
+    "2018:VOL_DOWN": 0.16,
+    "2018:VOL_UP": 0.3,
+    "2019:CALM_DOWN": 0.02,
+    "2019:CALM_UP": 0.647,
+    "2019:VOL_DOWN": 0.098,
+    "2019:VOL_UP": 0.235,
+    "2020:CALM_UP": 0.5,
+    "2020:VOL_DOWN": 0.26,
+    "2020:VOL_UP": 0.24,
+    "2021:CALM_UP": 0.98,
+    "2021:VOL_UP": 0.02,
+    "2022:CALM_DOWN": 0.28,
+    "2022:CALM_UP": 0.1,
+    "2022:VOL_DOWN": 0.56,
+    "2022:VOL_UP": 0.06,
+    "2023:CALM_DOWN": 0.06,
+    "2023:CALM_UP": 0.94,
+    "2024:CALM_UP": 0.94,
+    "2024:VOL_UP": 0.06,
+    "2025:CALM_DOWN": 0.02,
+    "2025:CALM_UP": 0.8,
+    "2025:VOL_DOWN": 0.14,
+    "2025:VOL_UP": 0.04,
+    "2026:CALM_DOWN": 0.032,
+    "2026:CALM_UP": 0.71,
+    "2026:VOL_DOWN": 0.032,
+    "2026:VOL_UP": 0.226
+  },
+  "q6_q7_conditional_alpha": "REFUSED at this layer. 'Signal S has positive expectancy only in state X' is a NEW HYPOTHESIS: it enters discovery, survives the screen, and pays for its own confirmatory look. The state layer describes; it never selects.",
+  "uncertain_fraction": 0.156,
+  "variable_independence_corr": {
+    "drawdown": {
+      "drawdown": 1.0,
+      "trend_vs_200d": 0.605,
+      "vol_20d": -0.652,
+      "vol_term_20_over_60": -0.069
+    },
+    "trend_vs_200d": {
+      "drawdown": 0.605,
+      "trend_vs_200d": 1.0,
+      "vol_20d": -0.724,
+      "vol_term_20_over_60": -0.169
+    },
+    "vol_20d": {
+      "drawdown": -0.652,
+      "trend_vs_200d": -0.724,
+      "vol_20d": 1.0,
+      "vol_term_20_over_60": 0.432
+    },
+    "vol_term_20_over_60": {
+      "drawdown": -0.069,
+      "trend_vs_200d": -0.169,
+      "vol_20d": 0.432,
+      "vol_term_20_over_60": 1.0
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
-  "chain_entries": 2750,
-  "generated_at": "2026-08-15T01:24:57.668112+00:00",
-  "lake_through": "2026-08-13",
+  "chain_entries": 2762,
+  "generated_at": "2026-08-15T09:38:57.421776+00:00",
+  "lake_through": "2026-08-14",
   "producers": {
     "baseline_base_rate": {
       "base_rate": 1.0,
@@ -46,8 +46,8 @@
       "uncertainty": 0.0
     },
     "baseline_momentum_rank": {
-      "base_rate": 0.4502,
-      "brier": 0.259659,
+      "base_rate": 0.4483,
+      "brier": 0.260022,
       "calibration": [
         {
           "bucket": "[0.4,0.5)",
@@ -57,50 +57,50 @@
         },
         {
           "bucket": "[0.5,0.6)",
-          "n": 165,
-          "realized_freq": 0.4545,
-          "stated_mean": 0.5822
+          "n": 166,
+          "realized_freq": 0.4518,
+          "stated_mean": 0.5823
         }
       ],
-      "log_loss": 0.712736,
-      "n": 231,
+      "log_loss": 0.713469,
+      "n": 232,
       "n_effective_dates": 1,
       "n_penalised_unresolved": 1,
-      "n_scored": 231,
-      "reliability": 0.011948,
-      "resolution": 4.7e-05,
+      "n_scored": 232,
+      "reliability": 0.012484,
+      "resolution": 3.1e-05,
       "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
-      "uncertainty": 0.247522
+      "uncertainty": 0.247325
     },
     "blind_twin": {
-      "base_rate": 0.4502,
+      "base_rate": 0.4483,
       "brier": 0.25,
       "calibration": [
         {
           "bucket": "[0.5,0.6)",
-          "n": 231,
-          "realized_freq": 0.4502,
+          "n": 232,
+          "realized_freq": 0.4483,
           "stated_mean": 0.5
         }
       ],
       "log_loss": 0.693147,
-      "n": 231,
+      "n": 232,
       "n_effective_dates": 1,
       "n_penalised_unresolved": 1,
-      "n_scored": 231,
-      "reliability": 0.00248,
+      "n_scored": 232,
+      "reliability": 0.002673,
       "resolution": 0.0,
       "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
-      "uncertainty": 0.247522
+      "uncertainty": 0.247325
     },
     "gp_rank": {
-      "base_rate": 0.4545,
-      "brier": 0.239303,
+      "base_rate": 0.4526,
+      "brier": 0.238975,
       "calibration": [
         {
           "bucket": "[0.4,0.5)",
-          "n": 116,
-          "realized_freq": 0.3448,
+          "n": 117,
+          "realized_freq": 0.3419,
           "stated_mean": 0.4101
         },
         {
@@ -110,25 +110,25 @@
           "stated_mean": 0.5901
         }
       ],
-      "log_loss": 0.671653,
-      "n": 231,
+      "log_loss": 0.670989,
+      "n": 232,
       "n_effective_dates": 1,
       "n_penalised_unresolved": 1,
-      "n_scored": 231,
-      "reliability": 0.00245,
-      "resolution": 0.012144,
+      "n_scored": 232,
+      "reliability": 0.002653,
+      "resolution": 0.012465,
       "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
-      "uncertainty": 0.247934
+      "uncertainty": 0.247752
     },
     "h3_rank": {
-      "base_rate": 0.4545,
-      "brier": 0.241899,
+      "base_rate": 0.4526,
+      "brier": 0.241784,
       "calibration": [
         {
           "bucket": "[0.4,0.5)",
-          "n": 123,
-          "realized_freq": 0.3577,
-          "stated_mean": 0.4476
+          "n": 124,
+          "realized_freq": 0.3548,
+          "stated_mean": 0.4478
         },
         {
           "bucket": "[0.5,0.6)",
@@ -137,15 +137,15 @@
           "stated_mean": 0.5371
         }
       ],
-      "log_loss": 0.676897,
-      "n": 231,
+      "log_loss": 0.676666,
+      "n": 232,
       "n_effective_dates": 1,
       "n_penalised_unresolved": 1,
-      "n_scored": 231,
-      "reliability": 0.004662,
-      "resolution": 0.010677,
+      "n_scored": 232,
+      "reliability": 0.00498,
+      "resolution": 0.010973,
       "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
-      "uncertainty": 0.247934
+      "uncertainty": 0.247752
     }
   }
 }
