@@ -300,6 +300,32 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
        activation_prereqs=("discovery_exercise_runner",),
        failure_behavior="calibration is never recomputed after model "
                         "inspection; a recalibrated model is a new version"),
+    # ---- APEX HUNTER (P0 contracts, 2026-08-15; P1+ gated on intraday data)
+    _c(name="hunter_contracts", state=BUILT, module="apex.hunter.contracts",
+       purpose="TradeThesis (immutable+hashed), PlaybookDefinition (no "
+               "mechanism = no candidate), fail-closed gate (unknown never "
+               "becomes safe)",
+       forbidden_deps=("apex.registration", "apex.governance.ledger"),
+       failure_behavior="a thesis without invalidation is refused"),
+    _c(name="hunter_lifecycle", state=BUILT, module="apex.hunter.lifecycle",
+       purpose="model lifecycle IDEA->...->LIVE with MECHANICAL calibration "
+               "gating; DEGRADED loses live eligibility structurally; no "
+               "override API exists",
+       failure_behavior="promotion without calibration evidence raises"),
+    _c(name="hunter_statemachine", state=BUILT, module="apex.hunter.statemachine",
+       purpose="ruled+chained trade transitions; a stop NEVER widens "
+               "(counterexampled)",
+       failure_behavior="an unruled transition is refused as a mood"),
+    _c(name="broker_adapter", state=BUILT, module="apex.hunter.broker",
+       purpose="abstract broker seam; live methods SEALED (subclass cannot "
+               "re-enable; dated governance change only)",
+       failure_behavior="live execution raises LiveExecutionDisabled"),
+    _c(name="hunter_intelligence", state=PLANNED, module="",
+       purpose="intraday replay, scanner funnel, ChartState, playbook "
+               "evaluation -- ALL gated on an intraday data source "
+               "(DATA_GAP: repo has zero intraday data; Robinhood MCP absent)",
+       activation_prereqs=("intraday minute-bar archive OR broker MCP",
+                           "hunter_contracts")),
     _c(name="discovery_exercise_runner", state=ABSENT, module="",
        purpose="THE remaining gap this tranche exposed: the machine can "
                "DECIDE on a fully-specified candidate but cannot yet FEED "

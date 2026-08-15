@@ -43,11 +43,23 @@ def test_no_machine_learning_dependency_exists():
 
 
 def test_no_execution_or_broker_dependency_exists():
-    """Audit claim: execution is ABSENT and must stay downstream."""
-    src = _all_source().lower()
+    """Audit claim: no LIVE execution exists. Updated 2026-08-15 (Hunter P0):
+    apex/hunter/broker.py deliberately NAMES place_order in order to SEAL it
+    -- the method raises always and subclasses cannot re-enable it (proven in
+    test_hunter_p0). That one module is exempt from the name scan; everything
+    else must still contain no execution vocabulary, and no broker library
+    may appear anywhere."""
+    src = "\n".join(
+        p.read_text() for p in APEX.rglob("*.py")
+        if "__pycache__" not in str(p) and p.name != "broker.py"
+    ).lower()
     for term in ("import ib_insync", "robin_stocks", "alpaca", "order_management",
                  "place_order", "submit_order"):
         assert term not in src, f"{term!r} present: execution has entered research"
+    # and the sealed module itself must contain no broker LIBRARY
+    broker_src = (APEX / "hunter" / "broker.py").read_text().lower()
+    for lib in ("import ib_insync", "robin_stocks", "alpaca"):
+        assert lib not in broker_src, f"{lib!r} inside the sealed adapter"
 
 
 def test_no_causal_inference_dependency_exists():
