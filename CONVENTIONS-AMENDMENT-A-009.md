@@ -1,14 +1,13 @@
-# CONVENTIONS — AMENDMENT A-009 (DRAFT, UNSIGNED, NOT IN FORCE)
+# CONVENTIONS — AMENDMENT A-009 (SIGNED 2026-08-15, IN FORCE)
 
-**Filed verbatim from the operator's 2026-08-14 draft. Nothing herein is
-implemented. See the signature block: unsigned. One open question flagged in
-review remains unresolved and is recorded at the bottom.**
+**Signed on operator instruction of 2026-08-15 ("Sign A-009 with the §3.1
+sentence — it's what makes the pivot legal"), with the composition sentence
+adopted verbatim into §3.1 below. The open review question is thereby
+RESOLVED and closed.**
 
 ## Segmented Holdout Capacity, Priced by Measured Independence
 
-**Status: AWAITING SIGNATURE. Not in force.**
-Claude Code must not implement, wire, or partially apply anything in this
-document prior to signature and a dated amendment-log entry.
+**Status: SIGNED 2026-08-15, IN FORCE.** Implementation proceeds per §7.
 
 **Drafted:** 2026-08-14
 **Extends:** A-003 (2026-08-09). Amends nothing.
@@ -54,6 +53,11 @@ formation window; a security-date in two holdouts invalidates both.
 **3.1** `N_eff(k, ρ̄) = k / (1 + (k−1)·ρ̄)`;
 `charge_k = N_eff(k, ρ̄) − N_eff(k−1, ρ̄)`, floored at **0.25**. No
 evaluation is ever free.
+
+**Composition with A-003 (added at signing, 2026-08-15):** an experiment
+costs its A-003 credit including its named holdout; §3 pricing governs
+additional holdout evaluations of the same validated strategy, with *k*
+counted per-strategy.
 
 **3.2** Governing ρ̄ = max(measured, class floor). Measured = mean pairwise
 correlation of the strategy's own in-sample return series across the
@@ -128,14 +132,14 @@ bypass an existing gate.
     Amendment:    A-009
     Title:        Segmented holdout capacity, priced by measured independence
     Drafted:      2026-08-14
-    Operator:     ______________________
-    Date:         ______________________
+    Operator:     Derek Duenas
+    Date:         2026-08-15
 
-**Unsigned. Not in force. Do not implement.**
+**SIGNED and IN FORCE. Implementation per section 7 proceeds.**
 
 ---
 
-### OPEN REVIEW QUESTION (flagged 2026-08-15, unresolved)
+### REVIEW QUESTION — RESOLVED AT SIGNING (the §3.1 sentence above)
 
 **Composition with A-003**: A-003 prices EXPERIMENTS (1 credit = validation
 + one holdout); §3 prices HOLDOUT EVALUATIONS. Unstated: whether the 5th

@@ -1,0 +1,81 @@
+{
+  "purpose": "APEX-004 draft section 5a structural breadth census",
+  "period": {
+    "start": "2005-01-01",
+    "end": "2017-12-31",
+    "locked": false
+  },
+  "floors": {
+    "min_market_cap_usd": 2000000000.0,
+    "min_addv_usd": 5000000.0,
+    "min_close_usd": 5.0,
+    "max_market_cap_usd": 10000000000.0,
+    "market_cap_ceiling_usd": 10000000000.0
+  },
+  "dataset_fingerprint": "6625bdea5ee2f9de1cba8557bfe4d8928d4c92bb0511a5ad4976cc0fda2c459f",
+  "eligible_names_per_day": {
+    "median": 649.0,
+    "p10": 448.0,
+    "p90": 775.0,
+    "min": 0
+  },
+  "gp_availability_within_eligible": {
+    "median_names": 647.0,
+    "median_fraction": 0.99830220713073
+  },
+  "by_year": {
+    "2005": {
+      "eligible_median": 0.0,
+      "gp_covered_median": 0.0
+    },
+    "2006": {
+      "eligible_median": 622.0,
+      "gp_covered_median": 618.0
+    },
+    "2007": {
+      "eligible_median": 670.0,
+      "gp_covered_median": 664.0
+    },
+    "2008": {
+      "eligible_median": 605.0,
+      "gp_covered_median": 602.0
+    },
+    "2009": {
+      "eligible_median": 493.0,
+      "gp_covered_median": 492.5
+    },
+    "2010": {
+      "eligible_median": 604.0,
+      "gp_covered_median": 602.0
+    },
+    "2011": {
+      "eligible_median": 650.0,
+      "gp_covered_median": 648.5
+    },
+    "2012": {
+      "eligible_median": 629.0,
+      "gp_covered_median": 628.0
+    },
+    "2013": {
+      "eligible_median": 708.0,
+      "gp_covered_median": 708.0
+    },
+    "2014": {
+      "eligible_median": 760.5,
+      "gp_covered_median": 759.0
+    },
+    "2015": {
+      "eligible_median": 776.0,
+      "gp_covered_median": 774.0
+    },
+    "2016": {
+      "eligible_median": 734.5,
+      "gp_covered_median": 734.0
+    },
+    "2017": {
+      "eligible_median": 774.0,
+      "gp_covered_median": 772.0
+    }
+  },
+  "reads": "eligibility + availability only; no magnitudes, no returns"
+}

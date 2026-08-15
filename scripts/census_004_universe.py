@@ -53,14 +53,33 @@ def main() -> int:
                     default=Path("results/004_universe_census.json"))
     ap.add_argument("--start", default=IN_SAMPLE[0])
     ap.add_argument("--end", default=IN_SAMPLE[1])
+    ap.add_argument("--min-mcap", type=float, default=None)
+    ap.add_argument("--max-mcap", type=float, default=None)
+    ap.add_argument("--min-addv", type=float, default=None)
+    ap.add_argument("--min-close", type=float, default=None)
     args = ap.parse_args()
 
     base = load_config("experiment", "costs", "synthetic", "sharadar")
     if pd.Timestamp(args.end) > pd.Timestamp(base.period("in_sample")["end"]):
         raise SystemExit("census is in-sample only; refusing a later end date")
 
+    floors = dict(SMALLCAP_FLOORS)
+    ceiling = MARKET_CAP_CEILING_USD
+    if args.min_mcap is not None:
+        floors["min_market_cap_usd"] = args.min_mcap
+    if args.min_addv is not None:
+        floors["min_addv_usd"] = args.min_addv
+    if args.min_close is not None:
+        floors["min_close_usd"] = args.min_close
+    if args.max_mcap is not None:
+        ceiling = args.max_mcap
+    # The ceiling goes through the CONFIG (build_universe supports it since
+    # the 004 registration). Overriding only the floor while the registered
+    # config carries max_market_cap_usd=2e9 produced an EMPTY band [2B,2B)
+    # in the first mid-cap run -- caught because zero breadth is impossible.
+    floors["max_market_cap_usd"] = ceiling
     data = copy.deepcopy(base.data)
-    data["universe"].update(SMALLCAP_FLOORS)
+    data["universe"].update(floors)
     cfg = type(base)(data=data, sources=base.sources)
 
     print(f"loading panel {args.start}..{args.end} (small-cap floors, in memory)")
@@ -70,7 +89,7 @@ def main() -> int:
     universe = build_universe(panel, cfg)
     # The draft's ceiling: keep names BELOW $2B. Applied here as a census
     # mask; a signed protocol would carry it in the certified universe path.
-    below_ceiling = panel.market_cap < MARKET_CAP_CEILING_USD
+    below_ceiling = panel.market_cap < ceiling
     eligible = universe.eligible & below_ceiling.reindex_like(universe.eligible).fillna(False)
 
     # Feature AVAILABILITY only: where does a PIT-admissible value exist?
@@ -88,7 +107,7 @@ def main() -> int:
     census = {
         "purpose": "APEX-004 draft section 5a structural breadth census",
         "period": {"start": args.start, "end": args.end, "locked": False},
-        "floors": {**SMALLCAP_FLOORS, "market_cap_ceiling_usd": MARKET_CAP_CEILING_USD},
+        "floors": {**floors, "market_cap_ceiling_usd": ceiling},
         "dataset_fingerprint": source.dataset_fingerprint,
         "eligible_names_per_day": {
             "median": float(names_per_day.median()),
