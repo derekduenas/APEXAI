@@ -367,7 +367,7 @@ def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
         rec["session_date"] = date
         rec["t_utc"] = str(t)
         try:
-            rec["alpha_half_life"] = halflife
+            rec["edge_persistence"] = halflife
             rec["intelligence_routing"] = routing
         except NameError:
             pass                                  # enrichment seat failed

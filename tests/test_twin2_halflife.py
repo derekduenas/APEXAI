@@ -60,8 +60,8 @@ def test_halflife_refuses_then_estimates_then_routes():
                      "ret_15m": 0.004, "ret_30m": 0.003,
                      "ret_60m": 0.001, "ret_90m": 0.0005})
     hl = estimate("HUNTER-001_v1", rows)
-    assert hl["status"] == "ESTIMATED_CRUDE"
-    assert hl["half_life_minutes"] == 30          # last horizon >= half peak
+    assert hl["status"] == "PERSISTENCE_MEASURED"
+    assert hl["edge_persistence_horizon_minutes"] == 30
     r = route_intelligence(hl)
     assert r["routing"] == "STANDARD" and r["allow_deep_swarm"] is True
     fast = estimate("X", [{"session_date": f"d{i}", "ret_15m": 0.004,

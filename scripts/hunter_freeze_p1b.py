@@ -143,6 +143,13 @@ ARTIFACTS = {
     "hunter_rule_model_v1.5.6": (
         "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py",
                   "apex/hunter/assassin.py", "apex/hunter/halflife.py")),
+    # v1.5.7 (FINAL Epoch 1 lineage): semantic honesty — the routing
+    # metric is an EDGE_PERSISTENCE_HORIZON (last checkpoint >= half of
+    # peak), NOT a fitted half-life; field/status names now say what is
+    # actually known. Prediction semantics FROZEN from here.
+    "hunter_rule_model_v1.5.7": (
+        "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py",
+                  "apex/hunter/assassin.py", "apex/hunter/halflife.py")),
 }
 
 
