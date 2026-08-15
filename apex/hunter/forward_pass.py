@@ -19,7 +19,6 @@ identically by anyone from the same bars.
 from __future__ import annotations
 
 import json
-import uuid
 from pathlib import Path
 
 import pandas as pd
@@ -30,7 +29,7 @@ from apex.hunter.capital import (ForecastSlot, evaluate_candidate,
                                  intraday_market_uncertain)
 from apex.hunter.chartstate import (BAR, ChartState, DailyContext,
                                     compute_chart_state, visible_bars)
-from apex.hunter.contracts import HORIZONS_MINUTES
+from apex.hunter.contracts import HORIZONS_MINUTES, content_hash
 from apex.hunter.evidence import EvidenceClass, stamp
 from apex.hunter.playbooks_v1 import match_hunter_001, match_hunter_002
 from apex.hunter.relstrength import compute_relative_strength
@@ -200,9 +199,14 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
                     or n == m["playbook_id"]}
             eligibility, reasons = birthlib.forward_eligibility(t, deps)
             bstamp = birthlib.birth_stamp(deps)
+            # F-09: content-derived id — identical inputs replay to an
+            # identical ledger, bit for bit
             rec = stamp({
                 "kind": "decision",
-                "decision_id": uuid.uuid4().hex[:16],
+                "decision_id": content_hash(
+                    {"t": str(t), "symbol": sym,
+                     "playbook": m["playbook_id"],
+                     "direction": m["direction"]})[:16],
                 "session_date": date, "t_utc": str(t),
                 "symbol": sym, **m,
                 "horizons_minutes": list(HORIZONS_MINUTES),

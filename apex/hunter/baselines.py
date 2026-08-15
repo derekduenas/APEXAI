@@ -29,11 +29,10 @@ playbooks.
 from __future__ import annotations
 
 import hashlib
-import uuid
 
 from apex.hunter import birth as birthlib
 from apex.hunter.chartstate import ChartState
-from apex.hunter.contracts import HORIZONS_MINUTES
+from apex.hunter.contracts import HORIZONS_MINUTES, content_hash
 from apex.hunter.evidence import EvidenceClass, stamp
 from apex.hunter.relstrength import RelativeStrengthState
 
@@ -86,7 +85,9 @@ def baseline_decisions(t, date: str, watchlist_syms: tuple,
             seen_baseline_keys.add((sym, pid))
             out.append(stamp({
                 "kind": "decision",
-                "decision_id": uuid.uuid4().hex[:16],
+                "decision_id": content_hash(
+                    {"t": str(t), "symbol": sym, "playbook": pid,
+                     "direction": direction})[:16],
                 "session_date": date, "t_utc": str(t),
                 "symbol": sym, "playbook_id": pid,
                 "direction": direction, "entry": cs.price,
