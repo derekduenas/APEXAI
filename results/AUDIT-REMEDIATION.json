@@ -1,0 +1,31 @@
+{
+ "audit": "APEX RED TEAM 2026-08-15",
+ "repair_law": "reproduce with failing test -> minimal fix -> focused tests -> full suite -> birth if load-bearing -> separate commit",
+ "remediated": [
+  {"id": "F-01", "sev": "P1", "fix": "chain writer walks past torn tail, links to last valid entry, stamps recovered_from_torn_tail; all 6 reader sites skip torn lines", "test": "test_f01_chain_survives_torn_tail", "commit": "separate"},
+  {"id": "F-02", "sev": "P1", "fix": "analog v1.1: support requires >=5 distinct symbols; n_symbols in result; wrong OK can no longer suppress capital caution", "test": "test_f02_single_symbol_cannot_be_ok_support", "commit": "separate"},
+  {"id": "F-03", "sev": "P1", "fix": "state records carry protocol-promised regime field (daily_classifier=NOT_WIRED_INTRADAY, intraday_vol_state, uncertain_proxy via the same capital rule)", "test": "test_f03_state_record_carries_regime", "commit": "separate"},
+  {"id": "F-04", "sev": "P2", "fix": "simulator refuses unknown ATR (no fabricated 2% scale)", "test": "test_f04_simulator_refuses_unknown_atr", "commit": "separate"},
+  {"id": "F-05", "sev": "P2", "fix": "ML dataset excludes any-missing rows; never zero-fills", "test": "test_f05_ml_excludes_missing_features", "commit": "separate"},
+  {"id": "F-06", "sev": "P2", "fix": "memory regime label FLAT/UP/DOWN/None; falsy-and 0.0 bug removed", "test": "test_f06_memory_regime_flat_market", "commit": "separate"},
+  {"id": "F-07", "sev": "P2", "fix": "sovereign liquidity constants in contracts.py; scanner+universe import (identity-asserted)", "test": "test_f07_liquidity_constants_single_source", "commit": "separate"},
+  {"id": "F-08", "sev": "P2", "fix": "2026 NYSE holidays + Dec 24 early close populated", "test": "test_f08_holiday_calendar", "commit": "separate"},
+  {"id": "F-09", "sev": "P2", "fix": "content-derived decision ids; identical inputs replay identical ledgers", "test": "test_f09_decision_ids_deterministic", "commit": "separate"},
+  {"id": "F-10", "sev": "P2", "fix": "adversarial test isolates the formed-at analog firewall (mutation now catchable)", "test": "test_f10_formed_after_but_resolved_before_refused", "commit": "with suite"}
+ ],
+ "deferred_with_reasons": [
+  {"id": "F-11", "sev": "P2", "why": "TradeThesis wiring + management-law unification: DORMANT path (PAPER_ELIGIBLE unreachable); scheduled as the FIRST task when Phase 5 activation is considered; touching it now adds risk for zero Monday benefit"},
+  {"id": "F-12", "sev": "P3", "why": "causal layer ornamental for Hunter: honest constant; real wiring is post-evidence work"},
+  {"id": "F-13", "sev": "P3", "why": "p_positive naming: field is inside the frozen v1 result shape; display layers must (and do) carry calibration_status; rename at next analog version"},
+  {"id": "F-14", "sev": "P3", "why": "manual-run lock file: procedural discipline until then; launchd cannot double-launch"},
+  {"id": "F-15", "sev": "P3", "why": "zero-decision-day scoreboard artifact: health report covers; cosmetic"},
+  {"id": "F-16", "sev": "P3", "why": "GAP_AND_GO chatter: frozen attention threshold; Week-1 finding, not a knob"},
+  {"id": "F-17", "sev": "P3", "why": "OR anchoring under data gaps: SPARSE_BARS partially covers; measure incidence in Week 1 before changing frozen semantics"}
+ ],
+ "births_minted": ["hunter_rule_model_v1.5 (2026-08-15T20:35:13Z, hash 039a846b78231c8a)"],
+ "old_births_touched": 0,
+ "tests_before": "847 passed / 1 skipped",
+ "tests_after": "857 passed / 1 skipped",
+ "unresolved_P0": 0,
+ "unresolved_P1": 0
+}
