@@ -30,6 +30,12 @@ ARTIFACTS = {
     "hunter_rule_model_v1": (
         "model", ("apex/hunter/scanner.py", "apex/hunter/playbooks_v1.py",
                   "apex/hunter/forward_pass.py")),
+    # v1.1: forward_pass ledger readers fixed post-mint (chain entries are
+    # flat, not wrapped) BEFORE any forecast existed; birth.py (the
+    # eligibility law itself) now hashed too. Append-only: v1 stays.
+    "hunter_rule_model_v1.1": (
+        "model", ("apex/hunter/scanner.py", "apex/hunter/playbooks_v1.py",
+                  "apex/hunter/forward_pass.py", "apex/hunter/birth.py")),
     "HUNTER-001_v1": (
         "playbook", ("docs/HUNTER-001-PLAYBOOK.md",
                      "apex/hunter/playbooks_v1.py")),

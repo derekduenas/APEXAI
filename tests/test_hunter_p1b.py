@@ -283,6 +283,22 @@ def test_missing_dependency_kind_fails_closed():
     assert any("missing dependency birth: model" in r for r in reasons)
 
 
+def test_load_births_reads_flat_chain_entries(tmp_path):
+    """Regression: _chain_append writes FLAT entries ({**record, prev_hash,
+    entry_hash}), not a {"record": ...} wrapper — the first mint was written
+    correctly but the readers were blind to it."""
+    import json
+
+    from apex.hunter.birth import load_births
+    reg = tmp_path / "birth_registry.jsonl"
+    reg.write_text(json.dumps({
+        "kind": "birth", "name": "X_v1", "dependency_kind": "playbook",
+        "artifact_hash": "ab", "birth_time_utc": "2026-08-15T18:43:03+00:00",
+        "prev_hash": "GENESIS", "entry_hash": "ff"}) + "\n")
+    b = load_births(reg)
+    assert b["X_v1"]["dependency_kind"] == "playbook"
+
+
 # ------------------------------------------------------------- realization
 def test_realization_deterministic_and_truncation_flagged():
     f = bars(drift=0.03)

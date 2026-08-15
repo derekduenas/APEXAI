@@ -39,10 +39,10 @@ def load_births(registry: Path = REGISTRY) -> dict:
     for line in registry.read_text().splitlines():
         if not line.strip():
             continue
-        e = json.loads(line)
-        if e.get("record", {}).get("kind") != "birth":
+        # chain entries are FLAT: {**record, prev_hash, entry_hash}
+        r = json.loads(line)
+        if r.get("kind") != "birth":
             continue
-        r = e["record"]
         if r["name"] in births:
             raise ValueError(
                 f"duplicate birth for {r['name']!r}: a changed artifact is a "
