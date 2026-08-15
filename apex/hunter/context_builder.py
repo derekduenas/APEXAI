@@ -24,14 +24,16 @@ import numpy as np
 import pandas as pd
 
 from apex.hunter.chartstate import DailyContext
+from apex.hunter.contracts import (LIQUIDITY_MIN_MEDIAN_DOLLAR_VOL,
+                                   LIQUIDITY_MIN_PRICE)
 from apex.intraday.eodhd import fetch_intraday_chunk, normalize_rows
 from apex.intraday.sessions import Session, classify
 
 SNAPSHOT = Path("data/snapshots/sharadar/current")
 OUT_DIR = Path("results/hunter")
 UNIVERSE_SIZE = 150
-MIN_PRICE = 5.0
-MIN_MEDIAN_DOLLAR_VOL = 50e6
+MIN_PRICE = LIQUIDITY_MIN_PRICE               # sovereign source (F-07)
+MIN_MEDIAN_DOLLAR_VOL = LIQUIDITY_MIN_MEDIAN_DOLLAR_VOL
 CONTEXT_LOOKBACK_DAYS = 30       # calendar; sessions derived from bars
 
 SECTOR_ETF = {"Technology": "XLK.US", "Financial Services": "XLF.US",

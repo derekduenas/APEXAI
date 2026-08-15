@@ -27,6 +27,11 @@ def content_hash(obj) -> str:
 
 HORIZONS_MINUTES = (15, 30, 60, 90)      # HUNTER-v1 frozen; separate targets
 
+# sovereign liquidity gates (protocol §4): ONE source of truth — scanner
+# and universe builder import these; a divergence is now impossible
+LIQUIDITY_MIN_PRICE = 5.0
+LIQUIDITY_MIN_MEDIAN_DOLLAR_VOL = 50e6
+
 
 class FailClosed(Enum):
     STALE_MARKET_DATA = "stale market data"

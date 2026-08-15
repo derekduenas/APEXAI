@@ -39,8 +39,10 @@ GAP_FAIL_RETRACE = 0.75
 # on any trending day (measured on real data pre-freeze, 2026-08-14 smoke)
 STRUCTURE_RVOL_FLOOR = 1.2
 OR_BREAK_MATERIAL = 0.25      # beyond the range by >= 25% of its width
-MIN_PRICE = 5.0               # frozen liquidity gates (protocol §4)
-MIN_MEDIAN_DOLLAR_VOL = 50e6
+from apex.hunter.contracts import (LIQUIDITY_MIN_MEDIAN_DOLLAR_VOL,  # noqa: E402
+                                   LIQUIDITY_MIN_PRICE)
+MIN_PRICE = LIQUIDITY_MIN_PRICE               # sovereign source (F-07)
+MIN_MEDIAN_DOLLAR_VOL = LIQUIDITY_MIN_MEDIAN_DOLLAR_VOL
 MIN_MINUTES_IN = 30           # RVOL/displacement unstable before 10:00 ET
 WATCHLIST_CAP = 20
 
