@@ -33,7 +33,7 @@ import pandas as pd
 
 from apex.hunter.evidence import EvidenceClass
 
-ANALOG_ENGINE_VERSION = "hunter_analog_v1"
+ANALOG_ENGINE_VERSION = "hunter_analog_v1.1"
 
 # ---------------------------------------------------------------- schema
 # FROZEN v1 feature schema: (name, extractor path in the stored candidate
@@ -60,6 +60,7 @@ ANALOG_FEATURE_SCHEMA_V1 = (
 )
 MAX_MISSING_FEATURES = 4          # more missing than this = not comparable
 SUPPORT_MIN_N = 20                # below this, support is LOW at best
+SUPPORT_MIN_SYMBOLS = 5           # one stock cannot dominate support
 SUPPORT_DISTANCE_HIGH = 1.0       # mean per-feature scaled distance bar
 
 
@@ -78,6 +79,7 @@ class AnalogResult:
     evidence_class: str
     n_raw: int
     n_effective: int
+    n_symbols: int
     neighbour_ids: tuple
     distances: tuple              # per selected neighbour, scaled
     mean_distance: float | None
@@ -148,7 +150,8 @@ def retrieve(query: AnalogQuery, memory_rows: list, *,
     def empty(status: str) -> AnalogResult:
         return AnalogResult(
             status=status, evidence_class=evidence_class.value,
-            n_raw=0, n_effective=0, neighbour_ids=(), distances=(),
+            n_raw=0, n_effective=0, n_symbols=0,
+            neighbour_ids=(), distances=(),
             mean_distance=None,
             coverage={"query_missing": list(q_missing)},
             forward_returns=(), p_positive=None, median_return=None,
@@ -189,11 +192,12 @@ def retrieve(query: AnalogQuery, memory_rows: list, *,
     # outcomes are read ONLY AFTER neighbour identities are frozen
     h = query.horizon_minutes
     rets, maes, mfes, tbs, regimes, ids, dists = [], [], [], [], [], [], []
-    sessions = set()
+    sessions, symbols = set(), set()
     for d, row in chosen:
         ids.append(row.get("decision_id", "?"))
         dists.append(round(d, 4))
         sessions.add(row.get("session_date"))
+        symbols.add(row.get("symbol"))
         regimes.append(row.get("regime") or "UNKNOWN")
         o = row.get("outcome") or {}
         r = o.get(f"ret_{h}m")
@@ -211,12 +215,16 @@ def retrieve(query: AnalogQuery, memory_rows: list, *,
     mean_d = float(np.mean(dists)) if dists else None
     if n_raw == 0:
         return empty("NO_VALID_ANALOGS")
+    # F-02: support quality requires DIVERSITY — one symbol (or a handful)
+    # repeating across sessions is one phenomenon observed often, not broad
+    # support, and a wrongly-confident OK would SUPPRESS capital caution
     low_support = (n_eff < SUPPORT_MIN_N
+                   or len(symbols) < SUPPORT_MIN_SYMBOLS
                    or (mean_d is not None and mean_d > SUPPORT_DISTANCE_HIGH))
     status = "ANALOG_SUPPORT_LOW" if low_support else "OK"
     return AnalogResult(
         status=status, evidence_class=evidence_class.value,
-        n_raw=n_raw, n_effective=n_eff,
+        n_raw=n_raw, n_effective=n_eff, n_symbols=len(symbols),
         neighbour_ids=tuple(ids), distances=tuple(dists),
         mean_distance=round(mean_d, 4) if mean_d is not None else None,
         coverage={"query_missing": list(q_missing),
