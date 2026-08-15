@@ -52,6 +52,14 @@ ARTIFACTS = {
         "model", ("apex/hunter/scanner.py", "apex/hunter/playbooks_v1.py",
                   "apex/hunter/forward_pass.py", "apex/hunter/birth.py",
                   "apex/hunter/baselines.py", "apex/hunter/neff.py")),
+    # v1.3 (Phase 4): APEX CAPITAL gate wired into the decision pass —
+    # candidate -> risk -> cost -> capacity -> portfolio -> reasoned final
+    # state; forecast slot typed NOT_YET_AVAILABLE; no execution path.
+    "hunter_rule_model_v1.3": (
+        "model", ("apex/hunter/scanner.py", "apex/hunter/playbooks_v1.py",
+                  "apex/hunter/forward_pass.py", "apex/hunter/birth.py",
+                  "apex/hunter/baselines.py", "apex/hunter/neff.py",
+                  "apex/hunter/capital.py")),
 }
 
 

@@ -37,7 +37,7 @@ PRELIMINARY_BELOW = 10
 
 def load_ledger(ledger: Path = LEDGER) -> dict:
     kinds: dict = {"forward_state": [], "scan": [], "decision": [],
-                   "realization": []}
+                   "realization": [], "capital_decision": []}
     if ledger.exists():
         for line in ledger.read_text().splitlines():
             if not line.strip():
@@ -68,8 +68,10 @@ def horizon_stats(rows: list, h: int) -> dict | None:
 
 def build_scoreboard(kinds: dict) -> dict:
     require_unmixed({r.get("evidence_class")
-                     for k in ("decision", "realization", "scan")
-                     for r in kinds[k]} or {"EODHD_FORWARD_OBSERVATION"})
+                     for k in ("decision", "realization", "scan",
+                               "capital_decision")
+                     for r in kinds.get(k, [])} or
+                    {"EODHD_FORWARD_OBSERVATION"})
     realized = {r["decision_id"]: r for r in kinds["realization"]
                 if r.get("resolvable")}
     decisions = kinds["decision"]
@@ -155,6 +157,20 @@ def build_scoreboard(kinds: dict) -> dict:
                  "never a threshold to retune toward"),
     }
 
+    # capital layer view: final states + reason codes, and the seed of the
+    # rejected-for-economics vs taken comparison (rejections are PRESERVED)
+    cap_recs = kinds.get("capital_decision", [])
+    capital = {
+        "n": len(cap_recs),
+        "final_states": dict(Counter(r["final_state"] for r in cap_recs)),
+        "reason_codes": dict(Counter(c for r in cap_recs
+                                     for c in r.get("reason_codes", []))),
+        "paper_eligible_n": sum(r["final_state"] == "PAPER_ELIGIBLE"
+                                for r in cap_recs),
+        "note": ("PAPER_ELIGIBLE requires the commissioned Phase 3 forecast "
+                 "path; LIVE_ELIGIBLE does not exist"),
+    }
+
     scans = kinds["scan"]
     sig_counts: Counter = Counter()
     for s in scans:
@@ -190,6 +206,7 @@ def build_scoreboard(kinds: dict) -> dict:
         "scoreboard": board,
         "identical_subject_comparisons": comparisons,
         "selected_vs_rejected": relationships,
+        "capital": capital,
         "funnel": funnel,
     }
 

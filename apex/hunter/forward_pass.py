@@ -26,6 +26,8 @@ import pandas as pd
 
 from apex.hunter import birth as birthlib
 from apex.hunter.baselines import baseline_decisions
+from apex.hunter.capital import (ForecastSlot, evaluate_candidate,
+                                 intraday_market_uncertain)
 from apex.hunter.chartstate import (BAR, ChartState, DailyContext,
                                     compute_chart_state, visible_bars)
 from apex.hunter.contracts import HORIZONS_MINUTES
@@ -205,12 +207,35 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
             }, EvidenceClass.EODHD_FORWARD_OBSERVATION)
             decisions.append(rec)
 
+    # APEX CAPITAL: every playbook candidate flows candidate -> risk ->
+    # cost -> capacity -> portfolio -> reasoned final state, into the SAME
+    # ledger (Phase 4 spine; baselines are measurement, not candidates)
+    from apex.portfolio.risk import PortfolioState
+    portfolio = PortfolioState(nav=100_000.0, positions={}, sector_weights={},
+                       heat=0.0, drawdown_budget_left=1.0,
+                       sleeve_correlations={})
+    uncertain = intraday_market_uncertain(market_cs)
+    capital_records = []
+    for d in decisions:
+        meta = universe["symbols"].get(d["symbol"], {})
+        cs = cs_by_symbol.get(d["symbol"])
+        cd = evaluate_candidate(
+            d, sector=meta.get("sector"),
+            median_dollar_volume=meta.get("median_dollar_volume"),
+            ann_vol=cs.realized_vol_ann if cs is not None else None,
+            market_uncertain=uncertain, forecast=ForecastSlot(),
+            portfolio=portfolio)
+        rec = stamp(cd.as_record(), EvidenceClass.EODHD_FORWARD_OBSERVATION)
+        rec["session_date"] = date
+        rec["t_utc"] = str(t)
+        capital_records.append(rec)
+
     # frozen baselines: same subjects, same ledger, same machinery —
     # deliberately naive directions (protocol §6; no separate system)
     decisions.extend(baseline_decisions(
         t, date, tuple(s for s, _, _ in result.watchlist),
         cs_by_symbol, rs_by_symbol, market_cs, births, seen_baseline))
-    return scan_record, decisions
+    return scan_record, decisions + capital_records
 
 
 def resolve_decision(decision: dict, day_bars: pd.DataFrame) -> dict:
