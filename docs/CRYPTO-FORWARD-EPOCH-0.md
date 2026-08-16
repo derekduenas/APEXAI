@@ -69,3 +69,36 @@ matches → assassin survivors → shadow verdicts — does economic quality
 rise with selectivity, prospectively, spread-paid? Interpretation floors
 apply (nothing under 10 distinct UTC days per cohort is interpreted).
 Failure is recorded, not repaired; predicates never retuned inside v1.
+
+## Amendment (2026-08-16): the Market Fabric (transport + fidelity only)
+
+Strategy semantics UNCHANGED (CRYPTO-001/002 predicates, thresholds,
+Assassin, Capital). Upgraded from 5-minute REST polling to a continuous
+WebSocket Market Fabric:
+
+- Coinbase public WS: heartbeats + ticker + market_trades + level2, all
+  three products, auto-reconnect + resubscribe, no auth, no order path.
+- OUR OWN BARS from the trade stream (the exchange's candle channel
+  buckets at 5m; our battlefield needs finer perception), completed
+  minutes only, with per-bar trade counts and buy volume.
+- LIVE BOOK: best bid/ask, spread bps, depth1/depth10, imbalance, and
+  BOOK WALKING for realistic fills at $1k/$10k/$50k notional (slippage
+  measured on the real ladder, not assumed).
+- HEALTH IS AUTHORITY: sequence gaps and staleness set
+  BOOK_HEALTH=DEGRADED and REVOKE microstructure authority; a gap heals
+  ONLY on a true snapshot resync, never on the next incremental update.
+  Degraded state falls back to REST quotes and is recorded on every
+  decision (`microstructure_authorized`, `feed_mode`, `book_health`).
+- LATENCY TELEMETRY on every decision: last_market_timestamp,
+  decision_timestamp, data_age_seconds — so edge decay before APEX even
+  sees a candidate becomes measurable.
+- LIVE TRADE MANAGEMENT (daemon, 30s): open shadow positions face
+  deterministic stop/target/time-stop transitions against current book
+  state; exits cross the spread again (both sides paid).
+
+LAB-06 (caught in the first 15 minutes of live streaming): the raw L2
+firehose wrote ~2.9GB/day and would have filled the disk and taken down
+MONDAY'S CLOCK. Fix: archive only value-dense channels (trades+ticker,
+~50MB/day) plus periodic bounded book snapshots; L2 remains live state;
+hourly rotation, 72h retention, hard 400MB cap. A research archive must
+never be able to starve production of disk.

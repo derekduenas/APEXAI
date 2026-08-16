@@ -163,6 +163,14 @@ ARTIFACTS = {
     "crypto_arena_model_v1": (
         "model", ("apex/crypto/arena.py", "apex/crypto/feed.py",
                   "apex/crypto/playbooks.py", "apex/crypto/perception.py")),
+    # Market Fabric: WebSocket transport + execution fidelity + LAB-06
+    # bounded archive. Strategy semantics unchanged (arena v2 = same
+    # predicates, live senses).
+    "crypto_market_fabric_v1.1": (
+        "model", ("apex/crypto/fabric.py",)),
+    "crypto_arena_model_v2": (
+        "model", ("apex/crypto/arena.py", "apex/crypto/fabric.py",
+                  "apex/crypto/playbooks.py", "apex/crypto/perception.py")),
     # v1.1 (LAB-01): empty-frame guard in visible_bars — a not-yet-listed
     # symbol crashed the whole scan tick (found by the replay campaign's
     # first minute; also a latent Monday robustness bug). Crash guard

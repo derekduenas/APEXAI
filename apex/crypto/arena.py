@@ -158,12 +158,39 @@ def resolve_pending(rows: list, candles: pd.DataFrame, now) -> list:
     return out
 
 
-def tick(now=None) -> dict:
+def tick(now=None, fabric=None) -> dict:
+    """One arena cycle. With a live MarketFabric the book/quote/liquidity
+    state comes from the continuous stream (execution fidelity); REST
+    remains the memory (trailing history) and the fallback. Strategy
+    semantics are identical either way."""
     now = pd.Timestamp(now) if now else pd.Timestamp.now(tz="UTC")
     today = str(now.date())
     candles = {p: feed.candles_1m(p, hours=26) for p in PRODUCTS}
-    book = feed.book_top(INSTRUMENT)
-    tick_px = feed.ticker(INSTRUMENT)
+    fab_snap = None
+    if fabric is not None:
+        fab_snap = fabric.snapshot()
+        # LIVE BARS: splice the fabric's own trade-built bars over the
+        # REST tail so the newest minutes are stream-fresh, not cached
+        live = fabric.bars_1m(INSTRUMENT, minutes=120)
+        if len(live) >= 5:
+            base = candles[INSTRUMENT]
+            cutoff = live["event_time_utc"].min()
+            candles[INSTRUMENT] = pd.concat(
+                [base[base["event_time_utc"] < cutoff],
+                 live[["event_time_utc", "open", "high", "low", "close",
+                       "volume"]]], ignore_index=True)
+    if fab_snap and fabric.microstructure_authorized():
+        bsnap = fab_snap["books"][INSTRUMENT]
+        book = {"spread_bps": bsnap["spread_bps"],
+                "imbalance_top10": bsnap["imbalance_top10"],
+                "mid": bsnap["mid"]}
+        tick_px = {"bid": bsnap["best_bid"], "ask": bsnap["best_ask"],
+                   "last": bsnap["mid"]}
+    else:
+        # DEGRADED or no fabric: REST quote, and microstructure loses
+        # authority (recorded on every decision, never assumed unchanged)
+        book = feed.book_top(INSTRUMENT)
+        tick_px = feed.ticker(INSTRUMENT)
     baseline = load_baseline(feed.candles_1m(INSTRUMENT, hours=24 * 14)
                              if not BASELINE_CACHE.exists()
                              or json.loads(BASELINE_CACHE.read_text()
@@ -175,7 +202,9 @@ def tick(now=None) -> dict:
                                book if p == INSTRUMENT else None)
               for p in PRODUCTS}
     world = crypto_world(states, now)
-    world_rec = stamp({**world, "arena_version": ARENA_VERSION},
+    world_rec = stamp({**world, "arena_version": ARENA_VERSION,
+                       "fabric": (fab_snap or {}).get("health",
+                                                      "NO_FABRIC")},
                       EvidenceClass.COINBASE_FORWARD_OBSERVATION)
     _append(world_rec)
 
@@ -195,6 +224,24 @@ def tick(now=None) -> dict:
             # Shadow entry honesty: cross the recorded spread.
             entry = tick_px["ask"] if m["direction"] == "LONG" \
                 else tick_px["bid"]
+            # EXECUTION FIDELITY: walk the live book for realistic fills
+            fills = {}
+            if fabric is not None and fabric.microstructure_authorized():
+                side = "BUY" if m["direction"] == "LONG" else "SELL"
+                for notional in (1_000, 10_000, 50_000):
+                    fills[f"${notional//1000}k"] = fabric.books[
+                        INSTRUMENT].walk(side, notional)
+            last_bar = candles[INSTRUMENT]["event_time_utc"].iloc[-1]
+            latency = {
+                "last_market_timestamp": str(last_bar),
+                "decision_timestamp": str(now),
+                "data_age_seconds": round(
+                    (now - last_bar).total_seconds(), 1),
+                "feed_mode": ("LIVE_FABRIC" if fabric is not None
+                              and fabric.microstructure_authorized()
+                              else "REST_FALLBACK"),
+                "book_health": (fab_snap or {}).get(
+                    "health", {}).get("book_health", "NO_FABRIC")}
             dec = stamp({
                 "kind": "crypto_decision",
                 "decision_id": content_hash(
@@ -207,6 +254,11 @@ def tick(now=None) -> dict:
                 "spread_paid_bps": round(abs(entry - (tick_px["bid"]
                                          + tick_px["ask"]) / 2)
                                          / entry * 1e4, 3),
+                "book_walk_fills": fills,
+                "latency": latency,
+                "microstructure_authorized": bool(
+                    fabric is not None
+                    and fabric.microstructure_authorized()),
                 "chart_state": cs.as_record(), "world": world,
                 "horizons_minutes": list(HORIZONS),
                 "capital_note": "SHADOW ONLY — zero capital by "
