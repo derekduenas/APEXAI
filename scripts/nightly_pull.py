@@ -158,14 +158,35 @@ def _refresh_tickers(client, root: Path, pull_date: str) -> dict:
     return {"file": path.name, "rows": len(rows), "sha256": digest}
 
 
-def pull_range(root: Path) -> tuple[str, str] | None:
-    """The incremental range: day after the lake ends, through yesterday UTC.
+def is_trading_day(date: str) -> bool:
+    """NYSE open on this calendar date? Uses the ONE calendar in the repo
+    (apex.intraday.sessions), so the nightly pull and the intraday clock can
+    never disagree about what a trading day is."""
+    from apex.intraday.sessions import HOLIDAYS
+    return pd.Timestamp(date).weekday() < 5 and date not in HOLIDAYS
 
-    None when the lake is already current -- a clean no-op, because the job
-    runs every night whether or not there was a trading day.
+
+def pull_range(root: Path) -> tuple[str, str] | None:
+    """The incremental range: day after the lake ends, through yesterday UTC,
+    TRIMMED to trading days at both ends.
+
+    None when the lake is already current OR the window contains no trading
+    day -- both are clean no-ops, because the job runs every night whether
+    or not the exchange did.
+
+    Trimming matters for more than tidiness. The vendor correctly returns
+    zero rows for a Saturday, and `fetch_table` correctly treats zero rows
+    as a failure ("a failure, not an empty dataset"). Without the trim those
+    two correct behaviors combine into a job that fails every single weekend
+    -- which is how an operator learns to ignore a red job, and how a REAL
+    zero-row failure on a trading day would go unnoticed.
     """
     start = pd.Timestamp(lake_through(root)) + pd.Timedelta(days=1)
     end = pd.Timestamp(dt.datetime.now(dt.timezone.utc).date()) - pd.Timedelta(days=1)
+    while start <= end and not is_trading_day(str(start.date())):
+        start += pd.Timedelta(days=1)
+    while start <= end and not is_trading_day(str(end.date())):
+        end -= pd.Timedelta(days=1)
     if start > end:
         return None
     return str(start.date()), str(end.date())
@@ -185,9 +206,19 @@ def run_pull(client, root: Path, lo: str, hi: str) -> dict:
         cursor, end = pd.Timestamp(lo), pd.Timestamp(hi)
         while cursor <= end:
             stop = min(cursor + pd.Timedelta(days=spec["chunk_days"] - 1), end)
-            records += snap.fetch_slice(
-                client, name, spec, str(cursor.date()), str(stop.date()), root, stats
-            )
+            # A chunk that spans only non-trading days (a bare weekend on a
+            # 1-day chunk) has nothing to ask for. Requesting it anyway would
+            # earn a correct zero-row response and a correct hard failure --
+            # for a day the exchange simply did not open.
+            span = pd.date_range(cursor, stop, freq="D")
+            if any(is_trading_day(str(d.date())) for d in span):
+                records += snap.fetch_slice(
+                    client, name, spec, str(cursor.date()), str(stop.date()),
+                    root, stats
+                )
+            else:
+                stats["non_trading_skipped"] = (
+                    stats.get("non_trading_skipped", 0) + 1)
             cursor = stop + pd.Timedelta(days=1)
         tables[name] = records
 
