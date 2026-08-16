@@ -150,6 +150,19 @@ ARTIFACTS = {
     "hunter_rule_model_v1.5.7": (
         "model", ("apex/hunter/forward_pass.py", "apex/hunter/swarm.py",
                   "apex/hunter/assassin.py", "apex/hunter/halflife.py")),
+    # CRYPTO SHADOW ARENA (Epoch 0, zero capital forever by construction;
+    # separate evidence class; NEVER equity evidence)
+    "crypto_feature_schema_v1": (
+        "feature_schema", ("apex/crypto/perception.py",)),
+    "CRYPTO-001_v1": (
+        "playbook", ("apex/crypto/playbooks.py",
+                     "docs/CRYPTO-FORWARD-EPOCH-0.md")),
+    "CRYPTO-002_v1": (
+        "playbook", ("apex/crypto/playbooks.py",
+                     "docs/CRYPTO-FORWARD-EPOCH-0.md")),
+    "crypto_arena_model_v1": (
+        "model", ("apex/crypto/arena.py", "apex/crypto/feed.py",
+                  "apex/crypto/playbooks.py", "apex/crypto/perception.py")),
     # v1.1 (LAB-01): empty-frame guard in visible_bars — a not-yet-listed
     # symbol crashed the whole scan tick (found by the replay campaign's
     # first minute; also a latent Monday robustness bug). Crash guard

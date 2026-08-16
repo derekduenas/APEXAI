@@ -16,6 +16,10 @@ class EvidenceClass(Enum):
     EODHD_FORWARD_OBSERVATION = "EODHD_FORWARD_OBSERVATION"
     EODHD_HISTORICAL_EXPLORATORY = "EODHD_HISTORICAL_EXPLORATORY"
     INSTITUTIONAL_HISTORICAL_INTRADAY = "INSTITUTIONAL_HISTORICAL_INTRADAY"
+    # additive (2026-08-16): the 24/7 crypto shadow arena — genuinely
+    # prospective, zero capital, NEVER evidence about equity playbooks;
+    # the unmixed law keeps it in its own ledgers and statistics
+    COINBASE_FORWARD_OBSERVATION = "COINBASE_FORWARD_OBSERVATION"
 
 
 FORBIDDEN_FOR_HISTORICAL_EXPLORATORY = (
