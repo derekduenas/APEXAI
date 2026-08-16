@@ -46,12 +46,16 @@ def test_no_execution_or_broker_dependency_exists():
     """Audit claim: no LIVE execution exists. Updated 2026-08-15 (Hunter P0):
     apex/hunter/broker.py deliberately NAMES place_order in order to SEAL it
     -- the method raises always and subclasses cannot re-enable it (proven in
-    test_hunter_p0). That one module is exempt from the name scan; everything
-    else must still contain no execution vocabulary, and no broker library
-    may appear anywhere."""
+    test_hunter_p0). Updated 2026-08-16 (ERD-1): apex/execution/sealing.py and
+    robinhood.py likewise NAME the placement verbs in order to forbid them (a
+    deny-list and a tripwire scanner cannot be written without naming what
+    they refuse). Those three modules are exempt from the NAME scan only --
+    the stronger invariant, that no module anywhere DEFINES a placement
+    function, is proven mechanically below and in test_execution_erd1."""
+    exempt = {"broker.py", "sealing.py", "robinhood.py"}
     src = "\n".join(
         p.read_text() for p in APEX.rglob("*.py")
-        if "__pycache__" not in str(p) and p.name != "broker.py"
+        if "__pycache__" not in str(p) and p.name not in exempt
     ).lower()
     for term in ("import ib_insync", "robin_stocks", "alpaca", "order_management",
                  "place_order", "submit_order"):
@@ -60,6 +64,11 @@ def test_no_execution_or_broker_dependency_exists():
     broker_src = (APEX / "hunter" / "broker.py").read_text().lower()
     for lib in ("import ib_insync", "robin_stocks", "alpaca"):
         assert lib not in broker_src, f"{lib!r} inside the sealed adapter"
+    # The claim that actually matters: the exempted modules may SAY these
+    # words, but nothing in apex may DEFINE a callable that places an order.
+    from apex.execution.sealing import scan_package_for_placement
+    scan = scan_package_for_placement("apex")
+    assert scan["clean"], f"a placement surface exists: {scan}"
 
 
 def test_no_causal_inference_dependency_exists():
@@ -129,7 +138,10 @@ def test_the_absent_layers_the_audit_claims_have_no_module():
     """§3 class-C claims: the layers the audit calls ABSENT have no directory,
     so the audit cannot be quietly falsified by a stub appearing."""
     # Genuinely absent engines (need a validated alpha or a broker first).
-    for absent_dir in ("execution", "backtest", "risk", "monitoring"):
+    # ERD-1 (2026-08-16) moved `execution` out of this set deliberately: the
+    # READ/REVIEW half is built and the contract now says so. It is guarded by
+    # the placement scan above, not by absence.
+    for absent_dir in ("backtest", "risk", "monitoring"):
         assert not (APEX / absent_dir).exists(), (
             f"apex/{absent_dir}/ exists but the audit classifies it ABSENT/planned; "
             f"reconcile the audit before building further"

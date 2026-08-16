@@ -167,12 +167,19 @@ CONTRACTS: dict[str, LayerContract] = {
         may_access_holdout=False,
         may_optimize=False,
     ),
-    # -- LAYER 4: deployment (PLANNED, gated on a monetisable backtest) -----
+    # -- LAYER 4: deployment ------------------------------------------------
+    # ERD-1 (2026-08-16): the READ/REVIEW half is BUILT — broker-neutral
+    # gateway, capability matrix, 17-check kill chain, idempotent intents,
+    # file-backed kill switch. The LIVE half remains structurally sealed
+    # (no placement method exists, authorization type unconstructable,
+    # tripwire scans). Terminal state is ORDER_READY; ORDER_SENT does not
+    # exist. Live deployment is still gated on monetisable evidence.
     "execution": LayerContract(
-        name="execution / paper / shadow / live",
+        name="execution gateway (read/review BUILT; live SEALED)",
         package="apex.execution",
-        purpose="consume approved weights, emit fills; generates no research",
-        status="PLANNED",
+        purpose="broker-neutral readiness to ORDER_READY; emits no fills, "
+                "generates no research, holds no authorization",
+        status="BUILT_READ_REVIEW_ONLY_LIVE_SEALED",
         forbidden=(REGISTRATION_CORE | SCREEN | DISCOVERY_LAYER
                    | frozenset({"apex.evaluate", "apex.features"})),
         is_new_hypothesis=False,

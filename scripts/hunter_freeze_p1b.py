@@ -181,6 +181,13 @@ ARTIFACTS = {
     "apex_captain_kernel_v1": (
         "model", ("apex/captain/kernel.py", "apex/captain/conviction.py",
                   "apex/captain/board.py", "docs/CAPTAIN-DOCTRINE.md")),
+    # ERD-1 execution readiness: broker-aware, ORDER_READY, vault sealed.
+    "apex_execution_gateway_v1": (
+        "model", ("apex/execution/contracts.py", "apex/execution/gateway.py",
+                  "apex/execution/robinhood.py", "apex/execution/sealing.py",
+                  "apex/execution/killswitch.py")),
+    "apex_expression_v2": (
+        "model", ("apex/execution/expression_v2.py",)),
     "apex_claude_cio_v1": (
         "model", ("apex/captain/cio.py",)),
     "crypto_arena_model_v3": (

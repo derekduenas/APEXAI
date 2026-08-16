@@ -337,6 +337,39 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
                "(DATA_GAP: repo has zero intraday data; Robinhood MCP absent)",
        activation_prereqs=("intraday minute-bar archive OR broker MCP",
                            "hunter_contracts")),
+    # ---- LAYER 4: execution readiness (ERD-1, 2026-08-16) ------------------
+    # Read/review only. There is no placement surface anywhere in apex; the
+    # terminal state is ORDER_READY and live placement is structurally SEALED.
+    _c(name="execution_gateway", state=BUILT,
+       module="apex.execution.gateway",
+       purpose="broker-neutral pre-handoff kill chain (17 checks) taking a "
+               "capital-approved intent to ORDER_READY; holds no "
+               "authorization and can place nothing",
+       inputs=("order_intent", "decision", "capital_decision"),
+       outputs=("execution_readiness_result", "order_intent_ledger"),
+       allowed_deps=("apex.execution.contracts", "apex.execution.robinhood",
+                     "apex.execution.sealing", "apex.execution.killswitch"),
+       forbidden_deps=("apex.research", "apex.governance.ledger",
+                       "apex.evaluate", "apex.features"),
+       tests_required=("seal barriers", "kill chain", "idempotency across "
+                       "restart", "kill switch"),
+       activation_prereqs=("broker authentication (operator act)",
+                           "a monetisable forward result"),
+       downstream=("flight_deck",),
+       failure_behavior="refuse with a reason code; never degrade to send"),
+    _c(name="options_expression_v2", state=BUILT,
+       module="apex.execution.expression_v2",
+       purpose="diagnostic-only expression selection over bounded structures; "
+               "underlying-first (refuses without an underlying decision id), "
+               "greeks never invented, no authorization power",
+       inputs=("decision", "option_chain", "broker_capabilities"),
+       outputs=("expression_decision",),
+       allowed_deps=("apex.execution.contracts",),
+       forbidden_deps=("apex.research", "apex.governance.ledger"),
+       tests_required=("underlying-first refusal", "deterministic payoff grid",
+                       "greeks UNKNOWN_NOT_SOURCED"),
+       downstream=("execution_gateway",),
+       failure_behavior="return a labeled UNAVAILABLE candidate; never guess"),
     _c(name="discovery_exercise_runner", state=ABSENT, module="",
        purpose="THE remaining gap this tranche exposed: the machine can "
                "DECIDE on a fully-specified candidate but cannot yet FEED "
