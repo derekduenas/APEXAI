@@ -85,6 +85,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--symbol", default="SPY",
                     help="liquid name: this rehearses PLUMBING, not a view")
+    ap.add_argument("--probe-file", default=None,
+                    help="JSON {tool: result} captured by the agent in its "
+                         "own authenticated MCP session (CLAIMED_MCP)")
     a = ap.parse_args()
 
     from apex.captain.kernel import assess
@@ -92,11 +95,12 @@ def main() -> int:
     from apex.execution.expression_v2 import evaluate as expr_eval
     from apex.execution.gateway import ExecutionGateway, intent_id_for
     from apex.execution.robinhood import BrokerAuthRequired, RobinhoodAdapter
-    try:
-        from apex.execution.mcp_transport import transport
-    except ImportError:
-        transport = None
-
+    from apex.execution.mcp_transport import (NO_TRANSPORT, default,
+                                              from_probe_file)
+    if a.probe_file:
+        transport, mode = from_probe_file(a.probe_file)
+    else:
+        transport, mode = default()
     adapter = RobinhoodAdapter(transport)
     print("=" * 68)
     print("EXECUTION_REHEARSAL_SYNTHETIC — real quote, fake opportunity, "

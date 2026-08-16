@@ -27,6 +27,8 @@ sys.path.insert(0, str(_S.parent)); sys.path.insert(0, str(_S))
 import pandas as pd  # noqa: E402
 
 PASS, FAIL, BLOCKED = "PASS", "FAIL", "BLOCKED"
+NO_ROUTE = "NO_ROUTE"      # this harness cannot reach the broker AT ALL --
+# emphatically not the same as "the operator has not authenticated yet"
 LEDGER = Path("results/execution/certification.jsonl")
 
 
@@ -34,12 +36,18 @@ def _row(name: str, verdict: str, detail: str = "") -> dict:
     return {"check": name, "verdict": verdict, "detail": detail}
 
 
-def _probe(adapter, tool: str, **kw) -> tuple:
+def _probe(adapter, tool: str, **kw) -> tuple:   # noqa: C901
     """Returns (verdict, detail). A typed BLOCKED_BROKER_AUTH is BLOCKED;
     an exception or a malformed payload is FAIL."""
+    from apex.execution.mcp_transport import TransportUnavailable
     from apex.execution.robinhood import BrokerAuthRequired
+    if getattr(adapter, "_transport", None) is None \
+            and not adapter.authenticated:
+        return NO_ROUTE, "no MCP transport wired into this process"
     try:
         out = adapter._call(tool, **kw)
+    except TransportUnavailable as e:
+        return NO_ROUTE, str(e)[:70]
     except BrokerAuthRequired:
         # NOT a failure. The distinction matters for the same reason the
         # weekend nightly-pull fix mattered: a board that cries FAIL for a
@@ -195,13 +203,18 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--symbol", default="SPY")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--probe-file", default=None,
+                    help="JSON {tool: result} captured by the agent in its "
+                         "own authenticated MCP session (CLAIMED_MCP)")
     a = ap.parse_args()
 
     from apex.execution.robinhood import RobinhoodAdapter
-    try:                                  # a live MCP transport if wired
-        from apex.execution.mcp_transport import transport
-    except ImportError:
-        transport = None
+    from apex.execution.mcp_transport import (NO_TRANSPORT, default,
+                                              from_probe_file)
+    if a.probe_file:
+        transport, mode = from_probe_file(a.probe_file)
+    else:
+        transport, mode = default()
     adapter = RobinhoodAdapter(transport)
     rows = certify(adapter, a.symbol)
 
@@ -217,13 +230,25 @@ def main() -> int:
     measurable = [r for r in rows if r["verdict"] in (PASS, FAIL)]
     failed = [r for r in rows if r["verdict"] == FAIL]
     blocked = [r for r in rows if r["verdict"] == BLOCKED]
+    noroute = [r for r in rows if r["verdict"] == NO_ROUTE]
 
-    print(f"seal intact: {seal_ok} | measured {len(measurable)} | "
-          f"failed {len(failed)} | blocked {len(blocked)}")
+    print(f"transport: {mode} | seal intact: {seal_ok} | "
+          f"measured {len(measurable)} | failed {len(failed)} | "
+          f"blocked {len(blocked)} | no-route {len(noroute)}")
+    if noroute:
+        print("NO_ROUTE is NOT 'pending authentication'. The MCP session "
+              "belongs to the Claude Code client; this process holds no "
+              "token and cannot acquire one. Authenticating alone will not "
+              "turn these green -- supply --probe-file with results "
+              "captured in the authenticated session (CLAIMED_MCP).")
     if blocked:
         print("BLOCKED rows are not failures — they need the operator's "
               "one interactive step: /mcp -> robinhood-trading -> auth")
-    if not failed and not blocked and seal_ok:
+    # READY requires every row MEASURED and passing. An unmeasured row is
+    # not a passing row -- declaring READY over NO_ROUTE/BLOCKED rows is
+    # precisely the "dashboard says a protection exists" failure, pointed
+    # at ourselves.
+    if not failed and not blocked and not noroute and seal_ok:
         print()
         print("APEX EXECUTION INFRASTRUCTURE: READY")
         print("Scientific authorization: NOT EARNED "
@@ -238,7 +263,8 @@ def main() -> int:
                            "authorization_power": "NONE"})
     if a.json:
         print(json.dumps(rows, indent=2))
-    return 0 if (seal_ok and not failed) else 1
+    return 0 if (seal_ok and not failed and not blocked and not noroute) \
+        else 1
 
 
 if __name__ == "__main__":

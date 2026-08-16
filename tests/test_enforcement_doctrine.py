@@ -218,3 +218,53 @@ def test_every_named_safety_claim_has_a_test_in_this_file():
     claims = set(re.findall(r"^### CLAIM (\d+)", doc.read_text(), re.M))
     assert claims == {str(i) for i in range(1, 9)}, (
         f"doctrine covers claims {sorted(claims)}; expected 1-8")
+
+
+# ---- the instrument audits itself -----------------------------------------
+
+def test_the_certification_board_cannot_declare_ready_over_unmeasured_rows():
+    """Category II, pointed at our own dashboard. The first version of this
+    harness printed "APEX EXECUTION INFRASTRUCTURE: READY" while eight rows
+    were unreachable, because the READY condition only checked FAIL. An
+    unmeasured row is not a passing row."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    import robinhood_certification as rc
+    src = open(rc.__file__).read()
+    ready = src.split('if not failed', 1)[1].split("\n")[0:2]
+    joined = " ".join(ready)
+    assert "noroute" in joined and "blocked" in joined, (
+        "READY must require every row measured, not merely not-failed")
+
+
+def test_no_route_is_distinct_from_blocked_broker_auth():
+    """"unreachable" and "not yet authenticated" are different facts.
+    Collapsing them tells the operator to wait for something that will
+    never arrive."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    import robinhood_certification as rc
+    assert rc.NO_ROUTE != rc.BLOCKED
+    from apex.execution.mcp_transport import NO_TRANSPORT, default
+    transport, mode = default()
+    assert transport is None and mode == NO_TRANSPORT
+
+
+def test_a_probe_file_cannot_turn_a_missing_tool_into_an_empty_success():
+    """LAB-04's lesson: absent is UNKNOWN, never empty."""
+    import json
+
+    import pytest as _pt
+    from apex.execution.mcp_transport import (TransportUnavailable,
+                                              from_probe_file)
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as fh:
+        json.dump({"get_stock_quote": {"last": 1.0}}, fh)
+        path = fh.name
+    call, mode = from_probe_file(path)
+    assert mode == "CLAIMED_MCP"
+    assert call("get_stock_quote")["last"] == 1.0
+    with _pt.raises(TransportUnavailable):
+        call("get_positions")
