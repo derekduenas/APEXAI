@@ -175,6 +175,14 @@ ARTIFACTS = {
     # evidence, bar-gap provenance. Infrastructure only; predicates frozen.
     "crypto_disk_governor_v1": (
         "model", ("apex/crypto/diskgov.py",)),
+    # THE CAPTAIN — CIO/meta-brain. Observational in Epoch 1
+    # (decision_power NONE): records what the desk SHOULD do next and
+    # changes no outcome. Capital remains sovereign over money.
+    "apex_captain_kernel_v1": (
+        "model", ("apex/captain/kernel.py", "apex/captain/conviction.py",
+                  "apex/captain/board.py", "docs/CAPTAIN-DOCTRINE.md")),
+    "apex_claude_cio_v1": (
+        "model", ("apex/captain/cio.py",)),
     "crypto_arena_model_v3": (
         "model", ("apex/crypto/arena.py", "apex/crypto/fabric.py",
                   "apex/crypto/diskgov.py", "apex/crypto/playbooks.py",

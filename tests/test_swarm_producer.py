@@ -102,7 +102,12 @@ def test_ordering_law_candidates_persist_before_enrichment(tmp_path):
     enriched = enrichment_pass(t, "2026-08-17", decisions, uni)
     assert {r["kind"] for r in enriched} == {"forecast_bundle",
                                              "assassin_review",
-                                             "capital_decision"}
+                                             "capital_decision",
+                                             "captain_state",
+                                             "opportunity_board"}
+    cap_state = [r for r in enriched if r["kind"] == "captain_state"][0]
+    assert cap_state["decision_power"] == "NONE_OBSERVATIONAL_EPOCH1"
+    assert cap_state["capital_is_sovereign"] is True
     rev = [r for r in enriched if r["kind"] == "assassin_review"][0]
     assert rev["verdict"] in ("SURVIVED_CLEAN", "SURVIVED_WOUNDED")
     assert len(rev["attempts"]) >= 4              # every mechanism recorded

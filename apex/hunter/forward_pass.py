@@ -291,6 +291,7 @@ def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
                                heat=0.0, drawdown_budget_left=1.0,
                                sleeve_correlations={})
     out: list = []
+    captain_states: list = []
     swarm_budget = 2
     for d in decisions:
         if d.get("playbook_id", "").startswith("BASELINE-"):
@@ -376,6 +377,32 @@ def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
         if assassin_rec is not None:
             out.append(assassin_rec)
         out.append(rec)
+        # THE CAPTAIN — observational in Epoch 1: records what the desk
+        # SHOULD do next; changes no outcome (decision_power NONE)
+        try:
+            from apex.captain.kernel import assess as captain_assess
+            cst = captain_assess(d, bundle_rec, assassin_rec, rec,
+                                 persistence=rec.get("edge_persistence"))
+            crec = stamp(cst.as_record(),
+                         EvidenceClass.EODHD_FORWARD_OBSERVATION)
+            crec["session_date"] = date
+            captain_states.append(cst)
+            out.append(crec)
+        except Exception as e:                              # noqa: BLE001
+            print(f"captain {d['symbol']}: {type(e).__name__}: {e}")
+    # the board: one scarce unit of risk, many candidates
+    if captain_states:
+        try:
+            from apex.captain.board import build as build_board
+            caps = {r["decision_id"]: r for r in out
+                    if r.get("kind") == "capital_decision"}
+            brec = stamp(build_board(captain_states, caps,
+                                     t_utc=str(t)).as_record(),
+                         EvidenceClass.EODHD_FORWARD_OBSERVATION)
+            brec["session_date"] = date
+            out.append(brec)
+        except Exception as e:                              # noqa: BLE001
+            print(f"board: {type(e).__name__}: {e}")
     return out
 
 

@@ -320,6 +320,25 @@ def tick(now=None, fabric=None) -> dict:
                         EvidenceClass.COINBASE_FORWARD_OBSERVATION)
             _append(rev)
             stats["verdict"] = verdict
+            try:
+                from apex.captain.kernel import assess as captain_assess
+                cst = captain_assess(
+                    {**dec, "symbol": INSTRUMENT},
+                    {"analog_view": {"status": "NOT_AVAILABLE"},
+                     "ml_view": {"status": "UNTRAINED"},
+                     "swarm_view": sv,
+                     "disagreement": {"level": "HIGH" if objection
+                                      else "UNMEASURABLE"},
+                     "distribution_source_status": "REFUSED"},
+                    {"verdict": ("SURVIVED_WOUNDED" if objection
+                                 else "SURVIVED_CLEAN")},
+                    {"final_state": verdict,
+                     "reason_codes": ["NO_CALIBRATED_FORECAST"],
+                     "gates": {"regime_uncertain": world.get("uncertain")}})
+                _append(stamp(cst.as_record(),
+                              EvidenceClass.COINBASE_FORWARD_OBSERVATION))
+            except Exception as e:                          # noqa: BLE001
+                print(f"captain: {type(e).__name__}: {e}")
 
     for rec in resolve_pending(rows, candles[INSTRUMENT], now):
         _append(stamp(rec, EvidenceClass.COINBASE_FORWARD_OBSERVATION))
