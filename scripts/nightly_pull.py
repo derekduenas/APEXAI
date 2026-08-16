@@ -92,16 +92,36 @@ def _chain_append(log_path: Path, entry: dict) -> dict:
     line that can be edited."""
     # a torn write (crash mid-append) must never kill the archive: walk
     # back to the last parseable entry, link past the tear, and RECORD the
-    # recovery in the new entry so the anomaly is visible, not hidden
+    # recovery in the new entry so the anomaly is visible, not hidden.
+    # LAB-03: read only the file TAIL (O(1)), not the whole ledger — the
+    # full-file read made appends quadratic on large replay ledgers. The
+    # tail chunk is far larger than any single record; if no line in it
+    # parses, fall back to a full walk (correctness over speed).
     prev, torn = "GENESIS", False
-    if log_path.exists():
-        lines = log_path.read_text().strip().splitlines()
+    if log_path.exists() and log_path.stat().st_size > 0:
+        size = log_path.stat().st_size
+        with log_path.open("rb") as fh:
+            fh.seek(max(0, size - 262144))
+            tail = fh.read().decode("utf-8", errors="replace")
+        lines = [ln for ln in tail.splitlines() if ln.strip()]
+        if size > 262144 and lines:
+            lines = lines[1:]                    # first tail line may be cut
+        found = False
         for line in reversed(lines):
             try:
                 prev = json.loads(line)["entry_hash"]
+                found = True
                 break
             except (json.JSONDecodeError, KeyError):
                 torn = True
+        if not found:                            # pathological: full walk
+            for line in reversed(
+                    log_path.read_text().strip().splitlines()):
+                try:
+                    prev = json.loads(line)["entry_hash"]
+                    break
+                except (json.JSONDecodeError, KeyError):
+                    torn = True
     body = {**entry, "prev_hash": prev}
     if torn:
         body["recovered_from_torn_tail"] = True
