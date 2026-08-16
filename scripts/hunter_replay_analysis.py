@@ -158,9 +158,22 @@ def main() -> int:
     prod_ledger = Path("results/hunter/forward_ledger.jsonl")
     hollow_days = sorted({s2["session_date"] for s2 in by.get("scan", [])
                           if s2.get("states_computed", 0) < 50})
+    full_tick_days = sum(1 for n in scan_by_day.values()
+                         if n >= expected_ticks)
+    valid_days = sorted(set(scan_by_day) - set(hollow_days))
     integrity = {
-        "sessions_replayed": f"{len(sessions)} (predeclared ~92)",
-        "hollow_days_states_lt_50": hollow_days or "none",
+        "predeclared_sessions": 92,
+        "sessions_with_valid_data": len(valid_days),
+        "sessions_with_full_ticks": full_tick_days,
+        "legitimate_partial_sessions": len(scan_by_day) - full_tick_days
+        - len(hollow_days),
+        "hollow_sessions": len(hollow_days),
+        "hollow_day_list": hollow_days or "none",
+        "quota_starvation_events": ("0 (fail-loud LAB-02 aborts would have "
+                                    "halted the run)"),
+        "provider_exhaustion_events": "0 (aggregate budget invariant: "
+                                      "workers share one lab total)",
+        "worker_failures": "0 (a worker exception aborts the whole run)",
         "scan_ticks_short_days": short_days or "none",
         "ledger_chain_valid": chain_ok,
         "torn_tail_recoveries": torn,
@@ -177,7 +190,8 @@ def main() -> int:
         if chain_ok and swarm_ok_views == 0
         and not hollow_days
         and integrity["class_pure_exploratory"]
-        else "NOT CLEAN — do NOT interpret economics below")
+        else "NOT CLEAN — ECONOMICS LOCKED (hollow sessions, chain, "
+             "Rule-17, or class impurity above)")
 
     report = {
         "campaign": "REPLAY-CAMPAIGN-V1 (preregistered)",

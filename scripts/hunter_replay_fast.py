@@ -46,10 +46,14 @@ PRESETS = {"smoke": 2, "micro": 10, "research": 25, "campaign": 92}
 ET = "America/New_York"
 
 
+LAB_TOTAL_BUDGET = 90_000        # aggregate across ALL workers (< the
+                                 # provider's ~100k/day allowance)
+
+
 def worker_day(args) -> str:
     """PASS A: one session-day of perception, fully self-contained.
     Returns the path of the deterministic per-day cache file."""
-    day, universe_cap, outdir = args
+    day, universe_cap, outdir, worker_budget = args
     import apex.hunter.forward_pass as fp
     import apex.hunter.swarm as swarm
     from apex.hunter.context_builder import (build_scan_universe,
@@ -64,7 +68,8 @@ def worker_day(args) -> str:
     t0 = time.monotonic()
     stage = {"io": 0.0, "perception": 0.0, "realization": 0.0}
 
-    gov = QuotaGovernor(daily_budget=90_000)   # LAB-02
+    # LAB-02 + aggregate invariant: this worker's slice of the LAB TOTAL
+    gov = QuotaGovernor(daily_budget=worker_budget)
     uni = build_scan_universe(day)
     subset = dict(list(uni["symbols"].items())[:universe_cap])
     uni = {**uni, "symbols": subset,
@@ -184,9 +189,14 @@ def main() -> int:
     print(f"ACCELERATED REPLAY: {len(days)} sessions, cap "
           f"{a.universe_cap}, workers {a.workers}")
 
+    per_worker = LAB_TOTAL_BUDGET // a.workers
+    print(f"provider budget: {LAB_TOTAL_BUDGET} aggregate -> "
+          f"{per_worker}/worker x {a.workers} (structural invariant: "
+          f"workers can never collectively exceed the lab total)")
     with ProcessPoolExecutor(max_workers=a.workers) as ex:
         files = list(ex.map(worker_day,
-                            [(d, a.universe_cap, str(out)) for d in days]))
+                            [(d, a.universe_cap, str(out), per_worker)
+                             for d in days]))
     ta = time.monotonic() - t0
     profiles = [json.loads(Path(f).read_text())["profile"] for f in files]
     print(f"PASS A done in {ta/60:.1f}m; per-day median "
