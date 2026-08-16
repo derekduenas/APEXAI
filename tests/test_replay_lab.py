@@ -72,3 +72,22 @@ def test_lab05b_governor_speaks_call_units():
     assert g.acquire(1)                            # cheap call still fits
     assert FORWARD_RESERVE_CALL_UNITS >= 30_000    # Monday is sovereign
     assert DAILY_LIMIT_CALL_UNITS == 100_000
+
+
+def test_lab05b_stale_counter_never_reads_as_exhausted(monkeypatch):
+    """EODHD's counter can show YESTERDAY's 100k after the GMT reset
+    until a new request lands; apiRequestsDate disambiguates. A stale
+    counter must not make the fresh bucket look exhausted — and a
+    current-date counter must be believed."""
+    import apex.intraday.eodhd as eodhd
+    stale = {"api_requests_units": 100_000,
+             "api_requests_date": "2026-08-16",
+             "daily_rate_limit_units": 100_000}
+    monkeypatch.setattr(eodhd, "provider_usage", lambda: dict(stale))
+    u = eodhd.lab_spare_units(now_utc="2026-08-17T00:05:00+00:00")
+    assert u["counter_stale_prior_bucket"] is True
+    assert u["consumed_current_bucket_units"] == 0
+    assert u["available_lab_units"] == 65_000      # fresh bucket - reserve
+    u2 = eodhd.lab_spare_units(now_utc="2026-08-16T23:00:00+00:00")
+    assert u2["counter_stale_prior_bucket"] is False
+    assert u2["available_lab_units"] == 0          # genuinely exhausted

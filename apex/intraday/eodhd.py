@@ -202,15 +202,30 @@ def provider_usage() -> dict:
             "daily_rate_limit_units": u.get("dailyRateLimit")}
 
 
-def lab_spare_units() -> dict:
+def lab_spare_units(now_utc=None) -> dict:
     """PRODUCTION_FORWARD > REPLAY is sovereign: the laboratory may spend
     only limit - consumed - FORWARD_RESERVE, even when the provider would
-    happily accept more."""
+    happily accept more.
+
+    STALE-COUNTER RULE (documented EODHD behavior): after midnight GMT
+    the displayed counter can keep showing the PRIOR day's usage until a
+    new request lands — apiRequestsDate exists to disambiguate. If the
+    reported date != current GMT date, the counter belongs to the old
+    bucket and current consumption is treated as zero-with-flag, never
+    inferred from the stale value (which would falsely read 'exhausted'
+    right after reset)."""
+    import pandas as _pd
     u = provider_usage()
     limit = u["daily_rate_limit_units"] or DAILY_LIMIT_CALL_UNITS
-    consumed = u["api_requests_units"] or 0
+    today_gmt = str((_pd.Timestamp(now_utc) if now_utc
+                     else _pd.Timestamp.now(tz="UTC")).date())
+    stale = u["api_requests_date"] != today_gmt
+    consumed = 0 if stale else (u["api_requests_units"] or 0)
     spare = max(0, limit - consumed - FORWARD_RESERVE_CALL_UNITS)
-    return {**u, "forward_reserve_units": FORWARD_RESERVE_CALL_UNITS,
+    return {**u, "current_gmt_date": today_gmt,
+            "counter_stale_prior_bucket": stale,
+            "consumed_current_bucket_units": consumed,
+            "forward_reserve_units": FORWARD_RESERVE_CALL_UNITS,
             "available_lab_units": spare}
 
 
