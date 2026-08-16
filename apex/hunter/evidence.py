@@ -52,6 +52,42 @@ def require_permitted(evidence_class: EvidenceClass, use: str) -> None:
             f"(50%/0% vs the 90% bar). The laboratory is not the exam.")
 
 
+def require_declared_class(rows, declared: EvidenceClass, *,
+                           where: str) -> None:
+    """LAB-08 -- enforcement at the POINT OF CONSUMPTION.
+
+    `require_unmixed` guards a statistic AFTER the fact, in the scoreboard.
+    That is the wrong end of the pipe for an engine that ACCEPTS rows and
+    STAMPS its output with a class it was simply told. A caller offering
+    exploratory rows while declaring FORWARD would previously receive a
+    result stamped clean-forward -- the class would be laundered, and the
+    downstream mixing guard would never see it because it inspects ledger
+    records, not engine inputs.
+
+    So: every offered row must carry `evidence_class`, and it must equal
+    what the caller declared. Unstamped is refused as loudly as mismatched
+    -- "I cannot verify this" and "this is wrong" get the same answer,
+    because a class that cannot be checked cannot be certified.
+    """
+    seen, unstamped = set(), 0
+    for r in rows:
+        v = (r or {}).get("evidence_class")
+        if v is None:
+            unstamped += 1
+        else:
+            seen.add(v.value if isinstance(v, EvidenceClass) else str(v))
+    if unstamped:
+        raise EvidenceViolation(
+            f"{where}: {unstamped}/{len(rows)} offered rows carry no "
+            f"evidence_class. An unverifiable class cannot be stamped "
+            f"{declared.value}; refusing rather than assuming.")
+    if seen - {declared.value}:
+        raise EvidenceViolation(
+            f"{where}: caller declared {declared.value} but the rows "
+            f"contain {sorted(seen)}. Evidence classes never mix, and a "
+            f"declaration does not convert one into another.")
+
+
 def require_unmixed(classes: set) -> None:
     """A calibration statistic computed over MIXED evidence classes is
     refused: forward truth and survivorship-limited history never share a

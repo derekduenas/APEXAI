@@ -91,9 +91,25 @@ class HunterModel:
 
 
 def build_dataset(decisions: list, realizations_by_id: dict,
-                  horizon_minutes: int) -> HunterDataset:
+                  horizon_minutes: int, *, evidence_class=None
+                  ) -> HunterDataset:
     """Features from DECISION records only; labels from REALIZATIONS only.
-    Playbook candidates only (baselines are a scoreboard concern)."""
+    Playbook candidates only (baselines are a scoreboard concern).
+
+    LAB-08: `evidence_class` is REQUIRED and verified against every row.
+    The forward_eligibility filter below is NOT a class barrier -- the
+    replay lab deliberately stamps its records FORWARD_ELIGIBLE as a
+    declared counterfactual, so exploratory rows sail straight through it.
+    A model trained on laboratory tape while believing itself forward-
+    trained is the exact confusion the evidence law exists to prevent.
+    """
+    from apex.hunter.evidence import require_declared_class
+    if evidence_class is None:
+        raise MLContractViolation(
+            "build_dataset requires an explicit evidence_class: a training "
+            "set whose provenance is assumed is not a training set.")
+    require_declared_class(decisions, evidence_class,
+                           where="ml.build_dataset")
     if horizon_minutes not in HORIZONS_MINUTES:
         raise MLContractViolation(f"undeclared horizon {horizon_minutes}")
     names = tuple(n for n, _, _ in ANALOG_FEATURE_SCHEMA_V1)

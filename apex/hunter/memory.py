@@ -95,6 +95,10 @@ def analog_memory_rows(as_of, ledger: Path = LEDGER,
                      "resolved_at": str(resolved_at),
                      "session_date": d["session_date"],
                      "symbol": d["symbol"],
+                     # LAB-08: the row carries the class of the RECORD it
+                     # came from, not the class of the ledger we hoped to
+                     # be reading. The engine verifies it downstream.
+                     "evidence_class": d.get("evidence_class"),
                      "regime": _regime_label(
                          (d.get("market_state") or {}).get("day_return"))})
     del horizon_minutes

@@ -90,9 +90,12 @@ def test_f05_ml_excludes_missing_features():
     from tests.test_hunter_spine import mem_row
     d = {**mem_row(0, "2026-08-10")["candidate"], "decision_id": "d0",
          "session_date": "2026-08-10", "playbook_id": "HUNTER-001_v1",
-         "forward_eligibility": "FORWARD_ELIGIBLE"}
+         "forward_eligibility": "FORWARD_ELIGIBLE",
+         "evidence_class": "EODHD_FORWARD_OBSERVATION"}
     d["chart_state"] = dict(d["chart_state"], rvol_tod=None)  # one missing
-    ds = build_dataset([d], {"d0": {"ret_60m": 0.01}}, 60)
+    from apex.hunter.evidence import EvidenceClass as _EC
+    ds = build_dataset([d], {"d0": {"ret_60m": 0.01}}, 60,
+                       evidence_class=_EC.EODHD_FORWARD_OBSERVATION)
     assert ds.n_raw == 0                          # excluded, not coerced
 
 

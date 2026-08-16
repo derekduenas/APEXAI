@@ -136,8 +136,17 @@ def retrieve(query: AnalogQuery, memory_rows: list, *,
              evidence_class: EvidenceClass, k: int = 50) -> AnalogResult:
     """memory_rows: [{candidate: decision-shaped dict, outcome: realization
     dict | None, resolved_at: iso, session_date, symbol, decision_id,
-    regime: str|None}]. ALL rows must share `evidence_class` (caller
-    separates ledgers; this engine never mixes)."""
+    evidence_class: str, regime: str|None}].
+
+    LAB-08: "ALL rows must share evidence_class" used to be a sentence
+    addressed to the caller. It is now VERIFIED here, before a single
+    neighbour is chosen or a single field is stamped -- because this
+    function's output carries an evidence_class label that downstream
+    consumers trust, and a label the engine never checked is a laundering
+    machine, not a guarantee."""
+    from apex.hunter.evidence import require_declared_class
+    require_declared_class(memory_rows, evidence_class,
+                           where="analog.retrieve")
     as_of = pd.Timestamp(query.as_of)
     if as_of.tzinfo is None:
         raise ValueError("as_of must be tz-aware")

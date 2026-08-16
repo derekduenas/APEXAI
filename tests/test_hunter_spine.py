@@ -23,6 +23,8 @@ ET = "America/New_York"
 def mem_row(i, day, ret60=0.01, rvol=2.0, r30=0.01, t_hour=15):
     return {"decision_id": f"a{i}", "session_date": day, "symbol": "AMD",
             "regime": "UP",
+            # LAB-08: rows declare their provenance; the engine verifies it
+            "evidence_class": "EODHD_FORWARD_OBSERVATION",
             "resolved_at": f"{day}T21:00:00+00:00",
             "candidate": {
                 "t_utc": f"{day}T{t_hour}:00:00+00:00",
@@ -75,7 +77,11 @@ def test_analog_time_firewall_structural():
 
 # ---- adversarial 3 + 7: historical stays limited; sparse stays humble
 def test_analog_historical_carries_limitation_and_sparse_refuses_confidence():
-    rows = [mem_row(i, "2026-08-10") for i in range(3)]
+    # LAB-08: exploratory rows must SAY they are exploratory. Declaring the
+    # class over forward-stamped rows is now refused, which is the point.
+    rows = [dict(mem_row(i, "2026-08-10"),
+                 evidence_class="EODHD_HISTORICAL_EXPLORATORY")
+            for i in range(3)]
     r = retrieve(QUERY, rows,
                  evidence_class=EvidenceClass.EODHD_HISTORICAL_EXPLORATORY)
     assert r.survivorship_limitation is True
@@ -94,14 +100,14 @@ def test_analog_no_rows_is_no_valid_analogs():
 
 # ---- adversarial 4/5/6: ML contract
 def test_ml_refuses_without_evidence_and_undeclared_horizon():
-    ds = build_dataset([], {}, 60)
+    ds = build_dataset([], {}, 60, evidence_class=EvidenceClass.EODHD_FORWARD_OBSERVATION)
     m = train(ds)
     assert m.status == "UNTRAINED"
     assert "INSUFFICIENT_FORWARD_DATA" in m.reasons[0]
     assert m.predict_p_positive({})["p_positive"] is None
     assert m.provenance                              # provenance always
     with pytest.raises(MLContractViolation):
-        build_dataset([], {}, 45)                    # undeclared horizon
+        build_dataset([], {}, 45, evidence_class=EvidenceClass.EODHD_FORWARD_OBSERVATION)   # undeclared horizon
 
 
 def test_ml_trains_deterministically_when_evidence_exists():
@@ -112,10 +118,11 @@ def test_ml_trains_deterministically_when_evidence_exists():
                       rvol=1.5 + (i % 4) * 0.5)
         d = {**row["candidate"], "decision_id": f"d{i}",
              "session_date": day, "playbook_id": "HUNTER-001_v1",
-             "forward_eligibility": "FORWARD_ELIGIBLE"}
+             "forward_eligibility": "FORWARD_ELIGIBLE",
+             "evidence_class": "EODHD_FORWARD_OBSERVATION"}
         decisions.append(d)
         realized[f"d{i}"] = {"ret_60m": 0.01 if i % 3 == 0 else -0.005}
-    ds = build_dataset(decisions, realized, 60)
+    ds = build_dataset(decisions, realized, 60, evidence_class=EvidenceClass.EODHD_FORWARD_OBSERVATION)
     assert ds.n_effective >= 40
     m1, m2 = train(ds), train(ds)
     assert m1.status == "EXPLORATORY_MODEL" and m1.coef == m2.coef
