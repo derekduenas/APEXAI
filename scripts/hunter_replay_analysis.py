@@ -158,6 +158,13 @@ def main() -> int:
     prod_ledger = Path("results/hunter/forward_ledger.jsonl")
     hollow_days = sorted({s2["session_date"] for s2 in by.get("scan", [])
                           if s2.get("states_computed", 0) < 50})
+    # LAB-04 class: states computed but EVERYTHING rejected for missing
+    # context = a blindfolded scan masquerading as a quiet market
+    ctx_starved = sorted({
+        d for d in {s2["session_date"] for s2 in by.get("scan", [])}
+        if all(s2.get("liquidity_data_ok", 0) == 0
+               and s2.get("states_computed", 0) > 50
+               for s2 in by.get("scan", []) if s2["session_date"] == d)})
     full_tick_days = sum(1 for n in scan_by_day.values()
                          if n >= expected_ticks)
     valid_days = sorted(set(scan_by_day) - set(hollow_days))
@@ -169,6 +176,10 @@ def main() -> int:
         - len(hollow_days),
         "hollow_sessions": len(hollow_days),
         "hollow_day_list": hollow_days or "none",
+        "context_starved_sessions": len(ctx_starved),
+        "context_starved_list": (ctx_starved[:10] + ["..."]
+                                 if len(ctx_starved) > 10
+                                 else ctx_starved) or "none",
         "quota_starvation_events": ("0 (fail-loud LAB-02 aborts would have "
                                     "halted the run)"),
         "provider_exhaustion_events": "0 (aggregate budget invariant: "
@@ -188,7 +199,7 @@ def main() -> int:
     integrity["VERDICT"] = (
         "CLEAN — economics may be interpreted"
         if chain_ok and swarm_ok_views == 0
-        and not hollow_days
+        and not hollow_days and not ctx_starved
         and integrity["class_pure_exploratory"]
         else "NOT CLEAN — ECONOMICS LOCKED (hollow sessions, chain, "
              "Rule-17, or class impurity above)")

@@ -88,6 +88,12 @@ def replay_day(day: str, gov, ledger: Path, universe_cap: int) -> dict:
                                      "not PIT for this date")}
     contexts = load_or_build_contexts(subset, day, gov,
                                       extra_symbols=("SPY.US",))
+    ctx_healthy = sum(1 for c in contexts.values()
+                      if c.sessions_observed > 0)
+    if ctx_healthy < 0.5 * max(len(contexts), 1):
+        raise RuntimeError(
+            f"LAB-04 CONTEXT ABORT {day}: {ctx_healthy}/{len(contexts)} "
+            f"contexts healthy")
     bars = {}
     for s in ("SPY.US", *subset):
         v = s if s.endswith(".US") else f"{s}.US"

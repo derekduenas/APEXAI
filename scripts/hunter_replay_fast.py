@@ -79,6 +79,13 @@ def worker_day(args) -> str:
     s = time.monotonic()
     contexts = load_or_build_contexts(subset, day, gov,
                                       extra_symbols=("SPY.US",))
+    ctx_healthy = sum(1 for c in contexts.values()
+                      if c.sessions_observed > 0)
+    if ctx_healthy < 0.5 * max(len(contexts), 1):
+        raise RuntimeError(
+            f"LAB-04 CONTEXT ABORT {day}: {ctx_healthy}/{len(contexts)} "
+            f"contexts healthy (provider concurrency pressure?) — dying "
+            f"loudly rather than scanning a blindfolded universe")
     bars = {}
     for sym in ("SPY.US", *subset):
         v = sym if sym.endswith(".US") else f"{sym}.US"
@@ -171,7 +178,8 @@ def main() -> int:
     ap.add_argument("--end", required=True)
     ap.add_argument("--tag", required=True)
     ap.add_argument("--universe-cap", type=int, default=150)
-    ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--workers", type=int, default=4)  # LAB-04:
+    # provider concurrency limits punish 8-way fetch storms
     a = ap.parse_args()
 
     from apex.intraday.sessions import Session, classify

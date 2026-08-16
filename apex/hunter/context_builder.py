@@ -148,7 +148,15 @@ def load_or_build_contexts(symbols: dict, today: str, gov,
     cache = OUT_DIR / f"daily_context_{today}.json"
     if cache.exists():
         raw = json.loads(cache.read_text())
-        return {s: DailyContext(**v) for s, v in raw.items()}
+        loaded = {s: DailyContext(**v) for s, v in raw.items()}
+        healthy = sum(1 for c in loaded.values() if c.sessions_observed > 0)
+        if healthy >= 0.5 * max(len(loaded), 1):
+            return loaded
+        # LAB-04: a mostly-empty cache is POISON (a past fetch failure
+        # frozen as fact) — quarantine and rebuild, never trust it
+        cache.rename(cache.with_suffix(".poisoned"))
+        print(f"context cache {today}: POISONED ({healthy}/{len(loaded)} "
+              f"healthy) — quarantined, rebuilding")
     lo = str((pd.Timestamp(today) - pd.Timedelta(days=CONTEXT_LOOKBACK_DAYS)).date())
     hi = str((pd.Timestamp(today) - pd.Timedelta(days=1)).date())
     out = {}
@@ -166,5 +174,12 @@ def load_or_build_contexts(symbols: dict, today: str, gov,
                                     sector_etf=setf,
                                     median_dollar_volume=mdv)
             print(f"context {sym}: {type(e).__name__}")
-    cache.write_text(json.dumps({s: asdict(c) for s, c in out.items()}))
+    healthy = sum(1 for c in out.values() if c.sessions_observed > 0)
+    if healthy >= 0.8 * max(len(out), 1):
+        cache.write_text(json.dumps({s: asdict(c) for s, c in out.items()}))
+    else:
+        # LAB-04: do NOT freeze a failure as a cache; callers see the
+        # degraded contexts this run, but no future run inherits them
+        print(f"context build {today}: {healthy}/{len(out)} healthy — "
+              f"NOT cached (transient failure must not become permanent)")
     return out
