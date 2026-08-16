@@ -231,6 +231,14 @@ def fetch_intraday_chunk(symbol: str, lo: str, hi: str,
             return rows, "network"
         except (urllib.error.HTTPError, urllib.error.URLError, OSError) as e:  # type: ignore[attr-defined]
             code = getattr(e, "code", None)
+            if code == 402:
+                # LAB-05: the PROVIDER's daily quota is exhausted. Never
+                # retried (deterministic until reset), named truthfully so
+                # no downstream layer can mistake it for anything else.
+                raise IntradayDataError(
+                    f"PROVIDER_QUOTA_EXHAUSTED (HTTP 402) for {symbol}: "
+                    f"the vendor daily allowance is spent; resume after "
+                    f"reset") from None
             if code in (429, 500, 502, 503) and attempt < 3:
                 time.sleep(governor.backoff(attempt,
                                             getattr(e, "headers", {}) and
