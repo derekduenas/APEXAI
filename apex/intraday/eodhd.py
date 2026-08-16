@@ -43,7 +43,17 @@ LAKE = Path("data/intraday/eodhd")
 LEDGER = LAKE / "manifests" / "eodhd_download_ledger.jsonl"
 
 # conservative local budget, deliberately far under the vendor daily cap
-DAILY_REQUEST_BUDGET = 2000
+# LAB-05b: quota accounting is in PROVIDER API-CALL UNITS, not HTTP
+# requests. EODHD's schedule is authoritative: an Intraday request costs
+# 5 units against the 100k/day plan limit (resets midnight GMT).
+INTRADAY_CALL_COST = 5
+DAILY_LIMIT_CALL_UNITS = 100_000
+# untouchable Monday reserve: measured clock worst case (~1.8k units on
+# a context-building first tick x 26 ticks + EOD resolver) + headroom
+FORWARD_RESERVE_CALL_UNITS = 35_000
+# per-process default, in UNITS (was 2000 requests; ~1200 requests now —
+# ample for any single clock tick incl. first-of-day context builds)
+DAILY_REQUEST_BUDGET = 6_000
 
 # LAB-04b: optional cross-process NETWORK semaphore. Labs set this so CPU
 # worker count and outbound provider concurrency become separate knobs;
@@ -151,14 +161,16 @@ class QuotaGovernor:
         self.used = 0
         self.last_request = 0.0
 
-    def acquire(self) -> bool:
-        if self.used >= self.daily_budget:
+    def acquire(self, cost: int = 1) -> bool:
+        """`used`/`daily_budget` are PROVIDER CALL UNITS (LAB-05b), not
+        request counts — an intraday request passes cost=INTRADAY_CALL_COST."""
+        if self.used + cost > self.daily_budget:
             return False                     # PAUSE_DOWNLOAD
         wait = MIN_REQUEST_INTERVAL_S - (time.time() - self.last_request)
         if wait > 0:
             time.sleep(wait)
         self.last_request = time.time()
-        self.used += 1
+        self.used += cost
         return True
 
     def backoff(self, attempt: int, retry_after: float | None = None) -> float:
@@ -173,6 +185,33 @@ def _ledger_append(record: dict) -> None:
     clean = json.loads(redact(json.dumps(record, sort_keys=True, default=str)))
     with LEDGER.open("a") as fh:
         fh.write(json.dumps(clean, sort_keys=True) + "\n")
+
+
+def provider_usage() -> dict:
+    """The provider's OWN accounting (EODHD User API): apiRequests (units
+    consumed today, their clock), apiRequestsDate, dailyRateLimit.
+    Reconciliation source of truth before any quota-blocked resume."""
+    url = f"https://eodhd.com/api/user?api_token={token()}&fmt=json"
+    import ssl
+    _ctx = ssl.create_default_context(
+        cafile=os.environ.get("APEX_CA_BUNDLE", "/etc/ssl/cert.pem"))
+    raw = urllib.request.urlopen(url, timeout=30, context=_ctx).read()
+    u = json.loads(raw)
+    return {"api_requests_units": u.get("apiRequests"),
+            "api_requests_date": u.get("apiRequestsDate"),
+            "daily_rate_limit_units": u.get("dailyRateLimit")}
+
+
+def lab_spare_units() -> dict:
+    """PRODUCTION_FORWARD > REPLAY is sovereign: the laboratory may spend
+    only limit - consumed - FORWARD_RESERVE, even when the provider would
+    happily accept more."""
+    u = provider_usage()
+    limit = u["daily_rate_limit_units"] or DAILY_LIMIT_CALL_UNITS
+    consumed = u["api_requests_units"] or 0
+    spare = max(0, limit - consumed - FORWARD_RESERVE_CALL_UNITS)
+    return {**u, "forward_reserve_units": FORWARD_RESERVE_CALL_UNITS,
+            "available_lab_units": spare}
 
 
 def cache_path(symbol: str, lo: str, hi: str) -> Path:
@@ -196,9 +235,10 @@ def fetch_intraday_chunk(symbol: str, lo: str, hi: str,
             cp.rename(q)
             _ledger_append({"event": "cache_quarantined", "file": cp.name})
 
-    if not governor.acquire():
-        raise IntradayDataError("PAUSE_DOWNLOAD: local daily budget exhausted; "
-                                "resume next run (progress is cached)")
+    if not governor.acquire(INTRADAY_CALL_COST):
+        raise IntradayDataError("PAUSE_DOWNLOAD: local call-unit budget "
+                                "exhausted; resume next run (progress is "
+                                "cached)")
     frm = int(pd.Timestamp(lo, tz="UTC").timestamp())
     to = int((pd.Timestamp(hi, tz="UTC") + pd.Timedelta(days=1)).timestamp())
     url = (f"{BASE}/intraday/{urllib.parse.quote(symbol)}"

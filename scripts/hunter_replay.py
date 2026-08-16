@@ -76,7 +76,7 @@ def restamp(record: dict) -> dict:
     return r
 
 
-LAB_DAILY_BUDGET = 90_000        # LAB-02: labs need lab-scale budgets
+LAB_DAILY_BUDGET = 45_000        # LAB-02/05b: CALL UNITS, lab scale
 
 
 def replay_day(day: str, gov, ledger: Path, universe_cap: int) -> dict:

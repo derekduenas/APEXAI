@@ -46,8 +46,9 @@ PRESETS = {"smoke": 2, "micro": 10, "research": 25, "campaign": 92}
 ET = "America/New_York"
 
 
-LAB_TOTAL_BUDGET = 90_000        # aggregate across ALL workers (< the
-                                 # provider's ~100k/day allowance)
+LAB_TOTAL_BUDGET = 45_000        # CALL UNITS aggregate across workers
+                                 # (~9k intraday requests); the reserve-
+                                 # aware resume shrinks this to true spare
 
 
 _SEM = None
