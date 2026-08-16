@@ -15,6 +15,7 @@ fidelity + trade management only.
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import sys
 import time
@@ -91,23 +92,59 @@ def main() -> int:
     from apex.crypto.arena import tick
     from apex.crypto.fabric import MarketFabric
 
+    from apex.crypto import health
+    started_at = pd.Timestamp.now(tz="UTC")
+    restart_count = int(health.read().get("restart_count", 0)) + 1
+
     fab = MarketFabric()
     fab.start()
     print(f"fabric starting; warming 45s ...")
     time.sleep(45)
     t_end = time.time() + a.minutes * 60 if a.minutes else None
     last_tick = 0.0
+    suspended = False
+    last_scan = None
     while t_end is None or time.time() < t_end:
         now = pd.Timestamp.now(tz="UTC")
-        # DISK SOVEREIGNTY: the laboratory dies before production does
-        from apex.crypto.diskgov import disk_state, must_suspend
+        # DISK SOVEREIGNTY: the laboratory yields before production does
+        from apex.crypto.diskgov import disk_state, may_resume, must_suspend
         ds = disk_state()
+
+        # INTENTIONAL SUSPENSION IS NOT A CRASH (2026-08-16).
+        # Previously this returned 0, launchd's KeepAlive read the exit as
+        # a failure, and the daemon was resurrected straight back into the
+        # starved condition -- two correct controls fighting, ~17 minutes
+        # apart. The process now STAYS ALIVE and idle, so KeepAlive has
+        # nothing to resurrect, and it waits for a materially healthier
+        # disk (may_resume) rather than the mere absence of must_suspend.
+        if suspended:
+            if may_resume(ds):
+                print(f"{now:%H:%M:%S} DISK GOVERNOR: RESUME "
+                      f"(free {ds['free_gb']}GB, crypto budget "
+                      f"{ds['available_crypto_mb']}MB >= hysteresis floor)")
+                suspended = False
+                fab.start()
+                time.sleep(45)
+            else:
+                health.write(
+                    process_pid=os.getpid(), started_at=str(started_at),
+                    last_heartbeat=str(now), last_market_message=None,
+                    last_scan_tick=str(last_scan) if last_scan else None,
+                    last_ledger_write=None, fabric_health="STOPPED_SUSPENDED",
+                    book_health="STOPPED_SUSPENDED", disk_state=ds,
+                    suspension_state="SUSPENDED_INTENTIONAL_DISK",
+                    restart_count=restart_count)
+                time.sleep(60)
+                continue
         if must_suspend(ds):
             print(f"{now:%H:%M:%S} DISK GOVERNOR: SELF-SUSPEND "
                   f"(free {ds['free_gb']}GB, crypto budget exhausted); "
-                  f"production reserves untouched")
+                  f"production reserves untouched. Staying alive and idle "
+                  f"— resume needs {ds['resume_above_bytes']//10**6}MB of "
+                  f"crypto budget (hysteresis), not merely one spare byte.")
             fab.stop()
-            return 0
+            suspended = True
+            continue
         try:
             mgmt = manage_open_positions(fab, now)
             exits = [m for m in mgmt if m.get("kind")]
@@ -122,12 +159,31 @@ def main() -> int:
             try:
                 st = tick(now=now, fabric=fab)
                 h = fab.snapshot()["health"]
+                last_scan = now
                 print(f"{now:%H:%M:%S} tick {st} | book={h['book_health']} "
                       f"hb={h['heartbeats']} gaps={h['gaps_detected']} "
                       f"reconn={h['reconnects']}")
             except Exception as e:                          # noqa: BLE001
                 print(f"tick failed (shadow-only): {type(e).__name__}: {e}")
             last_tick = time.time()
+        # HEALTH ARTIFACT every cycle: monitoring asks this, never the
+        # human-readable log (which can go stale while the process runs).
+        try:
+            h = fab.snapshot()["health"]
+            from apex.crypto.arena import LEDGER as _LED
+            health.write(
+                process_pid=os.getpid(), started_at=str(started_at),
+                last_heartbeat=str(now),
+                last_market_message=h.get("last_message_utc"),
+                last_scan_tick=str(last_scan) if last_scan else None,
+                last_ledger_write=(str(pd.Timestamp(
+                    _LED.stat().st_mtime, unit="s", tz="UTC"))
+                    if _LED.exists() else None),
+                fabric_health=h, book_health=h.get("book_health"),
+                disk_state=ds, suspension_state="RUNNING",
+                restart_count=restart_count)
+        except Exception as e:                              # noqa: BLE001
+            print(f"health write failed: {type(e).__name__}: {e}")
         time.sleep(30)
     fab.stop()
     return 0

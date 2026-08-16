@@ -182,6 +182,14 @@ ARTIFACTS = {
         "model", ("apex/captain/kernel.py", "apex/captain/conviction.py",
                   "apex/captain/board.py", "docs/CAPTAIN-DOCTRINE.md")),
     # ERD-1 execution readiness: broker-aware, ORDER_READY, vault sealed.
+    # Crypto Epoch 0 observability/orchestration repair (2026-08-16).
+    # NOT a decision-surface change: the matchers' returns are byte-identical
+    # with and without tracing (proved in test_crypto_observability), so this
+    # is an instrumentation birth, not an Epoch break.
+    "crypto_observability_v1": (
+        "model", ("apex/crypto/health.py",)),
+    "crypto_disk_governor_v1.1": (
+        "model", ("apex/crypto/diskgov.py",)),
     "apex_execution_gateway_v1": (
         "model", ("apex/execution/contracts.py", "apex/execution/gateway.py",
                   "apex/execution/robinhood.py", "apex/execution/sealing.py",

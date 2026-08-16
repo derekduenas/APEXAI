@@ -32,7 +32,19 @@ PRODUCTION_RESERVE = 2_000_000_000     # equity clock: ledger + cache growth
 CRITICAL_SERVICE_RESERVE = 1_500_000_000   # OS/logs/git breathing room
 CRYPTO_TRIM_BELOW = 800_000_000        # crypto's own comfort band
 CRYPTO_MINIMAL_BELOW = 300_000_000
-DISK_GOVERNOR_VERSION = "disk_governor_v1"
+
+# HYSTERESIS (2026-08-16). SUSPEND fires when crypto's budget hits zero.
+# Resuming at that SAME boundary is what produced the observed sawtooth:
+# the governor correctly suspended at 16:56 and 17:13, launchd's KeepAlive
+# correctly restarted what looked like a crash, and the two correct
+# controls fought each other every ~17 minutes -- each restart re-warming
+# the fabric and breaking book continuity.
+#
+# The law: the condition required to RESTART must be materially healthier
+# than the condition that caused suspension. Recovery therefore demands a
+# full TRIM band of clear air, not one spare byte.
+CRYPTO_RESUME_ABOVE = CRYPTO_TRIM_BELOW      # 800MB of crypto budget
+DISK_GOVERNOR_VERSION = "disk_governor_v1.1"
 
 
 def disk_state(path: str = ".") -> dict:
@@ -56,6 +68,8 @@ def disk_state(path: str = ".") -> dict:
         "available_crypto_bytes": available_crypto,
         "available_crypto_mb": round(available_crypto / 1e6, 1),
         "mode": mode,
+        "resume_above_bytes": CRYPTO_RESUME_ABOVE,
+        "may_resume": available_crypto >= CRYPTO_RESUME_ABOVE,
         "law": "FORWARD EQUITY > CRYPTO LABORATORY: the arena suspends "
                "itself before production loses disk",
     }
@@ -75,6 +89,20 @@ def snapshot_interval_s(state: dict | None = None) -> int:
 
 
 def must_suspend(state: dict | None = None) -> bool:
-    """True => the crypto daemon stops touching disk and exits. The
-    production clocks are never asked to yield."""
+    """True => the crypto daemon stops touching disk. The production
+    clocks are never asked to yield.
+
+    NOTE: the daemon no longer EXITS on suspension -- exiting is
+    indistinguishable from a crash to launchd, which then resurrects it
+    into the same starved condition. It stays alive and idle instead; see
+    may_resume().
+    """
     return (state or disk_state())["mode"] == "SUSPEND"
+
+
+def may_resume(state: dict | None = None) -> bool:
+    """Hysteresis gate. A suspended daemon waits for this, NOT for the
+    mere absence of must_suspend() -- otherwise it restarts at the exact
+    boundary that killed it."""
+    return (state or disk_state())["available_crypto_bytes"] \
+        >= CRYPTO_RESUME_ABOVE

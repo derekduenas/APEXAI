@@ -130,3 +130,102 @@ FUTURE (recorded, not built): the measured fill curve is the seed of
 capacity-aware Capital — "how much can THIS opportunity absorb before
 impact destroys the asymmetry" — which is how account scaling
 eventually becomes a measured question instead of a guess.
+
+---
+
+## Observability/orchestration repair — 2026-08-16 (NOT an Epoch break)
+
+After 176 world records and **zero decisions**, two infrastructure defects
+were found. Neither is a strategy change; Crypto Epoch 0 predicates,
+thresholds, RS/VWAP definitions, risk bands, and Assassin/Captain/Capital
+semantics are untouched and remain frozen.
+
+### 1. Zero decisions was indistinguishable from zero scanning
+
+Only the human-readable daemon log carried `decisions: 0`. The scientific
+archive recorded world state and nothing about the funnel, so the record
+could not answer *"did APEX evaluate and decline, or never evaluate?"* —
+LAB-04's lesson, never applied to crypto.
+
+Repair: a `crypto_scan_tick` record per cycle carrying symbols
+expected/observed/healthy/evaluated, bar and book health, per-stage
+counters for both playbooks, stage counts through Hunter/Assassin/Captain,
+shadow watch/trade, and an explicit
+`COMPLETE_HEALTHY | PARTIAL | REFUSED_DATA_HEALTH | FAILED` status.
+
+The counters are collected by an optional `trace` dict threaded into the
+matchers, incremented at the predicates' EXISTING early-exits. No
+predicate was duplicated (this repo's most-repeated bug is two sources of
+truth), and nothing reads the trace: the matchers' returns are proved
+byte-identical with and without it.
+
+    decision_power = NONE_OBSERVATIONAL_EPOCH0
+
+First live tick under the repair — the shape that was previously
+unprovable:
+
+    scan_status            COMPLETE_HEALTHY
+    symbols_healthy        3 / 3
+    C001_evaluated         1     C001_structure_pass  0
+    C002_evaluated         1     C002_blocked_volume  1
+    hunter_candidates      0
+
+Scanned, healthy, evaluated, declined. **Zero matches remains completely
+legal** — selectivity is the design.
+
+### 2. Intentional suspension fought KeepAlive
+
+The disk governor correctly suspended at 16:56 and 17:13 (crypto budget
+exhausted, production reserves untouched). The daemon exited; launchd read
+the exit as a crash and resurrected it into the same starved condition.
+Two correct controls, oscillating ~17 minutes apart, each restart
+re-warming the fabric and breaking book continuity.
+
+Repair: suspension is now a first-class state. The daemon **stays alive
+and idle** rather than exiting, so KeepAlive has nothing to resurrect, and
+it waits on `may_resume()` — a materially healthier disk — rather than the
+mere absence of `must_suspend()`. Hysteresis: suspend at zero crypto
+budget, resume only above the full TRIM band (800MB).
+
+**The law:** the condition required to restart must be materially healthier
+than the condition that caused suspension.
+
+### 3. A stale log could not be distinguished from a dead daemon
+
+Observed: process alive, ledger written at 18:19, daemon log last written
+at 17:13. The operator surface was lying by omission.
+
+Repair: `results/crypto/crypto_health.json`, atomically overwritten each
+cycle — pid, start time, last heartbeat, last market message, last scan,
+last ledger write, fabric/book health, disk state, suspension state,
+restart count. A missing artifact reads `NO_HEALTH_ARTIFACT` and a torn one
+reads `HEALTH_ARTIFACT_UNREADABLE`; neither is ever reported as healthy,
+and unknown staleness returns None, never 0.
+
+### Honest board
+
+    COINBASE MARKET FABRIC        LIVE
+    WORLD STATE                   LIVE
+    BAR CONSTRUCTION              LIVE
+    L2 / MICROSTRUCTURE           LIVE
+    DATA HEALTH                   LIVE
+    SCAN TELEMETRY                LIVE  (new)
+
+    SCOUT/HUNTER CODE             DEPLOYED
+    REAL SCOUT/HUNTER SIGNAL      NOT YET OBSERVED
+    ASSASSIN CODE                 DEPLOYED
+    REAL CRYPTO ASSASSIN REVIEW   NOT YET OBSERVED
+    CAPTAIN CODE                  DEPLOYED
+    REAL CRYPTO CAPTAIN REVIEW    NOT YET OBSERVED
+    SHADOW EXECUTION              READY
+    REAL SHADOW POSITION          NONE YET
+    TRADE MANAGER                 READY
+    REAL MANAGED SHADOW TRADE     NOT YET OBSERVED
+
+    REAL DECISIONS                0
+    REAL SHADOW TRADES            0
+    CRYPTO EPOCH 0                FROZEN
+    ECONOMIC EVIDENCE             INSUFFICIENT
+
+The decision layer is **deployed, not tested live**. It earns that word when
+one genuine forward candidate traverses it.

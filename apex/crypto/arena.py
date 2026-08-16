@@ -222,13 +222,23 @@ def tick(now=None, fabric=None) -> dict:
     stats = {"decisions": 0, "resolved": 0, "verdict": None}
     cs = states.get(INSTRUMENT)
     rows = _rows()
+    # EPOCH-0 OBSERVABILITY: a tally, never an input. Nothing below reads
+    # `trace` -- it exists so "scanned and declined" is distinguishable in
+    # the ARCHIVE from "never scanned", which the daemon log alone could
+    # prove and the scientific record could not.
+    trace: dict = {}
+    scan_status = "COMPLETE_HEALTHY"
+    if cs is None:
+        scan_status = "REFUSED_DATA_HEALTH"
+    elif bar_health is not None and bar_health.get("dropped_unhealthy"):
+        scan_status = "PARTIAL"
     if cs is not None:
         ages = extreme_ages(candles[INSTRUMENT], now)
         seen = {(r["playbook_id"], r["direction"])
                 for r in rows if r.get("kind") == "crypto_decision"
                 and pd.Timestamp(r["t_utc"]) > now - pd.Timedelta(hours=2)}
-        for m in (match_crypto_001(cs, world),
-                  match_crypto_002(cs, world, ages)):
+        for m in (match_crypto_001(cs, world, trace),
+                  match_crypto_002(cs, world, ages, trace)):
             if m is None or (m["playbook_id"], m["direction"]) in seen:
                 continue
             # THE ORDERING LAW: persist the decision before enrichment.
@@ -343,4 +353,44 @@ def tick(now=None, fabric=None) -> dict:
     for rec in resolve_pending(rows, candles[INSTRUMENT], now):
         _append(stamp(rec, EvidenceClass.COINBASE_FORWARD_OBSERVATION))
         stats["resolved"] += 1
+
+    # --- the scan tick: proof the funnel RAN, emitted last so it can count
+    # everything, and appended AFTER the decisions it describes (the
+    # ordering law -- telemetry never precedes the thing it reports on).
+    healthy = [p for p, st in states.items() if st is not None]
+    _append(stamp({
+        "kind": "crypto_scan_tick",
+        "t_utc": str(now),
+        "arena_version": ARENA_VERSION,
+        "symbols_expected": len(PRODUCTS),
+        "symbols_observed": sum(1 for p in PRODUCTS if len(candles[p])),
+        "symbols_healthy": len(healthy),
+        "symbols_evaluated": 1 if cs is not None else 0,
+        "world_state_available": bool(world),
+        "bars_healthy": (bar_health or {}).get("healthy"),
+        "bars_dropped_unhealthy": (bar_health or {}).get(
+            "dropped_unhealthy"),
+        "book_healthy": (fab_snap or {}).get("health", {}).get(
+            "book_health", "NO_FABRIC") == "OK",
+        "scout_evaluated": 1 if cs is not None else 0,
+        **{k: trace.get(k, 0) for k in (
+            "C001_evaluated", "C001_blocked_inputs_missing",
+            "C001_structure_pass", "C001_volume_pass",
+            "C001_risk_band_pass", "C001_matches",
+            "C002_evaluated", "C002_blocked_inputs_missing",
+            "C002_blocked_volume", "C002_volume_pass",
+            "C002_extension_pass", "C002_retrace_pass",
+            "C002_vwap_pass", "C002_risk_band_pass", "C002_matches")},
+        "hunter_candidates": stats["decisions"],
+        "assassin_reviews": stats["decisions"],
+        "captain_reviews": stats["decisions"],
+        "shadow_watch": 1 if stats["verdict"] == "SHADOW_WATCH" else 0,
+        "shadow_trade": 1 if stats["verdict"] == "SHADOW_TRADE" else 0,
+        "resolved": stats["resolved"],
+        "scan_status": scan_status,
+        "decision_power": "NONE_OBSERVATIONAL_EPOCH0",
+        "telemetry_note": "counts only; cannot alter eligibility, "
+                          "predicates, thresholds, verdicts or execution",
+    }, EvidenceClass.COINBASE_FORWARD_OBSERVATION))
+    stats["scan_status"] = scan_status
     return stats
