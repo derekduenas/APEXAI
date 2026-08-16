@@ -519,3 +519,42 @@ def test_sac1_14_scan_records_carry_the_observability_fields():
     for required in ("universe_count", "states_computed", "liquidity_data_ok",
                      "abnormal", "watchlist"):
         assert required in fields, f"scan record cannot prove {required}"
+
+
+# ============ the session reporter must not fabricate a session ============
+
+def test_the_session_reporter_refuses_to_invent_a_quiet_session(monkeypatch,
+                                                                tmp_path):
+    """The reporter is the artifact the operator will read to decide whether
+    Monday counted. An absent session must read NO_SESSION_RECORDED, never
+    'a valid session with zero trades' -- the same distinction the crypto
+    scan_tick draws, applied to the surface a human actually looks at."""
+    import sys
+    from pathlib import Path as _P
+    sys.path.insert(0, str(_P(__file__).resolve().parent.parent / "scripts"))
+    import epoch1_session_report as rep
+    monkeypatch.setattr(rep, "LEDGER", tmp_path / "absent.jsonl")
+    text, ok = rep.build("2026-08-17")
+    assert ok is False
+    assert "NO_SESSION_RECORDED" in text
+    assert "VALID_FORWARD_SESSION" not in text
+
+
+def test_the_session_reporter_puts_validity_above_trade_count(monkeypatch,
+                                                              tmp_path):
+    """Trades appear beneath the verdict, never as the headline."""
+    import sys
+    from pathlib import Path as _P
+    sys.path.insert(0, str(_P(__file__).resolve().parent.parent / "scripts"))
+    import epoch1_session_report as rep
+    led = tmp_path / "l.jsonl"
+    for i in range(25):
+        _append(led, {"kind": "scan", "session_date": "2026-08-17",
+                      "universe_count": 150, "states_computed": 148,
+                      "abnormal": 0, "watchlist": [],
+                      "evidence_class": "EODHD_FORWARD_OBSERVATION"})
+    monkeypatch.setattr(rep, "LEDGER", led)
+    text, ok = rep.build("2026-08-17")
+    assert ok is True, text
+    assert "VALID_FORWARD_SESSION" in text
+    assert text.index("SESSION: VALID_FORWARD_SESSION") < text.index("Trades:")
