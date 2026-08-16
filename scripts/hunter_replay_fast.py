@@ -50,10 +50,24 @@ LAB_TOTAL_BUDGET = 90_000        # aggregate across ALL workers (< the
                                  # provider's ~100k/day allowance)
 
 
+_SEM = None
+
+
+def _init_worker(sem):
+    """Runs in each worker at pool start: install the SHARED network
+    semaphore so N CPU workers exert at most PROVIDER_CONCURRENCY
+    simultaneous requests on the vendor."""
+    import apex.intraday.eodhd as eodhd
+    eodhd.NET_SEMAPHORE = sem
+
+
 def worker_day(args) -> str:
     """PASS A: one session-day of perception, fully self-contained.
     Returns the path of the deterministic per-day cache file."""
     day, universe_cap, outdir, worker_budget = args
+    out_path = Path(outdir) / f"day_{day}.json"
+    if out_path.exists():                         # RESUME: verified cache
+        return str(out_path)
     import apex.hunter.forward_pass as fp
     import apex.hunter.swarm as swarm
     from apex.hunter.context_builder import (build_scan_universe,
@@ -178,8 +192,11 @@ def main() -> int:
     ap.add_argument("--end", required=True)
     ap.add_argument("--tag", required=True)
     ap.add_argument("--universe-cap", type=int, default=150)
-    ap.add_argument("--workers", type=int, default=4)  # LAB-04:
-    # provider concurrency limits punish 8-way fetch storms
+    ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--provider-concurrency", type=int, default=2,
+                    help="max simultaneous vendor requests across ALL "
+                         "workers (LAB-04b: CPU and network are separate "
+                         "knobs)")
     a = ap.parse_args()
 
     from apex.intraday.sessions import Session, classify
@@ -193,6 +210,11 @@ def main() -> int:
         print("REFUSED: ledger exists; a campaign denominator is never "
               "silently appended to")
         return 1
+    done = len(list(out.glob("day_*.json")))
+    if done:
+        print(f"RESUME: {done} verified Pass A day-caches found; "
+              f"recomputing only the remainder (Pass A is deterministic "
+              f"pure perception per day)")
     t0 = time.monotonic()
     print(f"ACCELERATED REPLAY: {len(days)} sessions, cap "
           f"{a.universe_cap}, workers {a.workers}")
@@ -201,7 +223,12 @@ def main() -> int:
     print(f"provider budget: {LAB_TOTAL_BUDGET} aggregate -> "
           f"{per_worker}/worker x {a.workers} (structural invariant: "
           f"workers can never collectively exceed the lab total)")
-    with ProcessPoolExecutor(max_workers=a.workers) as ex:
+    import multiprocessing as mp
+    sem = mp.get_context("spawn").BoundedSemaphore(a.provider_concurrency)
+    with ProcessPoolExecutor(max_workers=a.workers,
+                             mp_context=mp.get_context("spawn"),
+                             initializer=_init_worker,
+                             initargs=(sem,)) as ex:
         files = list(ex.map(worker_day,
                             [(d, a.universe_cap, str(out), per_worker)
                              for d in days]))

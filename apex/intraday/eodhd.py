@@ -44,6 +44,11 @@ LEDGER = LAKE / "manifests" / "eodhd_download_ledger.jsonl"
 
 # conservative local budget, deliberately far under the vendor daily cap
 DAILY_REQUEST_BUDGET = 2000
+
+# LAB-04b: optional cross-process NETWORK semaphore. Labs set this so CPU
+# worker count and outbound provider concurrency become separate knobs;
+# production never sets it (None = behavior unchanged).
+NET_SEMAPHORE = None
 MIN_REQUEST_INTERVAL_S = 0.15
 
 
@@ -207,7 +212,11 @@ def fetch_intraday_chunk(symbol: str, lo: str, hi: str,
     open_fn = opener
     for attempt in range(4):
         try:
-            raw = open_fn(url)
+            if NET_SEMAPHORE is not None:
+                with NET_SEMAPHORE:
+                    raw = open_fn(url)
+            else:
+                raw = open_fn(url)
             rows = json.loads(raw)
             if not isinstance(rows, list):
                 raise IntradayDataError(redact(f"malformed response for "
