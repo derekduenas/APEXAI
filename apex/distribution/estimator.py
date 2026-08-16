@@ -108,6 +108,30 @@ def mint_calibrated(estimate: DistributionEstimate,
     """The ONLY door to CALIBRATED. Demands a reality-loop report whose
     named producer has accrued enough forward evidence."""
     report = json.loads(Path(reality_report).read_text())
+
+    # SAC1-01: WHERE the evidence came from, checked BEFORE how much of it
+    # there is. `calibration_certification` is one of the six uses the
+    # evidence law forbids to EODHD_HISTORICAL_EXPLORATORY, and until this
+    # audit require_permitted() had ZERO production callers -- the law
+    # existed, the only door that could violate it never consulted it.
+    # CALIBRATED is the sole status permitted to authorize, so minting one
+    # from laboratory tape is the shortest path to fabricated confidence.
+    from apex.hunter.evidence import (EvidenceClass, EvidenceViolation,
+                                      require_permitted)
+    raw_class = report.get("evidence_class")
+    if raw_class is None:
+        raise EvidenceViolation(
+            f"{reality_report} carries no evidence_class: calibration "
+            f"cannot be certified against evidence of unverifiable "
+            f"provenance. Unlabelled is refused exactly as loudly as "
+            f"forbidden.")
+    try:
+        cls = EvidenceClass(raw_class)
+    except ValueError:
+        raise EvidenceViolation(
+            f"unknown evidence_class {raw_class!r} in {reality_report}")
+    require_permitted(cls, "calibration_certification")
+
     stats = report.get("producers", {}).get(producer)
     if stats is None:
         raise EstimatorError(f"{producer!r} has no record in {reality_report}")

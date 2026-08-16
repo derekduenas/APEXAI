@@ -188,12 +188,22 @@ def test_options_expression_is_demoted_without_calibration():
 def test_calibrated_cannot_be_minted_without_reality_evidence(tmp_path):
     import json
     report = tmp_path / "calibration_report.json"
-    report.write_text(json.dumps({"producers": {"gp_rank": {
-        "n_effective_dates": 3, "reliability": 0.002}}}))
+    # SAC1-01: provenance is checked BEFORE sample size -- evidence of
+    # unknown origin is not weighed at all. Declare a legal forward class
+    # so this test still probes what it was written to probe.
+    report.write_text(json.dumps({
+        "evidence_class": "EODHD_FORWARD_OBSERVATION",
+        "producers": {"gp_rank": {
+            "n_effective_dates": 3, "reliability": 0.002}}}))
     with pytest.raises(EstimatorError, match="cannot be hurried"):
         mint_calibrated(_estimate(), report, "gp_rank")
-    report.write_text(json.dumps({"producers": {"gp_rank": {
-        "n_effective_dates": 25, "reliability": 0.002}}}))
+    # SAC1-01: provenance is checked BEFORE sample size -- evidence of
+    # unknown origin is not weighed at all. Declare a legal forward class
+    # so this test still probes what it was written to probe.
+    report.write_text(json.dumps({
+        "evidence_class": "EODHD_FORWARD_OBSERVATION",
+        "producers": {"gp_rank": {
+            "n_effective_dates": 25, "reliability": 0.002}}}))
     upgraded = mint_calibrated(_estimate(), report, "gp_rank")
     assert upgraded.calibration_status is CalibrationStatus.CALIBRATED
 

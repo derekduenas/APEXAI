@@ -309,3 +309,94 @@ def test_the_flight_deck_does_not_call_no_transport_an_auth_problem():
     row = fd._broker_row(ex)
     if ex["transport_mode"] == "NO_TRANSPORT":
         assert row == "NO_TRANSPORT_NOT_AUTH_ISSUE"
+
+
+# ---- SAC-1 P1 repairs ------------------------------------------------------
+
+def _est():
+    """An UNCALIBRATED estimate — the only legitimate starting point."""
+    from apex.distribution.estimator import (CalibrationStatus,
+                                             DistributionEstimate)
+    return DistributionEstimate(
+        returns=[-0.01, 0.0, 0.01], probs=[0.3, 0.4, 0.3], horizon_days=1,
+        calibration_status=CalibrationStatus.UNCALIBRATED_MODEL,
+        provenance={"producer": "sac1_fixture"}, calibration_evidence=None)
+
+def test_sac1_02_the_allow_list_stops_a_non_placement_broker_tool():
+    """SAC1-02. Disabling the allow-list used to survive mutation, because
+    every existing test probed placement-NAMED tools that the name-marker
+    check catches first. These four are stopped ONLY by the allow-list --
+    moving money and changing account settings are exactly what must never
+    be reachable, and neither is caught by a 'place_'-style marker."""
+    from apex.execution.robinhood import RobinhoodAdapter
+    a = RobinhoodAdapter(lambda tool, **kw: {"ok": True})
+    for tool in ("transfer_funds", "withdraw_funds", "enable_margin",
+                 "update_account", "delete_watchlist", "get_crypto_quote"):
+        with pytest.raises(PermissionError) as e:
+            a._call(tool)
+        assert "not in the adapter's allowed" in str(e.value), (
+            f"{tool} was refused, but by the name-marker rather than the "
+            f"allow-list -- the allow-list remains untested")
+
+
+def test_sac1_02_every_allow_listed_tool_is_read_or_review_only():
+    """The allow-list is only a barrier if its CONTENTS are safe."""
+    from apex.execution.robinhood import ALLOWED_TOOLS
+    for t in ALLOWED_TOOLS:
+        assert t.startswith(("get_", "review_")), (
+            f"{t!r} is allow-listed but is neither a read nor a review")
+
+
+def test_sac1_01_calibration_cannot_be_minted_from_exploratory_evidence(
+        tmp_path):
+    """SAC1-01. CALIBRATED is the ONLY status permitted to authorize, and
+    mint_calibrated gated solely on sample size and reliability -- never on
+    where the evidence came from. 'calibration_certification' is one of the
+    six uses the evidence law forbids for laboratory data, and the guard
+    that says so (require_permitted) had zero production callers."""
+    import json
+
+    from apex.distribution.estimator import (DistributionEstimate,
+                                             EstimatorError, mint_calibrated)
+    from apex.hunter.evidence import EvidenceViolation
+    est = _est()
+    report = tmp_path / "reality.json"
+    report.write_text(json.dumps({
+        "evidence_class": "EODHD_HISTORICAL_EXPLORATORY",
+        "producers": {"gp_rank": {"n_effective_dates": 999,
+                                  "reliability": 0.0001}}}))
+    with pytest.raises((EvidenceViolation, EstimatorError)) as e:
+        mint_calibrated(est, report, "gp_rank")
+    assert "EXPLORATORY" in str(e.value).upper() or "evidence" in str(e.value)
+
+
+def test_sac1_01_a_forward_report_still_mints(tmp_path):
+    """The repair must not break the legitimate path."""
+    import json
+
+    from apex.distribution.estimator import (CalibrationStatus,
+                                             DistributionEstimate,
+                                             mint_calibrated)
+    est = _est()
+    report = tmp_path / "reality.json"
+    report.write_text(json.dumps({
+        "evidence_class": "EODHD_FORWARD_OBSERVATION",
+        "producers": {"gp_rank": {"n_effective_dates": 999,
+                                  "reliability": 0.0001}}}))
+    out = mint_calibrated(est, report, "gp_rank")
+    assert out.calibration_status is CalibrationStatus.CALIBRATED
+
+
+def test_sac1_01_an_unlabelled_report_cannot_mint(tmp_path):
+    """Unverifiable provenance is refused as loudly as forbidden provenance."""
+    import json
+
+    from apex.distribution.estimator import (DistributionEstimate,
+                                             EstimatorError, mint_calibrated)
+    from apex.hunter.evidence import EvidenceViolation
+    est = _est()
+    report = tmp_path / "r.json"
+    report.write_text(json.dumps({"producers": {
+        "p": {"n_effective_dates": 999, "reliability": 0.0}}}))
+    with pytest.raises((EvidenceViolation, EstimatorError)):
+        mint_calibrated(est, report, "p")
