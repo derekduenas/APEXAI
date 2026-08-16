@@ -167,11 +167,22 @@ def tick(now=None, fabric=None) -> dict:
     today = str(now.date())
     candles = {p: feed.candles_1m(p, hours=26) for p in PRODUCTS}
     fab_snap = None
+    bar_health = None
     if fabric is not None:
         fab_snap = fabric.snapshot()
         # LIVE BARS: splice the fabric's own trade-built bars over the
         # REST tail so the newest minutes are stream-fresh, not cached
         live = fabric.bars_1m(INSTRUMENT, minutes=120)
+        if len(live):
+            # BAR HEALTH DOCTRINE: gapped/incomplete bars have no
+            # ChartState authority — dropped, never silently trusted
+            unhealthy = int((live["coverage_status"]
+                             != "COMPLETE_HEALTHY").sum())
+            live = live[live["coverage_status"] == "COMPLETE_HEALTHY"]
+            bar_health = {"healthy": len(live), "dropped_unhealthy":
+                          unhealthy}
+        else:
+            bar_health = {"healthy": 0, "dropped_unhealthy": 0}
         if len(live) >= 5:
             base = candles[INSTRUMENT]
             cutoff = live["event_time_utc"].min()
@@ -225,12 +236,15 @@ def tick(now=None, fabric=None) -> dict:
             entry = tick_px["ask"] if m["direction"] == "LONG" \
                 else tick_px["bid"]
             # EXECUTION FIDELITY: walk the live book for realistic fills
-            fills = {}
+            fills, book_evidence = {}, None
             if fabric is not None and fabric.microstructure_authorized():
                 side = "BUY" if m["direction"] == "LONG" else "SELL"
                 for notional in (1_000, 10_000, 50_000):
                     fills[f"${notional//1000}k"] = fabric.books[
                         INSTRUMENT].walk(side, notional)
+                # FORENSIC EVIDENCE: the ladder that produced those fills,
+                # kept with the decision (the firehose is not archived)
+                book_evidence = fabric.books[INSTRUMENT].decision_snapshot()
             last_bar = candles[INSTRUMENT]["event_time_utc"].iloc[-1]
             latency = {
                 "last_market_timestamp": str(last_bar),
@@ -240,6 +254,7 @@ def tick(now=None, fabric=None) -> dict:
                 "feed_mode": ("LIVE_FABRIC" if fabric is not None
                               and fabric.microstructure_authorized()
                               else "REST_FALLBACK"),
+                "bar_health": bar_health if fabric is not None else None,
                 "book_health": (fab_snap or {}).get(
                     "health", {}).get("book_health", "NO_FABRIC")}
             dec = stamp({
@@ -255,6 +270,7 @@ def tick(now=None, fabric=None) -> dict:
                                          + tick_px["ask"]) / 2)
                                          / entry * 1e4, 3),
                 "book_walk_fills": fills,
+                "decision_book_snapshot": book_evidence,
                 "latency": latency,
                 "microstructure_authorized": bool(
                     fabric is not None

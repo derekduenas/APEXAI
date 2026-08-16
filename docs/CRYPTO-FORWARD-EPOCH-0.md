@@ -102,3 +102,31 @@ MONDAY'S CLOCK. Fix: archive only value-dense channels (trades+ticker,
 ~50MB/day) plus periodic bounded book snapshots; L2 remains live state;
 hourly rotation, 72h retention, hard 400MB cap. A research archive must
 never be able to starve production of disk.
+
+## Amendment (2026-08-16): execution-readiness hardening (3 items)
+
+1. DISK SOVEREIGNTY (apex/crypto/diskgov.py) — free space is governed
+   like API quota, same doctrine: FORWARD EQUITY > CRYPTO LABORATORY.
+   Declared reserves (production 2GB + critical services 1.5GB) are
+   subtracted before the arena sees any budget; graduated response
+   HEALTHY -> TRIM (raw archival stops) -> MINIMAL (snapshots slow to
+   5min) -> SUSPEND (the daemon self-terminates). Crypto voluntarily
+   dies before it can threaten Monday.
+2. DECISION-TIME BOOK EVIDENCE — every decision that used microstructure
+   carries a bounded DecisionBookSnapshot: top-30 bids/asks with sizes,
+   depth1/5/10 per side, sync state. Retaining a book-walk RESULT while
+   discarding the ladder that produced it would be exactly the evidence
+   gap APEX refuses elsewhere; the walk is now reproducible forever from
+   the decision record alone.
+3. BAR-GAP PROVENANCE — stream-built bars carry coverage_status
+   (COMPLETE_HEALTHY / COMPLETE_WITH_GAP / INCOMPLETE) plus
+   gap_duration_ms, computed from recorded feed outages and intra-bar
+   trade-time coverage. ONLY COMPLETE_HEALTHY bars feed perception;
+   gapped/thin bars are dropped and counted in the decision's
+   bar_health. Valid calculation over incomplete observation is still a
+   lie — the book's law now applies to candles too.
+
+FUTURE (recorded, not built): the measured fill curve is the seed of
+capacity-aware Capital — "how much can THIS opportunity absorb before
+impact destroys the asymmetry" — which is how account scaling
+eventually becomes a measured question instead of a guess.

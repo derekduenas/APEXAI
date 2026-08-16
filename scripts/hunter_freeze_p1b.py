@@ -171,6 +171,14 @@ ARTIFACTS = {
     "crypto_arena_model_v2": (
         "model", ("apex/crypto/arena.py", "apex/crypto/fabric.py",
                   "apex/crypto/playbooks.py", "apex/crypto/perception.py")),
+    # execution-readiness hardening: disk sovereignty, decision-time book
+    # evidence, bar-gap provenance. Infrastructure only; predicates frozen.
+    "crypto_disk_governor_v1": (
+        "model", ("apex/crypto/diskgov.py",)),
+    "crypto_arena_model_v3": (
+        "model", ("apex/crypto/arena.py", "apex/crypto/fabric.py",
+                  "apex/crypto/diskgov.py", "apex/crypto/playbooks.py",
+                  "apex/crypto/perception.py")),
     # v1.1 (LAB-01): empty-frame guard in visible_bars — a not-yet-listed
     # symbol crashed the whole scan tick (found by the replay campaign's
     # first minute; also a latent Monday robustness bug). Crash guard

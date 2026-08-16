@@ -99,6 +99,15 @@ def main() -> int:
     last_tick = 0.0
     while t_end is None or time.time() < t_end:
         now = pd.Timestamp.now(tz="UTC")
+        # DISK SOVEREIGNTY: the laboratory dies before production does
+        from apex.crypto.diskgov import disk_state, must_suspend
+        ds = disk_state()
+        if must_suspend(ds):
+            print(f"{now:%H:%M:%S} DISK GOVERNOR: SELF-SUSPEND "
+                  f"(free {ds['free_gb']}GB, crypto budget exhausted); "
+                  f"production reserves untouched")
+            fab.stop()
+            return 0
         try:
             mgmt = manage_open_positions(fab, now)
             exits = [m for m in mgmt if m.get("kind")]

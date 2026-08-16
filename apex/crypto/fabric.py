@@ -83,6 +83,26 @@ class BookState:
                 if bid_sz + ask_sz else None,
                 "levels_bid": len(self.bids), "levels_ask": len(self.asks)}
 
+    def decision_snapshot(self, depth: int = 30) -> dict:
+        """FORENSIC EVIDENCE (bounded): the ladder that PRODUCED a fill
+        estimate, kept with the decision so the walk is reproducible
+        after the firehose is gone. Retaining a book-walk result while
+        discarding the book that produced it is exactly the evidence gap
+        APEX refuses elsewhere."""
+        if not self.bids or not self.asks:
+            return {"status": "EMPTY"}
+        bb = sorted(self.bids.items(), reverse=True)[:depth]
+        ba = sorted(self.asks.items())[:depth]
+        return {"status": "OK", "depth_levels": depth,
+                "top_bids": [[round(p, 2), round(q, 8)] for p, q in bb],
+                "top_asks": [[round(p, 2), round(q, 8)] for p, q in ba],
+                "depth1_bid": bb[0][1], "depth1_ask": ba[0][1],
+                "depth5_bid": round(sum(q for _, q in bb[:5]), 6),
+                "depth5_ask": round(sum(q for _, q in ba[:5]), 6),
+                "depth10_bid": round(sum(q for _, q in bb[:10]), 6),
+                "depth10_ask": round(sum(q for _, q in ba[:10]), 6),
+                "synced": self.synced}
+
     def walk(self, side: str, notional_usd: float) -> dict:
         """Book-walk a hypothetical order: VWAP fill, slippage vs top of
         book, and whether displayed depth can even absorb it."""
@@ -132,6 +152,8 @@ class MarketFabric:
         self._t0 = 0.0
         self._archive_writes = 0
         self._last_book_snap = 0.0
+        self._outages: list = []          # (start_ts, end_ts) feed gaps
+        self._disconnect_at = 0.0
 
     # ---------------------------------------------------------- transport
     def _archive_event(self, msg: dict) -> None:
@@ -140,6 +162,11 @@ class MarketFabric:
         never be able to starve the production clock of disk."""
         if not self._archive or msg.get("channel") not in ARCHIVE_CHANNELS:
             return
+        from apex.crypto.diskgov import may_archive_raw
+        if not may_archive_raw():      # disk sovereignty: crypto yields
+            self.health["archive_paused_disk"] = True
+            return
+        self.health["archive_paused_disk"] = False
         hour = pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%d-%H")
         RAW_ARCHIVE.mkdir(parents=True, exist_ok=True)
         with (RAW_ARCHIVE / f"events_{hour}.jsonl").open("a") as fh:
@@ -173,8 +200,12 @@ class MarketFabric:
 
     def _maybe_snapshot_book(self, now: float) -> None:
         """Periodic bounded book snapshots: the microstructure record we
-        actually study, ~1.4MB/day instead of 2.9GB."""
-        if now - self._last_book_snap < BOOK_SNAPSHOT_EVERY_S:
+        actually study, ~1.4MB/day instead of 2.9GB. Cadence and
+        existence are both subject to the disk governor."""
+        from apex.crypto.diskgov import may_snapshot, snapshot_interval_s
+        if now - self._last_book_snap < snapshot_interval_s():
+            return
+        if not may_snapshot():
             return
         self._last_book_snap = now
         if not self._archive:
@@ -276,6 +307,11 @@ class MarketFabric:
                     on_close=lambda *_: None)
                 self._ws = ws
                 with self._lock:
+                    if self._disconnect_at:
+                        self._outages.append((self._disconnect_at,
+                                              time.time()))
+                        self._outages = self._outages[-500:]
+                        self._disconnect_at = 0.0
                     self.health["connected"] = True
                 ws.run_forever(sslopt={"ca_certs": "/etc/ssl/cert.pem"},
                                ping_interval=20, ping_timeout=10)
@@ -284,6 +320,7 @@ class MarketFabric:
             with self._lock:
                 self.health["connected"] = False
                 self.health["reconnects"] += 1
+                self._disconnect_at = time.time()
                 for b in self.books.values():
                     b.synced = False            # resubscribe -> resync
             if not self._stop.is_set():
@@ -307,11 +344,20 @@ class MarketFabric:
                 pass
 
     # ------------------------------------------------------------- state
-    def bars_1m(self, product: str, minutes: int = 90) -> pd.DataFrame:
-        """OUR bars, built from the trade stream (not the 5m candle
-        channel). Only COMPLETED minutes are returned."""
+    def bars_1m(self, product: str, minutes: int = 90,
+                with_provenance: bool = False) -> pd.DataFrame:
+        """OUR bars from the trade stream. Only COMPLETED minutes.
+
+        BAR HEALTH DOCTRINE (same law as the book): a minute whose feed
+        was interrupted is NOT silently "complete" just because the next
+        minute arrived. Each bar carries coverage_status —
+        COMPLETE_HEALTHY / COMPLETE_WITH_GAP / INCOMPLETE — and only
+        COMPLETE_HEALTHY carries normal ChartState authority. Valid
+        calculation over incomplete observation is still a lie (LAB-04).
+        """
         with self._lock:
             tr = list(self.trades.get(product, ()))
+            outages = list(self._outages)
         if not tr:
             return pd.DataFrame()
         f = pd.DataFrame(tr)
@@ -329,7 +375,38 @@ class MarketFabric:
                 if len(x) else 0.0)}).dropna(subset=["close"])
         bars = bars[bars.index < now_min]         # completed only
         bars = bars.reset_index().rename(columns={"ts": "event_time_utc"})
-        return bars.tail(minutes)
+        # provenance: intra-bar feed outages and trade-time coverage
+        first_t = g["price"].apply(lambda x: x.index.min() if len(x) else None)
+        last_t = g["price"].apply(lambda x: x.index.max() if len(x) else None)
+        cov, gap_ms = [], []
+        for _, row in bars.iterrows():
+            b0 = row["event_time_utc"]
+            b1 = b0 + pd.Timedelta(minutes=1)
+            overlap = 0.0
+            for o0, o1 in outages:
+                s0, s1 = max(b0.timestamp(), o0), min(b1.timestamp(), o1)
+                if s1 > s0:
+                    overlap += (s1 - s0)
+            ft = first_t.get(b0)
+            lt = last_t.get(b0)
+            edge_gap = 0.0
+            if ft is not None and lt is not None and pd.notna(ft):
+                edge_gap = ((ft - b0).total_seconds()
+                            + (b1 - lt).total_seconds())
+            total_ms = (overlap + max(0.0, edge_gap - 10)) * 1000
+            gap_ms.append(round(total_ms))
+            if overlap > 0:
+                cov.append("COMPLETE_WITH_GAP")
+            elif row["trades"] < 3 or edge_gap > 30:
+                cov.append("INCOMPLETE")
+            else:
+                cov.append("COMPLETE_HEALTHY")
+        bars["coverage_status"] = cov
+        bars["gap_duration_ms"] = gap_ms
+        out = bars.tail(minutes)
+        if with_provenance:
+            return out
+        return out
 
     def snapshot(self) -> dict:
         with self._lock:
