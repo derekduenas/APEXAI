@@ -108,12 +108,53 @@ class TradeLifecycle:
         self.current_stop = float(new_stop)
 
     def verify_ledger(self) -> int:
-        rows = ([json.loads(l) for l in self.ledger.read_text().strip().splitlines()]
-                if self.ledger.exists() else [])
+        """Recompute every entry_hash and check linkage. Returns the count
+        of VALID records; `self.verification_damage` holds torn fragments.
+
+        SAC1-06/07: two different things can be wrong with a ledger and
+        they deserve different answers.
+
+          TORN FRAGMENT   a crash mid-append left an unparseable line. The
+                          physical world did this. It is DAMAGE: recorded,
+                          counted, and stepped over -- it must not make the
+                          valid records that follow disappear, and it must
+                          not be silently swallowed either.
+          HASH MISMATCH   a record's body no longer matches its own hash,
+                          or linkage is broken between valid records.
+                          Somebody did this. It is TAMPERING, and it still
+                          raises.
+
+        Previously an unparseable line raised JSONDecodeError from the list
+        comprehension, so a torn tail made verification impossible rather
+        than reporting the tear -- the forensic tool failed on exactly the
+        condition it exists to describe.
+        """
+        self.verification_damage: list = []
+        rows = []
+        if self.ledger.exists():
+            for i, line in enumerate(self.ledger.read_text().splitlines()):
+                if not line.strip():
+                    continue
+                try:
+                    rows.append(json.loads(line))
+                except json.JSONDecodeError:
+                    self.verification_damage.append(
+                        {"row": i, "bytes": len(line),
+                         "classification": "TORN_FRAGMENT"})
         prev = "GENESIS"
         for i, r in enumerate(rows):
             body = {k: v for k, v in r.items() if k != "entry_hash"}
-            if r["prev_hash"] != prev or _canon(body) != r["entry_hash"]:
-                raise TransitionError(f"decision ledger broken at row {i}")
+            if _canon(body) != r["entry_hash"]:
+                raise TransitionError(
+                    f"decision ledger TAMPERED at valid-row {i}: the record "
+                    f"body does not match its own entry_hash")
+            if r["prev_hash"] != prev:
+                # a record written after a tear legitimately links to the
+                # last VALID entry; that is recovery, not tampering, and it
+                # says so on the record itself.
+                if not r.get("recovered_from_torn_tail"):
+                    raise TransitionError(
+                        f"decision ledger broken at valid-row {i}: linkage "
+                        f"mismatch with no torn-tail recovery stamp")
             prev = r["entry_hash"]
         return len(rows)
