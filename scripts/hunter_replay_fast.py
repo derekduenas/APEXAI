@@ -84,7 +84,7 @@ def worker_day(args) -> str:
     stage = {"io": 0.0, "perception": 0.0, "realization": 0.0}
 
     # LAB-02 + aggregate invariant: this worker's slice of the LAB TOTAL
-    gov = QuotaGovernor(daily_budget=worker_budget)
+    gov = QuotaGovernor(daily_budget=worker_budget, purpose="LAB")
     uni = build_scan_universe(day)
     subset = dict(list(uni["symbols"].items())[:universe_cap])
     uni = {**uni, "symbols": subset,
@@ -220,10 +220,25 @@ def main() -> int:
     print(f"ACCELERATED REPLAY: {len(days)} sessions, cap "
           f"{a.universe_cap}, workers {a.workers}")
 
+    # LAB-07: the per-process budget is a COURTESY cap, not an invariant.
+    # It is constructed per (worker x day), so it bounds nothing in
+    # aggregate -- the claim printed here previously ("workers can never
+    # collectively exceed the lab total") was false, and a campaign spent
+    # the full 100k provider units through it. The real bound is the
+    # cross-process GMT-day ledger, which stops LAB at limit - reserve.
+    from apex.intraday import quota_ledger
     per_worker = LAB_TOTAL_BUDGET // a.workers
-    print(f"provider budget: {LAB_TOTAL_BUDGET} aggregate -> "
-          f"{per_worker}/worker x {a.workers} (structural invariant: "
-          f"workers can never collectively exceed the lab total)")
+    lab_headroom = quota_ledger.headroom(quota_ledger.LAB)
+    print(f"provider budget: {per_worker}/worker x {a.workers} local "
+          f"courtesy cap; ENFORCED bound is the shared GMT-day ledger: "
+          f"{lab_headroom} lab units remain "
+          f"(ceiling {quota_ledger.ceiling(quota_ledger.LAB)}, forward "
+          f"reserve untouchable)")
+    if lab_headroom <= 0:
+        print("LAB HEADROOM EXHAUSTED for this GMT day -- the forward "
+              "reserve is not available to the lab. Resume after the "
+              "midnight-GMT reset.")
+        return 2
     import multiprocessing as mp
     sem = mp.get_context("spawn").BoundedSemaphore(a.provider_concurrency)
     with ProcessPoolExecutor(max_workers=a.workers,

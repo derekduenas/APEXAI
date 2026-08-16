@@ -294,9 +294,9 @@ def main() -> int:
     sess = classify(now)
     today = str(now.tz_convert("America/New_York").date())
     if sess is Session.REGULAR:
-        _regular_tick(now, QuotaGovernor(), today)
+        _regular_tick(now, QuotaGovernor(purpose="FORWARD"), today)
     elif sess is Session.POSTMARKET:
-        _post_tick(now, QuotaGovernor(), today)
+        _post_tick(now, QuotaGovernor(purpose="FORWARD"), today)
     return 0
 
 

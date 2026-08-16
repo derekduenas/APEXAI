@@ -154,23 +154,53 @@ def chunk_range(start: str, end: str, max_days: int = MAX_SPAN_DAYS) -> list:
 
 class QuotaGovernor:
     """Conservative, resumable, never-spin. Exhaustion pauses; it does not
-    error-and-start-over."""
+    error-and-start-over.
 
-    def __init__(self, daily_budget: int = DAILY_REQUEST_BUDGET):
+    TWO budgets, both of which must allow the spend (LAB-07):
+
+      local  — `daily_budget`, this process's own cap. Cheap, but it resets
+               to zero in every new process, so it can never protect a
+               shared resource on its own.
+      shared — the cross-process GMT-day counter in `quota_ledger`, which
+               enforces the forward reserve. LAB spenders stop at
+               limit - reserve; FORWARD spenders may use the reserve,
+               because the reserve exists for them.
+
+    `purpose` defaults to LAB. Defaulting to FORWARD would mean any caller
+    that forgot to declare itself could quietly spend Monday's quota.
+    """
+
+    def __init__(self, daily_budget: int = DAILY_REQUEST_BUDGET,
+                 purpose: str = "LAB", shared: bool = True):
+        from apex.intraday.quota_ledger import PURPOSES
+        if purpose not in PURPOSES:
+            raise ValueError(f"unknown quota purpose {purpose!r}")
         self.daily_budget = daily_budget
+        self.purpose = purpose
+        self.shared = shared
         self.used = 0
         self.last_request = 0.0
+        self.last_refusal: str | None = None
 
     def acquire(self, cost: int = 1) -> bool:
         """`used`/`daily_budget` are PROVIDER CALL UNITS (LAB-05b), not
         request counts — an intraday request passes cost=INTRADAY_CALL_COST."""
         if self.used + cost > self.daily_budget:
+            self.last_refusal = (f"LOCAL_BUDGET: {self.used}+{cost} > "
+                                 f"{self.daily_budget}")
             return False                     # PAUSE_DOWNLOAD
+        if self.shared:
+            from apex.intraday import quota_ledger
+            claim = quota_ledger.spend(cost, self.purpose)
+            if not claim["granted"]:
+                self.last_refusal = claim["reason"]
+                return False                 # PAUSE_DOWNLOAD, reserve intact
         wait = MIN_REQUEST_INTERVAL_S - (time.time() - self.last_request)
         if wait > 0:
             time.sleep(wait)
         self.last_request = time.time()
         self.used += cost
+        self.last_refusal = None
         return True
 
     def backoff(self, attempt: int, retry_after: float | None = None) -> float:
@@ -221,12 +251,25 @@ def lab_spare_units(now_utc=None) -> dict:
                      else _pd.Timestamp.now(tz="UTC")).date())
     stale = u["api_requests_date"] != today_gmt
     consumed = 0 if stale else (u["api_requests_units"] or 0)
-    spare = max(0, limit - consumed - FORWARD_RESERVE_CALL_UNITS)
+    # LAB-07: this used to END here -- a computed number with no caller and
+    # therefore no authority. It now RECONCILES the shared spend ledger that
+    # actually gates every acquire(), taking the max of the two (the local
+    # counter sees in-flight claims the provider has not billed yet; the
+    # provider sees spend that never passed through a governor).
+    from apex.intraday import quota_ledger
+    if not stale:
+        quota_ledger.reconcile_with_provider(consumed, u["api_requests_date"],
+                                             now_utc)
+    enforced_consumed = max(consumed, quota_ledger.read(now_utc)["units"])
+    spare = max(0, limit - enforced_consumed - FORWARD_RESERVE_CALL_UNITS)
     return {**u, "current_gmt_date": today_gmt,
             "counter_stale_prior_bucket": stale,
             "consumed_current_bucket_units": consumed,
+            "enforced_consumed_units": enforced_consumed,
             "forward_reserve_units": FORWARD_RESERVE_CALL_UNITS,
-            "available_lab_units": spare}
+            "available_lab_units": spare,
+            "lab_headroom_enforced": quota_ledger.headroom(quota_ledger.LAB,
+                                                           now_utc)}
 
 
 def cache_path(symbol: str, lo: str, hi: str) -> Path:

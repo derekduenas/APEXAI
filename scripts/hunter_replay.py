@@ -205,7 +205,7 @@ def main() -> int:
     fp.LEDGER = ledger
     mem.LEDGER = ledger
 
-    gov = QuotaGovernor(daily_budget=LAB_DAILY_BUDGET)
+    gov = QuotaGovernor(daily_budget=LAB_DAILY_BUDGET, purpose="LAB")
     days = [str(d.date()) for d in pd.bdate_range(a.start, a.end)
             if classify(pd.Timestamp(f"{d.date()} 10:00", tz=ET)
                         .tz_convert("UTC")) is Session.REGULAR]

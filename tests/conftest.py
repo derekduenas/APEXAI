@@ -19,6 +19,18 @@ from apex.data.synthetic import SyntheticSource
 from apex.pipeline import build_panel_pipeline, evaluate
 
 
+@pytest.fixture(autouse=True, scope="session")
+def _isolate_quota_ledger(tmp_path_factory):
+    """LAB-07: the quota spend counter is a real governance artifact that
+    decides whether the forward reserve is intact. A test run must never
+    write into it -- phantom test units would refuse a real Monday tick."""
+    from apex.intraday import quota_ledger
+    real = quota_ledger.SPEND_DIR
+    quota_ledger.SPEND_DIR = tmp_path_factory.mktemp("quota_ledger")
+    yield
+    quota_ledger.SPEND_DIR = real
+
+
 @pytest.fixture(scope="session")
 def config():
     return load_config("experiment", "costs", "synthetic")
