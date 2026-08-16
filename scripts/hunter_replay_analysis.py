@@ -149,7 +149,7 @@ def main() -> int:
         prev = r.get("entry_hash", prev)
     classes = {r.get("evidence_class") for r in rows}
     scan_by_day = Counter(r["session_date"] for r in by.get("scan", []))
-    expected_ticks = 26                     # 09:45..15:45 every 15m
+    expected_ticks = 25                     # 09:45..15:45 every 15m = 25
     short_days = {d: n for d, n in scan_by_day.items()
                   if n < expected_ticks}
     swarm_ok_views = sum(
