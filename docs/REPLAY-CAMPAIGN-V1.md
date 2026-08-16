@@ -76,3 +76,38 @@ universe, laws, and preregistered analyses unchanged.
 
 Lab speed tiers (standing): SMOKE 2 / MICRO 10 / RESEARCH 25 /
 CAMPAIGN 90+ sessions; FORWARD = the only evidence that matters.
+
+## Amendment (2026-08-16): the three-level clean + the museum
+
+Operator hierarchy, now enforced in compute_integrity():
+1. RECORD integrity — did we write the data correctly? (chain, classes,
+   production isolation)
+2. OBSERVATION integrity — could APEX actually see? (context health
+   median/p10/min per session, hollow days, context-starved days).
+   Zero abnormalities is LEGAL; zero observability is not. Prove APEX
+   could see before asking what APEX saw.
+3. EXPERIMENT integrity — were the declared laws obeyed? (Rule 17,
+   denominator, counterfactual declarations)
+
+ATTEMPT_2 passed 1 and 3 while failing 2 — a perfectly valid ledger of
+perfectly wrong observations. The gate now locks economics on all three.
+
+THE MUSEUM (tests/test_integrity_museum.py): aborted attempts are
+permanent negative controls — ATTEMPT_1 (LAB-02 hollow) and ATTEMPT_2
+(LAB-04 blindfold) must be REFUSED forever, each for its own disease;
+if a refactor ever makes a museum piece pass, the integrity system has
+regressed. ATTEMPT_0's ledger was not preserved (tombstone + unit
+guards only) — preservation is now the standing rule.
+
+LAB DEBT (recorded, not blocking ATTEMPT_3): a shared provider-
+concurrency semaphore so CPU workers and outbound API pressure become
+separate knobs (WORKERS=12 / PROVIDER_CONCURRENCY=3 style); per-fetch
+failure/retry counters instrumented into the lab ledger so provider
+health is reportable, not inferred.
+
+TWIN DOCTRINE reinforced by LAB-04: every future world-state facet
+carries VALUE + SOURCE + EVENT_TIME + KNOWN_FROM + FRESHNESS + QUALITY
++ COVERAGE + STATUS — "RVOL unavailable" is fundamentally different
+from "RVOL normal"; "breadth weak" is fundamentally different from
+"only 22% of the universe was measurable." APEX must always know
+'the market is quiet' from 'my sensors are broken.'

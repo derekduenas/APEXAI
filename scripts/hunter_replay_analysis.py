@@ -29,6 +29,86 @@ FLOOR_SESSIONS = 10
 HORIZONS = (15, 30, 60, 90)
 
 
+def compute_integrity(rows: list, by: dict, sessions: list) -> dict:
+    """THE THREE-LEVEL CLEAN (operator hierarchy): 1 RECORD integrity
+    (chain/classes/writes), 2 OBSERVATION integrity (could APEX actually
+    see? — context health, hollow days), 3 EXPERIMENT integrity (laws:
+    Rule 17, evidence class, denominator). Zero abnormalities is LEGAL;
+    zero observability is not. Prove APEX could see before asking what
+    APEX saw."""
+    import numpy as _np
+    prev, chain_ok, torn = "GENESIS", True, 0
+    for r in rows:
+        if r.get("prev_hash") != prev:
+            chain_ok = False
+        if r.get("recovered_from_torn_tail"):
+            torn += 1
+        prev = r.get("entry_hash", prev)
+    classes = {r.get("evidence_class") for r in rows}
+    scans = by.get("scan", [])
+    scan_by_day = Counter(r["session_date"] for r in scans)
+    expected_ticks = 25
+    short_days = {d: n for d, n in scan_by_day.items()
+                  if n < expected_ticks}
+    hollow_days = sorted({s2["session_date"] for s2 in scans
+                          if s2.get("states_computed", 0) < 50})
+    # OBSERVATION integrity: per-day context health = observable fraction
+    day_health = {}
+    for d in scan_by_day:
+        fr = [s2.get("liquidity_data_ok", 0)
+              / max(s2.get("states_computed", 1), 1)
+              for s2 in scans if s2["session_date"] == d
+              and s2.get("states_computed", 0) > 0]
+        day_health[d] = float(_np.median(fr)) if fr else 0.0
+    ctx_starved = sorted(d for d, h in day_health.items()
+                         if h < 0.10 and d not in hollow_days)
+    hv = list(day_health.values())
+    swarm_ok_views = sum(
+        1 for r in by.get("forecast_bundle", [])
+        if (r.get("swarm_view") or {}).get("status") == "OK")
+    prod_ledger = Path("results/hunter/forward_ledger.jsonl")
+    integrity = {
+        "predeclared_sessions": 92,
+        "sessions_replayed": len(sessions),
+        "sessions_with_full_ticks": sum(
+            1 for n in scan_by_day.values() if n >= expected_ticks),
+        "legitimate_partial_sessions": len(short_days) - len(hollow_days)
+        if len(short_days) >= len(hollow_days) else 0,
+        "hollow_sessions": len(hollow_days),
+        "hollow_day_list": hollow_days or "none",
+        "context_healthy_sessions": sum(1 for h in hv if h >= 0.5),
+        "context_starved_sessions": len(ctx_starved),
+        "context_starved_list": (ctx_starved[:8] + ["..."]
+                                 if len(ctx_starved) > 8
+                                 else ctx_starved) or "none",
+        "context_health_median": round(float(_np.median(hv)), 3)
+        if hv else None,
+        "context_health_p10": round(float(_np.percentile(hv, 10)), 3)
+        if hv else None,
+        "context_health_min": round(min(hv), 3) if hv else None,
+        "provider_failure_counters": "not ledger-instrumented (lab debt: "
+                                     "shared network semaphore + counters)",
+        "quota_starvation_events": "0 (fail-loud LAB-02 aborts)",
+        "worker_failures": "0 (a worker exception aborts the run)",
+        "rule_17_llm_views_in_replay": swarm_ok_views,
+        "evidence_classes_present": sorted(c for c in classes if c),
+        "class_pure_exploratory": classes <= {
+            "EODHD_HISTORICAL_EXPLORATORY", None},
+        "production_ledger_writes": (
+            "NONE (file absent)" if not prod_ledger.exists()
+            else "file exists - VERIFY none from replay"),
+        "ledger_chain_valid": chain_ok,
+        "torn_tail_recoveries": torn,
+    }
+    integrity["VERDICT"] = (
+        "CLEAN — economics may be interpreted"
+        if chain_ok and swarm_ok_views == 0
+        and not hollow_days and not ctx_starved
+        and integrity["class_pure_exploratory"]
+        else "NOT CLEAN — ECONOMICS LOCKED")
+    return integrity
+
+
 def stats(rows, h=60):
     rets = [r[f"ret_{h}m"] for r in rows if r.get(f"ret_{h}m") is not None]
     if not rets:
@@ -138,71 +218,7 @@ def main() -> int:
             disagreement_level=None, analog_support_low=False)
         flips[f"{c['final_state']}->{cd.final_state}"] += 1
 
-    # A. REPLAY INTEGRITY FIRST — economics is not interpreted unless
-    # these are clean (operator law)
-    prev, chain_ok, torn = "GENESIS", True, 0
-    for r in rows:
-        if r.get("prev_hash") != prev:
-            chain_ok = False
-        if r.get("recovered_from_torn_tail"):
-            torn += 1
-        prev = r.get("entry_hash", prev)
-    classes = {r.get("evidence_class") for r in rows}
-    scan_by_day = Counter(r["session_date"] for r in by.get("scan", []))
-    expected_ticks = 25                     # 09:45..15:45 every 15m = 25
-    short_days = {d: n for d, n in scan_by_day.items()
-                  if n < expected_ticks}
-    swarm_ok_views = sum(
-        1 for r in by.get("forecast_bundle", [])
-        if (r.get("swarm_view") or {}).get("status") == "OK")
-    prod_ledger = Path("results/hunter/forward_ledger.jsonl")
-    hollow_days = sorted({s2["session_date"] for s2 in by.get("scan", [])
-                          if s2.get("states_computed", 0) < 50})
-    # LAB-04 class: states computed but EVERYTHING rejected for missing
-    # context = a blindfolded scan masquerading as a quiet market
-    ctx_starved = sorted({
-        d for d in {s2["session_date"] for s2 in by.get("scan", [])}
-        if all(s2.get("liquidity_data_ok", 0) == 0
-               and s2.get("states_computed", 0) > 50
-               for s2 in by.get("scan", []) if s2["session_date"] == d)})
-    full_tick_days = sum(1 for n in scan_by_day.values()
-                         if n >= expected_ticks)
-    valid_days = sorted(set(scan_by_day) - set(hollow_days))
-    integrity = {
-        "predeclared_sessions": 92,
-        "sessions_with_valid_data": len(valid_days),
-        "sessions_with_full_ticks": full_tick_days,
-        "legitimate_partial_sessions": len(scan_by_day) - full_tick_days
-        - len(hollow_days),
-        "hollow_sessions": len(hollow_days),
-        "hollow_day_list": hollow_days or "none",
-        "context_starved_sessions": len(ctx_starved),
-        "context_starved_list": (ctx_starved[:10] + ["..."]
-                                 if len(ctx_starved) > 10
-                                 else ctx_starved) or "none",
-        "quota_starvation_events": ("0 (fail-loud LAB-02 aborts would have "
-                                    "halted the run)"),
-        "provider_exhaustion_events": "0 (aggregate budget invariant: "
-                                      "workers share one lab total)",
-        "worker_failures": "0 (a worker exception aborts the whole run)",
-        "scan_ticks_short_days": short_days or "none",
-        "ledger_chain_valid": chain_ok,
-        "torn_tail_recoveries": torn,
-        "rule_17_llm_views_in_replay": swarm_ok_views,
-        "evidence_classes_present": sorted(c for c in classes if c),
-        "class_pure_exploratory": classes <= {
-            "EODHD_HISTORICAL_EXPLORATORY", None},
-        "production_ledger_writes": (
-            "NONE (file absent)" if not prod_ledger.exists()
-            else f"file exists with {len(prod_ledger.read_text().splitlines())} lines — VERIFY none from replay"),
-    }
-    integrity["VERDICT"] = (
-        "CLEAN — economics may be interpreted"
-        if chain_ok and swarm_ok_views == 0
-        and not hollow_days and not ctx_starved
-        and integrity["class_pure_exploratory"]
-        else "NOT CLEAN — ECONOMICS LOCKED (hollow sessions, chain, "
-             "Rule-17, or class impurity above)")
+    integrity = compute_integrity(rows, by, sessions)
 
     report = {
         "campaign": "REPLAY-CAMPAIGN-V1 (preregistered)",
