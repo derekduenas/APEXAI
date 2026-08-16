@@ -156,8 +156,11 @@ def main() -> int:
         1 for r in by.get("forecast_bundle", [])
         if (r.get("swarm_view") or {}).get("status") == "OK")
     prod_ledger = Path("results/hunter/forward_ledger.jsonl")
+    hollow_days = sorted({s2["session_date"] for s2 in by.get("scan", [])
+                          if s2.get("states_computed", 0) < 50})
     integrity = {
         "sessions_replayed": f"{len(sessions)} (predeclared ~92)",
+        "hollow_days_states_lt_50": hollow_days or "none",
         "scan_ticks_short_days": short_days or "none",
         "ledger_chain_valid": chain_ok,
         "torn_tail_recoveries": torn,
@@ -172,6 +175,7 @@ def main() -> int:
     integrity["VERDICT"] = (
         "CLEAN — economics may be interpreted"
         if chain_ok and swarm_ok_views == 0
+        and not hollow_days
         and integrity["class_pure_exploratory"]
         else "NOT CLEAN — do NOT interpret economics below")
 

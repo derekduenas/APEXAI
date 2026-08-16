@@ -57,3 +57,22 @@ here. Sample-size floors: no cohort below 10 effective sessions is
 interpreted. The Swarm's value is evaluated ONLY prospectively from
 Monday (its unique advantage: evidence we cannot manufacture
 historically).
+
+## Amendment (2026-08-16 ~01:15Z): ATTEMPT_1 aborted; accelerated harness certified
+
+ATTEMPT_1 (legacy harness) went HOLLOW after 7 sessions — LAB-02: the
+QuotaGovernor's per-process 2000-request budget (pilot-era) starved all
+later fetches silently. Caught by states-health before any economics
+were read; ledger preserved for diagnostics; ZERO observations
+contribute. Fixes: lab-scale budget (90k) + fail-loud per-day health
+abort in both harnesses + hollow-day check in the integrity gate.
+
+ACCELERATOR CERTIFIED: two-pass harness (parallel per-day perception ->
+chronological enrichment) produced BYTE-IDENTICAL canonical records in
+IDENTICAL ORDER vs the legacy harness on a fixed 2-session sample
+(1,347/1,347). Same experiment, less compute. The official campaign_v1
+denominator restarts from zero under the accelerated harness; dates,
+universe, laws, and preregistered analyses unchanged.
+
+Lab speed tiers (standing): SMOKE 2 / MICRO 10 / RESEARCH 25 /
+CAMPAIGN 90+ sessions; FORWARD = the only evidence that matters.

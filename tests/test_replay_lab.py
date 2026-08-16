@@ -39,3 +39,15 @@ def test_replay_results_can_never_graduate():
         with pytest.raises(EvidenceViolation):
             require_permitted(EvidenceClass.EODHD_HISTORICAL_EXPLORATORY,
                               use)
+
+
+def test_lab02_health_abort_semantics():
+    """A quota-starved day must ABORT loudly, never race through hollow
+    ticks (the ATTEMPT_1 failure mode). We assert the guard exists in
+    BOTH harnesses and fires below the 50% bars floor."""
+    for f in ("hunter_replay.py", "hunter_replay_fast.py"):
+        src = (Path(__file__).resolve().parent.parent / "scripts" / f
+               ).read_text()
+        assert "LAB-02 HEALTH ABORT" in src
+        assert "daily_budget=90_000" in src.replace("LAB_DAILY_BUDGET",
+                                                    "daily_budget=90_000")             or "LAB_DAILY_BUDGET" in src

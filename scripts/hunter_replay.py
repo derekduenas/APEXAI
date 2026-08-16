@@ -76,6 +76,9 @@ def restamp(record: dict) -> dict:
     return r
 
 
+LAB_DAILY_BUDGET = 90_000        # LAB-02: labs need lab-scale budgets
+
+
 def replay_day(day: str, gov, ledger: Path, universe_cap: int) -> dict:
     uni = build_scan_universe(day)
     subset = dict(list(uni["symbols"].items())[:universe_cap])
@@ -96,6 +99,13 @@ def replay_day(day: str, gov, ledger: Path, universe_cap: int) -> dict:
         except Exception as e:                              # noqa: BLE001
             print(f"  fetch {s}: {type(e).__name__}")
     stats = {"ticks": 0, "decisions": 0, "capital": 0}
+    # LAB-02: a starving replay must die loudly, never race through
+    # hollow days that later masquerade as findings
+    healthy = sum(1 for f in bars.values() if len(f) > 100)
+    if healthy < 0.5 * (len(subset) + 1):
+        raise RuntimeError(
+            f"LAB-02 HEALTH ABORT {day}: only {healthy}/{len(subset)+1} "
+            f"symbols have bars (quota starvation or vendor outage)")
     for hm in TICK_TIMES:
         t = pd.Timestamp(f"{day} {hm}", tz=ET).tz_convert("UTC")
         if classify(t) is not Session.REGULAR:
@@ -189,7 +199,7 @@ def main() -> int:
     fp.LEDGER = ledger
     mem.LEDGER = ledger
 
-    gov = QuotaGovernor()
+    gov = QuotaGovernor(daily_budget=LAB_DAILY_BUDGET)
     days = [str(d.date()) for d in pd.bdate_range(a.start, a.end)
             if classify(pd.Timestamp(f"{d.date()} 10:00", tz=ET)
                         .tz_convert("UTC")) is Session.REGULAR]
