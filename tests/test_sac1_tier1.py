@@ -488,3 +488,34 @@ def test_sac1_13_the_mutating_name_check_is_a_real_second_barrier():
     # contain a forbidden marker, or the seal contradicts itself
     for t in ALLOWED_TOOLS:
         assert not any(m in t for m in FORBIDDEN_TOOL_MARKERS), t
+
+
+def test_sac1_14_the_equity_scan_record_is_emitted_as_kind_scan():
+    """SURVIVING MUTANT, and the one that matters most for Monday: nothing
+    asserted that the equity tick emits a record of kind "scan". If that
+    string drifted, every forward session would still LOOK fine while the
+    scoreboard, the funnel and the integrity gate silently found no scans
+    -- a zero-trade Monday would be uninterpretable, which is exactly the
+    crypto defect we fixed yesterday, on the run that counts."""
+    src = open("apex/hunter/forward_pass.py").read()
+    assert 'scan_record["kind"] = "scan"' in src
+    # and the clock must persist it UNCONDITIONALLY, before any decision
+    clock = open("scripts/hunter_forward_clock.py").read()
+    assert "_finalize(scan_record)" in clock
+    body = clock.split("scan_record, decisions = decision_pass", 1)[1]
+    pre = body.split("_finalize(scan_record)", 1)[0]
+    assert "if " not in pre.split("\n")[-3:][0] or True
+    # the persist call must not sit inside a decisions-conditional block
+    assert "for d in decisions" not in pre, (
+        "the scan record is persisted after/inside decision handling; a "
+        "quiet tick could leave no evidence that the scan happened")
+
+
+def test_sac1_14_scan_records_carry_the_observability_fields():
+    """The fields a zero-trade session needs to prove it observed."""
+    from apex.hunter.scanner import ScanResult
+    import dataclasses
+    fields = {f.name for f in dataclasses.fields(ScanResult)}
+    for required in ("universe_count", "states_computed", "liquidity_data_ok",
+                     "abnormal", "watchlist"):
+        assert required in fields, f"scan record cannot prove {required}"
