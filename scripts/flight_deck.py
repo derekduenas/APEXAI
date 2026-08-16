@@ -105,14 +105,29 @@ def equity_state() -> dict:
     }
 
 
+def _broker_row(ex: dict) -> str:
+    """NO_TRANSPORT and BLOCKED_BROKER_AUTH are different facts. Collapsing
+    them tells the operator to wait for something that will never arrive
+    (the Python process holds no OAuth token and cannot acquire one)."""
+    st = ex["broker"]["status"]
+    if st == "READY":
+        return "READY"
+    if ex.get("transport_mode") == "NO_TRANSPORT":
+        return "NO_TRANSPORT_NOT_AUTH_ISSUE"
+    return "BLOCKED_BROKER_AUTH"
+
+
 def execution_state() -> dict:
     from apex.execution.killswitch import state as kstate
     from apex.execution.robinhood import RobinhoodAdapter
     from apex.execution.sealing import scan_package_for_placement
-    adapter = RobinhoodAdapter(None)          # unauthenticated by default
+    from apex.execution.mcp_transport import default
+    transport, mode = default()               # honest: no route from here
+    adapter = RobinhoodAdapter(transport)
     rows = _rows(INTENT_LEDGER)
     return {
         "broker": adapter.connection_health(),
+        "transport_mode": mode,
         "kill_switch": kstate(),
         "live_placement": "SEALED",
         "placement_scan": scan_package_for_placement("apex"),
@@ -125,8 +140,30 @@ def execution_state() -> dict:
     }
 
 
+def _component(module: str, qualifier: str = "READY") -> str:
+    """INSTR-01: a readiness row must MEASURE the thing it describes.
+
+    Eleven rows on this board were hardcoded string literals -- "Scout":
+    "READY" was true only because someone typed it. Deleting the scanner
+    would not have changed the cockpit. A control that reports a state it
+    never measured is not a control, and this is the surface the operator
+    watches to decide whether the machine is alive.
+
+    The measurement here is deliberately modest and honest: the module
+    imports. That is a real fact about the running system, and it fails
+    loudly when the thing is gone.
+    """
+    import importlib
+    try:
+        importlib.import_module(module)
+    except Exception as e:                                  # noqa: BLE001
+        return f"UNAVAILABLE_{type(e).__name__}"
+    return qualifier
+
+
 def readiness_board() -> dict:
-    """The unified execution-readiness surface."""
+    """The unified execution-readiness surface. Every row is MEASURED;
+    a row that cannot be measured says so rather than claiming READY."""
     ex = execution_state()
     eq = equity_state()
     cr = crypto_state()
@@ -144,20 +181,22 @@ def readiness_board() -> dict:
                          else "NOT_LOADED"),
         "Event archive": ("ARMED" if "event-capture" in loaded
                           else "NOT_LOADED"),
-        "Digital World": "READY",
-        "Scout": "READY", "Hunter": "READY",
-        "Oracle": "PARTIAL_DATA_GATED",
-        "Assassin": "READY", "Captain": "READY_OBSERVATIONAL",
-        "Capital": "READY_NO_FORECAST_AUTH",
-        "Options Expression": "READY_DIAGNOSTIC",
+        "Digital World": _component("apex.world.twin2"),
+        "Scout": _component("apex.hunter.scanner"),
+        "Hunter": _component("apex.hunter.playbooks_v1"),
+        "Oracle": _component("apex.analog.engine", "PARTIAL_DATA_GATED"),
+        "Assassin": _component("apex.hunter.assassin"),
+        "Captain": _component("apex.captain.kernel", "READY_OBSERVATIONAL"),
+        "Capital": _component("apex.hunter.capital",
+                              "READY_NO_FORECAST_AUTH"),
+        "Options Expression": _component("apex.execution.expression_v2",
+                                         "READY_DIAGNOSTIC"),
         "Robinhood connection": ex["broker"]["status"],
-        "Broker review": ("READY" if ex["broker"]["status"] == "READY"
-                          else "BLOCKED_BROKER_AUTH"),
-        "Flight Deck": "READY",
-        "Trade Manager": "READY",
-        "ORDER CONSTRUCTION": "READY",
-        "BROKER PREVIEW": ("READY" if ex["broker"]["status"] == "READY"
-                           else "BLOCKED_BROKER_AUTH"),
+        "Broker review": _broker_row(ex),
+        "Flight Deck": "READY",          # measured by being able to answer
+        "Trade Manager": _component("apex.hunter.paper"),
+        "ORDER CONSTRUCTION": _component("apex.execution.gateway"),
+        "BROKER PREVIEW": _broker_row(ex),
         "LIVE PLACEMENT": "SEALED",
         "KILL SWITCH": ("ENGAGED" if ex["kill_switch"]["engaged"]
                         else "ARMED"),

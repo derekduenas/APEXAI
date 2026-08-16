@@ -91,3 +91,43 @@ prohibited action through the real code path**.
 
 Both LAB-07 and LAB-08 were found the same way: by asking `grep` who
 actually calls the guard. That question is now part of the audit.
+
+### INSTR-01 — the instrument that certified itself
+
+**Category II, pointed at the dashboard rather than the system.**
+
+The certification harness built to *detect* Category II defects shipped
+with one. Both broker scripts did:
+
+    try:    from apex.execution.mcp_transport import transport
+    except ImportError:    transport = None
+
+That module did not exist. `transport` was always `None`, and every
+broker row rendered `BLOCKED_BROKER_AUTH` — so the board reported *"the
+operator has not authenticated yet"* when the truth was *"this process
+cannot reach the broker even after they do."* A certification that can
+never turn green is worse than none: it looks like progress pending
+someone else.
+
+On the first run of the repair it then printed **"APEX EXECUTION
+INFRASTRUCTURE: READY"** with eight rows unreachable, because the READY
+condition tested only for FAIL. An unmeasured row is not a passing row.
+
+Same audit then found the same disease in the **Flight Deck**, where it
+mattered more: eleven readiness rows were hardcoded string literals.
+`"Scout": "READY"` was true because someone typed it. Deleting
+`apex/hunter/scanner.py` would not have changed the cockpit. This is the
+surface the operator watches to decide whether the machine is alive.
+
+**Repairs.** Three honest transport states (`NO_TRANSPORT` /
+`BLOCKED_BROKER_AUTH` / `READY`); READY requires every row MEASURED, with
+the exit code following; every component row now imports the module it
+describes and reports `UNAVAILABLE_<error>` when it cannot. Negative
+control: with the scanner made unimportable, the Scout row flips to
+`UNAVAILABLE_ModuleNotFoundError` while unrelated rows stay READY.
+
+**The principle, stated for the Flight Deck's whole future:**
+
+> A control that reports a state it never actually measured is not a
+> control. An indicator that cannot go red has no information in it
+> when it is green.

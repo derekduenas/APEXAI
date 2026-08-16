@@ -268,3 +268,44 @@ def test_a_probe_file_cannot_turn_a_missing_tool_into_an_empty_success():
     assert call("get_stock_quote")["last"] == 1.0
     with _pt.raises(TransportUnavailable):
         call("get_positions")
+
+
+def test_the_flight_deck_measures_its_rows_instead_of_asserting_them():
+    """INSTR-01. Eleven readiness rows were hardcoded literals -- deleting
+    the scanner would not have changed "Scout: READY". The cockpit is the
+    surface the operator reads to decide whether the machine is alive, so
+    a row that never touches its subject is the Category II disease at its
+    most consequential."""
+    import importlib
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    import flight_deck as fd
+
+    real = importlib.import_module
+
+    def broken(name, *a, **k):
+        if name == "apex.hunter.scanner":
+            raise ModuleNotFoundError("simulated")
+        return real(name, *a, **k)
+
+    importlib.import_module = broken
+    try:
+        board = fd.readiness_board()
+    finally:
+        importlib.import_module = real
+    assert board["Scout"].startswith("UNAVAILABLE"), (
+        "the Scout row survived its own component going missing")
+    assert board["Hunter"] == "READY", "unrelated rows must be unaffected"
+
+
+def test_the_flight_deck_does_not_call_no_transport_an_auth_problem():
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    import flight_deck as fd
+    ex = fd.execution_state()
+    assert "transport_mode" in ex, "the board must know how it is connected"
+    row = fd._broker_row(ex)
+    if ex["transport_mode"] == "NO_TRANSPORT":
+        assert row == "NO_TRANSPORT_NOT_AUTH_ISSUE"
