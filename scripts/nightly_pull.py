@@ -128,7 +128,20 @@ def _chain_append(log_path: Path, entry: dict) -> dict:
     body["entry_hash"] = hashlib.sha256(
         json.dumps(body, sort_keys=True).encode()
     ).hexdigest()
+    # SAC1-06: a torn write leaves the file WITHOUT a trailing newline.
+    # Appending blindly then merges the new record onto the fragment,
+    # producing one unparseable line that destroys BOTH -- while this
+    # function still returns `body`, so the caller believes it persisted.
+    # Terminate the tear first: the fragment stays as its own (visibly
+    # damaged, unparseable) line, and the new record starts clean.
+    needs_nl = False
+    if log_path.exists() and log_path.stat().st_size > 0:
+        with log_path.open("rb") as fh:
+            fh.seek(-1, 2)
+            needs_nl = fh.read(1) != b"\n"
     with log_path.open("a") as fh:
+        if needs_nl:
+            fh.write("\n")
         fh.write(json.dumps(body, sort_keys=True) + "\n")
     return body
 
