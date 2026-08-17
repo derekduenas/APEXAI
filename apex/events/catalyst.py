@@ -101,20 +101,40 @@ def catalyst_state(symbol: str, as_of, *, cik: str | None = None,
     newest_known = (max((e["known_from_utc"] for e in visible), default=None)
                     if visible else None)
 
+    # FEED HEALTH: read the capture health artifact, not the newest event.
+    # EDGAR is near-silent on weekends; "no new filings for 30 hours" with
+    # a heartbeat every 15 minutes is a HEALTHY quiet feed, while the same
+    # silence without heartbeats is a dead one. Only the artifact can tell
+    # them apart.
+    last_poll = None
+    hp = EVENTS_LEDGER.parent / "capture_health.json"
+    # only consult the REAL artifact when reading the REAL ledger --
+    # injected test events must not inherit production feed health
+    if events is None and hp.exists():
+        try:
+            last_poll = json.loads(hp.read_text()).get("last_poll_utc")
+        except (json.JSONDecodeError, OSError):
+            last_poll = None
+
     if not rows:
         return CatalystState(symbol=symbol, as_of=str(t),
                              status=EVENT_UNCERTAIN,
                              reason="event archive absent or empty: the "
                                     "catalyst question cannot be answered")
-    if newest_known is None or (
-            t - pd.Timestamp(newest_known)
-            > pd.Timedelta(hours=FEED_STALE_HOURS)):
+    heartbeat_fresh = (last_poll is not None
+                       and t - pd.Timestamp(last_poll)
+                       <= pd.Timedelta(hours=1))
+    event_fresh = (newest_known is not None
+                   and t - pd.Timestamp(newest_known)
+                   <= pd.Timedelta(hours=FEED_STALE_HOURS))
+    if not heartbeat_fresh and not event_fresh:
         return CatalystState(symbol=symbol, as_of=str(t),
                              status=EVENT_UNCERTAIN,
                              feed_last_known_from=newest_known,
-                             reason=f"archive stale (> {FEED_STALE_HOURS}h "
-                                    f"since last capture): silence may be "
-                                    f"a dead feed, not a quiet issuer")
+                             reason=f"no capture heartbeat within 1h and "
+                                    f"no event within {FEED_STALE_HOURS}h: "
+                                    f"silence may be a dead feed, not a "
+                                    f"quiet issuer")
     if cik is None:
         return CatalystState(symbol=symbol, as_of=str(t),
                              status=EVENT_UNCERTAIN,

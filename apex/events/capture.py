@@ -117,5 +117,22 @@ def capture_once(client, ledger: Path = EVENTS_LEDGER) -> dict:
             continue
         _chain_append(ledger, ev)
         new += ev["kind"] == "edgar_event"
-    return {"captured_at": now, "feed_entries": sum(
+    result = {"captured_at": now, "feed_entries": sum(
         1 for e in events if e["kind"] == "edgar_event"), "new": new}
+    # FEED HEALTH ARTIFACT (2026-08-17): a quiet-weekend poll appends
+    # nothing, so ledger mtime cannot distinguish "polled and empty" from
+    # "not polling" -- LAB-04's disease. The catalyst Eyes read THIS
+    # (atomic overwrite, the crypto_health pattern), never the newest
+    # event's timestamp.
+    try:
+        import json as _json
+        import os as _os
+        hp = ledger.parent / "capture_health.json"
+        tmp = hp.with_suffix(".tmp")
+        tmp.write_text(_json.dumps({"artifact": "edgar_capture_health_v1",
+                                    "last_poll_utc": now, **result,
+                                    "status": "OK"}))
+        _os.replace(tmp, hp)
+    except Exception:                                       # noqa: BLE001
+        pass
+    return result

@@ -62,7 +62,7 @@ def test_a_stale_archive_is_uncertain_not_quiet():
     old = _ev(known="2026-08-16T20:00:00+00:00")     # 18h before as_of
     st = catalyst_state("NVDA.US", NOW, cik="1045810", events=[old])
     assert st.status == EVENT_UNCERTAIN
-    assert "stale" in st.reason
+    assert "dead feed" in st.reason
 
 
 def test_an_empty_archive_is_uncertain():
