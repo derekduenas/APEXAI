@@ -201,6 +201,8 @@ def rows() -> list:
         ("PREMARKET JOB", _probe(lambda: _launchd("com.apex.premarket"))),
         ("PREMARKET PACKET", _probe(_premarket_packet)),
         ("MORNING BRIEF", _probe(_morning_brief)),
+        ("SHADOW PAPER", _probe(lambda: _ledger_age(
+            "results/frontier/shadow_paper_ledger.jsonl"))),
         ("RE-UNDERWRITING", _probe(lambda: _ledger_age(
             "results/frontier/underwriting_ledger.jsonl"))),
         ("CLOSING JOB", _probe(lambda: _launchd("com.apex.closing"))),

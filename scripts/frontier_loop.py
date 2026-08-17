@@ -257,6 +257,35 @@ def tick(st: dict) -> None:
         try:
             build_card(d, rows, st)
             st["carded"].append(did)
+            # SHADOW PAPER: authorization is the only counterfactual.
+            # Eligibility is the FROZEN rule; the fill needs the REAL
+            # microscope quote or it refuses.
+            from apex.frontier.shadow_paper import open_position
+            card_p = Path(f"results/decision_cards/{st['day']}/{did}.json")
+            chash = (json.loads(card_p.read_text())["before"]
+                     ["card_sha256"] if card_p.exists() else None)
+            cap = next((r for r in reversed(rows)
+                        if r.get("kind") == "capital_decision"
+                        and r.get("decision_id") == did), None)
+            q = None
+            for r in reversed(_rows(Path(
+                    "results/hunter/microscope_ledger.jsonl"))):
+                if r.get("kind") == "microscope_result" and                         r.get("symbol", "").replace(".US", "") ==                         d["symbol"].replace(".US", ""):
+                    raw = (r.get("quote") or {})
+                    inner = ((raw.get("data") or {}).get("results")
+                             or [{}])[0].get("quote", {})                         if isinstance(raw.get("data"), dict) else raw
+                    q = {"bid": float(inner["bid_price"])
+                         if inner.get("bid_price") else None,
+                         "ask": float(inner["ask_price"])
+                         if inner.get("ask_price") else None,
+                         "quote_time": inner.get("updated_at")
+                         or r.get("response_time")}
+                    break
+            sp = open_position(d, cap, card_hash=chash, quote=q)
+            st.setdefault("shadow_positions", {})[did] =                 {k: v for k, v in sp.as_record().items() if k != "kind"}
+            print(f"  SHADOW {sp.state} {did}"
+                  + (f" @ {sp.entry_price}" if sp.entry_price else
+                     f" ({sp.exit_reason})"))
         except Exception as e:                              # noqa: BLE001
             print(f"  card build failed for {did}: {type(e).__name__}: {e}")
     # CONTINUOUS RE-UNDERWRITING: every carded candidate gets the
@@ -307,6 +336,35 @@ def tick(st: dict) -> None:
             except Exception as e:                          # noqa: BLE001
                 print(f"  reunderwrite failed for {did}: "
                       f"{type(e).__name__}")
+
+    # manage open shadow positions on fresh completed bars
+    from apex.frontier.shadow_paper import ShadowPosition, manage
+    from apex.intraday.eodhd import QuotaGovernor, fetch_intraday_chunk, \
+        normalize_rows
+    spos = st.setdefault("shadow_positions", {})
+    open_ids = [k for k, v in spos.items() if v.get("state") == "SHADOW_OPEN"]
+    if open_ids:
+        gov = QuotaGovernor(daily_budget=2000, purpose="LAB")
+        for did in open_ids:
+            v = spos[did]
+            try:
+                raw, _src = fetch_intraday_chunk(v["symbol"], st["day"],
+                                                 st["day"], gov)
+                f = normalize_rows(raw or [], v["symbol"])
+                if not len(f):
+                    continue
+                bar = f.iloc[-1]
+                nxt = manage(ShadowPosition(**v),
+                             {"high": float(bar.high),
+                              "low": float(bar.low),
+                              "close": float(bar.close)}, now=now)
+                spos[did] = {k: x for k, x in nxt.as_record().items()
+                             if k != "kind"}
+                if nxt.state == "SHADOW_FLAT":
+                    print(f"  SHADOW FLAT {did} {nxt.exit_reason} "
+                          f"@ {nxt.exit_price}")
+            except Exception as e:                          # noqa: BLE001
+                print(f"  shadow manage failed {did}: {type(e).__name__}")
 
     if not decisions:
         print(f"{now:%H:%M:%S} frontier quiet — no candidates yet "

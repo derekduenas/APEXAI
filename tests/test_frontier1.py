@@ -230,11 +230,16 @@ def test_the_frontier_package_never_writes_official_ledgers():
 
 
 def test_frontier_power_is_the_only_power_in_the_package():
+    """Executable source only — shadow_paper's docstring legitimately
+    PROHIBITS these words (the prose trap's seventh appearance, this time
+    tripping an existing raw-text guard)."""
     from pathlib import Path
+
+    from apex.audit.execution_path import executable_source
     for f in Path("apex/frontier").rglob("*.py"):
-        src = f.read_text()
-        assert "PAPER_ELIGIBLE" not in src
-        assert "LIVE_ELIGIBLE" not in src
+        code = executable_source(f.read_text())
+        assert "PAPER_ELIGIBLE" not in code, f
+        assert "LIVE_ELIGIBLE" not in code, f
 
 
 # ============ THE TWO-DESK ISOLATION CERTIFICATE ===========================
