@@ -190,6 +190,8 @@ ARTIFACTS = {
     # power NONE_OBSERVATIONAL_EPOCH1; instrumentation births, no Epoch break.
     # FRONTIER-1 (2026-08-17): Desk B shadow instrumentation, power
     # NONE_FRONTIER_SHADOW throughout; the Epoch-1 control is untouched.
+    "apex_premarket_context_v1": (
+        "model", ("apex/frontier/premarket.py",)),
     "apex_decision_card_v1": (
         "model", ("apex/frontier/decision_card.py",)),
     "apex_frontier_senses_v1": (

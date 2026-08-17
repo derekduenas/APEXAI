@@ -19,7 +19,8 @@ from apex.frontier import FRONTIER_POWER
 
 CARDS_ROOT = Path("results/decision_cards")
 
-SECTIONS = ("identity", "timing", "world", "scout", "dislocation",
+SECTIONS = ("identity", "timing", "premarket", "world", "scout",
+            "dislocation",
             "hunter", "fastwatch", "microscope", "catalyst", "visual",
             "oracle", "assassin", "captain", "opportunity_competition",
             "capital", "expression", "execution", "before_statement")

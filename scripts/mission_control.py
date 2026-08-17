@@ -112,6 +112,25 @@ def _seal():
             else "SEAL_SCAN_DIRTY")
 
 
+def _premarket_packet():
+    import pandas as pd
+    day = str(pd.Timestamp.now(tz="America/New_York").date())
+    from apex.frontier.premarket import load_sealed
+    pkt = load_sealed(day)
+    if pkt is None:
+        return "NOT_SEALED_TODAY (seals 06:25 PT on trading days)"
+    return (f"SEALED {pkt['packet_sha256'][:10]} "
+            f"({len(pkt.get('gap_map', []))} movers, "
+            f"{len(pkt.get('blind_spots', []))} stated blind spots)")
+
+
+def _morning_brief():
+    import pandas as pd
+    day = str(pd.Timestamp.now(tz="America/New_York").date())
+    p = Path(f"results/frontier/premarket/{day}_morning_brief.md")
+    return "PRESENT" if p.exists() else "NOT_WRITTEN_TODAY"
+
+
 def _full_suite():
     """Reads the artifact the suite runner writes — a stale or absent
     artifact reads as such, never as PASS."""
@@ -167,6 +186,9 @@ def rows() -> list:
             "apex.execution.gateway"))),
         ("LIVE PLACEMENT", _probe(_seal)),
         ("FULL SUITE", _probe(_full_suite)),
+        ("PREMARKET JOB", _probe(lambda: _launchd("com.apex.premarket"))),
+        ("PREMARKET PACKET", _probe(_premarket_packet)),
+        ("MORNING BRIEF", _probe(_morning_brief)),
         ("FRONTIER BUS", _probe(lambda: _ledger_age(
             "results/frontier/event_bus.jsonl"))),
         ("FRONTIER BOARD", _probe(lambda: _ledger_age(

@@ -45,6 +45,15 @@ PREREGISTRATION = {
             "groups": ("CLEAN", "WOUNDED", "UNAVAILABLE"),
             "measures": ("ret_15m", "ret_30m", "ret_60m", "ret_90m",
                          "mfe", "mae")},
+        "H_PREMARKET": {
+            "question": ("does alignment/contradiction with the sealed "
+                         "premarket context provide incremental "
+                         "information about prospective candidate "
+                         "outcomes?"),
+            "groups": ("ALIGNED", "CONTRADICTED", "NOT_RELEVANT",
+                       "UNKNOWN"),
+            "measures": ("ret_15m", "ret_30m", "ret_60m", "ret_90m",
+                         "mfe", "mae")},
         "H_CATALYST": {
             "question": ("do candidate outcomes differ across catalyst "
                          "attribution states?"),

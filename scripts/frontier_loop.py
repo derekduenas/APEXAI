@@ -70,6 +70,28 @@ def _save(st: dict) -> None:
     os.replace(tmp, STATE)
 
 
+def _premarket_section(d: dict) -> dict:
+    """The sealed opening context, attached by hash. PRIOR_AGREEMENT is
+    UNKNOWN in this lineage — computing alignment is a post-Day-1 act,
+    not a bell-eve one; the field exists so H_PREMARKET can be tested
+    later without retrofitting cards."""
+    from apex.frontier.premarket import load_sealed
+    import pandas as pd
+    day = str(pd.Timestamp(d["t_utc"]).tz_convert(
+        "America/New_York").date())
+    pkt = load_sealed(day)
+    if pkt is None:
+        return {"status": "NO_SEALED_PACKET"}
+    sym = d.get("symbol", "").replace(".US", "")
+    in_watch = any(sym in [s.replace(".US", "") for s in v]
+                   for v in pkt.get("watch_map", {}).values())
+    return {"premarket_context_hash": pkt["packet_sha256"],
+            "sealed": pkt["sealed"],
+            "symbol_in_watch_map": in_watch,
+            "premarket_prior_agreement": "UNKNOWN",
+            "blind_spots": pkt.get("blind_spots", [])}
+
+
 def build_card(d: dict, rows: list, st: dict) -> None:
     """Assemble + seal the BEFORE card from persisted records only."""
     from apex.frontier.decision_card import persist, seal_before
@@ -113,6 +135,7 @@ def build_card(d: dict, rows: list, st: dict) -> None:
                    "fastwatch_first_condition": (
                        first_cond or {}).get("observed_at"),
                    "sensing_transport": "POLLING"},
+        "premarket": _premarket_section(d),
         "world": last("world_state", with_id=False) or {"status": "UNKNOWN"},
         "scout": {"rvol_tod": cs.get("rvol_tod"),
                   "gap_frac": cs.get("gap_frac"),
