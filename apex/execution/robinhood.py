@@ -31,15 +31,27 @@ BROKER = "robinhood"
 
 # the ONLY tools this adapter will ever route to. Placement tools are
 # not listed, not imported, and not reachable.
+# MEASURED SURFACE (2026-08-17, via headless child session): the original
+# list was built on ASSUMED tool names (get_accounts, get_equity_quotes)
+# that do not exist on the real server -- every legitimate call would have
+# been refused. Names below are the hand-vetted read/review subset of the
+# 54 measured tools. exercise_option and all watchlist add/remove tools
+# were deliberately EXCLUDED: a crude name classifier binned them as
+# "read" during measurement, which is SAC1-02's lesson happening live.
 ALLOWED_TOOLS = (
-    "get_account_info", "get_buying_power", "get_positions",
-    "get_open_orders", "get_stock_quote", "get_stock_info",
-    "get_options_chains", "get_options_instruments",
-    "get_options_market_data", "get_options_positions",
+    "get_accounts", "get_portfolio",
+    "get_equity_quotes", "get_equity_positions", "get_equity_orders",
+    "get_equity_tradability", "get_equity_price_book",
+    "get_equity_historicals", "get_equity_fundamentals",
+    "get_financials", "get_earnings_results", "get_earnings_calendar",
+    "get_indexes", "get_index_quotes",
+    "get_option_chains", "get_option_instruments", "get_option_quotes",
+    "get_option_positions", "get_option_orders",
     "review_equity_order", "review_option_order",
 )
-FORBIDDEN_TOOL_MARKERS = ("place", "submit", "execute", "cancel_all", "sell_",
-                          "buy_")
+FORBIDDEN_TOOL_MARKERS = ("place", "submit", "execute", "cancel", "sell_",
+                          "buy_", "exercise", "update_", "create_",
+                          "follow", "add_", "remove_")
 
 
 class BrokerAuthRequired(RuntimeError):
@@ -94,7 +106,7 @@ class RobinhoodAdapter:
         if not self.authenticated:
             return BrokerCapabilities(broker=BROKER, source="UNVERIFIED")
         try:
-            info = self._call("get_account_info")
+            info = self._call("get_accounts")
         except Exception:                                   # noqa: BLE001
             return BrokerCapabilities(broker=BROKER, source="UNVERIFIED")
         lvl = (info or {}).get("options_level")
@@ -116,10 +128,10 @@ class RobinhoodAdapter:
             return BrokerAccountState(status="BLOCKED_AUTH",
                                       detail="robinhood not authenticated")
         try:
-            acct = self._call("get_account_info") or {}
-            bp = self._call("get_buying_power") or {}
-            pos = self._call("get_positions") or {}
-            orders = self._call("get_open_orders") or {}
+            acct = self._call("get_accounts") or {}
+            bp = self._call("get_portfolio") or {}
+            pos = self._call("get_equity_positions") or {}
+            orders = self._call("get_equity_orders") or {}
             return BrokerAccountState(
                 status="OK",
                 buying_power=_f(bp.get("buying_power")),
@@ -136,7 +148,7 @@ class RobinhoodAdapter:
         if not self.authenticated:
             return BrokerQuote(status="UNAVAILABLE", symbol=symbol)
         try:
-            q = self._call("get_stock_quote", symbol=symbol) or {}
+            q = self._call("get_equity_quotes", symbol=symbol) or {}
             return BrokerQuote(status="OK", symbol=symbol,
                                bid=_f(q.get("bid")), ask=_f(q.get("ask")),
                                last=_f(q.get("last") or q.get("price")),
@@ -150,7 +162,7 @@ class RobinhoodAdapter:
             return BrokerTradability(status="UNKNOWN", symbol=symbol,
                                      reason="broker not authenticated")
         try:
-            info = self._call("get_stock_info", symbol=symbol) or {}
+            info = self._call("get_equity_tradability", symbol=symbol) or {}
             tradable = info.get("tradable")
             return BrokerTradability(
                 status=("TRADABLE" if tradable is True
@@ -164,10 +176,10 @@ class RobinhoodAdapter:
         if not self.authenticated:
             return {"status": "BLOCKED_BROKER_AUTH", "symbol": symbol}
         try:
-            ch = self._call("get_options_chains", symbol=symbol) or {}
-            inst = self._call("get_options_instruments", symbol=symbol,
+            ch = self._call("get_option_chains", symbol=symbol) or {}
+            inst = self._call("get_option_instruments", symbol=symbol,
                               expiration=expiration) or {}
-            md = self._call("get_options_market_data", symbol=symbol,
+            md = self._call("get_option_quotes", symbol=symbol,
                             expiration=expiration) or {}
             return {"status": "OK", "symbol": symbol, "chain": ch,
                     "instruments": inst, "market_data": md}

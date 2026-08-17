@@ -26,7 +26,7 @@ sys.path.insert(0, str(_S.parent)); sys.path.insert(0, str(_S))
 
 import pandas as pd  # noqa: E402
 
-PASS, FAIL, BLOCKED = "PASS", "FAIL", "BLOCKED"
+PASS, FAIL, BLOCKED, GATED = "PASS", "FAIL", "BLOCKED", "GATED"
 NO_ROUTE = "NO_ROUTE"      # this harness cannot reach the broker AT ALL --
 # emphatically not the same as "the operator has not authenticated yet"
 LEDGER = Path("results/execution/certification.jsonl")
@@ -62,6 +62,11 @@ def _probe(adapter, tool: str, **kw) -> tuple:   # noqa: C901
         return FAIL, f"non-dict payload {type(out).__name__}"
     if out.get("status") == "BLOCKED_BROKER_AUTH":
         return BLOCKED, "broker not authenticated"
+    if out.get("status") == "REQUIRES_OPERATOR_ACCOUNT_INPUT":
+        # the broker's OWN consent gate: the tool demands a human-supplied
+        # account number and forbids defaulting it. Measured, by design,
+        # and deliberately not worked around -- neither FAIL nor NO_ROUTE.
+        return GATED, out.get("detail", "broker consent gate")[:70]
     if out.get("error"):
         return FAIL, str(out["error"])[:60]
     return PASS, ", ".join(sorted(out)[:4]) or "empty payload"
@@ -71,18 +76,18 @@ def certify(adapter, symbol: str = "SPY") -> list:
     rows = []
 
     # --- account visibility
-    for label, tool in (("Account visible", "get_account_info"),
-                        ("Buying power visible", "get_buying_power"),
-                        ("Positions visible", "get_positions")):
+    for label, tool in (("Account visible", "get_accounts"),
+                        ("Buying power visible", "get_portfolio"),
+                        ("Positions visible", "get_equity_positions")):
         v, d = _probe(adapter, tool)
         rows.append(_row(label, v, d))
 
     # --- market data
-    v, d = _probe(adapter, "get_stock_quote", symbol=symbol)
+    v, d = _probe(adapter, "get_equity_quotes", symbol=symbol)
     rows.append(_row("Live equity quote", v, d))
-    v, d = _probe(adapter, "get_options_chains", symbol=symbol)
+    v, d = _probe(adapter, "get_option_chains", symbol=symbol)
     rows.append(_row("Option chain", v, d))
-    v, d = _probe(adapter, "get_options_market_data", symbol=symbol)
+    v, d = _probe(adapter, "get_option_quotes", symbol=symbol)
     rows.append(_row("Option quote", v, d))
 
     # --- review (the deepest legal reach: broker prices the order, no send)
@@ -231,10 +236,12 @@ def main() -> int:
     failed = [r for r in rows if r["verdict"] == FAIL]
     blocked = [r for r in rows if r["verdict"] == BLOCKED]
     noroute = [r for r in rows if r["verdict"] == NO_ROUTE]
+    gated = [r for r in rows if r["verdict"] == GATED]
 
     print(f"transport: {mode} | seal intact: {seal_ok} | "
           f"measured {len(measurable)} | failed {len(failed)} | "
-          f"blocked {len(blocked)} | no-route {len(noroute)}")
+          f"blocked {len(blocked)} | no-route {len(noroute)} | "
+          f"consent-gated {len(gated)}")
     if noroute:
         print("NO_ROUTE is NOT 'pending authentication'. The MCP session "
               "belongs to the Claude Code client; this process holds no "
@@ -248,6 +255,9 @@ def main() -> int:
     # not a passing row -- declaring READY over NO_ROUTE/BLOCKED rows is
     # precisely the "dashboard says a protection exists" failure, pointed
     # at ourselves.
+    for g in gated:
+        print(f"GATED (broker consent, by design): {g['check']} -- "
+              f"{g['detail']}")
     if not failed and not blocked and not noroute and seal_ok:
         print()
         print("APEX EXECUTION INFRASTRUCTURE: READY")

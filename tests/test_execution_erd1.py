@@ -46,14 +46,14 @@ def _intent(**kw):
 def _fake_mcp(**overrides):
     def call(tool, **kwargs):
         data = {
-            "get_account_info": {"options_level": 3, "cash": 5000,
+            "get_accounts": {"options_level": 3, "cash": 5000,
                                  "as_of": "2026-08-16T15:00:00Z"},
-            "get_buying_power": {"buying_power": 5000},
-            "get_positions": {"positions": []},
-            "get_open_orders": {"orders": []},
-            "get_stock_quote": {"bid": 199.98, "ask": 200.02,
+            "get_portfolio": {"buying_power": 5000},
+            "get_equity_positions": {"positions": []},
+            "get_equity_orders": {"orders": []},
+            "get_equity_quotes": {"bid": 199.98, "ask": 200.02,
                                 "last": 200.0, "age_seconds": 1.0},
-            "get_stock_info": {"tradable": True, "state": "active"},
+            "get_equity_tradability": {"tradable": True, "state": "active"},
             "review_equity_order": {"estimated_cost": 2000.0,
                                     "estimated_fees": 0.0},
             "review_option_order": {"estimated_cost": 250.0},
@@ -155,7 +155,7 @@ def test_unauthenticated_broker_blocks_and_never_fabricates(tmp_path):
     assert a.quote("AAPL").status == "UNAVAILABLE"
     assert a.review_order(_intent()).review == "BROKER_REVIEW_UNAVAILABLE"
     with pytest.raises(BrokerAuthRequired):
-        a._call("get_account_info")
+        a._call("get_accounts")
     g = ExecutionGateway(a, ledger=tmp_path / "i.jsonl")
     r = g.evaluate(_intent(), READY_DECISION, READY_CAPITAL)
     assert r.state == ReadinessState.BLOCKED_BROKER_AUTH.value
@@ -302,3 +302,19 @@ def test_greeks_are_never_invented():
     assert s.greeks_status == "UNKNOWN_NOT_SOURCED"
     assert set(EXPRESSIONS) >= {"NO_TRADE", "STOCK", "LONG_CALL",
                                 "CALL_DEBIT_SPREAD"}
+
+
+def test_sac1_15_an_unknown_quote_age_cannot_pass_the_freshness_gate():
+    """Found by REAL broker data: the gateway's freshness check read
+    `age_seconds is None or age <= MAX` -- unknown passed. Its own parser
+    produced None from the real payload shape, so a 52-HOUR-old Friday
+    quote cleared the gate built to refuse anything over 30 seconds.
+    Unknown never becomes safe; an unmeasured age is a refusal."""
+    import inspect
+
+    from apex.execution.gateway import ExecutionGateway
+    src = inspect.getsource(ExecutionGateway)
+    seg = src.split('check("quote_freshness"', 1)[1][:300]
+    assert "is None or" not in seg, (
+        "an unknown quote age still passes the freshness check")
+    assert "is not None" in seg

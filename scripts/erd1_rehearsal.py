@@ -153,14 +153,14 @@ def mock_broker():
     gateway's tripwire scans it like any adapter."""
     def call(tool, **kw):
         return {
-            "get_account_info": {"options_level": 3, "cash": 25000,
+            "get_accounts": {"options_level": 3, "cash": 25000,
                                  "as_of": str(pd.Timestamp.now(tz="UTC"))},
-            "get_buying_power": {"buying_power": 25000},
-            "get_positions": {"positions": []},
-            "get_open_orders": {"orders": []},
-            "get_stock_quote": {"bid": 199.97, "ask": 200.03,
+            "get_portfolio": {"buying_power": 25000},
+            "get_equity_positions": {"positions": []},
+            "get_equity_orders": {"orders": []},
+            "get_equity_quotes": {"bid": 199.97, "ask": 200.03,
                                 "last": 200.0, "age_seconds": 1.2},
-            "get_stock_info": {"tradable": True, "state": "active"},
+            "get_equity_tradability": {"tradable": True, "state": "active"},
             "review_equity_order": {"estimated_cost": 2000.3,
                                     "estimated_fees": 0.0,
                                     "buying_power_effect": -2000.3},

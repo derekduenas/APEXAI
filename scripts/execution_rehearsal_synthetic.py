@@ -55,12 +55,31 @@ def real_quote(adapter, symbol: str) -> dict:
     clothes."""
     from apex.execution.robinhood import BrokerAuthRequired
     try:
-        q = adapter._call("get_stock_quote", symbol=symbol)
+        q = adapter._call("get_equity_quotes", symbol=symbol)
     except BrokerAuthRequired:
         return {"status": "BLOCKED_BROKER_AUTH"}
     except Exception as e:                                  # noqa: BLE001
         return {"status": "QUOTE_FAILED", "error": type(e).__name__}
-    return {"status": "OK", **q}
+    # REAL payload shape: data.results[].quote with string prices. The
+    # first draft read flat fields, got last=0.0, and PROCEEDED -- zero is
+    # not missing (SAC doctrine 3), and a rehearsal that accepts a garbage
+    # price is a simulation again. Parse the real shape; refuse unusable.
+    try:
+        quote = q["data"]["results"][0]["quote"]
+        last = float(quote.get("last_trade_price") or 0)
+        bid = float(quote.get("bid_price") or 0) or None
+        ask = float(quote.get("ask_price") or 0) or None
+        qtime = quote.get("venue_last_trade_time") or quote.get("updated_at")
+    except (KeyError, IndexError, TypeError, ValueError):
+        return {"status": "QUOTE_UNPARSEABLE", "raw_keys": sorted(q)[:6]}
+    if not last or last <= 0:
+        return {"status": "QUOTE_UNUSABLE", "detail": "no positive last"}
+    import pandas as pd
+    age = (pd.Timestamp.now(tz="UTC")
+           - pd.Timestamp(qtime)).total_seconds() if qtime else None
+    return {"status": "OK", "last": last, "bid": bid, "ask": ask,
+            "age_seconds": round(age, 1) if age is not None else None,
+            "quote_time": str(qtime)}
 
 
 def synthetic_opportunity(symbol: str, spot: float) -> dict:
@@ -148,7 +167,7 @@ def main() -> int:
 
     chain, chain_src = [], "NONE"
     try:
-        raw = adapter._call("get_options_chains", symbol=a.symbol)
+        raw = adapter._call("get_option_chains", symbol=a.symbol)
         chain_src = "ROBINHOOD_LIVE_CHAIN" if raw else "EMPTY"
     except BrokerAuthRequired:
         chain_src = "BLOCKED_BROKER_AUTH"

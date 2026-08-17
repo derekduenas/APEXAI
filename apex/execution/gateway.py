@@ -106,10 +106,13 @@ class ExecutionGateway:
               if age is not None else "unknown decision age")
         q = self.adapter.quote(intent.symbol)
         check("quote_available", q.status == "OK", f"quote {q.status}")
+        # SAC1-15: unknown never becomes safe. The first version passed a
+        # None age; real broker data promptly walked a 52-hour-old quote
+        # through this gate. An unmeasured age is a refusal, full stop.
         check("quote_freshness",
-              q.status == "OK" and (q.age_seconds is None
-                                    or q.age_seconds <= MAX_QUOTE_AGE_S),
-              f"quote age {q.age_seconds}s")
+              q.status == "OK" and q.age_seconds is not None
+              and q.age_seconds <= MAX_QUOTE_AGE_S,
+              f"quote age {q.age_seconds}s (None = unmeasured = refuse)")
         dq = (decision.get("chart_state") or {}).get("data_quality") or ()
         check("data_health", not dq, f"data quality flags {list(dq)}")
         health = self.adapter.connection_health()
