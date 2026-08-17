@@ -1,0 +1,26 @@
+{
+  "artifact": "PRE_EPOCH1_FINAL",
+  "minted_utc": "2026-08-17 04:01:04.049069+00:00",
+  "commit": "a6a25ca8625eb9aa27fb5eff2b618b73e50b587d",
+  "full_suite": {
+    "result": "PASS",
+    "passed": 1165,
+    "skipped": 1,
+    "commit": "a6a25ca8625eb9aa27fb5eff2b618b73e50b587d"
+  },
+  "sac2_baseline_sha": "d28bcd6c8aaec086fbe4f3cb51e8706aa51f153d8aa22d8f85feb6da82f5b045",
+  "mcp_tool_surface_sha": "950d877a4600d7f24a70bcdeec2f5d1996b3d61ef89189fbdfad6c345259b9d1",
+  "claude_code": "2.1.233 (Claude Code)",
+  "birth_tip_sha": "f83f1cfb970034d34f0ccf0236901f701ffd375b7f0b44cf1ea226a5d61a976a",
+  "quota": {
+    "lab": 35490,
+    "forward": 70490
+  },
+  "disk_mode": "SUSPEND",
+  "launchd_jobs": "7",
+  "paper": "LOCKED",
+  "live": "SEALED",
+  "credit_5": "SEALED",
+  "holdout": "SEALED",
+  "sha256": "fb2e970b247a6aaec881d525beeba50d9e9ecd1fe4b7c926d568fd2c673d2d2d"
+}

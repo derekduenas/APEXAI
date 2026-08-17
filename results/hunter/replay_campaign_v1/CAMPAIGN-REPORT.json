@@ -1,0 +1,321 @@
+{
+ "campaign": "REPLAY-CAMPAIGN-V1 (preregistered)",
+ "0_integrity_first": {
+  "predeclared_sessions": 92,
+  "sessions_replayed": 92,
+  "sessions_with_full_ticks": 92,
+  "legitimate_partial_sessions": 0,
+  "hollow_sessions": 0,
+  "hollow_day_list": "none",
+  "context_healthy_sessions": 89,
+  "context_starved_sessions": 1,
+  "context_starved_list": [
+   "2026-05-06"
+  ],
+  "context_health_median": 1.0,
+  "context_health_p10": 0.987,
+  "context_health_min": 0.068,
+  "provider_failure_counters": "not ledger-instrumented (lab debt: shared network semaphore + counters)",
+  "quota_starvation_events": "0 (fail-loud LAB-02 aborts)",
+  "worker_failures": "0 (a worker exception aborts the run)",
+  "rule_17_llm_views_in_replay": 0,
+  "evidence_classes_present": [
+   "EODHD_HISTORICAL_EXPLORATORY"
+  ],
+  "class_pure_exploratory": true,
+  "production_ledger_writes": "NONE (file absent)",
+  "ledger_chain_valid": true,
+  "torn_tail_recoveries": 0,
+  "VERDICT": "NOT CLEAN \u2014 ECONOMICS LOCKED"
+ },
+ "evidence": "EODHD_HISTORICAL_EXPLORATORY \u2014 laboratory only",
+ "sessions": 92,
+ "regime_coverage": {
+  "VOL_DOWN": 2,
+  "VOL_UP": 60,
+  "CALM_UP": 30
+ },
+ "1_funnel": {
+  "scout_baseline_momentum": {
+   "n": 36977,
+   "n_scored": 36977,
+   "ev": -9e-05,
+   "median": -7e-05,
+   "hit": 0.495,
+   "p10_tail": -0.01072,
+   "mfe_med": 0.00498,
+   "mae_med": -0.00519,
+   "n_sessions": 92
+  },
+  "hunter_matched": {
+   "n": 234,
+   "n_scored": 234,
+   "ev": -0.00062,
+   "median": -0.00048,
+   "hit": 0.479,
+   "p10_tail": -0.01544,
+   "mfe_med": 0.00553,
+   "mae_med": -0.00773,
+   "n_sessions": 73
+  },
+  "assassin_clean": {
+   "n": 234,
+   "n_scored": 234,
+   "ev": -0.00062,
+   "median": -0.00048,
+   "hit": 0.479,
+   "p10_tail": -0.01544,
+   "mfe_med": 0.00553,
+   "mae_med": -0.00773,
+   "n_sessions": 73
+  },
+  "assassin_wounded": {
+   "n": 0,
+   "n_scored": 0
+  },
+  "capital_observe": {
+   "n": 233,
+   "n_scored": 233,
+   "ev": -0.00053,
+   "median": -0.0004,
+   "hit": 0.481,
+   "p10_tail": -0.01521,
+   "mfe_med": 0.00556,
+   "mae_med": -0.00771,
+   "n_sessions": 72
+  }
+ },
+ "2_assassin_brutal": {
+  "15m": {
+   "clean": {
+    "n": 234,
+    "n_scored": 234,
+    "ev": -0.00088,
+    "median": -0.00082,
+    "hit": 0.419,
+    "p10_tail": -0.0089,
+    "mfe_med": 0.00335,
+    "mae_med": -0.00473,
+    "n_sessions": 73
+   },
+   "wounded": {
+    "n": 0,
+    "n_scored": 0
+   }
+  },
+  "30m": {
+   "clean": {
+    "n": 234,
+    "n_scored": 234,
+    "ev": -0.00042,
+    "median": -0.0006,
+    "hit": 0.453,
+    "p10_tail": -0.00992,
+    "mfe_med": 0.00444,
+    "mae_med": -0.00591,
+    "n_sessions": 73
+   },
+   "wounded": {
+    "n": 0,
+    "n_scored": 0
+   }
+  },
+  "60m": {
+   "clean": {
+    "n": 234,
+    "n_scored": 234,
+    "ev": -0.00062,
+    "median": -0.00048,
+    "hit": 0.479,
+    "p10_tail": -0.01544,
+    "mfe_med": 0.00553,
+    "mae_med": -0.00773,
+    "n_sessions": 73
+   },
+   "wounded": {
+    "n": 0,
+    "n_scored": 0
+   }
+  },
+  "90m": {
+   "clean": {
+    "n": 234,
+    "n_scored": 234,
+    "ev": 1e-05,
+    "median": -0.00012,
+    "hit": 0.487,
+    "p10_tail": -0.01631,
+    "mfe_med": 0.007,
+    "mae_med": -0.00849,
+    "n_sessions": 73
+   },
+   "wounded": {
+    "n": 0,
+    "n_scored": 0
+   }
+  }
+ },
+ "3_baselines": {
+  "BASELINE-MARKET": {
+   "n": 42296,
+   "n_scored": 42296,
+   "ev": -0.0001,
+   "median": -5e-05,
+   "hit": 0.496,
+   "p10_tail": -0.01165,
+   "mfe_med": 0.00535,
+   "mae_med": -0.00536,
+   "n_sessions": 92
+  },
+  "BASELINE-MOMENTUM": {
+   "n": 36977,
+   "n_scored": 36977,
+   "ev": -9e-05,
+   "median": -7e-05,
+   "hit": 0.495,
+   "p10_tail": -0.01072,
+   "mfe_med": 0.00498,
+   "mae_med": -0.00519,
+   "n_sessions": 92
+  },
+  "BASELINE-RANDOM": {
+   "n": 42296,
+   "n_scored": 42296,
+   "ev": 6e-05,
+   "median": 3e-05,
+   "hit": 0.501,
+   "p10_tail": -0.01142,
+   "mfe_med": 0.0054,
+   "mae_med": -0.00531,
+   "n_sessions": 92
+  },
+  "BASELINE-RELSTRENGTH": {
+   "n": 37045,
+   "n_scored": 37045,
+   "ev": -5e-05,
+   "median": -4e-05,
+   "hit": 0.496,
+   "p10_tail": -0.01071,
+   "mfe_med": 0.00502,
+   "mae_med": -0.00514,
+   "n_sessions": 92
+  }
+ },
+ "4_by_regime": {
+  "hunter_matched": {
+   "CALM_UP": {
+    "n": 111,
+    "n_scored": 111,
+    "ev": -0.00178,
+    "median": -0.00133,
+    "hit": 0.414,
+    "p10_tail": -0.0171,
+    "mfe_med": 0.00462,
+    "mae_med": -0.0077,
+    "n_sessions": 28
+   },
+   "VOL_DOWN": {
+    "n": 3,
+    "n_scored": 3,
+    "ev": 0.00926,
+    "median": 0.00701,
+    "hit": 1.0,
+    "p10_tail": 0.00332,
+    "mfe_med": 0.01023,
+    "mae_med": -0.00319,
+    "n_sessions": 1,
+    "status": "INSUFFICIENT_DO_NOT_INTERPRET"
+   },
+   "VOL_UP": {
+    "n": 120,
+    "n_scored": 120,
+    "ev": 0.0002,
+    "median": 0.00098,
+    "hit": 0.525,
+    "p10_tail": -0.01519,
+    "mfe_med": 0.00744,
+    "mae_med": -0.00786,
+    "n_sessions": 44
+   }
+  },
+  "scout_baseline": {
+   "CALM_UP": {
+    "n": 12253,
+    "n_scored": 12253,
+    "ev": 0.00013,
+    "median": 0.0,
+    "hit": 0.498,
+    "p10_tail": -0.0106,
+    "mfe_med": 0.00507,
+    "mae_med": -0.00529,
+    "n_sessions": 30
+   },
+   "VOL_DOWN": {
+    "n": 596,
+    "n_scored": 596,
+    "ev": -0.00116,
+    "median": -0.00075,
+    "hit": 0.47,
+    "p10_tail": -0.01007,
+    "mfe_med": 0.00486,
+    "mae_med": -0.00523,
+    "n_sessions": 2,
+    "status": "INSUFFICIENT_DO_NOT_INTERPRET"
+   },
+   "VOL_UP": {
+    "n": 24128,
+    "n_scored": 24128,
+    "ev": -0.00017,
+    "median": -9e-05,
+    "hit": 0.493,
+    "p10_tail": -0.01079,
+    "mfe_med": 0.00495,
+    "mae_med": -0.00512,
+    "n_sessions": 60
+   }
+  }
+ },
+ "5_edge_persistence_exploratory": {
+  "HUNTER-002_v1": {
+   "15m": -0.00088,
+   "30m": -0.00042,
+   "60m": -0.00062,
+   "90m": 1e-05
+  }
+ },
+ "6_ablation_no_assassin_caution": {
+  "capital_state_flips": {
+   "OBSERVE->OBSERVE": 233,
+   "WATCH->WATCH": 1
+  },
+  "note": "identical candidates, wounds zeroed; flips show what the Assassin's caution changed"
+ },
+ "7_concentration": {
+  "by_symbol": {
+   "HCA": 8,
+   "NOW": 6,
+   "BX": 6,
+   "PEP": 5,
+   "REGN": 5,
+   "GILD": 5,
+   "ORLY": 5,
+   "PYPL": 5,
+   "TMO": 5,
+   "ABT": 4
+  },
+  "by_playbook": {
+   "HUNTER-002_v1": 234
+  },
+  "by_hour_et": {
+   "10": 192,
+   "11": 38,
+   "12": 3,
+   "13": 1
+  },
+  "by_direction": {
+   "LONG": 109,
+   "SHORT": 125
+  }
+ },
+ "discipline": "findings -> versioned hypotheses via governance; Epoch 1 unchanged"
+}

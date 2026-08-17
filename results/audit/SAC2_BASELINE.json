@@ -1,0 +1,21 @@
+{
+  "audit": "SAC-2",
+  "captured_utc": "2026-08-17 02:04:21.711537+00:00",
+  "git_commit": "bba1909f5bbc9c1c199e57c25348c61b44da43fd",
+  "git_clean": true,
+  "python": "3.11.9",
+  "claude_code": "2.1.233 (Claude Code)",
+  "os": "macOS-12.7.4-x86_64-i386-64bit",
+  "timezone": "PDT",
+  "clock_offset_s": 0.28,
+  "mcp_tool_surface_sha256": "950d877a4600d7f24a70bcdeec2f5d1996b3d61ef89189fbdfad6c345259b9d1",
+  "n_mcp_tools": 54,
+  "quota": {
+    "lab": 49335,
+    "forward": 84335
+  },
+  "disk": "SUSPEND",
+  "launchd_jobs": "6",
+  "host_sleep_defect": "system sleep=1min; ONLY held by transient assertions -- operator must enable prevent-sleep-on-AC",
+  "sha256": "d28bcd6c8aaec086fbe4f3cb51e8706aa51f153d8aa22d8f85feb6da82f5b045"
+}
