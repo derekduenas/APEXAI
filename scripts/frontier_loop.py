@@ -259,6 +259,55 @@ def tick(st: dict) -> None:
             st["carded"].append(did)
         except Exception as e:                              # noqa: BLE001
             print(f"  card build failed for {did}: {type(e).__name__}: {e}")
+    # CONTINUOUS RE-UNDERWRITING: every carded candidate gets the
+    # current-state question on material change or stale heartbeat.
+    # Inputs are CURRENT canonical records; the prior judgment's content
+    # cannot leak (enforced by reunderwrite's signature).
+    from apex.frontier.underwriting import (OpportunityState,
+                                            judgment_status, reunderwrite,
+                                            what_changed)
+    states = st.setdefault("opportunity_states", {})
+    visuals = {r.get("decision_id"): r for r in
+               _rows(Path("results/hunter/visual_ledger.jsonl"))
+               if r.get("kind") == "visual_challenge"}
+    for d in decisions:
+        did = d["decision_id"]
+        cs = d.get("chart_state") or {}
+        vis = visuals.get(did) or {}
+        cur = {"rs_state": ("PERSISTING" if (d.get("relative_strength")
+                            or {}).get("excess_market_60m", 0) > 0
+                            else "UNKNOWN"),
+               "vwap_relationship": ("ABOVE" if cs.get("above_vwap")
+                                     else "BELOW"
+                                     if cs.get("above_vwap") is False
+                                     else "UNKNOWN"),
+               "visual_structure": vis.get("visual_structure", "UNKNOWN"),
+               "assassin_verdict": next(
+                   (r.get("verdict") for r in reversed(rows)
+                    if r.get("kind") == "assassin_review"
+                    and r.get("decision_id") == did), "UNKNOWN")}
+        raw = states.get(did)
+        prior = (OpportunityState(**raw) if raw else OpportunityState(
+            candidate_id=did, symbol=d["symbol"], state="DISCOVERED"))
+        if prior.state in ("INVALIDATED", "EXPIRED"):
+            continue
+        stale = judgment_status(prior, now)["status"] == "STALE"
+        material = bool(what_changed(prior.inputs_snapshot, cur))
+        if stale or material:
+            eg = vis.get("entry_geometry", "UNKNOWN")
+            dq = ("STRONG" if eg.startswith("DIRECTION_STRONG")
+                  else "MODERATE" if eg == "UNKNOWN" else "WEAK")
+            eq = ("STRONG" if eg.endswith("ENTRY_STRONG")
+                  else "WEAK" if eg.endswith("ENTRY_WEAK") else "UNKNOWN")
+            try:
+                nxt = reunderwrite(prior, current_inputs=cur,
+                                   direction_quality=dq, entry_quality=eq)
+                states[did] = {k: v for k, v in nxt.as_record().items()
+                               if k != "kind"}
+            except Exception as e:                          # noqa: BLE001
+                print(f"  reunderwrite failed for {did}: "
+                      f"{type(e).__name__}")
+
     if not decisions:
         print(f"{now:%H:%M:%S} frontier quiet — no candidates yet "
               f"(budget {MAX_CHILD_CALLS - st['child_calls']} child calls)")
