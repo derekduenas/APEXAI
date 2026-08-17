@@ -50,6 +50,13 @@ THE OPEN / SCENARIO A / SCENARIO B / SCENARIO C (each scenario: WOULD
 EXPECT + INVALIDATED BY; qualitative, NO probabilities) / NAMES WORTH
 WATCHING.
 
+ELITE LENS (mandatory where catalysts exist): expectation vs reaction —
+WHAT HAPPENED vs HOW PRICE REACTED. Good news + weak/negative reaction
+IS information; bad news + refusal to fall IS information. Distinguish
+gap QUALITY from gap size; sector sympathy from idiosyncratic moves;
+note extension of overnight moves and possibly-trapped overnight
+participants; end with WHAT WOULD MAKE THE CAPTAIN ABANDON THIS THESIS.
+
 Rules: every factual claim must cite a field from the JSON (cite as
 [field]). Anything not in the JSON is UNKNOWN. Never use the words: buy,
 sell, position size, probability, expected return. These are PRIORS, not

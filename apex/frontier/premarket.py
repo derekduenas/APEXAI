@@ -123,8 +123,23 @@ def assemble(*, symbols: list, gov, as_of=None,
                 entry["catalyst_status"] = f"UNKNOWN_{type(e).__name__}"
         abnormal.append(entry)
 
+    # THE COGNITIVE LOOP: yesterday's DailyMarketMemory is the prior's
+    # prior. Consumed read-only; absent reads NO_PRIOR_MEMORY, and
+    # nothing about yesterday's TRADES arrives — knowledge, not positions.
+    from apex.frontier.closing import load_memory
+    mem = load_memory(prior_day)
+    memory_section = ({"status": "NO_PRIOR_MEMORY"} if mem is None else
+                      {"memory_sha256": mem.get("memory_sha256"),
+                       "market_structure_at_close": mem.get(
+                           "market_structure_at_close"),
+                       "persistent_rs_leaders": mem.get(
+                           "persistent_rs_leaders"),
+                       "known_overnight_risks": mem.get(
+                           "known_overnight_risks")})
+
     return {
         "kind": "premarket_context_packet",
+        "yesterday_memory": memory_section,
         "market_date": day, "prior_session": prior_day,
         "as_of_time": str(now), "created_at": str(pd.Timestamp.now(tz="UTC")),
         "source_coverage": dict(SOURCES),

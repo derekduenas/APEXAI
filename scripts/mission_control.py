@@ -112,6 +112,18 @@ def _seal():
             else "SEAL_SCAN_DIRTY")
 
 
+def _daily_memory():
+    import pandas as pd
+    from apex.frontier.closing import load_memory
+    # yesterday's memory is what tomorrow consumes
+    d = pd.Timestamp.now(tz="America/New_York") - pd.Timedelta(days=1)
+    mem = load_memory(str(d.date()))
+    if mem is None:
+        return "NO_PRIOR_MEMORY (first session, or closing job not yet run)"
+    return (f"{mem['memory_sha256'][:10]} carried="
+            f"{mem['positions_carried_overnight']}")
+
+
 def _premarket_packet():
     import pandas as pd
     day = str(pd.Timestamp.now(tz="America/New_York").date())
@@ -189,6 +201,8 @@ def rows() -> list:
         ("PREMARKET JOB", _probe(lambda: _launchd("com.apex.premarket"))),
         ("PREMARKET PACKET", _probe(_premarket_packet)),
         ("MORNING BRIEF", _probe(_morning_brief)),
+        ("CLOSING JOB", _probe(lambda: _launchd("com.apex.closing"))),
+        ("DAILY MEMORY", _probe(_daily_memory)),
         ("FRONTIER BUS", _probe(lambda: _ledger_age(
             "results/frontier/event_bus.jsonl"))),
         ("FRONTIER BOARD", _probe(lambda: _ledger_age(

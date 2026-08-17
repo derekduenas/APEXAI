@@ -54,6 +54,14 @@ PREREGISTRATION = {
                        "UNKNOWN"),
             "measures": ("ret_15m", "ret_30m", "ret_60m", "ret_90m",
                          "mfe", "mae")},
+        "H_CLOSE_PERSISTENCE": {
+            "question": ("does late-day persistence/decay state contain "
+                         "incremental prospective information about "
+                         "candidate quality and next-session behavior?"),
+            "groups": ("PERSISTED_TO_CLOSE", "DECAYED", "FAILED",
+                       "REVERSED", "UNKNOWN"),
+            "measures": ("ret_15m", "ret_30m", "ret_60m", "ret_90m",
+                         "mfe", "mae")},
         "H_CATALYST": {
             "question": ("do candidate outcomes differ across catalyst "
                          "attribution states?"),
