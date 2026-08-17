@@ -204,8 +204,9 @@ def test_no_broker_and_no_paper_vocabulary():
     # state is the whole correction); it must never ASSIGN one. The
     # calibration-sweep precedent: comparison at the consumption point is
     # the law working, emission would be the violation.
-    assert 'state == "PAPER_ELIGIBLE"' in code
-    assert '"final_state":' not in code and "final_state =" not in code, (
+    # executable_source strips whitespace; compare in stripped form
+    assert '=="PAPER_ELIGIBLE"' in code, "the V2 comparison vanished"
+    assert '"final_state":' not in code and "final_state=" not in code, (
         "the shadow layer wrote a capital state")
     assert "NONE_RESEARCH_SHADOW" in code
 

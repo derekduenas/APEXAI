@@ -238,8 +238,14 @@ def test_frontier_power_is_the_only_power_in_the_package():
     from apex.audit.execution_path import executable_source
     for f in Path("apex/frontier").rglob("*.py"):
         code = executable_source(f.read_text())
-        assert "PAPER_ELIGIBLE" not in code, f
         assert "LIVE_ELIGIBLE" not in code, f
+        if f.name == "shadow_paper.py":
+            # the ONE sanctioned reader: V2 must COMPARE against
+            # PAPER_ELIGIBLE to build the faithful cohort; it may never
+            # assign a capital state (pinned in test_shadow_paper).
+            assert '=="PAPER_ELIGIBLE"' in code
+            continue
+        assert "PAPER_ELIGIBLE" not in code, f
 
 
 # ============ THE TWO-DESK ISOLATION CERTIFICATE ===========================
