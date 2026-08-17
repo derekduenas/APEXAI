@@ -186,6 +186,15 @@ ARTIFACTS = {
     # NOT a decision-surface change: the matchers' returns are byte-identical
     # with and without tracing (proved in test_crypto_observability), so this
     # is an instrumentation birth, not an Epoch break.
+    # EYES-1/T1 sensory stack (2026-08-17): all observational, decision
+    # power NONE_OBSERVATIONAL_EPOCH1; instrumentation births, no Epoch break.
+    "apex_captain_eyes_v1": (
+        "model", ("apex/captain/context.py", "apex/vision/render.py",
+                  "apex/vision/challenger.py")),
+    "apex_event_eyes_v1": (
+        "model", ("apex/events/catalyst.py", "apex/events/cik_bridge.py")),
+    "apex_microscope_v1": (
+        "model", ("apex/hunter/microscope.py",)),
     "crypto_observability_v1": (
         "model", ("apex/crypto/health.py",)),
     "crypto_disk_governor_v1.1": (
