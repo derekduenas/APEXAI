@@ -10,11 +10,14 @@ Two structural facts shape this module:
    a pure function of persisted records, so the same ledger always yields
    the same targets and the choice is auditable forever.
 
-2. THE LIVE HALF RUNS IN AN AGENT SESSION, NOT THE CLOCK. The launchd
-   Python process holds no MCP route to Robinhood and never will — the
-   OAuth grant belongs to the Claude Code client. So this module owns
-   selection and the record contract; an agent session (or probe file)
-   supplies the broker data. The archive stamps which transport spoke.
+2. EPOCH-1 IMPLEMENTATION: AGENT-SESSION ACTIVITY. The launchd Python
+   process holds no OAuth grant — that lives in the Claude Code client —
+   so for Epoch 1 an agent session (or probe file) supplies the broker
+   data and the archive stamps which transport spoke. A persistent
+   autonomous MCP client is a FUTURE architectural option (Robinhood's
+   MCP supports third-party MCP-capable platforms) that requires an
+   explicitly governed headless-authentication design; it is deliberately
+   not being invented hours before the experiment.
 
 Everything here is decision_power = NONE_OBSERVATIONAL_EPOCH1. L2 cannot
 alter an Epoch-1 decision; it exists to be studied prospectively.

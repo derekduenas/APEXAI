@@ -41,6 +41,7 @@ import pandas as pd  # noqa: E402
 OBSERVATIONAL = "NONE_OBSERVATIONAL_EPOCH1"
 OFFICIAL_LEDGER = Path("results/hunter/forward_ledger.jsonl")
 FW_LEDGER = Path("results/hunter/fastwatch_ledger.jsonl")
+FASTWATCH_LAB_BUDGET = 12_000   # units; see allocation note in main()
 MAX_SYMBOLS = 8              # bounded: candidates + strongest watchlist
 BENCH = "SPY.US"
 
@@ -143,7 +144,16 @@ def main() -> int:
     ap.add_argument("--cadence", type=float, default=60)
     a = ap.parse_args()
     from apex.intraday.eodhd import QuotaGovernor
-    gov = QuotaGovernor(daily_budget=20_000, purpose="LAB")
+    # LAB POOL ALLOCATION (operator, 2026-08-16). The shared ceiling is
+    # 65k (limit - forward reserve). Declared consumers:
+    #     replay    45,000  (LAB_TOTAL_BUDGET in hunter_replay_fast)
+    #     fastwatch 12,000  (here)
+    #     cushion    8,000  (unallocated, deliberately)
+    # LAB-07 protects the FORWARD reserve; these local budgets keep the
+    # lab consumers from starving EACH OTHER on the first day cadence is
+    # being measured. Enforced twice: locally here, and by the shared
+    # ledger for the pool total.
+    gov = QuotaGovernor(daily_budget=FASTWATCH_LAB_BUDGET, purpose="LAB")
     print(f"FASTWATCH — observational, LAB-governed, decision_power NONE")
     t_end = time.time() + a.minutes * 60
     while time.time() < t_end:

@@ -116,3 +116,29 @@ def test_official_pipeline_is_byte_identical_with_fastwatch_present():
               "apex/hunter/playbooks_v1.py", "scripts/hunter_forward_clock.py"):
         src = Path(f).read_text()
         assert "fastwatch" not in src.lower(), f"{f} consumes FastWatch"
+
+
+# ---------------- Mission Control obeys INSTR-01 ---------------------------
+
+def test_mission_control_measures_every_row():
+    """Every dynamic row goes through _probe(fn); the only literals are the
+    two structural locks whose state IS the literal (paper/credit)."""
+    src = open("scripts/mission_control.py").read()
+    rows_seg = src.split("def rows()", 1)[1].split("def main", 1)[0]
+    import re
+    typed_greens = re.findall(r'\(\"[A-Z ()/5]+\", \"(READY|HEALTHY|RUNNING|'
+                              r'ARMED|VALID|PASS)', rows_seg)
+    assert not typed_greens, f"hardcoded green rows: {typed_greens}"
+    assert "_probe(" in rows_seg
+    assert rows_seg.count("_probe(") >= 18
+
+
+def test_mission_control_flags_and_exits_nonzero_on_unmeasured_rows():
+    import subprocess
+    r = subprocess.run([".venv/bin/python", "scripts/mission_control.py"],
+                       capture_output=True, text=True, timeout=300)
+    # tonight the forward ledger is legitimately absent -> flags -> exit 1;
+    # what we pin is the MECHANISM: flags present iff exit nonzero
+    flagged = "row(s) flagged" in r.stdout
+    assert (r.returncode == 1) == flagged
+    assert "UNKNOWN" in r.stdout or "ABSENT" in r.stdout or flagged is False

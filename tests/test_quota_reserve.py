@@ -69,8 +69,12 @@ def test_forward_may_spend_the_reserve_because_that_is_what_it_is_for(ledger):
 
 
 def test_refusal_is_a_pause_not_a_crash(ledger):
-    """The never-spin rule: exhaustion returns False, it does not raise."""
-    ql.spend(ql.ceiling(ql.LAB), ql.LAB, DAY)
+    """The never-spin rule: exhaustion returns False, it does not raise.
+
+    NOTE: seed the CURRENT bucket, not the hardcoded DAY — acquire() uses
+    wall-clock now, and this test silently depended on the calendar
+    agreeing with the fixture until the GMT rollover proved otherwise."""
+    ql.spend(ql.ceiling(ql.LAB), ql.LAB)
     g = QuotaGovernor(daily_budget=10_000, purpose=ql.LAB)
     assert g.acquire(5) is False
     assert "QUOTA_CEILING_LAB" in g.last_refusal
