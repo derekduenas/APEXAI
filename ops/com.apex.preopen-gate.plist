@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.apex.preopen-gate</string>
+  <key>ProgramArguments</key>
+  <array><string>/bin/zsh</string><string>-c</string>
+  <string>cd $HOME/apex-equities &amp;&amp; .venv/bin/python scripts/preopen_gate.py >> logs/preopen_gate.log 2>&amp;1</string></array>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+  </array>
+</dict></plist>

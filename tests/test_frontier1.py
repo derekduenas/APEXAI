@@ -385,3 +385,18 @@ def test_catalyst_absence_names_its_sources():
     assert st.sources_checked["NEWS"] == "NOT_CONNECTED"
     assert st.sources_checked["SEC_EDGAR"] == "HEALTHY"
     assert "WITHIN ACTIVE SOURCES" in st.reason
+
+
+def test_synthetic_cards_never_enter_the_learning_denominator():
+    """SAC-2 Phase 35: the Sunday demo card (REHEARSAL_NOT_EVIDENCE) was
+    counted as a resolved observation. Harmless at n=1 vs a 20-card rule;
+    a disease regardless of dose."""
+    from apex.frontier.learning import _resolved_cards
+    for payload in _resolved_cards():
+        ident = payload["before"].get("identity") or {}
+        assert "REHEARSAL" not in str(ident.get("evidence_class", ""))
+        assert "SYNTH" not in str(payload["before"]["decision_id"]).upper()
+    r = estimate("H_VISUAL")
+    assert r["resolved_cards"] == 0, (
+        f"{r['resolved_cards']} resolved cards exist before Monday — "
+        f"pre-market contamination")

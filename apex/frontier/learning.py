@@ -87,8 +87,21 @@ def _resolved_cards() -> list:
             payload = json.loads(p.read_text())
         except json.JSONDecodeError:
             continue
-        if "after" in payload:
-            out.append(payload)
+        if "after" not in payload:
+            continue
+        # SAC-2 PHASE 35: synthetic/rehearsal cards are NOT observations.
+        # The Sunday demo card carried evidence_class REHEARSAL_NOT_EVIDENCE
+        # and was already being counted in this denominator -- harmless at
+        # n=1 vs a 20-card rule, but synthetic contamination in a learning
+        # denominator is a disease regardless of dose.
+        ident = (payload.get("before", {}).get("identity") or {})
+        ec = str(ident.get("evidence_class", ""))
+        if "REHEARSAL" in ec or "SYNTH" in str(
+                payload["before"].get("decision_id", "")).upper():
+            continue
+        if payload["before"].get("evidence_class") == "REHEARSAL_NOT_EVIDENCE":
+            continue
+        out.append(payload)
     return out
 
 
