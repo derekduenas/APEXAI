@@ -85,11 +85,19 @@ def test_session_end_entry_refused_not_truncated():
                       now="2026-08-17T19:57:20+00:00")   # 15:57:20 ET
     assert p.state == "SHADOW_REFUSED"
     assert "SESSION_END" in p.exit_reason
-    # and the boundary is 90m before flat: 14:28 ET refuses, 14:27 opens
-    q2 = dict(QUOTE, quote_time="2026-08-17T18:27:00+00:00")
-    early = open_position(DEC, CAP, card_hash="h", quote=q2,
-                          now="2026-08-17T18:27:30+00:00")  # 14:27:30 ET
-    assert early.state == "SHADOW_OPEN"
+    # THE EXCLUSIVE BOUNDARY (LAW A), pinned at SECOND granularity:
+    # minimum_horizon_completion must PRECEDE mandatory_flat_time — the
+    # 90m outcome and the flatten operation may never collide at the
+    # same timestamp. 14:28:00 + 90m == 15:58:00 exactly -> REFUSED.
+    q2 = dict(QUOTE, quote_time="2026-08-17T18:27:55+00:00")
+    at_2759 = open_position(DEC, CAP, card_hash="h", quote=q2,
+                            now="2026-08-17T18:27:59+00:00")  # 14:27:59 ET
+    assert at_2759.state == "SHADOW_OPEN"       # horizon ends 15:57:59
+    q3 = dict(QUOTE, quote_time="2026-08-17T18:27:56+00:00")
+    at_2800 = open_position(DEC, CAP, card_hash="h", quote=q3,
+                            now="2026-08-17T18:28:00+00:00")  # 14:28:00 ET
+    assert at_2800.state == "SHADOW_REFUSED"    # horizon ends AT flat
+    assert "SESSION_END" in at_2800.exit_reason
     # "let's pretend we bought it" is unrepresentable: no thesis, no fill
     p = open_position({"decision_id": "X", "symbol": "Y",
                        "direction": "LONG"}, CAP, card_hash="h",

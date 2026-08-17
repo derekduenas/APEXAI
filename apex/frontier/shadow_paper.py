@@ -159,10 +159,18 @@ def open_position(decision: dict, capital: dict | None, *,
     # 35-second "trade" at 15:57 pollutes every statistic the horizon
     # defines; the cutoff derives from the frozen time stop, it is not a
     # discretionary number.
+    #
+    # THE BOUNDARY IS EXCLUSIVE, BY LAW (operator-ratified, LAW A):
+    #   minimum_horizon_completion must PRECEDE mandatory_flat_time.
+    #   entry + 90m <  15:58  -> eligible      (14:27:59 eligible)
+    #   entry + 90m >= 15:58  -> refused       (14:28:00 refused)
+    # The 90-minute outcome and the mandatory flatten operation may never
+    # collide at the same timestamp — refusal, not a tie. This is `>=`
+    # on purpose, not an accidental `>` vs `>=`.
     et = now.tz_convert("America/New_York")
     flat_at = et.normalize() + pd.Timedelta(hours=FLAT_BY_ET[0],
                                             minutes=FLAT_BY_ET[1])
-    if et + pd.Timedelta(minutes=TIME_STOP_MINUTES) > flat_at:
+    if et + pd.Timedelta(minutes=TIME_STOP_MINUTES) >= flat_at:
         return refuse("SHADOW_REFUSED_SESSION_END: insufficient regular-"
                       "session lifetime to express the frozen "
                       f"{TIME_STOP_MINUTES}m horizon before DAILY_FLAT")
