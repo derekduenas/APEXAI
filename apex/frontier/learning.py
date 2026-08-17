@@ -21,6 +21,10 @@ REGISTRY = Path("results/frontier/learning_registry.json")
 # exist is a lineage break, and a test pins the hash.
 PREREGISTRATION = {
     "registered_utc": "2026-08-17T02:00:00+00:00",
+    "amendment_note": ("catalyst absence group relabeled to WITHIN_ACTIVE_"
+                       "SOURCES at ZERO observations, before any card "
+                       "resolved — absence labels fixed pre-data so "
+                       "learning cannot inherit an overclaim"),
     "min_n_rule": ("each compared group needs >= 20 resolved decision "
                    "cards across >= 10 distinct session dates before ANY "
                    "estimate is computed"),
@@ -44,7 +48,8 @@ PREREGISTRATION = {
         "H_CATALYST": {
             "question": ("do candidate outcomes differ across catalyst "
                          "attribution states?"),
-            "groups": ("KNOWN_CATALYST", "NO_KNOWN_CATALYST",
+            "groups": ("KNOWN_CATALYST",
+                       "NO_KNOWN_CATALYST_WITHIN_ACTIVE_SOURCES",
                        "EVENT_UNCERTAIN"),
             "measures": ("ret_15m", "ret_30m", "ret_60m", "ret_90m",
                          "mfe", "mae")},

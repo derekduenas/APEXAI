@@ -112,6 +112,19 @@ def _seal():
             else "SEAL_SCAN_DIRTY")
 
 
+def _full_suite():
+    """Reads the artifact the suite runner writes — a stale or absent
+    artifact reads as such, never as PASS."""
+    p = Path("results/readiness/full_suite.json")
+    if not p.exists():
+        return "NEVER_RECORDED"
+    r = json.loads(p.read_text())
+    age_h = (pd.Timestamp.now(tz="UTC")
+             - pd.Timestamp(r["finished_utc"])).total_seconds() / 3600
+    return (f"{r['result']} ({r['passed']} passed, "
+            f"{age_h:.1f}h ago, commit {r['commit'][:8]})")
+
+
 def _vision():
     p = Path("results/readiness/vision/injection_result.json")
     if not p.exists():
@@ -153,6 +166,7 @@ def rows() -> list:
         ("EXECUTION GATEWAY", _probe(lambda: _component(
             "apex.execution.gateway"))),
         ("LIVE PLACEMENT", _probe(_seal)),
+        ("FULL SUITE", _probe(_full_suite)),
         ("FRONTIER BUS", _probe(lambda: _ledger_age(
             "results/frontier/event_bus.jsonl"))),
         ("FRONTIER BOARD", _probe(lambda: _ledger_age(

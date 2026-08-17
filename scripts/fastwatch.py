@@ -120,6 +120,14 @@ def observe_once(gov, symbols: list, last_official) -> dict:
             "official_last_seen_at": (str(last_official)
                                       if last_official else None),
             "elapsed_since_official_tick_s": elapsed,
+            # LATENCY HONESTY: this measures CANDIDATE_EVOLUTION_LATENCY —
+            # what happened to names ALREADY on APEX's radar between
+            # official ticks. It is NOT universe discovery latency: a
+            # 1-minute 150-symbol shadow scanner does not exist, so a
+            # stock never on the watchlist was never seen here.
+            "latency_kind": "CANDIDATE_EVOLUTION_LATENCY",
+            "universe_discovery_latency": "NOT_MEASURABLE_NO_BROAD_"
+                                          "FAST_SCANNER",
             "status": "OK",
         }
         # light geometry flags: OBSERVED conditions, never matches

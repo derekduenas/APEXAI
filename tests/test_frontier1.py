@@ -235,3 +235,153 @@ def test_frontier_power_is_the_only_power_in_the_package():
         src = f.read_text()
         assert "PAPER_ELIGIBLE" not in src
         assert "LIVE_ELIGIBLE" not in src
+
+
+# ============ THE TWO-DESK ISOLATION CERTIFICATE ===========================
+# Imports-absent is necessary, not sufficient. This runs the DECISION-
+# AFFECTING path on frozen fixtures with the frontier machinery actively
+# firing between evaluations — events, boards, dislocations, cards, router
+# — and requires semantic equivalence of every canonical output.
+
+def _canonical_outputs():
+    """One pass of the deterministic decision-affecting stack on a fixed
+    fixture. Everything here is what Epoch-1 uses to DECIDE."""
+    import pandas as pd
+
+    from apex.hunter.capital import ForecastSlot, evaluate_candidate
+    from apex.hunter.chartstate import DailyContext, compute_chart_state
+    from apex.hunter.scanner import scan
+    from apex.portfolio.risk import PortfolioState
+    t = pd.Timestamp("2026-08-17T15:00:00Z")
+    idx = pd.date_range("2026-08-17T13:30:00Z", periods=180, freq="1min")
+    bars = pd.DataFrame({"event_time_utc": idx, "open": 100.0,
+                         "high": 100.6, "low": 99.4,
+                         "close": [100 + i * 0.01 for i in range(180)],
+                         "volume": 1500.0})
+    cs = compute_chart_state("AAPL", bars, t,
+                             DailyContext(symbol="AAPL",
+                                          as_of_date="2026-08-17"))
+    sc = scan(str(t), 1, [])
+    cap = evaluate_candidate(
+        dict(SECTIONS_OK["identity"], **{
+            "decision_id": "ISO-1", "symbol": "AAPL", "direction": "LONG",
+            "playbook_id": "HUNTER-001_v1", "entry": 200.0, "stop": 198.0,
+            "target": 204.0, "risk_frac": 0.01, "t_utc": str(t),
+            "forward_eligibility": "FORWARD_ELIGIBLE",
+            "chart_state": {"data_quality": [], "rvol_tod": 2.0,
+                            "realized_vol_ann": 0.25},
+            "relative_strength": {}, "market_state": {"day_return": 0.001}}),
+        sector="TECH", median_dollar_volume=5e7, ann_vol=0.25,
+        market_uncertain=False,
+        forecast=ForecastSlot(status="NOT_YET_AVAILABLE"),
+        portfolio=PortfolioState(nav=1e5, positions={}, sector_weights={},
+                                 heat=0.0, drawdown_budget_left=1.0,
+                                 sleeve_correlations={}),
+        relative_spread=0.0004)
+    return {"chart": (cs.as_record() if cs is not None else None),
+            "scan": sc.as_record(),
+            "capital": {"final_state": cap.final_state,
+                        "reason_codes": [str(c) for c in cap.reason_codes],
+                        "weight": cap.weight}}
+
+
+def _normalize(rec: dict) -> str:
+    """Contract-permitted normalization: wall-clock creation stamps only.
+    Nothing decision-affecting is normalized."""
+    drop = ("computed_at", "created_at", "t_wall")
+    def scrub(o):
+        if isinstance(o, dict):
+            return {k: scrub(v) for k, v in o.items() if k not in drop}
+        if isinstance(o, (list, tuple)):
+            return [scrub(v) for v in o]
+        return o
+    return json.dumps(scrub(rec), sort_keys=True, default=str)
+
+
+def test_two_desk_isolation_certificate(tmp_path, monkeypatch):
+    import apex.frontier.senses as sn
+    import apex.frontier.decision_card as dc
+    monkeypatch.setattr(sn, "BUS_LEDGER", tmp_path / "bus.jsonl")
+    monkeypatch.setattr(sn, "BOARD_LEDGER", tmp_path / "board.jsonl")
+    monkeypatch.setattr(dc, "CARDS_ROOT", tmp_path / "cards")
+    monkeypatch.setattr(dc, "TRACES", tmp_path / "cards")
+
+    run_a = _normalize(_canonical_outputs())        # frontier OFF
+
+    # frontier ON: fire every shadow mechanism between evaluations
+    sn.emit("SCOUT_ABNORMALITY", "AAPL",
+            event_time="2026-08-17T14:00:00Z",
+            known_from="2026-08-17T14:00:01Z",
+            source="test", transport="POLLING")
+    sn.rank_opportunities([{"symbol": "AAPL",
+                            "candidate_class": "HUNTER"}])
+    sn.detect_dislocations({"rvol_tod": 5.0, "range_vs_atr": 3.0},
+                           {"excess_market_60m": 0.05,
+                            "cross_sectional_pct": 0.99},
+                           {"day_return": 0.0})
+    sn.route_reasoning(is_hunter_candidate=True, on_watchlist=True,
+                       persistence_ticks=5)
+    card = dc.seal_before("ISO-CARD", "2026-08-17", SECTIONS_OK,
+                          official_epoch_candidate=True,
+                          frontier_shadow_candidate=True)
+    dc.persist(card)
+    dc.seal_trace(symbol="AAPL", session_date="2026-08-17",
+                  entered_because="test", stage_reached="WATCHLIST",
+                  died_at="WATCHLIST", when="2026-08-17T14:01:00Z",
+                  what_was_known={"signals": ["RVOL"]})
+
+    run_b = _normalize(_canonical_outputs())        # frontier ON
+
+    assert run_a == run_b, (
+        "SEMANTIC_EQUIVALENCE = FALSE: frontier activity perturbed the "
+        "canonical decision path")
+
+
+def test_candidate_traces_preserve_the_dead(tmp_path, monkeypatch):
+    """The denominator: a rejected watchlist name leaves a sealed trace
+    saying where and why it died, with what was known — and cannot carry
+    outcome vocabulary."""
+    import apex.frontier.decision_card as dc
+    monkeypatch.setattr(dc, "TRACES", tmp_path)
+    tr = dc.seal_trace(symbol="XYZ", session_date="2026-08-17",
+                       entered_because="scout signals ['RVOL']",
+                       stage_reached="WATCHLIST", died_at="WATCHLIST",
+                       when="2026-08-17T14:00:00Z",
+                       what_was_known={"rvol": 2.1})
+    assert tr["alive"] is False and tr["died_at"] == "WATCHLIST"
+    assert tr["trace_sha256"]
+    with pytest.raises(Exception):
+        dc.seal_trace(symbol="XYZ", session_date="2026-08-17",
+                      entered_because="x", stage_reached="WATCHLIST",
+                      died_at=None, when="t",
+                      what_was_known={"ret_60m": 0.02})   # outcome leak
+
+
+def test_latency_claims_are_scoped_to_candidate_evolution():
+    """Gap 1: FastWatch measures names already on the radar. The records
+    and the report must say so, and must state that universe discovery
+    latency is NOT measured."""
+    fw = open("scripts/fastwatch.py").read()
+    assert "CANDIDATE_EVOLUTION_LATENCY" in fw
+    assert "NOT_MEASURABLE_NO_BROAD_" in fw
+    rep = open("scripts/frontier_session_report.py").read()
+    assert "candidate_evolution_latency" in rep
+    assert "UNIVERSE_DISCOVERY_" in rep
+
+
+def test_catalyst_absence_names_its_sources():
+    """Gap 2: NO_KNOWN_CATALYST is epistemically bounded to the sources
+    actually checked; unconnected sources are named NOT_CONNECTED."""
+    from apex.events.catalyst import NO_KNOWN_CATALYST, catalyst_state
+    import pandas as pd
+    assert NO_KNOWN_CATALYST == "NO_KNOWN_CATALYST_WITHIN_ACTIVE_SOURCES"
+    ev = {"kind": "edgar_event", "form_type": "8-K",
+          "company_raw": "OTHER CO (0009999999) (Filer)",
+          "event_time_utc": "2026-08-17T13:00:00+00:00",
+          "known_from_utc": "2026-08-17T13:30:00+00:00"}
+    st = catalyst_state("NVDA.US", pd.Timestamp("2026-08-17T14:00:00Z"),
+                        cik="1045810", events=[ev])
+    assert st.status == NO_KNOWN_CATALYST
+    assert st.sources_checked["NEWS"] == "NOT_CONNECTED"
+    assert st.sources_checked["SEC_EDGAR"] == "HEALTHY"
+    assert "WITHIN ACTIVE SOURCES" in st.reason

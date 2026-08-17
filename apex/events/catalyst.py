@@ -37,13 +37,25 @@ OBSERVATIONAL = "NONE_OBSERVATIONAL_EPOCH1"
 EVENTS_LEDGER = Path("results/events/edgar_events.jsonl")
 
 KNOWN_CATALYST = "KNOWN_CATALYST"
-NO_KNOWN_CATALYST = "NO_KNOWN_CATALYST"
+# "No catalyst identified within currently observed sources" — NEVER "no
+# catalyst exists". A healthy 8-K archive cannot rule out earnings wires,
+# press releases, analyst actions, FDA news, macro or sympathy moves.
+NO_KNOWN_CATALYST = "NO_KNOWN_CATALYST_WITHIN_ACTIVE_SOURCES"
 EVENT_UNCERTAIN = "EVENT_UNCERTAIN"
 
 LOOKBACK_HOURS = 72          # how far back an event still "explains" a move
 FEED_STALE_HOURS = 12        # older than this, the archive may be down
 
 _CIK_RX = re.compile(r"\((\d{7,10})\)")
+
+
+SOURCES_CHECKED_TEMPLATE = {
+    "SEC_EDGAR": "UNKNOWN",              # set per call from feed health
+    "ROBINHOOD_EARNINGS": "NOT_CONNECTED",
+    "NEWS": "NOT_CONNECTED",
+    "ANALYST": "NOT_CONNECTED",
+    "MACRO_NEWS": "NOT_CONNECTED",
+}
 
 
 @dataclass(frozen=True)
@@ -54,6 +66,8 @@ class CatalystState:
     events: tuple = ()                    # newest first, PIT-visible only
     reason: str = ""
     feed_last_known_from: str | None = None
+    sources_checked: dict = field(default_factory=lambda: dict(
+        SOURCES_CHECKED_TEMPLATE))
     decision_power: str = OBSERVATIONAL
 
     def as_record(self) -> dict:
@@ -167,6 +181,9 @@ def catalyst_state(symbol: str, as_of, *, cik: str | None = None,
     return CatalystState(symbol=symbol, as_of=str(t),
                          status=NO_KNOWN_CATALYST,
                          feed_last_known_from=newest_known,
-                         reason=f"feed healthy, identity bridged, no "
-                                f"filing in {LOOKBACK_HOURS}h — a MEASURED "
-                                f"absence")
+                         sources_checked={**SOURCES_CHECKED_TEMPLATE,
+                                          "SEC_EDGAR": "HEALTHY"},
+                         reason=f"no SEC filing in {LOOKBACK_HOURS}h — a "
+                                f"MEASURED absence WITHIN ACTIVE SOURCES "
+                                f"only; news/analyst/macro sources are "
+                                f"NOT_CONNECTED and cannot be ruled out")

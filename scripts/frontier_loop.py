@@ -176,6 +176,37 @@ def tick(st: dict) -> None:
             except Exception as e:                          # noqa: BLE001
                 print(f"  bus emit failed: {type(e).__name__}")
 
+    # THE DENOMINATOR: every watchlist member leaves a sealed trace,
+    # including the ones that die here. Traced once per (day, symbol,
+    # stage) so a quiet name is one row, not four hundred.
+    from apex.frontier.decision_card import seal_trace
+    scans = [r for r in rows if r.get("kind") == "scan"]
+    day = st["day"]
+    seen_tr = set(st.get("traced", []))
+    hunter_syms = {d["symbol"] for d in decisions}
+    for scan in scans[-2:]:
+        for entry in scan.get("watchlist") or []:
+            try:
+                sym, sigs, rvol = entry[0], entry[1], entry[2]
+            except (TypeError, IndexError):
+                continue
+            stage = "HUNTER" if sym in hunter_syms else "WATCHLIST"
+            key = f"{day}|{sym}|{stage}"
+            if key in seen_tr:
+                continue
+            try:
+                seal_trace(symbol=sym, session_date=day,
+                           entered_because=f"scout signals {list(sigs)[:4]}",
+                           stage_reached=stage,
+                           died_at=None if stage == "HUNTER" else "WATCHLIST",
+                           when=str(now),
+                           what_was_known={"signals": list(sigs)[:6],
+                                           "rvol": rvol})
+                seen_tr.add(key)
+            except Exception as e:                          # noqa: BLE001
+                print(f"  trace failed for {sym}: {type(e).__name__}")
+    st["traced"] = sorted(seen_tr)[-2000:]
+
     # board snapshot from current candidates
     cands = [{"symbol": d["symbol"], "as_of": d["t_utc"],
               "candidate_class": "HUNTER",

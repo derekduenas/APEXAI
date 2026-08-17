@@ -135,3 +135,44 @@ def render_html(payload: dict) -> str:
             f"frontier={c['frontier_shadow_candidate']} | "
             f"power={c['decision_power']}</p>"
             + "".join(rows) + after + "</body></html>")
+
+
+# ===================== CANDIDATE TRACE (the denominator) ====================
+
+FUNNEL_STAGES = ("SCOUT_ABNORMAL", "WATCHLIST", "NEAR_CANDIDATE",
+                 "HUNTER", "FRONTIER_SERIOUS")
+TRACES = Path("results/decision_cards")
+
+
+def seal_trace(*, symbol: str, session_date: str, entered_because: str,
+               stage_reached: str, died_at: str | None, when: str,
+               what_was_known: dict) -> dict:
+    """The lightweight sealed record for EVERY material funnel member —
+    including the ones that die. Finalists proving out means nothing
+    without the denominator: selectivity is only demonstrable if the
+    rejected cohort is preserved with what was known when it was rejected.
+    """
+    if stage_reached not in FUNNEL_STAGES:
+        raise CardViolation(f"unknown funnel stage {stage_reached!r}")
+    if died_at is not None and died_at not in FUNNEL_STAGES:
+        raise CardViolation(f"unknown death stage {died_at!r}")
+    body = {"kind": "candidate_trace", "symbol": symbol,
+            "session_date": session_date,
+            "entered_funnel_because": entered_because,
+            "stage_reached": stage_reached,
+            "died_at": died_at, "alive": died_at is None,
+            "when": when, "what_was_known": dict(what_was_known),
+            "decision_power": FRONTIER_POWER}
+    blob = json.dumps(body, sort_keys=True, default=str).lower()
+    for bad in FORBIDDEN_IN_BEFORE:
+        if f'"{bad}"' in blob:
+            raise CardViolation(
+                f"candidate trace contains outcome field {bad!r}")
+    body["trace_sha256"] = _hash(body)
+    import sys
+    sys.path.insert(0, "scripts")
+    from nightly_pull import _chain_append
+    d = TRACES / session_date
+    d.mkdir(parents=True, exist_ok=True)
+    _chain_append(d / "traces.jsonl", body)
+    return body

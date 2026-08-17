@@ -45,10 +45,18 @@ def main() -> int:
     bus = [r for r in _rows("results/frontier/event_bus.jsonl")
            if str(r.get("known_from", "")).startswith(day)]
     boards = [r for r in _rows("results/frontier/opportunity_board.jsonl")]
-    cards = []
+    cards, traces = [], []
     cdir = Path(f"results/decision_cards/{day}")
     if cdir.exists():
-        cards = [json.loads(p.read_text()) for p in cdir.glob("*.json")]
+        cards = [json.loads(p.read_text()) for p in cdir.glob("*.json")
+                 if p.name != "traces.jsonl"]
+        tpath = cdir / "traces.jsonl"
+        if tpath.exists():
+            for line in tpath.read_text().splitlines():
+                try:
+                    traces.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
 
     scans = [r for r in official if r.get("kind") == "scan"]
     decs = [r for r in official if r.get("kind") == "decision"
@@ -59,7 +67,19 @@ def main() -> int:
          f"{'observations':<24}{len(scans):<12}{len(fw)}",
          f"{'typed events':<24}{'n/a':<12}{len(bus)}",
          f"{'candidates':<24}{len(decs):<12}{len(cards)}",
-         f"{'board snapshots':<24}{'(frozen)':<12}{len(boards)}", ""]
+         f"{'board snapshots':<24}{'(frozen)':<12}{len(boards)}",
+         f"{'candidate traces':<24}{'n/a':<12}{len(traces)}", "",
+         "THE DENOMINATOR (funnel deaths preserved):"]
+    from collections import Counter
+    deaths = Counter((t.get("stage_reached"), t.get("died_at"))
+                     for t in traces)
+    for (stage, died), n in sorted(deaths.items()):
+        L.append(f"  reached {stage or '?':<16} "
+                 f"{'died at ' + died if died else 'ALIVE':<22} x{n}")
+    if not traces:
+        L.append("  no traces — either an empty watchlist all day (legal) "
+                 "or the frontier loop did not run")
+    L.append("")
 
     # per-candidate latency: fastwatch first condition vs official t
     for payload in cards:
@@ -72,7 +92,8 @@ def main() -> int:
             delta = round((pd.Timestamp(t_off)
                            - pd.Timestamp(t_fw)).total_seconds(), 1)
         L.append(f"{did}: official={t_off} fastwatch_first={t_fw} "
-                 f"latency_delta_s={delta if delta is not None else 'UNKNOWN'}")
+                 f"candidate_evolution_latency_s="
+                 f"{delta if delta is not None else 'UNKNOWN'}")
         vis = c.get("visual") or {}
         L.append(f"  visual: {vis.get('entry_geometry', 'UNKNOWN')} | "
                  f"catalyst: {(c.get('catalyst') or {}).get('status')} | "
@@ -87,7 +108,10 @@ def main() -> int:
     if not cards:
         L.append("no decision cards — either no candidates (legal) or the "
                  "frontier loop did not run (check mission control)")
-    L += ["", "DAY-1 LAW: observational only. Nothing here tunes anything."]
+    L += ["", "LATENCY SCOPE: all deltas above are CANDIDATE_EVOLUTION_"
+          "LATENCY (names already on the radar). UNIVERSE_DISCOVERY_"
+          "LATENCY is NOT measured — no broad 1-minute scanner exists.",
+          "", "DAY-1 LAW: observational only. Nothing here tunes anything."]
     text = "\n".join(L)
     print(text)
     out = Path(f"results/frontier/COMPARISON_{day}.md")
