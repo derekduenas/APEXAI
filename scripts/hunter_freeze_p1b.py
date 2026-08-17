@@ -188,6 +188,14 @@ ARTIFACTS = {
     # is an instrumentation birth, not an Epoch break.
     # EYES-1/T1 sensory stack (2026-08-17): all observational, decision
     # power NONE_OBSERVATIONAL_EPOCH1; instrumentation births, no Epoch break.
+    # FRONTIER-1 (2026-08-17): Desk B shadow instrumentation, power
+    # NONE_FRONTIER_SHADOW throughout; the Epoch-1 control is untouched.
+    "apex_decision_card_v1": (
+        "model", ("apex/frontier/decision_card.py",)),
+    "apex_frontier_senses_v1": (
+        "model", ("apex/frontier/senses.py",)),
+    "apex_frontier_learning_registry_v1": (
+        "model", ("apex/frontier/learning.py",)),
     "apex_captain_eyes_v1": (
         "model", ("apex/captain/context.py", "apex/vision/render.py",
                   "apex/vision/challenger.py")),

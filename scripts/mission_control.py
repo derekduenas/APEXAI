@@ -153,6 +153,19 @@ def rows() -> list:
         ("EXECUTION GATEWAY", _probe(lambda: _component(
             "apex.execution.gateway"))),
         ("LIVE PLACEMENT", _probe(_seal)),
+        ("FRONTIER BUS", _probe(lambda: _ledger_age(
+            "results/frontier/event_bus.jsonl"))),
+        ("FRONTIER BOARD", _probe(lambda: _ledger_age(
+            "results/frontier/opportunity_board.jsonl"))),
+        ("DECISION CARDS", _probe(lambda: _component(
+            "apex.frontier.decision_card"))),
+        ("DISLOCATION ENGINE", _probe(lambda: _component(
+            "apex.frontier.senses"))),
+        ("REASONING ROUTER", _probe(lambda: _component(
+            "apex.frontier.senses"))),
+        ("LEARNING REGISTRY", _probe(lambda: __import__("json").loads(
+            Path("results/frontier/learning_registry.json").read_text()
+        )["preregistration"]["min_n_rule"][:40] + "... (0 obs)")),
         ("PAPER", "LOCKED (structural: forecast slot uncommissioned)"),
         ("CREDIT 5 / HOLDOUT", "SEALED (human acts only)"),
     ]
