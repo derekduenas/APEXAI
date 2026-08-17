@@ -163,3 +163,89 @@ def test_what_changed_is_computed_never_remembered():
 def test_attention_scales_with_seriousness():
     assert HEARTBEAT_S["CAPITAL_REVIEW"] < HEARTBEAT_S["SERIOUS"] \
         < HEARTBEAT_S["WATCHING"] < HEARTBEAT_S["DISCOVERED"]
+
+
+# ================= THE SYNTHETIC INTRADAY MOVIE ============================
+# The operator's full sequence as ONE run — certifying the continuous-
+# attention machinery as a SYSTEM, not as independently-tested pieces.
+
+def test_the_intraday_movie(tmp_path, monkeypatch):
+    import apex.frontier.underwriting as uw
+    import apex.frontier.senses as sn
+    monkeypatch.setattr(uw, "LEDGER", tmp_path / "uw.jsonl")
+    monkeypatch.setattr(sn, "BOARD_LEDGER", tmp_path / "board.jsonl")
+
+    t = lambda hm: f"2026-08-17T{hm}:00-04:00"              # noqa: E731
+    s = OpportunityState(candidate_id="MOVIE-1", symbol="NVDA.US",
+                         state="DISCOVERED",
+                         inputs_snapshot={})
+    history = [s.state]
+
+    def step(when, inputs, dq, eq, reason=""):
+        nonlocal s
+        s = reunderwrite(s, current_inputs=inputs,
+                         direction_quality=dq, entry_quality=eq,
+                         reason=reason, now=t(when))
+        history.append(s.state)
+        return s
+
+    # 09:45 mediocre -> 09:48 RVOL -> 09:50 RS -> 09:52 sector
+    step("09:45", {"participation": "NORMAL"}, "MODERATE", "UNKNOWN")
+    step("09:48", {"participation": "RVOL_RISING"}, "MODERATE", "UNKNOWN")
+    step("09:50", {"participation": "RVOL_RISING",
+                   "rs_state": "ACCELERATING"}, "MODERATE", "UNKNOWN")
+    step("09:52", {"participation": "RVOL_RISING",
+                   "rs_state": "ACCELERATING",
+                   "sector_leadership": "STRENGTHENING"},
+         "STRONG", "GOOD")                                   # 09:54 breakout
+    assert s.state == "SERIOUS"
+    # 09:55 too extended -> WAIT (conditional, not death)
+    step("09:55", {"price_structure": "EXTENDED"}, "STRONG", "WEAK",
+         reason="TOO_EXTENDED")
+    assert s.state == "WAITING_FOR_ENTRY"
+    # 09:58 clean pullback, 10:00 VWAP holds, 10:02 short trap,
+    # 10:04 entry becomes good -> re-promoted
+    step("10:04", {"price_structure": "CLEAN_RETEST",
+                   "vwap_relationship": "ABOVE",
+                   "dislocation_state": "POSSIBLE_SHORT_TRAP"},
+         "STRONG", "GOOD")
+    assert s.state == "SERIOUS", "a clean reset must re-promote"
+    # board reranks while NVDA is serious
+    b = sn.rank_opportunities([
+        {"symbol": "NVDA.US", "candidate_class": "HUNTER",
+         "direction_quality": "STRONG", "entry_quality": "STRONG"}])
+    assert b["ranked"][0]["symbol"] == "NVDA.US"
+    # 10:08 market deteriorates, 10:10 RS collapses -> DEGRADED
+    step("10:10", {"market_regime": "DETERIORATING",
+                   "rs_state": "REVERSING"}, "WEAK", "WEAK")
+    assert s.state == "DEGRADED"
+    # 10:11 thesis invalidates -> terminal
+    step("10:11", {"rs_state": "REVERSING",
+                   "vwap_relationship": "BELOW"}, "WEAK", "WEAK",
+         reason="THESIS_INVALIDATED")
+    assert s.state == "INVALIDATED"
+
+    # the required arc, in order
+    assert history == ["DISCOVERED", "DEVELOPING", "DEVELOPING",
+                       "DEVELOPING", "SERIOUS", "WAITING_FOR_ENTRY",
+                       "SERIOUS", "DEGRADED", "INVALIDATED"]
+
+    # no resurrection without a new lineage
+    with pytest.raises(UnderwritingViolation):
+        reunderwrite(s, current_inputs={"rs_state": "ACCELERATING"},
+                     direction_quality="STRONG", entry_quality="STRONG")
+
+    # every transition persisted, every diff computed, no anchoring channel
+    recs = [json.loads(l) for l in
+            (tmp_path / "uw.jsonl").read_text().splitlines()]
+    assert len(recs) == 8                     # one per re-underwrite
+    assert all(r["prior_referenced_as"] == "PRIOR_BELIEF_LABEL_ONLY"
+               for r in recs)
+    # material events were seen, not silently dropped: the RS collapse
+    # step recorded exactly what changed
+    collapse = recs[6]
+    changed = {c["field"] for c in collapse["what_changed"]}
+    assert "rs_state" in changed and "market_regime" in changed
+    # Epoch-1 untouched: nothing wrote to the forward ledger
+    from pathlib import Path as _P
+    assert not _P("results/hunter/forward_ledger.jsonl").exists()
