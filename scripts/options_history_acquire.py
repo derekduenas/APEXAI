@@ -114,6 +114,21 @@ def _gz_write(path: Path, text: str) -> tuple:
     return (hashlib.sha256(data).hexdigest(), path.stat().st_size)
 
 
+def _root_ok() -> bool:
+    """EXTERNAL-STORAGE LAW: production root must exist and be the
+    configured volume. If it disappears mid-run: STOP_CLEANLY -- never
+    silently redirect writes to the internal disk."""
+    if not ROOT.exists():
+        return False
+    probe = ROOT / ".write_test"
+    try:
+        probe.write_text("ok")
+        probe.unlink()
+        return True
+    except OSError:
+        return False
+
+
 def _free_gb() -> float:
     return shutil.disk_usage(ROOT if ROOT.exists() else ".").free / 1e9
 
@@ -145,14 +160,31 @@ def acquire_symbol_day(sym: str, date: str, akey: str, asec: str) -> dict:
     if not bars:
         rec.update(state="VALIDATED", note="MARKET_CLOSED_OR_NO_DATA")
         return rec
-    closes = sorted(b["c"] for b in bars)
+    # SESSION SEMANTICS LAW (audited on SPY 2018-01-02: 705 bars =
+    # 232 PRE + 390 REGULAR + 83 POST, while option quotes span exactly
+    # 09:30-16:00). Extended-hours underlying is RETAINED and tagged;
+    # an Options World Lab state may only exist at minutes where a
+    # legitimate option quote exists -- the option file bounds the
+    # state; underlying joins at <=T with its age. Never hardcode 390.
+    import pandas as pd
+    sess = {"PRE": 0, "REGULAR": 0, "POST": 0}
+    for b in bars:
+        t = pd.Timestamp(b["t"]).tz_convert("America/New_York")
+        h = t.hour * 60 + t.minute
+        b["session"] = ("PRE" if h < 570 else
+                        "REGULAR" if h < 960 else "POST")
+        sess[b["session"]] += 1
+    reg = [b["c"] for b in bars if b["session"] == "REGULAR"] or         [b["c"] for b in bars]
+    closes = sorted(reg)
     spot_ref = closes[len(closes) // 2]
     csum, nbytes = _gz_write(
         ROOT / sym / f"underlying_{d8}.json.gz",
-        json.dumps({"source": "ALPACA_IEX_1MIN", "bars": bars}))
+        json.dumps({"source": "ALPACA_SIP_1MIN", "bars": bars}))
     rec["underlying"] = {"rows": len(bars), "sha256": csum,
                          "bytes": nbytes, "spot_ref": spot_ref,
-                         "source": "ALPACA_IEX_1MIN"}
+                         "session_mix": sess,
+                         "spot_ref_basis": "median REGULAR close",
+                         "source": "ALPACA_SIP_1MIN"}
 
     # -- option quotes (primary memory), moneyness-filtered on ingest
     raw_csv = _theta("option/history/quote", symbol=sym, date=d8,
@@ -219,6 +251,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--phase", default="ALL", choices=[*PHASES, "ALL"])
     ap.add_argument("--limit-days", type=int, default=0)
+    ap.add_argument("--workers", type=int, default=2,
+                    help="bounded parallelism; start 2, raise to 4 "
+                         "only after stability is observed (terminal "
+                         "max concurrent = 4)")
     a = ap.parse_args()
     import pandas as pd
     try:
@@ -235,28 +271,56 @@ def main() -> int:
             pd.bdate_range(HISTORY_START, pd.Timestamp.now().date())]
     done = _manifest_states()
     phases = [a.phase] if a.phase != "ALL" else ["A", "B", "C"]
+    workers = max(1, min(a.workers, 4))
+    import threading
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    mlock = threading.Lock()
+    stop = {"reason": None}
     n_done = 0
+
+    def work(sym, date):
+        if stop["reason"]:
+            return None
+        try:
+            return acquire_symbol_day(sym, date, akey, asec)
+        except Exception as e:                             # noqa: BLE001
+            return {"symbol": sym, "date": date, "state": "PARTIAL",
+                    "error": type(e).__name__}
+
     for phase in phases:
-        print(f"=== PHASE {phase}: {PHASES[phase]}")
-        for sym in PHASES[phase]:
-            for date in days:
-                if done.get((sym, date)) == "VALIDATED":
-                    continue
+        print(f"=== PHASE {phase}: {PHASES[phase]} workers={workers}")
+        todo = [(sym, date) for sym in PHASES[phase] for date in days
+                if done.get((sym, date)) != "VALIDATED"]
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            i = 0
+            while i < len(todo) and not stop["reason"]:
+                batch = todo[i:i + workers * 8]
+                i += len(batch)
+                if not _root_ok():
+                    stop["reason"] = "ROOT_GONE"
+                    print("STOP_CLEANLY: history root missing or "
+                          "unwritable -- never redirecting to the "
+                          "internal disk")
+                    break
                 if _free_gb() < MIN_FREE_GB:
+                    stop["reason"] = "DISK_GUARD"
                     print(f"DISK GUARD: {_free_gb():.1f} GB free < "
                           f"{MIN_FREE_GB} -- stopping cleanly")
-                    return 2
-                try:
-                    rec = acquire_symbol_day(sym, date, akey, asec)
-                except Exception as e:                     # noqa: BLE001
-                    rec = {"symbol": sym, "date": date,
-                           "state": "PARTIAL",
-                           "error": type(e).__name__}
-                _record(rec)
-                n_done += 1
-                if a.limit_days and n_done >= a.limit_days:
-                    print(f"limit-days {a.limit_days} reached")
-                    return 0
+                    break
+                futs = [ex.submit(work, s_, d_) for s_, d_ in batch]
+                for f in as_completed(futs):
+                    rec = f.result()
+                    if rec is None:
+                        continue
+                    with mlock:
+                        _record(rec)
+                        n_done += 1
+                    if a.limit_days and n_done >= a.limit_days:
+                        stop["reason"] = "LIMIT"
+        if stop["reason"]:
+            print(f"stopped: {stop['reason']}")
+            return {"ROOT_GONE": 3, "DISK_GUARD": 2}.get(
+                stop["reason"], 0)
         print(f"=== PHASE {phase} complete")
     return 0
 
