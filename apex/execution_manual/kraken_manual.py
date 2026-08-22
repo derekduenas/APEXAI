@@ -18,9 +18,13 @@ from apex.governance.chain_ledger import chain_append
 
 EXPRESSION_TARGET = "BTC_PERP_KRAKEN_MANUAL"
 
+# OPERATOR LAW (2026-08-22): "I can see and operate the product" must
+# NEVER silently mean "money is authorized". Interface readiness and
+# capital readiness are SEPARATE attested states -- READY_MANUAL_
+# INTERFACE never implies funding deployment or authority promotion.
 STATUS_STATES = ("NOT_CONFIGURED", "ACCOUNT_UNLOCK_REQUIRED",
-                 "READY_MANUAL", "MAINTENANCE", "UNAVAILABLE",
-                 "OPERATOR_PAUSED")
+                 "READY_MANUAL_INTERFACE", "READY_LIVE_CAPITAL",
+                 "MAINTENANCE", "UNAVAILABLE", "OPERATOR_PAUSED")
 
 CARD_STATES = ("CANDIDATE", "CAPITAL_APPROVED", "BEFORE_CARD_SEALED",
                "MANUAL_ORDER_REQUESTED", "AWAITING_OPERATOR_FILL",
@@ -116,20 +120,34 @@ class ManualExecutionDesk:
     def record_attestation(self, *, account_verified: bool,
                            us_futures_unlocked: bool,
                            btc_perp_visible: bool,
-                           account_funded: bool,
                            contract_understood: str,
-                           operator_statement: str) -> dict:
+                           operator_statement: str,
+                           manual_entry_understood: bool = True,
+                           account_funded: bool = False,
+                           live_capital_authorized: bool = False
+                           ) -> dict:
         """One-time operator confirmation. NO SECRETS -- booleans and
-        the operator's own words only."""
+        the operator's own words only.
+
+        THE SPLIT: the first five arguments attest the INTERFACE ("I
+        can see and operate the product"). `account_funded` and
+        `live_capital_authorized` attest CAPITAL and default FALSE --
+        an interface attestation can never accidentally authorize
+        money, and neither field changes authority (that requires an
+        explicit authority-ladder transition)."""
         return self._append({
             "kind": "operator_attestation",
             "known_from": str(self._now()),
             "account_verified": account_verified,
             "us_futures_unlocked": us_futures_unlocked,
             "btc_perp_visible": btc_perp_visible,
-            "account_funded": account_funded,
             "contract_understood": contract_understood,
-            "operator_statement": operator_statement})
+            "manual_entry_understood": manual_entry_understood,
+            "account_funded": account_funded,
+            "live_capital_authorized": live_capital_authorized,
+            "operator_statement": operator_statement,
+            "law": "INTERFACE readiness != CAPITAL readiness; neither "
+                   "promotes authority from OBSERVE"})
 
     def set_paused(self, paused: bool) -> None:
         self._append({"kind": "operator_pause", "paused": paused,
@@ -143,11 +161,15 @@ class ManualExecutionDesk:
         a = self.attestation
         if a is None:
             return "NOT_CONFIGURED"
-        if not (a["account_verified"] and a["us_futures_unlocked"]):
+        if not (a["account_verified"] and a["us_futures_unlocked"]
+                and a["btc_perp_visible"]
+                and a.get("manual_entry_understood", False)):
             return "ACCOUNT_UNLOCK_REQUIRED"
-        if not (a["btc_perp_visible"] and a["account_funded"]):
-            return "ACCOUNT_UNLOCK_REQUIRED"
-        return "READY_MANUAL"
+        # the interface is ready; capital is a SEPARATE attestation and
+        # even READY_LIVE_CAPITAL does not promote authority
+        if a.get("account_funded") and a.get("live_capital_authorized"):
+            return "READY_LIVE_CAPITAL"
+        return "READY_MANUAL_INTERFACE"
 
     # ------------------------------------------------ card lifecycle
     def seal_card(self, trade: dict, *, commissioning_test: bool,

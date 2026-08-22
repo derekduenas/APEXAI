@@ -61,18 +61,62 @@ def test_status_ladder(tmp_path):
     assert d.status() == "NOT_CONFIGURED"
     d.record_attestation(account_verified=True,
                          us_futures_unlocked=False,
-                         btc_perp_visible=True, account_funded=True,
+                         btc_perp_visible=True,
                          contract_understood="PBTCUC 0.01 BTC cash",
                          operator_statement="test")
     assert d.status() == "ACCOUNT_UNLOCK_REQUIRED"
     d.record_attestation(account_verified=True,
                          us_futures_unlocked=True,
-                         btc_perp_visible=True, account_funded=True,
+                         btc_perp_visible=True,
                          contract_understood="PBTCUC 0.01 BTC cash",
                          operator_statement="test")
-    assert d.status() == "READY_MANUAL"
+    assert d.status() == "READY_MANUAL_INTERFACE"
     d.set_paused(True)
     assert d.status() == "OPERATOR_PAUSED"
+
+
+def test_interface_readiness_never_implies_capital(tmp_path):
+    """THE SPLIT: attesting the interface must not authorize money.
+    Capital fields default FALSE and require their own attestation."""
+    d = _desk(tmp_path)
+    d.record_attestation(account_verified=True,
+                         us_futures_unlocked=True,
+                         btc_perp_visible=True,
+                         contract_understood="PBTCUC 0.01 BTC cash",
+                         operator_statement="interface only")
+    assert d.status() == "READY_MANUAL_INTERFACE"
+    assert d.attestation["account_funded"] is False
+    assert d.attestation["live_capital_authorized"] is False
+    # funding alone is still not authorization
+    d.record_attestation(account_verified=True,
+                         us_futures_unlocked=True,
+                         btc_perp_visible=True, account_funded=True,
+                         contract_understood="PBTCUC 0.01 BTC cash",
+                         operator_statement="funded, not authorized")
+    assert d.status() == "READY_MANUAL_INTERFACE"
+    d.record_attestation(account_verified=True,
+                         us_futures_unlocked=True,
+                         btc_perp_visible=True, account_funded=True,
+                         live_capital_authorized=True,
+                         contract_understood="PBTCUC 0.01 BTC cash",
+                         operator_statement="capital authorized")
+    assert d.status() == "READY_LIVE_CAPITAL"
+
+
+def test_ready_states_do_not_promote_authority(tmp_path):
+    """Even READY_LIVE_CAPITAL leaves authority at OBSERVE -- live
+    cards still refuse."""
+    d = _desk(tmp_path)
+    d.record_attestation(account_verified=True,
+                         us_futures_unlocked=True,
+                         btc_perp_visible=True, account_funded=True,
+                         live_capital_authorized=True,
+                         contract_understood="PBTCUC 0.01 BTC cash",
+                         operator_statement="everything attested")
+    assert d.status() == "READY_LIVE_CAPITAL"
+    with pytest.raises(ManualExecutionRefused, match="OBSERVE"):
+        d.seal_card(_trade(), commissioning_test=False,
+                    authority_level="OBSERVE")
 
 
 def test_maintenance_window_math():
