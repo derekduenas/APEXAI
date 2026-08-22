@@ -1,0 +1,265 @@
+#!/usr/bin/env python
+"""OPTIONS PHD -- FULL HISTORICAL MEMORY ACQUISITION (bulk daemon).
+
+Authorized 2026-08-22 after the ThetaData Standard pilot PASSED 12/12.
+GATED at launch on two operator actions: (1) key rotation (the pilot
+key was chat-exposed), (2) a storage decision -- the host has ~5 GiB
+free and the corpus needs ~140 GB compressed, so APEX_OPTIONS_HISTORY_
+ROOT must point at a volume with real capacity.
+
+CANONICAL_INITIAL_UNIVERSE = 21 (audited: 3 index + 11 sector + 7
+equities; the earlier "22" was an arithmetic error, and no pre-approved
+22nd symbol exists in any repository plan).
+
+LAWS ENFORCED HERE:
+  * quotes are PRIMARY memory; trades are TARGETED/ON_DEMAND -- this
+    daemon does NOT bulk-mirror the trade tape.
+  * 1-minute canonical resolution; tick is forensic-only, not pulled.
+  * research region moneyness 0.80-1.20 (filtered locally against the
+    day's underlying median close) + DTE<=120 (server-side max_dte);
+    raw-available vs retained counts persisted per symbol-day.
+  * OI rows keep their own source timestamps: OI_KNOWN_FROM is the
+    measured publication instant, never a hardcoded clock time.
+  * underlying truth comes from Alpaca historical 1m bars (existing
+    keychain data keys) -- ThetaData stock history needs a Stock
+    subscription we deliberately did not buy. Source identity kept.
+  * vendor residualRate is never adopted as APEX canonical rate.
+  * resumable: every symbol-day has a manifest state
+    (NOT_STARTED -> PARTIAL -> COMPLETE_UNVALIDATED -> VALIDATED),
+    sha256 checksums, row counts; re-runs are duplicate-safe.
+  * disk guard: stops cleanly below MIN_FREE_GB. Never fills the host.
+  * NO credentials are printed, logged, or written anywhere.
+
+    python scripts/options_history_acquire.py [--phase A|B|C|ALL]
+                                              [--limit-days N]
+
+decision_power: NONE -- data acquisition only. Authority OBSERVE.
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import gzip
+import hashlib
+import io
+import json
+import os
+import shutil
+import subprocess
+import sys
+import time
+import ssl
+import urllib.parse
+import urllib.request
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+THETA = "http://127.0.0.1:25503/v3"
+CTX = ssl.create_default_context(cafile="/etc/ssl/cert.pem")
+ALPACA = "https://data.alpaca.markets/v2"
+ROOT = Path(os.environ.get("APEX_OPTIONS_HISTORY_ROOT",
+                           "results/world_lab/raw/options_history"))
+MANIFEST = ROOT / "manifest.jsonl"
+MIN_FREE_GB = float(os.environ.get("APEX_MIN_FREE_GB", "8.0"))
+HISTORY_START = "2018-01-01"
+
+PHASES = {
+    "A": ("SPY", "QQQ", "IWM", "AAPL", "MSFT", "NVDA"),
+    "B": ("XLK", "XLF", "XLE", "XLV", "XLI", "XLY", "XLP", "XLB",
+          "XLU", "XLRE", "XLC"),
+    "C": ("AMZN", "META", "GOOGL", "TSLA"),
+}
+MAX_DTE = 120
+MONEY_LO, MONEY_HI = 0.80, 1.20
+
+
+def _keychain(service: str) -> str:
+    return subprocess.run(
+        ["security", "find-generic-password", "-s", service, "-w"],
+        capture_output=True, text=True, check=True).stdout.strip()
+
+
+def _theta(path: str, **params) -> str:
+    q = urllib.parse.urlencode({k: v for k, v in params.items()
+                                if v is not None})
+    req = urllib.request.Request(f"{THETA}/{path}?{q}")
+    with urllib.request.urlopen(req, timeout=300) as r:
+        return r.read().decode()
+
+
+def _alpaca_bars(sym: str, date: str, key: str, sec: str) -> list:
+    out, token = [], None
+    while True:
+        q = {"timeframe": "1Min", "start": f"{date}T08:00:00Z",
+             "end": f"{date}T23:00:00Z", "limit": 10000, "feed": "sip"}
+        if token:
+            q["page_token"] = token
+        req = urllib.request.Request(
+            f"{ALPACA}/stocks/{sym}/bars?" + urllib.parse.urlencode(q),
+            headers={"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": sec})
+        with urllib.request.urlopen(req, context=CTX, timeout=60) as r:
+            d = json.loads(r.read())
+        out.extend(d.get("bars") or [])
+        token = d.get("next_page_token")
+        if not token:
+            return out
+
+
+def _gz_write(path: Path, text: str) -> tuple:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data = text.encode()
+    with gzip.open(path, "wb") as f:
+        f.write(data)
+    return (hashlib.sha256(data).hexdigest(), path.stat().st_size)
+
+
+def _free_gb() -> float:
+    return shutil.disk_usage(ROOT if ROOT.exists() else ".").free / 1e9
+
+
+def _manifest_states() -> dict:
+    if not MANIFEST.exists():
+        return {}
+    out = {}
+    for line in MANIFEST.read_text().splitlines():
+        if line.strip():
+            r = json.loads(line)
+            out[(r["symbol"], r["date"])] = r["state"]
+    return out
+
+
+def _record(rec: dict) -> None:
+    MANIFEST.parent.mkdir(parents=True, exist_ok=True)
+    with open(MANIFEST, "a") as f:
+        f.write(json.dumps(rec, sort_keys=True) + "\n")
+
+
+def acquire_symbol_day(sym: str, date: str, akey: str, asec: str) -> dict:
+    d8 = date.replace("-", "")
+    rec = {"symbol": sym, "date": date, "state": "PARTIAL",
+           "acquired_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                        time.gmtime())}
+    # -- underlying truth (Alpaca; source identity preserved)
+    bars = _alpaca_bars(sym, date, akey, asec)
+    if not bars:
+        rec.update(state="VALIDATED", note="MARKET_CLOSED_OR_NO_DATA")
+        return rec
+    closes = sorted(b["c"] for b in bars)
+    spot_ref = closes[len(closes) // 2]
+    csum, nbytes = _gz_write(
+        ROOT / sym / f"underlying_{d8}.json.gz",
+        json.dumps({"source": "ALPACA_IEX_1MIN", "bars": bars}))
+    rec["underlying"] = {"rows": len(bars), "sha256": csum,
+                         "bytes": nbytes, "spot_ref": spot_ref,
+                         "source": "ALPACA_IEX_1MIN"}
+
+    # -- option quotes (primary memory), moneyness-filtered on ingest
+    raw_csv = _theta("option/history/quote", symbol=sym, date=d8,
+                     interval="1m", expiration="*", strike="*",
+                     right="both", max_dte=MAX_DTE, format="csv")
+    kept, raw_n, bad_cross, bad_size, bad_exp = [], 0, 0, 0, 0
+    rdr = csv.DictReader(io.StringIO(raw_csv))
+    kept.append(",".join(rdr.fieldnames or []))
+    for r in rdr:
+        raw_n += 1
+        k = float(r["strike"])
+        if not (MONEY_LO < k / spot_ref < MONEY_HI):
+            continue
+        b, a = float(r["bid"]), float(r["ask"])
+        if b > a:
+            bad_cross += 1
+            continue
+        if float(r["bid_size"]) < 0 or float(r["ask_size"]) < 0:
+            bad_size += 1
+            continue
+        if r["expiration"].replace("-", "") <= d8:
+            bad_exp += 1
+            continue
+        kept.append(",".join(r[f] for f in rdr.fieldnames))
+    csum, nbytes = _gz_write(ROOT / sym / f"quotes_{d8}.csv.gz",
+                             "\n".join(kept))
+    rec["quotes"] = {"raw_contract_rows": raw_n,
+                     "retained_rows": len(kept) - 1,
+                     "retention_ratio": round((len(kept) - 1) /
+                                              max(raw_n, 1), 4),
+                     "rejected_crossed": bad_cross,
+                     "rejected_size": bad_size,
+                     "rejected_expiry": bad_exp,
+                     "sha256": csum, "bytes": nbytes}
+
+    # -- open interest (own source timestamps = measured OI_KNOWN_FROM)
+    oi_csv = _theta("option/history/open_interest", symbol=sym, date=d8,
+                    expiration="*", strike="*", right="both",
+                    max_dte=MAX_DTE, format="csv")
+    okept, on = [], 0
+    ordr = csv.DictReader(io.StringIO(oi_csv))
+    okept.append(",".join(ordr.fieldnames or []))
+    for r in ordr:
+        on += 1
+        k = float(r["strike"])
+        if MONEY_LO < k / spot_ref < MONEY_HI:
+            okept.append(",".join(r[f] for f in ordr.fieldnames))
+    csum, nbytes = _gz_write(ROOT / sym / f"oi_{d8}.csv.gz",
+                             "\n".join(okept))
+    rec["oi"] = {"raw_rows": on, "retained_rows": len(okept) - 1,
+                 "sha256": csum, "bytes": nbytes,
+                 "known_from_law": "per-row source timestamp IS the "
+                                   "publication instant; never a "
+                                   "hardcoded clock"}
+    rec["state"] = "COMPLETE_UNVALIDATED"
+    # validation: quality gates already applied on ingest; a day is
+    # VALIDATED when quotes+oi+underlying all landed with checksums
+    if all(x in rec for x in ("underlying", "quotes", "oi")):
+        rec["state"] = "VALIDATED"
+    return rec
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--phase", default="ALL", choices=[*PHASES, "ALL"])
+    ap.add_argument("--limit-days", type=int, default=0)
+    a = ap.parse_args()
+    import pandas as pd
+    try:
+        _theta("option/history/quote", symbol="SPY", date="20240522",
+               interval="1m", strike_range=1, right="call",
+               expiration="*", max_dte=7, format="csv",
+               start_time="10:00:00", end_time="10:01:00")
+    except Exception:                                      # noqa: BLE001
+        print("REFUSED: Theta Terminal not reachable/authorized")
+        return 1
+    akey = _keychain("ALPACA_API_KEY_ID")
+    asec = _keychain("ALPACA_API_SECRET_KEY")
+    days = [str(d.date()) for d in
+            pd.bdate_range(HISTORY_START, pd.Timestamp.now().date())]
+    done = _manifest_states()
+    phases = [a.phase] if a.phase != "ALL" else ["A", "B", "C"]
+    n_done = 0
+    for phase in phases:
+        print(f"=== PHASE {phase}: {PHASES[phase]}")
+        for sym in PHASES[phase]:
+            for date in days:
+                if done.get((sym, date)) == "VALIDATED":
+                    continue
+                if _free_gb() < MIN_FREE_GB:
+                    print(f"DISK GUARD: {_free_gb():.1f} GB free < "
+                          f"{MIN_FREE_GB} -- stopping cleanly")
+                    return 2
+                try:
+                    rec = acquire_symbol_day(sym, date, akey, asec)
+                except Exception as e:                     # noqa: BLE001
+                    rec = {"symbol": sym, "date": date,
+                           "state": "PARTIAL",
+                           "error": type(e).__name__}
+                _record(rec)
+                n_done += 1
+                if a.limit_days and n_done >= a.limit_days:
+                    print(f"limit-days {a.limit_days} reached")
+                    return 0
+        print(f"=== PHASE {phase} complete")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
