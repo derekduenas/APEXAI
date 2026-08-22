@@ -119,3 +119,59 @@ be performed twice.
 4. No migration adapter becomes permanent — each carries a removal
    condition in this file.
 5. Architecture receives no tenure; neither does this plan.
+
+---
+
+# PHASE 1 ADDENDUM (2026-08-22) — rulings now backed by forensic evidence
+
+## LEGACY CAPTAIN RULING: **DEMOTE_TO_INTERNAL_CONVICTION**
+The forensic settles the two-Captain question empirically.
+`frontier2/captain_shadow` holds all 4,760 prospective reviews and its
+predicate structure is sound — SERIOUS is unreachable because of
+*starved inputs*, not bad logic. It is therefore KEEP_AS_UNDERWRITER.
+`apex/captain/` (707 loc, no prospective ledger) contains conviction
+and entry-adjacent logic in `conviction.py` / `kernel.py` that belongs
+inside the new ATTACK_GEOMETRY faculty.
+**Migration:** port conviction primitives into
+`apex/predators/*/attack_geometry.py`, carry their tests, then retire
+the package. **Removal condition:** every conviction test passes
+against the geometry implementation.
+
+## ASSASSIN CONSOLIDATION DESIGN (design only — no code merged)
+Canonical interface `PredatorAssassin` with sleeve-specific wounds:
+
+| implementation | ruling | rationale |
+|---|---|---|
+| `frontier2/assassin2` | **KEEP** — becomes `PredatorAssassin` | the live one (9 runtime refs, 4,726 records) |
+| `pattern_observatory/pattern_assassin` | **MIGRATE** to a pattern-scoped wound provider | unique conjunction wounds worth keeping |
+| `hunter/assassin` | **DEPRECATE** after wound-family port | superseded; no unique wound identified |
+
+Long-term there is exactly one decision semantic; wounds differ by
+sleeve, the verdict grammar does not.
+
+## THE TWO STRUCTURAL BLOCKERS (both must be fixed; neither alone suffices)
+```
+1. entry_quality UNKNOWN        4,760 / 4,760  (100%)   -> Attack Geometry ABSENT
+2. transition_quality STRONG        0 / 4,760  ( 0%)    -> Curve INPUT STARVATION
+```
+Curve dimension support measured over 3,324 records carrying the field:
+```
+price                643   (19%)      correlation      0   NEVER
+relative_strength    353   (11%)      cross_asset      0   NEVER
+breadth               48  (1.4%)      event_reaction   0   NEVER
+sector_leadership     48  (1.4%)      flow             0   NEVER
+                                      liquidity        0   NEVER
+                                      volatility       0   NEVER
+```
+HIGH likelihood requires >=3 elevated dimensions across >=2 dependency
+groups. Only PRICE_DERIVED and CROSS_SECTIONAL groups have ever had a
+supported dimension; VOLATILITY, LIQUIDITY_FLOW and EXTERNAL have
+**never once** been supported. Max observed independent elevated groups
+= 1. **SERIOUS was structurally unreachable, exactly like the earlier
+self-inclusive-sigma defect** — and, as then, the correct fix is to feed
+the organ, never to lower the bar.
+
+**PHASE 2 CANDIDATE (not authorized):** curve dimension feeding —
+volatility and liquidity dimensions are computable from bars already
+persisted; correlation and cross_asset need the market_state layer
+wired; event_reaction needs apex/events joined.
