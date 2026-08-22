@@ -156,3 +156,30 @@ def test_eligibility_law_is_recorded_not_activated():
     assert any("BEFORE card" in r for r in EXPLORATORY_REQUIREMENTS)
     assert set(ROUTES) >= {"PIPELINE_STOP", "NO_TRADE",
                            "PAPER_EXPLORATORY_CANDIDATE"}
+
+
+# ------------------------------------------------ small-capital doctrine
+
+def test_doctrine_characteristics_exist_and_default_unknown():
+    """SMALL-CAPITAL ADVANTAGE DOCTRINE: the characteristics are
+    measured fields, never one score, and default UNKNOWN -- an
+    opportunity that has not been assessed cannot look favorable."""
+    o = _opp()
+    for f in ("capacity_suitability", "giant_competition_risk",
+              "signal_half_life", "our_expected_footprint",
+              "crowding", "forced_participant_strength"):
+        assert getattr(o, f) == "UNKNOWN"
+    # and there is no collapsed doctrine score anywhere on the schema
+    for k in o.as_record():
+        assert "advantage_score" not in k.lower()
+        assert "anti_giant" not in k.lower()
+
+
+def test_doctrine_fields_carry_through_the_record():
+    o = _opp(crowding="TRAP_FORMING",
+             forced_participant_strength="STRONG",
+             capacity_suitability="SMALL_CAPITAL_ADVANTAGE")
+    rec = o.as_record()
+    assert rec["crowding"] == "TRAP_FORMING"
+    assert rec["forced_participant_strength"] == "STRONG"
+    assert rec["capacity_suitability"] == "SMALL_CAPITAL_ADVANTAGE"

@@ -81,6 +81,21 @@ class PredatorOpportunity:
     attack_class: str = "NO_TRADE"
     data_quality: str = "UNKNOWN"
     authority_eligibility: str = "OBSERVE_ONLY"
+
+    # --- SMALL-CAPITAL ADVANTAGE DOCTRINE (operator, 2026-08-22):
+    # measured characteristics, never collapsed into one score. They
+    # let Capital distinguish "great signal on a 3-second-half-life
+    # HFT battlefield -> REJECT" from "a $150K-capacity dislocation
+    # with trapped participants and 5R geometry -> PREY". All default
+    # UNKNOWN; UNKNOWN != favorable and UNKNOWN != zero. No thresholds
+    # are defined here -- evidence defines them later.
+    capacity_suitability: str = "UNKNOWN"    # would $50M kill this edge?
+    giant_competition_risk: str = "UNKNOWN"  # whose battlefield is this?
+    signal_half_life: str = "UNKNOWN"        # seconds are not our war
+    our_expected_footprint: str = "UNKNOWN"  # are we a rounding error?
+    crowding: str = "UNKNOWN"                # AVOID vs TRAP_FORMING
+    forced_participant_strength: str = "UNKNOWN"
+
     decision_power: str = "NONE_PREDATOR"
 
     def __post_init__(self):
