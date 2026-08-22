@@ -110,3 +110,33 @@ def test_daemon_source_carries_the_law_not_the_defect():
     assert "NOT_ESTIMABLE" in src
     assert "future_underlying_joins" in src
     assert "START_OF_BAR" in src
+
+
+def test_raw_retention_is_not_research_eligibility():
+    """ELIGIBILITY LAW: NOT_ESTIMABLE rows are preserved observations
+    the Predator may never learn from."""
+    import options_history_acquire as m
+    ok = m.row_eligibility("CAUSAL")
+    assert ok == {"raw_eligible": True, "research_eligible": True,
+                  "forecast_eligible": True}
+    bad = m.row_eligibility("NOT_ESTIMABLE")
+    assert bad["raw_eligible"] is True
+    assert bad["research_eligible"] is False
+    assert bad["forecast_eligible"] is False
+    assert bad["reason"] == "MONEYNESS_NOT_ESTABLISHABLE_AT_T"
+    # unknown/future statuses fail CLOSED, not open
+    weird = m.row_eligibility("SOME_FUTURE_STATUS")
+    assert weird["research_eligible"] is False
+
+
+def test_oi_coverage_cannot_be_truncated_by_any_band():
+    """OI COVERAGE LAW: no strike/moneyness filter may touch OI --
+    a morning band could exclude contracts that migrate into the
+    research region on a volatile day."""
+    src = Path("scripts/options_history_acquire.py").read_text()
+    assert "OI COVERAGE LAW" in src
+    assert "no strike\n    # filter whatsoever" in src or \
+        "no strike" in src
+    # the old widened-band code is gone
+    assert "MONEY_LO * 0.9" not in src
+    assert "first_ref" not in src

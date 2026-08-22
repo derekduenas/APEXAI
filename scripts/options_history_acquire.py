@@ -74,6 +74,23 @@ MAX_DTE = 120
 MONEY_LO, MONEY_HI = 0.80, 1.20
 
 
+# ELIGIBILITY LAW (operator, 2026-08-22): RAW_RETENTION !=
+# RESEARCH_ELIGIBILITY. A row whose contemporaneous moneyness could
+# not be established is preserved as an observation but the Predator
+# may never learn from it -- a state without establishable moneyness
+# cannot teach anything about moneyness-scoped behavior.
+def row_eligibility(moneyness_status: str) -> dict:
+    """Pure function of the persisted moneyness_status column -- the
+    ONLY sanctioned way to derive research eligibility for a stored
+    options-history quote row. Survives restart/replay trivially."""
+    if moneyness_status == "CAUSAL":
+        return {"raw_eligible": True, "research_eligible": True,
+                "forecast_eligible": True}
+    return {"raw_eligible": True, "research_eligible": False,
+            "forecast_eligible": False,
+            "reason": "MONEYNESS_NOT_ESTABLISHABLE_AT_T"}
+
+
 def _keychain(service: str) -> str:
     return subprocess.run(
         ["security", "find-generic-password", "-s", service, "-w"],
@@ -274,20 +291,19 @@ def acquire_symbol_day(sym: str, date: str, akey: str, asec: str) -> dict:
                     expiration="*", strike="*", right="both",
                     max_dte=MAX_DTE, format="csv")
     okept, on = [], 0
-    # OI is published pre-session (06:30 ET measured): filter against
-    # the EARLIEST knowable underlying ref of the day -- a value known
-    # before the session, never a same-day later price.
-    first_ref = ref_closes[0][0] if ref_closes else None
+    # OI COVERAGE LAW (operator, 2026-08-22): historical OI
+    # availability may not be determined by future intraday moneyness
+    # NOR by a morning band that could exclude contracts later
+    # migrating into the research region (a +16% NVDA day makes that
+    # real). OI rows are tiny relative to quotes, so the law is
+    # satisfied the simple way: keep ALL DTE<=120 OI, no strike
+    # filter whatsoever. Every causally-retained quote state is
+    # guaranteed OI coverage by construction.
     ordr = csv.DictReader(io.StringIO(oi_csv))
     okept.append(",".join(ordr.fieldnames or []))
     for r in ordr:
         on += 1
-        if first_ref is None:
-            okept.append(",".join(r[f] for f in ordr.fieldnames))
-            continue
-        k = float(r["strike"])
-        if MONEY_LO * 0.9 < k / first_ref < MONEY_HI * 1.1:
-            okept.append(",".join(r[f] for f in ordr.fieldnames))
+        okept.append(",".join(r[f] for f in ordr.fieldnames))
     csum, nbytes = _gz_write(ROOT / sym / f"oi_{d8}.csv.gz",
                              "\n".join(okept))
     rec["oi"] = {"raw_rows": on, "retained_rows": len(okept) - 1,
