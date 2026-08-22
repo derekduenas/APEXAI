@@ -5,15 +5,15 @@ Runs ONLY when the operator's Theta Terminal v3 is alive on
 127.0.0.1:25503 (operator subscribes/logs in; credentials never touch
 this repo). Exits with a clear refusal otherwise.
 
-VALUE-TIER LAW (operator-verified against current docs):
-    historical NBBO quotes   YES (1m interval, history from 2020-01-01)
-    historical OI            YES
-    historical OHLC          YES
-    historical trades        NOT_AVAILABLE_ON_PILOT_TIER (Standard+)
-    vendor IV/Greeks         NOT_AVAILABLE_ON_PILOT_TIER (Standard+)
-Absent tiers are recorded as NOT_AVAILABLE_ON_PILOT_TIER -- never FAIL.
-The PRIMARY TEST is raw NBBO + APEX's own pricing stack: can the
-Predator manufacture its own IV/surface intelligence from market truth?
+TIER: operator subscribed STANDARD (2026-08-22) -- historical NBBO
+quotes AND trades AND (per docs) 8 years of history are in scope.
+The PRIMARY TEST is unchanged: raw NBBO + APEX's own pricing stack --
+can the Predator manufacture its own IV/surface intelligence from
+market truth? Vendor analytics, where exposed, are a cross-check,
+never the authority.
+SECRET LAW: the API key lives in the macOS keychain and the Theta
+Terminal's environment ONLY. It never appears in this file, any
+ledger, any output, or any commit.
 
 PRE-REGISTERED (2026-08-22, before any download):
     symbols  SPY NVDA AAPL
@@ -98,6 +98,21 @@ def pull_oi(symbol: str, date: str) -> Path:
     return p
 
 
+def pull_trades(symbol: str, date: str):
+    """Standard tier exposes historical option trades -- pull them as a
+    SEPARATE stream (quote and trade semantics are never merged)."""
+    d = date.replace("-", "")
+    try:
+        txt = _get("option/history/trade", symbol=symbol, date=d,
+                   expiration="*", strike="*", right="both",
+                   max_dte=MAX_DTE, format="csv")
+    except Exception:                                      # noqa: BLE001
+        return None
+    p = OUT / f"theta_trades_{symbol}_{d}.csv"
+    p.write_text(txt)
+    return p
+
+
 def main() -> int:
     if not terminal_alive():
         return 1
@@ -116,9 +131,12 @@ def main() -> int:
             try:
                 qp = pull_quotes(sym, date)
                 op = pull_oi(sym, date)
+                tp = pull_trades(sym, date)
                 manifest["pulled"].append(
                     {"symbol": sym, "date": date,
                      "quotes": str(qp), "oi": str(op),
+                     "trades": str(tp) if tp else
+                     "TRADES_ENDPOINT_UNAVAILABLE",
                      "quote_bytes": qp.stat().st_size})
                 print(f"  {sym} {date}: quotes "
                       f"{qp.stat().st_size/1e6:.1f} MB")
