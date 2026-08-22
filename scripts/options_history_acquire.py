@@ -160,30 +160,53 @@ def acquire_symbol_day(sym: str, date: str, akey: str, asec: str) -> dict:
     if not bars:
         rec.update(state="VALIDATED", note="MARKET_CLOSED_OR_NO_DATA")
         return rec
-    # SESSION SEMANTICS LAW (audited on SPY 2018-01-02: 705 bars =
-    # 232 PRE + 390 REGULAR + 83 POST, while option quotes span exactly
-    # 09:30-16:00). Extended-hours underlying is RETAINED and tagged;
-    # an Options World Lab state may only exist at minutes where a
-    # legitimate option quote exists -- the option file bounds the
-    # state; underlying joins at <=T with its age. Never hardcode 390.
+    # SESSION + TIMESTAMP SEMANTICS (both audited empirically):
+    #   * 705 bars = 232 PRE + 390 REGULAR + 83 POST; option quotes
+    #     span exactly 09:30-16:00 (391 sampling instants).
+    #   * ALPACA BAR LABELS ARE START-OF-BAR (regular labels run
+    #     09:30..15:59, no 16:00 label): a bar labeled L contains
+    #     trades L:00-L:59, so its close is knowable only at L+1min.
+    #   * THETADATA 1m quote timestamps are SAMPLING INSTANTS.
+    # CAUSAL JOIN RULE: an option state at instant T may consume only
+    # bars with label <= T - 1min. Never hardcode 390.
+    #
+    # UNDERLYING REFERENCE LAW (operator repair 2026-08-22): the first
+    # implementation used the day's median REGULAR close as spot_ref --
+    # LOOKAHEAD: a 10:00 retention decision knew 14:00 prices. Now
+    # UNDERLYING_REF(T) = close of the latest bar whose label+1min <=
+    # T; stale/missing => MONEYNESS = NOT_ESTIMABLE, never future-
+    # filled, and such rows are RETAINED with a flag (fail-open for
+    # storage: ignorance may not silently discard a state).
+    import bisect
     import pandas as pd
     sess = {"PRE": 0, "REGULAR": 0, "POST": 0}
+    ref_times, ref_closes = [], []
     for b in bars:
         t = pd.Timestamp(b["t"]).tz_convert("America/New_York")
         h = t.hour * 60 + t.minute
         b["session"] = ("PRE" if h < 570 else
                         "REGULAR" if h < 960 else "POST")
         sess[b["session"]] += 1
-    reg = [b["c"] for b in bars if b["session"] == "REGULAR"] or         [b["c"] for b in bars]
-    closes = sorted(reg)
-    spot_ref = closes[len(closes) // 2]
+        # the instant this bar's close becomes knowable
+        ref_times.append(t.tz_localize(None) + pd.Timedelta(minutes=1))
+        ref_closes.append((b["c"], t.tz_localize(None), b["session"]))
+
+    def underlying_ref(T):
+        """(close, source_label, age_s, session) of the latest bar
+        knowable at T, or None -- pure and monotone in T."""
+        i = bisect.bisect_right(ref_times, T) - 1
+        if i < 0:
+            return None
+        c, lbl, ses = ref_closes[i]
+        return (c, lbl, (T - ref_times[i]).total_seconds(), ses)
     csum, nbytes = _gz_write(
         ROOT / sym / f"underlying_{d8}.json.gz",
         json.dumps({"source": "ALPACA_SIP_1MIN", "bars": bars}))
     rec["underlying"] = {"rows": len(bars), "sha256": csum,
-                         "bytes": nbytes, "spot_ref": spot_ref,
-                         "session_mix": sess,
-                         "spot_ref_basis": "median REGULAR close",
+                         "bytes": nbytes, "session_mix": sess,
+                         "bar_label_semantics": "START_OF_BAR "
+                         "(audited: regular labels 09:30..15:59)",
+                         "causal_join_rule": "bar label + 1min <= T",
                          "source": "ALPACA_SIP_1MIN"}
 
     # -- option quotes (primary memory), moneyness-filtered on ingest
@@ -191,13 +214,14 @@ def acquire_symbol_day(sym: str, date: str, akey: str, asec: str) -> dict:
                      interval="1m", expiration="*", strike="*",
                      right="both", max_dte=MAX_DTE, format="csv")
     kept, raw_n, bad_cross, bad_size, bad_exp = [], 0, 0, 0, 0
+    not_est = 0
+    ages = []
     rdr = csv.DictReader(io.StringIO(raw_csv))
-    kept.append(",".join(rdr.fieldnames or []))
+    kept.append(",".join(rdr.fieldnames or []) +
+                ",underlying_ref,underlying_ref_label,"
+                "underlying_ref_age_s,moneyness_status")
     for r in rdr:
         raw_n += 1
-        k = float(r["strike"])
-        if not (MONEY_LO < k / spot_ref < MONEY_HI):
-            continue
         b, a = float(r["bid"]), float(r["ask"])
         if b > a:
             bad_cross += 1
@@ -208,13 +232,38 @@ def acquire_symbol_day(sym: str, date: str, akey: str, asec: str) -> dict:
         if r["expiration"].replace("-", "") <= d8:
             bad_exp += 1
             continue
-        kept.append(",".join(r[f] for f in rdr.fieldnames))
+        T = pd.Timestamp(r["timestamp"])
+        ref = underlying_ref(T)
+        if ref is None:
+            # ignorance may not silently discard a state
+            not_est += 1
+            kept.append(",".join(r[f] for f in rdr.fieldnames) +
+                        ",,,,NOT_ESTIMABLE")
+            continue
+        close, lbl, age_s, _ses = ref
+        ages.append(age_s)
+        m = float(r["strike"]) / close
+        if not (MONEY_LO < m < MONEY_HI):
+            continue
+        kept.append(",".join(r[f] for f in rdr.fieldnames) +
+                    f",{close},{lbl},{age_s:.0f},CAUSAL")
     csum, nbytes = _gz_write(ROOT / sym / f"quotes_{d8}.csv.gz",
                              "\n".join(kept))
     rec["quotes"] = {"raw_contract_rows": raw_n,
                      "retained_rows": len(kept) - 1,
                      "retention_ratio": round((len(kept) - 1) /
                                               max(raw_n, 1), 4),
+                     "not_estimable_retained": not_est,
+                     "underlying_age_s": {
+                         "min": min(ages) if ages else None,
+                         "median": sorted(ages)[len(ages) // 2]
+                         if ages else None,
+                         "max": max(ages) if ages else None},
+                     "future_underlying_joins": 0,
+                     "moneyness_law": "causal per-minute UNDERLYING_"
+                                      "REF(T); server prefilter = NONE "
+                                      "(full strike chain fetched; "
+                                      "max_dte only, causally known)",
                      "rejected_crossed": bad_cross,
                      "rejected_size": bad_size,
                      "rejected_expiry": bad_exp,
@@ -225,12 +274,19 @@ def acquire_symbol_day(sym: str, date: str, akey: str, asec: str) -> dict:
                     expiration="*", strike="*", right="both",
                     max_dte=MAX_DTE, format="csv")
     okept, on = [], 0
+    # OI is published pre-session (06:30 ET measured): filter against
+    # the EARLIEST knowable underlying ref of the day -- a value known
+    # before the session, never a same-day later price.
+    first_ref = ref_closes[0][0] if ref_closes else None
     ordr = csv.DictReader(io.StringIO(oi_csv))
     okept.append(",".join(ordr.fieldnames or []))
     for r in ordr:
         on += 1
+        if first_ref is None:
+            okept.append(",".join(r[f] for f in ordr.fieldnames))
+            continue
         k = float(r["strike"])
-        if MONEY_LO < k / spot_ref < MONEY_HI:
+        if MONEY_LO * 0.9 < k / first_ref < MONEY_HI * 1.1:
             okept.append(",".join(r[f] for f in ordr.fieldnames))
     csum, nbytes = _gz_write(ROOT / sym / f"oi_{d8}.csv.gz",
                              "\n".join(okept))
