@@ -23,6 +23,7 @@ import numpy as np
 
 from apex.hunter.chartstate import ChartState
 from apex.hunter.relstrength import RelativeStrengthState
+from apex.hunter.watchlist import make_entry
 
 SCANNER_VERSION = "hunter_scanner_v1"
 
@@ -143,14 +144,14 @@ class ScanResult:
     states_computed: int
     liquidity_data_ok: int
     abnormal: int
-    watchlist: tuple                # ((symbol, signals, sort_key), ...)
+    watchlist: tuple                # (WatchlistEntry, ...) -- the canonical
+                                    # contract, apex/hunter/watchlist.py
     rejected_examples: tuple        # sample of refusals with reasons
     dormant_signals: tuple = DORMANT_SIGNALS
 
     def as_record(self) -> dict:
         d = asdict(self)
-        d["watchlist"] = [{"symbol": s, "signals": [x.value for x in sig],
-                           "rvol": k} for s, sig, k in self.watchlist]
+        d["watchlist"] = [e.as_record() for e in self.watchlist]
         return d
 
 
@@ -165,14 +166,26 @@ def scan(t_utc: str, universe_count: int,
             ok_pairs.append((cs, rs))
         elif len(rejected) < 10:
             rejected.append((cs.symbol, why))
+    # RVOL HONESTY: cs.rvol_tod is None on an invalid session anchor
+    # (SESSION INTEGRITY GATE, chartstate.py v1.2) -- it is never
+    # laundered into 0.0 here. A missing rvol is its own sort tier
+    # (WatchlistEntry.sort_key), never confused with a real near-zero
+    # reading, and is persisted as rvol=None + rvol_status, never as a
+    # fabricated number a downstream consumer could mistake for data.
     hits = []
     for cs, rs in ok_pairs:
         sigs = detect_signals(cs, rs)
         if sigs:
-            hits.append((cs.symbol, sigs,
-                         float(cs.rvol_tod or 0.0), cs, rs))
-    hits.sort(key=lambda h: (-len(h[1]), -h[2]))
-    watch = tuple((s, sig, rv) for s, sig, rv, _, _ in hits[:WATCHLIST_CAP])
+            rvol = cs.rvol_tod           # already None when invalid
+            rvol_status = (cs.feature_validity.get("rvol_tod", {})
+                          .get("status", "UNKNOWN")
+                          if cs.feature_validity else
+                          ("VALID" if rvol is not None else "UNKNOWN"))
+            entry = make_entry(cs.symbol, [s.value for s in sigs], rvol,
+                               rvol_status=rvol_status, as_of=cs.t_utc)
+            hits.append(entry)
+    hits.sort(key=lambda e: e.sort_key())
+    watch = tuple(hits[:WATCHLIST_CAP])
     return ScanResult(
         t_utc=t_utc, scanner_version=SCANNER_VERSION,
         universe_count=universe_count, states_computed=len(pairs),

@@ -15,6 +15,22 @@ scanner's data-quality gate).
 
 feature_schema_version identifies this exact field set + computation; any
 change to either is a NEW schema version with a NEW birth.
+
+SESSION-ANCHORED FEATURE VALIDITY (v1.2): every field whose semantics
+require history from the TRUE exchange session open (vwap and its
+derivatives, opening range and its derivatives, gap and its derivatives,
+rvol_tod, cum_volume, day_return) is computed EXACTLY as before, THEN
+gated on `session_coverage.session_anchor_valid` (apex/hunter/
+session_coverage.py, built on the true 09:30 ET calendar boundary, never
+inferred from where bars happen to start). Invalid -> the field reads
+None, and `feature_validity[name]` carries a typed
+{status, reason} pair — never a silently-corrupted number, never zero.
+Trailing-window features (r_1m..r_60m, trend_slope, hh_hl/lh_ll,
+realized_vol_ann, range_so_far_frac, range_vs_atr) need no session
+anchor and are UNCHANGED by this gate; on a normal session where the
+true open was observed, session_anchor_valid is True and every
+session-anchored field computes byte-identically to v1 — this gate adds
+a filter, it does not change a formula.
 """
 
 from __future__ import annotations
@@ -24,9 +40,19 @@ from dataclasses import asdict, dataclass, field
 import numpy as np
 import pandas as pd
 
+from apex.hunter.session_coverage import compute_session_coverage
 from apex.intraday.sessions import Session, classify
 
-FEATURE_SCHEMA_VERSION = "hunter_feature_schema_v1"
+# v1.2 (SESSION INTEGRITY HARDENING, 2026-08-17 Day-1 defect): open_t used
+# to BE the session anchor (first visible bar == market open, always).
+# session_coverage.compute_session_coverage() now supplies the TRUE
+# exchange-calendar session_open independently of what bars happen to
+# exist; session-anchored features (vwap/or/gap/rvol/cum_volume/
+# day_return) are gated on session_anchor_valid and read None + a typed
+# reason, never a number computed from the wrong anchor. Trailing-window
+# features (r_Nm, trend_slope, realized_vol_ann, ...) are UNCHANGED — see
+# feature_validity docstring below for the full contract.
+FEATURE_SCHEMA_VERSION = "hunter_feature_schema_v1.2"
 
 BAR = pd.Timedelta(minutes=1)
 OPENING_RANGE_MINUTES = 30          # frozen: classic 30m opening range
@@ -134,6 +160,8 @@ class ChartState:
     minutes_missing_frac: float | None
     last_bar_age_min: float
     data_quality: tuple = ()
+    session_coverage: dict = field(default_factory=dict)
+    feature_validity: dict = field(default_factory=dict)
     feature_schema_version: str = FEATURE_SCHEMA_VERSION
 
     def as_record(self) -> dict:
@@ -163,8 +191,19 @@ def compute_chart_state(symbol: str, bars: pd.DataFrame, t_utc,
     quality: list = []
 
     open_t = times.iloc[0]
-    minutes_in = int((t - open_t).total_seconds() // 60)
     day_open = float(f["open"].astype(float).iloc[0])
+
+    # SESSION INTEGRITY GATE: the TRUE exchange-calendar anchor, never
+    # inferred from open_t. minutes_into_session derives from THIS,
+    # unconditionally -- it needs no bars at all, only the calendar and
+    # the current event time (test U: correct even when anchor invalid).
+    session_cov = compute_session_coverage(bars, ctx.as_of_date, t)
+    anchor_ok = session_cov.session_anchor_valid
+    if session_cov.session_open is not None:
+        minutes_in = int((t - pd.Timestamp(session_cov.session_open))
+                         .total_seconds() // 60)
+    else:                                       # non-trading day: defensive
+        minutes_in = int((t - open_t).total_seconds() // 60)
 
     # vwap path (as-of by construction: cumulative over visible bars)
     tp = (hi + lo + px) / 3
@@ -181,10 +220,14 @@ def compute_chart_state(symbol: str, bars: pd.DataFrame, t_utc,
                         / slope_base.iloc[0])
                   if len(slope_base) >= 2 and vwap is not None else None)
 
-    # opening range
-    or_end = open_t + pd.Timedelta(minutes=OPENING_RANGE_MINUTES)
+    # opening range: window is defined by the TRUE session open, never
+    # by open_t (the first VISIBLE bar) -- a fake OR can never complete
+    # from a late-starting feed (test Q)
+    or_anchor = (pd.Timestamp(session_cov.session_open)
+                if session_cov.session_open is not None else open_t)
+    or_end = or_anchor + pd.Timedelta(minutes=OPENING_RANGE_MINUTES)
     or_mask = times < or_end
-    or_complete = bool(t >= or_end + BAR and or_mask.any())
+    or_complete = bool(anchor_ok and t >= or_end + BAR and or_mask.any())
     or_high = float(hi[or_mask].max()) if or_complete else None
     or_low = float(lo[or_mask].min()) if or_complete else None
     pos_in_or = or_break_up = or_break_down = or_failure = None
@@ -262,9 +305,60 @@ def compute_chart_state(symbol: str, bars: pd.DataFrame, t_utc,
     if missing is not None and missing > 0.2:
         quality.append("SPARSE_BARS")
 
+    # SESSION INTEGRITY GATE (v1.2), the ONLY place this schema version
+    # changes prior behavior: every formula above is untouched (byte-
+    # identical to v1 whenever anchor_ok is True, i.e. the true session
+    # open was observed -- see test_chartstate_session_integrity.py's
+    # full-session equivalence proof). Invalid -> the local variables
+    # feeding the session-anchored fields below are overridden to
+    # None/False so the return statement's existing expressions (e.g.
+    # `distance_to_vwap=(price/vwap-1) if vwap else None`) cascade
+    # correctly with zero further changes.
+    invalid_reason = (
+        f"observation began {session_cov.observed_start}, true session "
+        f"open {session_cov.session_open}" if session_cov.observed_start
+        else "session open never observed")
+    if not anchor_ok:
+        vwap = vwap_slope = None
+        above = None
+        reclaim = rejection = False
+        or_high = or_low = pos_in_or = None
+        or_break_up = or_break_down = or_failure = False
+        gap = gap_dir = gap_fill = None
+        rvol = None
+        cum_volume = None
+        day_open = None
+
+    feature_validity = {}
+    for _name in ("vwap", "distance_to_vwap", "vwap_slope", "above_vwap",
+                 "vwap_reclaim", "vwap_rejection", "or_complete", "or_high",
+                 "or_low", "position_in_or", "or_break_up", "or_break_down",
+                 "or_failure", "gap_frac", "gap_direction", "gap_fill_frac",
+                 "rvol_tod", "cum_volume", "day_return"):
+        feature_validity[_name] = (
+            {"status": "VALID", "reason": None} if anchor_ok else
+            {"status": "INVALID_MISSING_SESSION_START",
+             "reason": invalid_reason})
+    feature_validity["minutes_into_session"] = {
+        "status": "VALID",
+        "reason": "derived from exchange calendar, independent of bars"}
+    for _name, _val in (("r_1m", _ret(px, times, t, 1)),
+                        ("r_5m", _ret(px, times, t, 5)),
+                        ("r_15m", _ret(px, times, t, 15)),
+                        ("r_30m", _ret(px, times, t, 30)),
+                        ("r_60m", _ret(px, times, t, 60)),
+                        ("trend_slope", trend_slope),
+                        ("realized_vol_ann", rvol_ann)):
+        feature_validity[_name] = (
+            {"status": "VALID", "reason": None} if _val is not None else
+            {"status": "NOT_YET_AVAILABLE",
+             "reason": "insufficient trailing bars"})
+
     return ChartState(
         symbol=symbol, t_utc=str(t), price=price,
         minutes_into_session=minutes_in,
+        session_coverage=session_cov.as_record(),
+        feature_validity=feature_validity,
         r_1m=_ret(px, times, t, 1), r_5m=_ret(px, times, t, 5),
         r_15m=_ret(px, times, t, 15), r_30m=_ret(px, times, t, 30),
         r_60m=_ret(px, times, t, 60),

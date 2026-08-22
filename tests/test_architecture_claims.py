@@ -51,11 +51,56 @@ def test_no_execution_or_broker_dependency_exists():
     deny-list and a tripwire scanner cannot be written without naming what
     they refuse). Those three modules are exempt from the NAME scan only --
     the stronger invariant, that no module anywhere DEFINES a placement
-    function, is proven mechanically below and in test_execution_erd1."""
-    exempt = {"broker.py", "sealing.py", "robinhood.py"}
+    function, is proven mechanically below and in test_execution_erd1.
+    Updated 2026-08-17 (Phase 0.4, PRIMARY_BROAD_SENSOR): alpaca_fabric.py
+    and provider_interface.py NAME "Alpaca" because it is now a legitimate
+    market-DATA vendor (operator-authorized Algo Trader Plus), not a broker
+    relationship -- the module subscribes trades/quotes over the vendor's
+    own websocket library only; no alpaca-py/alpaca_trade_api SDK is
+    imported, and no order/placement function is defined (same invariant,
+    proven the same way below). Updated 2026-08-18 (Options Research V1,
+    F O24): apex/options_research/market_state.py NAMES "Alpaca" for the
+    identical reason -- from_alpaca_snapshot() parses the shape of
+    Alpaca's OPRA /v1beta1/options/snapshots/{symbol} response dict; it
+    takes the dict as a plain argument, makes no HTTP call itself, imports
+    no Alpaca SDK, and defines no order/placement function (proven by
+    test_options_research_firewall.py's own broker/order-keyword scan).
+
+    Updated 2026-08-18 (Phase 1.0 continuity truth):
+    apex/intraday/reconnect_ledger.py NAMES "Alpaca" for the same
+    market-DATA reason as alpaca_fabric.py -- it is the durable event
+    record for that sensor's reconnects, built because the counter
+    reached 388 with zero corresponding log lines. It defines no order
+    or placement function and imports no SDK (proven by
+    test_intraday_continuity_truth.py and by the placement scan below).
+    """
+    # Updated 2026-08-20 (Profit Predator v1): checkpoint_graph.py NAMES
+    # the sensor module and its artifact paths because it is the
+    # DOCUMENTARY funnel map -- an audit artifact that obfuscated its own
+    # producers would defeat its purpose. It defines no placement
+    # function and imports nothing (the mechanical invariant below still
+    # covers it).
+    exempt = {"broker.py", "sealing.py", "robinhood.py", "alpaca_fabric.py",
+             "provider_interface.py", "market_state.py", "reconnect_ledger.py",
+             "checkpoint_graph.py"}
+    # PATH-scoped exemptions (2026-08-20): name-based exemption of
+    # "__init__.py" would blind the scan across every package, so files
+    # that must name the sensor module get exempted individually.
+    # apex/market_state/__init__.py imports the canonical bar-stream
+    # path FROM the sensor module (single source of truth) -- a data
+    # dependency on the audited sensor, not a broker relationship.
+    # apex/execution_paper (2026-08-21): the PAPER adapter must name the
+    # vendor's paper endpoint; its own commissioning tests forbid the
+    # live trading URL from appearing anywhere in the package and prove
+    # the live host is refused by allowlist -- a stronger guarantee than
+    # this name scan provides.
+    exempt_paths = {"apex/market_state/__init__.py",
+                    "apex/execution_paper/__init__.py",
+                    "apex/execution_paper/harness.py"}
     src = "\n".join(
         p.read_text() for p in APEX.rglob("*.py")
         if "__pycache__" not in str(p) and p.name not in exempt
+        and str(p.relative_to(APEX.parent)) not in exempt_paths
     ).lower()
     for term in ("import ib_insync", "robin_stocks", "alpaca", "order_management",
                  "place_order", "submit_order"):

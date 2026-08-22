@@ -78,7 +78,13 @@ def run(smoke: str | None) -> int:
                 continue
     decisions = [r for r in rows if r.get("kind") == "decision"]
     scans = [r for r in rows if r.get("kind") == "scan"]
-    targets = list(select_targets(decisions=decisions, scans=scans[-4:]))
+    targets, errors = select_targets(decisions=decisions, scans=scans[-4:])
+    targets = list(targets)
+    if errors:
+        from apex.hunter.watchlist import record_parse_errors
+        record_parse_errors(errors, component="microscope_pass.run",
+                            input_reference=(scans[-1].get("t_utc")
+                                             if scans else None))
     if not targets and smoke:
         targets = [MicroscopeTarget(symbol=smoke, priority=1,
                                     reason_selected="SMOKE_TEST_OPERATOR",

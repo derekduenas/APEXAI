@@ -28,6 +28,8 @@ import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from apex.hunter.watchlist import parse_watchlist
+
 OBSERVATIONAL = "NONE_OBSERVATIONAL_EPOCH1"
 MAX_L2_TARGETS = 4          # platform bound: real-time books for <=4 names
 MAX_QUOTE_TARGETS = 20      # platform bound: real-time quotes for <=20
@@ -49,14 +51,24 @@ class MicroscopeTarget:
 def select_targets(*, decisions: list, scans: list,
                    board: dict | None = None) -> tuple:
     """Deterministic priority: (1) actual Hunter candidates, newest first;
-    (2) strongest watchlist near-candidates by signal count then RVOL;
+    (2) strongest watchlist near-candidates by signal count then RVOL
+    (apex.hunter.watchlist.WatchlistEntry.sort_key — a candidate with an
+    UNKNOWN rvol, e.g. an invalid session anchor, ranks below one with a
+    known rvol at the same signal count, and is NEVER treated as rvol=0);
     (3) Opportunity Board rank; ties broken lexicographically by symbol.
 
-    Returns at most MAX_QUOTE_TARGETS targets, of which the first
-    MAX_L2_TARGETS carry wants_l2=True.
+    Returns (targets, errors): at most MAX_QUOTE_TARGETS targets, of
+    which the first MAX_L2_TARGETS carry wants_l2=True; `errors` is
+    every malformed watchlist entry skipped along the way (this function
+    is pure -- it never writes; the caller persists errors via
+    apex.hunter.watchlist.record_parse_errors). One malformed entry can
+    never again kill target selection: the 2026-08-17 defect was exactly
+    this loop unpacking a dict as a positional tuple with no matching
+    except clause.
     """
     ranked: list = []
     seen: set = set()
+    all_errors: list = []
 
     # 1. real Hunter candidates (never baselines), newest decision first
     playbook = [d for d in decisions
@@ -69,24 +81,24 @@ def select_targets(*, decisions: list, scans: list,
             seen.add(s)
             ranked.append((s, f"hunter_candidate:{d.get('decision_id')}"))
 
-    # 2. watchlist near-candidates: most signals, then rvol, then name
+    # 2. watchlist near-candidates via the canonical contract
     wl: dict = {}
-    for scan in scans:
-        for entry in scan.get("watchlist") or []:
-            try:
-                sym, sigs, rvol = entry[0], entry[1], entry[2]
-            except (IndexError, TypeError):
-                continue
-            n = len(sigs) if isinstance(sigs, (list, tuple)) else 0
-            r = float(rvol) if isinstance(rvol, (int, float)) else 0.0
-            cur = wl.get(sym)
-            if cur is None or (n, r) > cur:
-                wl[sym] = (n, r)
-    for sym, (n, r) in sorted(wl.items(),
-                              key=lambda kv: (-kv[1][0], -kv[1][1], kv[0])):
+    for i, scan in enumerate(scans):
+        entries, errors = parse_watchlist(scan.get("watchlist"))
+        for e in errors:
+            all_errors.append({**e, "scan_index": i,
+                              "scan_t_utc": scan.get("t_utc")})
+        for entry in entries:
+            cur = wl.get(entry.symbol)
+            if cur is None or entry.sort_key() < cur.sort_key():
+                wl[entry.symbol] = entry
+    for sym, entry in sorted(wl.items(), key=lambda kv: kv[1].sort_key()):
         if sym not in seen:
             seen.add(sym)
-            ranked.append((sym, f"watchlist:signals={n},rvol={r:.2f}"))
+            rvol_txt = (f"{entry.rvol:.2f}" if entry.rvol is not None
+                       else f"UNKNOWN({entry.rvol_status})")
+            ranked.append((sym, f"watchlist:signals={len(entry.signals)},"
+                          f"rvol={rvol_txt}"))
 
     # 3. opportunity board order, as persisted
     for row in (board or {}).get("ranked", []):
@@ -100,7 +112,7 @@ def select_targets(*, decisions: list, scans: list,
         out.append(MicroscopeTarget(symbol=sym, priority=i + 1,
                                     reason_selected=why,
                                     wants_l2=i < MAX_L2_TARGETS))
-    return tuple(out)
+    return tuple(out), tuple(all_errors)
 
 
 def record_request(target: MicroscopeTarget, *, request_time: str,

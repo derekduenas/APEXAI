@@ -378,6 +378,113 @@ REGISTRY: dict[str, Component] = {c.name: c for c in [
                "emits the historical opportunity report",
        activation_prereqs=("distribution_estimator", "opportunity_engine",
                            "real options chain data OR stock-only declared")),
+
+    # ---- FRONTIER-2: next-gen shadow intelligence (2026-08-18) -------------
+    # Structurally isolated package (apex/frontier2/), decision_power always
+    # NONE_FRONTIER_SHADOW. All 16 forbid apex.hunter/apex.captain/
+    # apex.execution/apex.hunter.capital by construction (mechanically
+    # proven in tests/test_frontier2_firewall.py, not just declared here).
+    # None consumes an experiment credit or is_new_hypothesis: these are
+    # observational organs producing typed shadow state, not registered
+    # research claims entering the credit-gated pipeline.
+    _c(name="frontier2_observation_integrity", state=BUILT,
+       module="apex.frontier2.observation_integrity",
+       purpose="F13 (partial): composes SessionCoverage + "
+               "UniverseCoverageState + DataDisagreementState into one "
+               "quality verdict every other Frontier-2 organ gates on",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution",
+                       "apex.hunter.capital"),
+       tests_required=("firewall isolation", "semantic equivalence"),
+       downstream=("frontier2_curve", "frontier2_system_cognition")),
+    _c(name="frontier2_event_bus", state=BUILT, module="apex.frontier2.event_bus2",
+       purpose="F14: typed STATE-CHANGE events (sibling to "
+               "apex.frontier.senses' raw-observation bus)",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_curve", state=BUILT, module="apex.frontier2.curve",
+       purpose="F1: MarketCurvatureState -- LEVEL/VELOCITY/ACCELERATION/"
+               "CURVATURE derivative stack per dimension; "
+               "TRANSITION_LIKELIHOOD/DIRECTION/EXPRESSION kept separate",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution"),
+       downstream=("frontier2_leading_edge_map", "frontier2_captain_shadow")),
+    _c(name="frontier2_expectation_violation", state=BUILT,
+       module="apex.frontier2.expectation_violation",
+       purpose="F2: 2 of 5 pre-registered relationships honestly "
+               "evaluable tonight; the rest NO_EXPECTATION_MODEL until "
+               "a constituent map/peer-group/catalyst source exist",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_participant_pressure", state=BUILT,
+       module="apex.frontier2.participant_pressure",
+       purpose="F3: possible_driver defaults UNKNOWN; only SHORT_COVERING "
+               "and MOMENTUM_CHASE reachable from price/volume alone",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_propagation", state=BUILT, module="apex.frontier2.propagation",
+       purpose="F4: empirical lagged-correlation lead-lag edges, split-"
+               "sample stability check, never labeled causal",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution"),
+       downstream=("frontier2_leading_edge_map",)),
+    _c(name="frontier2_leading_edge_map", state=BUILT,
+       module="apex.frontier2.leading_edge_map",
+       purpose="F5: deterministic lexicographic ranking of candidates "
+               "for one named transition; independent reimplementation "
+               "of apex.frontier.senses.rank_opportunities' discipline",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution",
+                       "apex.frontier")),
+    _c(name="frontier2_world_lab", state=BUILT, module="apex.frontier2.world_lab",
+       purpose="F6: wraps apex.world.simulator (read-only, untouched) "
+               "into 10 scenario types; 4 declared UNREACHABLE tonight",
+       allowed_deps=("apex.world.simulator",),
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_model_market", state=BUILT, module="apex.frontier2.model_market",
+       purpose="F7: 13-seat stance tally (SUPPORT/OPPOSE/ABSTAIN/UNKNOWN); "
+               "plain vote counting, never a weighted consensus",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_assassin2", state=BUILT, module="apex.frontier2.assassin2",
+       purpose="F8: ModelBreakerState, sibling to apex.hunter.assassin.py; "
+               "monotone caution law (caution never decreases)",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_captain_shadow", state=BUILT,
+       module="apex.frontier2.captain_shadow",
+       purpose="F9: parallel advisory shadow CIO, 8-state lattice, "
+               "anti-anchoring reused from apex.frontier.underwriting's "
+               "discipline (reimplemented, not imported)",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution",
+                       "apex.frontier")),
+    _c(name="frontier2_opportunity_graph", state=BUILT,
+       module="apex.frontier2.opportunity_graph",
+       purpose="F10: append-only provenance DAG answering WHY DID I "
+               "ENTER/PERSIST, WHAT HURT, WHY DID I DIE via typed edges "
+               "over artifact-hash references, never copied content",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_edge_genome", state=BUILT, module="apex.frontier2.edge_genome",
+       purpose="F11: 13-domain attribution schema; every domain starts "
+               "UNATTRIBUTED and a real status is mechanically impossible "
+               "without a real basis string; no numeric field anywhere",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_research_scientist", state=BUILT,
+       module="apex.frontier2.research_scientist",
+       purpose="F12: hypothesis PROPOSALS only, status always "
+               "RESEARCH_PROPOSAL_ONLY (no other value constructible); "
+               "cannot reach apex.governance.ledger or holdout_capacity",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution",
+                       "apex.governance.ledger", "apex.governance.holdout_capacity")),
+    _c(name="frontier2_system_cognition", state=BUILT,
+       module="apex.frontier2.system_cognition",
+       purpose="F13 (full assembly): overall_quality is the WORST of "
+               "every tracked component; can_claim_high_quality() is "
+               "the one place 'no HIGH_QUALITY while integrity is "
+               "degraded' gets enforced",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_compute_router", state=BUILT,
+       module="apex.frontier2.compute_router2",
+       purpose="F15: 5-tier deterministic compute routing; tier is an "
+               "attention budget only, never trade or risk authority",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
+    _c(name="frontier2_learning_registry", state=BUILT,
+       module="apex.frontier2.learning_registry2",
+       purpose="F16: 10 hypotheses preregistered at 0 observations; "
+               "estimate() is the only door and raises rather than "
+               "quietly computing once the sample rule is met",
+       forbidden_deps=("apex.hunter", "apex.captain", "apex.execution")),
 ]}
 
 

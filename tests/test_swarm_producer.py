@@ -91,8 +91,10 @@ def test_ordering_law_candidates_persist_before_enrichment(tmp_path):
                              "median_dollar_volume": 500e6}},
            "universe_limitation": "test"}
     scan_rec, decisions = decision_pass(
-        t, uni, {"X": f, "SPY.US": bars("SPY", n=120, noise=5e-5)},
-        {"X": ctx("X"), "SPY.US": ctx("SPY")}, enrich=False)
+        t, uni, {"X": f, "SPY.US": bars("SPY", date="2026-08-17",
+                                        n=120, noise=5e-5)},
+        {"X": ctx("X", as_of_date="2026-08-17"),
+         "SPY.US": ctx("SPY", as_of_date="2026-08-17")}, enrich=False)
     kinds = {d.get("kind") for d in decisions}
     assert kinds == {"decision"}                 # nothing waits on an LLM
     led = tmp_path / "led.jsonl"

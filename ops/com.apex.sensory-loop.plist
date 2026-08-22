@@ -3,7 +3,7 @@
 <plist version="1.0"><dict>
   <key>Label</key><string>com.apex.sensory-loop</string>
   <key>ProgramArguments</key>
-  <array><string>/bin/zsh</string><string>/Users/derekduenas/apex-equities/ops/sensory-loop.sh</string></array>
+  <array><string>/bin/zsh</string><string>/Users/derekduenas/apex-equities/ops/sensory_loop.sh</string></array>
   <key>StartCalendarInterval</key>
   <array>
     <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>28</integer></dict>

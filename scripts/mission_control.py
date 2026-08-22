@@ -105,6 +105,115 @@ def _component(mod: str):
     return "READY"
 
 
+def _frontier_progress():
+    """READY cannot mean 'module exists' (2026-08-17: frontier_loop.py
+    ran ~3h with a live PID and zero completed cycles). This reads the
+    SAME independent watchdog logic the standalone script uses --
+    PROCESS_STATUS + cycle progress, never a capability check."""
+    import json
+    from apex.governance.service_progress import is_pid_alive, watchdog_classify
+    path = Path("results/frontier/service_progress.json")
+    if not path.exists():
+        return "STOPPED (no service_progress.json ever written)"
+    try:
+        record = json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return "STOPPED (corrupt service_progress.json)"
+    pid = record.get("pid")
+    alive = is_pid_alive(pid) if isinstance(pid, int) else False
+    verdict = watchdog_classify(record, current_pid=pid, pid_alive=alive)
+    age_s = None
+    lsc = record.get("last_successful_cycle")
+    if lsc:
+        age_s = round((pd.Timestamp.now(tz="UTC")
+                      - pd.Timestamp(lsc)).total_seconds())
+    return (f"{verdict['progress_status']} | pid_alive={alive} | "
+           f"cycles={record.get('cycle_number')} | "
+           f"last_success_age_s={age_s} | "
+           f"consecutive_failures={record.get('consecutive_failures')} | "
+           f"total_failures={record.get('total_failures')}")
+
+
+def _alpaca_health():
+    """CONNECTED != HEALTHY, AUTHENTICATED != HEALTHY, SUBSCRIBED !=
+    HEALTHY (THE HEALTH LAW) -- this reads the measured status field
+    the fabric itself computed from real trade/quote timestamps, never
+    a capability check."""
+    p = Path("results/intraday/alpaca_fabric_health.json")
+    if not p.exists():
+        return "STOPPED (no alpaca_fabric_health.json ever written)"
+    h = json.loads(p.read_text())
+    age = h.get("last_message_age_s")
+    return (f"{h['status']} | authorized={h.get('authorized')} | "
+           f"symbols={h.get('symbol_count')} | "
+           f"last_msg_age_s={age} | "
+           f"reconnects={h.get('counters', {}).get('reconnects')}")
+
+
+def _alpaca_coverage_field(*keys):
+    p = Path("results/intraday/universe_coverage.json")
+    if not p.exists():
+        return "STOPPED (no universe_coverage.json ever written)"
+    cov = json.loads(p.read_text())
+    if cov.get("transport") != "ALPACA_WEBSOCKET_SIP_V1":
+        return f"NOT_ALPACA (transport={cov.get('transport')})"
+    out = []
+    for k in keys:
+        out.append(f"{k}={cov.get(k)}")
+    return " | ".join(out)
+
+
+def _alpaca_trade_coverage():
+    p = Path("results/intraday/alpaca_fabric_health.json")
+    if not p.exists():
+        return "STOPPED (no alpaca_fabric_health.json ever written)"
+    h = json.loads(p.read_text())
+    c = h.get("counters", {})
+    return (f"trades={c.get('trades')} | "
+           f"trade_symbols_accepted={h.get('trade_symbols_accepted')}/"
+           f"{h.get('trade_symbols_requested')} | "
+           f"symbols_with_trade_activity="
+           f"{h.get('symbols_with_trade_activity')}/"
+           f"{h.get('symbol_count')}")
+
+
+def _alpaca_quote_coverage():
+    p = Path("results/intraday/alpaca_fabric_health.json")
+    if not p.exists():
+        return "STOPPED (no alpaca_fabric_health.json ever written)"
+    h = json.loads(p.read_text())
+    c = h.get("counters", {})
+    return (f"quote_msgs={c.get('quote_messages')} | "
+           f"quote_symbols_accepted={h.get('quote_symbols_accepted')}/"
+           f"{h.get('quote_symbols_requested')} | "
+           f"symbols_with_quote_activity="
+           f"{h.get('symbols_with_quote_activity')}/"
+           f"{h.get('symbol_count')} | UNTESTED_LIVE until Tuesday's "
+           f"quote-health measurement (directive Sec7)")
+
+
+def _alpaca_latest_event_age():
+    p = Path("results/intraday/alpaca_fabric_health.json")
+    if not p.exists():
+        return "STOPPED"
+    h = json.loads(p.read_text())
+    age = h.get("last_message_age_s")
+    return "NO_DATA_YET" if age is None else f"{age:.1f}s"
+
+
+def _alpaca_bar_completeness():
+    p = Path("results/intraday/alpaca_fabric_health.json")
+    if not p.exists():
+        return "STOPPED"
+    h = json.loads(p.read_text())
+    persisted = h.get("bars_persisted", {})
+    if not persisted:
+        return "NO_BARS_PERSISTED_YET"
+    tot = sum(persisted.values())
+    n_with_bars = sum(1 for v in persisted.values() if v > 0)
+    return f"{tot} bars across {n_with_bars}/{len(persisted)} symbols"
+
+
 def _seal():
     from apex.execution.sealing import scan_package_for_placement
     return ("SEALED (scan clean)"
@@ -172,6 +281,21 @@ def rows() -> list:
         ("QUOTA", _probe(_quota)),
         ("EODHD LAKE", _probe(lambda: _ledger_age(
             "data/live/sharadar/state.json"))),
+        ("ALPACA BROAD SENSOR", _probe(_alpaca_health)),
+        ("ALPACA TRADE COVERAGE", _probe(_alpaca_trade_coverage)),
+        ("ALPACA QUOTE COVERAGE", _probe(_alpaca_quote_coverage)),
+        ("UNIVERSE COVERAGE", _probe(lambda: _alpaca_coverage_field(
+            "coverage_fraction", "continuous_coverage_fraction",
+            "coverage_count"))),
+        ("BROAD DISCOVERY VALIDITY", _probe(lambda: _alpaca_coverage_field(
+            "broad_discovery_valid", "discovery_latency_scope"))),
+        ("LATEST EVENT AGE", _probe(_alpaca_latest_event_age)),
+        ("BAR COMPLETENESS", _probe(_alpaca_bar_completeness)),
+        ("RECONNECT COUNT", _probe(lambda: json.loads(
+            Path("results/intraday/alpaca_fabric_health.json").read_text()
+        )["counters"]["reconnects"] if Path(
+            "results/intraday/alpaca_fabric_health.json").exists()
+            else "STOPPED")),
         ("FORWARD LEDGER", _probe(lambda: _ledger(
             "results/hunter/forward_ledger.jsonl"))),
         ("BIRTH REGISTRY", _probe(lambda: _ledger(
@@ -207,6 +331,7 @@ def rows() -> list:
             "results/frontier/underwriting_ledger.jsonl"))),
         ("CLOSING JOB", _probe(lambda: _launchd("com.apex.closing"))),
         ("DAILY MEMORY", _probe(_daily_memory)),
+        ("FRONTIER PROGRESS", _probe(_frontier_progress)),
         ("FRONTIER BUS", _probe(lambda: _ledger_age(
             "results/frontier/event_bus.jsonl"))),
         ("FRONTIER BOARD", _probe(lambda: _ledger_age(

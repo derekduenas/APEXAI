@@ -14,20 +14,26 @@ import pytest
 from apex.hunter.microscope import (MAX_L2_TARGETS, MAX_QUOTE_TARGETS,
                                     record_result, select_targets)
 
+from apex.hunter.watchlist import make_entry  # noqa: E402
+
 DEC = [{"kind": "decision", "decision_id": f"D{i}", "symbol": s,
         "playbook_id": "HUNTER-001_v1", "t_utc": f"2026-08-17T15:{i:02d}:00Z"}
        for i, s in enumerate(["NVDA.US", "AMD.US"])]
 BASE = [{"kind": "decision", "decision_id": "B1", "symbol": "MSFT.US",
          "playbook_id": "BASELINE-RANDOM", "t_utc": "2026-08-17T15:30:00Z"}]
+# NATURAL SHAPE: the REAL persisted form (apex/hunter/watchlist.py), never
+# a handcrafted positional tuple -- that mismatch is exactly what let the
+# 2026-08-17 production defect hide in this file's tests for months.
 SCANS = [{"kind": "scan", "watchlist": [
-    ("TSLA.US", ["OR_BREAK", "RVOL"], 3.1),
-    ("AAPL.US", ["RVOL"], 2.0),
-    ("META.US", ["OR_BREAK", "RVOL", "RS"], 2.4)]}]
+    make_entry("TSLA.US", ["OR_BREAK", "RVOL"], 3.1).as_record(),
+    make_entry("AAPL.US", ["RVOL"], 2.0).as_record(),
+    make_entry("META.US", ["OR_BREAK", "RVOL", "RS"], 2.4).as_record()]}]
 
 
 def test_selection_is_deterministic_and_prioritizes_real_candidates():
-    a = select_targets(decisions=DEC + BASE, scans=SCANS)
-    b = select_targets(decisions=DEC + BASE, scans=SCANS)
+    a, err_a = select_targets(decisions=DEC + BASE, scans=SCANS)
+    b, err_b = select_targets(decisions=DEC + BASE, scans=SCANS)
+    assert not err_a and not err_b
     assert [t.symbol for t in a] == [t.symbol for t in b]
     # newest hunter candidate first; baselines never selected as candidates
     assert a[0].symbol == "AMD.US" and "hunter_candidate" in a[0].reason_selected
@@ -41,8 +47,10 @@ def test_selection_is_deterministic_and_prioritizes_real_candidates():
 
 def test_l2_is_bounded_to_four_and_quotes_to_twenty():
     scans = [{"kind": "scan", "watchlist": [
-        (f"S{i:02d}.US", ["RVOL"], 2.0 + i * 0.01) for i in range(30)]}]
-    targets = select_targets(decisions=[], scans=scans)
+        make_entry(f"S{i:02d}.US", ["RVOL"], 2.0 + i * 0.01).as_record()
+        for i in range(30)]}]
+    targets, errors = select_targets(decisions=[], scans=scans)
+    assert not errors
     assert len(targets) <= MAX_QUOTE_TARGETS
     assert sum(t.wants_l2 for t in targets) <= MAX_L2_TARGETS
     assert all(t.wants_l2 == (t.priority <= MAX_L2_TARGETS) for t in targets)

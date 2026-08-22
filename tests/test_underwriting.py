@@ -175,6 +175,14 @@ def test_the_intraday_movie(tmp_path, monkeypatch):
     monkeypatch.setattr(uw, "LEDGER", tmp_path / "uw.jsonl")
     monkeypatch.setattr(sn, "BOARD_LEDGER", tmp_path / "board.jsonl")
 
+    # snapshot BEFORE, not "must not exist": a real forward_ledger.jsonl
+    # now legitimately exists from Monday's live session. The invariant
+    # under test is narrower and still exact -- underwriting must add
+    # NOTHING to it -- not that the file can never exist in this tree.
+    from pathlib import Path as _P
+    _fl = _P("results/hunter/forward_ledger.jsonl")
+    _fl_before = _fl.read_bytes() if _fl.exists() else None
+
     t = lambda hm: f"2026-08-17T{hm}:00-04:00"              # noqa: E731
     s = OpportunityState(candidate_id="MOVIE-1", symbol="NVDA.US",
                          state="DISCOVERED",
@@ -246,6 +254,7 @@ def test_the_intraday_movie(tmp_path, monkeypatch):
     collapse = recs[6]
     changed = {c["field"] for c in collapse["what_changed"]}
     assert "rs_state" in changed and "market_regime" in changed
-    # Epoch-1 untouched: nothing wrote to the forward ledger
-    from pathlib import Path as _P
-    assert not _P("results/hunter/forward_ledger.jsonl").exists()
+    # Epoch-1 untouched: the forward ledger is byte-identical to before
+    # this test ran (absent stays absent; present stays unappended)
+    _fl_after = _fl.read_bytes() if _fl.exists() else None
+    assert _fl_after == _fl_before

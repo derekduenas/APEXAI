@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.apex.option-analytics</string>
+  <key>ProgramArguments</key>
+  <array><string>/bin/zsh</string><string>/Users/derekduenas/apex-equities/ops/option_analytics_sidecar.sh</string></array>
+  <!-- OBSERVATIONAL_SIDECAR. 06:32 PT == 09:32 ET, 2 min after the bell, so the first samples are real regular-session books rather than a premarket book that is not open. StartCalendarInterval is LOCAL time and this machine is America/Los_Angeles; US zones shift DST together, so the ET offset holds year-round. The wrapper's admission gate refuses if the Alpaca sensor is not healthy, and sizes the budget from the wall clock so the process terminates AT 16:00 ET. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>32</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>32</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>32</integer></dict>
+    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>32</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>32</integer></dict>
+  </array>
+</dict></plist>

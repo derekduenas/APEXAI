@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.apex.frontier2</string>
+  <key>ProgramArguments</key>
+  <array><string>/bin/zsh</string><string>/Users/derekduenas/apex-equities/ops/frontier2_shadow_runtime.sh</string></array>
+  <!-- 06:00 PT == 09:00 ET, 30 min BEFORE the bell and 46 min after the
+       Alpaca sensor starts (05:14 PT), so the first prospective Curve /
+       Captain state exists before the opening transition. On 2026-08-18
+       this runtime had no launchd job at all and was started by hand at
+       09:43 ET, 13 min after the open. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+  </array>
+</dict></plist>

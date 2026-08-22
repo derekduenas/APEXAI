@@ -1,7 +1,7 @@
 {
   "chain_entries": 2762,
-  "generated_at": "2026-08-15T09:38:57.421776+00:00",
-  "lake_through": "2026-08-14",
+  "generated_at": "2026-08-21T10:27:41.227109+00:00",
+  "lake_through": "2026-08-20",
   "producers": {
     "baseline_base_rate": {
       "base_rate": 1.0,

@@ -212,7 +212,7 @@ def layer_visual_eyes():
 
 def layer_microscope():
     from apex.hunter.microscope import select_targets
-    t = select_targets(decisions=[DECISION], scans=[])
+    t, _errors = select_targets(decisions=[DECISION], scans=[])
     assert t and t[0].wants_l2
     led = Path("results/hunter/microscope_ledger.jsonl")
     live = "live records present" if led.exists() else "no live pass yet"

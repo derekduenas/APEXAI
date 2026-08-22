@@ -401,13 +401,32 @@ def test_catalyst_absence_names_its_sources():
 def test_synthetic_cards_never_enter_the_learning_denominator():
     """SAC-2 Phase 35: the Sunday demo card (REHEARSAL_NOT_EVIDENCE) was
     counted as a resolved observation. Harmless at n=1 vs a 20-card rule;
-    a disease regardless of dose."""
+    a disease regardless of dose.
+
+    SEMANTIC RULING 2026-08-18 (Phase 1.1). This test previously also
+    asserted `resolved_cards == 0` with the message "before Monday --
+    pre-market contamination". That assertion encoded a PRE-LIVE WORLD,
+    not a governance law: it said no live resolved card may exist at
+    all. The 2026-08-18 session produced APEX's first real resolved card
+    (HD, decision_id 6dd9548de8055a85, evidence_class
+    EODHD_FORWARD_OBSERVATION -- legitimate, non-synthetic, genuinely
+    traded through the funnel), so the assertion became a statement that
+    the system must never have traded.
+
+    The law it was PROXYING for is kept and strengthened below: the
+    denominator must contain ONLY legitimate non-synthetic cards, and a
+    non-empty denominator must not leak into premature estimability.
+    Asserting emptiness is not that law."""
     from apex.frontier.learning import _resolved_cards
-    for payload in _resolved_cards():
+    cards = _resolved_cards()
+    for payload in cards:
         ident = payload["before"].get("identity") or {}
         assert "REHEARSAL" not in str(ident.get("evidence_class", ""))
         assert "SYNTH" not in str(payload["before"]["decision_id"]).upper()
     r = estimate("H_VISUAL")
-    assert r["resolved_cards"] == 0, (
-        f"{r['resolved_cards']} resolved cards exist before Monday — "
-        f"pre-market contamination")
+    # the denominator is exactly the legitimate cards -- nothing extra
+    # slipped in alongside them
+    assert r["resolved_cards"] == len(cards)
+    # and real cards existing must NOT make an under-powered hypothesis
+    # estimable: no promotion leakage from a non-empty denominator
+    assert r["status"] == "NOT_YET_ESTIMABLE"

@@ -28,6 +28,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from apex.hunter.session_coverage import compute_session_coverage
 from apex.intraday.sessions import Session, classify
 from apex.world.state import classify_online
 
@@ -100,7 +101,14 @@ def transition_state(spy_daily: pd.Series | None, today: str,
                             "label + uncertainty flag is what is known"}}
 
 
-def _sector_states(etf_frames: dict, now) -> dict:
+def _sector_states(etf_frames: dict, now, today: str | None = None) -> dict:
+    """SESSION INTEGRITY GATE (v1.2): day_return/above_vwap are the SAME
+    class of session-anchored feature gated in apex/hunter/chartstate.py
+    — computed here independently (Twin 2.0 does not route ETF frames
+    through ChartState), so they need the SAME session_coverage check.
+    Gated on session_anchor_valid; everything else (dollar_volume,
+    last_bar_age_min, returns_1m -- a trailing series, no anchor needed)
+    is unchanged."""
     out = {}
     for sym, f in etf_frames.items():
         reg = _reg(f)
@@ -109,9 +117,17 @@ def _sector_states(etf_frames: dict, now) -> dict:
         px = reg["close"].astype(float)
         vol = reg["volume"].astype(float)
         vwap = float((px * vol).sum() / max(vol.sum(), 1))
+        anchor_ok = True
+        cov = None
+        if today is not None:
+            cov = compute_session_coverage(f, today, now)
+            anchor_ok = cov.session_anchor_valid
         out[sym] = {
-            "day_return": float(px.iloc[-1] / px.iloc[0] - 1),
-            "above_vwap": bool(px.iloc[-1] > vwap),
+            "day_return": (float(px.iloc[-1] / px.iloc[0] - 1)
+                          if anchor_ok else None),
+            "above_vwap": bool(px.iloc[-1] > vwap) if anchor_ok else None,
+            "session_anchor_valid": anchor_ok,
+            "session_coverage": cov.as_record() if cov is not None else None,
             "dollar_volume": float((px * vol).sum()),
             "last_bar_age_min": float(
                 (now - (reg["event_time_utc"].iloc[-1]
@@ -127,11 +143,25 @@ def build_world(etf_frames: dict, now, today: str, *,
     """One world_state record. `universe_facets` comes from the scan
     record (computed by the Scout over the whole universe)."""
     now = pd.Timestamp(now)
-    st = _sector_states(etf_frames, now)
+    st = _sector_states(etf_frames, now, today)
     spy = st.get("SPY.US", {})
     sectors = {k: v for k, v in st.items()
                if k not in ("SPY.US", "QQQ.US", "IWM.US")}
-    rets = {k: v["day_return"] for k, v in sectors.items()}
+    # SESSION INTEGRITY GATE (v1.2): day_return is None for any symbol
+    # whose session anchor is invalid (see _sector_states) -- every
+    # aggregate below must exclude None rather than crash on it
+    # (sorted()/np.mean()/abs() all raise on a None mixed with floats).
+    # This is not cosmetic: an invalid-anchor morning is EXACTLY when
+    # every sector's day_return goes None simultaneously.
+    rets = {k: v["day_return"] for k, v in sectors.items()
+           if v["day_return"] is not None}
+    n_anchor_valid = sum(1 for v in st.values()
+                        if v.get("session_anchor_valid"))
+    observation_integrity = {
+        "n_symbols": len(st), "n_session_anchor_valid": n_anchor_valid,
+        "session_anchor_valid_frac": (round(n_anchor_valid / len(st), 2)
+                                      if st else None),
+        "healthy_session_state": bool(st) and n_anchor_valid == len(st)}
     absent = {"status": "INSUFFICIENT_INPUTS"}
 
     # correlation: mean pairwise corr of sector 1m returns, trailing 60m
@@ -203,6 +233,7 @@ def build_world(etf_frames: dict, now, today: str, *,
         },
         "intraday_structure": (universe_facets or
                                {"status": "SCOUT_FACETS_UNAVAILABLE"}),
+        "observation_integrity": observation_integrity,
         "event_world": {"status": "DORMANT_NO_TIMESTAMPED_FEED"},
         "transition_state": transition_state(spy_daily, today),
         "system_state": {

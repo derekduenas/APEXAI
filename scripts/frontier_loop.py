@@ -31,10 +31,38 @@ sys.path.insert(0, str(_S.parent)); sys.path.insert(0, str(_S))
 
 import pandas as pd  # noqa: E402
 
+from apex.governance.session_integrity_gate import (  # noqa: E402
+    decision_eligible, refusal_reason,
+)
+from apex.hunter.watchlist import (  # noqa: E402
+    parse_watchlist, record_parse_errors,
+)
+
 OFFICIAL = Path("results/hunter/forward_ledger.jsonl")
 FASTWATCH = Path("results/hunter/fastwatch_ledger.jsonl")
 STATE = Path("results/frontier/loop_state.json")
+REFUSALS = Path("results/frontier/decision_refusals.jsonl")
 MAX_CHILD_CALLS = 80
+
+
+def _refuse_card(did: str, symbol: str, day: str, *,
+                 gate: str = "SESSION_INTEGRITY_GATE",
+                 reason: str | None = None) -> None:
+    """SESSION INTEGRITY GATE or KILL/DEGRADE LAW: no Decision Card is
+    sealed and no Shadow Paper position is opened when the session is
+    ratified invalid OR this service's own progress is STALLED/FAILED
+    -- a stale prior judgment can never remain 'current' merely because
+    the process stopped completing cycles. Recorded, never silently
+    skipped."""
+    sys.path.insert(0, "scripts")
+    from nightly_pull import _chain_append
+    REFUSALS.parent.mkdir(parents=True, exist_ok=True)
+    _chain_append(REFUSALS, {
+        "kind": "frontier_decision_refused", "decision_id": did,
+        "symbol": symbol, "session_date": day, "gate": gate,
+        "reason": f"{gate}: {reason or refusal_reason(day)}",
+        "refused": ("decision_card_seal", "shadow_paper_open"),
+        "decision_power": "NONE_FRONTIER_SHADOW"})
 
 
 def _rows(path: Path) -> list:
@@ -174,7 +202,7 @@ def build_card(d: dict, rows: list, st: dict) -> None:
     print(f"  CARD SEALED {did} -> {p} sha={card['card_sha256'][:12]}")
 
 
-def tick(st: dict) -> None:
+def tick(st: dict, *, service_progress_status: str = "HEALTHY") -> None:
     from apex.frontier.senses import emit, rank_opportunities
     now = pd.Timestamp.now(tz="UTC")
     rows = _rows(OFFICIAL)
@@ -208,11 +236,17 @@ def tick(st: dict) -> None:
     seen_tr = set(st.get("traced", []))
     hunter_syms = {d["symbol"] for d in decisions}
     for scan in scans[-2:]:
-        for entry in scan.get("watchlist") or []:
-            try:
-                sym, sigs, rvol = entry[0], entry[1], entry[2]
-            except (TypeError, IndexError):
-                continue
+        # THE FASTWATCH-CLASS BUG, fixed at its second site: the
+        # persisted watchlist is dicts (apex/hunter/watchlist.py), never
+        # positional tuples. parse_watchlist() skips and RECORDS a
+        # malformed entry instead of raising -- one bad row can never
+        # again stall this whole loop the way it did from 14:52 UTC
+        # onward on 2026-08-17 (root cause of the Frontier stall).
+        wl_entries, wl_errors = parse_watchlist(scan.get("watchlist"))
+        record_parse_errors(wl_errors, component="frontier_loop.tick",
+                           input_reference=str(scan.get("t_utc")))
+        for entry in wl_entries:
+            sym, sigs, rvol = entry.symbol, entry.signals, entry.rvol
             stage = "HUNTER" if sym in hunter_syms else "WATCHLIST"
             key = f"{day}|{sym}|{stage}"
             if key in seen_tr:
@@ -224,7 +258,8 @@ def tick(st: dict) -> None:
                            died_at=None if stage == "HUNTER" else "WATCHLIST",
                            when=str(now),
                            what_was_known={"signals": list(sigs)[:6],
-                                           "rvol": rvol})
+                                           "rvol": rvol,
+                                           "rvol_status": entry.rvol_status})
                 seen_tr.add(key)
             except Exception as e:                          # noqa: BLE001
                 print(f"  trace failed for {sym}: {type(e).__name__}")
@@ -241,8 +276,29 @@ def tick(st: dict) -> None:
 
     # decision cards + child-session work for new candidates
     fresh = [d for d in decisions if d["decision_id"] not in st["carded"]]
+    day_elig, day_label = decision_eligible(st["day"])
+    # KILL/DEGRADE LAW: a STALLED or FAILED Frontier loses decision
+    # authority automatically -- a stale prior judgment can never remain
+    # "current" merely because the process stopped completing cycles.
+    # DEGRADED (occasional failures, still completing cycles) may still
+    # act; STALLED/FAILED may not.
+    service_ok = service_progress_status not in ("STALLED", "FAILED")
+    elig = day_elig and service_ok
+    label = day_label if not day_elig else (
+        f"SERVICE_{service_progress_status}" if not service_ok else day_label)
     for d in fresh[:3]:
         did = d["decision_id"]
+        if not elig:
+            if not day_elig:
+                _refuse_card(did, d["symbol"], st["day"],
+                            gate="SESSION_INTEGRITY_GATE")
+            else:
+                _refuse_card(did, d["symbol"], st["day"],
+                            gate="SERVICE_HEALTH_GATE",
+                            reason=f"progress_status={service_progress_status}")
+            st["carded"].append(did)     # seen, not retried -- refused, not skipped
+            print(f"  CARD REFUSED {d['symbol']} ({label})")
+            continue
         if MAX_CHILD_CALLS - st["child_calls"] >= 3:
             subprocess.run([sys.executable, "scripts/microscope_pass.py"],
                            capture_output=True, text=True, timeout=600)
@@ -375,19 +431,70 @@ def tick(st: dict) -> None:
     _save(st)
 
 
+PROGRESS_STATE_PATH = Path("results/frontier/service_progress.json")
+
+
 def main() -> int:
     import argparse
+    import traceback
+    from apex.governance import service_progress as sp
     ap = argparse.ArgumentParser()
     ap.add_argument("--minutes", type=float, default=395)
     ap.add_argument("--cadence", type=float, default=120)
     a = ap.parse_args()
     print("FRONTIER SHADOW LOOP — decision_power NONE_FRONTIER_SHADOW")
     t_end = time.time() + a.minutes * 60
+
+    # RESTART SEMANTICS: this PID starts a FRESH ServiceProgressState --
+    # it never inherits a previous instance's last_successful_cycle as
+    # evidence of ITS OWN health (the exact 2026-08-17 ambiguity).
+    prog = sp.start("frontier_loop", expected_cadence_s=a.cadence)
+    sp.write(prog, PROGRESS_STATE_PATH)
+
     while time.time() < t_end:
+        prog.cycle_number += 1
+        prog.last_cycle_start = str(pd.Timestamp.now(tz="UTC"))
+        prog.heartbeat_time = prog.last_cycle_start
+        t0 = time.monotonic()
         try:
-            tick(_state())
+            st = _state()
+            prog.last_state_read = str(pd.Timestamp.now(tz="UTC"))
+            # the gate reflects health COMING INTO this cycle (state
+            # accumulated by prior cycles) -- a service cannot bless its
+            # own current cycle's authority
+            tick(st, service_progress_status=prog.progress_status())
+            prog.last_state_write = str(pd.Timestamp.now(tz="UTC"))
+            now = str(pd.Timestamp.now(tz="UTC"))
+            prog.last_cycle_complete = now
+            prog.last_successful_cycle = now
+            prog.cycle_duration_s = round(time.monotonic() - t0, 3)
+            prog.consecutive_failures = 0
+            prog.blocking_operation = None
+            prog.error_reference = None
         except Exception as e:                              # noqa: BLE001
-            print(f"tick failed (loop continues): {type(e).__name__}: {e}")
+            # NO SILENT EXCEPTION LOOPS: every failure is a STRUCTURED,
+            # DURABLE record with a full traceback, the cycle it happened
+            # on, and the exact input in play -- never print() into a
+            # pipe that may sit unflushed for hours (2026-08-17's actual
+            # failure mode: ~150 identical KeyErrors, invisible until the
+            # process finally exited on its own budget).
+            tb = traceback.format_exc()
+            err_path = Path(f"results/frontier/errors/"
+                           f"cycle_{prog.cycle_number:06d}.json")
+            err_path.parent.mkdir(parents=True, exist_ok=True)
+            err_path.write_text(json.dumps({
+                "kind": "frontier_cycle_error", "cycle_number": prog.cycle_number,
+                "timestamp_utc": str(pd.Timestamp.now(tz="UTC")),
+                "exception_type": type(e).__name__, "message": str(e),
+                "traceback": tb}, indent=1, default=str))
+            prog.last_cycle_complete = str(pd.Timestamp.now(tz="UTC"))
+            prog.consecutive_failures += 1
+            prog.total_failures += 1
+            prog.error_reference = str(err_path)
+            print(f"CYCLE {prog.cycle_number} FAILED "
+                  f"({prog.consecutive_failures} consecutive): "
+                  f"{type(e).__name__}: {e} -> {err_path}")
+        sp.write(prog, PROGRESS_STATE_PATH)
         time.sleep(a.cadence)
     return 0
 

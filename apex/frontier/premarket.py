@@ -178,8 +178,32 @@ def seal(packet: dict) -> dict:
                     if k != "packet_sha256"},
                    sort_keys=True, default=str).encode()).hexdigest()
     PACKETS.mkdir(parents=True, exist_ok=True)
-    (PACKETS / f"{packet['market_date']}.json").write_text(
-        json.dumps(body, indent=2, default=str))
+    canonical = PACKETS / f"{packet['market_date']}.json"
+    canonical.write_text(json.dumps(body, indent=2, default=str))
+
+    # MANIFEST REGISTRATION (Phase 1.1, 2026-08-18). On 2026-08-18 the
+    # EOD recap could not locate a sealed Morning Prior at all and fell
+    # back to guessing filenames, which found nothing. Registration
+    # happens HERE, at the one real seal site, so a packet cannot be
+    # sealed without becoming deterministically locatable. A manifest
+    # failure must never invalidate an otherwise-good seal, so it is
+    # reported and swallowed -- locate() will then honestly return None
+    # rather than a false success.
+    try:
+        from apex.memory import morning_prior_manifest as _mpm
+        _mpm.register(
+            session_date=packet["market_date"], canonical_path=canonical,
+            source_health={
+                "source_coverage": body.get("source_coverage"),
+                "blind_spots": body.get("blind_spots"),
+                "packet_sha256": body["packet_sha256"],
+            },
+            known_from=packet["as_of_time"], now=pd.Timestamp.now(tz="UTC"),
+            runtime_version="premarket_seal_v1")
+    except Exception as e:                                  # noqa: BLE001
+        print(f"morning prior manifest registration FAILED "
+              f"({type(e).__name__}: {e}) -- packet is sealed but will NOT "
+              f"be deterministically locatable at EOD")
     return body
 
 

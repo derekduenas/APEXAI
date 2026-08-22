@@ -120,8 +120,10 @@ def test_full_stack_synthetic_proof(tmp_path):
                                   "median_dollar_volume": 500e6}},
                 "universe_limitation": "synthetic-proof"}
     scan_rec, records = decision_pass(
-        t, universe, {"X": f, "SPY.US": bars("SPY", n=120, noise=5e-5)},
-        {"X": ctx("X"), "SPY.US": ctx("SPY")})
+        t, universe, {"X": f, "SPY.US": bars("SPY", date="2026-08-17",
+                                             n=120, noise=5e-5)},
+        {"X": ctx("X", as_of_date="2026-08-17"),
+         "SPY.US": ctx("SPY", as_of_date="2026-08-17")})
     led = tmp_path / "ledger.jsonl"
     _chain_append(led, scan_rec)
     for r in records:
@@ -177,7 +179,16 @@ def test_production_forward_path_monday_truth():
     assert fb["distribution_source_status"] in ("REFUSED", "ANALOG_FORWARD")
     assert cap["final_state"] in ("OBSERVE", "WATCH", "NO_TRADE", "REFUSED")
     assert cap["final_state"] != "PAPER_ELIGIBLE"    # unreachable, proven
-    assert "NO_CALIBRATED_FORECAST" in cap["reason_codes"]
+    # SESSION INTEGRITY HARDENING (v1.2): whichever reason blocks capital
+    # first is fine -- either the calibration gate never opened, or the
+    # birth law itself refuses (a decision timestamped earlier in the
+    # day than the newest same-day feature_schema birth is correctly
+    # NOT_FORWARD_ELIGIBLE -- "conservative by design", apex/hunter/
+    # birth.py). Both are the SAME guarantee this test exists to prove:
+    # nothing here ever reaches PAPER_ELIGIBLE.
+    assert cap["reason_codes"] and (
+        "NO_CALIBRATED_FORECAST" in cap["reason_codes"]
+        or "GOVERNANCE_FAILURE" in cap["reason_codes"])
     # and NO paper order exists anywhere in the production records
     assert not any(r.get("kind") == "paper_order" for r in records)
 
@@ -185,5 +196,7 @@ def test_production_forward_path_monday_truth():
 def decision_pass_prod(t, universe, f):
     from apex.hunter.forward_pass import decision_pass
     return decision_pass(
-        t, universe, {"X": f, "SPY.US": bars("SPY", n=120, noise=5e-5)},
-        {"X": ctx("X"), "SPY.US": ctx("SPY")})
+        t, universe, {"X": f, "SPY.US": bars("SPY", date="2026-08-17",
+                                             n=120, noise=5e-5)},
+        {"X": ctx("X", as_of_date="2026-08-17"),
+         "SPY.US": ctx("SPY", as_of_date="2026-08-17")})

@@ -180,29 +180,45 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
     scan_record["kind"] = "scan"
     # Scout-level universe facets for the DIGITAL WORLD (Twin 2.0):
     # observational aggregates over every computed state, typed absences
-    # when the universe is thin
+    # when the universe is thin OR when session-anchored features are
+    # invalid (SESSION INTEGRITY GATE, v1.2) -- an aggregate over zero
+    # valid inputs is None + status, never a silent 0.0/NaN.
     if cs_by_symbol:
         import numpy as _np
         _states = list(cs_by_symbol.values())
+        _anchor_valid_states = [c for c in _states
+                                if c.session_coverage.get("session_anchor_valid")]
+        _n_anchor_valid = len(_anchor_valid_states)
         _gaps = [c.gap_frac for c in _states if c.gap_frac is not None]
         _rvols = [c.rvol_tod for c in _states if c.rvol_tod is not None]
+        _avwap = [bool(c.above_vwap) for c in _states
+                 if c.above_vwap is not None]
+        _or_states = [c for c in _anchor_valid_states if c.or_complete]
+
+        def _mean_or_none(vals):
+            return round(float(_np.mean(vals)), 2) if vals else None
+
+        def _median_or_none(vals):
+            return round(float(_np.median(vals)), 2) if vals else None
+
         scan_record["universe_facets"] = {
             "n_states": len(_states),
-            "above_vwap_frac": round(float(_np.mean(
-                [bool(c.above_vwap) for c in _states
-                 if c.above_vwap is not None])), 2),
+            "n_session_anchor_valid": _n_anchor_valid,
+            "session_anchor_valid_frac": round(
+                _n_anchor_valid / len(_states), 2) if _states else None,
+            "above_vwap_frac": _mean_or_none(_avwap),
             "gap_environment": {
                 "median_abs_gap": round(float(_np.median(
                     [abs(g) for g in _gaps])), 4) if _gaps else None,
-                "material_gap_frac": round(float(_np.mean(
-                    [abs(g) >= 0.02 for g in _gaps])), 2) if _gaps else None},
-            "participation_median_rvol": round(float(_np.median(_rvols)), 2)
-            if _rvols else None,
+                "material_gap_frac": _mean_or_none(
+                    [abs(g) >= 0.02 for g in _gaps]) if _gaps else None},
+            "participation_median_rvol": _median_or_none(_rvols),
             "opening_behavior": {
-                "or_break_up_frac": round(float(_np.mean(
-                    [c.or_break_up for c in _states])), 2),
-                "or_break_down_frac": round(float(_np.mean(
-                    [c.or_break_down for c in _states])), 2)},
+                "n_or_complete": len(_or_states),
+                "or_break_up_frac": _mean_or_none(
+                    [c.or_break_up for c in _or_states]),
+                "or_break_down_frac": _mean_or_none(
+                    [c.or_break_down for c in _or_states])},
             "breakout_success_environment": {"status":
                                              "DORMANT_NEEDS_OUTCOMES"}}
     else:
@@ -214,8 +230,36 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
     births = birthlib.load_births()
     seen, seen_baseline = existing_decision_keys(date)
     decisions = []
-    for sym, _sigs, _rv in result.watchlist:
+    # SESSION INTEGRITY GATE (v1.2): a playbook that NEVER got a chance
+    # to evaluate its required features (session-anchored: vwap,
+    # rvol_tod, or_complete) must be distinguishable from one that
+    # evaluated and genuinely found no match. Both playbooks_v1.py
+    # matchers already fail-closed internally on `None in (cs.vwap,
+    # cs.rvol_tod, ...)` -- untouched, unchanged -- but that makes
+    # REFUSE_INSUFFICIENT_VALID_STATE indistinguishable from NO_MATCH
+    # from the outside. This check is ORCHESTRATION, not a playbook
+    # predicate or threshold: it decides whether to call the matcher at
+    # all, never how the matcher decides.
+    REQUIRED_FOR_MATCH = ("vwap", "rvol_tod")
+
+    def _insufficient_state(cs: ChartState) -> bool:
+        fv = cs.feature_validity or {}
+        return any(fv.get(name, {}).get("status") != "VALID"
+                  for name in REQUIRED_FOR_MATCH)
+
+    refusals = []
+    for _entry in result.watchlist:
+        sym = _entry.symbol
         cs, rs = cs_by_symbol[sym], rs_by_symbol[sym]
+        if _insufficient_state(cs):
+            refusals.append({
+                "kind": "playbook_match_refused", "symbol": sym,
+                "t_utc": str(t), "session_date": date,
+                "match_result": "REFUSE_INSUFFICIENT_VALID_STATE",
+                "reason": {k: v for k, v in (cs.feature_validity or {}).items()
+                          if k in REQUIRED_FOR_MATCH and v.get("status") != "VALID"},
+                "playbooks_not_evaluated": ("HUNTER-001", "HUNTER-002")})
+            continue
         geo = extension_geometry(bars_by_symbol[sym], t)
         for m in (match_hunter_001(cs, rs, market_cs),
                   match_hunter_002(cs, rs, geo)):
@@ -254,10 +298,12 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
             }, EvidenceClass.EODHD_FORWARD_OBSERVATION)
             decisions.append(rec)
 
+    scan_record["playbook_match_refusals"] = refusals
+
     # frozen baselines: same subjects, same ledger, same machinery —
     # deliberately naive directions (protocol §6; no separate system)
     decisions.extend(baseline_decisions(
-        t, date, tuple(s for s, _, _ in result.watchlist),
+        t, date, tuple(e.symbol for e in result.watchlist),
         cs_by_symbol, rs_by_symbol, market_cs, births, seen_baseline))
 
     if not enrich:

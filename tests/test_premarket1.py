@@ -79,7 +79,15 @@ def test_h_premarket_is_preregistered_and_not_estimable():
                                 "UNKNOWN"}
     r = estimate("H_PREMARKET")
     assert r["status"] == "NOT_YET_ESTIMABLE"
-    assert r["resolved_cards"] == 0
+    # SEMANTIC RULING 2026-08-18 (Phase 1.1): `resolved_cards == 0` here
+    # encoded a pre-live world, not a governance law -- the 2026-08-18
+    # session produced APEX's first legitimate resolved card (HD). The
+    # law that matters is the line above: a non-empty denominator must
+    # still not make an under-powered hypothesis estimable. See
+    # test_frontier1.test_synthetic_cards_never_enter_the_learning_denominator
+    # for the full ruling and the retained synthetic-exclusion invariant.
+    from apex.frontier.learning import _resolved_cards
+    assert r["resolved_cards"] == len(_resolved_cards())
 
 
 def test_cards_carry_the_premarket_hash_but_agreement_stays_unknown():
