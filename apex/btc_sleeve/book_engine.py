@@ -49,13 +49,24 @@ class BookState:
     negative_size_events: int = 0
     invalidations: int = 0
     resyncs: int = 0
-    # the venue's periodic snapshots (~10s cadence measured) are ground
-    # truth: each one is diffed against our reconstruction BEFORE it
-    # replaces it. Persistent divergence = real delta loss; occasional
-    # divergence can be in-flight timing, so it is telemetry, not an
-    # automatic invalidation.
+    # SNAPSHOT RECONCILIATION (operator mandate 2026-08-22: "in-flight
+    # timing is an explanation, not yet proof"). Each periodic venue
+    # snapshot is quantitatively reconciled against our reconstruction
+    # BEFORE replacing it. Classification law:
+    #   * a mismatch that is GONE at the next reconciliation was a
+    #     transient in-flight race -> RECONCILIATION_RACE_CONFIRMED
+    #   * the SAME level mismatched at two consecutive reconciliations
+    #     -> BOOK_RECONSTRUCTION_DIVERGENCE (L2 stays provisional)
     snapshot_divergence_events: int = 0
     last_divergence: dict | None = None
+    reconciliations_total: int = 0
+    reconciliations_perfect: int = 0
+    races_confirmed: int = 0
+    persistent_divergences: int = 0
+    last_reconciliation: dict | None = None
+    _pending_mismatch_keys: tuple = ()
+    _levels_since_snapshot: int = 0
+    _last_level_arrival: float | None = None
 
     def _invalidate(self, reason: str) -> None:
         if self.quality != BOOK_INVALID:
@@ -63,7 +74,8 @@ class BookState:
         self.quality = BOOK_INVALID
         self.invalid_reason = reason
 
-    def apply_snapshot(self, msg: dict) -> None:
+    def apply_snapshot(self, msg: dict, arrival: float | None = None
+                       ) -> None:
         ack = int(msg["ack_id"])
         if ack == 0:
             self.quality = BOOK_CLOSED
@@ -80,13 +92,9 @@ class BookState:
             return
         was_invalid = self.quality == BOOK_INVALID
         if self.quality == BOOK_VALID:
-            diff = self._diff_against(bids, asks)
-            if diff:
-                self.snapshot_divergence_events += 1
-                self.last_divergence = {"snapshot_ack": ack,
-                                        "our_ack": self.last_applied_ack,
-                                        "mismatched_levels": diff}
+            self._reconcile(ack, msg, bids, asks, arrival)
         self.bids, self.asks = bids, asks
+        self._levels_since_snapshot = 0
         self.snapshot_ack = ack
         self.last_applied_ack = ack
         self.snapshots += 1
@@ -96,8 +104,11 @@ class BookState:
             self.resyncs += 1
         self._check_crossed()
 
-    def apply_level(self, msg: dict) -> None:
+    def apply_level(self, msg: dict, arrival: float | None = None
+                    ) -> None:
         ack = int(msg["ack_id"])
+        if arrival is not None:
+            self._last_level_arrival = arrival
         if self.snapshot_ack is None or self.quality == BOOK_CLOSED:
             # delta before any snapshot: cannot anchor -- uncertainty
             self._invalidate("LEVEL_BEFORE_SNAPSHOT")
@@ -132,6 +143,7 @@ class BookState:
             side[price] = qty
         self.last_applied_ack = ack
         self.levels_applied += 1
+        self._levels_since_snapshot += 1
         self._check_crossed()
 
     def on_disconnect(self) -> None:
@@ -170,21 +182,73 @@ class BookState:
                 "last_applied_ack": self.last_applied_ack}
 
     def _diff_against(self, bids: dict, asks: dict, top_n: int = 5
-                      ) -> list:
+                      ) -> tuple:
         """Mismatched top-N levels between our reconstruction and a
-        fresh venue snapshot -- the reconstruction-correctness probe."""
-        out = []
-        for name, ours, theirs, best in (
-                ("bid", self.bids, bids, max), ("ask", self.asks, asks,
-                                                min)):
+        fresh venue snapshot -- the reconstruction-correctness probe.
+        Returns (mismatches, levels_compared, qty_mm, price_mm)."""
+        out, compared, qty_mm, price_mm = [], 0, 0, 0
+        for name, ours, theirs in (("bid", self.bids, bids),
+                                   ("ask", self.asks, asks)):
             keys = sorted(set(ours) | set(theirs),
                           reverse=(name == "bid"))[:top_n]
+            compared += len(keys)
             for p in keys:
                 if ours.get(p) != theirs.get(p):
+                    if p in ours and p in theirs:
+                        qty_mm += 1
+                    else:
+                        price_mm += 1
                     out.append({"side": name, "price": p,
                                 "ours": ours.get(p),
                                 "snapshot": theirs.get(p)})
-        return out
+        return out, compared, qty_mm, price_mm
+
+    def _reconcile(self, ack: int, msg: dict, bids: dict, asks: dict,
+                   arrival: float | None) -> None:
+        """Quantitative snapshot reconciliation + race-vs-divergence
+        classification (see class docstring for the law)."""
+        diff, compared, qty_mm, price_mm = self._diff_against(bids, asks)
+        self.reconciliations_total += 1
+        our_bb, our_ba = self.best_bid(), self.best_ask()
+        snap_bb = max(bids) if bids else None
+        snap_ba = min(asks) if asks else None
+        rec = {"snapshot_ack": ack,
+               "snapshot_event_time": msg.get("timestamp"),
+               "local_last_applied_ack": self.last_applied_ack,
+               "time_delta_ms": round(
+                   (arrival - self._last_level_arrival) * 1000.0, 1)
+               if arrival is not None and
+               self._last_level_arrival is not None else None,
+               "levels_compared": compared,
+               "levels_matching": compared - len(diff),
+               "quantity_mismatch": qty_mm,
+               "price_mismatch": price_mm,
+               "top_of_book_match": (our_bb == snap_bb and
+                                     our_ba == snap_ba),
+               "events_between_local_capture_and_snapshot":
+                   self._levels_since_snapshot,
+               "mismatched_levels": diff[:10]}
+        # classify LAST reconciliation's pending mismatches
+        if self._pending_mismatch_keys:
+            now_keys = {(d["side"], d["price"]) for d in diff}
+            repeated = [k for k in self._pending_mismatch_keys
+                        if k in now_keys]
+            if repeated:
+                self.persistent_divergences += 1
+                rec["classification"] = "BOOK_RECONSTRUCTION_DIVERGENCE"
+                rec["repeated_levels"] = repeated
+            else:
+                self.races_confirmed += 1
+                rec["prior_divergence_classification"] = \
+                    "RECONCILIATION_RACE_CONFIRMED"
+        if diff:
+            self.snapshot_divergence_events += 1
+            self.last_divergence = rec
+        else:
+            self.reconciliations_perfect += 1
+        self._pending_mismatch_keys = tuple(
+            (d["side"], d["price"]) for d in diff)
+        self.last_reconciliation = rec
 
     def continuity(self) -> dict:
         return {"snapshots": self.snapshots,
@@ -193,6 +257,10 @@ class BookState:
                 "same_ack_repeats": self.same_ack_repeats,
                 "snapshot_divergence_events":
                     self.snapshot_divergence_events,
+                "reconciliations_total": self.reconciliations_total,
+                "reconciliations_perfect": self.reconciliations_perfect,
+                "races_confirmed": self.races_confirmed,
+                "persistent_divergences": self.persistent_divergences,
                 "out_of_order": self.out_of_order,
                 "crossed_events": self.crossed_events,
                 "negative_size_events": self.negative_size_events,

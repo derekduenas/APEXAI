@@ -324,6 +324,151 @@ def test_real_ledger_pre_lineage_rows_are_excluded_and_preserved():
             assert b["last_trade"]["semantic_type"] == "LAST_TRADE"
 
 
+# ------------------------------------------------ dual-writer closure
+
+def _chain(rows):
+    """Hash-chain a list of dicts the way chain_append does."""
+    import hashlib
+    out, prev = [], "GENESIS"
+    for r in rows:
+        r = dict(r, prev_hash=prev)
+        prev = hashlib.sha256(
+            json.dumps(r, sort_keys=True).encode()).hexdigest()
+        r["entry_hash"] = prev
+        out.append(r)
+    return out
+
+
+_MARKER = {"kind": "commissioning_perturbation",
+           "cause": "BUILDER_CAUSED_DUAL_WRITER", "known_from": "t2"}
+
+
+def test_chain_closure_bounds_forensic_interval_and_proves_post_fix(
+        tmp_path, monkeypatch):
+    from apex.btc_sleeve.lineage_eligibility import (
+        FORENSIC_REASON, ws_chain_closure_report, ws_eligible_rows)
+    monkeypatch.chdir(tmp_path)          # sidecar path is relative
+    # pre-boundary rows with a deliberate break, then marker, then
+    # a clean post-fix chain
+    pre = _chain([{"kind": "ws_trade", "known_from": "t0"},
+                  {"kind": "ws_trade", "known_from": "t1"}])
+    pre[1]["prev_hash"] = "BROKEN_BY_SECOND_WRITER"
+    tail = _chain([_MARKER,
+                   {"kind": "ws_trade", "known_from": "t3"},
+                   {"kind": "ws_trade", "known_from": "t4"}])
+    lp = tmp_path / "ws.jsonl"
+    lp.write_text("\n".join(json.dumps(r) for r in pre + tail))
+    rep = ws_chain_closure_report(lp)
+    assert rep["POST_FIX_HASH_CHAIN_BREAKS"] == 0
+    assert rep["DUAL_WRITER_EVENTS_POST_FIX"] == 0
+    assert rep["forensic_interval_rows"] == 3
+    fe = rep["forensic_eligibility"]
+    assert not fe["canonical_eligible"] and \
+        not fe["research_eligible"] and not fe["forecast_eligible"]
+    assert fe["reason"] == FORENSIC_REASON
+    assert rep["lock_contention_observable"] is True
+    kept = list(ws_eligible_rows(lp))
+    assert [r["known_from"] for r in kept] == ["t3", "t4"]
+
+
+def test_chain_closure_detects_post_fix_breaks(tmp_path, monkeypatch):
+    from apex.btc_sleeve.lineage_eligibility import (
+        ws_chain_closure_report)
+    monkeypatch.chdir(tmp_path)
+    rows = _chain([_MARKER, {"kind": "ws_trade", "known_from": "t3"}])
+    rows[1]["prev_hash"] = "TAMPERED"
+    lp = tmp_path / "ws.jsonl"
+    lp.write_text("\n".join(json.dumps(r) for r in rows))
+    rep = ws_chain_closure_report(lp)
+    assert rep["POST_FIX_HASH_CHAIN_BREAKS"] == 1
+    assert rep["DUAL_WRITER_EVENTS_POST_FIX"] != 0
+
+
+def test_real_ws_ledgers_post_fix_chains_are_clean():
+    from apex.btc_sleeve.lineage_eligibility import (
+        ws_chain_closure_report)
+    for lp in (Path("results/btc/ws_trades_ledger.jsonl"),
+               Path("results/btc/ws_book_ledger.jsonl")):
+        if not lp.exists():
+            pytest.skip("no real WS ledgers in this environment")
+        rep = ws_chain_closure_report(lp)
+        assert rep["POST_FIX_HASH_CHAIN_BREAKS"] == 0, rep
+        assert rep["pre_fix_chain_breaks_preserved"] >= 1
+
+
+def test_lock_contention_is_observable(tmp_path, monkeypatch):
+    import os
+    import btc_ws_stream as ws
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "results/btc").mkdir(parents=True)
+    monkeypatch.setattr(ws, "LOCK",
+                        tmp_path / "results/btc/ws_stream.pid")
+    ws.LOCK.write_text(str(os.getpid()))       # a provably live holder
+    with pytest.raises(SystemExit):
+        ws._acquire_single_writer_lock()
+    side = tmp_path / "results/btc/ws_lock_contention.jsonl"
+    ev = json.loads(side.read_text().splitlines()[0])
+    assert ev["outcome"] == "REFUSED_SINGLE_WRITER_LAW"
+    assert ev["holder_pid"] == os.getpid()
+
+
+# ------------------------------------------------ snapshot reconciliation
+
+def test_transient_divergence_classified_as_race():
+    """A mismatch that self-heals by the next snapshot is a confirmed
+    in-flight race, not a reconstruction error."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100), arrival=1.0)
+    b.apply_level(_level(110, 15650, 20), arrival=1.5)
+    diverged = _snapshot(ack=150, bids=((15650, 77), (15645, 30)))
+    b.apply_snapshot(diverged, arrival=2.0)
+    assert b.snapshot_divergence_events == 1
+    healed = _snapshot(ack=200, bids=((15650, 77), (15645, 30)))
+    b.apply_snapshot(healed, arrival=3.0)
+    assert b.races_confirmed == 1
+    assert b.persistent_divergences == 0
+    assert b.last_reconciliation[
+        "prior_divergence_classification"] == \
+        "RECONCILIATION_RACE_CONFIRMED"
+
+
+def test_repeated_divergence_is_reconstruction_error():
+    """The SAME level wrong at two consecutive reconciliations is
+    BOOK_RECONSTRUCTION_DIVERGENCE -- L2 stays provisional."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100), arrival=1.0)
+    for ack in (150, 200):
+        # venue keeps saying 15650 -> 77; we never saw that delta
+        b.apply_snapshot(_snapshot(
+            ack=ack, bids=((15650, 77 + ack), (15645, 30))),
+            arrival=float(ack))
+    assert b.persistent_divergences == 1
+    assert b.last_reconciliation["classification"] == \
+        "BOOK_RECONSTRUCTION_DIVERGENCE"
+    assert b.last_reconciliation["repeated_levels"]
+
+
+def test_reconciliation_record_carries_the_mandated_fields():
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100), arrival=1.0)
+    b.apply_level(_level(110, 15650, 20), arrival=1.5)
+    b.apply_snapshot(_snapshot(ack=150, bids=((15650, 20),
+                                              (15645, 30))),
+                     arrival=2.0)
+    rec = b.last_reconciliation
+    for f in ("snapshot_ack", "snapshot_event_time",
+              "local_last_applied_ack", "time_delta_ms",
+              "levels_compared", "levels_matching",
+              "quantity_mismatch", "price_mismatch",
+              "top_of_book_match",
+              "events_between_local_capture_and_snapshot"):
+        assert f in rec, f
+    assert rec["time_delta_ms"] == 500.0
+    assert rec["events_between_local_capture_and_snapshot"] == 1
+    assert rec["top_of_book_match"] is True
+    assert rec["levels_matching"] == rec["levels_compared"]
+
+
 def test_schema_change_attack_unknown_shape_is_excluded():
     """A future upstream schema change that drops lineage fields must
     fail CLOSED (excluded), not open."""

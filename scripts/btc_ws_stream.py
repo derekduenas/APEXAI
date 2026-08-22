@@ -180,7 +180,14 @@ class BitnomialStream:
             self.counts["books"] += 1
             self._resolve_unit(float(msg["asks"][0][0])
                                if msg.get("asks") else 0.0)
-            self.book.apply_snapshot(msg)
+            self.book.apply_snapshot(msg, arrival=arrival)
+            recon = self.book.last_reconciliation
+            if recon and (recon.get("mismatched_levels") or
+                          "classification" in recon or
+                          "prior_divergence_classification" in recon):
+                chain_append(BOOK_LEDGER, dict(
+                    recon, kind="ws_book_reconciliation",
+                    known_from=_utcnow(), decision_power="NONE"))
             chain_append(BOOK_LEDGER, {
                 "kind": "ws_book_snapshot", "known_from": _utcnow(),
                 "venue": "BITNOMIAL", "symbol": msg.get("symbol"),
@@ -195,7 +202,7 @@ class BitnomialStream:
         elif mtype == "level":
             self.counts["levels"] += 1
             before = self.book.quality
-            self.book.apply_level(msg)
+            self.book.apply_level(msg, arrival=arrival)
             if self.book.quality != before and \
                     self.book.quality != BOOK_VALID:
                 chain_append(BOOK_LEDGER, {
@@ -353,6 +360,15 @@ def _acquire_single_writer_lock() -> None:
         try:
             pid = int(LOCK.read_text().strip())
             os.kill(pid, 0)
+            # contention must be OBSERVABLE (operator mandate) -- the
+            # refusal is logged to a sidecar, never to the chain ledger
+            # (a second writer touching the ledger is the disease)
+            with open("results/btc/ws_lock_contention.jsonl", "a") as f:
+                f.write(json.dumps({
+                    "kind": "ws_lock_contention",
+                    "known_from": _utcnow(), "holder_pid": pid,
+                    "refused_pid": os.getpid(),
+                    "outcome": "REFUSED_SINGLE_WRITER_LAW"}) + "\n")
             raise SystemExit(f"REFUSED: btc_ws_stream pid={pid} is "
                              f"alive -- single-writer law")
         except (ValueError, ProcessLookupError):

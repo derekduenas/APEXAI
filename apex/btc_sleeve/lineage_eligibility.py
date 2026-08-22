@@ -74,6 +74,81 @@ def eligible_rows(ledger_path: Path, *, purpose: str = "canonical"):
             yield row, verdict
 
 
+# ---------------------------------------------------------------------
+# FORENSIC_CORRUPTED_INTERVAL (operator mandate, 2026-08-22): the WS
+# ledgers' dual-writer window compromised LEDGER PROVENANCE -- not
+# necessarily the market data, but a chain whose integrity is uncertain
+# may not feed World Lab or any eligible corpus. The boundary marker is
+# the append-only `commissioning_perturbation` record itself (appended
+# after both writers were killed and before the locked daemon started):
+# every row at or before it is forensic; every row after it must chain
+# cleanly.
+FORENSIC_REASON = "FORENSIC_CORRUPTED_INTERVAL_DUAL_WRITER"
+_PERTURBATION_CAUSE = "BUILDER_CAUSED_DUAL_WRITER"
+
+
+def ws_chain_closure_report(ledger_path: Path) -> dict:
+    """Hard closure of the dual-writer incident for one WS ledger:
+    bounds the forensic interval, proves the post-fix chain is clean,
+    and reports lock-contention observability."""
+    rows = [json.loads(x) for x in
+            Path(ledger_path).read_text().splitlines() if x.strip()]
+    boundary = None
+    for i, r in enumerate(rows):
+        if r.get("kind") == "commissioning_perturbation" and \
+                r.get("cause") == _PERTURBATION_CAUSE:
+            boundary = i
+    if boundary is None:
+        return {"kind": "ws_chain_closure", "ledger": str(ledger_path),
+                "status": "NO_PERTURBATION_MARKER",
+                "rows_total": len(rows)}
+    post = rows[boundary:]
+    post_breaks = sum(
+        1 for i in range(1, len(post))
+        if post[i].get("prev_hash") != post[i - 1].get("entry_hash"))
+    pre_breaks = sum(
+        1 for i in range(1, boundary + 1)
+        if rows[i].get("prev_hash") != rows[i - 1].get("entry_hash"))
+    contention = Path("results/btc/ws_lock_contention.jsonl")
+    contention_events = (len(contention.read_text().splitlines())
+                        if contention.exists() else 0)
+    return {"kind": "ws_chain_closure", "ledger": str(ledger_path),
+            "rows_total": len(rows),
+            "forensic_interval_rows": boundary + 1,
+            "forensic_interval_bounds": {
+                "first_known_from": rows[0].get("known_from"),
+                "boundary_known_from": rows[boundary].get("known_from")},
+            "forensic_eligibility": {
+                "canonical_eligible": False,
+                "research_eligible": False,
+                "forecast_eligible": False,
+                "reason": FORENSIC_REASON,
+                "note": "ledger provenance compromised; underlying "
+                        "market data not necessarily bad -- excluded "
+                        "anyway"},
+            "pre_fix_chain_breaks_preserved": pre_breaks,
+            "post_fix_rows": len(post) - 1,
+            "POST_FIX_HASH_CHAIN_BREAKS": post_breaks,
+            "DUAL_WRITER_EVENTS_POST_FIX": 0 if post_breaks == 0 else
+            "UNKNOWN -- breaks present, investigate",
+            "LOCK_CONTENTION_EVENTS": contention_events,
+            "lock_contention_observable": True}
+
+
+def ws_eligible_rows(ledger_path: Path):
+    """WS-ledger analog of eligible_rows: yields only rows AFTER the
+    dual-writer perturbation marker (forensic interval excluded)."""
+    rows = [json.loads(x) for x in
+            Path(ledger_path).read_text().splitlines() if x.strip()]
+    boundary = -1
+    for i, r in enumerate(rows):
+        if r.get("kind") == "commissioning_perturbation" and \
+                r.get("cause") == _PERTURBATION_CAUSE:
+            boundary = i
+    for r in rows[boundary + 1:]:
+        yield r
+
+
 def exclusion_report(ledger_path: Path) -> dict:
     total, excluded = 0, 0
     for line in Path(ledger_path).read_text().splitlines():

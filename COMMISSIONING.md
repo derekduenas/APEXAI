@@ -118,3 +118,42 @@ after close  reconcile vs independent Alpaca REST aggregates
 ```
 Do NOT commission Layer 7 Monday morning. Perturbations (like Friday's
 15:56 restart) are recorded as such, never as free validation.
+
+## BTC SLEEVE LADDER (independent; weekend 2026-08-21/22)
+```
+BTC-L0  host 24/7            SOAKING (sentinel shared with equities)
+BTC-L1  venue reachability   PASS (Deribit/Kraken/OKX/Coinbase/Bitnomial;
+                             Binance 451 + Bybit 403 recorded, no workaround)
+BTC-L2  raw integrity        IN_PROGRESS -> weekend soak running
+BTC-L3+ cognition            NOT_AUTHORIZED (STOP LAW)
+```
+BTC-L2 facts on record (all resolved by docs/spec/measurement, never guessed):
+- Price lineage: /product/data mark_price = FUNDING_MARK (frozen between
+  8h intervals, no own timestamp) -- the "-1.48% discount" was a lineage
+  artifact. last_price = LAST_TRADE with own timestamp.
+- PERMANENT LINEAGE-EXCLUSION LAW: 157 pre-lineage rows preserved
+  append-only, excluded from canonical/research/forecast forever
+  (PRE_LINEAGE_SEMANTIC_DEFECT; classifier is a pure function of the
+  row -> survives restart/replay; tests prove it).
+- Funding endpoint RESOLVED: /exchange/api/v1/funding-rates/ (NOT under
+  /prod/ -- mount mismatch was the 404 mystery). Settled 8h intervals
+  only; price_index/mark_price in TICKS. ACTUAL funding, never estimate.
+- WS trades+book LIVE: wss://bitnomial.com/exchange/ws, PBTCUCZ50,
+  launchd com.apex.btc-ws, single-writer pid lock. Unit resolved
+  empirically = TICKS (docs silent). Periodic ~10s venue snapshots
+  diffed against our reconstruction (divergence probe). Live catch:
+  ~47% of level msgs share ack_id (atomic multi-level events, NOT
+  duplicates) -- first engine skipped them; fixed to apply-idempotent.
+- STALE-LAST-TRADE LAW: predeclared 60s policy (never tuned); stale or
+  unknown age -> LAST_TRADE_REALTIME_COMPARISON=INELIGIBLE, spread
+  withheld. Firing correctly on the quiet overnight tape.
+- BOOK LAW: any sequence uncertainty -> INVALID until fresh snapshot
+  (reconnect-forced resync); invalid book yields a reason, never a price.
+- Red team: 28 attacks, all end in REFUSAL/DEGRADED/INVALID/NOT_ESTIMABLE
+  (tests/test_btc_l2_redteam.py).
+- Builder-caused perturbations recorded: dual-writer window (9+1 chain
+  breaks preserved as forensic evidence; remedies = watchdog budget
+  enforcement + pid lock) and the ~43min poller gap during the upgrade.
+- Liquidations: NOT_AVAILABLE. No inferred liquidations, no geoblock
+  workarounds.
+FINAL BTC-L2 ACCEPTANCE: after the weekend soak (btc_l2_report.py).
