@@ -151,3 +151,46 @@ PURCHASE REQUIRED NEXT    YES — either ORATS one-time ($1,500 + S3
 LIVE SIZE PERSISTENCE     READY_AFTER_MONDAY (values already in memory)
 AUTHORITY                 OBSERVE        APEX CHANGES: 0
 ```
+
+---
+
+# ADDENDUM (2026-08-22, operator correction) — THE OI CAUSAL LAW, CORRECTED
+
+My original rule — "re-stamp OI known_from = previous close" — was
+**wrong in the direction that matters**. Per OCC/Cboe semantics
+(operator-verified): open interest reflects the previous day's
+settlement, and the previous-night OCC value becomes the trading day's
+starting OI. But *settlement state* and *availability* are different
+instants, and conflating them can leak the final previous-day OI into
+timestamps where it was not yet knowable.
+
+**THE PINNED LAW (binding on every future options ingest):**
+
+```
+OI_AS_OF       = the prior completed clearing/settlement state the
+                 value represents
+OI_KNOWN_FROM  = the earliest timestamp the value was ACTUALLY
+                 available from the source (vendor publication /
+                 next-session availability)
+               ≠ prior close automatically
+```
+
+If the vendor's historical publication instant cannot be established:
+use a conservative documented session-availability convention or mark
+`OI_CAUSALITY = LIMITED`. Never let same-day end-of-session OI enter
+earlier intraday states — and never let previous-day OI enter states
+before it was published.
+
+The measured fact from the sample stands unchanged (0/920 contracts
+change OI intraday — it is a daily snapshot stamped onto every minute);
+only the stamping rule is corrected.
+
+# ADDENDUM 2 — PILOT DECISION (operator, 2026-08-22)
+
+ORATS $1,500 purchase: **DEFERRED.** One month of ThetaData Value
+(~$40, price to be confirmed at checkout) is the next step — five
+minutes of one AAPL day proved ORATS's schema, not multi-regime
+quality, and ThetaData's raw interval-sampled NBBO with sizes is the
+market truth APEX wants to reconstruct its own intelligence from.
+Head-to-head runs on the pre-registered sessions once access exists.
+Subscription/credentials are OPERATOR actions.
