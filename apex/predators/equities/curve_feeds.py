@@ -55,6 +55,15 @@ import math
 
 SHADOW_POWER = "NONE_CURVE_DIMENSION_SHADOW"
 
+# TERMINOLOGY LAW (operator, 2026-08-22). "CANONICAL" below describes
+# the IMPLEMENTATION SEMANTICS -- that volatility and correlation are
+# the real dimensions rather than proxies. It does NOT mean Captain may
+# consume them. Anyone reading this file months from now must not infer
+# authorization from the word canonical.
+IMPLEMENTATION_SEMANTICS = "CANONICAL"      # real dimensions, not proxies
+DECISION_AUTHORITY = "SHADOW"               # until natural acceptance
+PROMOTION_STATUS = "NOT_AUTHORIZED_PENDING_MONDAY_NATURAL_ACCEPTANCE"
+
 # canonical market and complex references present in the bar store
 MARKET_PROXY = "SPY"
 EQUITY_COMPLEX = ("SPY", "QQQ", "IWM")
@@ -247,11 +256,15 @@ def volume_pressure_proxy_points(bars: list,
 
 # what each feed is allowed to be called, and where it may go
 FEED_SEMANTICS = {
-    "volatility": {"kind": "CANONICAL", "dimension": "volatility",
+    "volatility": {"kind": "CANONICAL",
+                   "decision_authority": DECISION_AUTHORITY,
+                   "dimension": "volatility",
                    "dependency_group": "VOLATILITY",
                    "reason_for_group": "derived from return dispersion, "
                                        "not from level or cross-section"},
-    "correlation": {"kind": "CANONICAL", "dimension": "correlation",
+    "correlation": {"kind": "CANONICAL",
+                    "decision_authority": DECISION_AUTHORITY,
+                    "dimension": "correlation",
                     "dependency_group": "CROSS_SECTIONAL",
                     "reason_for_group": "requires other subjects; shares "
                                         "the cross-sectional dependency "
