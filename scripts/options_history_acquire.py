@@ -361,8 +361,44 @@ def main() -> int:
 
     for phase in phases:
         print(f"=== PHASE {phase}: {PHASES[phase]} workers={workers}")
-        todo = [(sym, date) for sym in PHASES[phase] for date in days
-                if done.get((sym, date)) != "VALIDATED"]
+        # ACQUISITION ORDER (2026-08-23): symbol-major chronological
+        # would spend ~20h on SPY before QQQ began -- the research gate
+        # needs BREADTH (4 symbols x multiple years x quiet+volatile)
+        # long before it needs depth. So: STRATIFIED PASSES over a
+        # deterministic uniform stride, round-robin across symbols.
+        # Pass k takes every STRIDE-th trading day at offset k, so each
+        # pass is a uniform sample of the ENTIRE 2018-2026 span for
+        # every symbol. No date is chosen for being interesting, the
+        # full set is still acquired, and the order is reproducible --
+        # operational sequencing, never hypothesis selection.
+        # YEAR-STRATIFIED FIRST: breadth (all years x all symbols)
+        # before depth. Pass 0 takes N_PER_YEAR uniformly-spaced days
+        # from EVERY year; later passes densify with a uniform stride.
+        # Deterministic, reproducible, no date chosen for being
+        # interesting -- the full set is still acquired.
+        from collections import defaultdict
+        by_year = defaultdict(list)
+        for d in days:
+            by_year[d[:4]].append(d)
+        todo, seen = [], set()
+
+        def _add(sym, d):
+            if (sym, d) not in seen and done.get((sym, d)) != "VALIDATED":
+                seen.add((sym, d))
+                todo.append((sym, d))
+
+        for n_per_year in (4, 12, 36):          # breadth -> density
+            for yr in sorted(by_year):
+                ds = by_year[yr]
+                step = max(1, len(ds) // n_per_year)
+                for d in ds[::step][:n_per_year]:
+                    for sym in PHASES[phase]:
+                        _add(sym, d)
+        STRIDE = 8                               # then fill the rest
+        for offset in range(STRIDE):
+            for di in range(offset, len(days), STRIDE):
+                for sym in PHASES[phase]:
+                    _add(sym, days[di])
         with ThreadPoolExecutor(max_workers=workers) as ex:
             i = 0
             while i < len(todo) and not stop["reason"]:
