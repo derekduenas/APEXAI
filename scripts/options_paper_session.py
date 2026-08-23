@@ -84,12 +84,12 @@ PROTOCOL = {
 
 
 def _scan_symbol(sym: str, sb: SessionScoreboard, ledger: Path,
-                 open_positions: list) -> dict:
+                 open_positions: list, as_of=None) -> dict:
     """One symbol, one instant. Returns a record of what happened."""
     rec = {"symbol": sym, "T": None}
     sb.stage("CANDIDATE")
     try:
-        obs = observe(sym)
+        obs = observe(sym, now=as_of)
     except FeedUnavailable as e:
         sb.stop("DATA_QUALITY")
         return {**rec, "status": "FEED_UNAVAILABLE", "detail": str(e)}
@@ -213,14 +213,14 @@ def _scan_symbol(sym: str, sb: SessionScoreboard, ledger: Path,
 
 
 def resolve_open(open_positions: list, sb: SessionScoreboard,
-                 ledger: Path) -> list:
+                 ledger: Path, as_of=None) -> list:
     """Close every open paper position at quoted sides."""
     import pandas as pd
     out = []
     for pos in open_positions:
         sym = pos["symbol"]
         try:
-            obs = observe(sym)
+            obs = observe(sym, now=as_of)
         except Exception as e:                             # noqa: BLE001
             out.append({"symbol": sym, "status": "UNRESOLVED",
                         "detail": f"{type(e).__name__}: {e}"})
@@ -270,14 +270,29 @@ def main() -> int:
     ap.add_argument("--symbols", default=",".join(UNIVERSE))
     ap.add_argument("--dry-run", action="store_true",
                     help="one scan cycle, resolve immediately")
+    ap.add_argument("--as-of", default=None,
+                    help="REHEARSAL ONLY: run the loop as if it were "
+                         "this UTC instant, to prove the machinery on "
+                         "a closed market. Output is stamped REHEARSAL "
+                         "and is NOT prospective evidence.")
     a = ap.parse_args()
 
     ledger = Path(a.ledger)
     syms = [s.strip().upper() for s in a.symbols.split(",") if s.strip()]
-    session = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    as_of = None
+    if a.as_of:
+        as_of = datetime.fromisoformat(a.as_of).replace(
+            tzinfo=timezone.utc)
+    now0 = as_of or datetime.now(timezone.utc)
+    session = now0.strftime("%Y-%m-%d")
     sb = SessionScoreboard(session=session)
 
-    chain_append(ledger, {**PROTOCOL, "session": session,
+    mode = {"evidence_class": "REHEARSAL_NOT_EVIDENCE",
+            "as_of": a.as_of,
+            "why": "the loop was driven at a past instant to prove the "
+                   "machinery; it produces NO prospective evidence"} \
+        if as_of else {"evidence_class": "PROSPECTIVE_PAPER"}
+    chain_append(ledger, {**PROTOCOL, **mode, "session": session,
                           "symbols": syms})
     print(f"protocol pre-registered for {session}: {syms}", flush=True)
 
@@ -287,18 +302,19 @@ def main() -> int:
         for sym in syms:
             if any(p["symbol"] == sym for p in open_positions):
                 continue          # one open paper position per symbol
-            r = _scan_symbol(sym, sb, ledger, open_positions)
+            r = _scan_symbol(sym, sb, ledger, open_positions,
+                             as_of=as_of)
             scans.append(r)
             print(f"  {sym:5} {r.get('status')}", flush=True)
         if a.dry_run:
             break
         time.sleep(a.interval_min * 60)
 
-    resolved = resolve_open(open_positions, sb, ledger)
+    resolved = resolve_open(open_positions, sb, ledger, as_of=as_of)
     report = sb.report()
     chain_append(ledger, report)
     Path(a.out).write_text(json.dumps(stamp(
-        {"protocol": PROTOCOL, "scoreboard": report,
+        {"protocol": {**PROTOCOL, **mode}, "scoreboard": report,
          "scans": scans, "resolved": resolved}, CODE_PATHS),
         indent=1, default=str))
     print(json.dumps(report, indent=1, default=str))
