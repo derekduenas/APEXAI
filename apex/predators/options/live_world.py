@@ -160,6 +160,16 @@ def observe(symbol: str, *, now: datetime | None = None,
     start = session_open_utc or (now - timedelta(hours=8))
     reasons = []
 
+    # TIMEZONE CONVENTION. ThetaData option timestamps are ET-NAIVE;
+    # Alpaca bar timestamps are UTC-AWARE. Comparing an ET-naive quote
+    # against a UTC clock makes every live quote look ~4 hours stale,
+    # which would have refused every scan of a live session while
+    # looking like a working staleness guard. The historical corpus is
+    # ET-naive, so live adopts ET-naive too -- the convention the whole
+    # stack was commissioned against.
+    now_et = pd.Timestamp(now).tz_convert("America/New_York") \
+        .tz_localize(None)
+
     bars = underlying_bars(symbol, start, now)
     if len(bars) < 30:
         raise FeedUnavailable(
@@ -180,8 +190,7 @@ def observe(symbol: str, *, now: datetime | None = None,
         raise FeedUnavailable(f"{symbol}: no usable option quotes")
 
     newest = max(q["timestamp"] for q in quotes)
-    q_age = (pd.Timestamp(now).tz_localize(None)
-             - pd.Timestamp(newest)).total_seconds()
+    q_age = (now_et - pd.Timestamp(newest)).total_seconds()
 
     try:
         nbbo = underlying_nbbo(symbol)
@@ -201,8 +210,8 @@ def observe(symbol: str, *, now: datetime | None = None,
         reasons.append(f"newest bar is {bar_age:.0f}s old")
 
     frozen = FrozenState(
-        symbol=symbol, session=now.strftime("%Y-%m-%d"),
-        T=str(pd.Timestamp(now).tz_localize(None)),
+        symbol=symbol, session=now_et.strftime("%Y-%m-%d"),
+        T=str(now_et),
         underlying_bars=tuple(bars), option_quotes=tuple(quotes),
         oi_rows=(), spot_ref=bars[-1]["c"],
         spot_ref_source_label=str(last_bar_t),
