@@ -367,3 +367,44 @@ def test_friction_is_knowable_before_the_trade():
     b = build_candidates(frozen, "LONG", iv=0.25)
     assert [c.round_trip_friction for c in a] == \
            [c.round_trip_friction for c in b]
+
+
+# ------------------- OBSERVED EQUITY EXECUTION closes the comparator
+# With a real stock BID/ASK the stock leg crosses its own quoted side
+# exactly as the option legs do, so the comparison becomes legitimate.
+
+def test_observed_stock_quote_makes_the_comparison_legitimate():
+    from apex.predators.options.expression import build_candidates
+    cands = build_candidates(_frozen(), "LONG", iv=0.25,
+                             stock_bid=99.98, stock_ask=100.02)
+    st = next(c for c in cands if c.expression == "STOCK")
+    assert st.execution_pedigree == "OBSERVED_QUOTE"
+    assert st.legs[0][3] == 100.02, "a long must pay the ASK"
+    assert st.round_trip_friction == 4.0        # 0.04 * 100 shares
+    assert any("OBSERVED quoted side" in n for n in st.notes)
+
+
+def test_a_short_stock_leg_receives_the_bid():
+    from apex.predators.options.expression import build_candidates
+    cands = build_candidates(_frozen(), "SHORT", iv=0.25,
+                             stock_bid=99.98, stock_ask=100.02)
+    st = next(c for c in cands if c.expression == "STOCK")
+    assert st.legs[0][3] == 99.98
+
+
+def test_without_an_observed_quote_stock_stays_limited():
+    from apex.predators.options.expression import build_candidates
+    st = next(c for c in build_candidates(_frozen(), "LONG", iv=0.25)
+              if c.expression == "STOCK")
+    assert st.execution_pedigree == "LIMITED_MODELLED_EXECUTION"
+    assert st.round_trip_friction is None
+    assert any("crosses NO spread" in n for n in st.notes)
+
+
+def test_a_crossed_stock_quote_is_not_treated_as_observed():
+    """Refuse nonsense rather than trade on it."""
+    from apex.predators.options.expression import build_candidates
+    st = next(c for c in build_candidates(_frozen(), "LONG", iv=0.25,
+                                          stock_bid=100.5, stock_ask=99.5)
+              if c.expression == "STOCK")
+    assert st.execution_pedigree == "LIMITED_MODELLED_EXECUTION"

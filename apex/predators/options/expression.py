@@ -132,9 +132,16 @@ def _delta(option_type, spot, strike, dte_years, rate, sigma):
 def build_candidates(frozen, direction: str, *, shares: int = 100,
                      rules: dict = CANDIDATE_RULES,
                      iv: float | None = None, rate: float = 0.04,
-                     stock_execution_pedigree: str = "MODELLED_EXECUTION"
-                     ) -> list:
-    """Every legitimate expression of one directional thesis at T."""
+                     stock_execution_pedigree: str = "MODELLED_EXECUTION",
+                     stock_bid: float | None = None,
+                     stock_ask: float | None = None) -> list:
+    """Every legitimate expression of one directional thesis at T.
+
+    OBSERVED EQUITY EXECUTION: when a real stock BID/ASK is supplied,
+    the stock leg crosses its own quoted side exactly as the option
+    legs do, its pedigree becomes OBSERVED_QUOTE, and the option-vs-
+    stock comparison becomes legitimate. Without it the stock leg is a
+    friction-free fiction and the comparison stays NOT_PROVEN."""
     spot = frozen.spot_ref
     if spot is None or direction not in ("LONG", "SHORT"):
         return []
@@ -162,25 +169,44 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
 
     out = []
     # ---------- STOCK (the benchmark every option must beat)
+    observed_stock = (stock_bid is not None and stock_ask is not None
+                      and stock_bid > 0 and stock_ask >= stock_bid)
+    if observed_stock:
+        # cross the real spread: long pays ASK, short receives BID
+        s_fill = stock_ask if direction == "LONG" else stock_bid
+        s_ped = "OBSERVED_QUOTE"
+        s_fric = round((stock_ask - stock_bid) * shares, 2)
+        s_liq = round(stock_bid * shares, 2) if direction == "LONG" \
+            else round(stock_ask * shares, 2)
+        s_notes = (f"stock crossed its OBSERVED quoted side at {s_fill}",
+                   f"round-trip friction {s_fric} on {shares} shares -- "
+                   f"real, comparable to the option legs")
+    else:
+        s_fill, s_ped, s_fric, s_liq = (spot, STOCK_COMPARATOR_PEDIGREE,
+                                        None, None)
+        s_notes = (
+            f"stock fill basis: {STOCK_COMPARATOR_PEDIGREE} -- "
+            f"crosses NO spread, so it is a DIAGNOSTIC comparator, "
+            f"never proof that stock beat options",
+            STOCK_COMPARATOR_LAW)
     out.append(ExpressionCandidate(
         expression="STOCK", direction=direction,
         legs=(("BUY" if direction == "LONG" else "SELL", "STOCK",
-               spot, spot),),
-        debit=round(spot * shares, 2), max_loss=None,
+               s_fill, s_fill),),
+        debit=round(s_fill * shares, 2), max_loss=None,
         max_gain="UNBOUNDED" if direction == "LONG" else None,
-        breakeven=spot, breakeven_move_pct=0.0,
-        quoted_spread_cost=None, liquidity="UNDERLYING",
-        capital_required=round(spot * shares, 2),
+        breakeven=s_fill, breakeven_move_pct=0.0,
+        quoted_spread_cost=s_fric, liquidity="UNDERLYING",
+        capital_required=round(s_fill * shares, 2),
         net_delta=1.0 if direction == "LONG" else -1.0,
         stock_equivalent_shares=float(shares),
-        max_theoretical_loss=round(spot * shares, 2),
-        execution_pedigree=STOCK_COMPARATOR_PEDIGREE,
+        max_theoretical_loss=round(s_fill * shares, 2),
+        immediate_liquidation_value=s_liq,
+        round_trip_friction=s_fric,
+        execution_pedigree=s_ped,
         notes=("max_loss shown is the instrument's theoretical bound, "
                "NOT the planned loss -- the strategy stop defines that",
-               f"stock fill basis: {STOCK_COMPARATOR_PEDIGREE} -- "
-               f"crosses NO spread, so it is a DIAGNOSTIC comparator, "
-               f"never proof that stock beat options",
-               STOCK_COMPARATOR_LAW)))
+               ) + s_notes))
 
     # ---------- LONG single option (nearest-ATM, deterministic)
     import pandas as pd
