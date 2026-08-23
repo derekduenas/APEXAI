@@ -73,6 +73,17 @@ class ExpressionCandidate:
     # single-expiry; anything multi-expiry must carry per-leg identity
     # before it may be executed.
     expiration: str | None = None
+    # EXIT FRICTION (2026-08-23). "Defined risk" is defined AT EXPIRY.
+    # A vertical closed at quoted sides crosses TWO spreads on the way
+    # in and TWO on the way out; in a wide market that round trip can
+    # cost more than the debit, so the position loses more than its
+    # supposed maximum. Measured on the first real replay: a MSFT put
+    # vertical up +$103 on mid realized -$215 against a $160 debit.
+    # These numbers are knowable at T and are therefore pre-trade
+    # information, not hindsight.
+    max_loss_basis: str = "AT_EXPIRY"
+    immediate_liquidation_value: float | None = None
+    round_trip_friction: float | None = None
     notes: tuple = ()
 
     def as_record(self) -> dict:
@@ -202,8 +213,13 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
                                      if d_atm is not None
                                      else "NOT_ESTIMABLE"),
             max_theoretical_loss=round(debit, 2),
+            max_loss_basis="AT_EXPIRY",
+            immediate_liquidation_value=round(b * 100, 2),
+            round_trip_friction=round((a - b) * 100, 2),
             execution_pedigree="OBSERVED_QUOTE",
             notes=("long leg pays ASK",
+                   f"immediate round-trip friction {round((a-b)*100,2)} "
+                   f"= {round(100*(a-b)/a) if a else '?'}% of the debit",
                    "one contract is NOT 100 shares of exposure -- see "
                    "stock_equivalent_shares")))
 
@@ -243,8 +259,20 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
                         if (d_atm is not None and d_wing is not None)
                         else "NOT_ESTIMABLE"),
                     max_theoretical_loss=round(net, 2),
+                    max_loss_basis="AT_EXPIRY",
+                    immediate_liquidation_value=round(
+                        (b - _wa) * 100, 2),
+                    round_trip_friction=round(
+                        (net - (b - _wa) * 100), 2),
                     execution_pedigree="OBSERVED_QUOTE",
                     notes=("short leg receives BID -- never mid",
+                           "max_theoretical_loss is the EXPIRY bound; "
+                           "closing at quoted sides crosses two more "
+                           "spreads and CAN lose more than the debit",
+                           f"immediate liquidation value "
+                           f"{round((b - _wa) * 100, 2)} vs debit "
+                           f"{round(net, 2)} -- round-trip friction "
+                           f"{round(net - (b - _wa) * 100, 2)}",
                            "favorable tail CAPPED at the wing",
                            "NET delta is long minus short -- a vertical "
                            "often carries only 20-30 share-equivalents")))

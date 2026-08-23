@@ -333,6 +333,10 @@ def counterfactual_expressions(*, candidates: list, T: str,
                         future_quote_lookup=future_quote_lookup,
                         entry_underlying=entry_underlying)
             out[c.expression] = {"pnl": o.pnl, "r": o.r_multiple,
+                                 "round_trip_friction": getattr(
+                                     c, "round_trip_friction", None),
+                                 "max_loss_basis": getattr(
+                                     c, "max_loss_basis", None),
                                  "risk_basis": o.risk_basis,
                                  "declared_1R_dollars":
                                  o.declared_1R_dollars,

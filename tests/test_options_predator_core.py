@@ -308,3 +308,33 @@ def test_compare_forbids_a_single_metric_winner():
                   expected_move_pct=2.0)
     assert out["comparison_basis_required"] is True
     assert "No OPTION_BETTER / STOCK_BETTER verdict" in out["law"]
+
+
+def test_defined_risk_is_defined_only_at_expiry():
+    """A vertical closed at quoted sides crosses two more spreads. The
+    debit bounds the loss AT EXPIRY, not on a round-trip exit -- the
+    first real replay produced a put vertical up +$103 on mid that
+    realized -$215 against a $160 debit."""
+    from apex.predators.options.expression import build_candidates
+    cands = build_candidates(_frozen(), "LONG", iv=0.25)
+    for c in cands:
+        if c.expression == "STOCK":
+            continue
+        assert c.max_loss_basis == "AT_EXPIRY"
+        assert c.round_trip_friction is not None
+        assert c.round_trip_friction > 0, "crossing spreads is not free"
+        assert c.immediate_liquidation_value is not None
+        # liquidating immediately must cost the friction, exactly
+        assert abs((c.debit - c.immediate_liquidation_value)
+                   - c.round_trip_friction) < 0.01
+
+
+def test_friction_is_knowable_before_the_trade():
+    """It is computed from the SAME quotes that priced the entry, so it
+    is pre-trade information rather than hindsight."""
+    from apex.predators.options.expression import build_candidates
+    frozen = _frozen()
+    a = build_candidates(frozen, "LONG", iv=0.25)
+    b = build_candidates(frozen, "LONG", iv=0.25)
+    assert [c.round_trip_friction for c in a] == \
+           [c.round_trip_friction for c in b]
