@@ -403,6 +403,11 @@ def test_every_ops_plist_is_well_formed_xml():
 
 
 def test_scheduled_ops_scripts_exist_and_are_executable():
+    import sys as _sys
+    if _sys.platform != "darwin":
+        import pytest
+        pytest.skip("verifies the Mac host launchd/ops installation -- "
+                    "Darwin-only by nature; cloud uses systemd (C6)")
     """A loaded job pointing at a missing script fails silently at its
     scheduled minute, which is the worst possible time to find out."""
     import plistlib

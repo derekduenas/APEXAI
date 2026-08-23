@@ -280,6 +280,11 @@ def test_the_only_provider_url_builder_is_inside_the_governed_module():
 # ==================== PHASE 24: SCHEDULER / DAEMON =========================
 
 def test_every_declared_launchd_job_has_a_plist_on_disk():
+    import sys as _sys
+    if _sys.platform != "darwin":
+        import pytest
+        pytest.skip("verifies the Mac host launchd/ops installation -- "
+                    "Darwin-only by nature; cloud uses systemd (C6)")
     import subprocess
     loaded = subprocess.run(["launchctl", "list"], capture_output=True,
                             text=True).stdout

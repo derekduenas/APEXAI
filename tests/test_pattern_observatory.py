@@ -1222,6 +1222,11 @@ def test_an_expiry_below_the_per_expiry_floor_is_excluded_not_averaged_in():
 
 
 def test_options_surface_reproduces_the_real_2026_08_19_finding():
+    from pathlib import Path as _P
+    if not _P("results/option_analytics/live/states.jsonl").exists():
+        import pytest
+        pytest.skip("production options live capture absent in this "
+                    "environment (Mac-only data, not code)")
     """End-to-end on the ACTUAL data that exposed the bug."""
     rows = [json.loads(l) for l in
            open("results/option_analytics/live/states.jsonl")
