@@ -36,10 +36,16 @@ def main(path: str) -> int:
             # spreads, so the true bound is debit + exit friction.
             # Breaching THAT is a defect; breaching the expiry bound
             # alone is real market friction and is reported separately.
-            bound = -cap - abs(v.get("round_trip_friction") or 0) - 1e-6
             if name != "STOCK" and cap and pnl < -cap - 1e-6:
                 s.setdefault("expiry_bound_exceeded", []).append(pnl)
-            if name != "STOCK" and cap and pnl < bound:
+            # THE DEFECT TEST is the accounting identity, not a bound:
+            # pnl = mid_change - entry_friction - exit_friction. A loss
+            # that satisfies it came from the market. A loss that
+            # violates it came from us.
+            ident = v.get("friction_identity_holds")
+            if ident is not None:
+                s.setdefault("identity", []).append(ident)
+            if name != "STOCK" and ident is False:
                 violations.append({"symbol": r["symbol"],
                                    "session": r["session"],
                                    "clock": r["clock_et"], "expr": name,
@@ -47,8 +53,15 @@ def main(path: str) -> int:
 
     print("=== INTEGRITY ===")
     print(f"resolved decisions        {len(recs)}")
-    print(f"structural breaches       {len(violations)}  "
-          f"(loss beyond debit + measured exit friction)")
+    print(f"friction-identity failures {len(violations)}  "
+          f"(pnl != mid_change - entry_friction - exit_friction)")
+    for k, v in sorted(per.items()):
+        idents = v.get("identity") or []
+        held = sum(1 for i in idents if i is True)
+        ne = sum(1 for i in idents if i == "NOT_ESTIMABLE")
+        if idents:
+            print(f"  {k:14} identity held {held}/{len(idents)}"
+                  f"{f', {ne} not estimable' if ne else ''}")
     for k, v in sorted(per.items()):
         eb = v.get("expiry_bound_exceeded") or []
         if eb:

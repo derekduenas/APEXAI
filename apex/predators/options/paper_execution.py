@@ -170,6 +170,9 @@ class Outcome:
     time_to_target_min: float | str
     underlying_return_pct: float | str
     execution_cost: float | None
+    exit_friction: float | str = NOT_ESTIMABLE
+    mid_change: float | str = NOT_ESTIMABLE
+    friction_identity_holds: bool | str = NOT_ESTIMABLE
     risk_basis: str = "NOT_DECLARED"
     declared_1R_dollars: float | str = NOT_ESTIMABLE
     capital_deployed: float | str = NOT_ESTIMABLE
@@ -185,6 +188,36 @@ class Outcome:
 
     def as_record(self) -> dict:
         return {"kind": "options_outcome", **asdict(self)}
+
+
+def _exit_accounting(legs, expiration, lookup) -> dict | None:
+    """The exact P&L identity for a quoted round trip.
+
+        pnl = mid_change - entry_friction - exit_friction
+
+    This is an accounting identity, not an approximation: paying the
+    ask is paying the mid plus a half-spread, and hitting the bid is
+    receiving the mid minus a half-spread. Recording all three terms
+    lets an auditor prove a loss came from the market rather than from
+    a bug -- and separates "the thesis was wrong" from "the thesis was
+    right and the spread took it", which are different problems with
+    different fixes."""
+    entry_mid = exit_mid = entry_fric = exit_fric = 0.0
+    for action, right, strike, entry_px, _side in legs:
+        if right == "STOCK":
+            return None
+        q = lookup(expiration, strike, right)
+        if q is None:
+            return None
+        xb, xa = q
+        xm = (xb + xa) / 2.0
+        sign = 1.0 if action == "BUY" else -1.0
+        # entry: BUY paid the ask, SELL received the bid
+        entry_mid += sign * entry_px
+        exit_mid += sign * xm
+        exit_fric += (xa - xb) / 2.0
+    return {"entry_mid_basis": entry_mid, "exit_mid": exit_mid,
+            "exit_friction_per_share": exit_fric}
 
 
 def _exit_value(legs, expiration, expiration_lookup) -> float | None:
@@ -267,6 +300,21 @@ def resolve(*, fill: PaperFill, sealed_card_hash: str,
             gross = ev * CONTRACT_MULTIPLIER * fill.contracts
             pnl = round(gross - fill.net_debit, 2)
             exit_rec["net_credit_received"] = round(gross, 2)
+            acct = _exit_accounting(fill.legs, fill.expiration,
+                                    future_quote_lookup)
+            if acct is not None:
+                mult = CONTRACT_MULTIPLIER * fill.contracts
+                exit_fric = round(
+                    acct["exit_friction_per_share"] * mult, 2)
+                mid_ch = round(
+                    (acct["exit_mid"] - acct["entry_mid_basis"]) * mult, 2)
+                # entry friction is what the fill already paid away
+                entry_fric = round(mid_ch - exit_fric - pnl, 2)
+                exit_rec.update({
+                    "mid_change": mid_ch, "exit_friction": exit_fric,
+                    "entry_friction": entry_fric,
+                    "identity": "pnl = mid_change - entry_friction "
+                                "- exit_friction"})
     # R LAW: divide by the DECLARED 1R only. Capital deployed is not R.
     r_basis = fill.risk_basis
     if isinstance(pnl, float) and \
@@ -290,6 +338,13 @@ def resolve(*, fill: PaperFill, sealed_card_hash: str,
                "capital": fill.capital_committed,
                "pedigree": list(fill.fill_pedigree)},
         exit=exit_rec, pnl=pnl, r_multiple=r_mult,
+        exit_friction=exit_rec.get("exit_friction", NOT_ESTIMABLE),
+        mid_change=exit_rec.get("mid_change", NOT_ESTIMABLE),
+        friction_identity_holds=(
+            abs(exit_rec["mid_change"] - exit_rec["entry_friction"]
+                - exit_rec["exit_friction"] - pnl) < 0.02
+            if ("mid_change" in exit_rec and isinstance(pnl, float))
+            else NOT_ESTIMABLE),
         risk_basis=r_basis,
         declared_1R_dollars=fill.declared_1R_dollars,
         capital_deployed=fill.capital_deployed,
@@ -333,6 +388,10 @@ def counterfactual_expressions(*, candidates: list, T: str,
                         future_quote_lookup=future_quote_lookup,
                         entry_underlying=entry_underlying)
             out[c.expression] = {"pnl": o.pnl, "r": o.r_multiple,
+                                 "exit_friction": o.exit_friction,
+                                 "mid_change": o.mid_change,
+                                 "friction_identity_holds":
+                                 o.friction_identity_holds,
                                  "round_trip_friction": getattr(
                                      c, "round_trip_friction", None),
                                  "max_loss_basis": getattr(

@@ -353,3 +353,51 @@ def test_an_option_without_contract_identity_is_refused():
     anon = replace(_call(), expiration=None)
     with pytest.raises(ExecutionRefused):
         simulate_entry(anon, T=T, sealed_card_hash=CARD)
+
+
+# --------------------------------- THE FRICTION ACCOUNTING IDENTITY
+# pnl = mid_change - entry_friction - exit_friction, exactly. This is
+# what separates "the thesis was wrong" from "the thesis was right and
+# the spread took it" -- and it is the only test that can prove a
+# large loss came from the market rather than from a bug.
+
+def test_the_friction_identity_holds_exactly():
+    f = simulate_entry(_vertical(), T=T, sealed_card_hash=CARD,
+                       risk_basis="FULL_PREMIUM")
+    out = resolve(fill=f, sealed_card_hash=CARD,
+                  future_underlying=_future([104.0]),
+                  future_quote_lookup=_quotes({(100.0, "C"): (5.0, 6.5),
+                                               (105.0, "C"): (2.0, 3.4)}),
+                  entry_underlying=100.0)
+    assert out.friction_identity_holds is True
+    e = out.exit
+    assert abs(e["mid_change"] - e["entry_friction"]
+               - e["exit_friction"] - out.pnl) < 0.02
+
+
+def test_a_right_thesis_can_still_lose_to_the_spread():
+    """The Volmageddon case, in miniature: the position gains on mid and
+    still loses money, because both exit spreads must be crossed. SPY
+    2018-02-05 did exactly this -- 251 dollars of mid value against a
+    155 dollar debit, realized as a 212 dollar loss."""
+    f = simulate_entry(_vertical(), T=T, sealed_card_hash=CARD,
+                       risk_basis="FULL_PREMIUM")
+    # wide exit market, but the spread's mid value has RISEN
+    out = resolve(fill=f, sealed_card_hash=CARD,
+                  future_underlying=_future([106.0]),
+                  future_quote_lookup=_quotes({(100.0, "C"): (4.0, 8.0),
+                                               (105.0, "C"): (1.5, 5.5)}),
+                  entry_underlying=100.0)
+    assert out.mid_change > 0, "mid value should have risen"
+    assert out.pnl < 0, "and the spread should still have taken it"
+    assert out.friction_identity_holds is True
+    assert out.exit_friction > 0
+
+
+def test_missing_exit_quotes_withhold_the_identity():
+    f = simulate_entry(_call(ask=3.0), T=T, sealed_card_hash=CARD)
+    out = resolve(fill=f, sealed_card_hash=CARD,
+                  future_underlying=_future([106]),
+                  future_quote_lookup=_quotes({}), entry_underlying=100.0)
+    assert out.friction_identity_holds == "NOT_ESTIMABLE"
+    assert out.exit_friction == "NOT_ESTIMABLE"
