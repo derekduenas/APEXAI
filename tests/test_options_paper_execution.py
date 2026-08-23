@@ -167,15 +167,74 @@ def test_short_direction_mfe_is_sign_corrected():
     assert out.mae == 2.0
 
 
-def test_r_multiple_uses_capital_actually_at_risk():
+def test_r_multiple_is_withheld_when_risk_was_never_declared():
+    """Superseded 2026-08-23: R used to default to capital committed.
+    That silently equated 'the debit' with 'the planned loss'. It now
+    REFUSES rather than assume."""
     f = simulate_entry(_call(ask=3.0), T=T, sealed_card_hash=CARD)
     out = resolve(fill=f, sealed_card_hash=CARD,
                   future_underlying=_future([106]),
                   future_quote_lookup=_quotes({(100.0, "C"): (6.0, 6.2)}),
                   entry_underlying=100.0)
     assert out.pnl == 300.0
-    assert out.r_multiple == 1.0        # 300 gained on 300 at risk
+    assert out.r_multiple == "NOT_ESTIMABLE"
+    assert "R withheld rather than assumed" in out.risk_basis
 
+
+def test_full_premium_declaration_makes_R_the_premium():
+    f = simulate_entry(_call(ask=3.0), T=T, sealed_card_hash=CARD,
+                       risk_basis="FULL_PREMIUM")
+    out = resolve(fill=f, sealed_card_hash=CARD,
+                  future_underlying=_future([106]),
+                  future_quote_lookup=_quotes({(100.0, "C"): (6.0, 6.2)}),
+                  entry_underlying=100.0)
+    assert out.declared_1R_dollars == 300.0
+    assert out.r_multiple == 1.0
+    assert out.risk_basis == "FULL_PREMIUM"
+
+
+def test_planned_invalidation_gives_a_larger_R_multiple():
+    """The SAME trade, same P&L: a plan that exits on underlying
+    invalidation risks less, so the win is worth more R. Two honest
+    numbers -- which is precisely why the basis must be recorded."""
+    f = simulate_entry(_call(ask=3.0), T=T, sealed_card_hash=CARD,
+                       risk_basis="PLANNED_INVALIDATION",
+                       planned_invalidation_loss=100.0)
+    out = resolve(fill=f, sealed_card_hash=CARD,
+                  future_underlying=_future([106]),
+                  future_quote_lookup=_quotes({(100.0, "C"): (6.0, 6.2)}),
+                  entry_underlying=100.0)
+    assert out.pnl == 300.0
+    assert out.declared_1R_dollars == 100.0
+    assert out.r_multiple == 3.0
+    assert out.capital_deployed == 300.0
+    assert out.capital_deployed != out.declared_1R_dollars
+
+
+def test_the_three_risk_numbers_are_persisted_separately():
+    f = simulate_entry(_call(ask=3.0), T=T, sealed_card_hash=CARD,
+                       risk_basis="PLANNED_INVALIDATION",
+                       planned_invalidation_loss=120.0)
+    rec = f.as_record()
+    for k in ("capital_deployed", "maximum_theoretical_loss",
+              "planned_invalidation_loss", "declared_1R_dollars",
+              "risk_basis"):
+        assert k in rec
+    assert rec["capital_deployed"] == 300.0
+    assert rec["planned_invalidation_loss"] == 120.0
+    assert "three different numbers" in rec["risk_law"]
+
+
+def test_unknown_risk_basis_is_refused():
+    import pytest
+    with pytest.raises(ExecutionRefused):
+        simulate_entry(_call(ask=3.0), T=T, sealed_card_hash=CARD,
+                       risk_basis="WHATEVER_LOOKS_GOOD")
+
+
+def test_fill_records_its_execution_pedigree():
+    f = simulate_entry(_call(ask=3.0), T=T, sealed_card_hash=CARD)
+    assert f.execution_pedigree == "OBSERVED_QUOTE"
 
 def test_missing_exit_quote_yields_not_estimable_not_zero():
     f = simulate_entry(_call(), T=T, sealed_card_hash=CARD)
@@ -208,3 +267,33 @@ def test_counterfactuals_compare_every_weapon_and_stay_measurement():
     assert "measurement only" in cf["_law"]
     # the interesting case: capital efficiency differs enormously
     assert cf["STOCK"]["capital"] > cf["CALL_VERTICAL"]["capital"]
+
+
+def test_counterfactuals_refuse_to_crown_a_winner():
+    """Every expression resolved, no single-metric verdict emitted."""
+    from apex.predators.options.paper_execution import (
+        counterfactual_expressions)
+    from apex.predators.options.expression import build_candidates
+    from tests.test_options_predator_core import _frozen
+
+    frozen = _frozen()
+    cands = build_candidates(frozen, "LONG", iv=0.25)
+    strikes = {float(q["strike"]) for q in frozen.option_quotes}
+    quotes = {(k, "C"): (6.0, 6.2) for k in strikes}
+    quotes.update({(k, "P"): (6.0, 6.2) for k in strikes})
+    cf = counterfactual_expressions(
+        candidates=cands, T=T, sealed_card_hash=CARD,
+        future_underlying=_future([106]),
+        future_quote_lookup=_quotes(quotes),
+        entry_underlying=frozen.spot_ref,
+        risk_basis="FULL_PREMIUM")
+    assert cf["_winner"].startswith("WITHHELD")
+    assert "report the basis or report nothing" in cf["_comparison_law"]
+    assert "STOCK" in cf
+    # stock is sized to matching underlying exposure, not 1 share
+    assert cf["STOCK"]["quantity"] == 100
+    # and each resolved leg carries the basis that produced its R
+    for name, row in cf.items():
+        if name.startswith("_") or "error" in row:
+            continue
+        assert "risk_basis" in row and "execution_pedigree" in row

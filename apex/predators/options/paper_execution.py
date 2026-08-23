@@ -45,6 +45,16 @@ class PaperFill:
     spread_paid: float | None
     fill_pedigree: tuple
     T: str
+    # ---- RISK LAW: R is DECLARED BEFORE the trade, never inferred
+    capital_deployed: float | str = NOT_ESTIMABLE
+    maximum_theoretical_loss: float | str = NOT_ESTIMABLE
+    planned_invalidation_loss: float | str = NOT_ESTIMABLE
+    declared_1R_dollars: float | str = NOT_ESTIMABLE
+    risk_basis: str = "NOT_DECLARED"
+    execution_pedigree: str = "OBSERVED_QUOTE"
+    risk_law: str = ("capital deployed, maximum theoretical loss and 1R "
+                     "are three different numbers; R comes from the "
+                     "sealed plan, never from the instrument default")
     law: str = ("each leg crossed its own contract's quoted side; no "
                 "midpoint, no model price, no future-best selection")
     decision_power: str = "NONE_PAPER"
@@ -54,8 +64,17 @@ class PaperFill:
 
 
 def simulate_entry(candidate, *, T: str, contracts: int = 1,
-                   sealed_card_hash: str | None = None) -> PaperFill:
-    """Execute an ExpressionCandidate at quoted sides."""
+                   sealed_card_hash: str | None = None,
+                   risk_basis: str = "NOT_DECLARED",
+                   planned_invalidation_loss: float | None = None
+                   ) -> PaperFill:
+    """Execute an ExpressionCandidate at quoted sides.
+
+    RISK LAW: the caller declares how the sealed plan defines 1R. We
+    refuse to guess. A long call held to expiry risks its premium; the
+    same call abandoned when the underlying invalidates risks far less,
+    and silently equating the two would corrupt every R-multiple this
+    system ever reports."""
     if not sealed_card_hash or len(sealed_card_hash) < 32:
         raise ExecutionRefused(
             "paper execution requires a sealed BEFORE card -- the "
@@ -68,13 +87,17 @@ def simulate_entry(candidate, *, T: str, contracts: int = 1,
                      "STOCK", px, px, side))
         pedigree.append(f"STOCK crossed {side} at {px}")
         net = px * contracts * 1.0
+        risk = _declare_risk(candidate, risk_basis,
+                             planned_invalidation_loss, abs(net))
         return PaperFill(expression="STOCK",
                          direction=candidate.direction,
                          legs=tuple(legs), net_debit=round(net, 2),
                          contracts=contracts,
                          capital_committed=round(net, 2),
                          spread_paid=None, fill_pedigree=tuple(pedigree),
-                         T=T)
+                         T=T, execution_pedigree=getattr(
+                             candidate, "execution_pedigree",
+                             "MODELLED_EXECUTION"), **risk)
     net = 0.0
     for action, right, strike, price in candidate.legs:
         side = "ASK" if action == "BUY" else "BID"
@@ -84,12 +107,44 @@ def simulate_entry(candidate, *, T: str, contracts: int = 1,
             f"{side} = {price}")
         net += price if action == "BUY" else -price
     net_total = net * CONTRACT_MULTIPLIER * contracts
+    risk = _declare_risk(candidate, risk_basis, planned_invalidation_loss,
+                         abs(net_total))
     return PaperFill(
         expression=candidate.expression, direction=candidate.direction,
         legs=tuple(legs), net_debit=round(net_total, 2),
         contracts=contracts, capital_committed=round(abs(net_total), 2),
         spread_paid=candidate.quoted_spread_cost,
-        fill_pedigree=tuple(pedigree), T=T)
+        fill_pedigree=tuple(pedigree), T=T,
+        execution_pedigree=getattr(candidate, "execution_pedigree",
+                                   "OBSERVED_QUOTE"), **risk)
+
+
+def _declare_risk(candidate, risk_basis: str,
+                  planned_invalidation_loss: float | None,
+                  capital: float) -> dict:
+    """Persist the three distinct risk numbers plus the declared 1R."""
+    from apex.predators.options.expression import RISK_BASES
+    mtl = getattr(candidate, "max_theoretical_loss", None)
+    out = {"capital_deployed": round(capital, 2),
+           "maximum_theoretical_loss": (round(mtl, 2) if mtl
+                                        else NOT_ESTIMABLE),
+           "planned_invalidation_loss": (planned_invalidation_loss
+                                         if planned_invalidation_loss
+                                         is not None else NOT_ESTIMABLE),
+           "risk_basis": risk_basis}
+    if risk_basis == "NOT_DECLARED":
+        out["declared_1R_dollars"] = NOT_ESTIMABLE
+        return out
+    if risk_basis not in RISK_BASES:
+        raise ExecutionRefused(f"unknown risk_basis {risk_basis!r}")
+    if risk_basis == "PLANNED_INVALIDATION":
+        r = planned_invalidation_loss
+    elif risk_basis in ("MAX_LOSS", "FULL_PREMIUM"):
+        r = mtl if mtl else capital
+    else:
+        r = planned_invalidation_loss
+    out["declared_1R_dollars"] = (round(r, 2) if r else NOT_ESTIMABLE)
+    return out
 
 
 @dataclass(frozen=True)
@@ -108,6 +163,10 @@ class Outcome:
     time_to_target_min: float | str
     underlying_return_pct: float | str
     execution_cost: float | None
+    risk_basis: str = "NOT_DECLARED"
+    declared_1R_dollars: float | str = NOT_ESTIMABLE
+    capital_deployed: float | str = NOT_ESTIMABLE
+    maximum_theoretical_loss: float | str = NOT_ESTIMABLE
     iv_change: float | str = NOT_ESTIMABLE
     theta_impact: float | str = NOT_ESTIMABLE
     spread_impact: float | str = NOT_ESTIMABLE
@@ -197,10 +256,15 @@ def resolve(*, fill: PaperFill, sealed_card_hash: str,
             gross = ev * CONTRACT_MULTIPLIER * fill.contracts
             pnl = round(gross - fill.net_debit, 2)
             exit_rec["net_credit_received"] = round(gross, 2)
-    if isinstance(pnl, float) and fill.capital_committed:
-        # R = P&L against capital actually at risk (debit structures:
-        # the debit IS the max loss)
-        r_mult = round(pnl / fill.capital_committed, 4)
+    # R LAW: divide by the DECLARED 1R only. Capital deployed is not R.
+    r_basis = fill.risk_basis
+    if isinstance(pnl, float) and \
+            isinstance(fill.declared_1R_dollars, (int, float)) and \
+            fill.declared_1R_dollars > 0:
+        r_mult = round(pnl / fill.declared_1R_dollars, 4)
+    elif isinstance(pnl, float):
+        r_mult = NOT_ESTIMABLE
+        r_basis = "NOT_DECLARED -- R withheld rather than assumed"
 
     iv_ch = NOT_ESTIMABLE
     if entry_options_state is not None and exit_options_state is not None:
@@ -215,6 +279,10 @@ def resolve(*, fill: PaperFill, sealed_card_hash: str,
                "capital": fill.capital_committed,
                "pedigree": list(fill.fill_pedigree)},
         exit=exit_rec, pnl=pnl, r_multiple=r_mult,
+        risk_basis=r_basis,
+        declared_1R_dollars=fill.declared_1R_dollars,
+        capital_deployed=fill.capital_deployed,
+        maximum_theoretical_loss=fill.maximum_theoretical_loss,
         mfe=mfe_u, mae=mae_u, time_to_mfe_min=t_mfe,
         time_to_mae_min=t_mae, time_to_invalidation_min=t_inval,
         time_to_target_min=t_target, underlying_return_pct=ur,
@@ -226,7 +294,10 @@ def counterfactual_expressions(*, candidates: list, T: str,
                                future_underlying: list,
                                future_quote_lookup,
                                entry_underlying: float,
-                               option_contracts: int = 1) -> dict:
+                               option_contracts: int = 1,
+                               risk_basis: str = "NOT_DECLARED",
+                               planned_losses: dict | None = None
+                               ) -> dict:
     """Resolve EVERY expression that was available, so the Predator can
     learn which weapon suited the thesis. MEASUREMENT ONLY.
 
@@ -235,19 +306,28 @@ def counterfactual_expressions(*, candidates: list, T: str,
     the SAME underlying exposure. Comparing one share against one
     contract would flatter the option's capital efficiency by 100x --
     a fake result, not an insight."""
+    planned_losses = planned_losses or {}
     out = {}
     for c in candidates:
         qty = (option_contracts * CONTRACT_MULTIPLIER
                if c.expression == "STOCK" else option_contracts)
         try:
-            f = simulate_entry(c, T=T, contracts=qty,
-                               sealed_card_hash=sealed_card_hash)
+            f = simulate_entry(
+                c, T=T, contracts=qty,
+                sealed_card_hash=sealed_card_hash,
+                risk_basis=risk_basis,
+                planned_invalidation_loss=planned_losses.get(c.expression))
             o = resolve(fill=f, sealed_card_hash=sealed_card_hash,
                         future_underlying=future_underlying,
                         future_quote_lookup=future_quote_lookup,
                         entry_underlying=entry_underlying)
             out[c.expression] = {"pnl": o.pnl, "r": o.r_multiple,
+                                 "risk_basis": o.risk_basis,
+                                 "declared_1R_dollars":
+                                 o.declared_1R_dollars,
                                  "capital": f.capital_committed,
+                                 "execution_pedigree":
+                                 f.execution_pedigree,
                                  "quantity": qty,
                                  "exposure_basis":
                                  f"{option_contracts} contract(s) "
@@ -259,4 +339,11 @@ def counterfactual_expressions(*, candidates: list, T: str,
             out[c.expression] = {"error": type(e).__name__}
     out["_law"] = ("measurement only -- the sealed decision is never "
                    "retroactively optimized against these results")
+    out["_comparison_law"] = (
+        "no expression winner may be declared from a single number. "
+        "Delta-equivalent share exposure, equal declared risk and equal "
+        "capital are DIFFERENT questions with different answers; report "
+        "the basis or report nothing.")
+    out["_winner"] = ("WITHHELD -- requires an explicit comparison "
+                      "basis; see expression.normalize()")
     return out

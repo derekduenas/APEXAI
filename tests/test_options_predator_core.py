@@ -205,3 +205,106 @@ def test_expression_vocabulary_closed():
     assert set(EXPRESSIONS) == {"STOCK", "LONG_CALL", "LONG_PUT",
                                 "CALL_VERTICAL", "PUT_VERTICAL",
                                 "NO_TRADE"}
+
+
+# ------------------------------------------ NORMALIZATION HARDENING
+# 1 contract != 100 shares of exposure; R != instrument default.
+
+def test_one_contract_is_not_universally_100_shares():
+    from apex.predators.options.expression import build_candidates
+    cands = build_candidates(_frozen(), "LONG", iv=0.25)
+    lc = next(c for c in cands if c.expression == "LONG_CALL")
+    if isinstance(lc.stock_equivalent_shares, float):
+        assert lc.stock_equivalent_shares != 100.0, \
+            "delta-equivalence collapsed back to the 100-share fiction"
+        assert 0 < lc.stock_equivalent_shares < 100
+        assert 0 < abs(lc.net_delta) < 1.0
+
+
+def test_delta_unavailable_yields_not_estimable_not_a_guess():
+    from apex.predators.options.expression import build_candidates
+    cands = build_candidates(_frozen(), "LONG", iv=None)   # no IV
+    lc = next(c for c in cands if c.expression == "LONG_CALL")
+    assert lc.net_delta == NOT_ESTIMABLE
+    assert lc.stock_equivalent_shares == NOT_ESTIMABLE
+
+
+def test_vertical_net_delta_is_long_minus_short():
+    from apex.predators.options.expression import build_candidates
+    cands = build_candidates(_frozen(), "LONG", iv=0.25)
+    v = [c for c in cands if c.expression == "CALL_VERTICAL"]
+    lc = next(c for c in cands if c.expression == "LONG_CALL")
+    if v and isinstance(v[0].net_delta, float) and \
+            isinstance(lc.net_delta, float):
+        assert abs(v[0].net_delta) < abs(lc.net_delta), \
+            "a vertical must carry LESS net delta than its long leg"
+
+
+def test_r_comes_from_the_declared_plan_not_the_instrument():
+    from apex.predators.options.expression import (
+        build_candidates, declared_risk)
+    cands = build_candidates(_frozen(), "LONG", iv=0.25)
+    lc = next(c for c in cands if c.expression == "LONG_CALL")
+    # holding to zero: premium really is 1R
+    full = declared_risk(lc, risk_basis="FULL_PREMIUM")
+    assert full["declared_1R_dollars"] == lc.max_theoretical_loss
+    # exiting on underlying invalidation: 1R is SMALLER than premium
+    planned = declared_risk(lc, risk_basis="PLANNED_INVALIDATION",
+                            planned_invalidation_loss=90.0)
+    assert planned["declared_1R_dollars"] == 90.0
+    assert planned["declared_1R_dollars"] < full["declared_1R_dollars"]
+    assert "not an instrument default" in planned["law"]
+
+
+def test_planned_invalidation_without_a_number_refuses():
+    from apex.predators.options.expression import (
+        build_candidates, declared_risk)
+    lc = next(c for c in build_candidates(_frozen(), "LONG", iv=0.25)
+              if c.expression == "LONG_CALL")
+    r = declared_risk(lc, risk_basis="PLANNED_INVALIDATION")
+    assert r["declared_1R_dollars"] == NOT_ESTIMABLE
+    assert "may not be inferred" in r["reason"]
+
+
+def test_all_four_comparison_bases_are_preserved():
+    from apex.predators.options.expression import (
+        COMPARISON_BASES, build_candidates, normalize)
+    cands = build_candidates(_frozen(), "LONG", iv=0.25)
+    n = normalize(cands, risk_budget_dollars=500.0,
+                  risk_basis="MAX_LOSS")
+    for basis in COMPARISON_BASES:
+        assert basis in n
+    assert "no single normalization may crown a winner" in n["_law"]
+    assert "DIAGNOSTIC ONLY" in \
+        n["EQUAL_CAPITAL_DEPLOYED"]["STOCK"]["caveat"]
+
+
+def test_equal_risk_budget_scales_by_declared_1R():
+    from apex.predators.options.expression import (
+        build_candidates, normalize)
+    cands = build_candidates(_frozen(), "LONG", iv=0.25)
+    n = normalize(cands, risk_budget_dollars=600.0,
+                  risk_basis="MAX_LOSS")
+    lc = n["EQUAL_RISK_BUDGET"]["LONG_CALL"]
+    if "units_for_budget" in lc:
+        assert lc["units_for_budget"] == round(600.0 / lc["one_R"], 3)
+
+
+def test_stock_execution_pedigree_is_honest():
+    """Modelled underlying fills must not masquerade as observed NBBO."""
+    from apex.predators.options.expression import build_candidates
+    cands = build_candidates(_frozen(), "LONG", iv=0.25)
+    st = next(c for c in cands if c.expression == "STOCK")
+    assert st.execution_pedigree == "MODELLED_EXECUTION"
+    opt = next(c for c in cands if c.expression == "LONG_CALL")
+    assert opt.execution_pedigree == "OBSERVED_QUOTE"
+    assert any("MODELLED_EXECUTION" in nt for nt in st.notes)
+
+
+def test_compare_forbids_a_single_metric_winner():
+    from apex.predators.options.expression import (
+        build_candidates, compare)
+    out = compare(build_candidates(_frozen(), "LONG", iv=0.25),
+                  expected_move_pct=2.0)
+    assert out["comparison_basis_required"] is True
+    assert "No OPTION_BETTER / STOCK_BETTER verdict" in out["law"]

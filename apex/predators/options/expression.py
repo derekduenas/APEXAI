@@ -57,6 +57,14 @@ class ExpressionCandidate:
     quoted_spread_cost: float | None
     liquidity: str
     capital_required: float | None
+    # NORMALIZATION INPUTS (2026-08-23): one contract is NOT universally
+    # 100 shares of exposure -- a 0.50-delta call is ~50 share-
+    # equivalents, a vertical often 20-30. Delta is carried so
+    # comparisons can be made on equal INITIAL DELTA, not a fiction.
+    net_delta: float | str = "NOT_ESTIMABLE"
+    stock_equivalent_shares: float | str = "NOT_ESTIMABLE"
+    max_theoretical_loss: float | None = None
+    execution_pedigree: str = "OBSERVED_QUOTE"
     notes: tuple = ()
 
     def as_record(self) -> dict:
@@ -85,8 +93,28 @@ def _pick_expiry(contracts: dict, T, rules) -> str | None:
     return eligible[0] if eligible else (exps[-1] if exps else None)
 
 
+def _delta(option_type, spot, strike, dte_years, rate, sigma):
+    """Causal delta from the commissioned stack; NOT_ESTIMABLE if the
+    inputs do not support it -- never a guessed 0.5."""
+    if not all((spot, strike, dte_years, sigma)) or dte_years <= 0 \
+            or sigma <= 0:
+        return None
+    try:
+        from apex.option_analytics.bsm import greeks
+        g = greeks(option_type=option_type, spot=spot, strike=strike,
+                   time_to_expiry_years=dte_years, rate=rate,
+                   sigma=sigma)
+        return getattr(g, "delta", None) if not isinstance(g, dict) \
+            else g.get("delta")
+    except Exception:                                      # noqa: BLE001
+        return None
+
+
 def build_candidates(frozen, direction: str, *, shares: int = 100,
-                     rules: dict = CANDIDATE_RULES) -> list:
+                     rules: dict = CANDIDATE_RULES,
+                     iv: float | None = None, rate: float = 0.04,
+                     stock_execution_pedigree: str = "MODELLED_EXECUTION"
+                     ) -> list:
     """Every legitimate expression of one directional thesis at T."""
     spot = frozen.spot_ref
     if spot is None or direction not in ("LONG", "SHORT"):
@@ -124,12 +152,25 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
         breakeven=spot, breakeven_move_pct=0.0,
         quoted_spread_cost=None, liquidity="UNDERLYING",
         capital_required=round(spot * shares, 2),
-        notes=("max_loss None: bounded only by the strategy stop, not "
-               "by the instrument",)))
+        net_delta=1.0 if direction == "LONG" else -1.0,
+        stock_equivalent_shares=float(shares),
+        max_theoretical_loss=round(spot * shares, 2),
+        execution_pedigree=stock_execution_pedigree,
+        notes=("max_loss shown is the instrument's theoretical bound, "
+               "NOT the planned loss -- the strategy stop defines that",
+               f"stock fill basis: {stock_execution_pedigree}")))
 
     # ---------- LONG single option (nearest-ATM, deterministic)
+    import pandas as pd
+    _Tn = pd.Timestamp(frozen.T)
+    if _Tn.tzinfo is not None:
+        _Tn = _Tn.tz_localize(None)
+    _dte_y = max((pd.Timestamp(exp) - _Tn).days, 0) / 365.0
+    _opt = "call" if right == "C" else "put"
+
     atm = min(strikes, key=lambda k: abs(k - spot))
     aq = q(atm)
+    d_atm = _delta(_opt, spot, atm, _dte_y, rate, iv) if iv else None
     if aq:
         b, a = aq
         debit = a * 100
@@ -146,7 +187,16 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
             quoted_spread_cost=round((a - b) * 100, 2),
             liquidity="QUOTED",
             capital_required=round(debit, 2),
-            notes=("long leg pays ASK",)))
+            net_delta=(round(d_atm, 4) if d_atm is not None
+                       else "NOT_ESTIMABLE"),
+            stock_equivalent_shares=(round(abs(d_atm) * 100, 1)
+                                     if d_atm is not None
+                                     else "NOT_ESTIMABLE"),
+            max_theoretical_loss=round(debit, 2),
+            execution_pedigree="OBSERVED_QUOTE",
+            notes=("long leg pays ASK",
+                   "one contract is NOT 100 shares of exposure -- see "
+                   "stock_equivalent_shares")))
 
         # ---------- VERTICAL (long ATM, short first wing >=1.5% OTM)
         target = atm * (1.015 if right == "C" else 0.985)
@@ -157,6 +207,8 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
             wq = q(wk)
             if wq:
                 wb, _wa = wq
+                d_wing = (_delta(_opt, spot, wk, _dte_y, rate, iv)
+                          if iv else None)
                 net = (a - wb) * 100          # pay ask, sell at BID
                 width = abs(wk - atm) * 100
                 bev = atm + (a - wb) if right == "C" else atm - (a - wb)
@@ -172,8 +224,117 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
                     quoted_spread_cost=round((a - b) * 100, 2),
                     liquidity="QUOTED",
                     capital_required=round(net, 2),
+                    net_delta=(round(d_atm - d_wing, 4)
+                               if (d_atm is not None
+                                   and d_wing is not None)
+                               else "NOT_ESTIMABLE"),
+                    stock_equivalent_shares=(
+                        round(abs(d_atm - d_wing) * 100, 1)
+                        if (d_atm is not None and d_wing is not None)
+                        else "NOT_ESTIMABLE"),
+                    max_theoretical_loss=round(net, 2),
+                    execution_pedigree="OBSERVED_QUOTE",
                     notes=("short leg receives BID -- never mid",
-                           "favorable tail CAPPED at the wing")))
+                           "favorable tail CAPPED at the wing",
+                           "NET delta is long minus short -- a vertical "
+                           "often carries only 20-30 share-equivalents")))
+    return out
+
+
+# ---------------------------------------------------------------------
+# COMPARISON BASES (operator law, 2026-08-23). There is NO single
+# correct normalization, so we never pick one and hide the rest.
+COMPARISON_BASES = ("RAW_UNIT_ECONOMICS", "EQUAL_INITIAL_DELTA",
+                    "EQUAL_RISK_BUDGET", "EQUAL_CAPITAL_DEPLOYED")
+
+RISK_BASES = ("PLANNED_INVALIDATION", "MAX_LOSS", "FULL_PREMIUM",
+              "OTHER_EXPLICIT")
+
+
+def declared_risk(candidate, *, risk_basis: str,
+                  planned_invalidation_loss: float | None = None
+                  ) -> dict:
+    """R MUST come from the risk DECLARED BEFORE the trade.
+
+    Never automatically equate premium / max debit / stock notional
+    with 1R. A long call held to zero really does risk the premium --
+    but a call the strategy intends to abandon when the UNDERLYING
+    invalidates risks far less, and treating the full premium as 1R
+    would make that trade look artificially efficient (or artificially
+    reckless) against stock."""
+    if risk_basis not in RISK_BASES:
+        raise ValueError(f"unknown risk_basis {risk_basis!r}")
+    max_loss = candidate.max_theoretical_loss
+    if risk_basis == "PLANNED_INVALIDATION":
+        if planned_invalidation_loss is None:
+            return {"declared_1R_dollars": "NOT_ESTIMABLE",
+                    "risk_basis": risk_basis,
+                    "reason": "planned invalidation loss not supplied "
+                              "-- R may not be inferred"}
+        r = min(planned_invalidation_loss, max_loss) if max_loss \
+            else planned_invalidation_loss
+    elif risk_basis in ("MAX_LOSS", "FULL_PREMIUM"):
+        r = max_loss
+    else:
+        r = planned_invalidation_loss
+    return {"declared_1R_dollars": (round(r, 2) if r else
+                                    "NOT_ESTIMABLE"),
+            "risk_basis": risk_basis,
+            "capital_deployed": candidate.capital_required,
+            "maximum_theoretical_loss": max_loss,
+            "planned_invalidation_loss": planned_invalidation_loss,
+            "law": "R is the loss the sealed plan intends, not an "
+                   "instrument default"}
+
+
+def normalize(candidates: list, *, risk_budget_dollars: float | None
+              = None, risk_basis: str = "MAX_LOSS",
+              planned_losses: dict | None = None) -> dict:
+    """Every honest comparison basis, side by side. No winner is
+    declared here."""
+    planned_losses = planned_losses or {}
+    out = {b: {} for b in COMPARISON_BASES}
+    ref_delta = None
+    for c in candidates:
+        if c.expression == "STOCK":
+            continue
+        if isinstance(c.stock_equivalent_shares, (int, float)):
+            ref_delta = c.stock_equivalent_shares
+            break
+    for c in candidates:
+        risk = declared_risk(
+            c, risk_basis=risk_basis,
+            planned_invalidation_loss=planned_losses.get(c.expression))
+        out["RAW_UNIT_ECONOMICS"][c.expression] = {
+            "unit": "1 contract" if c.expression != "STOCK"
+            else "stated share block",
+            "debit": c.debit, "capital": c.capital_required,
+            "max_theoretical_loss": c.max_theoretical_loss,
+            **risk}
+        out["EQUAL_INITIAL_DELTA"][c.expression] = (
+            {"stock_equivalent_shares": c.stock_equivalent_shares,
+             "net_delta": c.net_delta,
+             "note": "stock sized to THIS many shares matches the "
+                     "option's initial directional exposure"}
+            if isinstance(c.stock_equivalent_shares, (int, float))
+            else {"status": "NOT_ESTIMABLE",
+                  "reason": "delta unavailable at decision time"})
+        r1 = risk["declared_1R_dollars"]
+        out["EQUAL_RISK_BUDGET"][c.expression] = (
+            {"units_for_budget": round(risk_budget_dollars / r1, 3),
+             "budget": risk_budget_dollars, "one_R": r1}
+            if (risk_budget_dollars and isinstance(r1, (int, float))
+                and r1 > 0)
+            else {"status": "NOT_ESTIMABLE",
+                  "reason": "no predeclared risk budget or 1R"})
+        out["EQUAL_CAPITAL_DEPLOYED"][c.expression] = {
+            "capital": c.capital_required,
+            "caveat": "DIAGNOSTIC ONLY -- capital efficiency is not a "
+                      "winner criterion"}
+    out["_law"] = ("multiple bases preserved deliberately; one option "
+                   "contract is NOT universally 100 shares of exposure, "
+                   "and no single normalization may crown a winner")
+    out["_reference_delta_shares"] = ref_delta
     return out
 
 
@@ -211,7 +372,10 @@ def compare(candidates: list, *, expected_move_pct: float | str
                           "a forecast",
                 "candidates": rows}
     return {"verdict": "COMPARED", "candidates": rows,
+            "comparison_basis_required": True,
             "law": "ranking is an observation; Capital selects and "
                    "sizes. Breakeven reach > 1.0 means the option "
                    "needs MORE than the expected move merely to break "
-                   "even."}
+                   "even. No OPTION_BETTER / STOCK_BETTER verdict may "
+                   "be drawn from one normalization -- call normalize() "
+                   "and report the basis explicitly."}
