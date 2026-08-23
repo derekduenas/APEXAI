@@ -101,16 +101,27 @@ def verify_artifact_is_current(art: dict, *,
             "artifact carries no provenance stamp -- it cannot be "
             "attributed to any run and is therefore not evidence")
 
-    now = provenance(code_paths or prov.get("code_paths") or [])
+    paths = code_paths or prov.get("code_paths") or []
+    now = provenance(paths)
     problems = []
-    if prov.get("commit") != now["commit"]:
+    # THE DIGEST IS AUTHORITATIVE. What matters is whether the code
+    # that PRODUCED the result still matches the code on disk -- not
+    # whether unrelated commits have landed since. A long-running job
+    # whose modules are untouched is still current; a job whose modules
+    # changed is stale even at the same commit. Falling back to the
+    # commit only when no module list is available keeps some check
+    # rather than none.
+    if paths:
+        if prov.get("code_digest") != now["code_digest"]:
+            problems.append(
+                "the modules that produced it differ from the modules "
+                "on disk (edited since the run, or a partially-synced "
+                "host)")
+    elif prov.get("commit") != now["commit"]:
         problems.append(
-            f"produced at commit {prov.get('commit_short')}, "
-            f"current is {now['commit_short']}")
-    if code_paths and prov.get("code_digest") != now["code_digest"]:
-        problems.append(
-            "the code that produced it differs from the code on disk "
-            "(uncommitted edit, or a partially-synced host)")
+            f"produced at commit {prov.get('commit_short')}, current is "
+            f"{now['commit_short']}, and no module list was recorded to "
+            f"check more precisely")
     if require_clean and prov.get("working_tree_dirty"):
         problems.append("produced from a dirty working tree")
     if problems:

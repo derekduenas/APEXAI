@@ -51,13 +51,25 @@ def test_an_unstamped_artifact_is_refused():
     assert "not evidence" in str(e.value)
 
 
-def test_an_artifact_from_another_commit_is_refused():
-    art = stamp({"result": "clean"})
+def test_an_artifact_with_no_module_list_falls_back_to_the_commit():
+    art = stamp({"result": "clean"})            # no code_paths given
     art["provenance"]["commit"] = "0" * 40
     art["provenance"]["commit_short"] = "0000000"
     with pytest.raises(StaleArtifact) as e:
         verify_artifact_is_current(art)
-    assert "does not belong to the current run" in str(e.value)
+    assert "no module list was recorded" in str(e.value)
+
+
+def test_an_unrelated_commit_does_not_invalidate_a_still_current_run():
+    """A long job whose own modules are untouched is still current.
+    Invalidating it because some other file was committed would make
+    the law unusable and train us to ignore it."""
+    paths = ["apex/governance/verification.py"]
+    art = stamp({"result": "clean"}, paths)
+    art["provenance"]["commit"] = "0" * 40      # unrelated commits since
+    art["provenance"]["commit_short"] = "0000000"
+    out = verify_artifact_is_current(art, code_paths=paths)
+    assert out["verdict"] == "ARTIFACT_CURRENT"
 
 
 def test_an_artifact_from_edited_code_is_refused():
@@ -66,7 +78,7 @@ def test_an_artifact_from_edited_code_is_refused():
     art["provenance"]["code_digest"] = "deadbeef" * 8
     with pytest.raises(StaleArtifact) as e:
         verify_artifact_is_current(art, code_paths=paths)
-    assert "differs from the code on disk" in str(e.value)
+    assert "differ from the modules on disk" in str(e.value)
 
 
 def test_a_current_artifact_passes():
