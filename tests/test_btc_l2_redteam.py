@@ -564,3 +564,88 @@ def test_reconciliation_field_renamed_honestly():
     assert "levels_since_prev_snapshot" in rec
     assert "events_between_local_capture_and_snapshot" not in rec
     assert "snapshot_stale_vs_applied" in rec
+
+
+# ------------------------------------ v2: RESYNCHRONIZATION SEMANTICS
+# Permanent adversarial suite. 280 of 281 healthy-stream snapshots are
+# stale (measured), so the snapshot's ONLY structural job is to anchor
+# a resync -- that path now carries the weight and must be proven.
+
+def test_resync_snapshot_establishes_state_at_its_ack():
+    """(1) an INVALID book takes the snapshot as canonical state."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100))
+    b.apply_level(_level(110, 15650, 20))
+    b.on_disconnect()
+    assert b.quality == BOOK_INVALID
+    b.apply_snapshot(_snapshot(ack=500, bids=((15600, 11),),
+                               asks=((15700, 12),)))
+    assert b.quality == BOOK_VALID
+    assert b.bids == {15600.0: 11.0} and b.asks == {15700.0: 12.0}
+    assert b.snapshot_ack == 500 and b.last_applied_ack == 500
+    assert b.resyncs == 1
+
+
+def test_resync_refuses_deltas_older_than_the_anchor():
+    """(2) queued pre-anchor deltas may NEVER be reapplied."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100))
+    b.on_disconnect()
+    b.apply_snapshot(_snapshot(ack=500, bids=((15600, 11),)))
+    before = dict(b.bids)
+    for stale_ack in (99, 100, 250, 499, 500):
+        b.apply_level(_level(stale_ack, 15600, 999))
+    assert b.bids == before, "a pre-anchor delta mutated the book"
+    assert b.levels_stale_skipped == 5
+    assert b.quality == BOOK_VALID          # skipping is not a defect
+
+
+def test_resync_applies_newer_deltas_and_state_is_replay_stable():
+    """(3) post-anchor deltas apply; re-delivery of the same event is
+    idempotent (absolute-quantity semantics), so the reconstructed
+    state is identical whether an event arrives once or twice."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100))
+    b.on_disconnect()
+    b.apply_snapshot(_snapshot(ack=500, bids=((15600, 11),)))
+    b.apply_level(_level(501, 15600, 42))
+    b.apply_level(_level(502, 15599, 7))
+    once = (dict(b.bids), dict(b.asks))
+    b.apply_level(_level(502, 15599, 7))     # duplicate re-delivery
+    assert (dict(b.bids), dict(b.asks)) == once
+    assert b.bids[15600.0] == 42.0 and b.bids[15599.0] == 7.0
+
+
+def test_resync_out_of_order_event_cannot_regress_the_book():
+    """(4) an ack REGRESSION after resync invalidates rather than
+    silently rewinding state."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100))
+    b.on_disconnect()
+    b.apply_snapshot(_snapshot(ack=500, bids=((15600, 11),)))
+    b.apply_level(_level(600, 15600, 42))
+    frozen = dict(b.bids)
+    b.apply_level(_level(550, 15600, 1))     # newer than anchor, older
+    assert b.quality == BOOK_INVALID         # than what we applied
+    assert b.invalid_reason == "ACK_REGRESSION"
+    assert b.bids == frozen, "regression mutated state before halting"
+
+
+def test_resync_result_reconciles_with_the_next_venue_snapshot():
+    """(5) after a clean resync + deltas, the next eligible (NEWER)
+    venue snapshot must agree with our reconstruction."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100))
+    b.on_disconnect()
+    b.apply_snapshot(_snapshot(ack=500, bids=((15600, 11), (15599, 5)),
+                               asks=((15700, 12),)))
+    b.apply_level(_level(600, 15600, 42))
+    b.apply_level(_level(601, 15599, 0))         # delete
+    # the venue's next snapshot, genuinely newer, reflects both deltas
+    b.apply_snapshot(_snapshot(ack=700, bids=((15600, 42),),
+                               asks=((15700, 12),)), arrival=1.0)
+    rec = b.last_reconciliation
+    assert rec["levels_matching"] == rec["levels_compared"], \
+        f"reconstruction disagreed with a newer snapshot: {rec}"
+    assert b.persistent_divergences == 0
+    assert b.quality == BOOK_VALID

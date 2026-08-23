@@ -6,9 +6,19 @@ theta, spread and breakeven distance. This module makes STOCK,
 LONG_CALL, LONG_PUT, CALL_VERTICAL, PUT_VERTICAL and NO_TRADE compete
 on REAL QUOTED ECONOMICS at time T.
 
-FILL LAW: long legs pay ASK, short legs receive BID. No midpoint fill
-is ever assumed -- a mid that never traded is a fantasy, and options
-spreads are wide enough that mid-fills manufacture edge from nothing.
+FILL LAW (quoted-side semantics, per-contract):
+
+    LONG  leg entry = THAT EXACT CONTRACT's ASK
+    SHORT leg entry = THAT EXACT CONTRACT's BID
+    debit vertical  = long_ask - short_bid
+
+No midpoint fill, no theoretical/model fill, and NO cross-contract
+price assumption: we do not assert that one strike's premium must sit
+below another's ask. That ordering usually holds for conventional debit
+spreads, but a surface anomaly or unusual structure must never be able
+to falsify a law -- the law is about WHICH SIDE OF ITS OWN QUOTE each
+leg crosses, nothing more. Economic validity (e.g. a debit structure
+costing more than its width) is checked separately, on its own terms.
 
 SELECTION LAW: strikes and expiries are chosen by DETERMINISTIC RULES
 declared before outcomes are seen -- never the retrospectively best

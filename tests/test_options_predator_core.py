@@ -102,19 +102,53 @@ def test_stock_is_always_a_competitor():
         "can never say EQUITY_BETTER"
 
 
-def test_long_leg_pays_ask_short_leg_receives_bid():
-    cands = build_candidates(_frozen(), "LONG")
+def test_long_leg_pays_ask_short_leg_receives_bid(monkeypatch):
+    """QUOTED-SIDE LAW: each leg fills at ITS OWN contract's quoted
+    side -- long=ASK, short=BID. This asserts the execution SEMANTIC,
+    not a cross-contract price ordering: a surface anomaly or unusual
+    structure must not be able to falsify a real invariant."""
+    frozen = _frozen()
+    cands = build_candidates(frozen, "LONG")
     lc = next(c for c in cands if c.expression == "LONG_CALL")
-    action, right, strike, price = lc.legs[0]
-    assert action == "BUY" and "ASK" in " ".join(lc.notes)
+    assert lc.legs[0][0] == "BUY" and "ASK" in " ".join(lc.notes)
+
+    # rebuild the quote map the way the engine does, then prove each
+    # leg's price IS that contract's own quoted side
+    from apex.predators.options.expression import _latest_by_contract
+    q = _latest_by_contract(list(frozen.option_quotes))
+
+    def sides(strike, right="C", exp="2024-06-21"):
+        r = q[(exp, strike, right)]
+        return float(r["bid"]), float(r["ask"])
+
+    assert lc.legs[0][3] == sides(lc.legs[0][2])[1]        # long = ASK
     vert = [c for c in cands if c.expression == "CALL_VERTICAL"]
     if vert:
         v = vert[0]
         assert v.legs[0][0] == "BUY" and v.legs[1][0] == "SELL"
-        assert v.legs[1][3] < v.legs[0][3]        # sold at bid < ask
+        assert v.legs[0][3] == sides(v.legs[0][2])[1]      # long = ASK
+        assert v.legs[1][3] == sides(v.legs[1][2])[0]      # short = BID
+        # net debit is DERIVED from those two actual quotes
+        assert abs(v.debit - (v.legs[0][3] - v.legs[1][3]) * 100) < 1e-6
         assert "never mid" in " ".join(v.notes)
-        # vertical must cost less than the outright it is built from
-        assert v.debit < lc.debit
+
+
+def test_no_midpoint_or_theoretical_fill_anywhere():
+    """No leg may ever price at a midpoint or a model value."""
+    frozen = _frozen()
+    from apex.predators.options.expression import _latest_by_contract
+    q = _latest_by_contract(list(frozen.option_quotes))
+    for direction in ("LONG", "SHORT"):
+        for c in build_candidates(frozen, direction):
+            for action, right, strike, price in c.legs:
+                if right == "STOCK":
+                    continue
+                key = ("2024-06-21", strike,
+                       "C" if right == "C" else "P")
+                b, a = float(q[key]["bid"]), float(q[key]["ask"])
+                mid = (a + b) / 2.0
+                assert price in (a, b), "leg priced off-quote"
+                assert price != mid or a == b, "midpoint fill detected"
 
 
 def test_vertical_caps_the_favorable_tail_explicitly():
