@@ -20,12 +20,48 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import threading
 from pathlib import Path
+
+# ATOMICITY LAW (2026-08-23, Defect B): the append transaction --
+# read-authoritative-prev -> construct -> hash -> append -> flush/fsync
+# -- must be one critical section. Two natural chain breaks occurred
+# when the WS daemon's watchdog and reader threads interleaved here
+# (both children of one parent, sub-ms apart; reproduced determin-
+# istically with a barrier). Serialization is TWO-LAYER: a per-path
+# thread lock (same process) plus an OS-level fcntl flock on a
+# sidecar .lock file (accidental multi-process writers on one host).
+# The historical broken ledgers stay forensic; they are never repaired.
+_LOCKS_GUARD = threading.Lock()
+_LOCKS: dict = {}
+
+
+def _path_lock(p: Path) -> threading.Lock:
+    key = str(p.resolve() if p.exists() else p.absolute())
+    with _LOCKS_GUARD:
+        if key not in _LOCKS:
+            _LOCKS[key] = threading.Lock()
+        return _LOCKS[key]
 
 
 def chain_append(log_path: Path, entry: dict) -> dict:
-    """Append one hash-chained record; returns the record as written."""
+    """Append one hash-chained record; returns the record as written.
+    Thread-safe and (per-host) multi-process-safe."""
     log_path = Path(log_path)
+    with _path_lock(log_path):
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        lockfile = log_path.with_suffix(log_path.suffix + ".lock")
+        with open(lockfile, "w") as lk:
+            try:
+                import fcntl
+                fcntl.flock(lk, fcntl.LOCK_EX)
+            except ImportError:                       # non-POSIX: thread
+                pass                                  # lock still holds
+            return _chain_append_locked(log_path, entry)
+
+
+def _chain_append_locked(log_path: Path, entry: dict) -> dict:
     prev, torn = "GENESIS", False
     if log_path.exists() and log_path.stat().st_size > 0:
         size = log_path.stat().st_size
@@ -66,4 +102,6 @@ def chain_append(log_path: Path, entry: dict) -> dict:
         if needs_nl:
             fh.write("\n")
         fh.write(json.dumps(body, sort_keys=True) + "\n")
+        fh.flush()
+        os.fsync(fh.fileno())
     return body

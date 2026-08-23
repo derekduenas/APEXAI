@@ -52,8 +52,46 @@ from apex.governance.chain_ledger import chain_append  # noqa: E402
 WS_URL = BITNOMIAL_WS_SEMANTICS["url"]
 SPEC_URL = "https://bitnomial.com/exchange/api/v1/prod/product/spec/5614"
 DATA_URL = "https://bitnomial.com/exchange/api/v1/prod/product/data/5614"
-TRADES_LEDGER = Path("results/btc/ws_trades_ledger.jsonl")
-BOOK_LEDGER = Path("results/btc/ws_book_ledger.jsonl")
+# LEDGER GENERATION 2 (2026-08-23): generation 1 is closed as
+# FORENSIC_TAINTED_CONCURRENCY_DEFECT (2 thread-race chain breaks,
+# root cause proven + repaired in chain_ledger). The g1 files are
+# immutable evidence and are NEVER repaired to verify. g2 opens with
+# a genesis record carrying full provenance.
+TRADES_LEDGER = Path("results/btc/ws_trades_ledger.g2.jsonl")
+BOOK_LEDGER = Path("results/btc/ws_book_ledger.g2.jsonl")
+G1_CLOSURE = {
+    "g1_book": "results/btc/forensic_2026-08-23/ws_book_ledger.jsonl",
+    "g1_trades": "results/btc/forensic_2026-08-23/ws_trades_ledger.jsonl",
+    "reason": "FORENSIC_TAINTED_CONCURRENCY_DEFECT -- two intra-process "
+              "append races (watchdog vs reader thread) broke the g1 "
+              "book chain; primitive repaired (atomic thread+flock "
+              "transaction); g1 preserved immutable as evidence",
+    "incident": "BTC-L2 Defect B, adjudicated 2026-08-23",
+}
+
+
+def _ensure_genesis() -> None:
+    """Write the g2 genesis provenance record once per ledger."""
+    import hashlib
+    import pandas as pd
+    for ledger, g1_key in ((BOOK_LEDGER, "g1_book"),
+                           (TRADES_LEDGER, "g1_trades")):
+        if ledger.exists():
+            continue
+        g1 = Path(G1_CLOSURE[g1_key])
+        g1_hash = (hashlib.sha256(g1.read_bytes()).hexdigest()
+                   if g1.exists() else "G1_FILE_ABSENT")
+        chain_append(ledger, {
+            "kind": "ledger_generation_genesis",
+            "generation": 2,
+            "known_from": str(pd.Timestamp.now(tz="UTC")),
+            "previous_ledger": str(g1),
+            "previous_ledger_sha256": g1_hash,
+            "reason": G1_CLOSURE["reason"],
+            "incident": G1_CLOSURE["incident"],
+            "code_version": "chain_ledger atomic tx + book_engine "
+                            "v2_stale_snapshot_law_2026_08_23",
+            "decision_power": "NONE"})
 HEALTH = Path("results/btc/ws_health.json")
 CTX = ssl.create_default_context(cafile="/etc/ssl/cert.pem")
 
@@ -384,6 +422,7 @@ def main() -> int:
     a = ap.parse_args()
     TRADES_LEDGER.parent.mkdir(parents=True, exist_ok=True)
     _acquire_single_writer_lock()
+    _ensure_genesis()
     s = BitnomialStream()
     print(f"BITNOMIAL WS STREAM start symbol={s.symbol} "
           f"increment={s.increment} url={WS_URL}", flush=True)

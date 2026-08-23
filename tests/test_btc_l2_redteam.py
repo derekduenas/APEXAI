@@ -384,16 +384,32 @@ def test_chain_closure_detects_post_fix_breaks(tmp_path, monkeypatch):
     assert rep["DUAL_WRITER_EVENTS_POST_FIX"] != 0
 
 
-def test_real_ws_ledgers_post_fix_chains_are_clean():
-    from apex.btc_sleeve.lineage_eligibility import (
-        ws_chain_closure_report)
-    for lp in (Path("results/btc/ws_trades_ledger.jsonl"),
-               Path("results/btc/ws_book_ledger.jsonl")):
-        if not lp.exists():
-            pytest.skip("no real WS ledgers in this environment")
-        rep = ws_chain_closure_report(lp)
-        assert rep["POST_FIX_HASH_CHAIN_BREAKS"] == 0, rep
-        assert rep["pre_fix_chain_breaks_preserved"] >= 1
+def test_real_ws_ledgers_generation_law():
+    """LEDGER GENERATION LAW (2026-08-23): g1 is closed as
+    FORENSIC_TAINTED_CONCURRENCY_DEFECT -- its 2 thread-race breaks
+    must remain PRESERVED (a g1 that suddenly verifies would mean
+    evidence was destroyed). g2 must be clean and must open with a
+    provenance genesis."""
+    g1 = Path("results/btc/ws_book_ledger.jsonl")
+    g2 = Path("results/btc/ws_book_ledger.g2.jsonl")
+    if not g1.exists():
+        pytest.skip("no real WS ledgers in this environment")
+    rows = [json.loads(x) for x in g1.read_text().splitlines()
+            if x.strip()]
+    total_breaks = sum(
+        1 for i in range(1, len(rows))
+        if rows[i].get("prev_hash") != rows[i - 1].get("entry_hash"))
+    assert total_breaks >= 2,         "g1 forensic breaks vanished -- evidence was destroyed"
+    if g2.exists():
+        g2rows = [json.loads(x) for x in g2.read_text().splitlines()
+                  if x.strip()]
+        assert g2rows[0]["kind"] == "ledger_generation_genesis"
+        assert g2rows[0]["generation"] == 2
+        assert "previous_ledger_sha256" in g2rows[0]
+        g2breaks = sum(
+            1 for i in range(1, len(g2rows))
+            if g2rows[i]["prev_hash"] != g2rows[i - 1]["entry_hash"])
+        assert g2breaks == 0, f"g2 has {g2breaks} breaks"
 
 
 def test_lock_contention_is_observable(tmp_path, monkeypatch):
@@ -461,10 +477,10 @@ def test_reconciliation_record_carries_the_mandated_fields():
               "levels_compared", "levels_matching",
               "quantity_mismatch", "price_mismatch",
               "top_of_book_match",
-              "events_between_local_capture_and_snapshot"):
+              "levels_since_prev_snapshot"):
         assert f in rec, f
     assert rec["time_delta_ms"] == 500.0
-    assert rec["events_between_local_capture_and_snapshot"] == 1
+    assert rec["levels_since_prev_snapshot"] == 1
     assert rec["top_of_book_match"] is True
     assert rec["levels_matching"] == rec["levels_compared"]
 
@@ -476,3 +492,75 @@ def test_schema_change_attack_unknown_shape_is_excluded():
         "status": "OK", "last_price": 15672,
         "some_new_field": {"semantic_type": "LAST_TRADE"}}}}
     assert not classify_row(mutated)["canonical_eligible"]
+
+
+# ------------------------------------------ v2: stale-snapshot law
+
+def test_stale_snapshot_cannot_regress_applied_state():
+    """DEFECT A ROOT CAUSE (proven 2026-08-23): a venue periodic
+    snapshot OLDER than our applied book must never replace it --
+    v1 did, resurrecting the deleted bid 15456."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100))
+    b.apply_level(_level(110, 15645, 0))       # we DELETE 15645
+    assert 15645.0 not in b.bids
+    # venue emits a periodic snapshot generated BEFORE our delete
+    stale = _snapshot(ack=105)                 # still contains 15645
+    b.apply_snapshot(stale)
+    assert 15645.0 not in b.bids, "stale snapshot resurrected a level"
+    assert b.last_applied_ack == 110           # applied state preserved
+    assert b.stale_snapshots_not_applied == 1
+    # a genuinely newer snapshot still replaces normally
+    fresh = _snapshot(ack=200, bids=((15650, 99),))
+    b.apply_snapshot(fresh)
+    assert b.bids == {15650.0: 99.0}
+
+
+def test_stale_snapshot_still_anchors_resync_after_invalid():
+    """The stale law applies only to a VALID book: an INVALID book
+    takes any snapshot as its resync anchor."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100))
+    b.apply_level(_level(110, 15650, 20))
+    b.on_disconnect()
+    b.apply_snapshot(_snapshot(ack=105))       # older than 110, but
+    assert b.quality == BOOK_VALID             # resync accepts it
+    assert b.resyncs == 1
+
+
+def test_direction_flip_is_not_persistent_divergence():
+    """DEFECT A2: 15456 flipped from snapshot-only to ours-only across
+    two reconciliations -- two different artifacts, not persistence."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100))
+    # snapshot 1: venue-only extra level (snapshot has 15646, we don't)
+    b.apply_snapshot(_snapshot(ack=150, bids=((15650, 50), (15646, 30))))
+    # our book replaced; now delete 15646 and see snapshot without it +
+    # us with a different ours-only artifact at the same price
+    b.apply_level(_level(160, 15646, 30))       # re-add as ours
+    b.apply_snapshot(_snapshot(ack=200, bids=((15650, 50), (15645, 30))))
+    # 15646 mismatched twice but directions differ -> NOT persistent
+    assert b.persistent_divergences == 0
+
+
+def test_same_direction_repeat_is_still_persistent():
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100))
+    for ack in (150, 200):
+        b.apply_snapshot(_snapshot(
+            ack=ack, bids=((15650, 77 + ack), (15645, 30))))
+    assert b.persistent_divergences == 1       # QTY direction both times
+
+
+def test_reconciliation_field_renamed_honestly():
+    """The old name implied a 0.2ms window held 700 events; v2 names
+    the inter-snapshot count what it is."""
+    b = BookState()
+    b.apply_snapshot(_snapshot(ack=100), arrival=1.0)
+    b.apply_level(_level(110, 15650, 20), arrival=1.5)
+    b.apply_snapshot(_snapshot(ack=150, bids=((15650, 20), (15645, 30))),
+                     arrival=2.0)
+    rec = b.last_reconciliation
+    assert "levels_since_prev_snapshot" in rec
+    assert "events_between_local_capture_and_snapshot" not in rec
+    assert "snapshot_stale_vs_applied" in rec

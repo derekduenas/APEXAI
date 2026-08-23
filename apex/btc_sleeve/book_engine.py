@@ -20,6 +20,22 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+BOOK_ENGINE_VERSION = "v2_stale_snapshot_law_2026_08_23"
+# V2 REPAIRS (Defect A, root cause PROVEN from forensic records
+# 4349/4352 of the sealed 37.6h soak):
+#   A1 STALE SNAPSHOT LAW -- the venue's ~10s periodic snapshots are
+#      frequently OLDER than our applied book (42 of 95 persisted
+#      mismatch records had last_applied_ack > snapshot_ack). V1
+#      replaced the book unconditionally, REGRESSING applied state and
+#      resurrecting deleted levels (bid 15456 was exactly this). V2:
+#      a VALID book only accepts snapshots with ack > last_applied_ack;
+#      stale snapshots are counted and used for awareness, never
+#      applied. An INVALID/NO_SNAPSHOT/CLOSED book still accepts any
+#      snapshot as its resync anchor.
+#   A2 DIRECTION-AWARE CLASSIFIER -- persistence now requires the SAME
+#      (side, price, direction) mismatch at consecutive comparisons;
+#      v1 keyed on (side, price) only, so a flip from snapshot-only to
+#      ours-only (two different artifacts) miscounted as persistent.
 BOOK_VALID = "VALID"
 BOOK_INVALID = "INVALID"
 BOOK_NO_SNAPSHOT = "NO_SNAPSHOT_YET"
@@ -58,6 +74,7 @@ class BookState:
     #   * the SAME level mismatched at two consecutive reconciliations
     #     -> BOOK_RECONSTRUCTION_DIVERGENCE (L2 stays provisional)
     snapshot_divergence_events: int = 0
+    stale_snapshots_not_applied: int = 0
     last_divergence: dict | None = None
     reconciliations_total: int = 0
     reconciliations_perfect: int = 0
@@ -93,6 +110,11 @@ class BookState:
         was_invalid = self.quality == BOOK_INVALID
         if self.quality == BOOK_VALID:
             self._reconcile(ack, msg, bids, asks, arrival)
+            if self.last_applied_ack is not None and                     ack <= self.last_applied_ack:
+                # STALE SNAPSHOT LAW: never regress applied state
+                self.stale_snapshots_not_applied += 1
+                self.snapshots += 1
+                return
         self.bids, self.asks = bids, asks
         self._levels_since_snapshot = 0
         self.snapshot_ack = ack
@@ -196,9 +218,13 @@ class BookState:
                 if ours.get(p) != theirs.get(p):
                     if p in ours and p in theirs:
                         qty_mm += 1
+                        direction = "QTY"
                     else:
                         price_mm += 1
+                        direction = ("OURS_ONLY" if p in ours
+                                     else "SNAPSHOT_ONLY")
                     out.append({"side": name, "price": p,
+                                "direction": direction,
                                 "ours": ours.get(p),
                                 "snapshot": theirs.get(p)})
         return out, compared, qty_mm, price_mm
@@ -225,12 +251,20 @@ class BookState:
                "price_mismatch": price_mm,
                "top_of_book_match": (our_bb == snap_bb and
                                      our_ba == snap_ba),
-               "events_between_local_capture_and_snapshot":
+               # renamed in v2: the old name
+               # events_between_local_capture_and_snapshot implied a
+               # 0.2ms window held 700 events; it always counted the
+               # whole inter-snapshot interval
+               "levels_since_prev_snapshot":
                    self._levels_since_snapshot,
+               "snapshot_stale_vs_applied":
+                   (self.last_applied_ack is not None and
+                    ack <= self.last_applied_ack),
                "mismatched_levels": diff[:10]}
         # classify LAST reconciliation's pending mismatches
         if self._pending_mismatch_keys:
-            now_keys = {(d["side"], d["price"]) for d in diff}
+            now_keys = {(d["side"], d["price"], d["direction"])
+                        for d in diff}
             repeated = [k for k in self._pending_mismatch_keys
                         if k in now_keys]
             if repeated:
@@ -247,7 +281,7 @@ class BookState:
         else:
             self.reconciliations_perfect += 1
         self._pending_mismatch_keys = tuple(
-            (d["side"], d["price"]) for d in diff)
+            (d["side"], d["price"], d["direction"]) for d in diff)
         self.last_reconciliation = rec
 
     def continuity(self) -> dict:
@@ -257,6 +291,9 @@ class BookState:
                 "same_ack_repeats": self.same_ack_repeats,
                 "snapshot_divergence_events":
                     self.snapshot_divergence_events,
+                "stale_snapshots_not_applied":
+                    self.stale_snapshots_not_applied,
+                "engine_version": BOOK_ENGINE_VERSION,
                 "reconciliations_total": self.reconciliations_total,
                 "reconciliations_perfect": self.reconciliations_perfect,
                 "races_confirmed": self.races_confirmed,
