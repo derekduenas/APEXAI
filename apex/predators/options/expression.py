@@ -174,10 +174,13 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
         net_delta=1.0 if direction == "LONG" else -1.0,
         stock_equivalent_shares=float(shares),
         max_theoretical_loss=round(spot * shares, 2),
-        execution_pedigree=stock_execution_pedigree,
+        execution_pedigree=STOCK_COMPARATOR_PEDIGREE,
         notes=("max_loss shown is the instrument's theoretical bound, "
                "NOT the planned loss -- the strategy stop defines that",
-               f"stock fill basis: {stock_execution_pedigree}")))
+               f"stock fill basis: {STOCK_COMPARATOR_PEDIGREE} -- "
+               f"crosses NO spread, so it is a DIAGNOSTIC comparator, "
+               f"never proof that stock beat options",
+               STOCK_COMPARATOR_LAW)))
 
     # ---------- LONG single option (nearest-ATM, deterministic)
     import pandas as pd
@@ -285,6 +288,24 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
 COMPARISON_BASES = ("RAW_UNIT_ECONOMICS", "EQUAL_INITIAL_DELTA",
                     "EQUAL_RISK_BUDGET", "EQUAL_CAPITAL_DEPLOYED")
 
+# STOCK COMPARATOR LIMITATION (operator ruling, 2026-08-23).
+# Our stock fills are modelled and cross NO spread, while option fills
+# cross real quoted spreads. Any option-vs-stock comparison therefore
+# hands stock a friction-free advantage it would not have in the
+# market. The historical replay's +8,656 stock result is NOT evidence
+# that stock beat options, and may never be cited as such.
+#
+# Options-vs-options competition is unaffected: every option
+# expression pays real quoted-side friction, so they are comparable to
+# each other on equal terms.
+STOCK_COMPARATOR_PEDIGREE = "LIMITED_MODELLED_EXECUTION"
+OPTION_VS_STOCK_STATUS = "NOT_PROVEN"
+STOCK_COMPARATOR_LAW = (
+    "stock fills are modelled and cross no spread; option fills cross "
+    "real quoted spreads. STOCK is a DIAGNOSTIC expression only. No "
+    "STOCK_BETTER or OPTION_BETTER verdict may be drawn until observed "
+    "equity execution is commissioned.")
+
 RISK_BASES = ("PLANNED_INVALIDATION", "MAX_LOSS", "FULL_PREMIUM",
               "OTHER_EXPLICIT")
 
@@ -372,6 +393,10 @@ def normalize(candidates: list, *, risk_budget_dollars: float | None
     out["_law"] = ("multiple bases preserved deliberately; one option "
                    "contract is NOT universally 100 shares of exposure, "
                    "and no single normalization may crown a winner")
+    out["_stock_comparator"] = {
+        "pedigree": STOCK_COMPARATOR_PEDIGREE,
+        "option_vs_stock": OPTION_VS_STOCK_STATUS,
+        "law": STOCK_COMPARATOR_LAW}
     out["_reference_delta_shares"] = ref_delta
     return out
 
@@ -411,6 +436,9 @@ def compare(candidates: list, *, expected_move_pct: float | str
                 "candidates": rows}
     return {"verdict": "COMPARED", "candidates": rows,
             "comparison_basis_required": True,
+            "stock_comparator_pedigree": STOCK_COMPARATOR_PEDIGREE,
+            "option_vs_stock": OPTION_VS_STOCK_STATUS,
+            "stock_comparator_law": STOCK_COMPARATOR_LAW,
             "law": "ranking is an observation; Capital selects and "
                    "sizes. Breakeven reach > 1.0 means the option "
                    "needs MORE than the expected move merely to break "

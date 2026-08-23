@@ -295,10 +295,39 @@ def test_stock_execution_pedigree_is_honest():
     from apex.predators.options.expression import build_candidates
     cands = build_candidates(_frozen(), "LONG", iv=0.25)
     st = next(c for c in cands if c.expression == "STOCK")
-    assert st.execution_pedigree == "MODELLED_EXECUTION"
+    # tightened 2026-08-23 by operator ruling: not merely "modelled"
+    # but LIMITED -- it crosses no spread at all, so it cannot settle
+    # an option-vs-stock question.
+    assert st.execution_pedigree == "LIMITED_MODELLED_EXECUTION"
     opt = next(c for c in cands if c.expression == "LONG_CALL")
     assert opt.execution_pedigree == "OBSERVED_QUOTE"
-    assert any("MODELLED_EXECUTION" in nt for nt in st.notes)
+    assert any("crosses NO spread" in nt for nt in st.notes)
+
+
+def test_option_vs_stock_superiority_is_not_proven():
+    """Stock gets friction-free fills; options pay real spreads. No
+    superiority verdict may be drawn from that comparison."""
+    from apex.predators.options.expression import (
+        build_candidates, compare, normalize)
+    cands = build_candidates(_frozen(), "LONG", iv=0.25)
+    out = compare(cands, expected_move_pct=2.0)
+    assert out["option_vs_stock"] == "NOT_PROVEN"
+    assert out["stock_comparator_pedigree"] == "LIMITED_MODELLED_EXECUTION"
+    assert "DIAGNOSTIC expression only" in out["stock_comparator_law"]
+    n = normalize(cands, risk_budget_dollars=500.0,
+                  risk_basis="MAX_LOSS")
+    assert n["_stock_comparator"]["option_vs_stock"] == "NOT_PROVEN"
+
+
+def test_options_compete_against_each_other_on_equal_terms():
+    """The limitation applies ONLY to the stock comparator -- every
+    option expression pays real quoted-side friction."""
+    from apex.predators.options.expression import build_candidates
+    cands = build_candidates(_frozen(), "LONG", iv=0.25)
+    opts = [c for c in cands if c.expression != "STOCK"]
+    assert len(opts) >= 2
+    assert all(c.execution_pedigree == "OBSERVED_QUOTE" for c in opts)
+    assert all(c.round_trip_friction > 0 for c in opts)
 
 
 def test_compare_forbids_a_single_metric_winner():
