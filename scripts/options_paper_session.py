@@ -134,13 +134,19 @@ def _scan_symbol(sym: str, sb: SessionScoreboard, ledger: Path,
 
     stock_c = next((c for c in cands if c.expression == "STOCK"), None)
     ready, blocked = [], []
+    import pandas as _pd
+    _T = _pd.Timestamp(frozen.T)
     for c in cands:
         if c.expression == "STOCK":
             continue
+        # DTE must be supplied or theta burden is UNKNOWN and the
+        # geometry judges a contract it cannot actually see the tenor of
+        dte = ((_pd.Timestamp(c.expiration) - _T.normalize()).days
+               if c.expiration else None)
         geo = attack_geometry.assess(
             subject=sym, direction=direction, candidate=c,
             underlying_geometry=ug, spot=frozen.spot_ref,
-            forecast_pedigree="NOT_ESTIMABLE")
+            dte=dte, forecast_pedigree="NOT_ESTIMABLE")
         fin = attack_geometry.assassinate(
             geometry=geo, options_state=ost, candidate=c,
             stock_candidate=stock_c)
@@ -154,19 +160,23 @@ def _scan_symbol(sym: str, sb: SessionScoreboard, ledger: Path,
     rec["blocked"] = blocked
 
     if not ready:
-        # a NEAR MISS isolates one variable and is the most
-        # informative population we collect
+        # WAIT_FOR_ENTRY vs REFUSED is a real distinction, not
+        # bookkeeping. If every contract was sound and only the
+        # LOCATION was poor, the thesis survives and we are early --
+        # that is a setup to revisit. If the CONTRACTS were the
+        # problem, no amount of waiting helps.
+        location_only = (ug.entry_quality == "POOR" and
+                         all(q in ("GEOMETRY",) for _e, q in blocked))
+        if location_only:
+            sb.stage("WAIT_FOR_ENTRY")
+            sb.stop("NO_TRADE")
+            return {**rec, "status": "WAIT_FOR_ENTRY",
+                    "why": "contracts are sound; the underlying "
+                           "location is not attackable yet"}
         if blocked:
-            sb.near_miss(symbol=sym, T=frozen.T,
-                         missing=blocked[0][1])
+            sb.near_miss(symbol=sym, T=frozen.T, missing=blocked[0][1])
         sb.stop("GEOMETRY_REFUSED" if blocked else "NO_TRADE")
         return {**rec, "status": "NO_ATTACKABLE_EXPRESSION"}
-
-    if ug.entry_quality in ("POOR",):
-        sb.stage("WAIT_FOR_ENTRY")
-        sb.stop("NO_TRADE")
-        return {**rec, "status": "WAIT_FOR_ENTRY",
-                "why": "thesis intact, location not attackable yet"}
 
     sb.stage("ATTACK_READY")
     # pre-declared selection: the expression whose breakeven demands the
