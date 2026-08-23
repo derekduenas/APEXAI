@@ -157,3 +157,17 @@ BTC-L2 facts on record (all resolved by docs/spec/measurement, never guessed):
 - Liquidations: NOT_AVAILABLE. No inferred liquidations, no geoblock
   workarounds.
 FINAL BTC-L2 ACCEPTANCE: after the weekend soak (btc_l2_report.py).
+
+## MANUAL KRAKEN EXECUTION (commissioned off-market 2026-08-22)
+Operator decision: Kraken Pro/KDUS = MANUAL execution interface; no
+programmatic Kraken routing pursued. `apex/execution_manual/` --
+expression target BTC_PERP_KRAKEN_MANUAL. Laws: card=instruction never
+order; FILLED only via operator confirmation; EXIT_REQUESTED != EXITED;
+NOT_EXECUTED legitimate + hypothetically tracked; emergency law (no
+card without stop+invalidation); Fri 17-19 CT maintenance blocks new
+cards (VENUE_UNAVAILABLE_SCHEDULED); at OBSERVE only COMMISSIONING_TEST
+cards; every latency hop measured (decision->presented->ack->submit->
+fill); actual fill never substituted by intended price; hash-chained
+ledger, full restart replay. 17/17 synthetic scenarios PASS. Receives
+ZERO intelligence calls until authorized. Operator attestation
+(account/unlock/PBTCUC/funding) still pending -- status NOT_CONFIGURED.
