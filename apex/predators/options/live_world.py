@@ -1,4 +1,4 @@
-"""LIVE WORLD — build the commissioned FrozenState from live feeds.
+"""LIVE WORLD -- build the commissioned FrozenState from live feeds.
 
 The whole Options stack (state, expression, geometry, assassin, paper
 execution) was commissioned against `FrozenState`. Live trading must
@@ -7,122 +7,34 @@ Anything else would mean the thing we validated is not the thing we
 run.
 
 WHY A FIREWALL STILL MATTERS LIVE. In replay the firewall stops us
-reading the future. Live, the future does not exist yet -- but a
-STALE quote is the same disease wearing different clothes: it makes
-the Predator believe something the market has already stopped saying.
-So every live quote carries its age, and the loop refuses to attack on
+reading the future. Live, the future does not exist yet -- but a STALE
+quote is the same disease wearing different clothes: it makes the
+Predator believe something the market has already stopped saying. So
+every live quote carries its age, and the loop refuses to attack on
 quotes it cannot vouch for.
 
-FEEDS
-    options   ThetaData v3 snapshot (options entitlement confirmed)
-    underlying Alpaca SIP bars + NBBO (real equity quotes, so the
-              stock comparator crosses a real spread)
+VENDOR IGNORANCE. Feed access lives in the sensor layer
+(apex/intraday/options_feed.py). This module does not know, and must
+not learn, which vendor answered -- research that names its broker has
+stopped being research.
 
 decision_power: NONE -- a sensor adapter.
 """
 from __future__ import annotations
 
-import csv
-import io
-import json
-import urllib.request
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
+from apex.intraday.options_feed import (
+    FeedUnavailable, option_chain_snapshot, option_expirations,
+    underlying_bars, underlying_nbbo)
 from apex.predators.options.replay import FrozenState
 
-THETA = "http://127.0.0.1:25503/v3"
-ALPACA = "https://data.alpaca.markets/v2"
-SECRETS = Path.home() / ".apex-secrets"
+__all__ = ["FeedUnavailable", "LiveObservation", "observe",
+           "MAX_QUOTE_AGE_S", "MAX_BAR_AGE_S"]
 
 MAX_QUOTE_AGE_S = 120.0        # pre-declared: older than this is stale
 MAX_BAR_AGE_S = 300.0
-
-
-class FeedUnavailable(RuntimeError):
-    """A feed could not be read. The loop must skip, never guess."""
-
-
-def _secret(name: str) -> str:
-    p = SECRETS / name
-    if not p.exists():
-        raise FeedUnavailable(
-            f"{name} not present -- the sensor refuses to start rather "
-            f"than run on an unauthenticated feed")
-    return p.read_text().strip()
-
-
-def _get(url: str, headers: dict | None = None, timeout: int = 20) -> str:
-    req = urllib.request.Request(url, headers=headers or {})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read().decode()
-
-
-# ------------------------------------------------------------ options
-
-def option_expirations(symbol: str) -> list:
-    txt = _get(f"{THETA}/option/list/expirations?symbol={symbol}")
-    return [r["expiration"] for r in csv.DictReader(io.StringIO(txt))
-            if r.get("expiration")]
-
-
-def option_chain_snapshot(symbol: str, expiration: str) -> list:
-    """Live quotes for one expiration. Rows shaped exactly like the
-    historical corpus so downstream code cannot tell the difference."""
-    txt = _get(f"{THETA}/option/snapshot/quote"
-               f"?symbol={symbol}&expiration={expiration}")
-    rows = []
-    for r in csv.DictReader(io.StringIO(txt)):
-        try:
-            bid, ask = float(r["bid"]), float(r["ask"])
-        except (TypeError, ValueError, KeyError):
-            continue
-        if bid <= 0 or ask <= 0 or ask < bid:
-            continue
-        rows.append({
-            "symbol": symbol, "expiration": r["expiration"],
-            "strike": r["strike"],
-            "right": "CALL" if r["right"].upper().startswith("C")
-            else "PUT",
-            "timestamp": r["timestamp"],
-            "bid": r["bid"], "ask": r["ask"],
-            "bid_size": r.get("bid_size", "0"),
-            "ask_size": r.get("ask_size", "0"),
-            # live quotes are causal by construction -- they cannot
-            # describe a future that has not happened
-            "moneyness_status": "CAUSAL",
-        })
-    return rows
-
-
-# ----------------------------------------------------------- equities
-
-def _alpaca_headers() -> dict:
-    return {"APCA-API-KEY-ID": _secret("ALPACA_API_KEY_ID"),
-            "APCA-API-SECRET-KEY": _secret("ALPACA_API_SECRET_KEY")}
-
-
-def underlying_bars(symbol: str, start: datetime, end: datetime) -> list:
-    url = (f"{ALPACA}/stocks/{symbol}/bars?timeframe=1Min"
-           f"&start={start.strftime('%Y-%m-%dT%H:%M:%SZ')}"
-           f"&end={end.strftime('%Y-%m-%dT%H:%M:%SZ')}"
-           f"&limit=10000&feed=sip&adjustment=raw")
-    data = json.loads(_get(url, _alpaca_headers()))
-    return [{"t": b["t"], "o": b["o"], "h": b["h"], "l": b["l"],
-             "c": b["c"], "v": b["v"], "session": "REGULAR"}
-            for b in (data.get("bars") or [])]
-
-
-def underlying_nbbo(symbol: str) -> dict:
-    """Real equity NBBO -- what makes the stock comparator legitimate."""
-    url = f"{ALPACA}/stocks/{symbol}/quotes/latest?feed=sip"
-    q = json.loads(_get(url, _alpaca_headers())).get("quote") or {}
-    if not q:
-        raise FeedUnavailable(f"no NBBO for {symbol}")
-    return {"bid": q.get("bp"), "ask": q.get("ap"),
-            "bid_size": q.get("bs"), "ask_size": q.get("as"),
-            "t": q.get("t")}
 
 
 # -------------------------------------------------------------- world
@@ -160,8 +72,8 @@ def observe(symbol: str, *, now: datetime | None = None,
     start = session_open_utc or (now - timedelta(hours=8))
     reasons = []
 
-    # TIMEZONE CONVENTION. ThetaData option timestamps are ET-NAIVE;
-    # Alpaca bar timestamps are UTC-AWARE. Comparing an ET-naive quote
+    # TIMEZONE CONVENTION. Option quote timestamps arrive ET-NAIVE;
+    # bar timestamps arrive UTC-AWARE. Comparing an ET-naive quote
     # against a UTC clock makes every live quote look ~4 hours stale,
     # which would have refused every scan of a live session while
     # looking like a working staleness guard. The historical corpus is

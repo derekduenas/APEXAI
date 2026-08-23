@@ -80,9 +80,16 @@ def test_no_execution_or_broker_dependency_exists():
     # producers would defeat its purpose. It defines no placement
     # function and imports nothing (the mechanical invariant below still
     # covers it).
+    # 2026-08-23 (Options PAPER_EXPLORATORY): options_feed.py is the
+    # market-DATA sensor for the live options loop and NAMES its data
+    # vendors for the same reason alpaca_fabric.py does. It was placed
+    # in the sensor layer specifically so the research package
+    # (apex/predators/options/live_world.py) could consume feeds
+    # through neutral names and stay vendor-ignorant -- the firewall
+    # was obeyed by moving the code, not by exempting research.
     exempt = {"broker.py", "sealing.py", "robinhood.py", "alpaca_fabric.py",
              "provider_interface.py", "market_state.py", "reconnect_ledger.py",
-             "checkpoint_graph.py"}
+             "checkpoint_graph.py", "options_feed.py"}
     # PATH-scoped exemptions (2026-08-20): name-based exemption of
     # "__init__.py" would blind the scan across every package, so files
     # that must name the sensor module get exempted individually.
