@@ -45,6 +45,7 @@ class PaperFill:
     spread_paid: float | None
     fill_pedigree: tuple
     T: str
+    expiration: str | None = None      # CONTRACT IDENTITY, see below
     # ---- RISK LAW: R is DECLARED BEFORE the trade, never inferred
     capital_deployed: float | str = NOT_ESTIMABLE
     maximum_theoretical_loss: float | str = NOT_ESTIMABLE
@@ -98,13 +99,18 @@ def simulate_entry(candidate, *, T: str, contracts: int = 1,
                          T=T, execution_pedigree=getattr(
                              candidate, "execution_pedigree",
                              "MODELLED_EXECUTION"), **risk)
+    if not getattr(candidate, "expiration", None):
+        raise ExecutionRefused(
+            "option execution requires the contract's expiration -- a "
+            "strike alone does not identify a contract, and resolving "
+            "on strike only can price a different expiry")
     net = 0.0
     for action, right, strike, price in candidate.legs:
         side = "ASK" if action == "BUY" else "BID"
         legs.append((action, right, strike, price, side))
         pedigree.append(
-            f"{action} {right}{strike} filled at that contract's "
-            f"{side} = {price}")
+            f"{action} {getattr(candidate, 'expiration', '?')} "
+            f"{right}{strike} filled at that contract's {side} = {price}")
         net += price if action == "BUY" else -price
     net_total = net * CONTRACT_MULTIPLIER * contracts
     risk = _declare_risk(candidate, risk_basis, planned_invalidation_loss,
@@ -115,6 +121,7 @@ def simulate_entry(candidate, *, T: str, contracts: int = 1,
         contracts=contracts, capital_committed=round(abs(net_total), 2),
         spread_paid=candidate.quoted_spread_cost,
         fill_pedigree=tuple(pedigree), T=T,
+        expiration=getattr(candidate, "expiration", None),
         execution_pedigree=getattr(candidate, "execution_pedigree",
                                    "OBSERVED_QUOTE"), **risk)
 
@@ -180,14 +187,18 @@ class Outcome:
         return {"kind": "options_outcome", **asdict(self)}
 
 
-def _exit_value(legs, future_quotes, expiration_lookup) -> float | None:
+def _exit_value(legs, expiration, expiration_lookup) -> float | None:
     """Mark the position out at quoted sides: we SELL longs at BID and
-    BUY BACK shorts at ASK -- the honest round trip."""
+    BUY BACK shorts at ASK -- the honest round trip.
+
+    The lookup is keyed on FULL contract identity (expiration, strike,
+    right). Keying on strike alone would let a July quote close a June
+    position."""
     total = 0.0
     for action, right, strike, _entry_px, _side in legs:
         if right == "STOCK":
             return None
-        q = expiration_lookup(strike, right)
+        q = expiration_lookup(expiration, strike, right)
         if q is None:
             return None
         bid, ask = q
@@ -251,7 +262,7 @@ def resolve(*, fill: PaperFill, sealed_card_hash: str,
                         fill.contracts, 2)
             exit_rec["price"] = last
     else:
-        ev = _exit_value(fill.legs, None, future_quote_lookup)
+        ev = _exit_value(fill.legs, fill.expiration, future_quote_lookup)
         if ev is not None:
             gross = ev * CONTRACT_MULTIPLIER * fill.contracts
             pnl = round(gross - fill.net_debit, 2)

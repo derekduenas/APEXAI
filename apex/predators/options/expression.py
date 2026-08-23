@@ -65,6 +65,14 @@ class ExpressionCandidate:
     stock_equivalent_shares: float | str = "NOT_ESTIMABLE"
     max_theoretical_loss: float | None = None
     execution_pedigree: str = "OBSERVED_QUOTE"
+    # CONTRACT IDENTITY (2026-08-23). A strike alone does NOT identify a
+    # contract -- the same strike exists on every expiry in the chain.
+    # Resolution that keys on strike only can silently price a
+    # DIFFERENT expiration, which is exactly the cross-contract price
+    # assumption the fill law forbids. Every option structure here is
+    # single-expiry; anything multi-expiry must carry per-leg identity
+    # before it may be executed.
+    expiration: str | None = None
     notes: tuple = ()
 
     def as_record(self) -> dict:
@@ -176,6 +184,7 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
         debit = a * 100
         be = atm + a if right == "C" else atm - a
         out.append(ExpressionCandidate(
+            expiration=exp,
             expression="LONG_CALL" if right == "C" else "LONG_PUT",
             direction=direction,
             legs=(("BUY", right, atm, a),),
@@ -213,6 +222,7 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
                 width = abs(wk - atm) * 100
                 bev = atm + (a - wb) if right == "C" else atm - (a - wb)
                 out.append(ExpressionCandidate(
+            expiration=exp,
                     expression="CALL_VERTICAL" if right == "C"
                     else "PUT_VERTICAL", direction=direction,
                     legs=(("BUY", right, atm, a),

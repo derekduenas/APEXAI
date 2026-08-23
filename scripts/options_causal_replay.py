@@ -69,10 +69,14 @@ PROTOCOL = {
 
 def _last_quotes_by_contract(rows: list) -> dict:
     """Collapse revealed future quotes to the LAST quote per contract --
-    the pre-declared session-close exit."""
+    the pre-declared session-close exit.
+
+    Keyed on FULL contract identity. Keying on strike alone let a
+    different expiration close the position (caught by the first real
+    replay: a long vertical showed a loss larger than its debit)."""
     out = {}
     for r in rows:
-        key = (float(r["strike"]),
+        key = (str(r["expiration"]), float(r["strike"]),
                "C" if r["right"].upper().startswith("C") else "P")
         prev = out.get(key)
         if prev is None or r["timestamp"] >= prev["timestamp"]:
@@ -81,8 +85,8 @@ def _last_quotes_by_contract(rows: list) -> dict:
 
 
 def _quote_lookup(last_by_contract: dict):
-    def lookup(strike, right):
-        r = last_by_contract.get((float(strike), right))
+    def lookup(expiration, strike, right):
+        r = last_by_contract.get((str(expiration), float(strike), right))
         if r is None:
             return None
         try:

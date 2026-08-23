@@ -19,9 +19,12 @@ CARD = "a" * 64
 T = "2024-05-22T14:00:00"
 
 
-def _call(strike=100.0, ask=3.0, bid=2.8):
+EXP = "2024-06-21"
+
+
+def _call(strike=100.0, ask=3.0, bid=2.8, expiration=EXP):
     return ExpressionCandidate(
-        expression="LONG_CALL", direction="LONG",
+        expression="LONG_CALL", direction="LONG", expiration=expiration,
         legs=(("BUY", "C", strike, ask),), debit=ask * 100,
         max_loss=ask * 100, max_gain="UNBOUNDED",
         breakeven=strike + ask, breakeven_move_pct=3.0,
@@ -31,7 +34,7 @@ def _call(strike=100.0, ask=3.0, bid=2.8):
 
 def _vertical():
     return ExpressionCandidate(
-        expression="CALL_VERTICAL", direction="LONG",
+        expression="CALL_VERTICAL", direction="LONG", expiration=EXP,
         legs=(("BUY", "C", 100.0, 3.0), ("SELL", "C", 105.0, 1.2)),
         debit=180.0, max_loss=180.0, max_gain=320.0, breakeven=101.8,
         breakeven_move_pct=1.8, quoted_spread_cost=20.0,
@@ -53,8 +56,13 @@ def _future(path):
             for i, c in enumerate(path)]
 
 
-def _quotes(mapping):
-    def lookup(strike, right):
+def _quotes(mapping, expiration=EXP):
+    """Identity-keyed lookup. Accepts the legacy (strike, right) mapping
+    and binds it to ONE expiration, so a test can never accidentally
+    close a position with another expiry's quote."""
+    def lookup(exp, strike, right):
+        if exp != expiration:
+            return None
         return mapping.get((strike, right))
     return lookup
 
@@ -297,3 +305,51 @@ def test_counterfactuals_refuse_to_crown_a_winner():
         if name.startswith("_") or "error" in row:
             continue
         assert "risk_basis" in row and "execution_pedigree" in row
+
+
+# ------------------------------------- CONTRACT IDENTITY (regression)
+# Caught 2026-08-23 by the first real-data replay: a CALL_VERTICAL
+# reported -$525 on a $155 debit. A long vertical cannot lose more than
+# its debit. Cause: resolution keyed on (strike, right) only, so a
+# DIFFERENT expiration's quote could close the position.
+
+def test_a_long_vertical_can_never_lose_more_than_its_debit():
+    v = _vertical()
+    f = simulate_entry(v, T=T, sealed_card_hash=CARD,
+                       risk_basis="FULL_PREMIUM")
+    out = resolve(fill=f, sealed_card_hash=CARD,
+                  future_underlying=_future([95.0]),
+                  future_quote_lookup=_quotes({(100.0, "C"): (0.05, 0.10),
+                                               (105.0, "C"): (0.01, 0.05)}),
+                  entry_underlying=100.0)
+    assert isinstance(out.pnl, float)
+    assert out.pnl >= -f.net_debit - 1e-6, (
+        f"lost {out.pnl} on a {f.net_debit} debit -- impossible")
+
+
+def test_a_foreign_expiry_may_not_close_the_position():
+    """The exact defect: same strikes, wrong expiry. It must refuse to
+    price rather than silently resolve against another contract."""
+    f = simulate_entry(_call(ask=3.0), T=T, sealed_card_hash=CARD,
+                       risk_basis="FULL_PREMIUM")
+    foreign = _quotes({(100.0, "C"): (99.0, 99.5)},
+                      expiration="2024-12-20")
+    out = resolve(fill=f, sealed_card_hash=CARD,
+                  future_underlying=_future([106]),
+                  future_quote_lookup=foreign, entry_underlying=100.0)
+    assert out.pnl == "NOT_ESTIMABLE", (
+        "a December quote closed a June position")
+
+
+def test_the_fill_records_which_contract_it_bought():
+    f = simulate_entry(_call(ask=3.0), T=T, sealed_card_hash=CARD)
+    assert f.expiration == EXP
+    assert EXP in f.fill_pedigree[0]
+
+
+def test_an_option_without_contract_identity_is_refused():
+    import pytest
+    from dataclasses import replace
+    anon = replace(_call(), expiration=None)
+    with pytest.raises(ExecutionRefused):
+        simulate_entry(anon, T=T, sealed_card_hash=CARD)
