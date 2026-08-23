@@ -27,6 +27,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from apex.governance.chain_ledger import chain_append          # noqa: E402
+from apex.governance.verification import stamp                 # noqa: E402
 from apex.predators.options import (                           # noqa: E402
     attack_geometry, expression, paper_execution, state,
     underlying_bridge)
@@ -34,6 +35,18 @@ from apex.predators.options.replay import (                    # noqa: E402
     ReplayWorld, sample_accounting, seal_before_card)
 
 NOT_ESTIMABLE = "NOT_ESTIMABLE"
+
+# Modules whose content decides these results. Stamped into the output
+# so a reader can prove which code produced it.
+CODE_PATHS = [
+    "scripts/options_causal_replay.py",
+    "apex/predators/options/replay.py",
+    "apex/predators/options/state.py",
+    "apex/predators/options/expression.py",
+    "apex/predators/options/attack_geometry.py",
+    "apex/predators/options/paper_execution.py",
+    "apex/predators/options/underlying_bridge.py",
+]
 
 # ------------------------------------------------ PRE-REGISTERED PROTOCOL
 PROTOCOL = {
@@ -295,7 +308,8 @@ def main() -> int:
         summary["status_counts"][s] = summary["status_counts"].get(s, 0) + 1
     chain_append(ledger, summary)
     Path(a.out).write_text(json.dumps(
-        {"summary": summary, "records": all_recs}, indent=1, default=str))
+        stamp({"summary": summary, "records": all_recs}, CODE_PATHS),
+        indent=1, default=str))
     print(json.dumps(summary, indent=1, default=str))
     return 0
 

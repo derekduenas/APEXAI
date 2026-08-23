@@ -7,14 +7,18 @@ options expression is worth attacking at all at small size.
 """
 from __future__ import annotations
 
-import json
 import statistics
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from apex.governance.verification import load_verified      # noqa: E402
+from scripts.options_causal_replay import CODE_PATHS        # noqa: E402
+
 
 def main(path: str) -> int:
-    d = json.loads(Path(path).read_text())
+    d = load_verified(path, code_paths=CODE_PATHS)
     recs = [r for r in d["records"] if r.get("status") == "RESOLVED"]
     per = {}
     for r in recs:
