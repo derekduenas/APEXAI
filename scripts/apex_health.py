@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -34,10 +35,18 @@ def main() -> int:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--service", action="append", default=None)
     a = ap.parse_args()
+    # EACH HOST DECLARES WHAT IT SHOULD BE RUNNING. Reporting
+    # NEVER_STARTED for a service that legitimately lives on another
+    # machine is a false alarm, and false alarms train an operator to
+    # ignore the alarm -- the same way a buffered empty log trained us
+    # to ignore a dead daemon.
+    expected = os.environ.get("APEX_EXPECTED_SERVICES")
     root = Path(a.heartbeat_dir) if a.heartbeat_dir else None
 
     relrep = rel.verify_running_release()
-    names = a.service or list(SERVICES)
+    names = (a.service
+             or ([n.strip() for n in expected.split(",") if n.strip()]
+                 if expected else list(SERVICES)))
     reports = [hb.health(n, root=root,
                          **SERVICES.get(n, {"beat_stale_s": 900}))
                for n in names]

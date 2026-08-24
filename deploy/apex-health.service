@@ -9,6 +9,8 @@ Environment=PYTHONUNBUFFERED=1
 Environment=APEX_HEARTBEAT_DIR=/apex-data/core/heartbeats
 Environment=APEX_RELEASE_ROOT=/opt/apex
 Environment=APEX_CANONICAL_REPO=/opt/apex-repo
+# this host runs the options lane; BTC capture lives on the Mac
+Environment=APEX_EXPECTED_SERVICES=options-acquire
 ExecStart=/opt/apex/shared/venv/bin/python -u \
     /opt/apex/current/scripts/apex_health.py --json
 StandardOutput=append:/apex-data/core/logs/health.log
