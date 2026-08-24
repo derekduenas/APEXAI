@@ -92,6 +92,19 @@ def row_eligibility(moneyness_status: str) -> dict:
 
 
 def _keychain(service: str) -> str:
+    """Secret lookup. macOS: keychain. Linux/cloud: 0600 files under
+    ~/.apex-secrets (APEX_SECRETS_DIR). Values are never printed.
+
+    Recovered 2026-08-23 from cloud-only commit 59ddce5, which was
+    destroyed by syncing the host onto Mac history that never contained
+    it. Without this the cloud daemon shells out to the macOS
+    `security` binary, which does not exist on Linux, and dies at
+    startup."""
+    sdir = Path(os.environ.get("APEX_SECRETS_DIR",
+                               Path.home() / ".apex-secrets"))
+    f = sdir / service
+    if f.exists():
+        return f.read_text().strip()
     return subprocess.run(
         ["security", "find-generic-password", "-s", service, "-w"],
         capture_output=True, text=True, check=True).stdout.strip()

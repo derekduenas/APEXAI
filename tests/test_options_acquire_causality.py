@@ -140,3 +140,44 @@ def test_oi_coverage_cannot_be_truncated_by_any_band():
     # the old widened-band code is gone
     assert "MONEY_LO * 0.9" not in src
     assert "first_ref" not in src
+
+
+# ------------------------------------------- secret backend (regression)
+# The cloud daemon died at startup because a sync onto Mac history
+# destroyed a cloud-only commit carrying the Linux secret backend,
+# leaving it shelling out to the macOS `security` binary. It left no
+# trace because its log was buffered into a 0-byte file.
+
+def test_secrets_resolve_from_files_without_a_macos_keychain(
+        tmp_path, monkeypatch):
+    import scripts.options_history_acquire as acq
+    (tmp_path / "SOME_TOKEN").write_text("value-not-printed\n")
+    monkeypatch.setenv("APEX_SECRETS_DIR", str(tmp_path))
+
+    def _no_keychain(*a, **k):
+        raise FileNotFoundError(
+            "[Errno 2] No such file or directory: 'security'")
+    monkeypatch.setattr(acq.subprocess, "run", _no_keychain)
+
+    assert acq._keychain("SOME_TOKEN") == "value-not-printed", (
+        "the file backend must answer before the keychain is reached, "
+        "or the cloud daemon cannot start")
+
+
+def test_a_missing_secret_still_falls_through_to_the_keychain(
+        tmp_path, monkeypatch):
+    """macOS must keep working: the file backend is an addition, not a
+    replacement."""
+    import scripts.options_history_acquire as acq
+    monkeypatch.setenv("APEX_SECRETS_DIR", str(tmp_path))
+    calls = {}
+
+    class _R:
+        stdout = "from-keychain"
+
+    def _fake(cmd, **k):
+        calls["cmd"] = cmd
+        return _R()
+    monkeypatch.setattr(acq.subprocess, "run", _fake)
+    assert acq._keychain("ABSENT") == "from-keychain"
+    assert calls["cmd"][0] == "security"
