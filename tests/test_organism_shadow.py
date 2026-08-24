@@ -192,35 +192,80 @@ def test_a_claim_resolves_once_and_only_once(tmp_path):
         resolve(led, claim_id="c1", occurred=False)
 
 
-def test_certainties_are_not_probabilities(tmp_path):
+def test_values_outside_the_unit_interval_are_not_probabilities(
+        tmp_path):
     led = tmp_path / "cal.jsonl"
-    for p in (0.0, 1.0, -0.1, 1.3):
+    for p in (-0.1, 1.3):
         with pytest.raises(CalibrationViolation):
             register(led, claim_id="c", p=p, event="x", sleeve="btc",
                      pedigree="ESTIMABLE_UNCALIBRATED")
+
+
+def test_certainty_must_be_earned_not_banned(tmp_path):
+    """Corrected law: 0 and 1 are mathematically valid probabilities.
+    What is prohibited is UNSUPPORTED certainty -- an empirical model
+    claiming the boundary it has not earned."""
+    led = tmp_path / "cal.jsonl"
+    # a model claiming certainty -> refused
+    with pytest.raises(CalibrationViolation) as e:
+        register(led, claim_id="hubris", p=1.0, event="+2R before -1R",
+                 sleeve="btc", pedigree="ESTIMABLE_UNCALIBRATED")
+    assert "certainty must be earned" in str(e.value)
+    # a deterministic fact -> legitimate, and flagged as extreme
+    rec = register(led, claim_id="fact", p=1.0,
+                   event="option expires by its expiration timestamp",
+                   sleeve="options",
+                   pedigree="DETERMINISTIC_BY_CONSTRUCTION")
+    assert rec["certainty_flag"] == "EXTREME_CERTAINTY_CLAIM"
+    # ordinary probabilities carry the ordinary flag
+    rec2 = register(led, claim_id="ordinary", p=0.6, event="x",
+                    sleeve="btc", pedigree="ESTIMABLE_UNCALIBRATED")
+    assert rec2["certainty_flag"] == "VALID_PROBABILITY"
 
 
 def test_reliability_refuses_to_draw_a_curve_through_noise(tmp_path):
     led = tmp_path / "cal.jsonl"
     for i in range(5):
         register(led, claim_id=f"c{i}", p=0.6, event="x", sleeve="btc",
-                 pedigree="ESTIMABLE_UNCALIBRATED")
+                 pedigree="ESTIMABLE_UNCALIBRATED", session=f"s{i}")
         resolve(led, claim_id=f"c{i}", occurred=(i < 3))
     rep = reliability(led)
-    assert rep["n_resolved"] == 5
+    assert rep["n_raw"] == 5
     assert rep["buckets"][0]["observed_freq"] == "INSUFFICIENT_SAMPLE"
     assert rep["verdict"] == "INSUFFICIENT_SAMPLE_EVERYWHERE"
+    assert rep["min_bucket_n_classification"] == \
+        "REPORTING_SUFFICIENCY_PRIOR"
 
 
-def test_reliability_measures_when_the_sample_allows(tmp_path):
+def test_dependent_observations_do_not_impersonate_a_sample(tmp_path):
+    """25 correlated claims from ONE session must not clear a floor
+    meant for independent calibration events."""
     led = tmp_path / "cal.jsonl"
     for i in range(25):
         register(led, claim_id=f"c{i}", p=0.6, event="x", sleeve="btc",
-                 pedigree="ESTIMABLE_UNCALIBRATED")
+                 pedigree="ESTIMABLE_UNCALIBRATED",
+                 session="2026-08-25")               # all one session
+        resolve(led, claim_id=f"c{i}", occurred=(i < 15))
+    rep = reliability(led)
+    row = rep["buckets"][0]
+    assert row["n_raw"] == 25
+    assert row["n_effective_lower_bound"] == 1
+    assert row["observed_freq"] == "INSUFFICIENT_SAMPLE"
+    assert rep["independent_session_count"] == 1
+
+
+def test_reliability_measures_when_independent_sessions_allow(tmp_path):
+    led = tmp_path / "cal.jsonl"
+    for i in range(25):
+        register(led, claim_id=f"c{i}", p=0.6, event="x", sleeve="btc",
+                 pedigree="ESTIMABLE_UNCALIBRATED", session=f"day{i}",
+                 regime_tags=["QUIET" if i % 2 else "NORMAL"])
         resolve(led, claim_id=f"c{i}", occurred=(i < 15))   # 60%
     rep = reliability(led)
     row = rep["buckets"][0]
-    assert row["n"] == 25
+    assert row["n_raw"] == 25
+    assert row["n_effective_lower_bound"] == 25
     assert row["observed_freq"] == 0.6
     assert abs(row["gap"]) < 0.01
+    assert isinstance(row["regime_concentration"], float)
     assert rep["verdict"] == "CALIBRATION_MEASURABLE"
