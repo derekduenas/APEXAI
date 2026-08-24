@@ -10,6 +10,7 @@ A heartbeat therefore records PROGRESS, not merely presence. The states
 below separate the failures that look identical from the outside:
 
     HEALTHY    beating, and work is completing
+    STARTING   beating, recently started, work not finished yet
     STALLED    beating, but no unit of work has completed
     STALE      not beating recently enough
     DEAD       the recorded pid is gone
@@ -37,8 +38,8 @@ from pathlib import Path
 HEARTBEAT_DIR = Path(os.environ.get("APEX_HEARTBEAT_DIR",
                                     "/apex-data/core/heartbeats"))
 
-HEALTH_STATES = ("HEALTHY", "STALLED", "STALE", "DEAD", "WRONG_RELEASE",
-                 "NEVER_STARTED")
+HEALTH_STATES = ("HEALTHY", "STARTING", "STALLED", "STALE", "DEAD",
+                 "WRONG_RELEASE", "NEVER_STARTED")
 
 
 def _now() -> datetime:
@@ -176,6 +177,19 @@ def health(service: str, *, beat_stale_s: float,
                        f"{round(beat_stale_s)}s -- the process exists "
                        f"but is not reporting"}
 
+    # STARTUP GRACE. A freshly restarted daemon has legitimately not
+    # finished a unit of work yet. Calling that STALLED would fire an
+    # alert on every restart, and an alert that cries wolf gets ignored
+    # -- the same way a buffered empty log got ignored.
+    started = _parse(hb.get("started_utc"))
+    start_age = (now - started).total_seconds() if started else None
+    if work_stale_s is not None and start_age is not None \
+            and start_age < work_stale_s and hb.get("work_completed", 0) == 0:
+        return {**base, "state": "STARTING",
+                "why": f"started {round(start_age)}s ago and has not "
+                       f"completed a unit of work yet; within the "
+                       f"{round(work_stale_s)}s startup grace"}
+
     if work_stale_s is not None:
         if work_age is None:
             return {**base, "state": "STALLED",
@@ -194,7 +208,9 @@ def health(service: str, *, beat_stale_s: float,
 
 
 def summarize(reports: list) -> dict:
-    bad = [r for r in reports if r["state"] != "HEALTHY"]
+    # STARTING is not a problem; it is a daemon doing exactly what a
+    # daemon does after a restart.
+    bad = [r for r in reports if r["state"] not in ("HEALTHY", "STARTING")]
     return {"kind": "apex_health_summary",
             "services": len(reports),
             "healthy": len(reports) - len(bad),

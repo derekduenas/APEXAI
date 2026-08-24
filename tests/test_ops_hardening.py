@@ -50,10 +50,17 @@ def test_alive_but_making_no_progress_reads_as_stalled(tmp_path):
 
 
 def test_beating_with_no_work_ever_is_stalled_not_healthy(tmp_path):
+    """Past the startup grace, a daemon that has never completed a unit
+    of work is stuck -- looping on a failing call looks identical to
+    working from the outside."""
     h = hb.Heartbeat(service="svc")
     h.beat(tmp_path)
+    data = json.loads((tmp_path / "svc.json").read_text())
+    data["started_utc"] = (NOW - timedelta(hours=2)).isoformat()
+    data["beat_utc"] = NOW.isoformat()
+    (tmp_path / "svc.json").write_text(json.dumps(data))
     r = hb.health("svc", beat_stale_s=600, work_stale_s=600,
-                  root=tmp_path)
+                  root=tmp_path, now=NOW)
     assert r["state"] == "STALLED"
     assert "EVER" in r["why"]
 
@@ -223,3 +230,42 @@ def test_no_current_release_refuses_rather_than_defaulting(tmp_path,
     monkeypatch.setattr(rel, "CURRENT", tmp_path / "absent")
     r = rel.verify_running_release()
     assert r["verdict"] == "NO_CURRENT_RELEASE"
+
+
+def test_a_freshly_restarted_daemon_is_starting_not_stalled(tmp_path):
+    """Every restart would otherwise fire an alert, and an alarm that
+    cries wolf is the failure mode we are trying to avoid."""
+    hb.Heartbeat(service="svc").beat(tmp_path)
+    r = hb.health("svc", beat_stale_s=600, work_stale_s=3600,
+                  root=tmp_path)
+    assert r["state"] == "STARTING"
+    assert "startup grace" in r["why"]
+    assert hb.summarize([r])["verdict"] == "ALL_HEALTHY"
+
+
+def test_the_grace_expires_and_a_stuck_daemon_is_caught(tmp_path):
+    h = hb.Heartbeat(service="svc")
+    h.beat(tmp_path)
+    data = json.loads((tmp_path / "svc.json").read_text())
+    data["started_utc"] = (NOW - timedelta(hours=4)).isoformat()
+    data["beat_utc"] = NOW.isoformat()
+    (tmp_path / "svc.json").write_text(json.dumps(data))
+    r = hb.health("svc", beat_stale_s=600, work_stale_s=3600,
+                  root=tmp_path, now=NOW)
+    assert r["state"] == "STALLED", (
+        "a daemon that never completed work in four hours is stuck, "
+        "grace or not")
+
+
+def test_a_daemon_that_has_worked_before_gets_no_grace(tmp_path):
+    """Grace covers startup, never an established daemon going quiet."""
+    h = hb.Heartbeat(service="svc")
+    h.work("one", root=tmp_path)
+    data = json.loads((tmp_path / "svc.json").read_text())
+    data["last_work_utc"] = (NOW - timedelta(hours=2)).isoformat()
+    data["started_utc"] = (NOW - timedelta(minutes=1)).isoformat()
+    data["beat_utc"] = NOW.isoformat()
+    (tmp_path / "svc.json").write_text(json.dumps(data))
+    r = hb.health("svc", beat_stale_s=600, work_stale_s=1800,
+                  root=tmp_path, now=NOW)
+    assert r["state"] == "STALLED"
