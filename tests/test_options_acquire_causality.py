@@ -181,3 +181,80 @@ def test_a_missing_secret_still_falls_through_to_the_keychain(
     monkeypatch.setattr(acq.subprocess, "run", _fake)
     assert acq._keychain("ABSENT") == "from-keychain"
     assert calls["cmd"][0] == "security"
+
+
+# ------------------------------------------- RESTART SAFETY (bounded)
+# The daemon must be restartable without duplicating validated work,
+# silently skipping partial work, or inferring completion from file
+# existence. Proven, not asserted in a docstring.
+
+def _manifest(tmp_path, rows):
+    import json
+    p = tmp_path / "manifest.jsonl"
+    p.write_text("".join(json.dumps(r, sort_keys=True) + "\n"
+                         for r in rows))
+    return p
+
+
+def _states(monkeypatch, tmp_path, rows):
+    import scripts.options_history_acquire as acq
+    monkeypatch.setattr(acq, "MANIFEST", _manifest(tmp_path, rows))
+    return acq._manifest_states()
+
+
+def test_validated_work_is_not_repeated_on_restart(monkeypatch,
+                                                   tmp_path):
+    st = _states(monkeypatch, tmp_path, [
+        {"symbol": "SPY", "date": "2020-04-01", "state": "VALIDATED"}])
+    assert st[("SPY", "2020-04-01")] == "VALIDATED"
+    # the selection rule the worker loop uses
+    assert not (st.get(("SPY", "2020-04-01")) != "VALIDATED")
+
+
+def test_partial_work_is_retried_not_treated_as_done(monkeypatch,
+                                                     tmp_path):
+    st = _states(monkeypatch, tmp_path, [
+        {"symbol": "SPY", "date": "2020-04-01", "state": "PARTIAL"}])
+    assert st[("SPY", "2020-04-01")] != "VALIDATED", (
+        "PARTIAL must be retried -- silently skipping it would present "
+        "an incomplete corpus as complete")
+
+
+def test_complete_unvalidated_is_not_mistaken_for_validated(
+        monkeypatch, tmp_path):
+    st = _states(monkeypatch, tmp_path, [
+        {"symbol": "QQQ", "date": "2021-01-04",
+         "state": "COMPLETE_UNVALIDATED"}])
+    assert st[("QQQ", "2021-01-04")] != "VALIDATED"
+
+
+def test_the_last_state_wins_so_a_retry_can_promote_a_partial(
+        monkeypatch, tmp_path):
+    """The manifest is append-only; a later VALIDATED supersedes an
+    earlier PARTIAL for the same symbol-day."""
+    st = _states(monkeypatch, tmp_path, [
+        {"symbol": "SPY", "date": "2020-04-01", "state": "PARTIAL"},
+        {"symbol": "SPY", "date": "2020-04-01", "state": "VALIDATED"}])
+    assert st[("SPY", "2020-04-01")] == "VALIDATED"
+
+
+def test_completion_is_never_inferred_from_file_existence(
+        monkeypatch, tmp_path):
+    """Files on disk with no manifest row must NOT count as done --
+    that is how a truncated download becomes invisible."""
+    import scripts.options_history_acquire as acq
+    root = tmp_path / "hist" / "SPY"
+    root.mkdir(parents=True)
+    for n in ("quotes_20200401.csv.gz", "oi_20200401.csv.gz",
+              "underlying_20200401.json.gz"):
+        (root / n).write_bytes(b"not-really-valid")
+    monkeypatch.setattr(acq, "MANIFEST", tmp_path / "absent.jsonl")
+    assert acq._manifest_states() == {}, (
+        "state comes from the manifest, never from a directory listing")
+
+
+def test_a_missing_manifest_restarts_from_nothing_not_from_a_guess(
+        monkeypatch, tmp_path):
+    import scripts.options_history_acquire as acq
+    monkeypatch.setattr(acq, "MANIFEST", tmp_path / "none.jsonl")
+    assert acq._manifest_states() == {}

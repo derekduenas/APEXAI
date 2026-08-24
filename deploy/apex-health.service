@@ -1,0 +1,15 @@
+[Unit]
+Description=APEX service health check
+
+[Service]
+Type=oneshot
+User=apex
+WorkingDirectory=/opt/apex/current
+Environment=PYTHONUNBUFFERED=1
+Environment=APEX_HEARTBEAT_DIR=/apex-data/core/heartbeats
+Environment=APEX_RELEASE_ROOT=/opt/apex
+Environment=APEX_CANONICAL_REPO=/opt/apex-repo
+ExecStart=/opt/apex/shared/venv/bin/python -u \
+    /opt/apex/current/scripts/apex_health.py --json
+StandardOutput=append:/apex-data/core/logs/health.log
+StandardError=append:/apex-data/core/logs/health.log

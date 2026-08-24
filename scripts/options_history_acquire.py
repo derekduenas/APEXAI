@@ -332,6 +332,39 @@ def acquire_symbol_day(sym: str, date: str, akey: str, asec: str) -> dict:
     return rec
 
 
+_HB = None
+
+
+def _start_heartbeat(phase: str, workers: int):
+    """Announce what this process is and which code it runs."""
+    global _HB
+    try:
+        from apex.ops.heartbeat import Heartbeat
+        from apex.ops.release import build_pedigree
+        ped = build_pedigree(
+            service="options-acquire",
+            release_dir=Path(__file__).resolve().parents[1],
+            code_paths=["scripts/options_history_acquire.py"],
+            config={"phase": phase, "workers": workers,
+                    "root": str(ROOT), "min_free_gb": MIN_FREE_GB},
+            authority="OBSERVE")
+        _HB = Heartbeat(service="options-acquire",
+                        release_commit=ped.get("commit"),
+                        release_path=ped["release_path"],
+                        authority="OBSERVE",
+                        notes={"secret_backend": ped["secret_backend"],
+                               "config_digest": ped["config_digest"],
+                               "module_digest": ped["module_digest"][:16],
+                               "phase": phase, "workers": workers})
+        _HB.beat()
+        print(f"heartbeat: {_HB.path()} "
+              f"(secrets={ped['secret_backend']})", flush=True)
+    except Exception as e:                                 # noqa: BLE001
+        # never let telemetry stop acquisition
+        print(f"heartbeat unavailable: {type(e).__name__}: {e}",
+              flush=True)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--phase", default="ALL", choices=[*PHASES, "ALL"])
@@ -372,6 +405,7 @@ def main() -> int:
             return {"symbol": sym, "date": date, "state": "PARTIAL",
                     "error": type(e).__name__}
 
+    _start_heartbeat(",".join(phases), workers)
     for phase in phases:
         print(f"=== PHASE {phase}: {PHASES[phase]} workers={workers}")
         # ACQUISITION ORDER (2026-08-23): symbol-major chronological
@@ -436,6 +470,18 @@ def main() -> int:
                     with mlock:
                         _record(rec)
                         n_done += 1
+                        # HEARTBEAT: record COMPLETED work, not mere
+                        # presence. A daemon looping on a failing API
+                        # is alive and useless, and only progress
+                        # distinguishes the two.
+                        if _HB is not None:
+                            if rec.get("state") == "VALIDATED":
+                                _HB.work(f"{rec['symbol']} {rec['date']}",
+                                         backlog=max(0, len(todo) - n_done))
+                            else:
+                                _HB.error(
+                                    f"{rec['symbol']} {rec['date']} -> "
+                                    f"{rec.get('state')}")
                     if a.limit_days and n_done >= a.limit_days:
                         stop["reason"] = "LIMIT"
         if stop["reason"]:

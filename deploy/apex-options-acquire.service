@@ -1,0 +1,46 @@
+[Unit]
+# APEX options history acquisition.
+#
+# Runs from the IMMUTABLE release pointer, never from the development
+# repository. On 2026-08-23 this daemon died at 18:08 UTC and was not
+# noticed for seven hours, because it shared a working tree with
+# development and logged into a buffered file that stayed empty.
+Description=APEX options history acquisition (OBSERVE)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=apex
+Group=apex
+WorkingDirectory=/opt/apex/current
+
+# -u: unbuffered. The original death left a 0-byte log and no
+# traceback; this is why it was invisible.
+Environment=PYTHONUNBUFFERED=1
+Environment=APEX_OPTIONS_HISTORY_ROOT=/apex-data/history-a/options_history
+Environment=APEX_MIN_FREE_GB=12
+Environment=APEX_SECRETS_DIR=/home/apex/.apex-secrets
+Environment=APEX_HEARTBEAT_DIR=/apex-data/core/heartbeats
+Environment=APEX_RELEASE_ROOT=/opt/apex
+Environment=APEX_CANONICAL_REPO=/opt/apex-repo
+
+ExecStart=/opt/apex/shared/venv/bin/python -u \
+    /opt/apex/current/scripts/options_history_acquire.py \
+    --phase A --workers 4
+
+Restart=on-failure
+RestartSec=30
+# bounded: 5 failures in 10 minutes means it is broken, not unlucky.
+# Crash-looping forever would be its own kind of silence.
+StartLimitBurst=5
+StartLimitIntervalSec=600
+
+StandardOutput=append:/apex-data/core/logs/options-acquire.log
+StandardError=append:/apex-data/core/logs/options-acquire.log
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

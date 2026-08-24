@@ -1,0 +1,11 @@
+[Unit]
+Description=APEX health check every 10 minutes
+# Seven hours of undetected death is what this closes.
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=10min
+AccuracySec=30s
+
+[Install]
+WantedBy=timers.target
