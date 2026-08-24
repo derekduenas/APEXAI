@@ -182,3 +182,50 @@ def test_outcome_is_stamped_prospective_and_powerless():
     assert rec["evidence_class"] == "PROSPECTIVE_PAPER"
     assert rec["decision_power"] == "NONE_PAPER"
     assert "exits on the BID" in rec["law"]
+
+
+# ------------------------------------------- cohorts + evidence class
+
+def test_every_window_lands_in_exactly_one_declared_cohort():
+    from scripts.btc_paper_session import COHORTS, _cohort
+    from tests.test_btc_attack_geometry import (
+        _assess as geo_assess, _mid_cascade, _thesis)
+    # attackable -> ATTACK_READY
+    g = geo_assess()
+    assert _cohort(_exhausting(), g) == "ATTACK_READY"
+    # susceptible -> its own cohort
+    sus = _thesis(price_change_pct=-0.05, oi_change_pct=0.0,
+                  funding_rate_annualized=0.6,
+                  book_depth_change_pct=-40.0)
+    gs = geo_assess(thesis=sus)
+    assert _cohort(sus, gs) == "SUSCEPTIBLE_NOT_TRIGGERED"
+    # credible thesis + structural block -> REFUSED
+    t = _exhausting()
+    gr = geo_assess(thesis=t, book=_book(quality="INVALID"))
+    assert _cohort(t, gr) == "REFUSED"
+    # credible thesis + only quality wounds blocking... geometry with
+    # quality wounds alone stays attackable, so NEAR_MISS requires a
+    # non-structural non-attackable path; quiet market -> NONE_OBSERVED
+    quiet = _thesis(price_change_pct=0.1, oi_change_pct=0.1,
+                    funding_rate_annualized=0.01,
+                    book_depth_change_pct=1.0)
+    gq = geo_assess(thesis=quiet)
+    assert _cohort(quiet, gq) == "NONE_OBSERVED"
+    for th, ge in ((_exhausting(), g), (sus, gs), (t, gr), (quiet, gq)):
+        assert _cohort(th, ge) in COHORTS
+
+
+def test_batch_and_follow_evidence_classes_can_never_be_conflated():
+    """The batch mode composes over futures already on disk. Its label
+    must say so, and the prospective label is reserved for the follow
+    loop -- conflating them would launder a replay into evidence."""
+    import inspect
+    from scripts import btc_paper_session as m
+    batch_src = inspect.getsource(m.run_batch)
+    follow_src = inspect.getsource(m.run_follow)
+    assert 'HISTORICAL_COMPOSITION_PROOF' in batch_src
+    assert 'PROSPECTIVE_PAPER' not in batch_src.replace(
+        'never be cited as prospective', '')
+    assert '"PROSPECTIVE_PAPER"' in follow_src
+    assert m.PROTOCOL["authority"] == "PAPER_EXPLORATORY"
+    assert m.PROTOCOL["trade_quota"].startswith("NONE")
