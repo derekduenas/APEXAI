@@ -88,15 +88,6 @@ also completely unproven, and is stamped so.
 Every thesis states what would disprove it *before* any outcome is
 known. A thesis that cannot be wrong is not a thesis.
 
-## What is NOT built, deliberately
-
-BTC Attack Geometry and any paper execution. The ladder is
-participant state → forced-action thesis → attack geometry →
-`PAPER_EXPLORATORY` review, and the first two are complete. Attack
-geometry is the next increment and has not been started.
-
-No live capital. No promotion. 40 tests across the two modules.
-
 ---
 
 ## Attack geometry — built 2026-08-24
