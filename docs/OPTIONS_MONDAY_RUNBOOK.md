@@ -8,15 +8,34 @@ account. It computes what would have filled at quoted sides.
 
 ## Start the session
 
-Run on the cloud host, where both feeds and the ThetaData terminal live:
+Run on the cloud host, where both feeds and the ThetaData terminal live.
+The session runs **supervised**, from the immutable release — never from
+the development repo:
 
 ```bash
-ssh apex@165.227.88.64 'cd /opt/apex && setsid nohup .venv/bin/python -u scripts/options_paper_session.py --ledger /apex-data/core/options_live_ledger.jsonl --out /apex-data/history-a/paper_$(date +%F).json --minutes 390 --interval-min 15 > /apex-data/history-a/paper_$(date +%F).log 2>&1 < /dev/null &'
+ssh apex@165.227.88.64 'sudo systemctl start apex-options-paper.service'
 ```
 
 Start it after 09:35 ET so the equity faculty has the ~30 bars it
 requires. Ending near 16:00 ET lets the pre-declared session-close exit
 resolve against live quotes.
+
+Watch it live:
+
+```bash
+ssh apex@165.227.88.64 'tail -f /apex-data/core/logs/options-paper.log'
+```
+
+The session writes a heartbeat recording completed scans, so a death or
+a stall is visible within ten minutes rather than seven hours:
+
+```bash
+ssh apex@165.227.88.64 'cd /opt/apex/current && APEX_EXPECTED_SERVICES=options-acquire,options-paper APEX_HEARTBEAT_DIR=/apex-data/core/heartbeats /opt/apex/shared/venv/bin/python scripts/apex_health.py'
+```
+
+A refusing session still counts as working: a completed SCAN is the unit
+of work, not an attack, so correctly refusing all day reads HEALTHY
+rather than STALLED.
 
 ## What is pre-registered
 
@@ -69,7 +88,7 @@ level exists to collect evidence, not to manufacture activity.
 ## Reading the result
 
 ```bash
-ssh apex@165.227.88.64 'cd /opt/apex && .venv/bin/python -c "
+ssh apex@165.227.88.64 'cd /opt/apex/current && /opt/apex/shared/venv/bin/python -c "
 import json;d=json.load(open(\"/apex-data/history-a/paper_$(date +%F).json\"));
 print(json.dumps(d[\"scoreboard\"],indent=1))"'
 ```

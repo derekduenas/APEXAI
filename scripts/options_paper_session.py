@@ -37,6 +37,8 @@ from apex.predators.options import (                           # noqa: E402
 from apex.predators.options.live_world import (                # noqa: E402
     FeedUnavailable, observe)
 from apex.predators.options.replay import seal_before_card     # noqa: E402
+from apex.ops.heartbeat import Heartbeat                       # noqa: E402
+from apex.ops.release import build_pedigree                    # noqa: E402
 from apex.predators.options.scoreboard import (                # noqa: E402
     SessionScoreboard)
 
@@ -302,8 +304,21 @@ def main() -> int:
             "why": "the loop was driven at a past instant to prove the "
                    "machinery; it produces NO prospective evidence"} \
         if as_of else {"evidence_class": "PROSPECTIVE_PAPER"}
+    # A live trading session must never be able to die unnoticed.
+    ped = build_pedigree(
+        service="options-paper",
+        release_dir=Path(__file__).resolve().parents[1],
+        code_paths=CODE_PATHS, config={"symbols": syms, **PROTOCOL},
+        authority="PAPER_EXPLORATORY")
+    beat = Heartbeat(service="options-paper",
+                     release_commit=ped.get("commit"),
+                     release_path=ped["release_path"],
+                     authority="PAPER_EXPLORATORY",
+                     notes={"session": session, "symbols": syms,
+                            "secret_backend": ped["secret_backend"]})
+    beat.beat()
     chain_append(ledger, {**PROTOCOL, **mode, "session": session,
-                          "symbols": syms})
+                          "symbols": syms, "pedigree": ped})
     print(f"protocol pre-registered for {session}: {syms}", flush=True)
 
     deadline = datetime.now(timezone.utc) + timedelta(minutes=a.minutes)
@@ -316,11 +331,18 @@ def main() -> int:
                              as_of=as_of)
             scans.append(r)
             print(f"  {sym:5} {r.get('status')}", flush=True)
+            # a completed SCAN is the unit of work -- a session that
+            # attacks nothing is still working, and must not read as
+            # stalled just because it correctly refused
+            beat.work(f"{sym} {r.get('status')}",
+                      backlog=len(open_positions))
         if a.dry_run:
             break
         time.sleep(a.interval_min * 60)
 
+    beat.work("resolving open positions")
     resolved = resolve_open(open_positions, sb, ledger, as_of=as_of)
+    beat.work(f"session complete: {len(resolved)} resolved")
     report = sb.report()
     chain_append(ledger, report)
     Path(a.out).write_text(json.dumps(stamp(
