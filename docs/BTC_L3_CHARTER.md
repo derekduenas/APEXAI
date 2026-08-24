@@ -96,3 +96,50 @@ participant state → forced-action thesis → attack geometry →
 geometry is the next increment and has not been started.
 
 No live capital. No promotion. 40 tests across the two modules.
+
+---
+
+## Attack geometry — built 2026-08-24
+
+`apex/btc_sleeve/attack_geometry.py` closes the third rung. It answers
+only the question asked of it:
+
+> When the forced-action thesis is plausible, is there a price location
+> with tight invalidation, workable liquidity, a favourable tail and
+> limited chase that gives a **small** account an asymmetric attack?
+
+**Both dimensions may veto.** A plausible thesis at a terrible location
+is not an attack, and a beautiful location with no thesis is not one
+either — the latter is tested explicitly, because it is the more
+seductive error.
+
+**Mid-cascade is a structural refusal, not a downgrade.** Entering while
+forced flow is still arriving is a latency race against liquidation
+engines, and a small account loses that by construction. The attack is
+always the *other* side of exhausted forced flow, never its
+continuation: if longs were the forced sellers, we are the buyer they
+must sell to once their supply runs out.
+
+**Size is judged against the actual book,** which is where the
+small-capital doctrine stops being a slogan. A touch holding 60
+contracts against our 1 makes our footprint negligible, and the module
+names that as the asymmetry we own and a fund does not. Reading the
+book directly is legitimate only because L2 passed and froze.
+
+Every rule is classified `STRUCTURAL_INVALIDITY` or
+`EXPLORATORY_QUALITY_PRIOR`. Only structural wounds refuse; a wide
+spread or an extended chase downgrades and is recorded. No
+`LEARNED_ECONOMIC_THRESHOLD` is authorized, because no outcome data
+exists to learn one from.
+
+Continuous measurements — invalidation distance in ATR, tail ratio,
+extension, spread in ticks, executable size, size-vs-book — are all
+preserved rather than collapsed into a verdict, so later study can
+judge the priors that judged the trade.
+
+### Still not built
+
+Paper execution and the BTC `PAPER_EXPLORATORY` review. The ladder is
+participant state → forced-action thesis → attack geometry → paper
+review, and the first three rungs are complete. 61 tests across the
+three modules. No live capital, no promotion.
