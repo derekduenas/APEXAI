@@ -158,6 +158,33 @@ def scientific_validity_decomposition(*, components: dict) -> dict:
             "decision_power": "NONE_RESEARCH"}
 
 
+def campaign_status(*, process_qualified: bool,
+                    economic_edge_proven: bool) -> dict:
+    """Three statuses that must never collapse into one word.
+
+    'QUALIFIED' alone let process quality imply edge quality. The
+    hierarchy: a QUALIFIED process with one replay path, one family,
+    one dominant run and no prospective confirmation has an UNPROVEN
+    edge — and trading authority is a third thing entirely, granted
+    by nobody in this module."""
+    if economic_edge_proven:
+        raise ChronosViolation(
+            "no historical replay can set economic_edge_proven=True: "
+            "proof requires prospective sessions, which CHRONOS is "
+            "structurally incapable of producing")
+    return {"kind": "campaign_status",
+            "SCIENTIFIC_PROCESS_AUTHORITY": (
+                "QUALIFIED_REPLAY_ONLY" if process_qualified
+                else "NONE"),
+            "ECONOMIC_EDGE_STATUS": "UNPROVEN",
+            "TRADING_AUTHORITY": "NONE",
+            "evidence_label": EVIDENCE_LABEL,
+            "law": "process quality and edge quality are different "
+                   "things; QUALIFIED must never imply proven edge, "
+                   "and neither grants a cent of trading authority",
+            "decision_power": "NONE_RESEARCH"}
+
+
 def classify_experiment(*, economic_positive: bool | None,
                         false_discovery_restraint: str,
                         survived_unseen_time: bool | None) -> dict:

@@ -738,10 +738,28 @@ def test_the_null_budget_is_set_by_attempt_number_not_by_the_score():
 
 
 def test_an_unresolvable_tail_refuses_no_matter_how_big_the_score():
+    """And the refusal is about OUR instrument, never about the
+    market: TEST_NOT_ESTIMABLE carries no evidence against the
+    hypothesis."""
     r = sequential_test(family="F", attempt=5, real_score=99.0,
                         null_scores=[0.1] * 100)
-    assert r["verdict"] == "NULL_TAIL_UNRESOLVED"
+    assert r["verdict"] == "TEST_NOT_ESTIMABLE"
+    assert r["reason"] == "NULL_TAIL_RESOLUTION"
+    assert r["evidence_about_hypothesis"].startswith("NONE")
     assert "Refusal, not fake precision" in r["why"]
+
+
+def test_closure_is_law_not_data():
+    """FAMILY_CLOSED comes from the preregistered schedule alone --
+    alpha halves, the null budget is capped -- with no scores
+    involved. Out of budget is not proven wrong."""
+    from apex.chronos.sequential import family_closure
+    open_ = family_closure(family="F", next_attempt=4)
+    assert open_["status"] == "FAMILY_OPEN"
+    closed = family_closure(family="F", next_attempt=5)
+    assert closed["status"] == "FAMILY_CLOSED"
+    assert closed["reason"] == "SEQUENTIAL_BUDGET_EXHAUSTED"
+    assert "not proven wrong" in closed["law"]
 
 
 def test_rank_arithmetic_is_checkable_by_hand():
@@ -804,3 +822,93 @@ def test_an_unnamed_defense_cannot_pass():
     del c["LOCKBOX_INTEGRITY"]
     with pytest.raises(ChronosViolation, match="unnamed defense"):
         scientific_validity_decomposition(components=c)
+
+
+# ============ ROSTER MULTIPLICITY (Campaign #003, predeclared)
+
+from apex.chronos.roster import (ALPHA_GLOBAL, HypothesisRoster,
+                                 hierarchical_alpha, roster_null_budget,
+                                 three_level_hallucination)
+from apex.chronos.scoring import campaign_status
+
+
+def test_the_whole_tree_is_bounded_by_the_global_alpha():
+    total = sum(hierarchical_alpha(mechanism_order=m, family_order=j,
+                                   attempt=k)
+                for m in range(1, 12) for j in range(1, 12)
+                for k in range(1, 12))
+    assert total < ALPHA_GLOBAL
+    assert hierarchical_alpha(mechanism_order=1, family_order=1,
+                              attempt=1) == 0.0125
+
+
+def test_later_mechanisms_are_more_expensive_by_construction():
+    a1 = hierarchical_alpha(mechanism_order=1, family_order=1,
+                            attempt=1)
+    a5 = hierarchical_alpha(mechanism_order=5, family_order=1,
+                            attempt=1)
+    assert a5 < a1
+    assert roster_null_budget(a1) == 100
+    assert roster_null_budget(a5) is None, \
+        "mechanism 5's first attempt is already unresolvable at the " \
+        "capped budget: research opportunity is consumed, not printed"
+
+
+def test_tree_positions_are_permanent_first_test_order():
+    r = HypothesisRoster(label="T")
+    p1 = r.register_attempt_position(mechanism="M_A", family="F_A1")
+    p2 = r.register_attempt_position(mechanism="M_B", family="F_B1")
+    p3 = r.register_attempt_position(mechanism="M_A", family="F_A1")
+    assert p1["mechanism_order"] == 1 and p2["mechanism_order"] == 2
+    assert p3["mechanism_order"] == 1, "no re-sorting to a cheaper slot"
+    assert p3["attempt"] == 2
+    assert p3["alpha"] < p1["alpha"]
+
+
+def test_an_unregistered_outcome_is_a_cooked_book():
+    r = HypothesisRoster(label="T")
+    with pytest.raises(ChronosViolation, match="cooked"):
+        r.record_outcome(family="NEVER_SEEN", admitted=True)
+
+
+def test_hallucination_is_three_numbers_never_one():
+    r = HypothesisRoster(label="C")
+    r.register_attempt_position(mechanism="M1", family="F1")
+    r.register_attempt_position(mechanism="M2", family="F2")
+    r.record_outcome(family="F1", admitted=True)
+    r.record_outcome(family="F2", admitted=False)
+    h = three_level_hallucination(
+        control_roster=r,
+        control_admissions=[
+            {"spec_admitted": True, "family": "F1", "mechanism": "M1"},
+            {"spec_admitted": False, "family": "F2",
+             "mechanism": "M2"}])
+    assert h["SPEC_HALLUCINATION_RATE"] == 0.5
+    assert h["FAMILY_HALLUCINATION_RATE"] == 0.5
+    assert h["MECHANISM_HALLUCINATION_RATE"] == 0.5
+    assert h["verdict"] == "ROSTER_MULTIPLICITY_CONTROL_FAILED"
+    assert "pooling is how a hierarchy hides" in h["law"]
+
+
+def test_an_unmeasured_roster_is_not_a_clean_one():
+    h = three_level_hallucination(
+        control_roster=HypothesisRoster(label="E"),
+        control_admissions=[])
+    assert h["verdict"] == "NO_CONTROLS_RUN"
+
+
+# ============ STATUS SEPARATION (operator: QUALIFIED must not imply
+# proven edge)
+
+def test_three_statuses_never_collapse_into_one_word():
+    s = campaign_status(process_qualified=True,
+                        economic_edge_proven=False)
+    assert s["SCIENTIFIC_PROCESS_AUTHORITY"] == "QUALIFIED_REPLAY_ONLY"
+    assert s["ECONOMIC_EDGE_STATUS"] == "UNPROVEN"
+    assert s["TRADING_AUTHORITY"] == "NONE"
+
+
+def test_no_replay_can_ever_claim_a_proven_edge():
+    with pytest.raises(ChronosViolation, match="structurally incapable"):
+        campaign_status(process_qualified=True,
+                        economic_edge_proven=True)

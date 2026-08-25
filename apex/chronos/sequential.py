@@ -60,23 +60,42 @@ def null_budget_for_attempt(attempt: int) -> int:
 
 
 def sequential_test(*, family: str, attempt: int, real_score: float,
-                    null_scores: list) -> dict:
+                    null_scores: list,
+                    alpha: float | None = None) -> dict:
     """One family attempt against its spent alpha.
 
-    Returns DISCOVERY / NOT_DISCOVERED / NULL_TAIL_UNRESOLVED, with
-    the rank arithmetic shown -- the number must be checkable by
-    hand from the record."""
+    `alpha` may be supplied by a HIERARCHICAL schedule (roster.py);
+    when omitted it defaults to the flat per-family schedule. Either
+    way it comes from a predeclared function of tree position, never
+    from the data.
+
+    Returns DISCOVERY / NOT_DISCOVERED / TEST_NOT_ESTIMABLE, with the
+    rank arithmetic shown -- the number must be checkable by hand
+    from the record."""
     if not null_scores:
         raise ChronosViolation("no nulls: nothing to rank against")
-    alpha_k = alpha_for_attempt(attempt)
+    alpha_k = alpha if alpha is not None else alpha_for_attempt(attempt)
+    if not 0 < alpha_k < 1:
+        raise ChronosViolation(f"nonsensical alpha {alpha_k!r}")
     n = len(null_scores)
     floor = 1.0 / (n + 1)
     if floor > alpha_k:
+        # TWO DIFFERENT CONCEPTS, never synonymous (operator law,
+        # 2026-08-25). This verdict is about OUR instrument, not the
+        # market: the negative-control sample cannot resolve the tail
+        # threshold this attempt requires. It is NOT evidence against
+        # the hypothesis. Whether the family is also CLOSED is a
+        # separate question answered by family_closure() from the
+        # preregistered budget schedule alone.
         return {"kind": "sequential_test", "family": family,
                 "attempt": attempt, "alpha_k": round(alpha_k, 6),
                 "null_n": n,
                 "min_expressible_p": round(floor, 6),
-                "verdict": "NULL_TAIL_UNRESOLVED",
+                "verdict": "TEST_NOT_ESTIMABLE",
+                "reason": "NULL_TAIL_RESOLUTION",
+                "evidence_about_hypothesis": "NONE -- a resolution "
+                    "limit of the control simulation says nothing "
+                    "about the market hypothesis",
                 "why": f"{n} nulls can express at best p_hat="
                        f"{floor:.4f}, but attempt {attempt} requires "
                        f"p_hat<={alpha_k:.4f}. The tail this attempt "
@@ -101,4 +120,35 @@ def sequential_test(*, family: str, attempt: int, real_score: float,
                 f"of its {ALPHA_TOTAL} lifetime alpha; the series is "
                 f"bounded, so unlimited fresh chances do not exist"),
             "predeclared": PREDECLARED,
+            "decision_power": "NONE_RESEARCH"}
+
+
+MAX_NULL_BUDGET = NULL_BUDGET_ESCALATED
+
+
+def family_closure(*, family: str, next_attempt: int) -> dict:
+    """Is this family CLOSED under the preregistered sequential law?
+
+    Distinct from TEST_NOT_ESTIMABLE by design: closure is a statement
+    of the LAW (the preregistered budget schedule can never again
+    resolve the required tail, because alpha halves while the null
+    budget is capped), computed from the schedule alone -- no data, no
+    scores, no market evidence involved. A closed family is out of
+    research budget; it has not been proven wrong."""
+    alpha_next = alpha_for_attempt(next_attempt)
+    floor_at_max = 1.0 / (MAX_NULL_BUDGET + 1)
+    if alpha_next < floor_at_max:
+        return {"kind": "family_closure", "family": family,
+                "status": "FAMILY_CLOSED",
+                "reason": "SEQUENTIAL_BUDGET_EXHAUSTED",
+                "next_attempt": next_attempt,
+                "alpha_next": round(alpha_next, 8),
+                "max_null_budget": MAX_NULL_BUDGET,
+                "law": "closure is a statement of the preregistered "
+                       "law, not evidence against the hypothesis; "
+                       "out of budget is not proven wrong",
+                "decision_power": "NONE_RESEARCH"}
+    return {"kind": "family_closure", "family": family,
+            "status": "FAMILY_OPEN", "next_attempt": next_attempt,
+            "alpha_next": round(alpha_next, 8),
             "decision_power": "NONE_RESEARCH"}
