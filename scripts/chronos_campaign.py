@@ -356,16 +356,22 @@ def main() -> int:
     fail_rate = (restraints.count("FAILED") / len(restraints)
                  if restraints else None)
     all_R = [d["R"] for d in sealed_decisions]
-    survived_any = bool(retired) or any(
-        len(e["acts"]) >= 5 and statistics.median(e["acts"]) > 0
-        for e in library.values())
+    # SURVIVAL IS JUDGED AT THE FAMILY LEVEL. First-pass defect,
+    # corrected: bool(retired) counted RETIREMENT as survival, and
+    # per-edge survival would be survivorship anyway -- monthly
+    # rebirths of the same hypothesis are clones, and cherry-picking
+    # the positive clones while their siblings lose is the exact
+    # laundering this campaign exists to catch. The family survived
+    # unseen time only if the whole sealed stream did.
+    survived_family = (len(all_R) >= 30 and sum(all_R) > 0
+                       if all_R else None)
     classification = classify_experiment(
         economic_positive=(sum(all_R) > 0 if all_R else None),
         false_discovery_restraint=(
             "DEMONSTRATED" if fail_rate is not None and fail_rate <= 0.1
             else "FAILED" if fail_rate is not None else
             "INSUFFICIENT_EVIDENCE"),
-        survived_unseen_time=survived_any if all_R else None)
+        survived_unseen_time=survived_family)
 
     report = stamp({
         "kind": "chronos_campaign_001", "version": CHRONOS_VERSION,
@@ -389,7 +395,15 @@ def main() -> int:
         "intelligence_trajectory": {
             k: traj[k] for k in ("n_epochs", "becoming_harder_to_fool")
             if k in traj},
-        "classification": classification}, CODE_PATHS)
+        "classification": classification,
+        "known_multiplicity_gap": (
+            "per-epoch null calibration controls nonsense WITHIN an "
+            "epoch; it cannot see the same hypothesis reborn across "
+            "epochs on overlapping data. Rebirth-as-descendant "
+            "suppression is the registered defect for Campaign #002 "
+            "-- a candidate whose frozen spec matches an active or "
+            "recently retired edge is the same hypothesis, not a new "
+            "discovery")}, CODE_PATHS)
     (out / "campaign_001.json").write_text(
         json.dumps(report, indent=1, default=str))
     print(json.dumps({

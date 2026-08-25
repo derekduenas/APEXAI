@@ -108,4 +108,46 @@ lie.
   deliberately crude single-feature searcher to test the **cage**.
 - Not a source of prospective evidence, ever.
 
+## 5. Campaign #001, first pass (58 monthly epochs, 2020-03 → 2024-12)
+
+Success criterion (not profitability): drive false-discovery behavior
+materially below Experiment 000 while still occasionally finding
+candidates that survive unseen time.
+
+**Half met, half not — and the honest half-miss taught more.**
+
+- **Restraint: 0/58 epochs failed** the per-epoch null calibration
+  (vs Experiment 000's temperature 1.0). The p99 null bar, frozen in
+  the discovery zone each epoch, did its job: real scores hovered at
+  0.18–0.21 against bars of 0.15–0.22, and births happened only on
+  strict exceedance. The self-attack fired all nine poison traps in
+  every epoch. Criterion half one: **met**.
+- **Survival: the family did not survive unseen time.** 51 edges born,
+  42 retired, 2,003 sealed decisions netting **−7.05R**. Fifteen
+  retirees were positive (+53.6R) — but they are clones: births in 51
+  of 58 epochs are the *same marginal hypothesis reborn monthly under
+  a new id*, and its siblings lost −60.4R. Selecting the winners would
+  be survivorship. Criterion half two: **not met**.
+- **My own metric defect, corrected with lineage:**
+  `survived_unseen_time` was computed as `bool(retired)` — retirement
+  counted as survival — inflating the first-pass classification to
+  `RESEARCH_CANDIDATE`. Corrected (correction appended to the
+  registry, original preserved):
+
+  ```text
+  ECONOMIC_TEST_RESULT:  NEGATIVE   (−7.05R / 2,003 sealed decisions)
+  SCIENTIFIC_VALIDITY:   PASSED_FALSE_DISCOVERY_CONTROL
+  EDGE_AUTHORITY:        NONE
+  ```
+
+- **The identified multiplicity gap (registered for Campaign #002):**
+  per-epoch null calibration controls nonsense *within* an epoch; it
+  cannot see the same hypothesis reborn *across* epochs on overlapping
+  data. Rebirth must obey the descendant law — a candidate whose
+  frozen spec matches an active or recently retired edge is the same
+  hypothesis, not a new discovery.
+
+The organism is no longer fooled by the moon phase. It has not yet
+found anything real. Both facts are on the record, separately.
+
 **CHRONOS educates. Reality examines. The lockbox waits.**
