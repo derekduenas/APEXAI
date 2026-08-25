@@ -284,3 +284,23 @@ def test_a_restart_loop_is_visible_even_when_heartbeats_look_fine(
     assert looping["state"] == "RESTART_LOOPING"
     assert "heartbeats alone cannot see" in looping["why"]
     assert hb.summarize([looping])["verdict"] == "ATTENTION_REQUIRED"
+
+
+def test_expecting_nothing_differs_from_declaring_nothing(monkeypatch,
+                                                          tmp_path):
+    """A host between sessions expects no services and is healthy. An
+    UNSET declaration falls back to the roster. Conflating the two made
+    a quiet host report its finished session as DEAD."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+    repo = Path(__file__).resolve().parents[1]
+    env = {**os.environ, "APEX_HEARTBEAT_DIR": str(tmp_path),
+           "APEX_RELEASE_ROOT": str(tmp_path / "nope")}
+    env["APEX_EXPECTED_SERVICES"] = ""
+    r = subprocess.run([sys.executable, "scripts/apex_health.py",
+                        "--json"], capture_output=True, text=True,
+                       env=env, cwd=str(repo))
+    assert '"services": 0' in r.stdout or '"healthy": 0' in r.stdout
+    assert "quiet host is not an unhealthy one" in r.stdout

@@ -40,17 +40,28 @@ def main() -> int:
     # machine is a false alarm, and false alarms train an operator to
     # ignore the alarm -- the same way a buffered empty log trained us
     # to ignore a dead daemon.
+    # SET-BUT-EMPTY is not the same intention as UNSET. An empty list
+    # means "this host should be running nothing right now" (between
+    # sessions, with acquisition deliberately disabled); an absent
+    # variable means "no declaration, fall back to the roster". Treating
+    # them alike made a quiet host report its finished session as DEAD.
     expected = os.environ.get("APEX_EXPECTED_SERVICES")
     root = Path(a.heartbeat_dir) if a.heartbeat_dir else None
 
     relrep = rel.verify_running_release()
-    names = (a.service
-             or ([n.strip() for n in expected.split(",") if n.strip()]
-                 if expected else list(SERVICES)))
+    if a.service:
+        names = a.service
+    elif expected is not None:
+        names = [n.strip() for n in expected.split(",") if n.strip()]
+    else:
+        names = list(SERVICES)
     reports = [hb.health(n, root=root,
                          **SERVICES.get(n, {"beat_stale_s": 900}))
                for n in names]
     summary = hb.summarize(reports)
+    if not names:
+        summary["note"] = ("no services are expected on this host right "
+                           "now; a quiet host is not an unhealthy one")
     out = {"release": relrep, "health": summary, "detail": reports}
 
     if a.json:
