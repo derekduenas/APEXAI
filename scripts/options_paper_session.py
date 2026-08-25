@@ -125,7 +125,21 @@ def _scan_symbol(sym: str, sb: SessionScoreboard, ledger: Path,
     ug = underlying_bridge.build(frozen, direction=direction)
     rec.update({"direction": direction,
                 "entry_quality": ug.entry_quality,
-                "chase_risk": ug.chase_risk})
+                "chase_risk": ug.chase_risk,
+                # BOUNDARY-DISTANCE RECORDING (V0.5 shadow, additive).
+                # A verdict alone cannot say how close it came to
+                # flipping: Day-1 stored entry_quality but not the
+                # ATR-scaled distances that produced it, so the
+                # boundary archaeology had nothing to measure. These
+                # are OBSERVATIONS -- no gate reads them and no
+                # decision consults them.
+                "extension_atr": ug.extension_atr,
+                "invalidation_distance_atr":
+                    ug.invalidation_distance_atr,
+                "range_position": ug.range_position,
+                "vwap_distance_atr": ug.vwap_distance_atr,
+                "atr": ug.atr,
+                "volume_participation": ug.volume_participation})
 
     cands = expression.build_candidates(
         frozen, direction, iv=ost.atm_iv,

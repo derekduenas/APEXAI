@@ -475,3 +475,114 @@ def test_null_results_stay_visible_in_the_family_denominator(tmp_path):
     assert fam["n_experiments"] == 3
     assert fam["n_null_or_dead"] == 2
     assert "denominator" in fam["law"]
+
+
+# ================================================= 8. BOUNDARY MAP
+
+from apex.edgeforge.boundary_map import (  # noqa: E402
+    DecisionBoundaryMap, compare_cohorts, map_equity_decision)
+
+
+def test_thresholds_are_imported_from_the_incumbent_never_restated():
+    """A copied constant would drift and the archaeology would then
+    measure a boundary the Predator does not use."""
+    import inspect
+    from apex.edgeforge import boundary_map as bm
+    src = inspect.getsource(bm)
+    assert "from apex.predators.equities.attack_geometry import" in src
+    from apex.predators.equities.attack_geometry import CHASE_LOW_ATR
+    assert bm.CHASE_LOW_ATR is CHASE_LOW_ATR
+
+
+def test_a_knife_edge_verdict_implicates_the_threshold():
+    m = map_equity_decision(
+        subject="SPY", T="t", verdict="GOOD", cohort="PAPER_ATTACKED",
+        extension_atr=1.48,      # CHASE_MODERATE_ATR is 1.5
+        invalidation_atr=0.9)
+    assert m.overall_proximity == "KNIFE_EDGE"
+    assert "decided BY THE THRESHOLD" in m.interpretation
+
+
+def test_an_interior_verdict_implicates_a_missing_variable():
+    m = map_equity_decision(
+        subject="SPY", T="t", verdict="GOOD", cohort="PAPER_ATTACKED",
+        extension_atr=1.0,       # mid-band of (0.5, 1.5)
+        invalidation_atr=0.75)   # mid-band of (-inf, 1.5) -> measurable
+    assert m.overall_proximity == "INTERIOR"
+    assert "MISSING A STATE VARIABLE" in m.interpretation
+
+
+def test_distances_are_per_dimension_never_a_scalar():
+    m = map_equity_decision(subject="SPY", T="t", verdict="GOOD",
+                            cohort="PAPER_ATTACKED", extension_atr=1.0,
+                            invalidation_atr=0.9)
+    rec = m.as_record()
+    assert isinstance(rec["dimensions"], list) and len(rec["dimensions"]) >= 2
+    assert "distance" not in rec, "a collapsed scalar distance exists"
+    for d in rec["dimensions"]:
+        assert "distance_to_worse" in d and "distance_to_better" in d
+
+
+def test_an_unestimable_dimension_invents_no_distance():
+    m = map_equity_decision(subject="SPY", T="t", verdict="UNKNOWN",
+                            cohort="REFUSED",
+                            extension_atr="NOT_ESTIMABLE",
+                            invalidation_atr="NOT_ESTIMABLE")
+    assert m.overall_proximity == "NOT_ESTIMABLE"
+    for d in m.dimensions:
+        assert d.distance_to_worse == "NOT_ESTIMABLE"
+
+
+def test_cohort_comparison_asks_whether_states_actually_differed():
+    attacked = [map_equity_decision(
+        subject="SPY", T="t1", verdict="GOOD", cohort="PAPER_ATTACKED",
+        extension_atr=1.2, invalidation_atr=0.8)]
+    waited = [map_equity_decision(
+        subject="QQQ", T=f"t{i}", verdict="POOR",
+        cohort="WAIT_FOR_ENTRY", extension_atr=1.1 + i * 0.05,
+        invalidation_atr=0.85) for i in range(4)]
+    c = compare_cohorts(attacked + waited)
+    assert c["cohorts"]["PAPER_ATTACKED"] == 1
+    assert c["cohorts"]["WAIT_FOR_ENTRY"] == 4
+    assert c["separation"]["extension_atr (chase)"] == "OVERLAPPING"
+    assert "merely land on the other side of a line" in c["question"]
+
+
+def test_separated_cohorts_are_reported_as_separated():
+    a = [map_equity_decision(subject="A", T="t", verdict="GOOD",
+                             cohort="PAPER_ATTACKED", extension_atr=0.6,
+                             invalidation_atr=0.8)]
+    b = [map_equity_decision(subject="B", T="t", verdict="POOR",
+                             cohort="WAIT_FOR_ENTRY", extension_atr=2.8,
+                             invalidation_atr=0.8)]
+    assert compare_cohorts(a + b)["separation"][
+        "extension_atr (chase)"] == "SEPARATED"
+
+
+def test_the_boundary_map_holds_no_authority():
+    m = map_equity_decision(subject="SPY", T="t", verdict="GOOD",
+                            cohort="PAPER_ATTACKED", extension_atr=1.0,
+                            invalidation_atr=0.9)
+    assert m.decision_power == "NONE_RESEARCH"
+    assert m.proximity_rule == "REPORTING_PRIOR"
+
+
+def test_boundary_distances_are_recorded_but_never_read_by_a_gate():
+    """V0.5 shadow recording: the funnel must PRESERVE the distances
+    that produced each verdict, without any decision consulting them.
+    Day-1 recorded verdicts only, which left the archaeology with
+    nothing to measure."""
+    import inspect
+    from scripts import options_paper_session as sess
+    src = inspect.getsource(sess._scan_symbol)
+    for f in ("extension_atr", "invalidation_distance_atr",
+              "range_position", "vwap_distance_atr"):
+        assert f'"{f}"' in src, f"{f} is not recorded"
+    # they may be WRITTEN into rec, never CONSULTED in a condition
+    for line in src.splitlines():
+        st = line.strip()
+        if st.startswith(("if ", "elif ", "while ")):
+            for f in ("extension_atr", "invalidation_distance_atr",
+                      "range_position", "vwap_distance_atr"):
+                assert f"ug.{f}" not in st, (
+                    f"a gate consults {f}: recording became a decision")
