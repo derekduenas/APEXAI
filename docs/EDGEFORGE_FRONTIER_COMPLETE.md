@@ -46,8 +46,16 @@
 
 - **Attack Tournament**: favorable in **34.5%** of worlds. Split by
   class, *reality was the harsher judge* — empirical 29.6% vs resampled
-  40.0%. A model kinder than history is the danger signal; here it went
-  the safe direction.
+  40.0%.
+- **Generator optimism** (new, permanent): `BIAS_DETECTED`, reference
+  class `EMPIRICAL_ANALOG`. The causal-resampled source is **+10.4pp
+  more favorable** than reality. Crucially, the bias is *not uniform* —
+  its left tail is slightly **harsher** (−9.75) while its right tail is
+  **+334 richer**. Block-bootstrap destroys the path structure that caps
+  favorable excursions in real sessions, so it invents upside it cannot
+  invent downside. Averaged across all worlds this would have read as
+  "roughly realistic". It is not. The diagnostic keeps the asymmetry
+  visible instead of letting the classes blend.
 - **Baseline Arena**: `INFERIOR_TO_A_SIMPLE_BASELINE` — beaten by all
   five, including NO_TRADE.
 - **Adversary**: `FRAGILE` under **every** stress family — entry
