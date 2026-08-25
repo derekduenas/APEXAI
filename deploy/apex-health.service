@@ -9,8 +9,14 @@ Environment=PYTHONUNBUFFERED=1
 Environment=APEX_HEARTBEAT_DIR=/apex-data/core/heartbeats
 Environment=APEX_RELEASE_ROOT=/opt/apex
 Environment=APEX_CANONICAL_REPO=/opt/apex-repo
-# this host runs the options lane; BTC capture lives on the Mac
-Environment=APEX_EXPECTED_SERVICES=options-acquire
+# This host runs the options lane; BTC capture lives on the Mac.
+# options-acquire is DELIBERATELY DISABLED pending the OOM re-enable
+# (MemoryMax armed, workers 4->2). A deliberately-stopped service left
+# in the expected list reports DEAD on every check forever, which is a
+# standing false alarm -- and an alarm that always fires is one nobody
+# reads. Restore it to this list at the same moment the unit is
+# re-enabled, never before.
+Environment=APEX_EXPECTED_SERVICES=
 ExecStart=/opt/apex/shared/venv/bin/python -u \
     /opt/apex/current/scripts/apex_health.py --json
 StandardOutput=append:/apex-data/core/logs/health.log
