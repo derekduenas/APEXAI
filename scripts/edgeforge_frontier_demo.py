@@ -250,9 +250,18 @@ def main() -> int:
     # Regime labels ride on empirical branches via source_session. A
     # source can be sound in ordinary trend and wild in transitions,
     # and one global verdict would average that distinction away.
-    regime_by_branch = {w.branch_id: regimes.get(w.source_session,
-                                                 "UNLABELLED")
-                        for w in worlds}
+    # Empirical branches carry their session; synthetic branches carry
+    # the regime they were conditioned on. Reading only source_session
+    # filed every resampled world under UNLABELLED, which left the
+    # stratified view with no reality to compare against -- a diagnostic
+    # that silently answered a different question.
+    regime_by_branch = {
+        w.branch_id: (regimes.get(w.source_session)
+                      or (w.hypothesis_condition
+                          if w.hypothesis_condition not in
+                          ("UNCONDITIONED", "UNCONDITIONED_EMPIRICAL")
+                          else "UNLABELLED"))
+        for w in worlds}
     optimism = generator_optimism(tourney, worlds, put.attack_id,
                                   regime_by_branch=regime_by_branch)
     run.stage("GENERATOR_OPTIMISM", optimism)
