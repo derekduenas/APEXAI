@@ -300,6 +300,7 @@ def main() -> int:
                             "born_epoch": epoch_id, "acts": [],
                             "decay_flags": 0,
                             "birth_class": birth["classification"],
+                            "birth_attempt": attempt,
                             "lifeline": EdgeLifeline(
                                 edge_id=eid,
                                 born=f"{ep_start}T00:00:00+00:00",
@@ -356,7 +357,9 @@ def main() -> int:
                     total = round(sum(e["acts"]), 4)
                     retired.append({"edge": eid, "at": month[-1],
                                     "acts": len(e["acts"]),
-                                    "total_R": total})
+                                    "total_R": total,
+                                    "birth_attempt":
+                                        e["birth_attempt"]})
                     ledger.record_attempt(
                         spec=e["spec"], mechanism=e["mechanism"],
                         at=f"{month[-1]}T16:00:00+00:00",
@@ -394,6 +397,20 @@ def main() -> int:
     all_R = [d["R"] for d in sealed_decisions]
     survived_family = (len(all_R) >= 30 and sum(all_R) > 0
                        if all_R else None)
+    # "WITHOUT relying on repeated research attempts" is a DIFFERENT
+    # question from "did the family net-survive" -- first-pass defect,
+    # corrected: it is answered only by an edge whose birth was its
+    # family's FIRST attempt and whose sealed record ended positive
+    # over a meaningful act count. A survivor at attempt 3 survived
+    # UNDER the charged-repeat framework -- legitimate, reported as
+    # exactly that, never as first-shot success.
+    ended = retired + [{"edge": eid, "acts": len(e["acts"]),
+                        "total_R": round(sum(e["acts"]), 4),
+                        "birth_attempt": e["birth_attempt"]}
+                       for eid, e in library.items()]
+    first_attempt_survivor = any(
+        r["birth_attempt"] == 1 and r["acts"] >= 20
+        and r["total_R"] > 0 for r in ended)
     lifetime = ledger.as_record()
     rebirth_channel_closed = (
         counters["clone_blocked"] > 0
@@ -461,7 +478,12 @@ def main() -> int:
             "did_the_cross_epoch_rebirth_channel_close": (
                 "YES" if rebirth_channel_closed else "NO"),
             "did_any_candidate_survive_unseen_time_without_repeated_attempts": (
-                "YES" if survived_family else "NO")}}, CODE_PATHS)
+                "YES" if first_attempt_survivor else
+                "NO -- the net-positive survivor was a later attempt "
+                "at its family, admitted under the predeclared "
+                "charged-repeat sequential framework; that is "
+                "legitimate and is not first-shot survival")}},
+        CODE_PATHS)
     (out / "campaign_002.json").write_text(
         json.dumps(report, indent=1, default=str))
     print(json.dumps({

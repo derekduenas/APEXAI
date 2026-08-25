@@ -150,4 +150,47 @@ candidates that survive unseen time.
 The organism is no longer fooled by the moon phase. It has not yet
 found anything real. Both facts are on the record, separately.
 
+## 6. Campaign #002 — the rebirth channel closed (same battlefield)
+
+Same four features, same family, same 58 epochs, same lockbox. Only
+the scientific process changed: three-level identity (SPEC / FAMILY /
+MECHANISM), clone blocking, the descendant law, and predeclared
+alpha-spending sequential control (attempt k spends 0.05·2⁻ᵏ, judged
+by rank among an attempt-determined null budget).
+
+| | Campaign #001 | Campaign #002 |
+|---|---|---|
+| "discoveries" / edges born | 51 | **3** |
+| unique hypothesis families | (untracked; ≈1) | **1** |
+| clone births blocked | 0 | **33** |
+| sequential / tail refusals | 0 | **22** |
+| sealed decisions | 2,003 | 166 |
+| sealed total | −7.05R | +9.10R |
+| CROSS_EPOCH_MULTIPLICITY_CONTROL | FAIL | **PASS** |
+| OVERALL_SCIENTIFIC_AUTHORITY | NONE | **QUALIFIED** |
+
+**"I found 51 edges" became "I tested one idea 25 times."** The
+family's full lifeline: attempt 1 died (−1.87R, on record as a
+sealed-test failure); attempt 2 refused; attempt 3 admitted at
+α₃=0.00625 and ran 112 acts to **+11.35R** before decay retired it;
+attempt 4 died (−0.38R); attempts 5–25 hit `NULL_TAIL_UNRESOLVED`
+twenty-one straight times — the lifetime alpha budget is spent, and
+the family can never be asked about again at the fixed null budget.
+The organism kept asking; the framework refused every time.
+
+**Plain answers (as corrected on the chain):**
+- Did the cross-epoch rebirth channel close? **YES.**
+- Did any candidate survive unseen time *without* repeated research
+  attempts? **NO.** The one net-positive survivor was its family's
+  third attempt — admitted legitimately under the charged-repeat
+  framework, which is that framework's purpose, but never to be
+  conflated with first-shot survival. (My script initially answered
+  YES from family-level net survival; corrected with lineage.)
+
+The +9.10R is HISTORICAL_REPLAY, one family, one realized path,
+dominated by a single 112-act run through 2020-09→2022-10. It confers
+`RESEARCH_CANDIDATE` under the predeclared rules and nothing more.
+Prospective sessions remain the judge, and the lockbox remains
+sealed.
+
 **CHRONOS educates. Reality examines. The lockbox waits.**
