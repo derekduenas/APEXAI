@@ -193,4 +193,46 @@ dominated by a single 112-act run through 2020-09→2022-10. It confers
 Prospective sessions remain the judge, and the lockbox remains
 sealed.
 
+## 7. Campaign #003 — roster control held; the survivor was beta
+
+**Scientific dimension** (predeclared hierarchical alpha-spending,
+MECHANISM → FAMILY → ATTEMPT, `ALPHA_GLOBAL = 0.10`, halving at every
+level): 6 persistent nonsense research lanes with complexity-matched
+search ran through the identical process for 58 epochs — **21
+nonsense families, 20 nonsense mechanisms, 348 attempts, ZERO
+admitted at any level.** `ROSTER_MULTIPLICITY_CONTROLLED`. Honesty
+about the mechanism: 342 of 348 attempts were refused as
+`TEST_NOT_ESTIMABLE` before scoring — the schedule makes late
+mechanisms unresolvable at the capped null budget, so protection came
+primarily from *refusal by budget*, and only ~6 nonsense attempts
+were ever scored. Small denominators, stated. Research opportunity is
+consumed, not printed.
+
+**Economic dimension** — the archaeology of C2EDGE_002, under verdict
+rules predeclared in the script:
+
+| | value |
+|---|---|
+| candidate total | +11.35R over 112 acts |
+| random 112-day subsets of the SAME period | median +2.01R, p90 +12.98R |
+| selection permutation p̂ | **0.141** (> 0.05) |
+| market beta / up capture / down capture | 0.26 / 0.28 / 0.23 |
+| RANDOM_ELIGIBLE over the same window | **+21.1R** |
+| verdict | **`BASELINE_REPACKAGING`** |
+
+Picking those 112 days added nothing distinguishable from picking 112
+days at random in a window so generous that a coin-flip policy made
+almost twice as much. The within-UP_HIVOL cell shows p̂ = 0.022, but
+that cell was selected post hoc among four and the overall gate
+failed first — recorded as a residual observation, never a finding.
+
+**Plain answers:** roster control — **YES** (with the refusal-by-
+budget caveat). Survivor beyond beta — **NO.**
+
+**Status:** `SCIENTIFIC_PROCESS_AUTHORITY: QUALIFIED_REPLAY_ONLY` ·
+`ECONOMIC_EDGE_STATUS: UNPROVEN` · `TRADING_AUTHORITY: NONE`. The
+scientist's ledger now reads: one idea, tested 25 times, its best run
+explained by the market it sat in. That is not a failure of the
+scientist — it is the scientist finally being able to say so.
+
 **CHRONOS educates. Reality examines. The lockbox waits.**
