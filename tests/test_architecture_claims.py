@@ -89,7 +89,15 @@ def test_no_execution_or_broker_dependency_exists():
     # was obeyed by moving the code, not by exempting research.
     exempt = {"broker.py", "sealing.py", "robinhood.py", "alpaca_fabric.py",
              "provider_interface.py", "market_state.py", "reconnect_ledger.py",
-             "checkpoint_graph.py", "options_feed.py"}
+             "checkpoint_graph.py", "options_feed.py",
+             # 2026-08-24: evidence_registry.py NAMES artifact paths --
+             # including a non-authoritative one -- because its entire
+             # job is declaring which file is canonical for a governed
+             # metric. A registry that obfuscated its own sources would
+             # defeat its purpose, the same reasoning that exempts
+             # checkpoint_graph.py. It defines no placement function
+             # and imports no SDK.
+             "evidence_registry.py"}
     # PATH-scoped exemptions (2026-08-20): name-based exemption of
     # "__init__.py" would blind the scan across every package, so files
     # that must name the sensor module get exempted individually.
