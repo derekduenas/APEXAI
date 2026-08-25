@@ -655,3 +655,110 @@ def test_world_budget_is_staged_behind_validation():
     ok = world_budget("RESEARCH", pipeline_valid=True,
                       generator_valid=True)
     assert ok["granted"] == "RESEARCH"
+
+
+# ==================== METRIC SEMANTICS AUDIT (operator, 2026-08-25)
+
+def test_a_correlation_is_not_compared_by_ratio():
+    """Audited: 'volatility clustering ratio = -0.02' named a
+    correlation coefficient as a ratio. Real +0.346 vs generated -0.006
+    is a total absence of clustering, which -0.02 made sound minor."""
+    from apex.edgeforge.world_foundry import METRIC_SEMANTICS
+    acf = METRIC_SEMANTICS["vol_clustering_acf1"]
+    assert acf["range"] == "[-1, 1]"
+    assert acf["comparison"] == "ABSOLUTE_DIFFERENCE"
+    assert "autocorrelation" in acf["definition"]
+    assert "vol_clustering" not in [k for k in METRIC_SEMANTICS
+                                    if k == "vol_clustering"], \
+        "the misleading name must not survive"
+
+
+def test_bounded_metrics_report_a_difference_and_scale_metrics_a_ratio():
+    g = ConditionalStateSpaceGenerator()
+    g.fit(series_by_regime={"NORMAL": _series(60, 200)})
+    gen = g.sample(regime="NORMAL", n_worlds=25, horizon=200,
+                   start_price=100.0, parent_state_hash="p")
+    real = causal_resampled_worlds(
+        returns_pool=[r for s in _series(60, 200) for r in s],
+        n_worlds=25, horizon=200, start_price=100.0,
+        parent_state_hash="p", seed=11)
+    v = validate_generated_worlds(generated=gen, real=real)
+    acf = v["checks"]["vol_clustering_acf1"]
+    assert "absolute_difference" in acf and "ratio" not in acf
+    assert acf["comparison"] == "ABSOLUTE_DIFFERENCE"
+    sd = v["checks"]["ret_sd"]
+    assert "ratio" in sd and sd["comparison"] == "RATIO"
+
+
+def test_a_zero_real_value_refuses_a_ratio_rather_than_inventing_one():
+    from apex.edgeforge.multiverse import WorldBranch
+    flat = [WorldBranch(branch_id=f"f{i}", parent_state_hash="p",
+                        hypothesis_condition="c",
+                        generation_method="EMPIRICAL_HISTORICAL_ANALOG",
+                        generation_pedigree="[EMPIRICAL_ANALOG] flat",
+                        path=tuple((t, 100.0) for t in range(50)))
+            for i in range(5)]
+    v = validate_generated_worlds(generated=flat, real=flat)
+    zero = [c for c in v["checks"].values()
+            if c.get("verdict") == "NOT_ESTIMABLE"
+            and c.get("comparison") == "RATIO"]
+    assert zero, "a zero denominator must refuse, not divide"
+    assert any("will not be invented" in c.get("why", "") for c in zero)
+
+
+# ==================== GENERATOR OPTIMISM DIAGNOSTIC
+
+def _two_class_worlds():
+    from apex.edgeforge.multiverse import WorldBranch
+    out = []
+    for i in range(10):          # empirical: mostly adverse
+        d = 0.3 if i < 3 else -0.3
+        out.append(WorldBranch(
+            branch_id=f"emp{i}", parent_state_hash="p",
+            hypothesis_condition="c",
+            generation_method="EMPIRICAL_HISTORICAL_ANALOG",
+            generation_pedigree="[EMPIRICAL_ANALOG] t",
+            path=tuple((t, 100.0 + d * t) for t in range(10))))
+    for i in range(10):          # resampled: mostly favorable
+        d = 0.3 if i < 8 else -0.3
+        out.append(WorldBranch(
+            branch_id=f"res{i}", parent_state_hash="p",
+            hypothesis_condition="c",
+            generation_method="ADVERSARIAL_STRESS",
+            generation_pedigree="[CAUSAL_RESAMPLED] t",
+            path=tuple((t, 100.0 + d * t) for t in range(10))))
+    return out
+
+
+def test_a_friendlier_world_source_is_flagged_not_hidden():
+    from apex.edgeforge.world_foundry import generator_optimism
+    worlds = _two_class_worlds()
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand")
+    assert d["verdict"] == "BIAS_DETECTED"
+    assert any("OPTIMISTIC vs reality" in f for f in d["flags"])
+    delta = d["generator_optimism_delta"]["CAUSAL_RESAMPLED"]
+    assert delta["favorable_fraction_delta"] > 0.1
+    assert "never be invisible" in d["law"]
+
+
+def test_the_diagnostic_preserves_tails_and_excursions():
+    from apex.edgeforge.world_foundry import generator_optimism
+    worlds = _two_class_worlds()
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand")
+    for cls in ("EMPIRICAL_ANALOG", "CAUSAL_RESAMPLED"):
+        p = d["profiles"][cls]
+        for k in ("favorable_fraction", "median", "left_tail_p10",
+                  "right_tail_p90", "mfe_median", "mae_median",
+                  "invalidation_rate"):
+            assert k in p
+
+
+def test_no_reference_class_is_reported_not_assumed():
+    from apex.edgeforge.world_foundry import generator_optimism
+    worlds = [w for w in _two_class_worlds()
+              if w.branch_id.startswith("res")]
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand")
+    assert d["verdict"] == "REFERENCE_MISSING"

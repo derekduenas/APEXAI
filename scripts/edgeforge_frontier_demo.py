@@ -47,8 +47,9 @@ from apex.edgeforge.scaling import (                        # noqa: E402
 from apex.edgeforge.self_critic import critique             # noqa: E402
 from apex.edgeforge.world_foundry import (                  # noqa: E402
     ConditionalStateSpaceGenerator, causal_resampled_worlds,
-    generative_health, memorization_test, results_by_class,
-    triangulate, validate_generated_worlds, world_set_hash)
+    generative_health, generator_optimism, memorization_test,
+    results_by_class, triangulate, validate_generated_worlds,
+    world_set_hash)
 from apex.governance.verification import stamp              # noqa: E402
 
 ALPACA = "https://data.alpaca.markets/v2"
@@ -242,6 +243,12 @@ def main() -> int:
     tourney = evaluate_common(attacks=[put], worlds=worlds)
     put_summary = summarize_attack(tourney, put)
     by_class = results_by_class(tourney, worlds, put.attack_id)
+    # GENERATOR OPTIMISM. A synthetic source that is systematically
+    # kinder than reality manufactures confidence; one that is harsher
+    # manufactures despair. Neither is corrected here -- the difference
+    # is measured and carried forward, permanently visible.
+    optimism = generator_optimism(tourney, worlds, put.attack_id)
+    run.stage("GENERATOR_OPTIMISM", optimism)
     ar = arena(candidate=put, baselines=build_baselines(entry=spot),
                worlds=worlds, evaluate_common=evaluate_common,
                summarize_attack=summarize_attack)
@@ -369,6 +376,7 @@ def main() -> int:
                "analog_quality": aq, "triangulation": tri,
                "generator_fit": fit, "generative_validation": gval,
                "memorization": gmem, "generative_health": ghealth,
+               "generator_optimism": optimism,
                "attack_summary": put_summary, "by_world_class": by_class,
                "baseline_arena": ar, "adversary": adv,
                "residual_search": resid, "self_critique": crit,
@@ -388,6 +396,7 @@ def main() -> int:
         "put_favorable": put_summary.get("favorable_world_fraction"),
         "by_class": by_class["per_class"], "class_flag": by_class["flag"],
         "arena": ar["verdict"], "adversary": adv["verdict"],
+        "generator_optimism": optimism["verdict"],
         "fragile_under": adv["fragile_under"],
         "residual": resid["verdict"],
         "critique": crit["research_confidence"],

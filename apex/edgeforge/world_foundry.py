@@ -249,6 +249,43 @@ class ConditionalStateSpaceGenerator:
 
 # ============================================ 4C VALIDATION BATTERY
 
+# METRIC SEMANTICS (audited 2026-08-25). Each validation metric
+# declares its definition, range and how two values of it may legally
+# be COMPARED. The first version reported every check as a "ratio",
+# including one that is a correlation coefficient -- a field name
+# implying arithmetic the statistic does not support, which is the same
+# error class as an `invalidation` that never invalidated.
+#
+# A ratio of two correlations is unstable and near-meaningless: with a
+# real value of 0.35 and a generated value of -0.006 it reads -0.017,
+# which sounds like a small discrepancy when the truth is that one
+# series has strong volatility clustering and the other has none at
+# all. Bounded statistics are compared by ABSOLUTE DIFFERENCE.
+METRIC_SEMANTICS = {
+    "ret_sd": {"definition": "standard deviation of per-step returns",
+               "range": "[0, inf)", "comparison": "RATIO",
+               "tolerance": 0.5},
+    "vol_clustering_acf1": {
+        "definition": "lag-1 autocorrelation of ABSOLUTE returns "
+                      "(volatility clustering)",
+        "range": "[-1, 1]", "comparison": "ABSOLUTE_DIFFERENCE",
+        "tolerance": 0.15},
+    "tail_freq_3sd": {"definition": "fraction of returns beyond 3 sd",
+                      "range": "[0, 1]",
+                      "comparison": "ABSOLUTE_DIFFERENCE",
+                      "tolerance": 0.02},
+    "final_sd": {"definition": "dispersion of terminal returns",
+                 "range": "[0, inf)", "comparison": "RATIO",
+                 "tolerance": 0.5},
+    "mfe_median": {"definition": "median maximum favorable excursion",
+                   "range": "(-inf, inf)", "comparison": "RATIO",
+                   "tolerance": 0.5},
+    "mae_median": {"definition": "median maximum adverse excursion",
+                   "range": "(-inf, inf)", "comparison": "RATIO",
+                   "tolerance": 0.5},
+}
+
+
 def _stats(paths: list) -> dict:
     rets, finals, mfes, maes = [], [], [], []
     for p in paths:
@@ -270,7 +307,8 @@ def _stats(paths: list) -> dict:
              for i in range(1, len(absr))) / \
         (sum((x - am) ** 2 for x in absr) or 1e-12)
     tail = sum(1 for x in rets if abs(x - mu) > 3 * sd) / len(rets)
-    return {"ret_mean": mu, "ret_sd": sd, "vol_clustering": ac,
+    return {"ret_mean": mu, "ret_sd": sd,
+            "vol_clustering_acf1": ac,
             "tail_freq_3sd": tail,
             "final_median": statistics.median(finals),
             "final_sd": (statistics.pstdev(finals) if len(finals) > 1
@@ -294,20 +332,44 @@ def validate_generated_worlds(*, generated: list, real: list,
                 "verdict": "INSUFFICIENT_DATA",
                 "eligibility_recommendation": "SUSPENDED"}
     checks, failures = {}, []
-    for k in ("ret_sd", "vol_clustering", "tail_freq_3sd",
-              "final_sd", "mfe_median", "mae_median"):
+    for k, sem in METRIC_SEMANTICS.items():
         gv, rv = g.get(k), r.get(k)
-        if rv in (None, 0):
+        tol = sem.get("tolerance", tolerance)
+        if gv is None or rv is None:
             checks[k] = {"generated": gv, "real": rv,
-                         "verdict": NOT_ESTIMABLE}
+                         "verdict": NOT_ESTIMABLE,
+                         "comparison": sem["comparison"]}
             continue
-        ratio = gv / rv if rv else float("inf")
-        ok = (1 - tolerance) <= abs(ratio) <= (1 + tolerance) if rv > 0 \
-            else (1 - tolerance) <= abs(gv / rv) <= (1 + tolerance)
-        checks[k] = {"generated": round(gv, 8), "real": round(rv, 8),
-                     "ratio": round(ratio, 4),
-                     "verdict": "OK" if ok else "OUT_OF_TOLERANCE"}
-        if not ok:
+        if sem["comparison"] == "ABSOLUTE_DIFFERENCE":
+            # a bounded statistic: the honest comparison is the gap
+            diff = gv - rv
+            ok = abs(diff) <= tol
+            checks[k] = {"generated": round(gv, 8),
+                         "real": round(rv, 8),
+                         "absolute_difference": round(diff, 6),
+                         "tolerance": tol,
+                         "comparison": "ABSOLUTE_DIFFERENCE",
+                         "definition": sem["definition"],
+                         "range": sem["range"],
+                         "verdict": "OK" if ok else "OUT_OF_TOLERANCE"}
+        else:
+            if rv == 0:
+                checks[k] = {"generated": gv, "real": rv,
+                             "verdict": NOT_ESTIMABLE,
+                             "comparison": "RATIO",
+                             "why": "real value is zero; a ratio is "
+                                    "undefined and will not be invented"}
+                continue
+            ratio = gv / rv
+            ok = (1 - tol) <= abs(ratio) <= (1 + tol)
+            checks[k] = {"generated": round(gv, 8),
+                         "real": round(rv, 8),
+                         "ratio": round(ratio, 4), "tolerance": tol,
+                         "comparison": "RATIO",
+                         "definition": sem["definition"],
+                         "range": sem["range"],
+                         "verdict": "OK" if ok else "OUT_OF_TOLERANCE"}
+        if checks[k]["verdict"] == "OUT_OF_TOLERANCE":
             failures.append(k)
     return {"kind": "generative_validation", "checks": checks,
             "failures": failures,
@@ -315,8 +377,12 @@ def validate_generated_worlds(*, generated: list, real: list,
                        else "CONDITIONAL_FIDELITY_FAILED",
             "eligibility_recommendation": ("UNCALIBRATED" if not failures
                                            else "SUSPENDED"),
+            "metric_semantics": METRIC_SEMANTICS,
             "law": "looking market-like in general is not the bar; "
-                   "fidelity must hold CONDITIONAL on the start state",
+                   "fidelity must hold CONDITIONAL on the start state. "
+                   "Each metric is compared by the method its own range "
+                   "supports -- a ratio of correlations is not a "
+                   "comparison",
             "decision_power": "NONE_RESEARCH"}
 
 
@@ -439,6 +505,91 @@ def results_by_class(run: dict, worlds: list, attack_id: str) -> dict:
                 "this candidate considerably more than history does")
     return {"kind": "results_by_world_class", "attack_id": attack_id,
             "per_class": summary, "flag": flag,
+            "decision_power": "NONE_RESEARCH"}
+
+
+def generator_optimism(run: dict, worlds: list, attack_id: str,
+                       *, reference: str = "EMPIRICAL_ANALOG") -> dict:
+    """GENERATOR_OPTIMISM_DIAGNOSTIC — is a world source friendlier
+    than reality?
+
+    Synthetic sources are NOT required to match empirical worlds; their
+    whole purpose is to supply paths history did not happen to produce.
+    What is required is that any systematic kindness be VISIBLE. A
+    resampler that quietly grades every candidate more generously than
+    reality would inflate confidence across the entire research
+    programme, and nobody would see it in a single result.
+
+    On the first full-stack run the resampler scored a candidate 40.0%
+    favorable where reality scored it 29.6% -- exactly the drift this
+    diagnostic exists to keep in view."""
+    cls = {w.branch_id: world_class_of(w) for w in worlds}
+    outs = run["outcomes"][attack_id]
+    per = {}
+    for bid, o in outs.items():
+        c = cls.get(bid, "UNKNOWN")
+        if not isinstance(o.get("pnl"), (int, float)):
+            continue
+        d = per.setdefault(c, {"pnl": [], "mfe": [], "mae": []})
+        d["pnl"].append(o["pnl"])
+        for k in ("mfe", "mae"):
+            if isinstance(o.get(k), (int, float)):
+                d[k].append(o[k])
+
+    def _prof(v):
+        p = v["pnl"]
+        srt = sorted(p)
+        return {
+            "n": len(p),
+            "favorable_fraction": round(
+                sum(1 for x in p if x > 0) / len(p), 4),
+            "median": round(statistics.median(p), 2),
+            "left_tail_p10": round(srt[max(0, len(srt) // 10 - 1)], 2),
+            "right_tail_p90": round(
+                srt[min(len(srt) - 1, 9 * len(srt) // 10)], 2),
+            "mfe_median": (round(statistics.median(v["mfe"]), 2)
+                           if v["mfe"] else NOT_ESTIMABLE),
+            "mae_median": (round(statistics.median(v["mae"]), 2)
+                           if v["mae"] else NOT_ESTIMABLE),
+            "invalidation_rate": round(
+                sum(1 for x in p if x < 0) / len(p), 4)}
+
+    profiles = {c: _prof(v) for c, v in per.items() if v["pnl"]}
+    ref = profiles.get(reference)
+    deltas, flags = {}, []
+    if ref:
+        for c, prof in profiles.items():
+            if c == reference:
+                continue
+            d = {
+                "favorable_fraction_delta": round(
+                    prof["favorable_fraction"]
+                    - ref["favorable_fraction"], 4),
+                "median_delta": round(prof["median"] - ref["median"], 2),
+                "left_tail_delta": round(
+                    prof["left_tail_p10"] - ref["left_tail_p10"], 2),
+                "right_tail_delta": round(
+                    prof["right_tail_p90"] - ref["right_tail_p90"], 2)}
+            deltas[c] = d
+            if d["favorable_fraction_delta"] >= 0.10:
+                flags.append(
+                    f"{c} is OPTIMISTIC vs reality: favorable fraction "
+                    f"+{d['favorable_fraction_delta']:.1%}")
+            elif d["favorable_fraction_delta"] <= -0.10:
+                flags.append(
+                    f"{c} is PESSIMISTIC vs reality: favorable fraction "
+                    f"{d['favorable_fraction_delta']:.1%}")
+    return {"kind": "generator_optimism_diagnostic",
+            "attack_id": attack_id, "reference_class": reference,
+            "profiles": profiles,
+            "generator_optimism_delta": deltas,
+            "flags": flags,
+            "verdict": ("REFERENCE_MISSING" if not ref else
+                        "BIAS_DETECTED" if flags else
+                        "NO_MATERIAL_BIAS"),
+            "law": "synthetic sources are not required to match reality "
+                   "-- supplying unseen paths is their purpose -- but "
+                   "systematic kindness must never be invisible",
             "decision_power": "NONE_RESEARCH"}
 
 

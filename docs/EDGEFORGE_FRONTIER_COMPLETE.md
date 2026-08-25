@@ -68,16 +68,30 @@ This is the result I'd flag hardest.
 The conditional state-space generator was fitted across three regimes,
 sampled 40 worlds — and its validation battery **rejected it**:
 
-| check | ratio (gen/real) | verdict |
-|---|---|---|
-| vol_clustering | **−0.02** | FAILED |
-| mae_median | **3.73×** | FAILED |
-| ret_sd, tail_freq, final_sd, mfe | 0.86–1.45 | OK |
+| check | comparison | generated | real | gap | verdict |
+|---|---|---|---|---|---|
+| `vol_clustering_acf1` | absolute difference | **−0.006** | **+0.346** | **0.352** | FAILED |
+| `mae_median` | ratio | −0.0067 | −0.0018 | **3.73×** | FAILED |
+| ret_sd, tail_freq, final_sd, mfe | ratio / abs. diff | — | — | 0.86–1.45 | OK |
 
-It produces paths with essentially **no volatility clustering** and
-**3.7× deeper adverse excursions** than reality. Marginals looked fine;
-the *dynamics* did not. Memorization test: none detected — so this is
-genuine model deficiency, not copying.
+> **Metric audit correction (2026-08-25).** This check was previously
+> reported as "volatility clustering **ratio** = −0.02". It is not a
+> ratio. It is the **lag-1 autocorrelation of absolute returns**, a
+> correlation coefficient bounded on [−1, 1]. The metric was computed
+> correctly; the *comparison method* was wrong for its type, and
+> dividing one correlation by another produced a number that sounded
+> like a rounding error. Stated correctly, the generator produces
+> **−0.006 against reality's +0.346** — not a small miss but the
+> **complete absence** of the single most robust stylized fact in
+> financial time series. The finding was always worse than the number
+> conveyed. Renamed prospectively; `METRIC_SEMANTICS` now declares each
+> metric's definition, range, comparison mode and tolerance so a field
+> name cannot again imply semantics the metric does not possess.
+
+It produces paths with **no volatility clustering** and **3.7× deeper
+adverse excursions** than reality. Marginals looked fine; the *dynamics*
+did not. Memorization test: none detected — genuine model deficiency,
+not copying.
 
 `generative_world_eligibility = SUSPENDED`. It contributed **0%** of
 the multiverse, and the triangulation degraded to empirical +
@@ -114,9 +128,21 @@ Family: `gate_separation_v1`. Boundary: prospective sessions from
 close), and the residual variable set — declared **before** the
 sessions accumulate, so the denominator is fixed in advance.
 
-It needs ~20 independent sessions before first read. It is the question
-Monday raised, the boundary recorder now feeds it, and it is answerable
-with machinery that already exists.
+**PREREGISTERED 2026-08-25**, sealed before Tuesday's observations
+existed. See `results/edgeforge/program_001_gate_separation_v1.json`.
+
+The first read is scheduled at **approximately 20 independent
+sessions** — and that is a **REPORTING CHECKPOINT, not an
+evidence-sufficiency threshold**. Twenty sessions spent inside one
+regime is twenty observations and almost no evidence. The checkpoint
+therefore reports `n_raw`, `n_effective_lower_bound`,
+`independent_session_count`, regime coverage, cohort occupancy, outcome
+concentration, top-session influence and boundary-state distribution —
+and is permitted to conclude that the data are not yet informative.
+Evidence maturity is determined by the data, never by the calendar.
+
+It is the question Monday raised, the boundary recorder now feeds it,
+and it is answerable with machinery that already exists.
 
 **EdgeForge proposes. Research tests. Reality judges. Predators trade.
 Capital authorizes money.**
