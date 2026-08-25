@@ -618,3 +618,189 @@ def test_the_trajectory_asks_if_it_is_harder_to_fool(tmp_path):
     t = intelligence_trajectory(led)
     assert t["becoming_harder_to_fool"] is True
     assert "never recomputed with hindsight" in t["law"]
+
+
+# ============ LIFETIME HYPOTHESIS IDENTITY (Campaign #002 directive:
+# "a new id does not create a new idea")
+
+from apex.chronos.identity import (LifetimeLedger, family_id,
+                                   mechanism_id, spec_id)
+from apex.chronos.scoring import (VALIDITY_COMPONENTS,
+                                  scientific_validity_decomposition)
+from apex.chronos.sequential import (alpha_for_attempt,
+                                     null_budget_for_attempt,
+                                     sequential_test)
+
+
+def _spec2(**over):
+    s = {"variables": ["rs"], "direction": "LONG",
+         "threshold_family": "quantile", "mechanism": "m",
+         "horizon": "SESSION_CLOSE",
+         "payoff_definition": "signed pct", "threshold": 0.62,
+         "lookback": 19}
+    s.update(over)
+    return s
+
+
+MECH = ("sustained relative demand creates continuation because "
+        "incremental buyers remain present")
+
+
+def test_parameter_drift_does_not_escape_the_family():
+    """RS>0.62 vs RS>0.63, lookback 19 vs 20: different specs, SAME
+    idea. This is the p-hack-by-mutation door, closed."""
+    a, b = _spec2(), _spec2(threshold=0.63, lookback=20)
+    assert spec_id(a) != spec_id(b)
+    assert family_id(a) == family_id(b)
+    c = _spec2(direction="SHORT")
+    assert family_id(a) != family_id(c)
+
+
+def test_a_mechanism_must_be_a_causal_claim_not_a_label():
+    assert mechanism_id(MECH) == mechanism_id(MECH.upper() + "  ")
+    with pytest.raises(ChronosViolation, match="label"):
+        mechanism_id("momentum")
+
+
+def test_an_active_family_cannot_be_reborn_under_a_new_name():
+    led = LifetimeLedger()
+    led.record_attempt(spec=_spec2(), mechanism=MECH,
+                       at="2020-01-01T00:00:00+00:00",
+                       outcome="BIRTHED", edge_id="E1")
+    birth = led.classify_birth(spec=_spec2(threshold=0.63),
+                               mechanism=MECH,
+                               at="2020-02-01T00:00:00+00:00")
+    assert birth["classification"] == "CLONE_BLOCKED"
+    assert "may not run concurrently under two names" in birth["why"]
+
+
+def test_a_retired_family_returns_only_as_a_descendant_with_debt():
+    led = LifetimeLedger()
+    led.record_attempt(spec=_spec2(), mechanism=MECH,
+                       at="2020-01-01T00:00:00+00:00",
+                       outcome="BIRTHED", edge_id="E1")
+    led.record_attempt(spec=_spec2(), mechanism=MECH,
+                       at="2020-06-01T00:00:00+00:00",
+                       outcome="RETIRED", edge_id="E1")
+    led.record_attempt(spec=_spec2(), mechanism=MECH,
+                       at="2020-06-01T00:00:00+00:00",
+                       outcome="SEALED_TEST_FAILURE", edge_id="E1")
+    birth = led.classify_birth(spec=_spec2(lookback=20),
+                               mechanism=MECH,
+                               at="2020-07-01T00:00:00+00:00")
+    assert birth["classification"] == "DESCENDANT"
+    assert birth["family_attempt_number"] == 2
+    assert birth["debt"]["family_sealed_test_failures"] == 1
+    assert "in full view" in birth["why"]
+
+
+def test_debt_is_never_collapsed_to_one_magic_number():
+    led = LifetimeLedger()
+    for _ in range(3):
+        led.record_attempt(spec=_spec2(), mechanism=MECH,
+                           at="2020-01-01T00:00:00+00:00",
+                           outcome="DISCOVERY_FAILURE")
+    d = led.debt(family=family_id(_spec2()),
+                 mechanism=mechanism_id(MECH))
+    assert d["family_discovery_failures"] == 3
+    assert "score" not in d and "total" not in d
+    assert "calendar does not erase" in d["law"]
+
+
+def test_the_ledger_counts_ideas_not_ids():
+    led = LifetimeLedger()
+    for th in (0.60, 0.62, 0.63, 0.65):
+        led.record_attempt(spec=_spec2(threshold=th), mechanism=MECH,
+                           at="2020-01-01T00:00:00+00:00",
+                           outcome="DISCOVERY_FAILURE")
+    rec = led.as_record()
+    assert rec["unique_specs"] == 4
+    assert rec["unique_families"] == 1
+    assert rec["unique_mechanisms"] == 1
+
+
+# ============ SEQUENTIAL CONTROL (predeclared before #002 outcomes)
+
+def test_the_lifetime_alpha_budget_is_bounded():
+    # the geometric series sums to ALPHA_TOTAL in the limit and every
+    # finite prefix is strictly below it -- unlimited fresh chances
+    # cannot exist at any attempt count
+    partial = sum(alpha_for_attempt(k) for k in range(1, 20))
+    assert partial < 0.05
+    assert alpha_for_attempt(1) == 0.025
+    assert alpha_for_attempt(2) == 0.0125
+
+
+def test_the_null_budget_is_set_by_attempt_number_not_by_the_score():
+    assert null_budget_for_attempt(1) == 100
+    assert null_budget_for_attempt(2) == 100
+    assert null_budget_for_attempt(3) == 320
+
+
+def test_an_unresolvable_tail_refuses_no_matter_how_big_the_score():
+    r = sequential_test(family="F", attempt=5, real_score=99.0,
+                        null_scores=[0.1] * 100)
+    assert r["verdict"] == "NULL_TAIL_UNRESOLVED"
+    assert "Refusal, not fake precision" in r["why"]
+
+
+def test_rank_arithmetic_is_checkable_by_hand():
+    nulls = [i / 100 for i in range(100)]      # 0.00 .. 0.99
+    r = sequential_test(family="F", attempt=1, real_score=0.995,
+                        null_scores=nulls)
+    assert r["null_exceedance_rank"] == 0
+    assert r["p_hat"] == round(1 / 101, 6)
+    assert r["verdict"] == "DISCOVERY"
+    weak = sequential_test(family="F", attempt=1, real_score=0.5,
+                           null_scores=nulls)
+    assert weak["verdict"] == "NOT_DISCOVERED"
+    assert weak["p_hat"] > 0.025
+
+
+def test_later_attempts_need_stronger_evidence():
+    nulls = [i / 320 for i in range(320)]
+    a1 = sequential_test(family="F", attempt=1, real_score=0.9,
+                         null_scores=nulls)
+    a3 = sequential_test(family="F", attempt=3, real_score=0.9,
+                         null_scores=nulls)
+    assert a1["alpha_k"] > a3["alpha_k"]
+    assert "does not exist" in a1["lifetime_budget_note"] or \
+        "do not exist" in a1["lifetime_budget_note"]
+
+
+# ============ DECOMPOSABLE SCIENTIFIC VALIDITY
+
+def _components(**over):
+    base = {c: {"verdict": "PASS", "evidence": "x"}
+            for c in VALIDITY_COMPONENTS}
+    for k, v in over.items():
+        base[k] = v
+    return base
+
+
+def test_one_failed_defense_means_no_overall_authority():
+    d = scientific_validity_decomposition(components=_components(
+        CROSS_EPOCH_MULTIPLICITY_CONTROL={"verdict": "FAIL",
+                                          "evidence": "51 rebirths"}))
+    assert d["OVERALL_SCIENTIFIC_AUTHORITY"] == "NONE"
+    assert d["failed"] == ["CROSS_EPOCH_MULTIPLICITY_CONTROL"]
+    assert "passing one defense is not passing the process" in d["law"]
+
+
+def test_an_unexercised_defense_also_blocks_authority():
+    d = scientific_validity_decomposition(components=_components(
+        SURVIVORSHIP_CONTROL={"verdict": "NOT_EXERCISED",
+                              "evidence": "no survivors existed"}))
+    assert d["OVERALL_SCIENTIFIC_AUTHORITY"] == "NONE"
+
+
+def test_all_passing_components_qualify():
+    d = scientific_validity_decomposition(components=_components())
+    assert d["OVERALL_SCIENTIFIC_AUTHORITY"] == "QUALIFIED"
+
+
+def test_an_unnamed_defense_cannot_pass():
+    c = _components()
+    del c["LOCKBOX_INTEGRITY"]
+    with pytest.raises(ChronosViolation, match="unnamed defense"):
+        scientific_validity_decomposition(components=c)

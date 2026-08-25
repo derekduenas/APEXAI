@@ -109,6 +109,55 @@ def scientific_score(*, dimension_evidence: dict) -> dict:
             "decision_power": "NONE_RESEARCH"}
 
 
+VALIDITY_COMPONENTS = (
+    "CAUSAL_INTEGRITY", "POISON_CONTROL",
+    "WITHIN_EPOCH_FALSE_DISCOVERY_CONTROL",
+    "CROSS_EPOCH_MULTIPLICITY_CONTROL", "SURVIVORSHIP_CONTROL",
+    "VALIDATION_DISCIPLINE", "LOCKBOX_INTEGRITY")
+
+
+def scientific_validity_decomposition(*, components: dict) -> dict:
+    """Scientific validity is DECOMPOSABLE, because Campaign #001
+    proved a single verdict misleads: PASSED_FALSE_DISCOVERY_CONTROL
+    was true and still sounded like the whole process passed, when it
+    had passed ONE defense and exposed failure in another.
+
+    Every component must be present with PASS / FAIL /
+    NOT_EXERCISED and evidence. Overall authority is NONE unless
+    every component PASSES -- a chain of defenses is as strong as its
+    weakest named link, and an unnamed link is weaker still."""
+    missing = [c for c in VALIDITY_COMPONENTS if c not in components]
+    if missing:
+        raise ChronosViolation(
+            f"validity decomposition refuses with unassessed "
+            f"components {missing}: an unnamed defense cannot pass")
+    rows = {}
+    for c in VALIDITY_COMPONENTS:
+        e = components[c]
+        if e.get("verdict") not in ("PASS", "FAIL", "NOT_EXERCISED"):
+            raise ChronosViolation(
+                f"component {c}: verdict must be PASS, FAIL or "
+                f"NOT_EXERCISED, got {e.get('verdict')!r}")
+        if not e.get("evidence"):
+            raise ChronosViolation(
+                f"component {c}: a verdict without evidence is an "
+                f"opinion wearing a lab coat")
+        rows[c] = {"verdict": e["verdict"], "evidence": e["evidence"]}
+    failed = [c for c, r in rows.items() if r["verdict"] == "FAIL"]
+    unexercised = [c for c, r in rows.items()
+                   if r["verdict"] == "NOT_EXERCISED"]
+    overall = ("NONE" if failed or unexercised else "QUALIFIED")
+    return {"kind": "scientific_validity_decomposition",
+            "components": rows, "failed": failed,
+            "not_exercised": unexercised,
+            "OVERALL_SCIENTIFIC_AUTHORITY": overall,
+            "evidence_label": EVIDENCE_LABEL,
+            "law": "passing one defense is not passing the process; "
+                   "authority is NONE until every named component "
+                   "qualifies",
+            "decision_power": "NONE_RESEARCH"}
+
+
 def classify_experiment(*, economic_positive: bool | None,
                         false_discovery_restraint: str,
                         survived_unseen_time: bool | None) -> dict:
