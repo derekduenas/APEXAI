@@ -7,13 +7,17 @@ funnel refused.
 Two outcomes are possible and they mean opposite things:
 
     KNIFE_EDGE + OVERLAPPING cohorts
-        the attacked states did not look different; a threshold decided
-        the day, and the threshold is the suspect.
+        the attacked states did not look different, and a threshold
+        decided the day; threshold placement and measurement noise
+        become the priority hypotheses.
 
     INTERIOR + SEPARATED cohorts
-        the attacked states genuinely looked different and still lost;
-        the threshold is exonerated and the REPRESENTATION is missing a
-        state variable it never saw.
+        the attacked states genuinely looked different and still lost,
+        so threshold placement alone is unlikely to explain the day.
+        That NARROWS the search -- to feature quality, threshold
+        family, interactions, state drift, regime conditionality, a
+        missing variable, or ordinary variance -- it does not name a
+        cause.
 
 SHADOW ONLY. Reads frozen Day-1 records, writes a research artifact,
 touches no incumbent.
@@ -61,12 +65,12 @@ def main() -> int:
             verdict=s.get("entry_quality", "UNKNOWN"),
             cohort=status, extension_atr=ext, invalidation_atr=inval)
         maps.append(m)
-        if m.overall_proximity == "NOT_ESTIMABLE":
+        if m.overall_proximity == "UNKNOWN":
             unusable[status] = unusable.get(status, 0) + 1
 
     comparison = compare_cohorts(maps)
     estimable = [m for m in maps
-                 if m.overall_proximity != "NOT_ESTIMABLE"]
+                 if m.overall_proximity != "UNKNOWN"]
 
     report = {
         "kind": "decision_boundary_archaeology",
@@ -77,6 +81,12 @@ def main() -> int:
         "proximity_counts": {},
         "comparison": comparison,
         "finding": "",
+        "permanent_status": "NOT_ESTIMABLE",
+        "permanent_reason": "REQUIRED_PROSPECTIVE_INPUTS_NOT_RECORDED",
+        "never_reconstruct": "Monday's boundary distances may NOT be "
+                             "back-filled from bars, however possible; "
+                             "the guard in boundary_map refuses "
+                             "reconstructed pedigree by construction",
         "law": "one session; descriptive only; no gate may move",
         "decision_power": "NONE_RESEARCH",
     }
@@ -87,7 +97,7 @@ def main() -> int:
 
     if not estimable:
         report["finding"] = (
-            "THE DIMENSIONS THE ARCHAEOLOGY NEEDS WERE NEVER RECORDED. "
+            "REQUIRED_PROSPECTIVE_INPUTS_NOT_RECORDED. "
             "The Day-1 funnel stored verdicts (entry_quality, cohort) "
             "but not the ATR-scaled distances that produced them, so "
             "how close each decision came to flipping is not "

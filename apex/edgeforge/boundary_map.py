@@ -4,16 +4,23 @@ A verdict of GOOD tells you almost nothing on its own. A state one
 hundredth of an ATR inside the boundary and a state deep in the
 interior both print GOOD, and they are entirely different animals:
 
-    BARELY INSIDE   the verdict is a coin balanced on its edge, and the
-                    incumbent's threshold is doing the deciding.
-    DEEP INSIDE     the verdict is robust, so if the outcome was wrong
-                    the fault is not the threshold -- it is a MISSING
-                    STATE VARIABLE the representation never saw.
+    BARELY INSIDE   the verdict is a coin balanced on its edge, so
+                    threshold placement and measurement noise become
+                    priority hypotheses.
+    DEEP INSIDE     the verdict was not marginal, so simple threshold
+                    placement is unlikely to explain it -- which does
+                    NOT identify the cause. A non-marginal decision
+                    that ended badly still admits a noisy feature, a
+                    wrong threshold family, a misspecified interaction,
+                    rapid state drift, regime conditionality, a missing
+                    variable, or ordinary stochastic loss.
 
-That distinction decides what kind of research problem we have, and it
-is invisible to any funnel that records only labels. Monday's SPY needs
-exactly this question asked of it, next to the six geometry near-misses
-that printed a different verdict.
+The map narrows the search; it never closes it. Diagnosing causality
+from proximity alone would be precisely the premature certainty this
+engine exists to refuse. That said, the distinction is invisible to any
+funnel recording only labels, and it is what separates "we placed the
+line wrong" from "we are looking at the market through an incomplete
+representation" -- two problems with completely different remedies.
 
 NEVER A SCALAR. Distances are reported PER DIMENSION. Collapsing
 "distance to the WAIT boundary" into one number would average an ATR of
@@ -39,7 +46,53 @@ from apex.predators.equities.attack_geometry import (
 
 NOT_ESTIMABLE = "NOT_ESTIMABLE"
 
-PROXIMITY = ("KNIFE_EDGE", "NEAR_BOUNDARY", "INTERIOR", NOT_ESTIMABLE)
+PROXIMITY = ("KNIFE_EDGE", "NEAR_BOUNDARY", "INTERIOR", "UNKNOWN")
+
+# THE ONTOLOGY GENERATES HYPOTHESES; IT DOES NOT DIAGNOSE CAUSALITY.
+# An earlier draft read INTERIOR as "therefore a missing state
+# variable", which is too strong: a non-marginal decision that ended
+# badly has at least six live explanations, and naming one of them the
+# answer would be exactly the premature causal claim this engine exists
+# to refuse.
+PROXIMITY_MEANING = {
+    "KNIFE_EDGE": {
+        "statement": "the decision is highly sensitive to the incumbent "
+                     "threshold",
+        "priority_hypotheses": (
+            "threshold placement",
+            "measurement noise in the boundary dimension")},
+    "NEAR_BOUNDARY": {
+        "statement": "the decision is moderately sensitive to the "
+                     "incumbent threshold",
+        "priority_hypotheses": (
+            "threshold placement",
+            "measurement noise",
+            "state drift between observation and action")},
+    "INTERIOR": {
+        "statement": "the decision was NOT marginal under the incumbent "
+                     "rule, so simple threshold placement alone is "
+                     "unlikely to explain it",
+        "priority_hypotheses": (
+            "the incumbent feature is itself noisy or poorly measured",
+            "the threshold FAMILY is wrong even far from this boundary",
+            "the interaction/function between dimensions is misspecified",
+            "the state changed rapidly after the frozen observation",
+            "the rule is valid only conditionally on another regime",
+            "a missing state variable the representation never saw",
+            "ordinary stochastic loss despite a genuinely favorable "
+            "state")},
+    "UNKNOWN": {
+        "statement": "required boundary inputs were not prospectively "
+                     "recorded, or are insufficiently reliable",
+        "priority_hypotheses": (
+            "nothing may be inferred; this is a measurement gap",)},
+}
+
+# Inputs may only found a proximity classification if they were
+# RECORDED AT DECISION TIME. Reconstructing them after the outcome is
+# known is where discovery quietly becomes hindsight.
+ACCEPTABLE_INPUT_PEDIGREE = ("PROSPECTIVELY_RECORDED",)
+UNRECORDED_REASON = "REQUIRED_PROSPECTIVE_INPUTS_NOT_RECORDED"
 
 # REPORTING_PRIOR (declared, not learned): fraction of the band's own
 # width within which a state counts as sitting on its edge.
@@ -71,7 +124,7 @@ class DimensionDistance:
 
 def _classify(frac) -> str:
     if not isinstance(frac, (int, float)):
-        return NOT_ESTIMABLE
+        return "UNKNOWN"
     edge = min(frac, 1.0 - frac)
     if edge <= KNIFE_EDGE_FRACTION:
         return "KNIFE_EDGE"
@@ -88,7 +141,7 @@ def _banded(dimension, value, edges, labels, source, note=""):
             dimension=dimension, value=NOT_ESTIMABLE, band=(),
             distance_to_worse=NOT_ESTIMABLE,
             distance_to_better=NOT_ESTIMABLE,
-            band_fraction_used=NOT_ESTIMABLE, proximity=NOT_ESTIMABLE,
+            band_fraction_used=NOT_ESTIMABLE, proximity="UNKNOWN",
             boundary_source=source,
             note="value not estimable; no distance is invented")
     lo = float("-inf")
@@ -124,9 +177,12 @@ class DecisionBoundaryMap:
     dimensions: tuple
     overall_proximity: str
     interpretation: str
+    candidate_hypotheses: tuple = ()
+    unknown_reason: str | None = None
     law: str = ("distances are per dimension and never collapsed; "
                 "thresholds are imported from the incumbent, never "
-                "restated")
+                "restated; proximity GENERATES hypotheses and never "
+                "diagnoses causality")
     proximity_rule: str = PROXIMITY_RULE_CLASSIFICATION
     decision_power: str = "NONE_RESEARCH"
 
@@ -137,13 +193,30 @@ class DecisionBoundaryMap:
 
 def map_equity_decision(*, subject: str, T: str, verdict: str,
                         cohort: str, extension_atr, invalidation_atr,
-                        extras: dict | None = None
+                        extras: dict | None = None,
+                        input_pedigree: str = "PROSPECTIVELY_RECORDED"
                         ) -> DecisionBoundaryMap:
     """Reconstruct how close an equity-geometry verdict was to flipping.
 
     `extras` accepts additional pre-declared banded dimensions as
     {name: (value, edges, source, note)} so the map can widen as the
     faculty does -- without this module inventing bands of its own."""
+    # THE ANTI-RECONSTRUCTION GUARD. Values derived after the outcome
+    # was known cannot found a proximity claim, however technically
+    # computable they are -- once the research system reconstructs
+    # whatever it needs after seeing results, the line between
+    # discovery and hindsight is gone.
+    if input_pedigree not in ACCEPTABLE_INPUT_PEDIGREE:
+        return DecisionBoundaryMap(
+            subject=subject, T=T, verdict=verdict, cohort=cohort,
+            dimensions=(), overall_proximity="UNKNOWN",
+            unknown_reason=UNRECORDED_REASON,
+            interpretation=(
+                f"input_pedigree={input_pedigree!r}: "
+                + PROXIMITY_MEANING["UNKNOWN"]["statement"]),
+            candidate_hypotheses=PROXIMITY_MEANING["UNKNOWN"][
+                "priority_hypotheses"])
+
     dims = [
         _banded("extension_atr (chase)", extension_atr,
                 [CHASE_LOW_ATR, CHASE_MODERATE_ATR, CHASE_HIGH_ATR],
@@ -160,30 +233,22 @@ def map_equity_decision(*, subject: str, T: str, verdict: str,
         value, edges, source, note = spec
         dims.append(_banded(name, value, edges, (), source, note))
 
-    proxes = [d.proximity for d in dims if d.proximity != NOT_ESTIMABLE]
+    proxes = [d.proximity for d in dims if d.proximity != "UNKNOWN"]
     if not proxes:
-        overall = NOT_ESTIMABLE
-        interp = "no estimable dimension; proximity unknown"
+        overall, reason = "UNKNOWN", UNRECORDED_REASON
     elif "KNIFE_EDGE" in proxes:
-        overall = "KNIFE_EDGE"
-        interp = (
-            "at least one dimension sits on its boundary: this verdict "
-            "was decided BY THE THRESHOLD. If the outcome was wrong, "
-            "the threshold is the suspect.")
+        overall, reason = "KNIFE_EDGE", None
     elif "NEAR_BOUNDARY" in proxes:
-        overall = "NEAR_BOUNDARY"
-        interp = ("close enough that small state changes would flip it")
+        overall, reason = "NEAR_BOUNDARY", None
     else:
-        overall = "INTERIOR"
-        interp = (
-            "deep inside the verdict on every measured dimension: the "
-            "threshold is NOT the suspect. If the outcome was wrong, "
-            "the representation is MISSING A STATE VARIABLE it never "
-            "saw.")
+        overall, reason = "INTERIOR", None
+    meaning = PROXIMITY_MEANING[overall]
     return DecisionBoundaryMap(
         subject=subject, T=T, verdict=verdict, cohort=cohort,
         dimensions=tuple(dims), overall_proximity=overall,
-        interpretation=interp)
+        unknown_reason=reason,
+        interpretation=meaning["statement"],
+        candidate_hypotheses=meaning["priority_hypotheses"])
 
 
 def compare_cohorts(maps: list) -> dict:

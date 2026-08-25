@@ -494,22 +494,50 @@ def test_thresholds_are_imported_from_the_incumbent_never_restated():
     assert bm.CHASE_LOW_ATR is CHASE_LOW_ATR
 
 
-def test_a_knife_edge_verdict_implicates_the_threshold():
+def test_a_knife_edge_makes_threshold_placement_a_priority_hypothesis():
     m = map_equity_decision(
         subject="SPY", T="t", verdict="GOOD", cohort="PAPER_ATTACKED",
         extension_atr=1.48,      # CHASE_MODERATE_ATR is 1.5
         invalidation_atr=0.9)
     assert m.overall_proximity == "KNIFE_EDGE"
-    assert "decided BY THE THRESHOLD" in m.interpretation
+    assert "highly sensitive to the incumbent threshold" in \
+        m.interpretation
+    assert "threshold placement" in m.candidate_hypotheses
 
 
-def test_an_interior_verdict_implicates_a_missing_variable():
+def test_an_interior_verdict_narrows_the_search_without_diagnosing():
+    """Corrected 2026-08-24: INTERIOR does NOT mean 'missing variable'.
+    A non-marginal decision that ended badly still admits a noisy
+    feature, a wrong threshold family, a misspecified interaction,
+    state drift, regime conditionality, or ordinary variance."""
     m = map_equity_decision(
         subject="SPY", T="t", verdict="GOOD", cohort="PAPER_ATTACKED",
-        extension_atr=1.0,       # mid-band of (0.5, 1.5)
-        invalidation_atr=0.75)   # mid-band of (-inf, 1.5) -> measurable
+        extension_atr=1.0, invalidation_atr=0.75)
     assert m.overall_proximity == "INTERIOR"
-    assert "MISSING A STATE VARIABLE" in m.interpretation
+    assert "unlikely to explain it" in m.interpretation
+    hyps = " | ".join(m.candidate_hypotheses)
+    for alternative in ("noisy or poorly measured", "threshold FAMILY",
+                        "interaction", "changed rapidly",
+                        "conditionally on another regime",
+                        "missing state variable",
+                        "ordinary stochastic loss"):
+        assert alternative in hyps, f"{alternative} not offered"
+    assert len(m.candidate_hypotheses) >= 6, \
+        "one hypothesis presented as the answer is a diagnosis"
+
+
+def test_reconstructed_inputs_cannot_found_a_proximity_claim():
+    """Monday must stay permanently unestimable. Once the research
+    system reconstructs whatever it needs after seeing outcomes, the
+    line between discovery and hindsight is gone."""
+    m = map_equity_decision(
+        subject="SPY", T="2026-08-24 09:55", verdict="GOOD",
+        cohort="PAPER_ATTACKED", extension_atr=1.0,
+        invalidation_atr=0.75,
+        input_pedigree="RECONSTRUCTED_FROM_BARS_AFTER_THE_FACT")
+    assert m.overall_proximity == "UNKNOWN"
+    assert m.unknown_reason == "REQUIRED_PROSPECTIVE_INPUTS_NOT_RECORDED"
+    assert m.dimensions == (), "no distances may be computed at all"
 
 
 def test_distances_are_per_dimension_never_a_scalar():
@@ -528,7 +556,8 @@ def test_an_unestimable_dimension_invents_no_distance():
                             cohort="REFUSED",
                             extension_atr="NOT_ESTIMABLE",
                             invalidation_atr="NOT_ESTIMABLE")
-    assert m.overall_proximity == "NOT_ESTIMABLE"
+    assert m.overall_proximity == "UNKNOWN"
+    assert m.unknown_reason == "REQUIRED_PROSPECTIVE_INPUTS_NOT_RECORDED"
     for d in m.dimensions:
         assert d.distance_to_worse == "NOT_ESTIMABLE"
 
