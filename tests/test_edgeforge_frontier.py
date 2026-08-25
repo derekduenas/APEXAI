@@ -953,3 +953,32 @@ def test_the_diagnostic_carries_each_sources_authority():
     assert d["authority_note"]["EMPIRICAL_ANALOG"] == \
         "EDGE_SUPPORT_ELIGIBLE"
     assert d["authority_note"]["CAUSAL_RESAMPLED"] == "DIAGNOSTIC_ONLY"
+
+
+def test_a_regime_confounded_global_comparison_says_so():
+    """The real trap found on 2026-08-25: the resampler was
+    conditioned on NORMAL while the empirical pool was 33/44 QUIET.
+    The global 'right tail +334' was a regime difference wearing the
+    source's name -- inside NORMAL the right-tail delta was 0.00."""
+    from apex.edgeforge.world_foundry import generator_optimism
+    worlds = _asymmetric_worlds()
+    regimes = {w.branch_id: ("QUIET" if w.branch_id.startswith("emp")
+                             else "NORMAL") for w in worlds}
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand",
+                           regime_by_branch=regimes)
+    assert d["verdict"] == "CONFOUNDED_GLOBAL_COMPARISON"
+    joined = " ".join(d["regime_stratified"]["confounding"])
+    assert "REGIME-CONFOUNDED" in joined
+    assert "not a source difference" in joined
+
+
+def test_matched_regime_composition_is_not_called_confounded():
+    from apex.edgeforge.world_foundry import generator_optimism
+    worlds = _asymmetric_worlds()
+    regimes = {w.branch_id: "NORMAL" for w in worlds}
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand",
+                           regime_by_branch=regimes)
+    assert d["regime_stratified"]["confounding"] == []
+    assert d["verdict"] == "BIAS_DETECTED"

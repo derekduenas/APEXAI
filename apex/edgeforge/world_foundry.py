@@ -75,17 +75,23 @@ SOURCE_AUTHORITY = {
         "as_of": "2026-08-25"},
     "CAUSAL_RESAMPLED": {
         "authority": "DIAGNOSTIC_ONLY",
-        "why": "block bootstrap scored a candidate 40.0% favorable "
-               "where reality scored it 29.6%, with the right tail "
-               "+334 richer while the left tail was slightly harsher. "
-               "It manufactures upside it cannot manufacture downside, "
-               "which is consistent with the bootstrap destroying the "
-               "path structure that caps favorable excursions. Useful "
-               "machinery, not a witness for the defence",
+        "why": "UNPROVEN, not proven biased. The global comparison "
+               "that prompted this downgrade (40.0% favorable vs "
+               "reality's 29.6%, right tail +334) turned out to be "
+               "REGIME-CONFOUNDED: the resampler was conditioned on "
+               "NORMAL while the empirical pool was 33/44 QUIET. "
+               "Stratified within NORMAL the right-tail delta is 0.00, "
+               "the left tail is milder not harsher (+16.26), and the "
+               "median is WORSE than reality (-44.40). So the "
+               "asymmetry was largely an artifact of composition. What "
+               "remains is n=11 empirical NORMAL afternoons, which "
+               "cannot establish credibility in either direction. A "
+               "source supports an edge by demonstrating credible "
+               "path dynamics, not by failing to be caught",
         "as_of": "2026-08-25",
-        "reinstatement": "demonstrate credible path dynamics -- "
-                         "notably that favorable-excursion structure "
-                         "survives the resampling -- then re-argue"},
+        "reinstatement": "a regime-matched comparison at adequate n "
+                         "showing favorable-excursion structure "
+                         "survives the resampling"},
     "LEARNED_GENERATIVE": {
         "authority": "SUSPENDED",
         "why": "conditional fidelity failed: ACF1(|r|) -0.006 against "
@@ -809,7 +815,38 @@ def generator_optimism(run: dict, worlds: list, attack_id: str,
     profiles = _collect()
     deltas, flags, ref = _compare(profiles)
 
+    # REGIME COMPOSITION. Comparing a source conditioned on one regime
+    # against a reference pool drawn mostly from another is not a test
+    # of the source -- it is a comparison of two regimes wearing the
+    # source's name. When the compositions differ materially the global
+    # numbers are confounded and must say so, loudly, next to
+    # themselves.
+    confounding = []
     if regime_by_branch:
+        def _mix(cls_name):
+            m = {}
+            for bid in outs:
+                if cls.get(bid) != cls_name:
+                    continue
+                m[regime_by_branch.get(bid, "UNLABELLED")] = 1 + m.get(
+                    regime_by_branch.get(bid, "UNLABELLED"), 0)
+            tot = sum(m.values()) or 1
+            return {k: round(v / tot, 4) for k, v in m.items()}
+
+        ref_mix = _mix(reference)
+        for c in {v for v in cls.values() if v != reference}:
+            c_mix = _mix(c)
+            tvd = 0.5 * sum(
+                abs(c_mix.get(k, 0.0) - ref_mix.get(k, 0.0))
+                for k in set(c_mix) | set(ref_mix))
+            if tvd >= 0.25:
+                confounding.append(
+                    f"{c} vs {reference} is REGIME-CONFOUNDED: "
+                    f"composition differs by {tvd:.0%} "
+                    f"({c_mix} vs {ref_mix}). The global deltas below "
+                    f"partly measure a regime difference, not a source "
+                    f"difference -- read the stratified view")
+
         by_regime, regimes = {}, sorted(
             {r for b, r in regime_by_branch.items() if b in outs})
         for r in regimes:
@@ -821,14 +858,17 @@ def generator_optimism(run: dict, worlds: list, attack_id: str,
                 "verdict": ("REFERENCE_MISSING" if not rr else
                             "BIAS_DETECTED" if fr else
                             "NO_MATERIAL_BIAS")}
-        regime_view = {"stratified": True, "by_regime": by_regime}
+        regime_view = {"stratified": True, "by_regime": by_regime,
+                       "confounding": confounding}
     else:
         regime_view = {
             "stratified": False,
             "why": "no regime labels supplied; a source that is sound "
                    "in one regime and optimistic in another would be "
-                   "invisible in this global view",
-            "by_regime": {}}
+                   "invisible in this global view, and a composition "
+                   "mismatch between classes could not be detected at "
+                   "all",
+            "by_regime": {}, "confounding": []}
 
     return {"kind": "generator_optimism_diagnostic",
             "attack_id": attack_id, "reference_class": reference,
@@ -836,9 +876,10 @@ def generator_optimism(run: dict, worlds: list, attack_id: str,
             "profiles": profiles,
             "generator_optimism_delta": deltas,
             "regime_stratified": regime_view,
-            "flags": flags,
+            "flags": flags + confounding,
             "verdict": ("REFERENCE_MISSING" if not ref else
-                        "BIAS_DETECTED" if flags else
+                        "CONFOUNDED_GLOBAL_COMPARISON" if confounding
+                        else "BIAS_DETECTED" if flags else
                         "NO_MATERIAL_BIAS"),
             "authority_note": {c: class_authority(c)["authority"]
                                for c in profiles},

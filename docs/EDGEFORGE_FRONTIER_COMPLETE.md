@@ -1,7 +1,7 @@
 # EDGEFORGE_FRONTIER_RESEARCH_STACK_COMPLETE
 
 **Date:** 2026-08-25 · **Authority:** `NONE_RESEARCH`, permanently
-**Tests:** 98 EdgeForge contracts · suite 2,809 passing
+**Tests:** 128 EdgeForge contracts · suite 2,848 passing
 **Non-interference:** enforced across all 14 modules by test
 
 ---
@@ -47,15 +47,31 @@
 - **Attack Tournament**: favorable in **34.5%** of worlds. Split by
   class, *reality was the harsher judge* — empirical 29.6% vs resampled
   40.0%.
-- **Generator optimism** (new, permanent): `BIAS_DETECTED`, reference
-  class `EMPIRICAL_ANALOG`. The causal-resampled source is **+10.4pp
-  more favorable** than reality. Crucially, the bias is *not uniform* —
-  its left tail is slightly **harsher** (−9.75) while its right tail is
-  **+334 richer**. Block-bootstrap destroys the path structure that caps
-  favorable excursions in real sessions, so it invents upside it cannot
-  invent downside. Averaged across all worlds this would have read as
-  "roughly realistic". It is not. The diagnostic keeps the asymmetry
-  visible instead of letting the classes blend.
+- **Generator optimism** (new, permanent) — and then the diagnostic
+  caught *itself*. The global comparison read `BIAS_DETECTED`:
+  causal-resampled **+10.4pp more favorable**, left tail −9.75, right
+  tail **+334 richer**. Stratifying by regime dissolved most of it:
+
+  | delta | global | within NORMAL |
+  |---|---|---|
+  | favorable_fraction | +0.104 | +0.036 |
+  | right_tail | **+334.13** | **0.00** |
+  | left_tail | −9.75 | **+16.26** |
+  | median_R | +14.30 | **−44.40** |
+
+  The resampler was conditioned on **NORMAL**; the empirical pool is
+  **33/44 QUIET**. The global numbers were comparing two regimes
+  wearing the source's name. Inside NORMAL the right-tail inflation is
+  *exactly zero*, the left tail is milder rather than harsher, and the
+  median is **worse** than reality. Verdict is now
+  `CONFOUNDED_GLOBAL_COMPARISON`, and a composition check (total
+  variation ≥ 0.25) fires beside any global delta it contaminates.
+
+  **This does not exonerate the resampler.** n=11 empirical NORMAL
+  afternoons cannot establish credibility in either direction. It stays
+  `DIAGNOSTIC_ONLY` because it is **unproven**, not because it was
+  proven biased — a source earns support authority by demonstrating
+  credible path dynamics, not by failing to be caught.
 - **Baseline Arena**: `INFERIOR_TO_A_SIMPLE_BASELINE` — beaten by all
   five, including NO_TRADE.
 - **Adversary**: `FRAGILE` under **every** stress family — entry
@@ -123,6 +139,18 @@ good enough, which the battery says plainly.
    claim yet, so no faculty has earned standing.
 5. **Boundary archaeology blind for Day-1** and permanently so.
 6. **Impact model is an unvalidated sqrt-participation proxy.**
+7. **No world source except EMPIRICAL_ANALOG may support an edge.**
+   `CAUSAL_RESAMPLED` is `DIAGNOSTIC_ONLY`, `LEARNED_GENERATIVE` is
+   `SUSPENDED`, adversarial and tail sources are `FALSIFICATION_ONLY`.
+   The asymmetry is deliberate: a questionable simulator may **kill** a
+   candidate when the stress is explicitly adversarial, but may not
+   **rescue** one. So `empirical = bad, resampled = good` is never
+   reported as "mixed evidence" — it is
+   `UNFAVORABLE_ON_ELIGIBLE_EVIDENCE` with the disagreement recorded as
+   informative about the *source*. **World count is not evidence
+   count.**
+8. **Regime-matched comparison at adequate n is missing.** Tonight's
+   only within-NORMAL comparison rests on 11 empirical afternoons.
 
 ## 5. Recommended FIRST registered research programme
 
