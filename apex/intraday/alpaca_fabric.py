@@ -225,6 +225,15 @@ class AlpacaRealtimeFabric:
         self._stale_close_pending = False
         self._data_frames_this_connection = 0
         self._last_frame_at = None
+        # VALIDITY-GATED LIVENESS (operator law, 2026-08-24). A frame
+        # ARRIVING is not evidence the feed is alive -- a peer emitting
+        # malformed or replayed bytes keeps a transport anchor fresh
+        # forever while delivering no market truth. Only a frame that
+        # PARSES, carries a usable market message, and is neither
+        # future-dated nor older than what we have already seen may
+        # advance liveness.
+        self._last_valid_data_at = None
+        self._newest_event_epoch = 0.0
         self.counters = {"messages": 0, "trades": 0, "quote_messages": 0,
                          "duplicates": 0, "out_of_order": 0,
                          "future_rejected": 0, "unknown_symbol": 0,
@@ -306,7 +315,8 @@ class AlpacaRealtimeFabric:
             with self._lock:
                 ws = self._ws
                 connected = self.connected_at
-                last_msg = self._last_frame_at      # transport truth
+                # liveness anchors on VALID data, not raw frames
+                last_msg = self._last_valid_data_at
                 pong_at = self._last_pong_at
             if ws is None or connected is None:
                 continue
@@ -318,7 +328,7 @@ class AlpacaRealtimeFabric:
                 pong_stale = (pong_at is None
                               or now - pong_at > LIVENESS_STALE_S)
                 data_fresh = (last_msg is not None
-                              and now - last_msg <= 5.0)
+                              and now - last_msg <= 5.0)   # VALID data
                 if pong_stale and data_fresh:
                     with self._lock:
                         self.counters["pong_missing_data_fresh"] =                             self.counters.get(
@@ -378,6 +388,7 @@ class AlpacaRealtimeFabric:
             self.worker_lag_s_max = lag
         try:
             self._process_frame(raw, now, ws)
+            self._advance_valid_liveness(raw, now)
         except Exception as e:                  # noqa: BLE001
             # a poison frame must not kill ingestion, and must not vanish
             try:
@@ -389,6 +400,56 @@ class AlpacaRealtimeFabric:
         finally:
             with self._lock:
                 self.counters["frames_processed"] += 1
+
+    def _advance_valid_liveness(self, raw, now: float) -> None:
+        """Advance the liveness anchor ONLY for valid, fresh market data.
+
+        Three rejections, each a way a dead feed can look alive:
+          malformed  -- bytes that do not parse are not market truth
+          future     -- an event stamped ahead of now is not observation
+          replayed   -- an event no newer than one already seen carries
+                        no new information, so a peer replaying its
+                        buffer cannot hold the connection open
+        """
+        try:
+            msgs = json.loads(raw)
+        except Exception:                       # noqa: BLE001
+            with self._lock:
+                self.counters["liveness_rejected_malformed"] = \
+                    self.counters.get("liveness_rejected_malformed", 0) + 1
+            return
+        if isinstance(msgs, dict):
+            msgs = [msgs]
+        if not isinstance(msgs, list):
+            return
+        newest = 0.0
+        for m in msgs:
+            if not isinstance(m, dict) or m.get("T") not in (
+                    "t", "q", "b"):             # trade / quote / bar
+                continue
+            ts = m.get("t")
+            if not ts:
+                continue
+            try:
+                import pandas as pd
+                ev = pd.Timestamp(ts).timestamp()
+            except Exception:                   # noqa: BLE001
+                continue
+            if ev > now + 5.0:                  # future-invalid
+                with self._lock:
+                    self.counters["liveness_rejected_future"] = \
+                        self.counters.get("liveness_rejected_future", 0) + 1
+                continue
+            newest = max(newest, ev)
+        if newest <= 0.0:
+            return
+        with self._lock:
+            if newest <= self._newest_event_epoch:
+                self.counters["liveness_rejected_replay"] = \
+                    self.counters.get("liveness_rejected_replay", 0) + 1
+                return
+            self._newest_event_epoch = newest
+            self._last_valid_data_at = now
 
     def _pump(self, limit: int = 1_000_000) -> int:
         """Drain the ingest queue on the CALLING thread.

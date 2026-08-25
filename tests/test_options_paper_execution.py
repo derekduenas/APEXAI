@@ -51,7 +51,12 @@ def _stock():
 
 
 def _future(path):
-    t0 = pd.Timestamp("2024-05-22T14:01:00Z")
+    # T is ET-naive 14:00, so the entry is 18:00Z and the path must
+    # start AFTER it. The old fixture put bars at 14:01Z -- four hours
+    # BEFORE its own entry -- which only passed because the pre-repair
+    # resolver compared naive ET against naive UTC. Day-1 Defect B in
+    # miniature, and the repaired causal filter now rejects it.
+    t0 = pd.Timestamp("2024-05-22T18:01:00Z")
     return [{"t": str(t0 + pd.Timedelta(minutes=i)), "c": c}
             for i, c in enumerate(path)]
 

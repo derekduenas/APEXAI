@@ -17,6 +17,9 @@ WorkingDirectory=/opt/apex/current
 
 # -u: unbuffered. The original death left a 0-byte log and no
 # traceback; this is why it was invisible.
+# workers reduced 4 -> 2: recent-year symbol-days carry 0DTE-era strike
+# proliferation, and four concurrent whole-response holds is what
+# reached 6.5GB. Bounded by observed memory, not by taste.
 Environment=PYTHONUNBUFFERED=1
 Environment=APEX_OPTIONS_HISTORY_ROOT=/apex-data/history-a/options_history
 Environment=APEX_MIN_FREE_GB=12
@@ -27,7 +30,17 @@ Environment=APEX_CANONICAL_REPO=/opt/apex-repo
 
 ExecStart=/opt/apex/shared/venv/bin/python -u \
     /opt/apex/current/scripts/options_history_acquire.py \
-    --phase A --workers 4
+    --phase A --workers 2
+
+# OOM CONTAINMENT (2026-08-24 incident). The daemon reached 6.5GB anon
+# RSS on an 8GB host and the kernel OOM-killer chose the victim 69
+# times. The killer is not obligated to pick the fattest process -- the
+# ThetaTerminal and the live paper session were candidates. A cgroup
+# cap means acquisition can only ever kill ITSELF, and does so with a
+# recorded failure instead of a silent SIGKILL.
+MemoryMax=3G
+MemoryHigh=2500M
+OOMPolicy=stop
 
 Restart=on-failure
 RestartSec=30

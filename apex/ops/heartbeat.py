@@ -39,7 +39,13 @@ HEARTBEAT_DIR = Path(os.environ.get("APEX_HEARTBEAT_DIR",
                                     "/apex-data/core/heartbeats"))
 
 HEALTH_STATES = ("HEALTHY", "STARTING", "STALLED", "STALE", "DEAD",
-                 "WRONG_RELEASE", "NEVER_STARTED")
+                 "WRONG_RELEASE", "NEVER_STARTED", "RESTART_LOOPING")
+
+# A process that dies and is restarted every few minutes completes a
+# little work each life, so heartbeats alone read HEALTHY. Only the
+# supervisor's restart counter reveals it -- the 2026-08-24 OOM loop
+# ran 69 restarts while health said fine.
+RESTART_LOOP_THRESHOLD = 3
 
 
 def _now() -> datetime:
@@ -134,6 +140,7 @@ def read(service: str, root: Path | None = None) -> dict | None:
 def health(service: str, *, beat_stale_s: float,
            work_stale_s: float | None = None,
            expected_commit: str | None = None,
+           restarts_since_last_check: int | None = None,
            root: Path | None = None, now: datetime | None = None
            ) -> dict:
     """Classify one service. Thresholds are the caller's to declare."""
@@ -159,6 +166,13 @@ def health(service: str, *, beat_stale_s: float,
             "backlog_remaining": hb.get("backlog_remaining"),
             "last_error": hb.get("last_error"),
             "authority": hb.get("authority")}
+
+    if isinstance(restarts_since_last_check, int) and \
+            restarts_since_last_check >= RESTART_LOOP_THRESHOLD:
+        return {**base, "state": "RESTART_LOOPING",
+                "why": f"{restarts_since_last_check} supervisor restarts "
+                       f"since the last check -- the process is dying and "
+                       f"being revived, which heartbeats alone cannot see"}
 
     if not _pid_alive(pid):
         return {**base, "state": "DEAD",

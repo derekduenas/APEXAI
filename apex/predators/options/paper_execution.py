@@ -247,18 +247,43 @@ def resolve(*, fill: PaperFill, sealed_card_hash: str,
             invalidation: float | None = None,
             target: float | None = None,
             entry_underlying: float | None = None,
-            entry_options_state=None, exit_options_state=None) -> Outcome:
-    """Resolve one sealed paper decision. Refuses without the card."""
+            entry_options_state=None, exit_options_state=None,
+            boundary_utc=None, entry_utc=None) -> Outcome:
+    """Resolve one sealed paper decision. Refuses without the card.
+
+    CAUSAL PATH INVARIANT (Day-1 Defect B). A realized path may contain
+    only observations strictly AFTER the entry and no later than the
+    sealed boundary. Monday's resolver compared a UTC-naive bar time
+    against an ET-naive entry time -- a four-hour offset that admitted
+    88 minutes of PRE-ENTRY bars, and the MFE it reported had occurred
+    eleven minutes before the position existed. The filter is enforced
+    HERE, where no caller can bypass it, rather than trusted upstream.
+    """
     if not sealed_card_hash or len(sealed_card_hash) < 32:
         raise ExecutionRefused(
             "resolution requires the sealed BEFORE card hash")
     import pandas as pd
 
+    from apex.governance.resolution_time import to_utc
+
+    if future_underlying:
+        e_utc = to_utc(entry_utc if entry_utc is not None else fill.T)
+        b_utc = to_utc(boundary_utc) if boundary_utc is not None else None
+        kept = []
+        for b in future_underlying:
+            t = to_utc(b["t"], assume="UTC")
+            if t <= e_utc:
+                continue                       # pre-entry: not our path
+            if b_utc is not None and t > b_utc:
+                continue                       # past the sealed boundary
+            kept.append(b)
+        future_underlying = kept
+
     # ---- underlying path
     ur, mfe_u, mae_u = NOT_ESTIMABLE, NOT_ESTIMABLE, NOT_ESTIMABLE
     t_mfe = t_mae = t_inval = t_target = NOT_ESTIMABLE
     if future_underlying and entry_underlying:
-        closes = [(pd.Timestamp(b["t"]), b["c"]) for b in
+        closes = [(to_utc(b["t"], assume="UTC"), b["c"]) for b in
                   future_underlying]
         t0 = closes[0][0]
         sign = 1.0 if fill.direction == "LONG" else -1.0

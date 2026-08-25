@@ -269,3 +269,18 @@ def test_a_daemon_that_has_worked_before_gets_no_grace(tmp_path):
     r = hb.health("svc", beat_stale_s=600, work_stale_s=1800,
                   root=tmp_path, now=NOW)
     assert r["state"] == "STALLED"
+
+
+def test_a_restart_loop_is_visible_even_when_heartbeats_look_fine(
+        tmp_path):
+    """The 2026-08-24 OOM loop: 69 restarts while health read HEALTHY,
+    because each short life completed a little work."""
+    hb.Heartbeat(service="svc").work("x", root=tmp_path)
+    ok = hb.health("svc", beat_stale_s=600, work_stale_s=600,
+                   root=tmp_path, restarts_since_last_check=0)
+    assert ok["state"] == "HEALTHY"
+    looping = hb.health("svc", beat_stale_s=600, work_stale_s=600,
+                        root=tmp_path, restarts_since_last_check=12)
+    assert looping["state"] == "RESTART_LOOPING"
+    assert "heartbeats alone cannot see" in looping["why"]
+    assert hb.summarize([looping])["verdict"] == "ATTENTION_REQUIRED"

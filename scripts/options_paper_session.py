@@ -188,8 +188,13 @@ def _scan_symbol(sym: str, sb: SessionScoreboard, ledger: Path,
                               if t[0].breakeven_move_pct is not None
                               else 9e9))
 
+    from apex.governance.trade_semantics import (
+        OPTIONS_HOLD_TO_CLOSE, TradeAuthorities)
+    authorities = TradeAuthorities(
+        thesis_invalidation=ug.invalidation, **OPTIONS_HOLD_TO_CLOSE)
     card = seal_before_card({
         "protocol_version": PROTOCOL["protocol_version"],
+        "authorities": authorities.as_record(),
         "symbol": sym, "T": frozen.T, "direction": direction,
         "frozen_digest": frozen.digest(),
         "expression": chosen.expression,
@@ -198,7 +203,9 @@ def _scan_symbol(sym: str, sb: SessionScoreboard, ledger: Path,
         "debit": chosen.debit,
         "round_trip_friction": chosen.round_trip_friction,
         "entry_quality": ug.entry_quality,
-        "invalidation": ug.invalidation,
+        # NAMED for what it is: diagnostic under this protocol, NOT an
+        # execution stop. See authorities above.
+        "thesis_invalidation": ug.invalidation,
         "atm_iv": ost.atm_iv,
         "assassin_verdict": fin.verdict,
         "exit_rule": PROTOCOL["exit_rule"],
@@ -237,8 +244,16 @@ def resolve_open(open_positions: list, sb: SessionScoreboard,
             out.append({"symbol": sym, "status": "UNRESOLVED",
                         "detail": f"{type(e).__name__}: {e}"})
             continue
+        from apex.governance.resolution_time import (
+            eligible_window as _ew, to_utc as _tu)
+        _ow = _ew(entry_ts=pos["opened_T"], session=sb.session,
+                  symbol=sym, option=True,
+                  horizon="REGULAR_SESSION_CLOSE")
+        _obound = _tu(_ow["boundary_utc"])
         latest = {}
         for q in obs.frozen.option_quotes:
+            if _tu(q["timestamp"], assume="ET") > _obound:
+                continue          # an option's own close, not the equity's
             key = (str(q["expiration"]), float(q["strike"]),
                    "C" if q["right"].upper().startswith("C") else "P")
             prev = latest.get(key)
@@ -252,13 +267,23 @@ def resolve_open(open_positions: list, sb: SessionScoreboard,
             b, a = float(r["bid"]), float(r["ask"])
             return (b, a) if (b > 0 and a > 0 and a >= b) else None
 
+        # DEFECT A+B REPAIR (2026-08-24). The sealed rule says
+        # SESSION_CLOSE, so the boundary comes from the trading
+        # calendar -- never from whenever this resolver happens to run.
+        # Timestamps are normalized UTC-aware before any comparison.
+        from apex.governance.resolution_time import (
+            eligible_window, to_utc)
+        win = eligible_window(
+            entry_ts=pos["opened_T"], session=sb.session, symbol=sym,
+            option=False, horizon="REGULAR_SESSION_CLOSE")
+        e_utc, b_utc = to_utc(win["entry_utc"]), to_utc(win["boundary_utc"])
         bars = [b for b in obs.frozen.underlying_bars
-                if pd.Timestamp(b["t"]).tz_localize(None)
-                > pd.Timestamp(pos["opened_T"])]
+                if e_utc < to_utc(b["t"], assume="UTC") <= b_utc]
         outcome = paper_execution.resolve(
             fill=pos["fill"], sealed_card_hash=pos["card_hash"],
             future_underlying=bars, future_quote_lookup=lookup,
-            entry_underlying=pos["entry_spot"])
+            entry_underlying=pos["entry_spot"],
+            entry_utc=win["entry_utc"], boundary_utc=win["boundary_utc"])
         att = friction_attribution.attribute(
             outcome=outcome, candidate=pos["candidate"])
         sb.attack(symbol=sym, T=pos["opened_T"],
