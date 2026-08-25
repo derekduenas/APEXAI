@@ -109,6 +109,67 @@ def scientific_score(*, dimension_evidence: dict) -> dict:
             "decision_power": "NONE_RESEARCH"}
 
 
+def classify_experiment(*, economic_positive: bool | None,
+                        false_discovery_restraint: str,
+                        survived_unseen_time: bool | None) -> dict:
+    """Top-level research qualification. Three lines, so nobody six
+    months from now reads 'challenger dominated!' without noticing the
+    nonsense controls.
+
+    THE TWO ASYMMETRIC LAWS:
+      economic success cannot rescue scientific invalidity -- a
+      pipeline that fails its false-discovery controls confers ZERO
+      edge authority on anything it produced, however pretty;
+      one bad economic realization does not automatically kill a
+      scientifically valid candidate -- outcomes have variance, and a
+      sound process with a losing draw is reported as exactly that."""
+    if false_discovery_restraint not in ("DEMONSTRATED", "FAILED",
+                                         "INSUFFICIENT_EVIDENCE"):
+        raise ChronosViolation(
+            f"unknown restraint verdict {false_discovery_restraint!r}")
+    econ = ("POSITIVE" if economic_positive else
+            "NEGATIVE" if economic_positive is not None else
+            "NOT_RUN")
+    if false_discovery_restraint == "FAILED":
+        sci = "FAILED_FALSE_DISCOVERY_CONTROL"
+        authority = "NONE"
+        note = ("the process that produced this result could not "
+                "distinguish real structure from deliberate nonsense; "
+                "the economic outcome is preserved as a sealed fact "
+                "and earns zero edge authority")
+    elif false_discovery_restraint == "INSUFFICIENT_EVIDENCE":
+        sci = "UNCALIBRATED"
+        authority = "NONE"
+        note = ("no measured hallucination rate; unmeasured is not "
+                "low")
+    else:
+        sci = "PASSED_FALSE_DISCOVERY_CONTROL"
+        if survived_unseen_time:
+            authority = "RESEARCH_CANDIDATE"
+            note = ("scientifically valid and survived unseen time; "
+                    "still HISTORICAL_REPLAY -- prospective sessions "
+                    "remain the judge")
+        elif survived_unseen_time is False and econ == "NEGATIVE":
+            authority = "NONE"
+            note = ("scientifically valid process, losing realization: "
+                    "outcomes have variance, and this is reported as a "
+                    "sound process with a bad draw, not as proof the "
+                    "process is broken")
+        else:
+            authority = "NONE"
+            note = "not yet tested on unseen time"
+    return {"kind": "experiment_classification",
+            "ECONOMIC_TEST_RESULT": econ,
+            "SCIENTIFIC_VALIDITY": sci,
+            "EDGE_AUTHORITY": authority,
+            "note": note,
+            "evidence_label": EVIDENCE_LABEL,
+            "law": "economic success cannot rescue scientific "
+                   "invalidity; one bad realization does not "
+                   "automatically kill a valid process",
+            "decision_power": "NONE_RESEARCH"}
+
+
 def blend(*_args, **_kwargs):
     """Deliberately unimplementable. The temptation gets a named
     grave instead of a quiet implementation."""

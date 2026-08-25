@@ -392,3 +392,229 @@ def test_shadows_are_deterministic_across_processes_not_just_calls():
     import hashlib as _h
     expect = [int(_h.sha256(t.encode()).hexdigest(), 16) % 7 for t in ts]
     assert vals == expect
+
+
+# ============ CALIBRATION (operator, 2026-08-25: the bar is set by
+# garbage, inside Discovery, then frozen)
+
+from apex.chronos.calibration import (freeze_bar, null_distribution,
+                                      research_hallucination_rate,
+                                      search_complexity, verify_bar)
+from apex.chronos.epoch import (beliefs_at, intelligence_trajectory,
+                                write_epoch)
+from apex.chronos.poison_suite import (POISON_CATALOG,
+                                       plant_full_catalog, self_attack)
+from apex.chronos.scoring import classify_experiment
+
+
+def _cx(**over):
+    base = dict(candidate_features_considered=4,
+                transformations_considered=1, interaction_orders=1,
+                thresholds_searched=1, horizons_searched=1,
+                directions_searched=2, regimes_searched=1,
+                expressions_searched=1)
+    base.update(over)
+    return search_complexity(**base)
+
+
+def _nulls(n=30, score=0.2, cx=None):
+    cx = cx or _cx()
+    return [{"replicate_id": f"r{i}", "control_kind": "RANDOM_FEATURES",
+             "complexity": cx, "best_abs_score": score + i * 0.001}
+            for i in range(n)]
+
+
+def test_every_degree_of_freedom_must_be_counted():
+    c = _cx()
+    assert c["total_search_space"] == 8
+    with pytest.raises(ChronosViolation, match="uncounted degree"):
+        search_complexity(candidate_features_considered=4)
+    with pytest.raises(ChronosViolation, match="undeclared complexity"):
+        _cx(secret_knob=5)
+
+
+def test_a_toy_control_family_cannot_calibrate_a_big_search():
+    big = _cx(candidate_features_considered=800)
+    with pytest.raises(ChronosViolation, match="complexity class"):
+        null_distribution(family="f", real_complexity=big,
+                          null_replicates=_nulls())
+
+
+def test_a_barely_sampled_null_distribution_is_refused():
+    with pytest.raises(ChronosViolation, match="barely sampled"):
+        null_distribution(family="f", real_complexity=_cx(),
+                          null_replicates=_nulls(n=5))
+
+
+def test_the_bar_freezes_in_discovery_and_nowhere_else():
+    nd = null_distribution(family="f", real_complexity=_cx(),
+                           null_replicates=_nulls())
+    bar = freeze_bar(null_dist=nd)
+    assert bar["bar"] == nd["p99_null"]
+    assert "learn to lie" in bar["law"]
+    with pytest.raises(ChronosViolation, match="already been adjusted"):
+        freeze_bar(null_dist=nd, frozen_in_zone="ZONE_B_VALIDATION")
+
+
+def test_a_moved_bar_kills_the_run():
+    nd = null_distribution(family="f", real_complexity=_cx(),
+                           null_replicates=_nulls())
+    bar = freeze_bar(null_dist=nd)
+    ok = verify_bar(bar, family="f", bar=bar["bar"],
+                    quantile="p99_null")
+    assert ok["verdict"] == "BAR_INTACT"
+    moved = verify_bar(bar, family="f", bar=bar["bar"] - 0.1,
+                       quantile="p99_null")
+    assert moved["verdict"] == "BAR_MOVED_AFTER_FREEZE"
+    assert "run is dead" in moved["remedy"]
+
+
+def test_hallucination_rate_is_per_family_never_pooled():
+    nd = null_distribution(family="single_feature",
+                           real_complexity=_cx(),
+                           null_replicates=_nulls())
+    bar = freeze_bar(null_dist=nd)
+    with pytest.raises(ChronosViolation, match="never across"):
+        research_hallucination_rate(
+            family="five_way_interactions", null_dist=nd,
+            real_results=[], frozen_bar=bar)
+
+
+def test_the_signature_metric_reports_real_vs_garbage_excess():
+    nd = null_distribution(family="f", real_complexity=_cx(),
+                           null_replicates=_nulls(score=0.2))
+    bar = freeze_bar(null_dist=nd)
+    rh = research_hallucination_rate(
+        family="f", null_dist=nd,
+        real_results=[{"score": 0.5}, {"score": 0.1}], frozen_bar=bar)
+    assert rh["best_real_score"] == 0.5
+    assert rh["real_vs_null_excess"] > 0
+    assert rh["interpretation"] == "REAL_EXCEEDS_GARBAGE"
+    assert rh["false_discovery_restraint"] == "DEMONSTRATED"
+    weak = research_hallucination_rate(
+        family="f", null_dist=nd,
+        real_results=[{"score": 0.15}], frozen_bar=bar)
+    assert weak["interpretation"] == \
+        "REAL_INDISTINGUISHABLE_FROM_GARBAGE"
+
+
+# ============ EXPERIMENT CLASSIFICATION (the three-line law)
+
+def test_economic_success_cannot_rescue_scientific_invalidity():
+    c = classify_experiment(economic_positive=True,
+                            false_discovery_restraint="FAILED",
+                            survived_unseen_time=True)
+    assert c["ECONOMIC_TEST_RESULT"] == "POSITIVE"
+    assert c["SCIENTIFIC_VALIDITY"] == "FAILED_FALSE_DISCOVERY_CONTROL"
+    assert c["EDGE_AUTHORITY"] == "NONE"
+    assert "zero edge authority" in c["note"]
+
+
+def test_one_bad_draw_does_not_kill_a_valid_process():
+    c = classify_experiment(economic_positive=False,
+                            false_discovery_restraint="DEMONSTRATED",
+                            survived_unseen_time=False)
+    assert c["EDGE_AUTHORITY"] == "NONE"
+    assert "bad draw" in c["note"]
+    assert "not as proof the process is broken" in c["note"]
+
+
+def test_uncalibrated_is_not_the_same_as_passing():
+    c = classify_experiment(
+        economic_positive=True,
+        false_discovery_restraint="INSUFFICIENT_EVIDENCE",
+        survived_unseen_time=True)
+    assert c["SCIENTIFIC_VALIDITY"] == "UNCALIBRATED"
+    assert c["EDGE_AUTHORITY"] == "NONE"
+
+
+def test_the_best_case_is_still_only_a_research_candidate():
+    c = classify_experiment(economic_positive=True,
+                            false_discovery_restraint="DEMONSTRATED",
+                            survived_unseen_time=True)
+    assert c["EDGE_AUTHORITY"] == "RESEARCH_CANDIDATE"
+    assert "prospective sessions remain the judge" in c["note"]
+
+
+# ============ POISON SUITE (the adversarial causal catalog)
+
+def test_the_catalog_covers_the_operators_named_leaks():
+    for name in ("future_return", "future_high", "future_low",
+                 "future_event_resolution", "revised_economic_data",
+                 "future_earnings_result", "future_oi_value",
+                 "forward_filled_state", "delisting_knowledge"):
+        assert name in POISON_CATALOG
+
+
+def test_self_attack_every_trap_must_fire():
+    c = CausalClock(start=T0)
+    hz = KnowledgeHorizon(clock=c)
+    plant_full_catalog(hz)
+    rep = self_attack(hz, attacker="test")
+    assert rep["verdict"] == "FIREWALL_HELD"
+    assert all(v == "TRAP_FIRED" for v in rep["results"].values())
+
+
+def test_an_unplanted_poison_fails_the_self_attack():
+    """A missing trap is a hole too: the attack demands the full
+    catalog, so a replay cannot quietly skip planting one."""
+    c = CausalClock(start=T0)
+    hz = KnowledgeHorizon(clock=c)
+    hz.register_poison("future_return", 1.0, why="only one planted")
+    with pytest.raises(ChronosViolation, match="FIREWALL BREACHED"):
+        self_attack(hz, attacker="test")
+
+
+# ============ EPOCHS (what did the organism believe THEN?)
+
+def _epoch(i, cutoff, rate):
+    return {"epoch_id": f"E{i:03d}", "knowledge_cutoff": cutoff,
+            "code_sha": "abc", "dataset_boundary": "SPY daily",
+            "active_edge_library": ["CEDGE_001"] if i else [],
+            "retired_edges": [], "candidate_registry": [],
+            "credibility_state": "EMPTY",
+            "world_source_authority": "EMPIRICAL_ONLY",
+            "research_hallucination_rate": {
+                "null_over_bar_rate": rate,
+                "false_discovery_restraint": "DEMONSTRATED"},
+            "capital_policy_state": "NONE_RESEARCH"}
+
+
+def test_an_epoch_with_a_hole_refuses_to_seal(tmp_path):
+    led = tmp_path / "ep.jsonl"
+    bad = _epoch(0, "2019-01-01T00:00:00+00:00", 0.1)
+    del bad["credibility_state"]
+    with pytest.raises(ChronosViolation, match="hole"):
+        write_epoch(led, epoch=bad)
+
+
+def test_the_organism_does_not_unknow_things(tmp_path):
+    led = tmp_path / "ep.jsonl"
+    write_epoch(led, epoch=_epoch(0, "2019-01-01T00:00:00+00:00", 0.1))
+    with pytest.raises(ChronosViolation, match="not advance"):
+        write_epoch(led, epoch=_epoch(1, "2018-12-01T00:00:00+00:00",
+                                      0.1))
+
+
+def test_beliefs_are_reconstructed_never_synthesized(tmp_path):
+    led = tmp_path / "ep.jsonl"
+    write_epoch(led, epoch=_epoch(0, "2019-01-01T00:00:00+00:00", 0.3))
+    write_epoch(led, epoch=_epoch(1, "2019-02-01T00:00:00+00:00", 0.1))
+    b = beliefs_at(led, timestamp="2019-01-15T00:00:00+00:00")
+    assert b["epoch_id"] == "E000"
+    assert b["beliefs"]["active_edge_library"] == []
+    early = beliefs_at(led, timestamp="2018-06-01T00:00:00+00:00")
+    assert early["verdict"] == "ORGANISM_DID_NOT_EXIST_YET"
+
+
+def test_the_trajectory_asks_if_it_is_harder_to_fool(tmp_path):
+    led = tmp_path / "ep.jsonl"
+    for i, (cut, rate) in enumerate((
+            ("2019-01-01T00:00:00+00:00", 0.5),
+            ("2019-02-01T00:00:00+00:00", 0.4),
+            ("2019-03-01T00:00:00+00:00", 0.1),
+            ("2019-04-01T00:00:00+00:00", 0.05))):
+        write_epoch(led, epoch=_epoch(i, cut, rate))
+    t = intelligence_trajectory(led)
+    assert t["becoming_harder_to_fool"] is True
+    assert "never recomputed with hindsight" in t["law"]

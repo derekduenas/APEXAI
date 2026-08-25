@@ -75,6 +75,21 @@ believe it.** That sentence is the whole deliverable.
   in the scientific score beside the pretty economics, and neither can
   erase the other because they are never blended.
 
+## 2b. Experiment 000 — official classification (appended 2026-08-25)
+
+```text
+ECONOMIC_TEST_RESULT:  POSITIVE            (+3.11R / 8 acts, sealed)
+SCIENTIFIC_VALIDITY:   FAILED_FALSE_DISCOVERY_CONTROL
+EDGE_AUTHORITY:        NONE
+```
+
+The key fact is not +3.11R. It is that **the discovery engine could
+not distinguish real structure from deliberate nonsense.** The
+economic outcome is preserved as a real sealed fact and earns zero
+edge authority — economic success cannot rescue scientific
+invalidity. Experiment 000 is never rerun with a corrected threshold;
+the corrected machinery is a new lineage (Campaign #001, EXP 001+).
+
 ## 3. Campaign rule earned by this result
 
 For the real CHRONOS campaign, the discovery bar is **set
