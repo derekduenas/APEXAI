@@ -39,7 +39,31 @@ HEARTBEAT_DIR = Path(os.environ.get("APEX_HEARTBEAT_DIR",
                                     "/apex-data/core/heartbeats"))
 
 HEALTH_STATES = ("HEALTHY", "STARTING", "STALLED", "STALE", "DEAD",
-                 "WRONG_RELEASE", "NEVER_STARTED", "RESTART_LOOPING")
+                 "WRONG_RELEASE", "NEVER_STARTED", "RESTART_LOOPING",
+                 "EXPECTED_IDLE", "UNEXPECTEDLY_RUNNING")
+
+# EXPECTED LIFECYCLE. Health is only meaningful relative to what the
+# service is SUPPOSED to be doing right now. A paper daemon that is
+# down at midnight because the market is closed is not a fault, and
+# reporting it as one trains the operator to ignore the health check --
+# which is precisely how a real daemon died unnoticed for seven hours.
+#
+# The inverse matters just as much: a service that is running when it
+# should be stopped is a genuine finding, not a happy accident.
+LIFECYCLE_STATES = ("EXPECTED_RUNNING", "EXPECTED_STOPPED",
+                    "EXPECTED_DISABLED", "EXPECTED_ON_DEMAND")
+
+# Idle-tolerant lifecycles: absence is the correct observation.
+_IDLE_OK = ("EXPECTED_STOPPED", "EXPECTED_DISABLED", "EXPECTED_ON_DEMAND")
+_ABSENT = ("DEAD", "NEVER_STARTED", "STALE", "STALLED")
+
+SEVERITY = {
+    "HEALTHY": "OK", "STARTING": "OK", "EXPECTED_IDLE": "OK",
+    "STALE": "DEGRADED", "STALLED": "DEGRADED",
+    "DEAD": "CRITICAL", "WRONG_RELEASE": "CRITICAL",
+    "NEVER_STARTED": "CRITICAL", "RESTART_LOOPING": "CRITICAL",
+    "UNEXPECTEDLY_RUNNING": "CRITICAL",
+}
 
 # A process that dies and is restarted every few minutes completes a
 # little work each life, so heartbeats alone read HEALTHY. Only the
@@ -137,13 +161,14 @@ def read(service: str, root: Path | None = None) -> dict | None:
         return None
 
 
-def health(service: str, *, beat_stale_s: float,
-           work_stale_s: float | None = None,
-           expected_commit: str | None = None,
-           restarts_since_last_check: int | None = None,
-           root: Path | None = None, now: datetime | None = None
-           ) -> dict:
-    """Classify one service. Thresholds are the caller's to declare."""
+def _classify(service: str, *, beat_stale_s: float,
+              work_stale_s: float | None = None,
+              expected_commit: str | None = None,
+              restarts_since_last_check: int | None = None,
+              root: Path | None = None, now: datetime | None = None
+              ) -> dict:
+    """Classify one service from its heartbeat alone. Thresholds are
+    the caller's to declare."""
     now = now or _now()
     hb = read(service, root)
     if hb is None:
@@ -221,17 +246,85 @@ def health(service: str, *, beat_stale_s: float,
                    f"({hb.get('work_completed')} units)"}
 
 
+def _reconcile(report: dict, expected: str) -> dict:
+    """Reconcile an observed state against the expected lifecycle.
+
+    The observation is NEVER destroyed. When absence is expected the
+    state becomes EXPECTED_IDLE, but the state that was actually
+    observed is retained as `observed_state` -- otherwise tonight's
+    legitimate idleness would erase the record of a daemon that died
+    mid-session this morning when it was supposed to be working."""
+    st = report["state"]
+    out = {**report, "expected_lifecycle": expected}
+    if expected in _IDLE_OK and st in _ABSENT:
+        out.update({
+            "state": "EXPECTED_IDLE", "observed_state": st,
+            "why": f"expected {expected}; observed {st} "
+                   f"({report.get('why', '')}). Absence is the correct "
+                   f"state right now -- this is not a fault, and the "
+                   f"observation is retained, not erased"})
+    elif expected in ("EXPECTED_STOPPED", "EXPECTED_DISABLED") and \
+            st in ("HEALTHY", "STARTING", "RESTART_LOOPING"):
+        out.update({
+            "state": "UNEXPECTEDLY_RUNNING", "observed_state": st,
+            "why": f"expected {expected} but the service is {st}. "
+                   f"Something started that should not be running"})
+    out["severity"] = SEVERITY.get(out["state"], "CRITICAL")
+    return out
+
+
+def health(service: str, *, beat_stale_s: float,
+           work_stale_s: float | None = None,
+           expected_commit: str | None = None,
+           restarts_since_last_check: int | None = None,
+           expected_lifecycle: str = "EXPECTED_RUNNING",
+           root: Path | None = None, now: datetime | None = None
+           ) -> dict:
+    """Classify one service AGAINST ITS EXPECTED LIFECYCLE.
+
+    Only the caller knows whether this service is supposed to be up
+    right now, so the expectation is an argument, never a guess. The
+    default is EXPECTED_RUNNING, which preserves the strict behaviour
+    for anything that has not declared otherwise -- a service nobody
+    thought about should still be able to alarm."""
+    if expected_lifecycle not in LIFECYCLE_STATES:
+        raise ValueError(
+            f"unknown expected lifecycle {expected_lifecycle!r}; health "
+            f"is meaningless without knowing what was expected")
+    report = _classify(
+        service, beat_stale_s=beat_stale_s, work_stale_s=work_stale_s,
+        expected_commit=expected_commit,
+        restarts_since_last_check=restarts_since_last_check,
+        root=root, now=now)
+    return _reconcile(report, expected_lifecycle)
+
+
 def summarize(reports: list) -> dict:
     # STARTING is not a problem; it is a daemon doing exactly what a
-    # daemon does after a restart.
-    bad = [r for r in reports if r["state"] not in ("HEALTHY", "STARTING")]
+    # daemon does after a restart. EXPECTED_IDLE is not a problem
+    # either -- it is a service correctly doing nothing.
+    bad = [r for r in reports
+           if SEVERITY.get(r["state"], "CRITICAL") != "OK"]
+    crit = [r for r in bad
+            if SEVERITY.get(r["state"]) == "CRITICAL"]
     return {"kind": "apex_health_summary",
             "services": len(reports),
             "healthy": len(reports) - len(bad),
             "unhealthy": len(bad),
+            "critical": len(crit),
             "states": {r["service"]: r["state"] for r in reports},
+            "severities": {r["service"]: SEVERITY.get(r["state"],
+                                                      "CRITICAL")
+                           for r in reports},
+            "idle_by_design": [r["service"] for r in reports
+                               if r["state"] == "EXPECTED_IDLE"],
             "attention": [{"service": r["service"], "state": r["state"],
+                           "severity": SEVERITY.get(r["state"],
+                                                    "CRITICAL"),
+                           "observed_state": r.get("observed_state"),
                            "why": r["why"]} for r in bad],
-            "verdict": "ALL_HEALTHY" if not bad else "ATTENTION_REQUIRED",
-            "law": "process existence is not health; a daemon looping "
-                   "on a failing call is alive and useless"}
+            "verdict": ("ALL_HEALTHY" if not bad else
+                        "CRITICAL" if crit else "DEGRADED"),
+            "law": "process existence is not health, and neither is "
+                   "process absence a fault -- health is measured "
+                   "against the EXPECTED lifecycle state"}

@@ -61,9 +61,36 @@ class CandidateAttack:
 # An evaluator maps (attack, world) -> outcome dict with at least
 # pnl, mfe, mae. Everything downstream is derived, never invented.
 
+def _path_timing(exc: list, params: dict) -> dict:
+    """WHEN things happened, as a fraction of the world's path.
+
+    Derived from the excursion series only. time_to_target and
+    time_to_invalidation require the attack to DECLARE those levels --
+    an undeclared target cannot be reached, and guessing one would
+    manufacture a timing statistic out of nothing."""
+    n = max(len(exc) - 1, 1)
+    out = {"time_to_mfe": round(exc.index(max(exc)) / n, 4),
+           "time_to_mae": round(exc.index(min(exc)) / n, 4)}
+    for key, level, cmp in (
+            ("time_to_target", params.get("target_pnl"), True),
+            ("time_to_invalidation", params.get("invalidation_pnl"),
+             False)):
+        if not isinstance(level, (int, float)):
+            out[key] = NOT_ESTIMABLE
+            out[key + "_why"] = "the attack declares no such level"
+            continue
+        hit = next((i for i, v in enumerate(exc)
+                    if (v >= level if cmp else v <= level)), None)
+        out[key] = round(hit / n, 4) if hit is not None else None
+        if hit is None:
+            out[key + "_why"] = "level never reached in this world"
+    return out
+
+
 def no_trade_evaluator(attack: CandidateAttack, world) -> dict:
     return {"pnl": 0.0, "mfe": 0.0, "mae": 0.0,
             "capital_deployed": 0.0, "friction": 0.0,
+            **_path_timing([0.0], attack.params),
             "note": "flat is a position"}
 
 
@@ -78,6 +105,7 @@ def stock_evaluator(attack: CandidateAttack, world) -> dict:
     return {"pnl": round(exc[-1], 2),
             "mfe": round(max(exc), 2), "mae": round(min(exc), 2),
             "capital_deployed": round(entry * shares, 2),
+            **_path_timing(exc, p),
             "friction": p.get("round_trip_friction", 0.0)}
 
 
@@ -117,7 +145,8 @@ def long_option_bsm_evaluator(attack: CandidateAttack, world) -> dict:
     exc = [v - cost for v in vals]
     return {"pnl": round(exc[-1] - friction, 2),
             "mfe": round(max(exc), 2), "mae": round(min(exc), 2),
-            "capital_deployed": round(cost, 2), "friction": friction}
+            "capital_deployed": round(cost, 2), "friction": friction,
+            **_path_timing(exc, p)}
 
 
 EVALUATORS = {"no_trade": no_trade_evaluator,

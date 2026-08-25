@@ -110,9 +110,10 @@ def test_summary_names_what_needs_attention(tmp_path):
     reports = [hb.health(s, beat_stale_s=600, root=tmp_path)
                for s in ("ok", "gone")]
     s = hb.summarize(reports)
-    assert s["verdict"] == "ATTENTION_REQUIRED"
-    assert s["unhealthy"] == 1
+    assert s["verdict"] == "CRITICAL"
+    assert s["unhealthy"] == 1 and s["critical"] == 1
     assert s["attention"][0]["service"] == "gone"
+    assert s["attention"][0]["severity"] == "CRITICAL"
     assert "existence is not health" in s["law"]
 
 
@@ -283,7 +284,7 @@ def test_a_restart_loop_is_visible_even_when_heartbeats_look_fine(
                         root=tmp_path, restarts_since_last_check=12)
     assert looping["state"] == "RESTART_LOOPING"
     assert "heartbeats alone cannot see" in looping["why"]
-    assert hb.summarize([looping])["verdict"] == "ATTENTION_REQUIRED"
+    assert hb.summarize([looping])["verdict"] == "CRITICAL"
 
 
 def test_expecting_nothing_differs_from_declaring_nothing(monkeypatch,
@@ -304,3 +305,76 @@ def test_expecting_nothing_differs_from_declaring_nothing(monkeypatch,
                        env=env, cwd=str(repo))
     assert '"services": 0' in r.stdout or '"healthy": 0' in r.stdout
     assert "quiet host is not an unhealthy one" in r.stdout
+
+
+# ============ EXPECTED LIFECYCLE (operator, 2026-08-25)
+# "options-paper, market closed, expected DISABLED, actual DISABLED
+#  -> HEALTHY / EXPECTED_IDLE. Not: heartbeat old -> ATTENTION."
+
+def test_a_service_idle_by_design_is_not_a_fault(tmp_path):
+    hb.Heartbeat(service="options-paper", pid=999999).beat(tmp_path)
+    r = hb.health("options-paper", beat_stale_s=600, root=tmp_path,
+                  expected_lifecycle="EXPECTED_DISABLED")
+    assert r["state"] == "EXPECTED_IDLE"
+    assert r["severity"] == "OK"
+    assert hb.summarize([r])["verdict"] == "ALL_HEALTHY"
+    assert hb.summarize([r])["idle_by_design"] == ["options-paper"]
+
+
+def test_suppressing_an_alarm_never_erases_the_observation(tmp_path):
+    """Tonight's legitimate idleness must not delete the record of a
+    daemon that died mid-session this morning."""
+    hb.Heartbeat(service="options-acquire", pid=999999).beat(tmp_path)
+    r = hb.health("options-acquire", beat_stale_s=600, root=tmp_path,
+                  expected_lifecycle="EXPECTED_ON_DEMAND")
+    assert r["state"] == "EXPECTED_IDLE"
+    assert r["observed_state"] == "DEAD"
+    assert "pid 999999 is gone" in r["why"]
+
+
+def test_running_when_it_should_be_stopped_is_a_finding(tmp_path):
+    hb.Heartbeat(service="svc").work("x", root=tmp_path)
+    r = hb.health("svc", beat_stale_s=600, root=tmp_path,
+                  expected_lifecycle="EXPECTED_STOPPED")
+    assert r["state"] == "UNEXPECTEDLY_RUNNING"
+    assert r["severity"] == "CRITICAL"
+    assert "should not be running" in r["why"]
+
+
+def test_an_undeclared_service_still_alarms(tmp_path):
+    """Fail loud is the default. Silence is the expensive error."""
+    hb.Heartbeat(service="svc", pid=999999).beat(tmp_path)
+    r = hb.health("svc", beat_stale_s=600, root=tmp_path)
+    assert r["expected_lifecycle"] == "EXPECTED_RUNNING"
+    assert r["state"] == "DEAD" and r["severity"] == "CRITICAL"
+
+
+def test_health_refuses_an_expectation_it_does_not_understand(tmp_path):
+    hb.Heartbeat(service="svc").work("x", root=tmp_path)
+    with pytest.raises(ValueError, match="meaningless without knowing"):
+        hb.health("svc", beat_stale_s=600, root=tmp_path,
+                  expected_lifecycle="PROBABLY_FINE")
+
+
+def test_late_and_gone_do_not_page_the_same_way(tmp_path):
+    """A watchdog that cannot tell 'a scanner is late' from 'the daemon
+    is gone' pages identically for both, and then stops being read."""
+    import os
+    h = hb.Heartbeat(service="late", pid=os.getpid())
+    h.work("x", root=tmp_path)
+    data = json.loads((tmp_path / "late.json").read_text())
+    data["beat_utc"] = (NOW - timedelta(hours=2)).isoformat()
+    (tmp_path / "late.json").write_text(json.dumps(data))
+    late = hb.health("late", beat_stale_s=600, root=tmp_path, now=NOW)
+    gone_hb = hb.Heartbeat(service="gone", pid=999999)
+    gone_hb.beat(tmp_path)
+    gone = hb.health("gone", beat_stale_s=600, root=tmp_path)
+    assert late["severity"] == "DEGRADED"
+    assert gone["severity"] == "CRITICAL"
+    assert hb.summarize([late])["verdict"] == "DEGRADED"
+    assert hb.summarize([late, gone])["verdict"] == "CRITICAL"
+
+
+def test_every_severity_maps_a_declared_state():
+    assert set(hb.SEVERITY) == set(hb.HEALTH_STATES)
+    assert set(hb.SEVERITY.values()) <= {"OK", "DEGRADED", "CRITICAL"}

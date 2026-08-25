@@ -749,9 +749,10 @@ def test_the_diagnostic_preserves_tails_and_excursions():
     d = generator_optimism(run, worlds, "cand")
     for cls in ("EMPIRICAL_ANALOG", "CAUSAL_RESAMPLED"):
         p = d["profiles"][cls]
-        for k in ("favorable_fraction", "median", "left_tail_p10",
+        for k in ("favorable_fraction", "median_R", "left_tail_p10",
                   "right_tail_p90", "mfe_median", "mae_median",
-                  "invalidation_rate"):
+                  "invalidation_rate", "time_to_target_median",
+                  "time_to_invalidation_median"):
             assert k in p
 
 
@@ -762,3 +763,193 @@ def test_no_reference_class_is_reported_not_assumed():
     run = evaluate_common(attacks=[_stock()], worlds=worlds)
     d = generator_optimism(run, worlds, "cand")
     assert d["verdict"] == "REFERENCE_MISSING"
+
+
+# ============ WORLD SOURCE AUTHORITY (operator, 2026-08-25)
+# "CAN_GENERATE = YES does not imply CAN_SUPPORT_EDGE = YES."
+
+def test_generating_worlds_is_not_authority_to_support_an_edge():
+    from apex.edgeforge.world_foundry import (
+        SOURCE_AUTHORITY, SUPPORT_ELIGIBLE, WORLD_SOURCE_AUTHORITY,
+        class_authority)
+    assert SUPPORT_ELIGIBLE == ("EMPIRICAL_ANALOG",)
+    assert class_authority("CAUSAL_RESAMPLED")["authority"] == \
+        "DIAGNOSTIC_ONLY"
+    assert class_authority("LEARNED_GENERATIVE")["authority"] == \
+        "SUSPENDED"
+    for c in ("ADVERSARIAL_STRESS", "EXTREME_TAIL_STRESS"):
+        assert class_authority(c)["authority"] == "FALSIFICATION_ONLY"
+    for rec in SOURCE_AUTHORITY.values():
+        assert rec["authority"] in WORLD_SOURCE_AUTHORITY
+        assert len(rec["why"]) > 40, "an authority needs a reason"
+
+
+def test_an_unregistered_source_has_no_standing():
+    from apex.edgeforge.world_foundry import class_authority
+    a = class_authority("SOMEONES_NEW_SIMULATOR")
+    assert a["authority"] == "UNVALIDATED"
+    assert "no standing" in a["why"]
+
+
+def test_a_downgraded_source_records_how_to_earn_its_way_back():
+    from apex.edgeforge.world_foundry import SOURCE_AUTHORITY
+    for c in ("CAUSAL_RESAMPLED", "LEARNED_GENERATIVE"):
+        assert "reinstatement" in SOURCE_AUTHORITY[c]
+    assert "no deadline" in \
+        SOURCE_AUTHORITY["LEARNED_GENERATIVE"]["reinstatement"]
+
+
+def test_reality_unfavorable_plus_resampler_favorable_is_not_mixed():
+    """THE RULE. 'Mixed evidence' launders an unqualified source into
+    a tie. The eligible evidence is unfavorable; the disagreeing source
+    is not currently qualified to support anything."""
+    from apex.edgeforge.world_foundry import evidence_verdict
+    v = evidence_verdict({
+        "EMPIRICAL_ANALOG": {"n": 44, "median": -68.5,
+                             "favorable_fraction": 0.296},
+        "CAUSAL_RESAMPLED": {"n": 40, "median": 54.2,
+                             "favorable_fraction": 0.400}})
+    assert v["verdict"] == "UNFAVORABLE_ON_ELIGIBLE_EVIDENCE"
+    assert v["disregarded_positive_support"] == ["CAUSAL_RESAMPLED"]
+    joined = " ".join(v["reasoning"])
+    assert "not 'mixed evidence'" in joined
+    assert "NOT counted as support" in joined
+    assert "world count is not evidence count" in v["law"]
+
+
+def test_positive_eligible_evidence_still_faces_the_other_vetoes():
+    from apex.edgeforge.world_foundry import evidence_verdict
+    v = evidence_verdict({
+        "EMPIRICAL_ANALOG": {"n": 44, "median": 31.0,
+                             "favorable_fraction": 0.61}})
+    assert v["verdict"] == "FAVORABLE_ON_ELIGIBLE_EVIDENCE"
+    assert any("not an edge" in r for r in v["reasoning"])
+
+
+def test_a_multiverse_of_only_ineligible_sources_supports_nothing():
+    from apex.edgeforge.world_foundry import evidence_verdict
+    v = evidence_verdict({
+        "CAUSAL_RESAMPLED": {"n": 40, "median": 90.0,
+                             "favorable_fraction": 0.9},
+        "ADVERSARIAL_STRESS": {"n": 20, "median": 40.0,
+                               "favorable_fraction": 0.8}})
+    assert v["verdict"] == "NO_SUPPORT_ELIGIBLE_EVIDENCE"
+    assert "regardless of how favorable" in " ".join(v["reasoning"])
+
+
+def test_the_verdict_refuses_a_statistic_it_cannot_interpret():
+    from apex.edgeforge.world_foundry import (
+        FoundryViolation, evidence_verdict)
+    with pytest.raises(FoundryViolation):
+        evidence_verdict({"EMPIRICAL_ANALOG": {"n": 1}},
+                         statistic="vibes")
+
+
+# ============ NINE PRESERVED DELTAS + REGIME STRATIFICATION
+
+def test_all_nine_deltas_are_preserved_even_when_not_estimable():
+    from apex.edgeforge.world_foundry import (
+        OPTIMISM_DELTAS, generator_optimism)
+    worlds = _two_class_worlds()
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand")
+    assert list(d["preserved_deltas"]) == list(OPTIMISM_DELTAS)
+    delta = d["generator_optimism_delta"]["CAUSAL_RESAMPLED"]
+    assert set(delta) == set(OPTIMISM_DELTAS), \
+        "a missing dimension must be visible, not omitted"
+    # no target declared -> refused, not invented
+    assert delta["time_to_target_delta"] == "NOT_ESTIMABLE"
+
+
+def test_an_undeclared_target_is_refused_not_guessed():
+    from apex.edgeforge.attack_lab import _path_timing
+    t = _path_timing([0.0, 5.0, -2.0], {})
+    assert t["time_to_target"] == "NOT_ESTIMABLE"
+    assert "declares no such level" in t["time_to_target_why"]
+    assert t["time_to_mfe"] == 0.5 and t["time_to_mae"] == 1.0
+
+
+def test_a_declared_level_never_reached_is_none_not_absent():
+    from apex.edgeforge.attack_lab import _path_timing
+    t = _path_timing([0.0, 1.0, 2.0], {"target_pnl": 99.0,
+                                       "invalidation_pnl": -99.0})
+    assert t["time_to_target"] is None
+    assert "never reached" in t["time_to_target_why"]
+    assert t["time_to_invalidation"] is None
+
+
+def _asymmetric_worlds():
+    """Reproduces the real shape: the synthetic source's LEFT tail is
+    slightly harsher than reality while its RIGHT tail is far richer.
+    Compare the two medians and it looks fine."""
+    from apex.edgeforge.multiverse import WorldBranch
+
+    def mk(prefix, method, ped, slopes):
+        return [WorldBranch(
+            branch_id=f"{prefix}{i}", parent_state_hash="p",
+            hypothesis_condition="c", generation_method=method,
+            generation_pedigree=ped,
+            path=tuple((t, 100.0 + d * t) for t in range(10)))
+            for i, d in enumerate(slopes)]
+
+    emp = [-0.30, -0.20, -0.10, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20, 0.25]
+    res = [-0.34, -0.24, -0.12, -0.05, 0.0, 0.05, 0.10, 0.15, 0.20, 3.00]
+    return (mk("emp", "EMPIRICAL_HISTORICAL_ANALOG",
+               "[EMPIRICAL_ANALOG] t", emp)
+            + mk("res", "ADVERSARIAL_STRESS",
+                 "[CAUSAL_RESAMPLED] t", res))
+
+
+def test_asymmetric_bias_is_flagged_where_a_mean_check_would_miss_it():
+    """The resampler's average looked plausible while its right tail
+    was massively richer and its left tail slightly harsher."""
+    from apex.edgeforge.world_foundry import generator_optimism
+    worlds = _asymmetric_worlds()
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand")
+    delta = d["generator_optimism_delta"]["CAUSAL_RESAMPLED"]
+    assert delta["right_tail_delta"] > 0, "richer upside"
+    assert delta["left_tail_delta"] < 0, "harsher downside"
+    assert abs(delta["median_R_delta"]) < abs(delta["right_tail_delta"])
+    assert d["verdict"] == "BIAS_DETECTED"
+    assert any("ASYMMETRIC bias" in f for f in d["flags"])
+    assert any("mean or variance check would have missed" in f
+               for f in d["flags"])
+
+
+def test_deltas_are_reported_by_regime_when_regimes_are_known():
+    """A resampler may be sound in ordinary trend and wild during
+    opening transitions; one global label throws that away."""
+    from apex.edgeforge.world_foundry import generator_optimism
+    worlds = _two_class_worlds()
+    regimes = {w.branch_id: ("OPENING" if int(w.branch_id[-1]) % 2
+                             else "TREND") for w in worlds}
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand",
+                           regime_by_branch=regimes)
+    assert d["regime_stratified"]["stratified"] is True
+    assert set(d["regime_stratified"]["by_regime"]) == {"OPENING",
+                                                        "TREND"}
+    for r in d["regime_stratified"]["by_regime"].values():
+        assert r["verdict"] in ("BIAS_DETECTED", "NO_MATERIAL_BIAS",
+                                "REFERENCE_MISSING")
+
+
+def test_missing_regimes_are_stated_not_assumed_away():
+    from apex.edgeforge.world_foundry import generator_optimism
+    worlds = _two_class_worlds()
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand")
+    rs = d["regime_stratified"]
+    assert rs["stratified"] is False and rs["by_regime"] == {}
+    assert "would be invisible in this global view" in rs["why"]
+
+
+def test_the_diagnostic_carries_each_sources_authority():
+    from apex.edgeforge.world_foundry import generator_optimism
+    worlds = _two_class_worlds()
+    run = evaluate_common(attacks=[_stock()], worlds=worlds)
+    d = generator_optimism(run, worlds, "cand")
+    assert d["authority_note"]["EMPIRICAL_ANALOG"] == \
+        "EDGE_SUPPORT_ELIGIBLE"
+    assert d["authority_note"]["CAUSAL_RESAMPLED"] == "DIAGNOSTIC_ONLY"

@@ -44,6 +44,83 @@ WORLD_CLASSES = ("EMPIRICAL_ANALOG", "CAUSAL_RESAMPLED",
                  "LEARNED_GENERATIVE", "ADVERSARIAL_STRESS",
                  "EXTREME_TAIL_STRESS")
 
+# ==================================================================
+# WORLD SOURCE AUTHORITY
+#
+# THE LAW: a source earns the right to SUPPORT an edge separately from
+# its ability to GENERATE worlds. CAN_GENERATE = YES does not imply
+# CAN_SUPPORT_EDGE = YES.
+#
+# Without this, the multiverse degenerates into "84 worlds = 84 votes",
+# and a source whose path dynamics are wrong buys a candidate more
+# credibility simply by producing more paths. World count is not
+# evidence count.
+#
+# The asymmetry is deliberate and is not a bug: a questionable
+# simulator MAY kill a candidate when the stress it applies is
+# explicitly adversarial, because surviving a harsh unrealistic world
+# was never claimed as proof of anything. The same simulator may NOT
+# rescue or strengthen a candidate until its path dynamics are shown
+# to be credible. Falsification tolerates a pessimistic error;
+# support does not tolerate an optimistic one.
+WORLD_SOURCE_AUTHORITY = ("UNVALIDATED", "DIAGNOSTIC_ONLY",
+                          "FALSIFICATION_ONLY", "EDGE_SUPPORT_ELIGIBLE",
+                          "SUSPENDED")
+
+SOURCE_AUTHORITY = {
+    "EMPIRICAL_ANALOG": {
+        "authority": "EDGE_SUPPORT_ELIGIBLE",
+        "why": "reality's own afternoons; the anchor. Its path "
+               "dynamics are not modelled, they are what happened",
+        "as_of": "2026-08-25"},
+    "CAUSAL_RESAMPLED": {
+        "authority": "DIAGNOSTIC_ONLY",
+        "why": "block bootstrap scored a candidate 40.0% favorable "
+               "where reality scored it 29.6%, with the right tail "
+               "+334 richer while the left tail was slightly harsher. "
+               "It manufactures upside it cannot manufacture downside, "
+               "which is consistent with the bootstrap destroying the "
+               "path structure that caps favorable excursions. Useful "
+               "machinery, not a witness for the defence",
+        "as_of": "2026-08-25",
+        "reinstatement": "demonstrate credible path dynamics -- "
+                         "notably that favorable-excursion structure "
+                         "survives the resampling -- then re-argue"},
+    "LEARNED_GENERATIVE": {
+        "authority": "SUSPENDED",
+        "why": "conditional fidelity failed: ACF1(|r|) -0.006 against "
+               "reality's +0.346 (gap 0.352 on [-1,1]) and mae_median "
+               "3.73x deeper. It reproduces unconditional "
+               "distributional properties while failing to reproduce "
+               "volatility persistence -- a conditional-dynamics "
+               "failure, not a calibration nudge",
+        "as_of": "2026-08-25",
+        "reinstatement": "pass the validation battery; no deadline, "
+                         "and permanent suspension is an acceptable "
+                         "outcome"},
+    "ADVERSARIAL_STRESS": {
+        "authority": "FALSIFICATION_ONLY",
+        "why": "declared degradations, not forecasts. It may kill; it "
+               "may never support. A candidate surviving a stress "
+               "world has not been shown to work -- only not to have "
+               "died there",
+        "as_of": "2026-08-25"},
+    "EXTREME_TAIL_STRESS": {
+        "authority": "FALSIFICATION_ONLY",
+        "why": "deliberately oversampled rare shapes; the sampling is "
+               "chosen, so favorable results in it are an artifact of "
+               "the choice",
+        "as_of": "2026-08-25"},
+}
+
+SUPPORT_ELIGIBLE = tuple(
+    c for c, v in SOURCE_AUTHORITY.items()
+    if v["authority"] == "EDGE_SUPPORT_ELIGIBLE")
+
+LAW_WORLD_COUNT = ("a source's ability to GENERATE worlds is separate "
+                   "from its authority to SUPPORT an edge; world count "
+                   "is not evidence count")
+
 COMPUTE_LADDER = {"SMOKE": 20, "RESEARCH": 200, "DEEP_RESEARCH": 2000}
 
 GENERATIVE_ELIGIBILITY = ("ELIGIBLE", "UNCALIBRATED", "SUSPENDED",
@@ -508,8 +585,159 @@ def results_by_class(run: dict, worlds: list, attack_id: str) -> dict:
             "decision_power": "NONE_RESEARCH"}
 
 
+def class_authority(world_class: str) -> dict:
+    """What a world source is currently permitted to establish."""
+    rec = SOURCE_AUTHORITY.get(world_class)
+    if rec is None:
+        return {"world_class": world_class, "authority": "UNVALIDATED",
+                "why": "unregistered source; an unknown generator has "
+                       "no standing until it argues for some"}
+    return {"world_class": world_class, **rec}
+
+
+def evidence_verdict(per_class: dict, *, statistic: str = "median") -> dict:
+    """Combine per-class results WITHOUT letting a support-ineligible
+    source contribute positive evidence.
+
+    THE RULE THIS ENFORCES. If reality says unfavorable and the
+    resampler says favorable, the answer is NOT "mixed evidence" --
+    that phrasing launders an unqualified source into a tie. The answer
+    is: the eligible evidence is unfavorable, and the disagreeing
+    source is not currently qualified to support anything.
+
+    Disagreement from an ineligible source is still recorded. It is
+    informative about the SOURCE, and may become informative about the
+    candidate later if that source earns standing.
+
+    Direction here is descriptive of this sample only. A favorable
+    direction is not an edge -- baselines and the adversary decide
+    that, and they have their own veto."""
+    if statistic not in ("median", "favorable_fraction"):
+        raise FoundryViolation(f"unsupported statistic {statistic!r}")
+    neutral = 0.0 if statistic == "median" else 0.5
+
+    eligible, ineligible = {}, {}
+    for cls, row in per_class.items():
+        v = row.get(statistic)
+        auth = class_authority(cls)["authority"]
+        bucket = (eligible if auth == "EDGE_SUPPORT_ELIGIBLE"
+                  else ineligible)
+        bucket[cls] = {"authority": auth, statistic: v, "n": row.get("n")}
+
+    if not eligible:
+        return {"kind": "evidence_verdict", "statistic": statistic,
+                "verdict": "NO_SUPPORT_ELIGIBLE_EVIDENCE",
+                "eligible": eligible, "ineligible": ineligible,
+                "reasoning": ["no EDGE_SUPPORT_ELIGIBLE world class is "
+                              "present; nothing here can support a "
+                              "candidate regardless of how favorable "
+                              "the other classes look"],
+                "law": LAW_WORLD_COUNT,
+                "decision_power": "NONE_RESEARCH"}
+
+    vals = [r[statistic] for r in eligible.values()
+            if isinstance(r[statistic], (int, float))]
+    if not vals:
+        direction = "NOT_ESTIMABLE"
+    elif statistics.median(vals) > neutral:
+        direction = "FAVORABLE"
+    elif statistics.median(vals) < neutral:
+        direction = "UNFAVORABLE"
+    else:
+        direction = "NEUTRAL"
+
+    reasoning, disregarded = [], []
+    for cls, r in ineligible.items():
+        v = r[statistic]
+        if isinstance(v, (int, float)) and v > neutral and \
+                direction in ("UNFAVORABLE", "NEUTRAL"):
+            disregarded.append(cls)
+            reasoning.append(
+                f"{cls} is favorable ({statistic}={v}) but carries "
+                f"authority {r['authority']}: it is NOT counted as "
+                f"support, and this is not 'mixed evidence'")
+
+    verdict = {"FAVORABLE": "FAVORABLE_ON_ELIGIBLE_EVIDENCE",
+               "UNFAVORABLE": "UNFAVORABLE_ON_ELIGIBLE_EVIDENCE",
+               "NEUTRAL": "NEUTRAL_ON_ELIGIBLE_EVIDENCE",
+               "NOT_ESTIMABLE": "NOT_ESTIMABLE"}[direction]
+    reasoning.insert(0, f"eligible classes {sorted(eligible)} are "
+                        f"{direction} on {statistic}")
+    if verdict == "FAVORABLE_ON_ELIGIBLE_EVIDENCE":
+        reasoning.append("a favorable direction in eligible worlds is "
+                         "not an edge; baselines and the adversary "
+                         "retain their vetoes")
+    return {"kind": "evidence_verdict", "statistic": statistic,
+            "verdict": verdict,
+            "eligible": eligible, "ineligible": ineligible,
+            "disregarded_positive_support": disregarded,
+            "reasoning": reasoning,
+            "law": LAW_WORLD_COUNT,
+            "decision_power": "NONE_RESEARCH"}
+
+
+OPTIMISM_DELTAS = (
+    "favorable_fraction_delta", "median_R_delta", "mfe_delta",
+    "mae_delta", "left_tail_delta", "right_tail_delta",
+    "invalidation_rate_delta", "time_to_target_delta",
+    "time_to_invalidation_delta")
+
+
+def _optimism_profile(v: dict) -> dict:
+    """Nine-dimensional shape of what a world source produced.
+
+    Mean and variance are not enough. The resampler's average looked
+    plausible while its left tail was slightly harsher and its right
+    tail was massively richer -- a single summary statistic would have
+    reported that as 'roughly realistic'."""
+    p = v["pnl"]
+    srt = sorted(p)
+
+    def med(key):
+        return (round(statistics.median(v[key]), 4) if v[key]
+                else NOT_ESTIMABLE)
+
+    return {
+        "n": len(p),
+        "favorable_fraction": round(sum(1 for x in p if x > 0) / len(p), 4),
+        "median_R": round(statistics.median(p), 2),
+        "left_tail_p10": round(srt[max(0, len(srt) // 10 - 1)], 2),
+        "right_tail_p90": round(srt[min(len(srt) - 1,
+                                        9 * len(srt) // 10)], 2),
+        "mfe_median": med("mfe"), "mae_median": med("mae"),
+        "invalidation_rate": round(sum(1 for x in p if x < 0) / len(p), 4),
+        "time_to_target_median": med("time_to_target"),
+        "time_to_invalidation_median": med("time_to_invalidation"),
+    }
+
+
+def _optimism_delta(prof: dict, ref: dict) -> dict:
+    """Every delta, always the full set. A delta that cannot be
+    computed is reported NOT_ESTIMABLE rather than omitted, so a
+    missing dimension is visible instead of silently absent."""
+    pairs = (("favorable_fraction_delta", "favorable_fraction", 4),
+             ("median_R_delta", "median_R", 2),
+             ("mfe_delta", "mfe_median", 2),
+             ("mae_delta", "mae_median", 2),
+             ("left_tail_delta", "left_tail_p10", 2),
+             ("right_tail_delta", "right_tail_p90", 2),
+             ("invalidation_rate_delta", "invalidation_rate", 4),
+             ("time_to_target_delta", "time_to_target_median", 4),
+             ("time_to_invalidation_delta",
+              "time_to_invalidation_median", 4))
+    out = {}
+    for name, key, nd in pairs:
+        a, b = prof.get(key), ref.get(key)
+        out[name] = (round(a - b, nd)
+                     if isinstance(a, (int, float))
+                     and isinstance(b, (int, float))
+                     else NOT_ESTIMABLE)
+    return out
+
+
 def generator_optimism(run: dict, worlds: list, attack_id: str,
-                       *, reference: str = "EMPIRICAL_ANALOG") -> dict:
+                       *, reference: str = "EMPIRICAL_ANALOG",
+                       regime_by_branch: dict | None = None) -> dict:
     """GENERATOR_OPTIMISM_DIAGNOSTIC — is a world source friendlier
     than reality?
 
@@ -522,74 +750,103 @@ def generator_optimism(run: dict, worlds: list, attack_id: str,
 
     On the first full-stack run the resampler scored a candidate 40.0%
     favorable where reality scored it 29.6% -- exactly the drift this
-    diagnostic exists to keep in view."""
+    diagnostic exists to keep in view.
+
+    WHY BY REGIME. A global label is a blunt instrument. A resampler
+    may be perfectly serviceable in ordinary trending regimes and
+    wildly optimistic during opening transitions, and "invalid" would
+    throw away the half that works while "valid" would license the half
+    that does not. When regimes are supplied the deltas are reported
+    per regime as well as globally; when they are not, that absence is
+    stated rather than assumed away."""
     cls = {w.branch_id: world_class_of(w) for w in worlds}
     outs = run["outcomes"][attack_id]
-    per = {}
-    for bid, o in outs.items():
-        c = cls.get(bid, "UNKNOWN")
-        if not isinstance(o.get("pnl"), (int, float)):
-            continue
-        d = per.setdefault(c, {"pnl": [], "mfe": [], "mae": []})
-        d["pnl"].append(o["pnl"])
-        for k in ("mfe", "mae"):
-            if isinstance(o.get(k), (int, float)):
-                d[k].append(o[k])
+    series = ("mfe", "mae", "time_to_target", "time_to_invalidation")
 
-    def _prof(v):
-        p = v["pnl"]
-        srt = sorted(p)
-        return {
-            "n": len(p),
-            "favorable_fraction": round(
-                sum(1 for x in p if x > 0) / len(p), 4),
-            "median": round(statistics.median(p), 2),
-            "left_tail_p10": round(srt[max(0, len(srt) // 10 - 1)], 2),
-            "right_tail_p90": round(
-                srt[min(len(srt) - 1, 9 * len(srt) // 10)], 2),
-            "mfe_median": (round(statistics.median(v["mfe"]), 2)
-                           if v["mfe"] else NOT_ESTIMABLE),
-            "mae_median": (round(statistics.median(v["mae"]), 2)
-                           if v["mae"] else NOT_ESTIMABLE),
-            "invalidation_rate": round(
-                sum(1 for x in p if x < 0) / len(p), 4)}
+    def _collect(keep=None):
+        per = {}
+        for bid, o in outs.items():
+            if keep is not None and not keep(bid):
+                continue
+            c = cls.get(bid, "UNKNOWN")
+            if not isinstance(o.get("pnl"), (int, float)):
+                continue
+            d = per.setdefault(c, {"pnl": [], **{k: [] for k in series}})
+            d["pnl"].append(o["pnl"])
+            for k in series:
+                if isinstance(o.get(k), (int, float)):
+                    d[k].append(o[k])
+        return {c: _optimism_profile(v) for c, v in per.items()
+                if v["pnl"]}
 
-    profiles = {c: _prof(v) for c, v in per.items() if v["pnl"]}
-    ref = profiles.get(reference)
-    deltas, flags = {}, []
-    if ref:
+    def _compare(profiles):
+        ref = profiles.get(reference)
+        deltas, flags = {}, []
+        if not ref:
+            return deltas, flags, ref
         for c, prof in profiles.items():
             if c == reference:
                 continue
-            d = {
-                "favorable_fraction_delta": round(
-                    prof["favorable_fraction"]
-                    - ref["favorable_fraction"], 4),
-                "median_delta": round(prof["median"] - ref["median"], 2),
-                "left_tail_delta": round(
-                    prof["left_tail_p10"] - ref["left_tail_p10"], 2),
-                "right_tail_delta": round(
-                    prof["right_tail_p90"] - ref["right_tail_p90"], 2)}
+            d = _optimism_delta(prof, ref)
             deltas[c] = d
-            if d["favorable_fraction_delta"] >= 0.10:
+            ff = d["favorable_fraction_delta"]
+            if isinstance(ff, (int, float)) and ff >= 0.10:
+                flags.append(f"{c} is OPTIMISTIC vs reality: favorable "
+                             f"fraction +{ff:.1%}")
+            elif isinstance(ff, (int, float)) and ff <= -0.10:
+                flags.append(f"{c} is PESSIMISTIC vs reality: favorable "
+                             f"fraction {ff:.1%}")
+            rt, lt = d["right_tail_delta"], d["left_tail_delta"]
+            if isinstance(rt, (int, float)) and isinstance(lt, (int, float)) \
+                    and rt > 0 and lt <= 0:
                 flags.append(
-                    f"{c} is OPTIMISTIC vs reality: favorable fraction "
-                    f"+{d['favorable_fraction_delta']:.1%}")
-            elif d["favorable_fraction_delta"] <= -0.10:
-                flags.append(
-                    f"{c} is PESSIMISTIC vs reality: favorable fraction "
-                    f"{d['favorable_fraction_delta']:.1%}")
+                    f"{c} shows ASYMMETRIC bias: right tail {rt:+.2f} "
+                    f"while left tail {lt:+.2f} -- it manufactures "
+                    f"upside it does not manufacture downside, which a "
+                    f"mean or variance check would have missed")
+        return deltas, flags, ref
+
+    profiles = _collect()
+    deltas, flags, ref = _compare(profiles)
+
+    if regime_by_branch:
+        by_regime, regimes = {}, sorted(
+            {r for b, r in regime_by_branch.items() if b in outs})
+        for r in regimes:
+            pr = _collect(lambda b, r=r: regime_by_branch.get(b) == r)
+            dr, fr, rr = _compare(pr)
+            by_regime[r] = {
+                "profiles": pr, "generator_optimism_delta": dr,
+                "flags": fr,
+                "verdict": ("REFERENCE_MISSING" if not rr else
+                            "BIAS_DETECTED" if fr else
+                            "NO_MATERIAL_BIAS")}
+        regime_view = {"stratified": True, "by_regime": by_regime}
+    else:
+        regime_view = {
+            "stratified": False,
+            "why": "no regime labels supplied; a source that is sound "
+                   "in one regime and optimistic in another would be "
+                   "invisible in this global view",
+            "by_regime": {}}
+
     return {"kind": "generator_optimism_diagnostic",
             "attack_id": attack_id, "reference_class": reference,
+            "preserved_deltas": list(OPTIMISM_DELTAS),
             "profiles": profiles,
             "generator_optimism_delta": deltas,
+            "regime_stratified": regime_view,
             "flags": flags,
             "verdict": ("REFERENCE_MISSING" if not ref else
                         "BIAS_DETECTED" if flags else
                         "NO_MATERIAL_BIAS"),
+            "authority_note": {c: class_authority(c)["authority"]
+                               for c in profiles},
             "law": "synthetic sources are not required to match reality "
                    "-- supplying unseen paths is their purpose -- but "
-                   "systematic kindness must never be invisible",
+                   "systematic kindness must never be invisible, and a "
+                   "binary valid/invalid label is less useful than "
+                   "knowing WHERE a source drifts",
             "decision_power": "NONE_RESEARCH"}
 
 

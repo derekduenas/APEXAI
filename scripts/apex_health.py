@@ -3,9 +3,11 @@
 Answers the question nobody asked for seven hours on 2026-08-23.
 
 Exit codes are meant for a timer or a watchdog:
-    0  everything healthy
-    1  something needs attention
+    0  everything healthy (including services idle by design)
+    1  degraded -- something is late but present
     2  the release itself cannot be accounted for
+    3  critical -- something expected is gone, looping, or running
+       when it should not be
 """
 from __future__ import annotations
 
@@ -27,6 +29,18 @@ SERVICES = {
     "options-paper": {"beat_stale_s": 1800, "work_stale_s": None},
     "btc-stream": {"beat_stale_s": 300, "work_stale_s": 900},
 }
+
+# EXPECTED LIFECYCLE, declared per service via
+#   APEX_SERVICE_LIFECYCLE="options-acquire=EXPECTED_ON_DEMAND,..."
+#
+# THE DEFAULT IS DELIBERATELY STRICT. Anything not declared is assumed
+# EXPECTED_RUNNING, so a service nobody thought about can still alarm.
+# The two failure directions are not symmetric: a false alarm at
+# midnight is annoying, while a session daemon dying at 10:09 and
+# reporting EXPECTED_IDLE is the seven-hour silence all of this exists
+# to prevent. Silence is the expensive error, so absence of a
+# declaration buys noise, never quiet.
+DEFAULT_LIFECYCLE = "EXPECTED_RUNNING"
 
 
 def main() -> int:
@@ -55,7 +69,14 @@ def main() -> int:
         names = [n.strip() for n in expected.split(",") if n.strip()]
     else:
         names = list(SERVICES)
+    lifecycles = {}
+    for item in (os.environ.get("APEX_SERVICE_LIFECYCLE") or "").split(","):
+        if "=" in item:
+            k, _, v = item.partition("=")
+            lifecycles[k.strip()] = v.strip()
     reports = [hb.health(n, root=root,
+                         expected_lifecycle=lifecycles.get(
+                             n, DEFAULT_LIFECYCLE),
                          **SERVICES.get(n, {"beat_stale_s": 900}))
                for n in names]
     summary = hb.summarize(reports)
@@ -70,12 +91,17 @@ def main() -> int:
         print(f"release: {relrep['verdict']}"
               f"{' -- ' + '; '.join(relrep['findings']) if relrep.get('findings') else ''}")
         for r in reports:
-            print(f"  {r['service']:20} {r['state']:14} {r['why']}")
+            print(f"  {r['service']:20} {r['state']:18} "
+                  f"[{r.get('severity', '?')}] {r['why']}")
         print(f"verdict: {summary['verdict']}")
 
     if relrep["verdict"] not in ("RELEASE_HEALTHY",):
         return 2
-    return 0 if summary["verdict"] == "ALL_HEALTHY" else 1
+    # 0 healthy · 1 degraded · 3 critical. A watchdog that cannot tell
+    # "a scanner is late" from "the daemon is gone" pages the same way
+    # for both, and then stops being read.
+    return {"ALL_HEALTHY": 0, "DEGRADED": 1, "CRITICAL": 3}.get(
+        summary["verdict"], 1)
 
 
 if __name__ == "__main__":

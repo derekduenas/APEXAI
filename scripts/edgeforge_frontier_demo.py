@@ -47,9 +47,9 @@ from apex.edgeforge.scaling import (                        # noqa: E402
 from apex.edgeforge.self_critic import critique             # noqa: E402
 from apex.edgeforge.world_foundry import (                  # noqa: E402
     ConditionalStateSpaceGenerator, causal_resampled_worlds,
-    generative_health, generator_optimism, memorization_test,
-    results_by_class, triangulate, validate_generated_worlds,
-    world_set_hash)
+    class_authority, evidence_verdict, generative_health,
+    generator_optimism, memorization_test, results_by_class,
+    triangulate, validate_generated_worlds, world_set_hash)
 from apex.governance.verification import stamp              # noqa: E402
 
 ALPACA = "https://data.alpaca.markets/v2"
@@ -247,8 +247,19 @@ def main() -> int:
     # kinder than reality manufactures confidence; one that is harsher
     # manufactures despair. Neither is corrected here -- the difference
     # is measured and carried forward, permanently visible.
-    optimism = generator_optimism(tourney, worlds, put.attack_id)
+    # Regime labels ride on empirical branches via source_session. A
+    # source can be sound in ordinary trend and wild in transitions,
+    # and one global verdict would average that distinction away.
+    regime_by_branch = {w.branch_id: regimes.get(w.source_session,
+                                                 "UNLABELLED")
+                        for w in worlds}
+    optimism = generator_optimism(tourney, worlds, put.attack_id,
+                                  regime_by_branch=regime_by_branch)
     run.stage("GENERATOR_OPTIMISM", optimism)
+    # A DIAGNOSTIC_ONLY source may not make this candidate look better
+    # than reality says it is.
+    ev = evidence_verdict(by_class["per_class"])
+    run.stage("EVIDENCE_VERDICT", ev)
     ar = arena(candidate=put, baselines=build_baselines(entry=spot),
                worlds=worlds, evaluate_common=evaluate_common,
                summarize_attack=summarize_attack)
@@ -377,6 +388,9 @@ def main() -> int:
                "generator_fit": fit, "generative_validation": gval,
                "memorization": gmem, "generative_health": ghealth,
                "generator_optimism": optimism,
+               "evidence_verdict": ev,
+               "world_source_authority": {
+                   c: class_authority(c) for c in by_class["per_class"]},
                "attack_summary": put_summary, "by_world_class": by_class,
                "baseline_arena": ar, "adversary": adv,
                "residual_search": resid, "self_critique": crit,
@@ -397,6 +411,9 @@ def main() -> int:
         "by_class": by_class["per_class"], "class_flag": by_class["flag"],
         "arena": ar["verdict"], "adversary": adv["verdict"],
         "generator_optimism": optimism["verdict"],
+        "evidence_verdict": ev["verdict"],
+        "disregarded_positive_support":
+            ev.get("disregarded_positive_support", []),
         "fragile_under": adv["fragile_under"],
         "residual": resid["verdict"],
         "critique": crit["research_confidence"],
