@@ -329,7 +329,7 @@ def main() -> int:
 
     record_result(reg, discovery_id="CHRONOS_DEMO_FOLD_SEARCH",
                   status=("NULL_RESULT" if not real_hits else
-                          "CANDIDATE"),
+                          "CANDIDATE_EDGE"),
                   result={"real_discoveries": len(real_hits),
                           "shadow_discoveries": len(shadow_hits),
                           "zone_b": zb.get("verdict"),
