@@ -282,4 +282,54 @@ here than anywhere, because the number being improved would be our own
 report card. A corrected instrument earns a new lineage (EXAM_001),
 and EXAM_000 keeps its defect on the record.
 
+## 9. EXAM_001 — the corrected ruler, and an interpretable power map
+
+New birth (2026-08-26), predeclared Welch studentized separation
+before any outcome existed. Same eight families, same search space,
+same defenses. Only the ruler changed — and the ruler was the thing
+that was broken.
+
+| family | effect | t | p̂ | outcome |
+|---|---|---|---|---|
+| SIMPLE_STRONG | 0.80 | 8.12 | 0.005 | **TRUE_POSITIVE** (MARGINAL f0) |
+| SIMPLE_MODERATE | 0.35 | 4.08 | 0.005 | **TRUE_POSITIVE** (truth feature f1) |
+| SEQUENCE_EDGE | 0.50 | 4.81 | 0.005 | FALSE_NEGATIVE — see below |
+| SIMPLE_WEAK | 0.12 | −3.60 | 0.030 | **APPROPRIATE_ABSTENTION** — see below |
+| DECAYING_EDGE | 0.60→0 | 2.97 | 0.264 | FALSE_NEGATIVE |
+| REGIME_CONDITIONAL | 0.55 | 2.51 | 0.632 | FALSE_NEGATIVE — anomaly noted |
+| INTERACTION_ONLY | 0.50 | 2.29 | 0.826 | FALSE_NEGATIVE |
+| NULL_FAMILY | 0.00 | −2.92 | 0.303 | **TRUE_NEGATIVE** |
+
+**EXAM_000's defect is confirmed fixed:** SIMPLE_MODERATE flipped from
+a noise-cell false negative to a clean detection of its true feature.
+Zero false positives, zero wrong-feature detections, null rejected.
+
+**Three findings, recorded rather than patched:**
+
+1. **SEQUENCE_EDGE is an instrument finding, not a scientist failure.**
+   Discovery found the *exactly correct* expression — `TRANSITION(f6)`
+   at t=4.81, p̂=0.005 — and validation returned t=+0.50: the 20%
+   session holdout contains too few *transition events* to confirm a
+   rare-event edge. Validation is session-count-aware where it needs
+   to be event-count-aware. Registered for EXAM_002 design; NOT
+   patched and re-run tonight, because tuning the exam after seeing
+   its outcomes is the laundering this lab exists to prevent.
+2. **SIMPLE_WEAK shows defense-in-depth working.** Discovery admitted
+   one noise expression (p̂=0.030 — one α=0.05 hit across eight
+   families ≈ the 0.4 expected) and the validation layer refused to
+   studentize the thin cell, killing it. Final outcome: correct
+   abstention.
+3. **REGIME_CONDITIONAL carries an unresolved anomaly.** The true
+   expression `REGIME_A(f5)` measured t=1.96 where a back-of-envelope
+   predicts ≈4. The discrepancy is logged as open — asserting either
+   "underpowered" or "exam bug" without resolving it would be a
+   narrative.
+
+**Verdict: `FAMILY_DEPENDENT`, now interpretable** — strong and
+moderate marginal signal detected; rare-event, interaction, decayed
+and half-sample conditional shapes sit below the power of an
+85-expression search at n=720 with this validation design; weak
+correctly abstained; nonsense still rejected. Research power is now
+MEASURED for marginal shapes and BOUNDED for the rest.
+
 **CHRONOS educates. Reality examines. The lockbox waits.**

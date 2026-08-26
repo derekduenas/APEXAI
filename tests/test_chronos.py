@@ -1006,3 +1006,36 @@ def test_every_declared_family_has_truth_and_an_effect_size():
         assert f in EFFECT and f in TRUTH_FEATURE
     with pytest.raises(ExamViolation):
         ControlUniverse(family="WISHFUL_THINKING")
+
+
+# ============ EXAM_001 — the corrected ruler (predeclared 2026-08-26)
+
+def test_the_studentized_statistic_penalizes_small_cells():
+    """EXAM_000's defect: a half-sample regime cell's noisy raw
+    separation beat a full-sample truth. Studentization charges for
+    the smaller n."""
+    from scripts.chronos_exam_001 import studentized
+    from apex.edgeforge.world_foundry import _Rng
+    rng = _Rng(5)
+    big_signal = [(i / 720, (0.6 if i > 576 else 0.0) + rng.normal())
+                  for i in range(720)]
+    small_noise = [(i / 80, rng.normal()) for i in range(80)]
+    t_big = studentized(big_signal)
+    t_small = studentized(small_noise)
+    assert t_big is not None and abs(t_big) > 3.0
+    assert t_small is None or abs(t_small) < abs(t_big)
+
+
+def test_a_cell_too_thin_to_studentize_is_refused_not_guessed():
+    from scripts.chronos_exam_001 import studentized
+    assert studentized([(0.1, 1.0)] * 30) is None      # < 3*MIN_CELL
+    assert studentized([]) is None
+
+
+def test_exam_001_is_a_new_birth_not_a_reinterpretation():
+    from pathlib import Path as _P
+    src = _P("scripts/chronos_exam_001.py").read_text()
+    assert "NEW BIRTH" in src
+    assert "PREDECLARED" in src
+    assert "not adjustable in response" in src
+    assert "EXAM_000" in src and "contaminated" in src
