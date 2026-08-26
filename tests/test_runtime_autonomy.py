@@ -171,7 +171,28 @@ def test_options_paper_is_required_for_arm():
     op = next(s for s in default_roster("cloud")
               if s.name == "options-paper")
     assert op.required_for_arm is True
-    assert "theta-terminal" in op.dependencies
+    assert op.phases_running == ("RTH",)
+
+
+def test_the_roster_does_not_invent_dependencies():
+    """An earlier draft required a ThetaTerminal the options session
+    never uses. A roster that invents a dependency reports CRITICAL
+    forever for a service that should not exist."""
+    names = {s.name for s in default_roster("cloud")}
+    assert "theta-terminal" not in names
+    for s in default_roster("cloud"):
+        for d in s.dependencies:
+            assert d in names, f"{s.name} depends on unrostered {d}"
+
+
+def test_the_calendar_owns_triggering_and_systemd_owns_supervision():
+    """systemd OnCalendar cannot express holidays or half-days, so the
+    orchestrator triggers; Restart=on-failure then supervises."""
+    op = next(s for s in default_roster("cloud")
+              if s.name == "options-paper")
+    assert op.supervised_by == "orchestrator"
+    assert op.externally_supervised is False
+    assert "systemctl" in " ".join(op.start_cmd)
 
 
 # ==================================================== OUTBOX

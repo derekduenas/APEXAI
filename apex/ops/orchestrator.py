@@ -277,24 +277,27 @@ def default_roster(host: str = "mac") -> list:
             f"unknown host {host!r}; a roster must know which machine "
             f"it is describing")
     if host == "cloud":
+        # NO theta-terminal. An earlier draft of this roster listed it
+        # as a required dependency on the assumption that the options
+        # predator needed it; reading the session script showed the
+        # only "theta" it mentions is the Greek. A roster that invents
+        # a dependency reports CRITICAL forever for a service that
+        # should not exist, which is a false alarm of exactly the kind
+        # that trains an operator to stop reading alarms.
         return [
-            ServiceSpec(name="theta-terminal",
-                        phases_running=("PREOPEN", "SESSION_ARMED",
-                                        "RTH"),
-                        start_cmd=("/opt/apex/current/ops/"
-                                   "theta_terminal.sh",),
-                        first_work_deadline_s=300, beat_stale_s=600,
-                        work_stale_s=None, required_for_arm=True,
-                        supervised_by="systemd"),
             ServiceSpec(name="options-paper",
                         phases_running=("RTH",),
-                        start_cmd=("/opt/apex/shared/venv/bin/python",
-                                   "/opt/apex/current/scripts/"
-                                   "options_paper_session.py"),
-                        first_work_deadline_s=600, beat_stale_s=1800,
+                        # the orchestrator TRIGGERS (it alone knows the
+                        # exchange calendar, incl. holidays and
+                        # half-days, which a systemd OnCalendar cannot
+                        # express); systemd then SUPERVISES via
+                        # Restart=on-failure
+                        start_cmd=("/usr/bin/sudo", "-n",
+                                   "/usr/bin/systemctl", "start",
+                                   "apex-options-paper.service"),
+                        first_work_deadline_s=900, beat_stale_s=1800,
                         work_stale_s=3600, required_for_arm=True,
-                        dependencies=("theta-terminal",),
-                        supervised_by="systemd"),
+                        supervised_by="orchestrator"),
         ]
     return [
         ServiceSpec(name="equity-fabric",

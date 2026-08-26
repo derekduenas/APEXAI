@@ -31,6 +31,15 @@ from apex.ops.orchestrator import (StartAttempt, default_roster,  # noqa: E402
                                    missed_start_verdict, phase_at,
                                    reconcile_expected)
 
+
+def detect_host() -> str:
+    """Which machine am I? Declared by env, else inferred from the
+    immutable release root that only the cloud host has."""
+    env = os.environ.get("APEX_HOST")
+    if env:
+        return env
+    return "cloud" if Path("/opt/apex/current").exists() else "mac"
+
 TICK_S = 60
 LEDGER = Path("results/ops/orchestrator.jsonl")
 MAX_RECOVERY_ATTEMPTS = 3
@@ -56,7 +65,6 @@ def process_running(name: str) -> bool:
     pats = {
         "equity-fabric": "alpaca_fabric",
         "options-paper": "options_paper_session",
-        "theta-terminal": "ThetaTerminal",
         "edgeforge-observatory": "edgeforge_observatory",
         "btc-paper": "btc_paper_session",
     }
@@ -103,7 +111,7 @@ def tick(state: dict, *, dry_run: bool) -> dict:
     session = session_of(t)
     ph = phase_at(t, session)
     phase = ph["phase"]
-    specs = default_roster()
+    specs = default_roster(state["host"])
     observed = {s.name: process_running(s.name) for s in specs}
     rec = reconcile_expected(phase=phase, specs=specs,
                              observed_running=observed)
@@ -151,6 +159,7 @@ def tick(state: dict, *, dry_run: bool) -> dict:
             incidents.append(v)
 
     out = {"kind": "orchestrator_tick", "at": t.isoformat(),
+           "host": state["host"],
            "session": session, "phase": phase, "why": ph["why"],
            "trading_day": ph.get("trading_day"),
            "half_day": ph.get("half_day"),
@@ -173,12 +182,13 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args()
-    state: dict = {"attempts": {}}
+    state: dict = {"attempts": {}, "host": detect_host()}
     beat = hb.Heartbeat(service="orchestrator")
     if a.once:
         r = tick(state, dry_run=a.dry_run)
         print(json.dumps(r, indent=1, default=str) if a.json else
-              f"{r['phase']:14} {r['reconciliation']['verdict']:9} "
+              f"{r['host']:6} {r['phase']:14} "
+              f"{r['reconciliation']['verdict']:9} "
               f"missing={r['reconciliation']['missing']} "
               f"incidents={len(r['incidents'])}")
         return 0 if not r["incidents"] else 3
