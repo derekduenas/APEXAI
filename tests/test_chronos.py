@@ -912,3 +912,97 @@ def test_no_replay_can_ever_claim_a_proven_edge():
     with pytest.raises(ChronosViolation, match="structurally incapable"):
         campaign_status(process_qualified=True,
                         economic_edge_proven=True)
+
+
+# ============ CAMPAIGN #004 — RESEARCH POWER (positive controls)
+
+from apex.chronos.exam import (CONTROL_LABEL, EFFECT, FAMILIES,
+                               TRUTH_FEATURE, ControlUniverse,
+                               ExamViolation, grade, power_report)
+
+
+def test_ground_truth_is_fixed_before_any_run():
+    u = ControlUniverse(family="SIMPLE_STRONG", n_sessions=200)
+    gt = u.ground_truth()
+    assert gt["truth_features"] == ["f0"]
+    assert gt["has_real_signal"] is True
+    assert gt["label"] == CONTROL_LABEL
+
+
+def test_control_findings_can_never_become_edge_dna():
+    g = grade(family="SIMPLE_STRONG", detected=True,
+              detected_features=("f0",), verdict="DISCOVERY")
+    assert g["label"] == "POSITIVE_CONTROL_ONLY"
+    r = power_report([g])
+    assert "never become EdgeDNA" in r["no_edge_authority"]
+
+
+def test_the_universe_is_reproducible_to_the_value():
+    a = ControlUniverse(family="SIMPLE_MODERATE", n_sessions=120)
+    b = ControlUniverse(family="SIMPLE_MODERATE", n_sessions=120)
+    assert a.outcomes == b.outcomes and a.features == b.features
+
+
+def test_interaction_only_really_has_no_marginal_signal():
+    """If a marginal carried it, the family would test nothing."""
+    import statistics as st
+    u = ControlUniverse(family="INTERACTION_ONLY", n_sessions=900)
+    for f in ("f3", "f4"):
+        pairs = sorted(((u.features[s][f], u.outcomes[s])
+                        for s in u.sessions), key=lambda p: p[0])
+        cut = len(pairs) * 4 // 5
+        sep = (st.median([o for _v, o in pairs[cut:]])
+               - st.median([o for _v, o in pairs[:cut]]))
+        assert abs(sep) < 0.35, f"{f} leaks a marginal edge: {sep}"
+
+
+def test_the_null_family_carries_nothing():
+    u = ControlUniverse(family="NULL_FAMILY", n_sessions=300)
+    assert u.ground_truth()["has_real_signal"] is False
+    assert EFFECT["NULL_FAMILY"] == 0.0
+    assert TRUTH_FEATURE["NULL_FAMILY"] == ()
+
+
+def test_abstaining_at_the_noise_floor_is_correct_not_a_failure():
+    g = grade(family="SIMPLE_WEAK", detected=False,
+              detected_features=(), verdict="NOT_DISCOVERED")
+    assert g["outcome"] == "APPROPRIATE_ABSTENTION"
+
+
+def test_a_null_detection_is_a_false_positive():
+    g = grade(family="NULL_FAMILY", detected=True,
+              detected_features=("f2",), verdict="DISCOVERY")
+    assert g["outcome"] == "FALSE_POSITIVE"
+    r = power_report([g])
+    assert r["verdict"] == "OVER_PERMISSIVE"
+
+
+def test_finding_the_wrong_feature_is_not_a_true_positive():
+    g = grade(family="SIMPLE_STRONG", detected=True,
+              detected_features=("f7",), verdict="DISCOVERY")
+    assert g["outcome"] == "DETECTED_WRONG_FEATURE"
+
+
+def test_detecting_nothing_real_is_over_conservative():
+    gs = [grade(family=f, detected=False, detected_features=(),
+                verdict="NOT_DISCOVERED")
+          for f in ("SIMPLE_STRONG", "SIMPLE_MODERATE",
+                    "INTERACTION_ONLY", "NULL_FAMILY")]
+    assert power_report(gs)["verdict"] == "OVER_CONSERVATIVE"
+
+
+def test_power_is_never_reported_without_specificity():
+    r = power_report([grade(family="SIMPLE_STRONG", detected=True,
+                            detected_features=("f0",),
+                            verdict="DISCOVERY")])
+    for k in ("true_positives", "false_negatives",
+              "false_positives_on_nulls", "detection_curve"):
+        assert k in r
+    assert "meaningless without" in r["law"]
+
+
+def test_every_declared_family_has_truth_and_an_effect_size():
+    for f in FAMILIES:
+        assert f in EFFECT and f in TRUTH_FEATURE
+    with pytest.raises(ExamViolation):
+        ControlUniverse(family="WISHFUL_THINKING")

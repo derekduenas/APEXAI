@@ -235,4 +235,51 @@ scientist's ledger now reads: one idea, tested 25 times, its best run
 explained by the market it sat in. That is not a failure of the
 scientist — it is the scientist finally being able to say so.
 
+## 8. Campaign #004 (EXAM_000) — specificity confirmed, power UNANSWERED
+
+Eight predeclared families, ground truth fixed before the run, all
+Campaign #003 defenses active (poison, complexity-matched nulls,
+exceedance-rank testing, freeze-then-validate).
+
+| family | effect (sd) | p̂ | outcome |
+|---|---|---|---|
+| SIMPLE_STRONG | 0.80 | 0.005 | **TRUE_POSITIVE** |
+| REGIME_CONDITIONAL | 0.55 | 0.010 | **TRUE_POSITIVE** |
+| SIMPLE_MODERATE | 0.35 | 0.070 | FALSE_NEGATIVE |
+| INTERACTION_ONLY | 0.50 | 0.129 | FALSE_NEGATIVE |
+| DECAYING_EDGE | 0.60 | 0.254 | FALSE_NEGATIVE |
+| SEQUENCE_EDGE | 0.50 | 0.502 | FALSE_NEGATIVE |
+| SIMPLE_WEAK | 0.12 | 0.294 | **APPROPRIATE_ABSTENTION** |
+| NULL_FAMILY | 0.00 | 0.861 | **TRUE_NEGATIVE** |
+
+**What this run does establish — specificity.** Zero false positives
+on the known-empty family, and correct abstention at the 0.12sd noise
+floor. Those two results do not depend on which expression the search
+picked, so they stand.
+
+**What it does NOT establish — power. The instrument is defective.**
+Inspecting the argmax exposes it: for `SIMPLE_MODERATE` the truth is
+a marginal on `f1`, and the winning expression was
+`REGIME_A(f4)` — pure noise. For `INTERACTION_ONLY` (truth = f3×f4)
+the winner was `REGIME_A(f4)`, a marginal that cannot carry a product.
+The cause is structural: **regime-conditioned expressions evaluate on
+half the sample, so their median separation is noisier and wins a raw
+|separation| argmax by chance.** The selection statistic is biased
+toward small-n expressions, which contaminates every FALSE_NEGATIVE
+in the table.
+
+So the honest verdict is not "the scientist is underpowered." It is:
+
+> **RESEARCH POWER REMAINS UNMEASURED.** The exam's selection
+> statistic must be sample-size aware (a t-like normalization, or
+> comparison only within equal-n strata) before any power claim can
+> be made.
+
+**This run is preserved as EXAM_000, not re-run into a nicer number.**
+Re-running a contaminated instrument until the scientist looks good is
+the exact laundering CHRONOS exists to prevent — and it would be worse
+here than anywhere, because the number being improved would be our own
+report card. A corrected instrument earns a new lineage (EXAM_001),
+and EXAM_000 keeps its defect on the record.
+
 **CHRONOS educates. Reality examines. The lockbox waits.**
