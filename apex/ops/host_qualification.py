@@ -40,7 +40,16 @@ HOST_INCIDENTS = Path("results/host/host_incidents.jsonl")
 
 
 def on_ac_power() -> tuple:
-    """macOS: `pmset -g batt` reports the power source in line 1."""
+    """macOS: `pmset -g batt` reports the power source in line 1.
+
+    On a datacenter VM there is no battery to be on, so the check is
+    NOT_APPLICABLE rather than a failure -- which is the entire point
+    of moving the fabric off a laptop. Reporting a mains-powered host
+    as "power unreadable" would block the very migration that fixed
+    the problem."""
+    if shutil.which("pmset") is None:
+        return True, "NOT_APPLICABLE -- no battery on this host " \
+                     "(datacenter VM); mains power assumed"
     try:
         out = subprocess.run(["pmset", "-g", "batt"],
                              capture_output=True, text=True,

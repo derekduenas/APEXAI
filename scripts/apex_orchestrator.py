@@ -126,9 +126,12 @@ def tick(state: dict, *, dry_run: bool) -> dict:
     # HOST QUALIFICATION gates the equity commissioning day on the
     # Mac only: a battery/network-degraded host produces a number
     # nobody can interpret, and burns a prospective session doing it.
+    # The gate follows the FABRIC, not a particular machine: equity
+    # now runs on DigitalOcean, so qualifying the Mac would check a
+    # host that no longer carries a market day.
+    runs_equity = any(sp.name == "equity-fabric" for sp in specs)
     host_q = None
-    if state["host"] == "mac" and phase in ("PREOPEN", "SESSION_ARMED",
-                                            "RTH"):
+    if runs_equity and phase in ("PREOPEN", "SESSION_ARMED", "RTH"):
         host_q = qualify_host(
             fabric_ready=(observed.get("equity-fabric", False)
                           and first_work_seen("equity-fabric")))
