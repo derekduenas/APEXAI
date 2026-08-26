@@ -634,7 +634,17 @@ class AlpacaRealtimeFabric:
                 # never the old hardcoded NETWORK_RECONNECT. When no
                 # evidence exists, say UNKNOWN and attach what raw
                 # observations there are.
-                recent = 3.0 * (PING_INTERVAL_S + PING_TIMEOUT_S)
+                # PING_TIMEOUT_S is None BY LAW (the library pong-kill is
+                # deliberately disabled), so it must never be summed
+                # naively. From 2026-08-24 to 2026-08-25 this line raised
+                # TypeError on EVERY reconnect, before persist() was ever
+                # reached: 50 reconnect counter increments produced 0
+                # event records across two prospective sessions, and the
+                # cause of every one of them is now permanently
+                # unrecoverable. The recovery handler worked perfectly and
+                # logged 37 LEDGER_WRITE errors -- which is how this was
+                # found. Code that "looks correct" is not evidence it ran.
+                recent = 3.0 * (PING_INTERVAL_S + (PING_TIMEOUT_S or 0))
                 err_recent = (err_at is not None
                               and time.time() - err_at < recent)
                 close_recent = (close_at is not None

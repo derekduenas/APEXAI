@@ -35,8 +35,23 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-HEARTBEAT_DIR = Path(os.environ.get("APEX_HEARTBEAT_DIR",
-                                    "/apex-data/core/heartbeats"))
+def _default_heartbeat_dir() -> Path:
+    """Where heartbeats live, WITHOUT requiring anyone to remember an
+    env var. The cloud has /apex-data; the Mac does not, and on macOS
+    the root filesystem is read-only, so the old default raised
+    OSError on every write. A default that only works on one host is
+    the same "someone must remember" failure class that lost a
+    session."""
+    env = os.environ.get("APEX_HEARTBEAT_DIR")
+    if env:
+        return Path(env)
+    cloud = Path("/apex-data/core/heartbeats")
+    if cloud.parent.parent.exists():
+        return cloud
+    return Path(__file__).resolve().parents[2] / "results/ops/heartbeats"
+
+
+HEARTBEAT_DIR = _default_heartbeat_dir()
 
 HEALTH_STATES = ("HEALTHY", "STARTING", "STALLED", "STALE", "DEAD",
                  "WRONG_RELEASE", "NEVER_STARTED", "RESTART_LOOPING",
