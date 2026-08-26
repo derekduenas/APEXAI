@@ -149,4 +149,10 @@ def test_mission_control_flags_and_exits_nonzero_on_unmeasured_rows():
     # what we pin is the MECHANISM: flags present iff exit nonzero
     flagged = "row(s) flagged" in r.stdout
     assert (r.returncode == 1) == flagged
-    assert "UNKNOWN" in r.stdout or "ABSENT" in r.stdout or flagged is False
+    # NOT_LOADED joined this set on 2026-08-26: with DigitalOcean
+    # canonical and MAC_RUNTIME_AUTHORITY = NONE, an empty Mac
+    # launchd roster is the CORRECT reading for a dev console, and
+    # mission_control rightly flags it as unmeasured rather than
+    # calling an absent scheduler healthy.
+    assert ("UNKNOWN" in r.stdout or "ABSENT" in r.stdout
+            or "NOT_LOADED" in r.stdout or flagged is False)

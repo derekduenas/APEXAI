@@ -136,29 +136,42 @@ def test_both_failure_directions_are_critical():
     assert r2["verdict"] == "CRITICAL"
 
 
-def test_a_roster_must_know_which_machine_it_describes():
-    """ThetaTerminal exists only on the cloud; a host-blind roster
-    would try forever to start options on a Mac that cannot run it."""
-    mac = {s.name for s in default_roster("mac")}
+def test_the_mac_holds_no_runtime_authority():
+    """DIGITALOCEAN IS APEX HOME (2026-08-26). The Mac roster is EMPTY
+    by law -- not small, empty -- because 175 battery incidents and 75
+    progression stalls proved a laptop cannot carry a market day."""
+    from apex.ops.orchestrator import (DIGITALOCEAN_RUNTIME_AUTHORITY,
+                                       MAC_RUNTIME_AUTHORITY)
+    assert MAC_RUNTIME_AUTHORITY == "NONE"
+    assert DIGITALOCEAN_RUNTIME_AUTHORITY == "CANONICAL"
+    assert default_roster("mac") == []
     cloud = {s.name for s in default_roster("cloud")}
-    assert "options-paper" in cloud and "options-paper" not in mac
-    assert "equity-fabric" in mac and "equity-fabric" not in cloud
+    assert {"equity-fabric", "options-paper", "btc-paper",
+            "edgeforge-observatory"} <= cloud
     with pytest.raises(OrchestratorViolation, match="which machine"):
         default_roster("laptop2")
+
+
+def test_no_cloud_service_references_a_mac_path():
+    """A single /Users/ path in the roster would reintroduce the
+    dependency this migration exists to remove."""
+    for s in default_roster("cloud"):
+        joined = " ".join(s.start_cmd)
+        assert "/Users/" not in joined, f"{s.name} still points at the Mac"
+        assert joined, f"{s.name} has no start_cmd"
 
 
 def test_every_service_declares_how_to_start_itself():
     """A spec without a start_cmd cannot be auto-recovered, which is
     the whole failure this phase exists to remove."""
-    for host in ("mac", "cloud"):
-        for s in default_roster(host):
-            assert s.start_cmd, f"{s.name} has no start_cmd"
+    for s in default_roster("cloud"):
+        assert s.start_cmd, f"{s.name} has no start_cmd"
 
 
 def test_edgeforge_is_an_always_on_sidecar_not_a_session_job():
     """Tying research observation to a market-open scheduler is what
     lost Tuesday."""
-    ef = next(s for s in default_roster("mac")
+    ef = next(s for s in default_roster("cloud")
               if s.name == "edgeforge-observatory")
     assert ef.always_on is True
     for phase in ("IDLE", "PREOPEN", "SESSION_ARMED", "RTH",
@@ -379,9 +392,8 @@ def test_every_spec_name_matches_a_real_heartbeat_identity():
     The btc spec said 'btc-loop' while the daemon writes 'btc-paper',
     so first_work_seen() always read ABSENT and the sentinel would
     have fired a false SESSION_MISSED_START every session."""
-    import subprocess
     from apex.ops.orchestrator import default_roster
-    names = {s.name for s in default_roster("mac")}
+    names = {s.name for s in default_roster("cloud")}
     assert "btc-paper" in names and "btc-loop" not in names
     # and the daemon's pgrep map must cover every spec it verifies
     src = Path("scripts/apex_orchestrator.py").read_text()
