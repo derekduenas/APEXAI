@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from apex.governance.chain_ledger import chain_append          # noqa: E402
 from apex.ops import heartbeat as hb                           # noqa: E402
+from apex.ops.host_qualification import qualify_host           # noqa: E402
 from apex.ops.orchestrator import (StartAttempt, default_roster,  # noqa: E402
                                    missed_start_verdict, phase_at,
                                    reconcile_expected)
@@ -122,6 +123,16 @@ def tick(state: dict, *, dry_run: bool) -> dict:
         state["attempts"] = {}
     elapsed = time.time() - state.get("phase_started", time.time())
 
+    # HOST QUALIFICATION gates the equity commissioning day on the
+    # Mac only: a battery/network-degraded host produces a number
+    # nobody can interpret, and burns a prospective session doing it.
+    host_q = None
+    if state["host"] == "mac" and phase in ("PREOPEN", "SESSION_ARMED",
+                                            "RTH"):
+        host_q = qualify_host(
+            fabric_ready=(observed.get("equity-fabric", False)
+                          and first_work_seen("equity-fabric")))
+
     actions, incidents = [], []
     for s in specs:
         exp = s.expected_lifecycle(phase)
@@ -169,8 +180,12 @@ def tick(state: dict, *, dry_run: bool) -> dict:
                               "unexpectedly_running":
                                   rec["unexpectedly_running"]},
            "actions": actions, "incidents": incidents,
+           "host_qualification": ({"verdict": host_q["verdict"],
+                                   "blocking": host_q["blocking"]}
+                                  if host_q else None),
            "decision_power": "NONE_OPERATIONAL"}
-    if actions or incidents or rec["verdict"] != "OK":
+    if (actions or incidents or rec["verdict"] != "OK"
+            or (host_q and host_q["verdict"] == "SAFE_BLOCKED")):
         LEDGER.parent.mkdir(parents=True, exist_ok=True)
         chain_append(LEDGER, out)
     return out
@@ -190,7 +205,8 @@ def main() -> int:
               f"{r['host']:6} {r['phase']:14} "
               f"{r['reconciliation']['verdict']:9} "
               f"missing={r['reconciliation']['missing']} "
-              f"incidents={len(r['incidents'])}")
+              f"incidents={len(r['incidents'])} "
+              f"host={(r.get('host_qualification') or {}).get('verdict')}")
         return 0 if not r["incidents"] else 3
     while True:
         try:

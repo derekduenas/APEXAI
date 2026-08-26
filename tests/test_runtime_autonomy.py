@@ -387,3 +387,61 @@ def test_every_spec_name_matches_a_real_heartbeat_identity():
     src = Path("scripts/apex_orchestrator.py").read_text()
     for n in names:
         assert f'"{n}"' in src, f"{n} has no process pattern"
+
+
+# ============ HOST QUALIFICATION (operator, 2026-08-26)
+# "Do not call a battery/network-degraded day a valid commissioning
+#  session."
+
+from apex.ops.host_qualification import (qualify_host,
+                                         recent_host_incidents)
+
+
+def _incidents(tmp_path, rows):
+    p = tmp_path / "host.jsonl"
+    p.write_text("\n".join(json.dumps(r) for r in rows))
+    return p
+
+
+def test_recent_incidents_respect_the_lookback_window(tmp_path):
+    now = datetime(2026, 8, 26, 12, 0, tzinfo=timezone.utc)
+    p = _incidents(tmp_path, [
+        {"kind": "host_network_unreachable",
+         "detected_at": "2026-08-26T11:00:00+00:00"},
+        {"kind": "host_network_unreachable",
+         "detected_at": "2026-08-25T01:00:00+00:00"}])
+    rows = recent_host_incidents(kinds=("host_network_unreachable",),
+                                 hours=6, now=now, path=p)
+    assert len(rows) == 1, "yesterday's failure is not today's"
+
+
+def test_a_degraded_host_is_safe_blocked_not_failed(tmp_path):
+    """The distinction that matters: SAFE_BLOCKED says nothing about
+    whether the fabric can hold a clean tape."""
+    now = datetime(2026, 8, 26, 12, 0, tzinfo=timezone.utc)
+    p = _incidents(tmp_path, [
+        {"kind": "host_network_unreachable",
+         "detected_at": "2026-08-26T11:30:00+00:00"}])
+    r = qualify_host(now=now, fabric_ready=True, incidents_path=p)
+    assert r["verdict"] == "SAFE_BLOCKED"
+    assert "NETWORK_STABLE" in r["blocking"]
+    assert r["commissioning_eligible"] is False
+    assert "never be counted against it" in r["law"]
+
+
+def test_an_unready_fabric_blocks_the_session(tmp_path):
+    now = datetime(2026, 8, 26, 12, 0, tzinfo=timezone.utc)
+    p = _incidents(tmp_path, [])
+    r = qualify_host(now=now, fabric_ready=False, incidents_path=p)
+    assert "FABRIC_READY" in r["blocking"]
+
+
+def test_all_four_operator_named_gates_are_required(tmp_path):
+    now = datetime(2026, 8, 26, 12, 0, tzinfo=timezone.utc)
+    r = qualify_host(now=now, fabric_ready=True,
+                     incidents_path=_incidents(tmp_path, []))
+    names = {c["check"] for c in r["checks"]}
+    for required in ("AC_POWER", "NETWORK_STABLE", "DISK_OK",
+                     "FABRIC_READY"):
+        assert required in names
+    assert all(c["required"] for c in r["checks"])
