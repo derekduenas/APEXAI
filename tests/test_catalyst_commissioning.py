@@ -522,3 +522,23 @@ def test_the_contract_sha_tracks_the_vocabulary():
     from apex.catalyst.brain import PROMPT_CONTRACT, PROMPT_CONTRACT_SHA
     assert PROMPT_CONTRACT_SHA == hashlib.sha256(
         PROMPT_CONTRACT.encode()).hexdigest()[:16]
+
+
+def test_the_cycle_record_says_where_it_looked(tmp_path, monkeypatch):
+    """Durable coverage. A reader months later asking 'was there a
+    catalyst?' must be able to see the scope of the search."""
+    r = _roots(tmp_path)
+    monkeypatch.setattr(pipeline, "fetch_all", lambda **k: {
+        "observations": [], "sources_checked": 3, "sources_succeeded": 2,
+        "sources_failed": 1, "coverage": "2/3", "succeeded": [],
+        "failures": {"BLS": "down"},
+        "coverage_classes_reached": ["MACRO_OFFICIAL", "REGULATORY"],
+        "coverage_classes_missing": ["BROAD_DISCOVERY"],
+        "sources_yielding_nothing": ["FEDERAL_REGISTER"]})
+    rec = run_cycle(session="2026-08-27", phase="TEST", roots=r)
+    assert rec["coverage_classes_reached"] == ["MACRO_OFFICIAL",
+                                               "REGULATORY"]
+    assert rec["coverage_classes_missing"] == ["BROAD_DISCOVERY"]
+    assert rec["sources_yielding_nothing"] == ["FEDERAL_REGISTER"]
+    on_disk = json.loads(r["cycles"].read_text().splitlines()[0])
+    assert on_disk["coverage_classes_missing"] == ["BROAD_DISCOVERY"]

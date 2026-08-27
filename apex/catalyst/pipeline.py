@@ -204,6 +204,15 @@ def run_cycle(*, session: str, phase: str, release_sha: str = "UNKNOWN",
            "sources_failed": sweep["sources_failed"],
            "coverage": sweep["coverage"],
            "failures": sweep["failures"],
+           # durable, because a later reader asking "was there a
+           # catalyst that day?" must be able to see WHERE we looked.
+           # An absence is only ever an absence within these classes.
+           "coverage_classes_reached":
+               sweep.get("coverage_classes_reached", []),
+           "coverage_classes_missing":
+               sweep.get("coverage_classes_missing", []),
+           "sources_yielding_nothing":
+               sweep.get("sources_yielding_nothing", []),
            "raw_offered": persisted["offered"],
            "new_observations": persisted["new"],
            "new_events": built["n_events"],
