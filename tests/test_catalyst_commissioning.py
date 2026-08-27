@@ -392,3 +392,52 @@ def test_a_source_that_yields_nothing_is_named(monkeypatch):
     assert sweep["sources_succeeded"] == 8
     assert len(sweep["sources_yielding_nothing"]) == 8, \
         "eight blind sources reported as healthy"
+
+
+# ==================================================== REACTION TRACKING
+
+def test_reaction_is_measured_only_after_known_from(tmp_path):
+    """The causal firewall, on the real bar-store shape."""
+    from apex.catalyst.pipeline import attach_reactions
+    bars = tmp_path / "bars"
+    bars.mkdir()
+    (bars / "SPY_2026-08-27.json").write_text(json.dumps({
+        "symbol": "SPY", "bars": [
+            {"event_time_utc": f"2026-08-27T{h:02d}:{m:02d}:00.000Z",
+             "open": 100 + i, "high": 101 + i, "low": 99 + i,
+             "close": 100.5 + i, "volume": 10}
+            for i, (h, m) in enumerate(
+                [(13, 30), (13, 45), (14, 0), (14, 15), (14, 30),
+                 (15, 0), (15, 30), (16, 0), (17, 0), (18, 0)])]}))
+
+    ev = build_events([_raw(title="Fed decision on rates",
+                            known_from="2026-08-27T15:00:00Z",
+                            first_seen_time="2026-08-27T15:00:00Z")],
+                      session="2026-08-27")["events"][0]
+    ev.affected_symbols = ("SPY",)
+
+    out = attach_reactions(session="2026-08-27", events=[ev],
+                           close_utc="2026-08-27T20:00:00Z",
+                           bars_root=bars, ledger=tmp_path / "r.jsonl")
+    assert out["reactions_written"] == 1
+    rec = json.loads((tmp_path / "r.jsonl").read_text().splitlines()[0])
+    # the 13:30-15:00 bars precede known_from and must not be counted
+    assert rec["reaction"]["reference_price"] >= 105
+
+
+def test_an_event_with_no_bars_is_unmeasurable_not_neutral(tmp_path):
+    from apex.catalyst.pipeline import attach_reactions
+    ev = build_events([_raw()], session="2026-08-27")["events"][0]
+    ev.affected_symbols = ("SPY",)
+    out = attach_reactions(session="2026-08-27", events=[ev],
+                           close_utc="2026-08-27T20:00:00Z",
+                           bars_root=tmp_path / "nope",
+                           ledger=tmp_path / "r.jsonl")
+    assert out["reactions_written"] == 0
+    assert out["unmeasurable"] == 1, "a missing tape scored as neutral"
+
+
+def test_atr_is_never_fabricated_from_thin_data():
+    from apex.catalyst.pipeline import _atr
+    assert _atr([{"high": 1, "low": 0}]) == "NOT_ESTIMABLE"
+    assert _atr([]) == "NOT_ESTIMABLE"

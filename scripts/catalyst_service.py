@@ -33,7 +33,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from apex.catalyst.interpreter import ClaudeCliInterpreter  # noqa: E402
-from apex.catalyst.pipeline import run_cycle  # noqa: E402
+from apex.catalyst.pipeline import (attach_reactions,  # noqa: E402
+                                    run_cycle)
 from apex.catalyst.premarket import phase_at  # noqa: E402
 from apex.ops.heartbeat import Heartbeat  # noqa: E402
 from apex.ops.orchestrator import session_bounds  # noqa: E402
@@ -71,6 +72,15 @@ def do_cycle(phase: str, *, session: str, interpreter, beat=None,
     rec = run_cycle(session=session, phase=phase,
                     release_sha=release_sha(),
                     interpreter=interpreter, include_sec=include_sec)
+    # at the seal, attach what the tape actually did -- prospectively,
+    # only for events already known and only from bars after known_from
+    if phase == "POST_CLOSE_SEAL":
+        b = session_bounds(session)
+        if b["trading_day"]:
+            rec["reaction_pass"] = attach_reactions(
+                session=session, events=rec.get("events") or [],
+                close_utc=b["close_utc"].isoformat())
+
     if beat is not None:
         beat.work(
             f"{phase}: {rec['sources_succeeded']}/"

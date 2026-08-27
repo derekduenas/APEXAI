@@ -26,6 +26,7 @@ decision_power: SHADOW_CONTEXT_ONLY.
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -217,3 +218,91 @@ def run_cycle(*, session: str, phase: str, release_sha: str = "UNKNOWN",
     chain_append(cy_l, rec)
     rec["events"] = built["events"]
     return rec
+
+
+# ------------------------------------------------------ reaction pass
+
+# The reaction pass consumes A BAR STORE. It deliberately does not name
+# a vendor: research modules that hardcode a market-data provider are
+# exactly what the architecture firewall in test_architecture_claims
+# exists to catch, and it caught this line. The concrete path is
+# configuration, supplied by the unit that knows which sensor is live.
+BARS_ROOT = Path(os.environ.get(
+    "APEX_BARS_ROOT", "data/live/bars"))
+REACTION_LEDGER = Path("results/catalyst/reactions.jsonl")
+ATR_LOOKBACK_BARS = 60
+
+
+def _load_bars(symbol: str, session: str, root: Path) -> list:
+    f = root / f"{symbol}_{session}.json"
+    if not f.exists():
+        return []
+    try:
+        return json.loads(f.read_text()).get("bars", [])
+    except (OSError, json.JSONDecodeError):
+        return []
+
+
+def _atr(bars: list) -> float | str:
+    """True range mean over recent bars. DETERMINISTIC arithmetic -- a
+    fabricated volatility would silently rescale every reaction."""
+    window = [b for b in bars[-ATR_LOOKBACK_BARS:]
+              if isinstance(b.get("high"), (int, float))
+              and isinstance(b.get("low"), (int, float))]
+    if len(window) < 5:
+        return "NOT_ESTIMABLE"
+    trs = [b["high"] - b["low"] for b in window]
+    return sum(trs) / len(trs)
+
+
+def attach_reactions(*, session: str, events: list, close_utc,
+                     bars_root: Path | None = None,
+                     ledger: Path | None = None) -> dict:
+    """Attach measured market behaviour to events AFTER the fact.
+
+    Nothing here touches the sealed event record: a reaction is its own
+    append-only row keyed by event_id. Measured strictly after
+    known_from, so an event we learned of at 14:03 is never credited
+    with the 14:01 move.
+    """
+    from apex.catalyst.reaction import classify, disagreement, measure
+
+    root = bars_root or BARS_ROOT
+    led = ledger or REACTION_LEDGER
+    written, unmeasurable, disagreements = 0, 0, []
+
+    for ev in events:
+        for sym in (ev.affected_symbols or ()):
+            bars = _load_bars(sym, session, root)
+            if not bars:
+                unmeasurable += 1
+                continue
+            atr = _atr(bars)
+            r = measure(bars=bars, known_from=ev.known_from, atr=atr,
+                        session_close=close_utc)
+            if r.get("verdict") == "NO_PATH":
+                unmeasurable += 1
+                continue
+            cls = classify(expectation="UNKNOWN", reaction=r, atr=atr)
+            dis = disagreement(event=ev,
+                               reaction_class=cls["reaction_class"])
+            rec = {"kind": "catalyst_reaction", "session": session,
+                   "event_id": ev.event_id, "symbol": sym,
+                   "known_from": ev.known_from, "atr": atr,
+                   "reaction": r, "classification": cls,
+                   "disagreement": dis,
+                   "law": "measured after known_from; appended, never "
+                          "merged into the sealed event",
+                   "decision_power": "SHADOW_CONTEXT_ONLY"}
+            chain_append(led, rec)
+            written += 1
+            if dis:
+                disagreements.append(dis)
+
+    return {"kind": "reaction_pass", "session": session,
+            "reactions_written": written,
+            "unmeasurable": unmeasurable,
+            "disagreements": disagreements,
+            "n_disagreements": len(disagreements),
+            "law": "an unmeasurable event is UNMEASURABLE, not neutral",
+            "decision_power": "SHADOW_CONTEXT_ONLY"}
