@@ -39,7 +39,16 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 
 GEOMETRY_QUALITY = ("STRONG", "GOOD", "ACCEPTABLE", "POOR", "UNKNOWN")
-ENTRY_QUALITY = GEOMETRY_QUALITY          # same vocabulary as Captain
+
+# DEGENERATE_GEOMETRY (GEO-2026-08-26-A) is a distinct state from POOR
+# and from UNKNOWN. POOR means "a real location, badly placed". UNKNOWN
+# means "we could not measure it". DEGENERATE means "measured fine, and
+# mathematically not a location at all" -- the invalidation sits at the
+# entry, so there is no adverse room and a declared 1R computed from it
+# is meaningless. Collapsing it into POOR would lose the distinction
+# research needs; collapsing it into UNKNOWN would falsely blame the
+# data.
+ENTRY_QUALITY = GEOMETRY_QUALITY + ("DEGENERATE_GEOMETRY",)
 CHASE_RISK = ("LOW", "MODERATE", "HIGH", "EXTREME", "UNKNOWN")
 NOT_ESTIMABLE = "NOT_ESTIMABLE"
 

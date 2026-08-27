@@ -50,6 +50,8 @@ decision_power: NONE.
 """
 from __future__ import annotations
 
+import math
+
 from apex.predators.core.attack_geometry import (
     NOT_ESTIMABLE, AttackGeometry, AttackGeometryEngine, unknown_geometry)
 
@@ -64,6 +66,13 @@ CHASE_HIGH_ATR = 3.0
 INVALIDATION_GOOD_ATR = 1.5
 INVALIDATION_POOR_ATR = 3.0
 COMPRESSION_TIGHT = 1.2        # recent range / ATR below this = coiled
+
+# GEO-2026-08-26-A. NUMERICAL epsilon ONLY -- this exists to identify
+# floating-point-zero distance, NOT to declare an economically minimum
+# risk distance. Choosing a value because 0.15 ATR "performs badly"
+# would be strategy tuning; this says only that a stop AT the entry is
+# not a location.
+DEGENERATE_ATR_EPSILON = 1e-9
 
 
 def _true_ranges(bars: list) -> list:
@@ -163,6 +172,24 @@ class EquityAttackGeometry(AttackGeometryEngine):
             objective = swing_lo
         inval_atr = abs(adverse) / a
 
+        # ---- DEGENERATE GEOMETRY INVARIANT (GEO-2026-08-26-A)
+        # A P1 defect found by the 2026-08-26 causal audit: reward/risk
+        # was guarded against adverse == 0, but inval_atr was not, so a
+        # ZERO invalidation distance satisfied `inval_atr <=
+        # INVALIDATION_GOOD_ATR` and scored as the BEST possible
+        # location. AAPL 12:01:57 that session recorded inval_atr = 0.0
+        # exactly (close == 20-bar swing low) and was blocked only by
+        # chase == EXTREME -- by luck, not by law.
+        #
+        # A stop at the entry is not bounded risk; it is no room at all,
+        # and a declared 1R computed from it is meaningless. This is a
+        # SEMANTIC correction, not an economic threshold: mathematically
+        # defined, economically untradeable.
+        degenerate = (not math.isfinite(inval_atr)
+                      or not math.isfinite(adverse)
+                      or abs(adverse) <= DEGENERATE_ATR_EPSILON
+                      or inval_atr <= DEGENERATE_ATR_EPSILON)
+
         # pullback: how far back from the extreme we are, in ATR
         if direction == "LONG":
             pullback_atr = (swing_hi - close) / a
@@ -189,7 +216,14 @@ class EquityAttackGeometry(AttackGeometryEngine):
             f"pullback {pullback_atr:.2f} ATR from swing extreme",
             f"range/ATR {rng:.2f}{' (compressed)' if compressed else ''}",
         ]
-        if chase in ("HIGH", "EXTREME"):
+        if degenerate:
+            eq = "DEGENERATE_GEOMETRY"
+            reasons.append(
+                f"invalidation sits at the entry (adverse room "
+                f"{adverse:.6g}, {inval_atr:.6g} ATR): there is no "
+                f"room to be wrong, so this is not a location -- "
+                f"never attackable, and never GOOD")
+        elif chase in ("HIGH", "EXTREME"):
             eq = "POOR"
             reasons.append("chase forbids attack regardless of thesis")
         elif inval_atr > INVALIDATION_POOR_ATR:
@@ -215,8 +249,16 @@ class EquityAttackGeometry(AttackGeometryEngine):
         return AttackGeometry(
             sleeve=self.sleeve, subject=subject, direction=direction,
             entry_quality=eq,
-            geometry_quality=eq if data_quality == "FULL" else "UNKNOWN"
-            if eq == "UNKNOWN" else "ACCEPTABLE",
+            # geometry_quality is the vocabulary SHARED with Captain, so
+            # the new DEGENERATE state is not pushed into it: a
+            # degenerate location grades POOR on the shared scale while
+            # entry_quality carries the precise reason. Widening a
+            # shared enum to describe one sleeve's edge case would make
+            # every other consumer handle a state it never asked for.
+            geometry_quality=("POOR" if eq == "DEGENERATE_GEOMETRY"
+                              else eq if data_quality == "FULL"
+                              else "UNKNOWN" if eq == "UNKNOWN"
+                              else "ACCEPTABLE"),
             entry_zone=(round(min(close, vwap), 4),
                         round(max(close, vwap), 4)),
             invalidation=round(invalidation, 4),

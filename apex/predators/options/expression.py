@@ -28,6 +28,8 @@ decision_power: NONE -- it compares; Capital decides.
 """
 from __future__ import annotations
 
+import math
+
 from dataclasses import asdict, dataclass
 
 EXPRESSIONS = ("STOCK", "LONG_CALL", "LONG_PUT", "CALL_VERTICAL",
@@ -219,7 +221,9 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
     atm = min(strikes, key=lambda k: abs(k - spot))
     aq = q(atm)
     d_atm = _delta(_opt, spot, atm, _dte_y, rate, iv) if iv else None
-    if aq:
+    # a zero/absent ask is a quote artifact, not free convexity:
+    # declared risk IS the 1R denominator (GEO-2026-08-26-A clause 4)
+    if aq and math.isfinite(aq[1] * 100) and aq[1] * 100 > MIN_DECLARED_RISK:
         b, a = aq
         debit = a * 100
         be = atm + a if right == "C" else atm - a
@@ -259,7 +263,10 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
         if wing:
             wk = wing[0]
             wq = q(wk)
-            if wq:
+            # zero/negative declared risk -> R is undefined
+            # (GEO-2026-08-26-A clause 4)
+            if wq and math.isfinite((a - wq[0]) * 100) \
+                    and (a - wq[0]) * 100 > MIN_DECLARED_RISK:
                 wb, _wa = wq
                 d_wing = (_delta(_opt, spot, wk, _dte_y, rate, iv)
                           if iv else None)
@@ -311,6 +318,13 @@ def build_candidates(frozen, direction: str, *, shares: int = 100,
 # ---------------------------------------------------------------------
 # COMPARISON BASES (operator law, 2026-08-23). There is NO single
 # correct normalization, so we never pick one and hide the rest.
+# GEO-2026-08-26-A, fourth clause. Declared risk IS the 1R denominator:
+# R = pnl / declared_1R. A candidate whose declared risk is zero or
+# negative makes R undefined, and a "debit" spread that costs nothing is
+# a quote artifact, not an opportunity. NUMERICAL guard only -- this
+# says nothing about how much risk is economically sensible.
+MIN_DECLARED_RISK = 1e-9
+
 COMPARISON_BASES = ("RAW_UNIT_ECONOMICS", "EQUAL_INITIAL_DELTA",
                     "EQUAL_RISK_BUDGET", "EQUAL_CAPITAL_DEPLOYED")
 
