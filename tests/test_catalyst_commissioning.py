@@ -347,3 +347,48 @@ def test_the_consumer_drains_a_real_v1_outbox(tmp_path):
     assert out["judged"] == 1, "attack_ready record was not judged"
     assert out["skipped_not_candidates"] == 1
     assert not out["errors"]
+
+
+# ============================================== FEED DIALECT REGRESSION
+
+RDF_FEED = b"""<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns="http://purl.org/rss/1.0/">
+  <channel><title>H.15</title></channel>
+  <item><title>Selected Interest Rates</title>
+        <link>https://federalreserve.gov/h15</link>
+        <description>Daily rates.</description>
+        <date>2026-08-26</date></item>
+</rdf:RDF>"""
+
+ATOM_FEED = b"""<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry><title>Apple files 8-K</title>
+         <link href="https://example.gov/a"/>
+         <updated>2026-08-26T12:00:00Z</updated>
+         <summary>A filing.</summary></entry>
+</feed>"""
+
+
+@pytest.mark.parametrize("body,expect", [(RDF_FEED, "Selected Interest"),
+                                         (ATOM_FEED, "Apple files")])
+def test_every_feed_dialect_parses(body, expect):
+    """RSS 1.0/RDF namespaces its items, and matching qualified names
+    made the Fed's H.15 feed parse to zero while reporting success --
+    a blind source behind a green light. Caught only by live traffic."""
+    from apex.catalyst.sources import _parse_feed
+    got = _parse_feed(body, source="S", source_type="OFFICIAL_FEED",
+                      authority="PRIMARY_OFFICIAL", release_sha="x")
+    assert len(got) == 1
+    assert expect in got[0].title
+    assert got[0].locator.startswith("https://")
+
+
+def test_a_source_that_yields_nothing_is_named(monkeypatch):
+    import apex.catalyst.sources as S
+    monkeypatch.setattr(S, "fetch_feed", lambda *a, **k: [])
+    monkeypatch.setattr(S, "fetch_sec_filings", lambda *a, **k: [])
+    sweep = S.fetch_all()
+    assert sweep["sources_succeeded"] == 8
+    assert len(sweep["sources_yielding_nothing"]) == 8, \
+        "eight blind sources reported as healthy"

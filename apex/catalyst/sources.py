@@ -136,14 +136,23 @@ def entity_hints(text: str) -> tuple:
 
 # ------------------------------------------------------------ parsing
 
+def _local(tag: str) -> str:
+    """Tag name without its namespace."""
+    return tag.split("}")[-1]
+
+
 def _text(node, *names):
-    for n in names:
-        el = node.find(n)
-        if el is not None and (el.text or "").strip():
-            return el.text.strip()
-        # Atom namespace
-        el = node.find(f"{{http://www.w3.org/2005/Atom}}{n}")
-        if el is not None and (el.text or "").strip():
+    """Namespace-agnostic child lookup.
+
+    Feeds arrive as RSS 2.0, RSS 1.0/RDF and Atom, and each puts its
+    items in a different namespace. Matching qualified names meant the
+    Fed's H.15 rates feed parsed to zero items while reporting success
+    -- a blind source wearing a green light, which is the exact failure
+    class the coverage record exists to expose.
+    """
+    want = {n.lower() for n in names}
+    for el in node:
+        if _local(el.tag).lower() in want and (el.text or "").strip():
             return el.text.strip()
     return ""
 
@@ -156,20 +165,20 @@ def _parse_feed(body: bytes, *, source: str, source_type: str,
     except ET.ParseError as e:
         raise SourceUnavailable(f"{source}: unparseable feed ({e})")
 
-    items = (root.iter("item")
-             or root.iter("{http://www.w3.org/2005/Atom}entry"))
-    items = list(root.iter("item")) + list(
-        root.iter("{http://www.w3.org/2005/Atom}entry"))
+    items = [el for el in root.iter()
+             if _local(el.tag).lower() in ("item", "entry")]
 
     out, now = [], _now()
     for it in items[:MAX_ITEMS_PER_SOURCE]:
         title = _text(it, "title")
         if not title:
             continue
-        link = _text(it, "link", "id")
-        if not link:
-            le = it.find("{http://www.w3.org/2005/Atom}link")
-            link = le.get("href", "") if le is not None else ""
+        link = _text(it, "link", "id", "guid")
+        if not link:                       # Atom puts it in an attribute
+            for el in it:
+                if _local(el.tag).lower() == "link" and el.get("href"):
+                    link = el.get("href")
+                    break
         pub = _text(it, "pubDate", "published", "updated", "date")
         desc = _text(it, "description", "summary", "content")[:1200]
         blob = f"{title}\n{desc}"
@@ -254,7 +263,7 @@ def fetch_all(*, release_sha: str = "UNKNOWN",
     'we found nothing' and 'we could not look' are different worlds and
     a research record that cannot tell them apart is worthless.
     """
-    obs, ok, failed = [], [], {}
+    obs, ok, failed, empty = [], [], {}, []
 
     for name, authority, stype, url in FEED_SOURCES:
         try:
@@ -262,6 +271,8 @@ def fetch_all(*, release_sha: str = "UNKNOWN",
                              release_sha=release_sha)
             obs.extend(got)
             ok.append({"source": name, "observations": len(got)})
+            if not got:
+                empty.append(name)
         except SourceUnavailable as e:
             failed[name] = str(e)[:200]
 
@@ -272,6 +283,8 @@ def fetch_all(*, release_sha: str = "UNKNOWN",
                 got = fetch_sec_filings(sym, cik, release_sha=release_sha)
                 obs.extend(got)
                 ok.append({"source": nm, "observations": len(got)})
+                if not got:
+                    empty.append(nm)
             except SourceUnavailable as e:
                 failed[nm] = str(e)[:200]
 
@@ -283,6 +296,9 @@ def fetch_all(*, release_sha: str = "UNKNOWN",
             "sources_succeeded": len(ok),
             "sources_failed": len(failed),
             "succeeded": ok, "failures": failed,
+            # a source that parses to nothing every time is blind, not
+            # quiet; naming it keeps a green light from hiding a gap
+            "sources_yielding_nothing": empty,
             "coverage": (f"{len(ok)}/{total}" if total else "0/0"),
             "law": "a source that could not be read is UNAVAILABLE, "
                    "never a quiet world",
