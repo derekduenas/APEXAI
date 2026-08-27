@@ -542,3 +542,15 @@ def test_the_cycle_record_says_where_it_looked(tmp_path, monkeypatch):
     assert rec["sources_yielding_nothing"] == ["FEDERAL_REGISTER"]
     on_disk = json.loads(r["cycles"].read_text().splitlines()[0])
     assert on_disk["coverage_classes_missing"] == ["BROAD_DISCOVERY"]
+
+
+def test_feed_furniture_does_not_manufacture_a_ticker():
+    """A Google News story about oil is not a GOOGL catalyst."""
+    from apex.catalyst.sources import entity_hints
+    story = ('Oil prices extend losses on Middle East supply talks '
+             '<a href="https://news.google.com/rss/articles/xyz">Reuters</a>')
+    hints = entity_hints(story)
+    assert "GOOGL" not in hints, "the aggregator branded its own story"
+    assert "ENERGY" in hints
+    # a genuine mention still resolves
+    assert "GOOGL" in entity_hints("Alphabet Inc reported cloud revenue")

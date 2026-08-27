@@ -32,6 +32,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -133,8 +134,20 @@ MACRO_TERMS = {
 }
 
 
+_URL_RE = re.compile(r"https?://\S+|<[^>]+>")
+
+
 def entity_hints(text: str) -> tuple:
-    low = f" {text.lower()} "
+    """Deterministic entity extraction from PROSE ONLY.
+
+    URLs and markup are stripped first. Live traffic showed why: every
+    Google News item embeds news.google.com links, so a story about
+    Middle East oil supply was being tagged GOOGL. Feed furniture
+    inflating a ticker's catalyst count is the same failure as one Fed
+    sentence inflating an event count -- a plumbing artifact masquerading
+    as a signal about a company.
+    """
+    low = f" {_URL_RE.sub(' ', text).lower()} "
     hits = [s for s, terms in ENTITY_TERMS.items()
             if any(t in low for t in terms)]
     hits += [m for m, terms in MACRO_TERMS.items()
