@@ -49,7 +49,15 @@ USER_AGENT = ("APEX-Research/1.0 (automated market research"
               + (f"; {_CONTACT}" if _CONTACT else "") + ")")
 
 SOURCE_TYPES = ("OFFICIAL_FEED", "OFFICIAL_API", "REGULATORY_FILING",
-                "STATISTICAL_API", "NEWS_SEARCH")
+                "STATISTICAL_API", "NEWS_SEARCH", "COMPANY_IR")
+
+# The classes a sweep is allowed to claim it searched. This exists so
+# that "no catalyst" can never be silently confused with "no catalyst
+# in the handful of places I happened to look" -- a cycle reports the
+# classes it covered, and an absence is only ever an absence WITHIN
+# that coverage.
+COVERAGE_CLASSES = ("MACRO_OFFICIAL", "CORPORATE_OFFICIAL",
+                    "COMPANY_IR", "REGULATORY", "BROAD_DISCOVERY")
 
 
 class SourceUnavailable(RuntimeError):
@@ -209,6 +217,45 @@ FEED_SOURCES = (
      "https://apps.bea.gov/rss/rss.xml"),
 )
 
+# ---- PRIMARY MACRO: statistical releases, not headlines about them.
+# A number from the agency that computed it beats a story about it.
+BLS_SERIES = {"CUUR0000SA0": "CPI (all urban consumers)",
+              "LNS14000000": "Unemployment rate",
+              "CES0000000001": "Total nonfarm payrolls"}
+
+TREASURY_YIELD_URL = (
+    "https://home.treasury.gov/resource-center/data-chart-center"
+    "/interest-rates/pages/xml?data=daily_treasury_yield_curve"
+    "&field_tdr_date_value=2026")
+
+# ---- COMPANY IR: the issuer speaking directly, ahead of any filing.
+IR_FEEDS = (
+    ("APPLE_NEWSROOM", "AAPL",
+     "https://www.apple.com/newsroom/rss-feed.rss"),
+    ("NVIDIA_NEWSROOM", "NVDA",
+     "https://nvidianews.nvidia.com/releases.xml"),
+    ("MICROSOFT_NEWS", "MSFT", "https://news.microsoft.com/feed/"),
+)
+
+# ---- BROAD DISCOVERY: how APEX first learns something happened at
+# all. Deliberately tiered AGGREGATOR -- below WIRE, therefore NOT
+# fact-bearing. These may raise a question; only a primary source may
+# answer it. Kept small on purpose: this is minimum world awareness,
+# not a news firehose.
+DISCOVERY_FEEDS = (
+    ("GOOGLE_NEWS_MARKETS", "https://news.google.com/rss/search?"
+     "q=stock+market+OR+federal+reserve+OR+earnings+when:1d"
+     "&hl=en-US&gl=US&ceid=US:en"),
+    ("GOOGLE_NEWS_GEOPOLITICS", "https://news.google.com/rss/search?"
+     "q=(geopolitical+OR+tariff+OR+sanctions+OR+oil+supply)+when:1d"
+     "&hl=en-US&gl=US&ceid=US:en"),
+    ("YAHOO_FINANCE", "https://finance.yahoo.com/news/rssindex"),
+)
+
+FEDERAL_REGISTER_URL = (
+    "https://www.federalregister.gov/api/v1/documents.rss"
+    "?per_page=20&order=newest")
+
 # combat universe only -- SEC is polled per-issuer, so the request
 # count is bounded by the roster rather than by the market
 SEC_CIKS = {"AAPL": "0000320193", "NVDA": "0001045810",
@@ -255,40 +302,138 @@ def fetch_sec_filings(symbol: str, cik: str, *,
     return out
 
 
-def fetch_all(*, release_sha: str = "UNKNOWN",
-              include_sec: bool = True) -> dict:
-    """Run every adapter. Never raises: a cycle reports coverage.
+def fetch_bls(*, release_sha: str = "UNKNOWN") -> list:
+    """Latest datapoint per tracked series.
 
-    Returns observations plus an explicit per-source outcome, because
-    'we found nothing' and 'we could not look' are different worlds and
-    a research record that cannot tell them apart is worthless.
+    The observation id is keyed on series+year+period, so re-fetching
+    an unchanged release is not new evidence -- only an actual new
+    print creates an observation.
+    """
+    out, now = [], _now()
+    for sid, label in BLS_SERIES.items():
+        body = _get(f"https://api.bls.gov/publicAPI/v2/timeseries/"
+                    f"data/{sid}")
+        try:
+            series = json.loads(body)["Results"]["series"][0]["data"]
+        except (json.JSONDecodeError, KeyError, IndexError) as e:
+            raise SourceUnavailable(f"BLS {sid}: unexpected shape ({e})")
+        if not series:
+            continue
+        d = series[0]
+        period = f"{d.get('year')}-{d.get('periodName')}"
+        title = f"{label}: {d.get('value')} ({period})"
+        blob = f"{sid}|{period}|{d.get('value')}"
+        out.append(RawObservation(
+            source_observation_id=_obs_id("BLS", sid, period),
+            source="BLS", source_type="STATISTICAL_API",
+            source_authority="PRIMARY_OFFICIAL",
+            locator=f"https://data.bls.gov/timeseries/{sid}",
+            title=title, published_time=period,
+            retrieved_time=now, first_seen_time=now, known_from=now,
+            raw_text_hash=hashlib.sha256(blob.encode()).hexdigest(),
+            raw_excerpt=f"series={sid} value={d.get('value')}",
+            entity_hints=entity_hints(label), release_sha=release_sha))
+    return out
+
+
+def fetch_treasury_curve(*, release_sha: str = "UNKNOWN") -> list:
+    """The most recent daily yield curve. Rates are a macro catalyst in
+    their own right, and this is the issuer's own publication."""
+    root = ET.fromstring(_get(TREASURY_YIELD_URL))
+    entries = [e for e in root.iter() if _local(e.tag) == "entry"]
+    if not entries:
+        raise SourceUnavailable("Treasury: no curve entries")
+    last = entries[-1]
+    vals = {_local(c.tag): (c.text or "").strip() for c in last.iter()
+            if (c.text or "").strip()}
+    date = vals.get("NEW_DATE", "UNKNOWN")[:10]
+    keys = [k for k in ("BC_2YEAR", "BC_10YEAR", "BC_30YEAR")
+            if k in vals]
+    title = ("US Treasury yield curve " + date + ": "
+             + ", ".join(f"{k.replace('BC_', '')} {vals[k]}"
+                         for k in keys))
+    blob = f"{date}|" + "|".join(f"{k}={vals[k]}" for k in sorted(vals))
+    return [RawObservation(
+        source_observation_id=_obs_id("US_TREASURY", "yield_curve", date),
+        source="US_TREASURY", source_type="OFFICIAL_API",
+        source_authority="PRIMARY_OFFICIAL",
+        locator=TREASURY_YIELD_URL, title=title, published_time=date,
+        retrieved_time=_now(), first_seen_time=_now(), known_from=_now(),
+        raw_text_hash=hashlib.sha256(blob.encode()).hexdigest(),
+        raw_excerpt=", ".join(f"{k}={vals[k]}" for k in keys),
+        entity_hints=("RATES", "FED"), release_sha=release_sha)]
+
+
+def fetch_all(*, release_sha: str = "UNKNOWN",
+              include_sec: bool = True,
+              include_discovery: bool = True) -> dict:
+    """Run every adapter across all coverage classes. Never raises.
+
+    Returns observations plus an explicit per-source outcome AND the
+    coverage classes actually reached. The second part matters as much
+    as the first: without it, "no catalyst" is indistinguishable from
+    "no catalyst among the handful of places I looked", and those are
+    very different claims to hand a research engine.
     """
     obs, ok, failed, empty = [], [], {}, []
+    classes_ok, classes_attempted = set(), set()
 
-    for name, authority, stype, url in FEED_SOURCES:
+    def attempt(name, cls, fn):
+        classes_attempted.add(cls)
         try:
-            got = fetch_feed(name, authority, stype, url,
-                             release_sha=release_sha)
+            got = fn()
             obs.extend(got)
-            ok.append({"source": name, "observations": len(got)})
+            ok.append({"source": name, "class": cls,
+                       "observations": len(got)})
+            classes_ok.add(cls)
             if not got:
                 empty.append(name)
         except SourceUnavailable as e:
             failed[name] = str(e)[:200]
+        except Exception as e:                          # noqa: BLE001
+            # an adapter bug must cost one source, never the sweep
+            failed[name] = f"{type(e).__name__}: {str(e)[:160]}"
 
+    # ---- PRIMARY MACRO
+    for name, authority, stype, url in FEED_SOURCES:
+        attempt(name, "MACRO_OFFICIAL",
+                lambda n=name, a=authority, t=stype, u=url:
+                fetch_feed(n, a, t, u, release_sha=release_sha))
+    attempt("BLS", "MACRO_OFFICIAL",
+            lambda: fetch_bls(release_sha=release_sha))
+    attempt("US_TREASURY", "MACRO_OFFICIAL",
+            lambda: fetch_treasury_curve(release_sha=release_sha))
+
+    # ---- CORPORATE OFFICIAL (the issuer's own filings)
     if include_sec:
         for sym, cik in SEC_CIKS.items():
-            nm = f"SEC_EDGAR:{sym}"
-            try:
-                got = fetch_sec_filings(sym, cik, release_sha=release_sha)
-                obs.extend(got)
-                ok.append({"source": nm, "observations": len(got)})
-                if not got:
-                    empty.append(nm)
-            except SourceUnavailable as e:
-                failed[nm] = str(e)[:200]
+            attempt(f"SEC_EDGAR:{sym}", "CORPORATE_OFFICIAL",
+                    lambda sy=sym, c=cik:
+                    fetch_sec_filings(sy, c, release_sha=release_sha))
+
+    # ---- COMPANY IR (the issuer speaking, often before the filing)
+    for name, sym, url in IR_FEEDS:
+        attempt(name, "COMPANY_IR",
+                lambda n=name, u=url: fetch_feed(
+                    n, "COMPANY_DIRECT", "COMPANY_IR", u,
+                    release_sha=release_sha))
+
+    # ---- REGULATORY
+    attempt("FEDERAL_REGISTER", "REGULATORY",
+            lambda: fetch_feed("FEDERAL_REGISTER", "PRIMARY_OFFICIAL",
+                               "OFFICIAL_FEED", FEDERAL_REGISTER_URL,
+                               release_sha=release_sha))
+
+    # ---- BROAD DISCOVERY (leads only: AGGREGATOR is not fact-bearing)
+    if include_discovery:
+        for name, url in DISCOVERY_FEEDS:
+            attempt(name, "BROAD_DISCOVERY",
+                    lambda n=name, u=url: fetch_feed(
+                        n, "AGGREGATOR", "NEWS_SEARCH", u,
+                        release_sha=release_sha))
 
     total = len(ok) + len(failed)
+    missing = sorted(classes_attempted - classes_ok)
     return {"kind": "source_sweep",
             "retrieved_utc": _now(),
             "observations": obs,
@@ -299,7 +444,11 @@ def fetch_all(*, release_sha: str = "UNKNOWN",
             # a source that parses to nothing every time is blind, not
             # quiet; naming it keeps a green light from hiding a gap
             "sources_yielding_nothing": empty,
+            "coverage_classes_reached": sorted(classes_ok),
+            "coverage_classes_missing": missing,
             "coverage": (f"{len(ok)}/{total}" if total else "0/0"),
+            "absence_is_qualified_by": sorted(classes_ok),
             "law": "a source that could not be read is UNAVAILABLE, "
-                   "never a quiet world",
+                   "never a quiet world; and an absence of catalysts "
+                   "is only ever an absence within the classes reached",
             "decision_power": "SHADOW_CONTEXT_ONLY"}

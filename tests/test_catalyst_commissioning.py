@@ -151,9 +151,14 @@ def test_one_dead_adapter_does_not_kill_the_sweep(monkeypatch):
     monkeypatch.setattr(S, "fetch_feed", half)
     monkeypatch.setattr(S, "fetch_sec_filings",
                         lambda *a, **k: [_raw(source="SEC_EDGAR")])
+    monkeypatch.setattr(S, "fetch_bls", lambda **k: [_raw(source="BLS")])
+    monkeypatch.setattr(S, "fetch_treasury_curve",
+                        lambda **k: [_raw(source="US_TREASURY")])
     sweep = S.fetch_all()
+    # counts are deliberately relational: a literal here would break
+    # every time coverage grows, which is the wrong thing to notice
     assert sweep["sources_failed"] == 1
-    assert sweep["sources_succeeded"] == 7
+    assert sweep["sources_succeeded"] == sweep["sources_checked"] - 1
     assert sweep["observations"], "one bad source emptied the sweep"
 
 
@@ -388,10 +393,13 @@ def test_a_source_that_yields_nothing_is_named(monkeypatch):
     import apex.catalyst.sources as S
     monkeypatch.setattr(S, "fetch_feed", lambda *a, **k: [])
     monkeypatch.setattr(S, "fetch_sec_filings", lambda *a, **k: [])
+    monkeypatch.setattr(S, "fetch_bls", lambda **k: [])
+    monkeypatch.setattr(S, "fetch_treasury_curve", lambda **k: [])
     sweep = S.fetch_all()
-    assert sweep["sources_succeeded"] == 8
-    assert len(sweep["sources_yielding_nothing"]) == 8, \
-        "eight blind sources reported as healthy"
+    assert sweep["sources_failed"] == 0
+    assert (len(sweep["sources_yielding_nothing"])
+            == sweep["sources_succeeded"]), \
+        "every source was blind and none was named"
 
 
 # ==================================================== REACTION TRACKING
@@ -441,3 +449,48 @@ def test_atr_is_never_fabricated_from_thin_data():
     from apex.catalyst.pipeline import _atr
     assert _atr([{"high": 1, "low": 0}]) == "NOT_ESTIMABLE"
     assert _atr([]) == "NOT_ESTIMABLE"
+
+
+# ============================================== WORLD-AWARENESS SCOPE
+
+def test_the_minimum_world_covers_five_classes(monkeypatch):
+    import apex.catalyst.sources as S
+    monkeypatch.setattr(S, "fetch_feed",
+                        lambda n, a, t, u, release_sha="x": [_raw(source=n)])
+    monkeypatch.setattr(S, "fetch_sec_filings",
+                        lambda *a, **k: [_raw(source="SEC_EDGAR")])
+    monkeypatch.setattr(S, "fetch_bls", lambda **k: [_raw(source="BLS")])
+    monkeypatch.setattr(S, "fetch_treasury_curve",
+                        lambda **k: [_raw(source="US_TREASURY")])
+    sweep = S.fetch_all()
+    assert set(sweep["coverage_classes_reached"]) == set(S.COVERAGE_CLASSES)
+    assert sweep["coverage_classes_missing"] == []
+    assert sweep["absence_is_qualified_by"]
+
+
+def test_a_dead_class_is_reported_missing_not_hidden(monkeypatch):
+    import apex.catalyst.sources as S
+    monkeypatch.setattr(S, "fetch_feed",
+                        lambda n, a, t, u, release_sha="x":
+                        [] if t == "NEWS_SEARCH"
+                        else (_ for _ in ()).throw(
+                            S.SourceUnavailable("down"))
+                        if t == "COMPANY_IR" else [_raw(source=n)])
+    monkeypatch.setattr(S, "fetch_sec_filings", lambda *a, **k: [_raw()])
+    monkeypatch.setattr(S, "fetch_bls", lambda **k: [_raw()])
+    monkeypatch.setattr(S, "fetch_treasury_curve", lambda **k: [_raw()])
+    sweep = S.fetch_all()
+    assert "COMPANY_IR" in sweep["coverage_classes_missing"]
+    assert "COMPANY_IR" not in sweep["absence_is_qualified_by"]
+
+
+def test_broad_discovery_can_never_assert_a_fact():
+    """Aggregators raise questions; only primary sources answer them."""
+    from apex.catalyst.events import FACT_BEARING
+    assert "AGGREGATOR" not in FACT_BEARING
+    ev = build_events([_raw(source="GOOGLE_NEWS_MARKETS",
+                            source_authority="AGGREGATOR",
+                            title="Report: something dramatic happened")],
+                      session="2026-08-27")["events"][0]
+    assert ev.verification == "UNVERIFIED", \
+        "an aggregator headline was treated as established fact"
