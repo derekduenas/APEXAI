@@ -109,15 +109,59 @@ def check_isolation() -> tuple[bool, str]:
             f"shadow={LEDGER} v1={v1}")
 
 
+def tree_digest(root: str = ".") -> str:
+    """Deterministic digest of the Python surface. Comparable across
+    machines, which is the only way to prove the code running in the
+    cloud is the code that was reviewed here."""
+    h = hashlib.sha256()
+    base = pathlib.Path(root)
+    for p in sorted(base.rglob("*.py")):
+        rel = p.relative_to(base).as_posix()
+        if rel.startswith((".venv/", "venv/")) or "__pycache__" in rel:
+            continue
+        h.update(rel.encode())
+        h.update(hashlib.sha256(p.read_bytes()).digest())
+    return h.hexdigest()[:16]
+
+
 def check_lineage(expected: str | None) -> tuple[bool, str]:
+    """Prove WHICH code this is.
+
+    A git checkout proves it by HEAD plus a clean tree. A deployed
+    release is not a checkout, and an earlier version of this check
+    read git's empty output there as "clean" and PASSED on no evidence
+    at all. An unverifiable lineage is a FAIL, never a pass.
+    """
     def git(*a):
-        return subprocess.run(("git",) + a, capture_output=True,
-                              text=True).stdout.strip()
-    head, dirty = git("rev-parse", "HEAD"), git("status", "--porcelain")
-    ok = not dirty and (expected is None or head == expected)
-    return ok, (f"HEAD {head[:8]}, tree "
-                + ("clean" if not dirty else "DIRTY")
-                + (f", expected {expected[:8]}" if expected else ""))
+        r = subprocess.run(("git",) + a, capture_output=True, text=True)
+        return r.stdout.strip() if r.returncode == 0 else ""
+
+    digest = tree_digest()
+    head = git("rev-parse", "HEAD")
+
+    if head:                                   # development checkout
+        dirty = git("status", "--porcelain")
+        ok = not dirty and (expected is None or head == expected)
+        return ok, (f"checkout {head[:8]}, tree "
+                    + ("clean" if not dirty else "DIRTY")
+                    + (f", expected {expected[:8]}" if expected else "")
+                    + f", py_digest {digest}")
+
+    stamp = pathlib.Path("RELEASE.json")       # immutable release
+    if not stamp.exists():
+        return False, ("NOT_VERIFIABLE — no git HEAD and no "
+                       "RELEASE.json; refusing to call this clean")
+    import json
+    commit = json.loads(stamp.read_text()).get("commit", "")
+    here = pathlib.Path.cwd().resolve().name
+    if not commit:
+        return False, "RELEASE.json carries no commit"
+    if here != commit and here != "current":
+        return False, f"RELEASE.json {commit[:8]} != directory {here[:8]}"
+    ok = expected is None or commit == expected
+    return ok, (f"release {commit[:8]} stamped, py_digest {digest}"
+                + ("" if expected is None
+                   else f", expected {expected[:8]}"))
 
 
 CHECKS = (("CATALYST/CAPITAL_AUTHORITY", check_authorities),
