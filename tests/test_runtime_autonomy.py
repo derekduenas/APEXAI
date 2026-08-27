@@ -457,3 +457,105 @@ def test_all_four_operator_named_gates_are_required(tmp_path):
                      "FABRIC_READY"):
         assert required in names
     assert all(c["required"] for c in r["checks"])
+
+
+# ============ REPAIRS 4 + 5 (post-Wednesday, proven defects)
+
+from apex.ops.orchestrator import expected_work_units
+from apex.ops.timebase import (SOURCE_CONTRACTS, TimebaseViolation,
+                               causal_window, to_utc)
+
+
+def test_intentional_ineligibility_is_never_missed_work():
+    """2026-08-26: the naive formula cried MISSED=16 on a session that
+    missed nothing -- two symbols held open positions."""
+    sweeps = [{"sweep_id": i, "eligible": ["AAPL", "NVDA", "MSFT", "IWM"],
+               "completed": ["AAPL", "NVDA", "MSFT", "IWM"],
+               "intentionally_skipped": ["SPY", "QQQ"]}
+              for i in range(1, 9)]
+    r = expected_work_units(sweeps=sweeps)
+    assert r["missed_work"] == 0
+    assert r["verdict"] == "CADENCE_CLEAN"
+    assert r["intentional_skips"], "skips are recorded, not counted"
+    assert "NEVER missed work" in r["law"]
+
+
+def test_a_genuinely_skipped_eligible_symbol_is_missed_work():
+    r = expected_work_units(sweeps=[
+        {"sweep_id": 1, "eligible": ["SPY", "QQQ"], "completed": ["SPY"]}])
+    assert r["missed_work"] == 1
+    assert r["verdict"] == "WORK_MISSED"
+    assert r["missed_detail"][0]["symbols"] == ["QQQ"]
+
+
+def test_et_naive_card_times_convert_correctly():
+    """MSFT's 14:42 card is 14:42 ET = 18:42 UTC in August (EDT)."""
+    t = to_utc("2026-08-24 14:42:06", source="OPTIONS_CARD")
+    assert t.hour == 18 and t.tzinfo is not None
+
+
+def test_dst_is_handled_by_construction_not_by_memory():
+    aug = to_utc("2026-08-24 14:42:00", source="OPTIONS_CARD")
+    jan = to_utc("2026-01-14 14:42:00", source="OPTIONS_CARD")
+    assert aug.hour == 18, "EDT is UTC-4"
+    assert jan.hour == 19, "EST is UTC-5"
+
+
+def test_an_undeclared_source_is_refused_not_defaulted():
+    with pytest.raises(TimebaseViolation, match="undeclared timestamp"):
+        to_utc("2026-08-26 10:00:00", source="SOMEONES_NEW_FEED")
+    assert SOURCE_CONTRACTS["OPTIONS_SCAN"] == "ET_NAIVE"
+    assert SOURCE_CONTRACTS["MARKET_BAR"] == "UTC_AWARE"
+
+
+def test_the_causal_window_excludes_both_failure_modes():
+    """Defect B admitted pre-entry bars; Defect A admitted an
+    after-hours print that flipped a verdict's sign."""
+    entry = to_utc("2026-08-26 11:16:34", source="OPTIONS_CARD")
+    close = to_utc("2026-08-26 16:00:00", source="OPTIONS_CARD")
+    bars = [{"event_time_utc": "2026-08-26T14:00:00Z"},   # pre-entry
+            {"event_time_utc": "2026-08-26T16:00:00Z"},   # in window
+            {"event_time_utc": "2026-08-26T20:00:00Z"},   # at close
+            {"event_time_utc": "2026-08-26T20:27:00Z"}]   # after hours
+    kept = causal_window(bars, entry=entry, boundary=close,
+                         source="MARKET_BAR")
+    times = [b["event_time_utc"] for b in kept]
+    assert times == ["2026-08-26T16:00:00Z", "2026-08-26T20:00:00Z"]
+
+
+def test_a_backwards_window_is_refused():
+    entry = to_utc("2026-08-26 15:00:00", source="OPTIONS_CARD")
+    early = to_utc("2026-08-26 10:00:00", source="OPTIONS_CARD")
+    with pytest.raises(TimebaseViolation, match="not after entry"):
+        causal_window([], entry=entry, boundary=early,
+                      source="MARKET_BAR")
+
+
+def test_kill_restart_loses_no_observation_and_duplicates_none(tmp_path):
+    """OPS-2026-08-26-C acceptance: simulate a mid-session process
+    death between emit and consume, then restart."""
+    from apex.ops.outbox import Cursor, consume, emit
+    ob = tmp_path / "v1_decisions.jsonl"
+    cur = Cursor(path=tmp_path / "cur.json", consumer="obs")
+
+    for i in range(30):                       # sweeps 1-5 emitted
+        emit(ob, kind="options_evaluation", session="2026-08-27",
+             payload={"evaluation_id": f"s:{i}", "verdict": "WAIT"},
+             source="v1", known_from="t")
+    seen = []
+    consume(ob, cur, lambda r: seen.append(r["payload"]["evaluation_id"])
+            or 1)
+    assert len(seen) == 30
+
+    for i in range(30, 78):                   # V1 keeps working
+        emit(ob, kind="options_evaluation", session="2026-08-27",
+             payload={"evaluation_id": f"s:{i}", "verdict": "WAIT"},
+             source="v1", known_from="t")
+    # consumer dies here -- a brand new Cursor object, same file
+    revived = Cursor(path=tmp_path / "cur.json", consumer="obs")
+    consume(ob, revived,
+            lambda r: seen.append(r["payload"]["evaluation_id"]) or 1)
+
+    assert len(seen) == 78, "no observation lost"
+    assert len(set(seen)) == 78, "no duplicate economic observation"
+    assert seen == [f"s:{i}" for i in range(78)], "and in order"

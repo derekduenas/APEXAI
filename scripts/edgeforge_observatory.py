@@ -38,7 +38,9 @@ from apex.ops import heartbeat as hb                           # noqa: E402
 from apex.ops.orchestrator import phase_at                     # noqa: E402
 from apex.ops.outbox import (Cursor, consume, consumer_health)  # noqa: E402
 
-OUTBOX = Path("results/edgeforge/v1_outbox.jsonl")
+# the producer writes to a NEUTRAL path; it does not
+# know this consumer exists
+OUTBOX = Path("results/outbox/v1_decisions.jsonl")
 CURSOR = Path("results/edgeforge/observatory_cursor.json")
 RESEARCH = Path("results/edgeforge/observatory_ledger.jsonl")
 QUALIFY = Path("results/edgeforge/qualifying_sessions.jsonl")
@@ -92,8 +94,14 @@ def qualifying_session(session: str) -> dict:
             if r.get("kind") == "observatory_record" and \
                     r.get("session") == session:
                 rows.append(r)
+    # V1 emits one record per COMPLETED EVALUATION, and the boundary
+    # dimensions ride in its payload. Looking only for a record kind
+    # named "decision_boundary_map" would report NO on a session that
+    # recorded every dimension -- the qualifying check must read what
+    # the producer actually writes.
     maps = [r for r in rows
-            if r.get("record_kind") == "decision_boundary_map"]
+            if r.get("record_kind") in ("decision_boundary_map",
+                                        "options_evaluation")]
     dims_present = set()
     for m in maps:
         dims_present |= {k for k, v in (m.get("payload") or {}).items()

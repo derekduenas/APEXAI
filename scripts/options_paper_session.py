@@ -38,6 +38,7 @@ from apex.predators.options.live_world import (                # noqa: E402
     FeedUnavailable, observe)
 from apex.predators.options.replay import seal_before_card     # noqa: E402
 from apex.ops.heartbeat import Heartbeat                       # noqa: E402
+from apex.ops.outbox import emit as _outbox_emit                # noqa: E402
 from apex.ops.release import build_pedigree                    # noqa: E402
 from apex.predators.options.scoreboard import (                # noqa: E402
     SessionScoreboard)
@@ -362,13 +363,68 @@ def main() -> int:
 
     deadline = datetime.now(timezone.utc) + timedelta(minutes=a.minutes)
     open_positions, scans = [], []
+    # DURABLE DECISION OBSERVATIONS (OPS-2026-08-26-C). Before this, the
+    # 128 refusals of a session lived in process memory until one write
+    # at the very end: a mid-session death erased the entire
+    # counterfactual population, which is the economically central input
+    # to gate_separation_v1. Attacks survived; the decisions we did NOT
+    # take did not.
+    #     ONE COMPLETED EVALUATION -> ONE DURABLE OBSERVATION
+    # Append-only and idempotent by evaluation_id. The trading path never
+    # blocks on research: this writes a local chained record and an
+    # asynchronous consumer drains it.
+    # NEUTRAL PATH BY LAW. V1 must not name its consumer -- the
+    # non-interference guard forbids the string, and it is right to:
+    # a producer that knows who reads it has already coupled to it.
+    # This is a durable decision channel; EdgeForge happens to drain it.
+    outbox = Path("results/outbox/v1_decisions.jsonl")
+    sweep_id = 0
     while datetime.now(timezone.utc) < deadline:
+        sweep_id += 1
         for sym in syms:
             if any(p["symbol"] == sym for p in open_positions):
                 continue          # one open paper position per symbol
             r = _scan_symbol(sym, sb, ledger, open_positions,
                              as_of=as_of)
             scans.append(r)
+            try:
+                _outbox_emit(
+                    outbox, kind="options_evaluation", session=session,
+                    source="scripts/options_paper_session._scan_symbol",
+                    known_from=str(r.get("T")),
+                    payload={"evaluation_id":
+                             f"{session}:{sweep_id:03d}:{sym}",
+                             "sweep_id": sweep_id, "symbol": sym,
+                             "event_time": r.get("T"),
+                             "verdict": r.get("status"),
+                             "direction": r.get("direction"),
+                             "trend_state": r.get("trend_state"),
+                             "entry_quality": r.get("entry_quality"),
+                             "chase_risk": r.get("chase_risk"),
+                             "extension_atr": r.get("extension_atr"),
+                             "invalidation_distance_atr":
+                                 r.get("invalidation_distance_atr"),
+                             "range_position": r.get("range_position"),
+                             "vwap_distance_atr":
+                                 r.get("vwap_distance_atr"),
+                             "atr": r.get("atr"),
+                             "volume_participation":
+                                 r.get("volume_participation"),
+                             "attackable": r.get("attackable"),
+                             "blocked": r.get("blocked"),
+                             "feed_quality": r.get("feed_quality"),
+                             "options_data_quality":
+                                 r.get("options_data_quality"),
+                             "release_sha": ped.get("release_commit"),
+                             "prospective": True})
+            except Exception as _e:                      # noqa: BLE001
+                # research durability must never kill the trading loop
+                from apex.governance.ledger_error import record as _lerr
+                _lerr(service="options_paper", operation="OUTBOX_EMIT",
+                      exc=_e, ledger="outbox/v1_decisions.jsonl",
+                      recovery_action="scan loop continues; the "
+                                      "session JSON remains the "
+                                      "fallback record")
             print(f"  {sym:5} {r.get('status')}", flush=True)
             # a completed SCAN is the unit of work -- a session that
             # attacks nothing is still working, and must not read as

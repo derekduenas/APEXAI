@@ -480,3 +480,45 @@ def reconcile_expected(*, phase: str, specs: list,
 
 # ==================================================== ROSTER
 
+
+
+# ==================================================== CADENCE
+
+def expected_work_units(*, sweeps: list) -> dict:
+    """EXPECTED_WORK = sum of ELIGIBLE evaluation units at each sweep
+    start. NEVER sweeps x configured_symbols.
+
+    On 2026-08-26 the naive formula reported MISSED=16 on a session
+    that in fact missed nothing: two symbols held open paper positions
+    and were intentionally skipped. Stated generically -- eligibility,
+    not headcount -- so a future legitimate exclusion cannot recreate
+    the same false alarm.
+
+    sweeps: [{"sweep_id": int, "eligible": [sym, ...],
+              "completed": [sym, ...]}, ...]
+    """
+    exp = act = 0
+    skips, missed = [], []
+    for sw in sweeps:
+        elig = set(sw.get("eligible") or [])
+        done = set(sw.get("completed") or [])
+        exp += len(elig)
+        act += len(done & elig)
+        gap = elig - done
+        if gap:
+            missed.append({"sweep_id": sw.get("sweep_id"),
+                           "symbols": sorted(gap)})
+        extra = sw.get("intentionally_skipped") or []
+        if extra:
+            skips.append({"sweep_id": sw.get("sweep_id"),
+                          "symbols": sorted(extra)})
+    return {"kind": "cadence_reconciliation",
+            "sweeps": len(sweeps),
+            "expected_eligible_evaluations": exp,
+            "completed_evaluations": act,
+            "missed_work": exp - act,
+            "missed_detail": missed,
+            "intentional_skips": skips,
+            "verdict": "CADENCE_CLEAN" if exp == act else "WORK_MISSED",
+            "law": "an intentional ineligibility is NEVER missed work",
+            "decision_power": "NONE_OPERATIONAL"}

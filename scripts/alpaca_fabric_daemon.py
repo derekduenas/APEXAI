@@ -30,6 +30,7 @@ from apex.intraday.alpaca_fabric import (  # noqa: E402
     AlpacaFabricViolation, AlpacaRealtimeFabric,
 )
 from apex.intraday.provider_interface import AlpacaBroadProvider  # noqa: E402
+from apex.ops.heartbeat import Heartbeat                       # noqa: E402
 
 BARS_DIR = Path("data/live/alpaca_fabric/bars")
 HEALTH_ARTIFACT = Path("results/intraday/alpaca_fabric_health.json")
@@ -37,9 +38,20 @@ COVERAGE_ARTIFACT = Path("results/intraday/universe_coverage.json")
 
 
 def _intended_universe() -> list:
-    """The SAME 164-symbol universe hunter_forward_clock.py's frozen
-    scan requires: 3 index ETFs + 11 sector ETFs + the frozen scan
-    universe -- one universe, read not redeclared."""
+    """3 index ETFs + 11 sector ETFs + the frozen hunter scan universe
+    + THE OPTIONS COMBAT UNIVERSE -- one universe, read not redeclared.
+
+    MIG-2026-08-26-A. On 2026-08-26 this returned only 14 symbols on
+    DigitalOcean, because results/hunter/scan_universe_*.json is written
+    by a Mac job and does not exist there. AAPL, NVDA and MSFT are in
+    the Options combat universe and were therefore absent from the tape,
+    making 78 of 130 refusal observations unresolvable and confounding
+    the L2 workload comparison.
+
+    THE LAW THIS ENFORCES: every Options decision must have the causal
+    underlying tape required to resolve its outcome. The combat universe
+    is read from the session module, so the two can never drift.
+    """
     sys.path.insert(0, "scripts")
     from hunter_forward_clock import INDEXES, SECTOR_ETF
     syms = {s.replace(".US", "") for s in INDEXES}
@@ -48,7 +60,27 @@ def _intended_universe() -> list:
     if uni:
         d = json.loads(uni[-1].read_text())
         syms |= {s.replace(".US", "") for s in d.get("symbols", {})}
+    # non-negotiable floor: whatever Options will decide on today
+    from options_paper_session import UNIVERSE as OPTIONS_UNIVERSE
+    syms |= {s.replace(".US", "") for s in OPTIONS_UNIVERSE}
     return sorted(syms)
+
+
+def options_universe_coverage(subscribed: list) -> dict:
+    """Prove the tape can resolve every Options decision."""
+    sys.path.insert(0, "scripts")
+    from options_paper_session import UNIVERSE as OPTIONS_UNIVERSE
+    want = {s.replace(".US", "") for s in OPTIONS_UNIVERSE}
+    have = set(subscribed)
+    missing = sorted(want - have)
+    return {"kind": "options_universe_resolution_coverage",
+            "required": sorted(want), "missing": missing,
+            "coverage_fraction": round(
+                (len(want) - len(missing)) / max(len(want), 1), 4),
+            "verdict": "COVERED" if not missing
+                       else "OPTIONS_TAPE_GAP",
+            "law": "every Options decision must have the causal "
+                   "underlying tape required for outcome resolution"}
 
 
 def _write_json(path: Path, record: dict) -> None:
@@ -168,7 +200,16 @@ def main() -> int:
     a = ap.parse_args()
 
     universe = _intended_universe()
+    cov = options_universe_coverage(universe)
     print(f"intended universe: {len(universe)} symbols", flush=True)
+    print(f"options-universe coverage: {cov['verdict']} "
+          f"({cov['coverage_fraction']:.0%})"
+          + (f" MISSING {cov['missing']}" if cov["missing"] else ""),
+          flush=True)
+    if cov["missing"]:
+        print("REFUSED TO START: the tape cannot resolve every Options "
+              "decision", flush=True)
+        return 2
 
     # FAIL FAST: credentials are checked synchronously here, not left to
     # surface only inside the background connection thread's _on_open
@@ -184,6 +225,16 @@ def main() -> int:
     fab = AlpacaRealtimeFabric(symbols=universe)
     provider = AlpacaBroadProvider(fab)
     fab.start()
+    # WORK HEARTBEAT (OPS-2026-08-26-B). The fabric processed 1.68M
+    # trades and 12.8M quotes on 2026-08-26 while first_work_seen()
+    # read False all session, because it emitted no heartbeat at all.
+    # The verifier could not distinguish PROCESS PRESENT from REAL
+    # MARKET WORK PROGRESSING, and would have raised a false
+    # SESSION_MISSED_START. Work here is BARS PERSISTED -- progression
+    # of the actual product, never mere liveness.
+    beat = Heartbeat(service="equity-fabric",
+                     authority="NONE_OBSERVATIONAL")
+    beat.beat()
 
     t_end = time.time() + a.minutes * 60
     last_report = 0.0
@@ -199,6 +250,13 @@ def main() -> int:
             h["persist_error"] = f"{type(e).__name__}: {e}"
             written = {}
         h["bars_persisted"] = written
+        # WORK = BARS PERSISTED. A cycle that persisted nothing is
+        # reported as backlog, not silently counted as progress.
+        try:
+            beat.work(f"persisted {len(written)} symbols",
+                      backlog=max(0, len(universe) - len(written)))
+        except Exception:                                   # noqa: BLE001
+            pass
         # LAYER 2 COMMISSIONING (2026-08-21): TAPE CONTINUITY is its own
         # axis, reconciled against the PERSISTED bars -- Friday proved
         # coverage_fraction (symbol reachability) can read 1.0 while 26%
