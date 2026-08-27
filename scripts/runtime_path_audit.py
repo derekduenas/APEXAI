@@ -44,7 +44,19 @@ def systemctl(*args) -> str:
     return r.stdout.strip()
 
 
-def active_apex_units() -> list:
+def active_apex_units(*, all_units: bool = False) -> list:
+    """Active units by default.
+
+    --all is not cosmetic. The service that actually carried this
+    defect (the options paper session) is deliberately NOT continuously
+    active: the orchestrator triggers it on the exchange calendar.
+    An audit that only inspects running services would have given a
+    clean PASS while the broken one sat waiting for the opening bell.
+    """
+    if all_units:
+        out = systemctl("list-unit-files", "apex-*.service",
+                        "--no-legend", "--plain")
+        return [ln.split()[0] for ln in out.splitlines() if ln.strip()]
     out = systemctl("list-units", "apex-*", "--type=service",
                     "--state=active", "--no-legend", "--plain")
     return [ln.split()[0] for ln in out.splitlines() if ln.strip()]
@@ -59,11 +71,44 @@ def unit_props(unit: str) -> dict:
     return d
 
 
-def script_of(execstart: str) -> str | None:
-    for tok in execstart.replace("'", " ").split():
+def script_of(execstart: str) -> tuple:
+    """Resolve the real python module AND any cd the launcher performs.
+
+    Some services start through a shell wrapper (used to load secrets
+    into the environment without ever putting them in a unit file or
+    argv). A wrapper that does `cd /apex-data/runtime` before exec
+    changes the working directory out from under the unit, so an audit
+    that stops at ExecStart reads the wrong directory and reports
+    NO_SCRIPT_RESOLVED -- a blind spot, not a pass.
+    """
+    # systemd renders ExecStart as a STRUCTURED string:
+    #   { path=/x/y ; argv[]=/x/y arg ; ignore_errors=no ; ... }
+    # so tokens carry path=/argv[]= prefixes. Splitting on whitespace
+    # alone silently finds nothing for a wrapper launcher.
+    toks = []
+    for t in execstart.replace("'", " ").split():
+        if "=" in t and (t.startswith("path=") or t.startswith("argv[]=")):
+            t = t.split("=", 1)[1]
+        toks.append(t)
+    for tok in toks:
         if tok.endswith(".py"):
-            return tok
-    return None
+            return tok, None
+    for tok in toks:
+        if tok.endswith(".sh") and Path(tok).exists():
+            try:
+                body = Path(tok).read_text()
+            except OSError:
+                return None, None
+            script, cd = None, None
+            for line in body.splitlines():
+                line = line.strip()
+                if line.startswith("cd "):
+                    cd = line[3:].strip()
+                for t in line.replace("\\", " ").split():
+                    if t.endswith(".py"):
+                        script = t
+            return script, cd
+    return None, None
 
 
 def declared_paths(script: Path) -> dict:
@@ -104,11 +149,17 @@ def writable(base: Path, rel: str) -> dict:
 def audit_unit(unit: str, *, probe: bool = True) -> dict:
     p = unit_props(unit)
     wd = p["WorkingDirectory"] or "/"
-    script = script_of(p["ExecStart"] or "")
+    script, wrapper_cd = script_of(p["ExecStart"] or "")
+    if wrapper_cd:                 # the launcher's cd is what wins
+        wd = wrapper_cd
     row = {"unit": unit, "active": p["ActiveState"],
            "working_directory": wd, "user": p["User"],
            "slice": p["Slice"], "restarts": p["NRestarts"],
-           "script": script}
+           "script": script, "wrapper_cd": wrapper_cd,
+           # systemd's EFFECTIVE config, drop-ins included. Reading the
+           # base unit file instead is how a .service.d override gets
+           # missed -- the file on disk is not the thing that runs.
+           "config_source": "systemctl show (effective, with drop-ins)"}
 
     if not script or not Path(script).exists():
         row["verdict"] = "NO_SCRIPT_RESOLVED"
@@ -150,12 +201,17 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--no-probe", action="store_true")
+    ap.add_argument("--all", action="store_true",
+                    help="include units that are installed but not "
+                         "currently running (calendar-triggered ones)")
     args = ap.parse_args()
 
-    units = active_apex_units()
+    units = active_apex_units(all_units=args.all)
     rows = [audit_unit(u, probe=not args.no_probe) for u in units]
-    bad = [r for r in rows if r["verdict"] not in ("OK",
-                                                   "NO_SCRIPT_RESOLVED")]
+    # An unresolvable service is an audit BLIND SPOT, not a pass. The
+    # whole point of this audit is that "we could not look" and "we
+    # looked and it was fine" must never render the same.
+    bad = [r for r in rows if r["verdict"] != "OK"]
 
     report = {"kind": "runtime_path_audit",
               "units_audited": len(rows),
@@ -171,7 +227,8 @@ def main() -> int:
         print(json.dumps(report, indent=1))
         return 0 if not bad else 1
 
-    print(f"RUNTIME PATH AUDIT — {len(rows)} active apex services\n")
+    scope = "installed" if args.all else "active"
+    print(f"RUNTIME PATH AUDIT — {len(rows)} {scope} apex services\n")
     for r in rows:
         mark = "ok " if r["verdict"] == "OK" else "!! "
         print(f"{mark}{r['unit']}")

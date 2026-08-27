@@ -494,3 +494,31 @@ def test_broad_discovery_can_never_assert_a_fact():
                       session="2026-08-27")["events"][0]
     assert ev.verification == "UNVERIFIED", \
         "an aggregator headline was treated as established fact"
+
+
+# ======================================= PROMPT CONTRACT VOCABULARY
+
+def test_the_contract_states_every_closed_vocabulary_it_enforces():
+    """Live traffic caught this: the first real interpretation was
+    refused for returning 'Regulatory enforcement action - individuals'
+    because the contract named the allowed FIELDS but never the allowed
+    VALUES. Enforcing an unwritten rule is a defect in the rule."""
+    from apex.catalyst.brain import PROMPT_CONTRACT
+    from apex.catalyst.events import EVENT_TYPES, IMPORTANCE
+    from apex.catalyst.reaction import DIRECTIONAL_EXPECTATION
+    for vocab in (EVENT_TYPES, IMPORTANCE, DIRECTIONAL_EXPECTATION):
+        for value in vocab:
+            assert value in PROMPT_CONTRACT, (
+                f"{value!r} is enforced by the validator but never "
+                f"shown to the interpreter")
+
+
+def test_the_contract_sha_tracks_the_vocabulary():
+    """The prompt is interpolated from the enforced tuples, so a new
+    event type changes the contract hash and every interpretation
+    remains traceable to the wording that produced it."""
+    import hashlib
+
+    from apex.catalyst.brain import PROMPT_CONTRACT, PROMPT_CONTRACT_SHA
+    assert PROMPT_CONTRACT_SHA == hashlib.sha256(
+        PROMPT_CONTRACT.encode()).hexdigest()[:16]
