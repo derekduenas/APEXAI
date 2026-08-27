@@ -27,3 +27,6 @@ data/live/
 !results/reality/
 .env.*
 secrets/*
+
+# unrelated tool state; churns constantly and would keep HASH_LINEAGE dirty
+.claude-flow/
