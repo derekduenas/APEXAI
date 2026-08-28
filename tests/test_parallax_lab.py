@@ -207,8 +207,12 @@ def test_commissioning_reruns_are_deduped_not_summed(tmp_path,
     d = tmp_path / "results/parallax"
     d.mkdir(parents=True)
     rows = []
-    for run in range(3):
-        for pid in ("PX_A", "PX_B"):
+    # run 1: three observations, one later found ineligible; run 2
+    # (corrected): only two. The canonical view must show run 2 alone
+    # -- a per-id dedupe cannot retract PX_C.
+    for run, ids in ((1, ("PX_A", "PX_B", "PX_C")),
+                     (2, ("PX_A", "PX_B"))):
+        for pid in ids:
             rows.append(json.dumps({
                 "kind": "parallax_violation", "eligible": True,
                 "parallax_id": pid, "episode_id": pid,
@@ -217,6 +221,8 @@ def test_commissioning_reruns_are_deduped_not_summed(tmp_path,
                 "violation_class": "FAILED_POSITIVE_REACTION"
                 if run == 2 else "EXPECTED_REACTION",
                 "expectation_debt": "HIGH"}))
+        rows.append(json.dumps({"kind": "parallax_session_pass",
+                                "session": "2026-08-28"}))
     (d / "commissioning.jsonl").write_text("\n".join(rows) + "\n")
     LAB.cmd_stats(None)
     out = capsys.readouterr().out

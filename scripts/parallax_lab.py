@@ -302,14 +302,25 @@ def _tier_rows() -> dict:
             if r.get("kind") == want_kind and r.get("eligible"):
                 out.append(r)
         if dedupe:
-            # a re-run appends a full corrected pass (append-only law);
-            # counting every run would triple the same observation, so
-            # keep the LATEST row per observation id. Previews are NOT
+            # a re-run appends a full corrected pass (append-only law).
+            # Keeping the latest row PER ID cannot retract an
+            # observation a corrected run EXCLUDED (the AMBIGUOUS rows
+            # proved it), so the canonical view is the LATEST COMPLETE
+            # RUN per session: violation rows buffered until their
+            # session_pass report row closes the run. Previews are NOT
             # deduped -- their duplicates are state transitions.
-            last = {}
-            for r in out:
-                last[r.get("parallax_id")] = r
-            out = list(last.values())
+            latest_run, buffer = {}, []
+            for line in Path(p).read_text().splitlines():
+                try:
+                    r = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if r.get("kind") == want_kind and r.get("eligible"):
+                    buffer.append(r)
+                elif r.get("kind") == "parallax_session_pass":
+                    latest_run[r.get("session")] = buffer
+                    buffer = []
+            out = [r for run in latest_run.values() for r in run]
         return out
     return {
         "PROSPECTIVE": rows(PX.VIOLATIONS, "parallax_violation"),
