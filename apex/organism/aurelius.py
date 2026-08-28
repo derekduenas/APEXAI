@@ -149,10 +149,7 @@ def gather_evidence(*, as_of: str | None = None,
           "attribution", "biggest_current_leak",
           "highest_evi_question"), 3),
         ("research_board", "results/edgeforge/research_board.jsonl",
-         ("kind", "id", "status", "question", "observation",
-          "verdict_now", "scorecard", "repairs", "law", "watch",
-          "state", "retrospective_validation", "sealed_utc",
-          "answers_aurelius_review_asks"), 12),
+         None, 12),
         ("opportunity_census", "results/edgeforge/opportunity_census"
          ".jsonl", ("kind", "id", "question", "status", "conclusion",
                     "verdict", "top_opportunities", "chase_gate_test",
@@ -165,8 +162,19 @@ def gather_evidence(*, as_of: str | None = None,
     ):
         try:
             rows = _rows(root / path, limit=n)
-            ev[name] = [{k: r.get(k) for k in keep if k in r}
-                        for r in rows]
+            if keep is None:
+                # full rows, hashes dropped, oversized values elided:
+                # a keep-list stripped governance seals to bare labels
+                # and the CIO rightly refused to trust them by name
+                ev[name] = [
+                    {k: (v if len(json.dumps(v, default=str)) <= 900
+                         else "ELIDED_OVERSIZE")
+                     for k, v in r.items()
+                     if k not in ("prev_hash", "entry_hash")}
+                    for r in rows]
+            else:
+                ev[name] = [{k: r.get(k) for k in keep if k in r}
+                            for r in rows]
         except Exception as e:                          # noqa: BLE001
             ev[name] = f"UNAVAILABLE: {type(e).__name__}"
 
@@ -302,8 +310,14 @@ def invoke_claude(prompt: str, *, model: str = DEFAULT_MODEL,
 # --------------------------------------------------------- conversation
 
 def _extract_forecasts(text: str) -> list:
-    return [ln.split("FORECAST:", 1)[1].strip()
-            for ln in text.splitlines() if "FORECAST:" in ln]
+    """Only lines PREFIXED with the marker, per the contract. Matching
+    the substring anywhere let AURELIUS's own prose about the forecast
+    mechanism corrupt its accountability record with fragments -- a
+    hole in the one mechanism designed to keep it honest, found by its
+    own red-team review."""
+    return [ln.strip().split("FORECAST:", 1)[1].strip()
+            for ln in text.splitlines()
+            if ln.strip().startswith("FORECAST:")]
 
 
 def ask(question: str, *, as_of: str | None = None,

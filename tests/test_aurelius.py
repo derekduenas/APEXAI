@@ -225,3 +225,32 @@ def test_the_review_gate_opens_when_everything_is_sealed(tmp_path):
     (r / "organism/experience_graph.jsonl").write_text("{}\n")
     g = AU.review_gate(session="2026-08-28", root=tmp_path)
     assert g["ready"] is True, g["blocked_by"]
+
+
+def test_prose_about_forecasts_cannot_pollute_the_record(tmp_path):
+    """Found by AURELIUS's own red team: substring matching let its
+    DISCUSSION of the mechanism corrupt its accountability record."""
+    conv = tmp_path / "c.jsonl"
+    rec = AU.ask("q", conversations=conv, _invoke=_fake_invoke(
+        'The board promises every `FORECAST:` line I issued is kept.\n'
+        'That mechanism matters.\n'
+        'FORECAST: refusals will stay at zero next session.'))
+    assert rec["forecasts"] == ["refusals will stay at zero next "
+                                "session."]
+
+
+def test_governance_seals_reach_the_cio_with_their_content(tmp_path,
+                                                           monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    b = tmp_path / "results/edgeforge"
+    b.mkdir(parents=True)
+    (b / "research_board.jsonl").write_text(json.dumps(
+        {"kind": "evidence_debt_register", "sealed_utc": "t",
+         "debts": {"CHASE_BAND": {"need": "prospective outcomes"}},
+         "prev_hash": "x", "entry_hash": "y"}) + "\n")
+    (tmp_path / "results/organism").mkdir()
+    (tmp_path / "results/equities").mkdir()
+    ev = AU.gather_evidence(root=tmp_path)
+    row = ev["research_board"][0]
+    assert row.get("debts"), "a governance seal reached the CIO bare"
+    assert "prev_hash" not in row
