@@ -285,3 +285,21 @@ def test_the_liquidity_floor_is_predeclared(tmp_path, monkeypatch):
     assert uni["eligible"] == ["SPY"]
     assert uni["thin"] == ["THIN"]
     assert uni["floor_shares_per_min"] == 20_000
+
+
+def test_liquidity_is_measured_over_rth_not_the_whole_file(tmp_path,
+                                                           monkeypatch):
+    """Caught by running it: measuring the median across the whole file
+    drags in overnight hours at ~zero volume, and the floor then
+    rejected SPY -- the most liquid instrument on the tape."""
+    import scripts.equity_shadow_session as S
+    root = tmp_path / "bars"
+    root.mkdir()
+    rth = bars([100.0] * 40, start_h=13, start_m=30, vol=90_000)
+    overnight = bars([100.0] * 300, start_h=1, start_m=0, vol=10)
+    (root / "SPY_2026-08-27.json").write_text(
+        json.dumps({"bars": overnight + rth}))
+    monkeypatch.setattr(S, "BARS_ROOT", root)
+    uni = S.eligible_universe("2026-08-27")
+    assert uni["eligible"] == ["SPY"], \
+        "overnight dead hours vetoed the most liquid symbol on the tape"

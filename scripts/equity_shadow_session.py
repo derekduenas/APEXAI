@@ -55,15 +55,32 @@ def load_bars(symbol: str, session: str) -> list:
         return []
 
 
+RTH_OPEN_UTC = "13:30"
+RTH_CLOSE_UTC = "20:00"
+
+
+def rth_only(bars: list) -> list:
+    """Liquidity must be measured over the REGULAR SESSION.
+
+    Measuring the median across the whole file drags in overnight and
+    extended hours where volume is near zero, and the floor then
+    rejects SPY -- the most liquid instrument on the tape. Caught by
+    running it: the eligible universe collapsed to a single symbol.
+    """
+    return [b for b in bars
+            if RTH_OPEN_UTC <= b["event_time_utc"][11:16] <= RTH_CLOSE_UTC]
+
+
 def eligible_universe(session: str) -> dict:
-    """Predeclared liquidity floor. Reported BEFORE any decision."""
+    """Predeclared liquidity floor, measured over RTH. Reported BEFORE
+    any decision."""
     ok, thin, missing = [], [], []
     if not BARS_ROOT.exists():
         return {"eligible": [], "thin": [], "missing": [],
                 "why": f"no bar store at {BARS_ROOT}"}
     for f in sorted(BARS_ROOT.glob(f"*_{session}.json")):
         sym = f.name.split("_")[0]
-        bars = load_bars(sym, session)
+        bars = rth_only(load_bars(sym, session))
         vols = [b.get("volume", 0) for b in bars]
         if len(bars) < day_trader.MIN_BARS:
             missing.append(sym)
@@ -88,7 +105,7 @@ def sweep(session: str, *, beat=None, roots: dict | None = None) -> dict:
                 if b["event_time_utc"] <= now.isoformat()]
         if not bars:
             continue
-        vols = [b.get("volume", 0) for b in bars]
+        vols = [b.get("volume", 0) for b in rth_only(bars)]
         try:
             d = day_trader.decide(
                 symbol=sym, session=session, bars=bars,
