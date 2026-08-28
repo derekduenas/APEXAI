@@ -70,6 +70,17 @@ def component_health(name: str, *, market_hours: bool = True,
             out["state"] = "FAILED"
             return out
         argv = _argv(unit)
+        # a service launched through a shell wrapper (the secrets
+        # launcher) shows the wrapper in argv; the real program lives
+        # inside it. Follow the wrapper -- the same blind spot the
+        # runtime path audit had, fixed the same way.
+        if expected and expected not in argv:
+            for tok in argv.replace("=", " ").split():
+                if tok.endswith(".sh"):
+                    try:
+                        argv += " " + Path(tok).read_text()
+                    except OSError:
+                        pass
         if expected and expected not in argv:
             # the wrong-program failure: active, described correctly,
             # running something else entirely
