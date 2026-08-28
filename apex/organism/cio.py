@@ -27,6 +27,12 @@ DIRECTIVES = Path("results/organism/cio_directives.jsonl")
 
 AUTHORITY = "RESEARCH_DIRECTION_ONLY"
 
+# The Evolutionary CIO's canonical identity (2026-08-28). Historical
+# generic-CIO artifacts keep their names -- renaming sealed records
+# would damage provenance for a cosmetic gain.
+NAME = "AURELIUS"
+TITLE = "AURELIUS — APEX Chief Investment & Evolution Officer"
+
 # hard research budget -- no recursive agent explosion
 MAX_ACTIVE_PRIMARY_HYPOTHESES = 5
 MAX_COMPETING_AGENTS_PER_HYPOTHESIS = 4
@@ -104,7 +110,8 @@ def daily_directive(*, session: str,
     leak = (refusal_stages.most_common(1)[0]
             if refusal_stages else ("NONE_OBSERVED", 0))
 
-    rec = {"kind": "cio_directive", "session": session,
+    rec = {"kind": "cio_directive", "cio": NAME,
+           "session": session,
            "sealed_utc": datetime.now(timezone.utc).isoformat(),
            "book": {k: st[k] for k in
                     ("capital", "realized_pnl", "open_positions",

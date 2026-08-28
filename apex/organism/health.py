@@ -43,6 +43,12 @@ COMPONENTS = {
     "EXPERIENCE_GRAPH": (None, None,
                          "results/organism/experience_graph.jsonl",
                          None),
+    # on-demand, operator-triggered: no unit, no cadence. Identity and
+    # transport state come from aurelius.transport_health(); the
+    # artifact here is the conversation chain it cannot rewrite.
+    "AURELIUS": (None, None,
+                 "results/organism/aurelius_conversations.jsonl",
+                 None),
 }
 
 
