@@ -267,6 +267,7 @@ def measure_violation(exp: dict, *, bars_by_symbol: dict,
     rec = {"kind": "parallax_violation",
            "parallax_id": exp["parallax_id"],
            "episode_id": exp["episode_id"],
+           "known_from": exp["known_from"],
            "symbol": sym, "eligible": True,
            "expected_direction": de,
            "horizon_min": horizon_min,
@@ -325,7 +326,13 @@ def episode_accounting(violations: list) -> dict:
     fams = {}
     for eid, vs in episodes.items():
         fam = INDEX_FAMILY.get(vs[0]["symbol"], "UNKNOWN")
-        bucket = str(vs[0].get("measured_utc", ""))[:13]
+        # bucket by EVENT hour, never by measurement hour: a batch
+        # post-close pass measures everything in the same minute, and
+        # bucketing on that collapsed 29 all-day episodes into "1
+        # independent" on the first real run -- conservative, but
+        # measuring the wrong dimension entirely
+        bucket = str(vs[0].get("known_from",
+                               vs[0].get("measured_utc", "")))[:13]
         fams.setdefault((fam, bucket), []).append(eid)
     clusters = [ids for ids in fams.values() if len(ids) > 1]
     independent = len(episodes) - sum(len(c) - 1 for c in clusters)

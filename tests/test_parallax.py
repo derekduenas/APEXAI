@@ -196,12 +196,25 @@ def test_horizons_of_one_event_are_one_episode():
 
 def test_a_same_family_cluster_is_correlated_not_independent():
     vs = [{"eligible": True, "episode_id": f"E{i}", "symbol": s,
-           "measured_utc": "2026-08-28T15:00"}
+           "known_from": "2026-08-28T15:00"}
           for i, s in enumerate(("NVDA", "AAPL", "MSFT"))]
     a = PX.episode_accounting(vs)
     assert a["episodes"] == 3
     assert a["correlated_clusters"] == 1
     assert a["independent_episode_estimate"] == 1
+
+
+def test_correlation_buckets_by_event_hour_not_measurement_hour():
+    """A batch post-close pass measures everything in the same minute;
+    that must not collapse a whole day into one cluster (it did, on
+    the first real run)."""
+    vs = [{"eligible": True, "episode_id": f"E{i}", "symbol": "NVDA",
+           "known_from": f"2026-08-28T{h:02d}:00:00Z",
+           "measured_utc": "2026-08-28T22:00"}
+          for i, h in enumerate((10, 13, 16))]
+    a = PX.episode_accounting(vs)
+    assert a["correlated_clusters"] == 0
+    assert a["independent_episode_estimate"] == 3
 
 
 def test_the_real_catalyst_event_dataclass_is_accepted(tmp_path):
