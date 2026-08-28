@@ -411,3 +411,33 @@ def test_stale_candidate_with_outcome_is_still_refused_upstream():
     j = join_attack_card(p, ledger=led)
     assert j["joined"] is False
     assert "hindsight" in j["why"] or "outcome" in j["why"]
+
+
+# ================= THE FRESHNESS FENCE (found live, first deployment)
+
+def test_a_prior_session_candidate_is_refused_as_stale(led):
+    """The initial cursor drain delivered Thursday's attacks on Friday
+    and the book funded both -- trades whose outcomes were already
+    public. Prospective means the outcome CANNOT yet be known."""
+    old = adapt_opt(opt_record(), led["cards"])   # known_from 08-28
+    run = AL.allocate([old], session="2026-08-29",
+                      book_ledger=led["book"],
+                      decision_ledger=led["dec"])
+    assert run["results"][0]["state"] == "REFUSED_STALE"
+    assert BK.state(ledger=led["book"])["open_positions"] == 0
+
+
+def test_a_voided_funding_leaves_the_economic_state(led):
+    env = adapt_opt(opt_record(eid="v1"), led["cards"])
+    AL.allocate([env], session="2026-08-28", book_ledger=led["book"],
+                decision_ledger=led["dec"])
+    assert BK.state(ledger=led["book"])["open_positions"] == 1
+    BK.void_funding(candidate_id="v1", why="test correction",
+                    ledger=led["book"])
+    st = BK.state(ledger=led["book"])
+    assert st["open_positions"] == 0
+    assert st["open_risk"] == 0.0
+    # and the chain still holds every record -- corrections append
+    kinds = [json.loads(l)["kind"] for l in
+             led["book"].read_text().splitlines() if l.strip()]
+    assert "paper_funding" in kinds and "paper_funding_void" in kinds

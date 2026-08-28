@@ -166,6 +166,26 @@ def allocate(envs: list, *, session: str,
 
     for env in sorted(envs, key=lambda e: e["declared_risk"]):
         cid = env["candidate_id"]
+        # THE FRESHNESS FENCE. A candidate from a prior session has a
+        # publicly resolved outcome; funding it is hindsight wearing a
+        # transport delay. Caught LIVE on first deployment: the initial
+        # cursor drain delivered Thursday's attacks and the book funded
+        # both. Prospective means the outcome CANNOT yet be known --
+        # same-session or refused.
+        cand_session = str(env["known_from"])[:10]
+        if cand_session != str(session)[:10]:
+            book.refuse(env, stage="STALE_CANDIDATE",
+                        reasons=[f"candidate is from {cand_session}, "
+                                 f"current session is {session}: its "
+                                 f"outcome may already be knowable and "
+                                 f"funding it would be hindsight"],
+                        session=session, ledger=book_ledger)
+            results.append({"candidate_id": cid,
+                            "sleeve": env["sleeve"],
+                            "symbol": env["symbol"],
+                            "state": "REFUSED_STALE"})
+            answered.add(cid)
+            continue
         if cid in answered:
             results.append({"candidate_id": cid,
                             "sleeve": env["sleeve"],

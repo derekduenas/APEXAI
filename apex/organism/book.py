@@ -47,12 +47,17 @@ def state(*, ledger: Path | None = None,
     the ledger IS the state, so reconciliation is a replay, not a
     guess."""
     rows = _rows(ledger or LEDGER)
-    funded, outcomes = {}, {}
+    funded, outcomes, voided = {}, {}, set()
     for r in rows:
         if r.get("kind") == "paper_funding":
             funded[r["candidate_id"]] = r
         elif r.get("kind") == "paper_outcome":
             outcomes[r["candidate_id"]] = r
+        elif r.get("kind") == "paper_funding_void":
+            voided.add(r["candidate_id"])
+    for cid in voided:                 # a voided funding never existed
+        funded.pop(cid, None)          # economically; the record stays
+        outcomes.pop(cid, None)        # as the correction's evidence
 
     open_pos, closed = [], []
     for cid, f in funded.items():
@@ -166,5 +171,19 @@ def attach_outcome(*, candidate_id: str, session: str,
            "detail": detail or {},
            "attached_utc": _now(),
            "law": "appended against a sealed funding, never merged",
+           "decision_power": "ACCOUNTING_ONLY"}
+    return chain_append(ledger or LEDGER, rec)
+
+
+def void_funding(*, candidate_id: str, why: str,
+                 ledger: Path | None = None) -> dict:
+    """Append-only correction: the funding record stays in the chain,
+    and this record removes it from the ECONOMIC state. Used when a
+    funding is discovered to have violated the prospective law -- the
+    one thing the book must never contain is a position whose outcome
+    was knowable at funding time."""
+    rec = {"kind": "paper_funding_void", "candidate_id": candidate_id,
+           "why": why, "voided_utc": _now(),
+           "law": "corrections append; history is never rewritten",
            "decision_power": "ACCOUNTING_ONLY"}
     return chain_append(ledger or LEDGER, rec)
