@@ -99,7 +99,12 @@ def expectation_from_event(ev: dict) -> dict | None:
         ev = dataclasses.asdict(ev)
     de = ev.get("directional_expectation", "UNKNOWN")
     ekf = ev.get("expectation_known_from", "NONE")
-    if de in ("UNKNOWN", None) or ekf in ("NONE", None):
+    # ONLY a directional expectation can be directionally violated.
+    # The governed vocabulary also holds AMBIGUOUS -- the first live
+    # playback caught an AMBIGUOUS event being silently signed as
+    # NEGATIVE, which is a fabricated expectation. Whitelist, never
+    # blocklist, a vocabulary.
+    if de not in ("POSITIVE", "NEGATIVE") or ekf in ("NONE", None):
         return None
     syms = [s for s in (ev.get("affected_symbols") or [])
             if s in INDEX_FAMILY]
@@ -382,11 +387,14 @@ def observe_session(*, session: str, close_utc, events: list,
         considered += 1
         exp = expectation_from_event(ev)
         if exp is None:
-            why = ("NO_PRE_REACTION_EXPECTATION"
-                   if ev.get("directional_expectation") in
-                   ("UNKNOWN", None)
-                   or ev.get("expectation_known_from") in
-                   ("NONE", None) else "NO_UNIVERSE_SYMBOL")
+            de = ev.get("directional_expectation")
+            if de in ("UNKNOWN", None) or \
+                    ev.get("expectation_known_from") in ("NONE", None):
+                why = "NO_PRE_REACTION_EXPECTATION"
+            elif de not in ("POSITIVE", "NEGATIVE"):
+                why = "NON_DIRECTIONAL_EXPECTATION"
+            else:
+                why = "NO_UNIVERSE_SYMBOL"
             ineligible[why] = ineligible.get(why, 0) + 1
             continue
         eligible += 1

@@ -90,6 +90,20 @@ def test_no_expectation_means_not_parallax_eligible():
     assert PX.expectation_from_event(e) is None
 
 
+def test_ambiguous_expectation_cannot_be_directionally_violated():
+    """First live playback caught AMBIGUOUS silently signed as
+    NEGATIVE -- a fabricated expectation. Only POSITIVE/NEGATIVE are
+    parallax-eligible; the governed vocabulary is whitelisted."""
+    assert PX.expectation_from_event(ev(de="AMBIGUOUS")) is None
+    rep = PX.observe_session(
+        session="2026-08-28", close_utc=CLOSE,
+        events=[ev(de="AMBIGUOUS")],
+        load_bars=lambda s: [], atr_fn=lambda b: 1.0,
+        expectations_ledger=Path("x"), violations_ledger=Path("x"))
+    assert rep["denominator"]["ineligible"][
+        "NON_DIRECTIONAL_EXPECTATION"] == 1
+
+
 def test_an_expectation_formed_mid_reaction_is_refused(tmp_path):
     exp = PX.expectation_from_event(ev())
     exp["expectation_created_at"] = "2026-08-28T15:00:00Z"  # after kf
