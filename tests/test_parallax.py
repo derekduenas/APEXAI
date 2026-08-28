@@ -204,6 +204,32 @@ def test_a_same_family_cluster_is_correlated_not_independent():
     assert a["independent_episode_estimate"] == 1
 
 
+def test_the_real_catalyst_event_dataclass_is_accepted(tmp_path):
+    """The live ledger yields CatalystEvent objects, not dicts --
+    assuming dicts is the schema-guessing defect class that cost two
+    candidates on Thursday. Fixture built from the REAL dataclass."""
+    from apex.catalyst.events import CatalystEvent
+    real = CatalystEvent(
+        event_id="EV_REAL", event_type="EARNINGS",
+        event_time="2026-08-28T13:55:00Z",
+        first_seen="2026-08-28T13:56:00Z",
+        known_from="2026-08-28T14:00:00Z", scheduled=True,
+        headline="h", factual_summary="s",
+        affected_symbols=("NVDA",), importance="HIGH",
+        directional_expectation="POSITIVE",
+        expectation_source="LLM_DERIVED_INTERPRETATION",
+        expectation_known_from="2026-08-28T14:00:00Z")
+    exp = PX.expectation_from_event(real)
+    assert exp is not None and exp["symbol"] == "NVDA"
+    rep = PX.observe_session(
+        session="2026-08-28", close_utc=CLOSE, events=[real],
+        load_bars=lambda s: bars([100 + i * 0.2 for i in range(30)]),
+        atr_fn=lambda b: 1.0,
+        expectations_ledger=tmp_path / "e.jsonl",
+        violations_ledger=tmp_path / "v.jsonl")
+    assert rep["denominator"]["measured"] == 1
+
+
 # ================================================== SESSION PASS
 
 def test_observe_session_seals_the_full_denominator(tmp_path):

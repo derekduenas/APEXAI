@@ -89,7 +89,14 @@ def expectation_from_event(ev: dict) -> dict | None:
     enforced upstream by the CAT-RXN repair). If the event carries no
     pre-reaction directional expectation it is NOT_PARALLAX_ELIGIBLE --
     there is nothing to be violated.
+
+    Accepts the governed CatalystEvent dataclass or its dict form --
+    the live ledger produces the former; assuming dicts is exactly the
+    schema-guessing defect class that cost two candidates on Thursday.
     """
+    import dataclasses
+    if dataclasses.is_dataclass(ev) and not isinstance(ev, dict):
+        ev = dataclasses.asdict(ev)
     de = ev.get("directional_expectation", "UNKNOWN")
     ekf = ev.get("expectation_known_from", "NONE")
     if de in ("UNKNOWN", None) or ekf in ("NONE", None):
@@ -350,7 +357,10 @@ def observe_session(*, session: str, close_utc, events: list,
     ineligible: dict[str, int] = {}
     violations, classes, debts = [], {}, {}
 
+    import dataclasses
     for ev in events:
+        if dataclasses.is_dataclass(ev) and not isinstance(ev, dict):
+            ev = dataclasses.asdict(ev)
         considered += 1
         exp = expectation_from_event(ev)
         if exp is None:
