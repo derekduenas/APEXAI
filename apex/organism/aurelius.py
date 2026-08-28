@@ -169,6 +169,15 @@ def gather_evidence(*, as_of: str | None = None,
           "aligned_move_atr", "informational_vs_expressible",
           "eligible", "commissioning_label", "label",
           "denominator", "episode_accounting"), 6),
+        # intraday previews, permanently labeled: AURELIUS may discuss
+        # them but must distinguish PARALLAX_LIVE_PREVIEW from the
+        # sealed prospective record -- a preview/canonical disagreement
+        # is calibration information, not a correction target
+        ("parallax_live_previews",
+         "results/parallax/live_previews.jsonl",
+         ("parallax_id", "symbol", "expected_direction",
+          "violation_class", "expectation_debt", "label",
+          "aligned_move_atr", "measured_utc"), 6),
     ):
         try:
             rows = _rows(root / path, limit=n)

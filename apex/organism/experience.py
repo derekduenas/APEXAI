@@ -28,6 +28,13 @@ SOURCES = {
     "allocator": Path("results/organism/allocator_decisions.jsonl"),
     "research_board": Path("results/edgeforge/research_board.jsonl"),
     "census": Path("results/edgeforge/opportunity_census.jsonl"),
+    # PARALLAX observations enter the MEMORY only -- the graph is
+    # derived and nothing on a trading path reads it at decision time.
+    # Stream names carry provenance so AS_KNOWN_AT answers arrive
+    # tier-labeled: prospective vs retrospective commissioning.
+    "parallax_prospective": Path("results/parallax/violations.jsonl"),
+    "parallax_commissioning": Path("results/parallax/commissioning"
+                                   ".jsonl"),
 }
 
 GRAPH = Path("results/organism/experience_graph.jsonl")

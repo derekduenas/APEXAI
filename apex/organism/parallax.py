@@ -282,8 +282,11 @@ def measure_violation(exp: dict, *, bars_by_symbol: dict,
            "measured_utc": _now(),
            "law": "the violation is a question, not alpha",
            "decision_power": AUTHORITY}
-    if ledger is not None or VIOLATIONS:
-        chain_append(ledger or VIOLATIONS, rec)
+    # write ONLY when a ledger is named: playback and live previews
+    # measure without sealing, and a default-write here would let a
+    # replay contaminate the canonical prospective record
+    if ledger is not None:
+        chain_append(ledger, rec)
     return rec
 
 
