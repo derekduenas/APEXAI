@@ -480,3 +480,25 @@ def test_options_aggregate_attaches_only_when_it_is_one_trade(
     assert st["realized_pnl"] == -35.0
     # a second call must not double-attach
     assert S.attach_new_outcomes("2026-08-28") == 0
+
+
+def test_baselines_are_computed_but_never_fund(led):
+    """The comparators exist beside every run; the book hears only
+    from the real arena."""
+    envs = [adapt_opt(opt_record(), led["cards"]),
+            CA.from_equity(eq_record())]
+    run = AL.allocate(envs, session="2026-08-28",
+                      book_ledger=led["book"],
+                      decision_ledger=led["dec"])
+    b = run["baseline_diagnostics"]
+    assert set(b["policies"]) == {"CASH", "EQUAL_RISK_ALL_ELIGIBLE",
+                                  "FIRST_VALID_CANDIDATE"}
+    assert b["policies"]["CASH"]["funds"] == []
+    assert len(b["policies"]["EQUAL_RISK_ALL_ELIGIBLE"]["funds"]) == 2
+    assert len(b["policies"]["FIRST_VALID_CANDIDATE"]["funds"]) == 1
+    # and the real book contains only what the REAL arena funded
+    st = BK.state(ledger=led["book"])
+    assert st["open_positions"] == 2   # arena funded both here
+    kinds = {json.loads(l)["kind"] for l in
+             led["book"].read_text().splitlines() if l.strip()}
+    assert "baseline_funding" not in kinds

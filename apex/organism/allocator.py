@@ -153,6 +153,16 @@ def allocate(envs: list, *, session: str,
 
     relations = cross_sleeve_relations(envs)
 
+    # predeclared diagnostic baselines, sealed BESIDE the real decision
+    # every run -- so Capital Arena's value can later be judged against
+    # comparators chosen before the evidence existed. Never funds.
+    try:
+        from apex.organism.baselines import baseline_decisions
+        baselines = baseline_decisions(
+            envs, book.state(ledger=book_ledger, session=session))
+    except Exception as e:                              # noqa: BLE001
+        baselines = {"UNAVAILABLE": f"{type(e).__name__}: {e}"}
+
     # cheapest-risk first: the cheapest way to learn goes first (the
     # arena's own incumbent ordering law)
     # idempotence FIRST: a candidate the book has already answered is
@@ -255,6 +265,7 @@ def allocate(envs: list, *, session: str,
     run = {"kind": "allocation_run", "session": session,
            "run_utc": _now(), "candidates": len(envs),
            "cross_sleeve_relations": relations,
+           "baseline_diagnostics": baselines,
            "results": results, "fail_closed": False,
            "release_sha": release_sha,
            "decision_power": "PAPER_ALLOCATION_ONLY"}
