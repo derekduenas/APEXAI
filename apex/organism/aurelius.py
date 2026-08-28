@@ -321,3 +321,74 @@ def track_record(*, conversations: Path | None = None) -> dict:
             "law": "preserved verbatim; calibration is judged against "
                    "later evidence, never against a revised memory",
             "decision_power": "RESEARCH_DIRECTION_ONLY"}
+
+
+# ------------------------------------------------------ review gate
+
+def review_gate(*, session: str, root: Path = Path(".")) -> dict:
+    """THE SEQUENCING LAW: AURELIUS may not conduct the post-session
+    review until every resolution artifact that could change the
+    economics is sealed. Reviewing a half-resolved organism produces a
+    first review that later has to reinterpret itself -- which is the
+    hindsight door, opened politely.
+
+        RTH close -> equity resolved -> options resolved -> BTC
+        current -> catalyst post-close seal -> book reconciled ->
+        graph caught up -> THEN the review.
+    """
+    checks = {}
+
+    def rows(path):
+        p = root / path
+        if not p.exists():
+            return []
+        out = []
+        for line in p.read_text().splitlines():
+            if line.strip():
+                try:
+                    out.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+        return out
+
+    eq_dec = [r for r in rows("results/equities/shadow_decisions.jsonl")
+              if r.get("session") == session
+              and r.get("decision") == "ATTACK_READY_SHADOW"]
+    eq_out = {r.get("decision_id") for r in
+              rows("results/equities/shadow_outcomes.jsonl")}
+    checks["EQUITY_RESOLVED"] = all(
+        d["decision_id"] in eq_out for d in eq_dec) if eq_dec else True
+
+    checks["OPTIONS_RESOLVED"] = any(
+        r.get("kind") == "options_session_scoreboard"
+        and r.get("session") == session
+        for r in rows("results/options_live_ledger.jsonl"))
+
+    checks["CATALYST_POST_CLOSE_SEALED"] = any(
+        c.get("session") == session
+        and c.get("phase") == "POST_CLOSE_SEAL"
+        for c in rows("results/catalyst/cycles.jsonl"))
+
+    from apex.organism import book as _book
+    st = _book.state(ledger=root / _book.LEDGER, session=session)
+    same_session_open = [
+        p for p in st["positions"]
+        if str(p.get("candidate_id", ""))]
+    book_rows = rows("results/organism/paper_book.jsonl")
+    open_this_session = {
+        r["candidate_id"] for r in book_rows
+        if r.get("kind") == "paper_funding"
+        and r.get("session") == session} - {
+        r["candidate_id"] for r in book_rows
+        if r.get("kind") in ("paper_outcome", "paper_funding_void")}
+    checks["BOOK_RECONCILED"] = not open_this_session
+
+    graph = root / Path("results/organism/experience_graph.jsonl")
+    checks["GRAPH_PRESENT"] = graph.exists()
+
+    ready = all(checks.values())
+    return {"kind": "aurelius_review_gate", "session": session,
+            "ready": ready, "checks": checks,
+            "blocked_by": [k for k, v in checks.items() if not v],
+            "law": "no review of a half-resolved organism",
+            "decision_power": "NONE_OBSERVATIONAL"}

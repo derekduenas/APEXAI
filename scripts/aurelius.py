@@ -56,6 +56,8 @@ def main() -> int:
     a.add_argument("--as-of", default=None)
     a.add_argument("question", nargs="+")
     sub.add_parser("track-record")
+    g = sub.add_parser("review")
+    g.add_argument("--session", default=None)
     sub.add_parser("health")
     args = ap.parse_args()
 
@@ -65,6 +67,26 @@ def main() -> int:
     if args.cmd == "track-record":
         print(json.dumps(aurelius.track_record(), indent=1))
         return 0
+    if args.cmd == "review":
+        from datetime import datetime, timezone
+        from apex.ops.timebase import ET
+        session = args.session or datetime.now(timezone.utc) \
+            .astimezone(ET).strftime("%Y-%m-%d")
+        gate = aurelius.review_gate(session=session)
+        if not gate["ready"]:
+            print(f"[REVIEW GATE CLOSED for {session}] blocked by: "
+                  f"{gate['blocked_by']}\n"
+                  f"AURELIUS does not review a half-resolved organism.")
+            return 1
+        print(f"[review gate OPEN for {session} -- all resolution "
+              f"artifacts sealed]\n")
+        rec = one(f"Conduct the full post-session organism review for "
+                  f"{session}. Separate cleanly: what happened, why, "
+                  f"what is evidence, what is still unknown, what "
+                  f"deserves more observation, and what if anything "
+                  f"should change. Default production recommendation "
+                  f"is NO CHANGE unless the evidence is exceptional.")
+        return 0 if rec else 1
     if args.cmd == "ask":
         rec = one(" ".join(args.question), as_of=args.as_of)
         return 0 if rec else 1

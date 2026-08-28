@@ -151,6 +151,17 @@ def resolve_session(session: str, *, roots: dict | None = None) -> dict:
     if not b["trading_day"]:
         return {"resolved": 0, "why": "not a trading day"}
     close = b["close_utc"]
+    # idempotent across restarts: a decision already resolved in the
+    # outcomes ledger is never resolved twice -- a service restart
+    # after the close must not duplicate outcome rows
+    already = set()
+    if Path(outp).exists():
+        for line in Path(outp).read_text().splitlines():
+            if line.strip():
+                try:
+                    already.add(json.loads(line).get("decision_id"))
+                except json.JSONDecodeError:
+                    continue
     done, skipped = 0, 0
     for line in Path(led).read_text().splitlines():
         if not line.strip():
@@ -160,6 +171,9 @@ def resolve_session(session: str, *, roots: dict | None = None) -> dict:
         except json.JSONDecodeError:
             continue
         if d.get("session") != session:
+            continue
+        if d.get("decision_id") in already:
+            skipped += 1
             continue
         res = shadow_resolution.resolve(
             decision=d, bars=load_bars(d["symbol"], session),

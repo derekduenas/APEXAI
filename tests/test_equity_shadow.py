@@ -307,3 +307,38 @@ def test_liquidity_is_measured_over_rth_not_the_whole_file(tmp_path,
     uni = S.eligible_universe("2026-08-27")
     assert uni["eligible"] == ["SPY"], \
         "overnight dead hours vetoed the most liquid symbol on the tape"
+
+
+def test_resolution_is_idempotent_across_restarts(tmp_path, monkeypatch):
+    """A restart after the close must not duplicate outcome rows."""
+    import scripts.equity_shadow_session as S
+    led = tmp_path / "dec.jsonl"
+    outp = tmp_path / "out.jsonl"
+    dec = {"kind": "equity_shadow_decision", "session": "2026-08-28",
+           "decision": "ATTACK_READY_SHADOW", "decision_id": "r1",
+           "symbol": "SPY", "direction": "LONG",
+           "known_from": "2026-08-28T14:00:00Z",
+           "entry_fill": 100.0, "stop": 90.0, "quantity": 10,
+           "declared_1R": 100.0, "friction_per_share": 0.01}
+    led.write_text(json.dumps(dec) + "\n")
+    root = tmp_path / "bars"
+    root.mkdir()
+    (root / "SPY_2026-08-28.json").write_text(json.dumps(
+        {"bars": [{"event_time_utc": f"2026-08-28T{h:02d}:00:00.000Z",
+                   "open": 100, "high": 101, "low": 99, "close": 100.5,
+                   "volume": 9} for h in range(15, 20)]}))
+    monkeypatch.setattr(S, "BARS_ROOT", root)
+    monkeypatch.setattr(S.session_bounds.__module__ and S, "session_bounds",
+                        lambda s: {"trading_day": True,
+                                   "close_utc": __import__("datetime")
+                                   .datetime(2026, 8, 28, 20, 0,
+                                             tzinfo=__import__("datetime")
+                                             .timezone.utc)})
+    r1 = S.resolve_session("2026-08-28",
+                           roots={"ledger": led, "outcomes": outp})
+    r2 = S.resolve_session("2026-08-28",
+                           roots={"ledger": led, "outcomes": outp})
+    assert r1["resolved"] == 1
+    assert r2["resolved"] == 0, "a restart duplicated an outcome"
+    rows = [l for l in outp.read_text().splitlines() if l.strip()]
+    assert len(rows) == 1

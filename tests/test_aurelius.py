@@ -185,3 +185,43 @@ def test_history_is_opt_in_and_bounded(tmp_path):
            history=[{"q": "earlier question", "a": "earlier answer"}],
            _invoke=inv)
     assert "earlier question" in inv.last_prompt
+
+
+def test_the_review_gate_blocks_a_half_resolved_organism(tmp_path):
+    """An unresolved same-session funding closes the gate."""
+    (tmp_path / "results/organism").mkdir(parents=True)
+    (tmp_path / "results/organism/paper_book.jsonl").write_text(
+        json.dumps({"kind": "paper_funding", "session": "2026-08-28",
+                    "candidate_id": "x", "symbol": "NVDA",
+                    "sleeve": "EQUITY", "direction": "SHORT",
+                    "expression": "STOCK", "funded_risk": 300.0,
+                    "declared_risk": 300.0}) + "\n")
+    g = AU.review_gate(session="2026-08-28", root=tmp_path)
+    assert g["ready"] is False
+    assert "BOOK_RECONCILED" in g["blocked_by"]
+
+
+def test_the_review_gate_opens_when_everything_is_sealed(tmp_path):
+    r = tmp_path / "results"
+    (r / "organism").mkdir(parents=True)
+    (r / "equities").mkdir()
+    (r / "catalyst").mkdir()
+    (r / "organism/paper_book.jsonl").write_text(
+        json.dumps({"kind": "paper_funding", "session": "2026-08-28",
+                    "candidate_id": "x", "symbol": "NVDA",
+                    "sleeve": "EQUITY", "direction": "SHORT",
+                    "expression": "STOCK", "funded_risk": 300.0,
+                    "declared_risk": 300.0}) + "\n" +
+        json.dumps({"kind": "paper_outcome", "session": "2026-08-28",
+                    "candidate_id": "x", "executable_pnl": -10.0,
+                    "outcome_class": "THESIS_FAILURE"}) + "\n")
+    (r / "equities/shadow_decisions.jsonl").write_text("")
+    (r / "equities/shadow_outcomes.jsonl").write_text("")
+    (r / "options_live_ledger.jsonl").write_text(json.dumps(
+        {"kind": "options_session_scoreboard",
+         "session": "2026-08-28"}) + "\n")
+    (r / "catalyst/cycles.jsonl").write_text(json.dumps(
+        {"session": "2026-08-28", "phase": "POST_CLOSE_SEAL"}) + "\n")
+    (r / "organism/experience_graph.jsonl").write_text("{}\n")
+    g = AU.review_gate(session="2026-08-28", root=tmp_path)
+    assert g["ready"] is True, g["blocked_by"]
