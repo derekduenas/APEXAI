@@ -317,7 +317,15 @@ def resolve_debt(violation: dict, *, later_signed_return: float | None,
 def episode_accounting(violations: list) -> dict:
     """One event is one episode however many horizons it spans, and a
     same-family cluster in one time bucket is correlated, not five
-    experiments."""
+    experiments.
+
+    THE VOCABULARY IS DELIBERATELY WEAK: event-hour clustering reduces
+    obvious pseudoreplication -- an earnings shock at 10:00 and its
+    continued reaction at 11:00 can still be ONE information episode,
+    so no independence count is reported. Anything stronger than
+    NOT_ESTIMABLE would let PARALLAX manufacture sample size, the
+    exact defect it exists to prevent.
+    """
     episodes = {}
     for v in violations:
         if not v.get("eligible"):
@@ -328,20 +336,20 @@ def episode_accounting(violations: list) -> dict:
         fam = INDEX_FAMILY.get(vs[0]["symbol"], "UNKNOWN")
         # bucket by EVENT hour, never by measurement hour: a batch
         # post-close pass measures everything in the same minute, and
-        # bucketing on that collapsed 29 all-day episodes into "1
-        # independent" on the first real run -- conservative, but
-        # measuring the wrong dimension entirely
+        # bucketing on that collapsed 29 all-day episodes into one
+        # cluster on the first real run -- conservative, but measuring
+        # the wrong dimension entirely
         bucket = str(vs[0].get("known_from",
                                vs[0].get("measured_utc", "")))[:13]
         fams.setdefault((fam, bucket), []).append(eid)
-    clusters = [ids for ids in fams.values() if len(ids) > 1]
-    independent = len(episodes) - sum(len(c) - 1 for c in clusters)
     return {"raw_observations": len(violations),
             "episodes": len(episodes),
-            "correlated_clusters": len(clusters),
-            "independent_episode_estimate": max(independent, 0),
-            "law": "raw observations are not samples; episodes are "
-                   "not automatically independent"}
+            "event_hour_clusters": len(fams),
+            "independent_episodes": "NOT_ESTIMABLE",
+            "law": "event-hour clustering reduces obvious "
+                   "pseudoreplication; it does not prove "
+                   "independence -- no machinery here can earn an "
+                   "independence count yet"}
 
 
 # ------------------------------------------------------ session pass

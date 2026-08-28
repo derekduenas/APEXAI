@@ -194,14 +194,26 @@ def test_horizons_of_one_event_are_one_episode():
     assert a["episodes"] == 1
 
 
+def test_independence_is_never_claimed():
+    """Event-hour clustering reduces pseudoreplication; it does not
+    prove independence. Reporting a number here would let PARALLAX
+    manufacture sample size -- the defect it exists to prevent."""
+    vs = [{"eligible": True, "episode_id": f"E{i}", "symbol": "NVDA",
+           "known_from": f"2026-08-28T{h:02d}:00:00Z"}
+          for i, h in enumerate((10, 13, 16))]
+    a = PX.episode_accounting(vs)
+    assert a["independent_episodes"] == "NOT_ESTIMABLE"
+    assert "independent_episode_estimate" not in a
+
+
 def test_a_same_family_cluster_is_correlated_not_independent():
     vs = [{"eligible": True, "episode_id": f"E{i}", "symbol": s,
            "known_from": "2026-08-28T15:00"}
           for i, s in enumerate(("NVDA", "AAPL", "MSFT"))]
     a = PX.episode_accounting(vs)
     assert a["episodes"] == 3
-    assert a["correlated_clusters"] == 1
-    assert a["independent_episode_estimate"] == 1
+    assert a["event_hour_clusters"] == 1
+    assert a["independent_episodes"] == "NOT_ESTIMABLE"
 
 
 def test_correlation_buckets_by_event_hour_not_measurement_hour():
@@ -213,8 +225,8 @@ def test_correlation_buckets_by_event_hour_not_measurement_hour():
            "measured_utc": "2026-08-28T22:00"}
           for i, h in enumerate((10, 13, 16))]
     a = PX.episode_accounting(vs)
-    assert a["correlated_clusters"] == 0
-    assert a["independent_episode_estimate"] == 3
+    assert a["event_hour_clusters"] == 3
+    assert a["independent_episodes"] == "NOT_ESTIMABLE"
 
 
 def test_the_real_catalyst_event_dataclass_is_accepted(tmp_path):
