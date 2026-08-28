@@ -73,6 +73,15 @@ def component_health(name: str, *, market_hours: bool = True,
         active = _active(unit)
         out["checks"].append(f"systemd={active}")
         if active != "active":
+            # a calendar-triggered service is SUPPOSED to be inactive
+            # outside its hours -- the weekend readiness audit flagged
+            # the options session FAILED for correctly not running on
+            # a Saturday. Off-hours inactivity is idleness, not death.
+            if not market_hours:
+                out["state"] = "UNKNOWN"
+                out["checks"].append("inactive off-hours "
+                                     "(calendar-triggered: expected)")
+                return out
             out["state"] = "FAILED"
             return out
         argv = _argv(unit)
