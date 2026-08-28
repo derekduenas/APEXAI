@@ -772,3 +772,152 @@ def test_reaction_rows_carry_lineage_and_evidence_class(tmp_path):
     assert rec["evidence_class"] == "RETROSPECTIVE_REPAIR_VALIDATION"
     assert rec["source_lineage"] and rec["market_data_lineage"]
     assert rec["known_from"] == "2026-08-27T14:30:00Z"
+
+
+# ============================ CAT-RXN directional_expectation repair
+
+def _interp_event(expectation="POSITIVE"):
+    """An event carrying an LLM-sealed expectation, as the repaired
+    interpreter now produces."""
+    ev = build_events([_raw(known_from="2026-08-27T14:00:00Z",
+                            first_seen_time="2026-08-27T14:00:00Z")],
+                      session="2026-08-27")["events"][0]
+    ev.affected_symbols = ("SPY",)
+    if expectation != "UNKNOWN":
+        ev.directional_expectation = expectation
+        ev.expectation_source = "LLM_DERIVED_INTERPRETATION"
+        ev.expectation_contract_sha = "deadbeefdeadbeef"
+        ev.expectation_known_from = ev.known_from
+    return ev
+
+
+def _bars(tmp_path, closes, *, step_min=1):
+    """MINUTE bars, because the governed horizons are 1m/5m/15m/30m/60m
+    and an hourly fixture leaves every one of them unestimable."""
+    d = tmp_path / "bars"
+    d.mkdir(exist_ok=True)
+    rows = []
+    for i, c in enumerate(closes):
+        m = i * step_min
+        rows.append({
+            "event_time_utc":
+                f"2026-08-27T{14 + m // 60:02d}:{m % 60:02d}:00.000Z",
+            "open": c, "high": c + 0.05, "low": c - 0.05, "close": c,
+            "volume": 9})
+    (d / "SPY_2026-08-27.json").write_text(json.dumps({"bars": rows}))
+    return d
+
+
+def test_the_interpreter_no_longer_drops_the_expectation():
+    it = ClaudeCliInterpreter(model="haiku")
+    ev = build_events([_raw()], session="2026-08-27")["events"][0]
+    ref = ev.observations[0].source_ref
+    it._invoke = lambda p: {ev.event_id: {
+        "event_type": "CENTRAL_BANK", "directional_expectation": "NEGATIVE",
+        "factual_summary": "x", "cited_source_refs": [ref]}}
+    assert it.interpret_many([ev])["interpreted"] == 1
+    assert ev.directional_expectation == "NEGATIVE"
+    assert ev.expectation_source == "LLM_DERIVED_INTERPRETATION"
+    assert ev.expectation_contract_sha != "NONE"
+
+
+def test_an_expectation_may_never_masquerade_as_a_source_fact():
+    from apex.catalyst.events import CatalystEvent, CatalystViolation
+    with pytest.raises(CatalystViolation, match="never a source fact"):
+        CatalystEvent(event_id="e", event_type="OTHER", event_time="t",
+                      first_seen="a", known_from="a", scheduled=False,
+                      headline="h", factual_summary="s",
+                      directional_expectation="POSITIVE")
+
+
+def test_expectation_does_not_promote_verification():
+    """HIGH importance + UNVERIFIED + NEGATIVE expectation is valid."""
+    ev = _interp_event("NEGATIVE")
+    ev.importance = "HIGH"
+    ev.verification = "UNVERIFIED"
+    assert ev.verification == "UNVERIFIED"
+    assert ev.directional_expectation == "NEGATIVE"
+
+
+@pytest.mark.parametrize("expectation,closes,expect_class", [
+    # flat tape: nothing moves beyond the ATR floor, so a directional
+    # expectation is contradicted in both polarities
+    ("POSITIVE", [100 + (i % 2) * 0.01 for i in range(20)],
+     "FAILED_POSITIVE_REACTION"),
+    ("NEGATIVE", [100 + (i % 2) * 0.01 for i in range(20)],
+     "FAILED_NEGATIVE_REACTION"),
+    ("UNKNOWN", [100 + i * 0.5 for i in range(20)], "UNKNOWN"),
+])
+def test_expectation_versus_observed_now_classifies(tmp_path, expectation,
+                                                    closes, expect_class):
+    from apex.catalyst.pipeline import attach_reactions
+    ev = _interp_event(expectation)
+    out = attach_reactions(session="2026-08-27", events=[ev],
+                           close_utc="2026-08-27T20:00:00Z",
+                           bars_root=_bars(tmp_path, closes),
+                           ledger=tmp_path / "r.jsonl")
+    assert out["reactions_written"] == 1
+    rec = json.loads((tmp_path / "r.jsonl").read_text().splitlines()[0])
+    assert rec["classification"]["reaction_class"] == expect_class
+    assert rec["directional_expectation"] == expectation
+
+
+def test_an_expectation_formed_after_the_path_began_is_refused(tmp_path):
+    """No hindsight: expectation must precede the reaction horizon."""
+    from apex.catalyst.pipeline import attach_reactions
+    ev = _interp_event("POSITIVE")
+    ev.expectation_known_from = "2026-08-27T19:00:00Z"   # after the path
+    out = attach_reactions(session="2026-08-27", events=[ev],
+                           close_utc="2026-08-27T23:00:00Z",
+                           bars_root=_bars(
+                               tmp_path,
+                               [100 - i * 0.5 for i in range(20)]),
+                           ledger=tmp_path / "r.jsonl")
+    rec = json.loads((tmp_path / "r.jsonl").read_text().splitlines()[0])
+    assert rec["directional_expectation"] == "UNKNOWN", \
+        "a late expectation was allowed to grade an earlier path"
+
+
+def test_expectation_survives_a_ledger_round_trip(tmp_path):
+    from apex.catalyst.pipeline import eligible_events
+    ev = _interp_event("NEGATIVE")
+    led = tmp_path / "e.jsonl"
+    led.write_text(json.dumps(ev.as_record()) + "\n")
+    got = eligible_events(session="2026-08-27",
+                          close_utc="2026-08-27T20:00:00Z",
+                          events_ledger=led)
+    assert len(got) == 1
+    assert got[0].directional_expectation == "NEGATIVE"
+    assert got[0].expectation_source == "LLM_DERIVED_INTERPRETATION"
+
+
+def test_a_forbidden_expectation_value_is_refused():
+    from apex.catalyst.brain import validate_interpretation
+    from apex.catalyst.events import CatalystViolation
+    with pytest.raises(CatalystViolation, match="directional_expectation"):
+        validate_interpretation(
+            {"event_type": "OTHER", "directional_expectation": "BUY"},
+            available_source_refs=("a",))
+
+
+def test_expectation_cannot_reach_v1_or_authorize_anything():
+    import apex.catalyst.events as E
+    import apex.catalyst.pipeline as P
+    for mod in (E, P):
+        src = open(mod.__file__).read()
+        for verb in ("ATTACK_READY", "place_order", "def attack"):
+            assert verb not in src, f"{mod.__name__} names {verb}"
+
+
+def test_a_tape_too_thin_for_an_atr_is_unmeasurable_not_a_crash(tmp_path):
+    """Every reaction figure is in ATR units. A halted or just-opened
+    symbol has no ATR, and passing NOT_ESTIMABLE onward would divide a
+    float by a string and take the whole pass down."""
+    from apex.catalyst.pipeline import attach_reactions
+    out = attach_reactions(session="2026-08-27",
+                           events=[_interp_event("POSITIVE")],
+                           close_utc="2026-08-27T20:00:00Z",
+                           bars_root=_bars(tmp_path, [100, 101]),
+                           ledger=tmp_path / "r.jsonl")
+    assert out["reactions_written"] == 0
+    assert out["unmeasurable"] == 1

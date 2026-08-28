@@ -314,6 +314,13 @@ def eligible_events(*, session: str, close_utc,
                 affected_symbols=tuple(r.get("affected_symbols") or ()),
                 importance=r.get("importance", "UNKNOWN"),
                 verification=r.get("verification", "UNVERIFIED"),
+                directional_expectation=r.get(
+                    "directional_expectation", "UNKNOWN"),
+                expectation_source=r.get("expectation_source", "NONE"),
+                expectation_contract_sha=r.get(
+                    "expectation_contract_sha", "NONE"),
+                expectation_known_from=r.get(
+                    "expectation_known_from", "NONE"),
                 release_sha=r.get("release_sha", "UNKNOWN"),
                 interpreter=r.get("interpreter", "UNKNOWN"))
         except Exception:                              # noqa: BLE001
@@ -357,12 +364,29 @@ def attach_reactions(*, session: str, events: list, close_utc,
                 unmeasurable += 1
                 continue
             atr = _atr(bars)
+            if not isinstance(atr, (int, float)) or atr <= 0:
+                # a thin, halted or just-opened symbol yields no ATR,
+                # and every reaction figure is expressed in ATR units.
+                # Passing NOT_ESTIMABLE through would divide a float by
+                # a string and take the whole pass down with it.
+                unmeasurable += 1
+                continue
             r = measure(bars=bars, known_from=ev.known_from, atr=atr,
                         session_close=close_utc)
             if r.get("verdict") == "NO_PATH":
                 unmeasurable += 1
                 continue
-            cls = classify(expectation="UNKNOWN", reaction=r, atr=atr)
+            # the expectation the brain sealed BEFORE any horizon
+            # existed. Hardcoding UNKNOWN here is what made every
+            # reaction unclassifiable and disagreement undetectable.
+            expectation = ev.directional_expectation
+            if (expectation != "UNKNOWN"
+                    and ev.expectation_known_from != "NONE"
+                    and ev.expectation_known_from > ev.known_from):
+                # an expectation formed after the path began would be
+                # hindsight wearing an interpretation's clothes
+                expectation = "UNKNOWN"
+            cls = classify(expectation=expectation, reaction=r, atr=atr)
             dis = disagreement(event=ev,
                                reaction_class=cls["reaction_class"])
             rec = {"kind": "catalyst_reaction", "session": session,
@@ -377,6 +401,10 @@ def attach_reactions(*, session: str, events: list, close_utc,
                    "market_data_lineage": str(root),
                    "interpreter": ev.interpreter,
                    "importance": ev.importance,
+                   "directional_expectation": expectation,
+                   "expectation_source": ev.expectation_source,
+                   "expectation_contract_sha": ev.expectation_contract_sha,
+                   "expectation_known_from": ev.expectation_known_from,
                    "evidence_class": evidence_class,
                    "reaction": r, "classification": cls,
                    "disagreement": dis,

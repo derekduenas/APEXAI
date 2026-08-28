@@ -209,5 +209,16 @@ class ClaudeCliInterpreter:
             ev.uncertainty = tup("uncertainty")
         if interp.get("importance"):
             ev.importance = interp["importance"]
+        # the field the whole reaction comparison depends on. It was
+        # requested, permitted and validated -- and then dropped here,
+        # because the event had nowhere to put it.
+        de = interp.get("directional_expectation")
+        if de and de != "UNKNOWN":
+            ev.directional_expectation = de
+            ev.expectation_source = "LLM_DERIVED_INTERPRETATION"
+            ev.expectation_contract_sha = PROMPT_CONTRACT_SHA
+            # sealed at interpretation time, which is strictly before
+            # any reaction horizon can have matured
+            ev.expectation_known_from = ev.known_from
         ev.interpreter = (f"CLAUDE_CLI:{self.model}"
                           f"@{PROMPT_CONTRACT_SHA}")

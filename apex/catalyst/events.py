@@ -117,6 +117,16 @@ class CatalystEvent:
     importance: str = "UNKNOWN"
     mechanism_hypotheses: tuple = ()
     uncertainty: tuple = ()
+    # WHAT THE CATALYST IMPLIES, not what anyone should do. Held apart
+    # from the factual fields above because it is INTERPRETATION: the
+    # brain reasoning from a mechanism, never something a source said.
+    # Without it the Reaction Engine sees UNKNOWN for every event and
+    # "good news, price fails" is undetectable -- which is most of why
+    # Catalyst exists.
+    directional_expectation: str = "UNKNOWN"
+    expectation_source: str = "NONE"
+    expectation_contract_sha: str = "NONE"
+    expectation_known_from: str = "NONE"
     expected_value: float | str = "NOT_ESTIMABLE"
     actual_value: float | str = "NOT_ESTIMABLE"
     prior_value: float | str = "NOT_ESTIMABLE"
@@ -136,6 +146,18 @@ class CatalystEvent:
         if self.importance not in IMPORTANCE:
             raise CatalystViolation(
                 f"unknown importance {self.importance!r}")
+        from apex.catalyst.reaction import DIRECTIONAL_EXPECTATION
+        if self.directional_expectation not in DIRECTIONAL_EXPECTATION:
+            raise CatalystViolation(
+                f"unknown directional_expectation "
+                f"{self.directional_expectation!r}")
+        if (self.directional_expectation != "UNKNOWN"
+                and self.expectation_source != "LLM_DERIVED_INTERPRETATION"):
+            raise CatalystViolation(
+                "a directional expectation may only come from an LLM "
+                "interpretation; it is never a source fact, and "
+                "recording it as one would let a reading become "
+                "evidence")
         if self.known_from < self.first_seen:
             raise CatalystViolation(
                 f"known_from {self.known_from} precedes first_seen "
