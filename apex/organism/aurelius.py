@@ -151,11 +151,12 @@ def gather_evidence(*, as_of: str | None = None,
         ("research_board", "results/edgeforge/research_board.jsonl",
          ("kind", "id", "status", "question", "observation",
           "verdict_now", "scorecard", "repairs", "law", "watch",
-          "state", "retrospective_validation",
+          "state", "retrospective_validation", "sealed_utc",
           "answers_aurelius_review_asks"), 12),
         ("opportunity_census", "results/edgeforge/opportunity_census"
-         ".jsonl", ("kind", "conclusion", "verdict", "top_opportunities",
-                    "chase_gate_test"), 6),
+         ".jsonl", ("kind", "id", "question", "status", "conclusion",
+                    "verdict", "top_opportunities", "chase_gate_test",
+                    "sealed_utc"), 6),
         ("interpretation_laws", "results/edgeforge/interpretation_laws"
          ".jsonl", ("id", "law"), 6),
         ("allocator_runs", "results/organism/allocator_decisions.jsonl",
@@ -193,6 +194,16 @@ def gather_evidence(*, as_of: str | None = None,
         ev["equity_risk_anatomy"] = anatomy
     except Exception as e:                              # noqa: BLE001
         ev["equity_risk_anatomy"] = f"UNAVAILABLE: {type(e).__name__}"
+
+    # AURELIUS's own durable forecasts. It refused its first
+    # self-audit because this was absent -- correctly: grading invented
+    # forecasts would be rewriting history through hindsight. Now the
+    # record it cannot rewrite travels with every evidence pull.
+    try:
+        tr = track_record()
+        ev["aurelius_own_forecasts"] = tr["forecasts"][-10:]
+    except Exception as e:                              # noqa: BLE001
+        ev["aurelius_own_forecasts"] = f"UNAVAILABLE: {type(e).__name__}"
 
     ev["canonical_economics"] = {
         "prospective_attacks": 6, "economically_resolved": 5,
