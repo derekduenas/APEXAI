@@ -71,6 +71,31 @@ RESOLUTIONS = (
 RELATIVE_FLOOR_ATR = 0.25       # incumbent reaction floor, reused
 
 
+def taxonomy_sha() -> str:
+    """Fingerprint of the rules doing the classifying. Stamped on
+    every row so 'what did PARALLAX classify this as under the rules
+    actually running that day?' stays answerable forever."""
+    import hashlib
+    return hashlib.sha256(json.dumps(
+        [VIOLATION_CLASSES, DEBT_BANDS, RESOLUTIONS,
+         RELATIVE_FLOOR_ATR]).encode()).hexdigest()[:16]
+
+
+# THE EVIDENTIARY VERSIONING LAW (operator-sealed 2026-08-29):
+#   CURRENT_ANALYTICAL_VIEW      may use legitimate corrections
+#   ORIGINAL_PROSPECTIVE_RECORD  never disappears
+#   NEW TAXONOMY VERSION         cannot retroactively become
+#                                prospective evidence
+#   OLD SESSION + NEW RULES      = RETROSPECTIVE_RECLASSIFICATION
+# Improved logic replayed over old sessions is tomorrow's knowledge
+# wearing yesterday's timestamps; the prospective path therefore
+# refuses any session that is not the current one.
+EVIDENTIARY_VERSIONING_LAW = (
+    "an unlabeled (prospective) pass may only classify the CURRENT "
+    "session; any other session is RETROSPECTIVE_RECLASSIFICATION and "
+    "must say so")
+
+
 class ParallaxViolation(RuntimeError):
     pass
 
@@ -273,6 +298,7 @@ def measure_violation(exp: dict, *, bars_by_symbol: dict,
            "parallax_id": exp["parallax_id"],
            "episode_id": exp["episode_id"],
            "known_from": exp["known_from"],
+           "taxonomy_sha": taxonomy_sha(),
            "symbol": sym, "eligible": True,
            "expected_direction": de,
            "horizon_min": horizon_min,
@@ -374,6 +400,20 @@ def observe_session(*, session: str, close_utc, events: list,
     Seals THE FULL DENOMINATOR: considered / ineligible-with-why /
     eligible / measured / unmeasurable.
     """
+    if label is None:
+        # THE EVIDENTIARY VERSIONING FENCE: only today's session may
+        # be classified prospectively. Rerunning an old session under
+        # current (possibly improved) rules is tomorrow's knowledge
+        # wearing yesterday's timestamps -- label it or be refused.
+        from apex.ops.timebase import ET
+        today = datetime.now(timezone.utc).astimezone(ET) \
+            .strftime("%Y-%m-%d")
+        if session != today:
+            raise ParallaxViolation(
+                f"unlabeled pass over {session} on {today}: "
+                f"OLD SESSION + CURRENT RULES = "
+                f"RETROSPECTIVE_RECLASSIFICATION -- pass an explicit "
+                f"label; it can never become prospective evidence")
     exp_led = expectations_ledger or EXPECTATIONS
     vio_led = violations_ledger or VIOLATIONS
     considered = eligible = measured = unmeasurable = 0
@@ -422,6 +462,8 @@ def observe_session(*, session: str, close_utc, events: list,
 
     return {"kind": "parallax_session_pass", "session": session,
             "label": label or "PROSPECTIVE",
+            "taxonomy_sha": taxonomy_sha(),
+            "versioning_law": EVIDENTIARY_VERSIONING_LAW,
             "denominator": {"events_considered": considered,
                             "ineligible": ineligible,
                             "eligible": eligible,

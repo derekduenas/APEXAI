@@ -97,7 +97,7 @@ def test_ambiguous_expectation_cannot_be_directionally_violated():
     assert PX.expectation_from_event(ev(de="AMBIGUOUS")) is None
     rep = PX.observe_session(
         session="2026-08-28", close_utc=CLOSE,
-        events=[ev(de="AMBIGUOUS")],
+        events=[ev(de="AMBIGUOUS")], label="TEST_FIXTURE",
         load_bars=lambda s: [], atr_fn=lambda b: 1.0,
         expectations_ledger=Path("x"), violations_ledger=Path("x"))
     assert rep["denominator"]["ineligible"][
@@ -118,6 +118,30 @@ def test_a_huge_move_without_a_sealed_expectation_is_simply_absent():
     assert PX.expectation_from_event(
         {"event_id": "x", "affected_symbols": ["NVDA"],
          "directional_expectation": "UNKNOWN"}) is None
+
+
+def test_old_session_under_current_rules_cannot_be_prospective(
+        tmp_path):
+    """THE EVIDENTIARY VERSIONING LAW: an unlabeled pass over any
+    session but today's is refused -- improved logic replayed over old
+    sessions is tomorrow's knowledge wearing yesterday's timestamps."""
+    with pytest.raises(PX.ParallaxViolation,
+                       match="RETROSPECTIVE_RECLASSIFICATION"):
+        PX.observe_session(
+            session="2020-01-02", close_utc=CLOSE, events=[],
+            load_bars=lambda s: [], atr_fn=lambda b: 1.0,
+            expectations_ledger=tmp_path / "e.jsonl",
+            violations_ledger=tmp_path / "v.jsonl")
+
+
+def test_every_row_carries_the_taxonomy_that_classified_it(tmp_path):
+    v = PX.measure_violation(
+        PX.expectation_from_event(ev()),
+        bars_by_symbol={"NVDA": bars([100 + i * 0.2
+                                      for i in range(30)])},
+        close_utc=CLOSE, atr=1.0, ledger=tmp_path / "v.jsonl")
+    assert v["taxonomy_sha"] == PX.taxonomy_sha()
+    assert len(v["taxonomy_sha"]) == 16
 
 
 # ================================================= VIOLATION CLASSES
@@ -262,6 +286,7 @@ def test_the_real_catalyst_event_dataclass_is_accepted(tmp_path):
     assert exp is not None and exp["symbol"] == "NVDA"
     rep = PX.observe_session(
         session="2026-08-28", close_utc=CLOSE, events=[real],
+        label="TEST_FIXTURE",
         load_bars=lambda s: bars([100 + i * 0.2 for i in range(30)]),
         atr_fn=lambda b: 1.0,
         expectations_ledger=tmp_path / "e.jsonl",
@@ -275,8 +300,12 @@ def test_observe_session_seals_the_full_denominator(tmp_path):
     events = [ev(),                                   # eligible
               ev(de="UNKNOWN"),                       # no expectation
               {**ev(), "affected_symbols": ["ZZZZ"]}]  # off-universe
+    from datetime import datetime, timezone
+    from apex.ops.timebase import ET
+    today = datetime.now(timezone.utc).astimezone(ET) \
+        .strftime("%Y-%m-%d")
     rep = PX.observe_session(
-        session="2026-08-28", close_utc=CLOSE, events=events,
+        session=today, close_utc=CLOSE, events=events,
         load_bars=lambda s: bars([100 + i * 0.2 for i in range(30)]),
         atr_fn=lambda b: 1.0,
         expectations_ledger=tmp_path / "e.jsonl",
