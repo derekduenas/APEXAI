@@ -34,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from apex.catalyst.interpreter import ClaudeCliInterpreter  # noqa: E402
 from apex.catalyst.pipeline import (attach_reactions,  # noqa: E402
-                                    run_cycle)
+                                    eligible_events, run_cycle)
 from apex.catalyst.premarket import phase_at  # noqa: E402
 from apex.ops.heartbeat import Heartbeat  # noqa: E402
 from apex.ops.orchestrator import session_bounds  # noqa: E402
@@ -77,9 +77,14 @@ def do_cycle(phase: str, *, session: str, interpreter, beat=None,
     if phase == "POST_CLOSE_SEAL":
         b = session_bounds(session)
         if b["trading_day"]:
+            close = b["close_utc"].isoformat()
+            # the DAY's durable events, not this cycle's discoveries --
+            # a quiet seal cycle finds nothing new, which is exactly how
+            # a session with 945 catalysts produced 0 reactions
             rec["reaction_pass"] = attach_reactions(
-                session=session, events=rec.get("events") or [],
-                close_utc=b["close_utc"].isoformat())
+                session=session, close_utc=close,
+                events=eligible_events(session=session,
+                                       close_utc=close))
 
     if beat is not None:
         beat.work(

@@ -249,12 +249,26 @@ def test_events_reach_the_edgeforge_outbox_without_a_verdict(tmp_path,
 # ================================================ CAPITAL COMMISSIONING
 
 def _cand_payload(**kw):
+    """A candidate as V1 ACTUALLY writes it: no declared_risk, no
+    attack_ready -- the risk lives in the sealed attack card."""
     base = dict(evaluation_id="2026-08-27:001:SPY", symbol="SPY",
-                direction="LONG", expression="CALL_VERTICAL",
-                declared_risk=120.0, attack_ready=True,
-                action="PAPER_ATTACKED", known_from="2026-08-27T14:00:00Z")
+                direction="LONG", verdict="PAPER_ATTACKED",
+                event_time="2026-08-27 14:00:00",
+                known_from="2026-08-27T14:00:00Z")
     base.update(kw)
     return base
+
+
+def _cards(tmp_path, *specs):
+    """Sealed attack cards for the payloads under test."""
+    rows = [{"kind": "options_live_attack", "symbol": sym,
+             "T": "2026-08-27 14:00:00", "status": "PAPER_ATTACKED",
+             "declared_1R": risk, "expression": "CALL_VERTICAL",
+             "net_debit": risk, "card_hash": f"hash_{sym}"}
+            for sym, risk in specs]
+    p = tmp_path / "attacks.jsonl"
+    p.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+    return p
 
 
 def test_a_record_that_already_knows_its_outcome_is_refused():
@@ -266,7 +280,7 @@ def test_a_record_that_already_knows_its_outcome_is_refused():
 
 
 def test_the_consumer_does_not_invent_greeks_or_half_lives():
-    c = to_candidate(_cand_payload())
+    c = to_candidate(_cand_payload(), declared_risk=120.0)
     assert c.signal_half_life_min == "NOT_ESTIMABLE"
     assert c.execution_burden == "NOT_ESTIMABLE"
     assert c.catalyst_exposure == "UNKNOWN"
@@ -274,23 +288,25 @@ def test_the_consumer_does_not_invent_greeks_or_half_lives():
 
 def test_a_candidate_without_declared_risk_is_refused():
     with pytest.raises(ConsumerViolation, match="1R denominator"):
-        to_candidate(_cand_payload(declared_risk=None))
+        to_candidate(_cand_payload(), declared_risk=None)
 
 
 def test_three_tickers_one_bet_is_caught_on_real_records(tmp_path):
     """The failure the arena exists for."""
     led = tmp_path / "shadow.jsonl"
+    cards = _cards(tmp_path, ("SPY", 120.0), ("QQQ", 120.0),
+                   ("NVDA", 120.0))
     s = "2026-08-27"
-    first = judge(_cand_payload(), session=s,
+    first = judge(_cand_payload(), session=s, attack_ledger=cards,
                   portfolio=load_shadow_portfolio(led), ledger=led)
     assert first["shadow_action"] == "FUND"
 
     second = judge(_cand_payload(evaluation_id="e2", symbol="QQQ"),
-                   session=s, portfolio=load_shadow_portfolio(led),
-                   ledger=led)
+                   session=s, attack_ledger=cards,
+                   portfolio=load_shadow_portfolio(led), ledger=led)
     third = judge(_cand_payload(evaluation_id="e3", symbol="NVDA"),
-                  session=s, portfolio=load_shadow_portfolio(led),
-                  ledger=led)
+                  session=s, attack_ledger=cards,
+                  portfolio=load_shadow_portfolio(led), ledger=led)
     assert "REFUSE" in second["shadow_action"] + third["shadow_action"]
     assert any("US_LARGE_BETA" in r or "beta" in r.lower()
                for r in second["reasons"] + third["reasons"])
@@ -299,10 +315,11 @@ def test_three_tickers_one_bet_is_caught_on_real_records(tmp_path):
 def test_cash_is_a_real_competitor(tmp_path):
     """Predator says attackable; the arena may still prefer cash."""
     led = tmp_path / "s.jsonl"
-    out = judge(_cand_payload(declared_risk=50.0,
-                              capital_lockup_min=350,
+    cards = _cards(tmp_path, ("SPY", 50.0))
+    out = judge(_cand_payload(capital_lockup_min=350,
                               edge_pedigree="UNPROVEN"),
                 session="2026-08-27", session_minutes_left=360,
+                attack_ledger=cards,
                 portfolio=load_shadow_portfolio(led), ledger=led)
     assert out["shadow_action"] == "DEFER_FOR_SUPERIOR_OPPORTUNITY"
     assert out["baseline_action"] == "PAPER_ATTACKED", \
@@ -311,8 +328,9 @@ def test_cash_is_a_real_competitor(tmp_path):
 
 def test_the_shadow_book_rebuilds_from_its_own_sealed_decisions(tmp_path):
     led = tmp_path / "s.jsonl"
+    cards = _cards(tmp_path, ("SPY", 120.0))
     before = load_shadow_portfolio(led).available_capital
-    judge(_cand_payload(), session="2026-08-27",
+    judge(_cand_payload(), session="2026-08-27", attack_ledger=cards,
           portfolio=load_shadow_portfolio(led), ledger=led)
     after = load_shadow_portfolio(led)
     assert after.available_capital == before - 120.0
@@ -321,7 +339,8 @@ def test_the_shadow_book_rebuilds_from_its_own_sealed_decisions(tmp_path):
 
 def test_outcome_is_appended_never_merged_into_the_seal(tmp_path):
     led = tmp_path / "s.jsonl"
-    judge(_cand_payload(), session="2026-08-27",
+    cards = _cards(tmp_path, ("SPY", 120.0))
+    judge(_cand_payload(), session="2026-08-27", attack_ledger=cards,
           portfolio=load_shadow_portfolio(led), ledger=led)
     append_outcome(session="2026-08-27",
                    candidate_id="2026-08-27:001:SPY",
@@ -343,10 +362,12 @@ def test_the_consumer_drains_a_real_v1_outbox(tmp_path):
     emit(ob, kind="options_evaluation", session="2026-08-27",
          source="scripts/options_paper_session._scan_symbol",
          known_from="2026-08-27T14:05:00Z",
-         payload=_cand_payload(evaluation_id="e9", attack_ready=False))
+         payload=_cand_payload(evaluation_id="e9",
+                               verdict="WAIT_FOR_ENTRY"))
 
     out = C.run(session="2026-08-27", outbox=ob,
                 cursor_path=tmp_path / "cur.json",
+                attack_ledger=_cards(tmp_path, ("SPY", 120.0)),
                 ledger=tmp_path / "s.jsonl")
     assert out["records_consumed"] == 2
     assert out["judged"] == 1, "attack_ready record was not judged"
@@ -554,3 +575,200 @@ def test_feed_furniture_does_not_manufacture_a_ticker():
     assert "ENERGY" in hints
     # a genuine mention still resolves
     assert "GOOGL" in entity_hints("Alphabet Inc reported cloud revenue")
+
+
+# ================================== CAP-2026-08-27-A (contract repair)
+
+def _attack_card(**kw):
+    base = dict(kind="options_live_attack", symbol="AAPL",
+                T="2026-08-27 10:31:47.573828",
+                status="PAPER_ATTACKED", declared_1R=335.0,
+                expression="LONG_PUT", net_debit=335.0,
+                card_hash="3898ed91824d7c48")
+    base.update(kw)
+    return base
+
+
+def _attack_payload(**kw):
+    base = dict(evaluation_id="2026-08-27:005:AAPL", symbol="AAPL",
+                direction="SHORT", verdict="PAPER_ATTACKED",
+                event_time="2026-08-27 10:31:47.573828",
+                entry_quality="GOOD", attackable=["LONG_PUT"])
+    base.update(kw)
+    return base
+
+
+def _write(path, rows):
+    path.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+    return path
+
+
+def test_the_governed_candidate_state_is_paper_attacked():
+    """The defect that lost both of Thursday's real attacks: the
+    predicate named a field V1 has never written."""
+    from apex.capital.consumer import CANDIDATE_VERDICT, is_candidate
+    assert CANDIDATE_VERDICT == "PAPER_ATTACKED"
+    rec = {"record_kind": "options_evaluation",
+           "payload": _attack_payload()}
+    assert is_candidate(rec) is True
+    assert is_candidate({"record_kind": "options_evaluation",
+                         "payload": _attack_payload(
+                             verdict="WAIT_FOR_ENTRY")}) is False
+    # and the field that never existed must not resurrect the old bug
+    assert is_candidate({"record_kind": "options_evaluation",
+                         "payload": {"attack_ready": True}}) is False
+
+
+def test_declared_risk_is_read_from_the_sealed_attack_card(tmp_path):
+    from apex.capital.consumer import join_attack_card
+    led = _write(tmp_path / "l.jsonl", [_attack_card()])
+    j = join_attack_card(_attack_payload(), ledger=led)
+    assert j["joined"] is True
+    assert j["declared_risk"] == 335.0
+    assert j["expression"] == "LONG_PUT"
+    assert j["card_hash"] == "3898ed91824d7c48"
+
+
+@pytest.mark.parametrize("rows,why", [
+    ([], "matched 0"),
+    ([_attack_card(), _attack_card()], "matched 2"),
+    ([_attack_card(status="CLOSED")], "not PAPER_ATTACKED"),
+    ([_attack_card(declared_1R=0)], "not a positive number"),
+    ([_attack_card(realized_pnl=-54.0)], "outcome fields"),
+])
+def test_any_broken_invariant_yields_not_estimable(tmp_path, rows, why):
+    """Never guess. An arena that estimates a risk it could not read is
+    worse than one that abstains."""
+    from apex.capital.consumer import join_attack_card
+    led = _write(tmp_path / "l.jsonl", rows) if rows else \
+        _write(tmp_path / "l.jsonl", [{"kind": "other"}])
+    j = join_attack_card(_attack_payload(), ledger=led)
+    assert j["joined"] is False
+    assert j["capital_decision"] == "NOT_ESTIMABLE"
+    assert why in j["why"]
+
+
+def test_a_card_sealed_after_the_decision_is_refused(tmp_path):
+    from apex.capital.consumer import join_attack_card
+    led = _write(tmp_path / "l.jsonl", [_attack_card()])
+    j = join_attack_card(_attack_payload(), ledger=led,
+                         decision_time="2026-08-27 09:00:00")
+    assert j["joined"] is False
+    assert "did not yet exist" in j["why"]
+
+
+def test_a_real_attack_now_becomes_one_sealed_shadow_decision(tmp_path):
+    """The full repaired path, on Thursday's actual record shapes."""
+    from apex.capital import consumer as C
+    led = _write(tmp_path / "attacks.jsonl", [_attack_card()])
+    ob = tmp_path / "v1.jsonl"
+    emit(ob, kind="options_evaluation", session="2026-08-27",
+         source="scripts/options_paper_session._scan_symbol",
+         known_from="2026-08-27 10:31:47.573828",
+         payload=_attack_payload())
+    emit(ob, kind="options_evaluation", session="2026-08-27",
+         source="scripts/options_paper_session._scan_symbol",
+         known_from="2026-08-27 11:00:00",
+         payload=_attack_payload(evaluation_id="e2",
+                                 verdict="WAIT_FOR_ENTRY"))
+
+    out = C.run(session="2026-08-27", outbox=ob,
+                cursor_path=tmp_path / "cur.json",
+                ledger=tmp_path / "shadow.jsonl", attack_ledger=led)
+    assert out["judged"] == 1, "the real attack was not judged"
+    assert out["skipped_not_candidates"] == 1
+    d = out["decisions"][0]
+    assert d["shadow_action"] in ("FUND", "PARTIALLY_FUND",
+                                 "REFUSE_REDUNDANT",
+                                 "REFUSE_RISK_CONCENTRATION",
+                                 "CASH_PREFERRED", "NO_CAPITAL",
+                                 "CAPITAL_RESERVED",
+                                 "DEFER_FOR_SUPERIOR_OPPORTUNITY")
+    snap = d["sealed"]["portfolio_snapshot"]
+    assert snap["risk_source"] == "options_live_attack"
+    assert snap["card_hash"] == "3898ed91824d7c48"
+    assert snap["prospective"] is True
+    assert d["sealed"]["outcome"] == "PENDING", "sealed with an outcome"
+
+
+def test_capital_never_synthesizes_risk(tmp_path):
+    """No card -> NOT_ESTIMABLE sealed, never an invented denominator."""
+    from apex.capital import consumer as C
+    ob = tmp_path / "v1.jsonl"
+    emit(ob, kind="options_evaluation", session="2026-08-27",
+         source="s", known_from="2026-08-27 10:31:47.573828",
+         payload=_attack_payload())
+    out = C.run(session="2026-08-27", outbox=ob,
+                cursor_path=tmp_path / "c.json",
+                ledger=tmp_path / "shadow.jsonl",
+                attack_ledger=tmp_path / "missing.jsonl")
+    assert out["judged"] == 1
+    assert out["decisions"][0]["shadow_action"] == "NOT_ESTIMABLE"
+    assert out["decisions"][0]["sealed"]["declared_risk"] == 0.0
+
+
+# ================================== RXN-2026-08-27-A (integration fix)
+
+def test_reaction_reads_the_session_ledger_not_the_cycle(tmp_path):
+    """The defect: a quiet seal cycle discovers nothing new, so a day
+    with hundreds of catalysts produced zero reactions."""
+    from apex.catalyst.pipeline import eligible_events
+    led = tmp_path / "events.jsonl"
+    rows = []
+    for i, kf in enumerate(["2026-08-27T14:00:00Z",
+                            "2026-08-27T15:00:00Z",
+                            "2026-08-27T23:00:00Z"]):
+        rows.append({"kind": "catalyst_event", "event_id": f"EV_{i}",
+                     "event_type": "CENTRAL_BANK",
+                     "event_time": kf, "first_seen": kf, "known_from": kf,
+                     "scheduled": False, "headline": "h",
+                     "factual_summary": "s", "affected_symbols": ["SPY"],
+                     "observations": []})
+    _write(led, rows)
+    got = eligible_events(session="2026-08-27",
+                          close_utc="2026-08-27T20:00:00Z",
+                          events_ledger=led)
+    ids = [e.event_id for e in got]
+    assert ids == ["EV_0", "EV_1"], \
+        "an event first known after the close has no in-session path"
+
+
+def test_a_duplicated_ledger_event_is_not_reacted_to_twice(tmp_path):
+    from apex.catalyst.pipeline import eligible_events
+    row = {"kind": "catalyst_event", "event_id": "EV_dup",
+           "event_type": "CENTRAL_BANK",
+           "event_time": "2026-08-27T14:00:00Z",
+           "first_seen": "2026-08-27T14:00:00Z",
+           "known_from": "2026-08-27T14:00:00Z", "scheduled": False,
+           "headline": "h", "factual_summary": "s",
+           "affected_symbols": ["SPY"], "observations": []}
+    led = _write(tmp_path / "e.jsonl", [row, row, row])
+    got = eligible_events(session="2026-08-27",
+                          close_utc="2026-08-27T20:00:00Z",
+                          events_ledger=led)
+    assert len(got) == 1
+
+
+def test_reaction_rows_carry_lineage_and_evidence_class(tmp_path):
+    from apex.catalyst.pipeline import attach_reactions
+    bars = tmp_path / "bars"
+    bars.mkdir()
+    (bars / "SPY_2026-08-27.json").write_text(json.dumps({
+        "bars": [{"event_time_utc": f"2026-08-27T{h:02d}:00:00.000Z",
+                  "open": 100 + i, "high": 101 + i, "low": 99 + i,
+                  "close": 100.5 + i, "volume": 9}
+                 for i, h in enumerate(range(14, 20))]}))
+    ev = build_events([_raw(known_from="2026-08-27T14:30:00Z",
+                            first_seen_time="2026-08-27T14:30:00Z")],
+                      session="2026-08-27")["events"][0]
+    ev.affected_symbols = ("SPY",)
+    out = attach_reactions(session="2026-08-27", events=[ev],
+                           close_utc="2026-08-27T20:00:00Z",
+                           bars_root=bars, ledger=tmp_path / "r.jsonl",
+                           evidence_class="RETROSPECTIVE_REPAIR_VALIDATION")
+    assert out["reactions_written"] == 1
+    assert out["events_considered"] == 1
+    rec = json.loads((tmp_path / "r.jsonl").read_text().splitlines()[0])
+    assert rec["evidence_class"] == "RETROSPECTIVE_REPAIR_VALIDATION"
+    assert rec["source_lineage"] and rec["market_data_lineage"]
+    assert rec["known_from"] == "2026-08-27T14:30:00Z"

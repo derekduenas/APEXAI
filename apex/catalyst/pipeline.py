@@ -264,9 +264,79 @@ def _atr(bars: list) -> float | str:
     return sum(trs) / len(trs)
 
 
+def eligible_events(*, session: str, close_utc,
+                    events_ledger: Path | None = None,
+                    now_utc: str | None = None) -> list:
+    """Today's DURABLE catalyst events whose reaction is resolvable.
+
+    The defect this replaces: the post-close seal was handed only the
+    events discovered during the seal cycle itself -- which on a quiet
+    seal is zero -- so a day with 945 catalyst events produced no
+    reaction evidence at all. The engine was correct; it was pointed at
+    the wrong population.
+
+    The governed population is the session's accumulated event ledger,
+    filtered to events that were known BEFORE the close and therefore
+    have a measurable forward path inside the session.
+    """
+    from apex.catalyst.events import CatalystEvent, SourceObservation
+
+    path = Path(events_ledger) if events_ledger is not None \
+        else EVENT_LEDGER
+    if not path.exists():
+        return []
+    close = str(close_utc)
+    out, seen = [], set()
+    for line in path.read_text().splitlines():
+        if not line.strip():
+            continue
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if r.get("kind") != "catalyst_event":
+            continue
+        kf = str(r.get("known_from", ""))
+        # an event first known after the close has no in-session path
+        if not kf or kf >= close:
+            continue
+        eid = r.get("event_id")
+        if eid in seen:            # the ledger is append-only and an
+            continue               # event may appear more than once
+        seen.add(eid)
+        try:
+            ev = CatalystEvent(
+                event_id=eid, event_type=r["event_type"],
+                event_time=r["event_time"], first_seen=r["first_seen"],
+                known_from=r["known_from"], scheduled=r["scheduled"],
+                headline=r["headline"],
+                factual_summary=r["factual_summary"],
+                affected_symbols=tuple(r.get("affected_symbols") or ()),
+                importance=r.get("importance", "UNKNOWN"),
+                verification=r.get("verification", "UNVERIFIED"),
+                release_sha=r.get("release_sha", "UNKNOWN"),
+                interpreter=r.get("interpreter", "UNKNOWN"))
+        except Exception:                              # noqa: BLE001
+            continue
+        for o in r.get("observations", []):
+            try:
+                ev.add_observation(SourceObservation(
+                    source=o["source"],
+                    source_authority=o["source_authority"],
+                    source_ref=o["source_ref"], headline=o["headline"],
+                    published_time=o["published_time"],
+                    retrieval_time=o["retrieval_time"],
+                    body_excerpt=o.get("body_excerpt", "")))
+            except Exception:                          # noqa: BLE001
+                continue
+        out.append(ev)
+    return out
+
+
 def attach_reactions(*, session: str, events: list, close_utc,
                      bars_root: Path | None = None,
-                     ledger: Path | None = None) -> dict:
+                     ledger: Path | None = None,
+                     evidence_class: str = "PROSPECTIVE") -> dict:
     """Attach measured market behaviour to events AFTER the fact.
 
     Nothing here touches the sealed event record: a reaction is its own
@@ -297,7 +367,17 @@ def attach_reactions(*, session: str, events: list, close_utc,
                                reaction_class=cls["reaction_class"])
             rec = {"kind": "catalyst_reaction", "session": session,
                    "event_id": ev.event_id, "symbol": sym,
+                   "event_time": ev.event_time,
                    "known_from": ev.known_from, "atr": atr,
+                   "source_lineage": [
+                       {"source": o.source,
+                        "source_authority": o.source_authority,
+                        "source_ref": o.source_ref}
+                       for o in ev.observations],
+                   "market_data_lineage": str(root),
+                   "interpreter": ev.interpreter,
+                   "importance": ev.importance,
+                   "evidence_class": evidence_class,
                    "reaction": r, "classification": cls,
                    "disagreement": dis,
                    "law": "measured after known_from; appended, never "
@@ -309,6 +389,8 @@ def attach_reactions(*, session: str, events: list, close_utc,
                 disagreements.append(dis)
 
     return {"kind": "reaction_pass", "session": session,
+            "evidence_class": evidence_class,
+            "events_considered": len(events),
             "reactions_written": written,
             "unmeasurable": unmeasurable,
             "disagreements": disagreements,
