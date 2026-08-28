@@ -197,6 +197,7 @@ def main() -> int:
 
     beat = Heartbeat(SERVICE)
     last = 0.0
+    resolved_session = None
     while True:
         session = datetime.now(timezone.utc).astimezone(ET) \
             .strftime("%Y-%m-%d")
@@ -209,6 +210,17 @@ def main() -> int:
                 sweep(session, beat=beat)
                 last = time.time()
             elif not in_rth:
+                # post-close: resolve the session's sealed attacks once.
+                # Without this trigger a funded shadow trade would sit
+                # PENDING forever -- found while preparing for the first
+                # natural attack (NVDA) to resolve.
+                if (b["trading_day"] and b["close_utc"]
+                        and now > b["close_utc"]
+                        and resolved_session != session):
+                    r = resolve_session(session)
+                    resolved_session = session
+                    beat.work(f"resolved {r.get('resolved', 0)} shadow "
+                              f"attack(s) for {session}")
                 beat.beat()
         except Exception as e:                          # noqa: BLE001
             beat.error(f"{type(e).__name__}: {str(e)[:120]}")
