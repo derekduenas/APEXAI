@@ -290,7 +290,7 @@ def _record_preview(item) -> None:
 
 
 def _tier_rows() -> dict:
-    def rows(p, want_kind):
+    def rows(p, want_kind, dedupe=False):
         if not Path(p).exists():
             return []
         out = []
@@ -301,16 +301,27 @@ def _tier_rows() -> dict:
                 continue
             if r.get("kind") == want_kind and r.get("eligible"):
                 out.append(r)
+        if dedupe:
+            # a re-run appends a full corrected pass (append-only law);
+            # counting every run would triple the same observation, so
+            # keep the LATEST row per observation id. Previews are NOT
+            # deduped -- their duplicates are state transitions.
+            last = {}
+            for r in out:
+                last[r.get("parallax_id")] = r
+            out = list(last.values())
         return out
     return {
         "PROSPECTIVE": rows(PX.VIOLATIONS, "parallax_violation"),
         "LIVE_PREVIEW": rows(PREVIEWS, "parallax_live_preview"),
         "RETROSPECTIVE_COMMISSIONING": rows(
             "results/parallax/commissioning.jsonl",
-            "parallax_violation"),
-        "HISTORICAL_SEALED": rows(HIST_SEALED, "parallax_violation"),
+            "parallax_violation", dedupe=True),
+        "HISTORICAL_SEALED": rows(HIST_SEALED, "parallax_violation",
+                                  dedupe=True),
         "HISTORICAL_CONTEMPORANEOUS": rows(HIST_PROXY,
-                                           "parallax_violation"),
+                                           "parallax_violation",
+                                           dedupe=True),
         "MODEL_TIME_CONTAMINATED": rows(
             "results/parallax/model_time_contaminated.jsonl",
             "parallax_violation"),

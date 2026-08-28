@@ -196,6 +196,36 @@ def test_nothing_on_a_trading_path_imports_the_lab():
                 f"{mod} depends on the observation lab"
 
 
+def test_commissioning_reruns_are_deduped_not_summed(tmp_path,
+                                                     monkeypatch,
+                                                     capsys):
+    """Three append-only runs of the same 2 observations must report
+    2, not 6 -- the latest (corrected) row per id wins."""
+    monkeypatch.setattr(PX, "VIOLATIONS", tmp_path / "v.jsonl")
+    monkeypatch.setattr(LAB, "PREVIEWS", tmp_path / "p.jsonl")
+    monkeypatch.chdir(tmp_path)
+    d = tmp_path / "results/parallax"
+    d.mkdir(parents=True)
+    rows = []
+    for run in range(3):
+        for pid in ("PX_A", "PX_B"):
+            rows.append(json.dumps({
+                "kind": "parallax_violation", "eligible": True,
+                "parallax_id": pid, "episode_id": pid,
+                "symbol": "NVDA",
+                "known_from": "2026-08-28T14:00:00Z",
+                "violation_class": "FAILED_POSITIVE_REACTION"
+                if run == 2 else "EXPECTED_REACTION",
+                "expectation_debt": "HIGH"}))
+    (d / "commissioning.jsonl").write_text("\n".join(rows) + "\n")
+    LAB.cmd_stats(None)
+    out = capsys.readouterr().out
+    assert "raw observations     2" in out
+    assert "FAILED_POSITIVE_REACTION         2" in out
+    assert "EXPECTED_REACTION" not in out.split(
+        "RETROSPECTIVE_COMMISSIONING")[1].split("==")[0]
+
+
 def test_spec_freeze_hashes_the_actual_rules():
     f1 = LAB.spec_freeze()
     f2 = LAB.spec_freeze()
