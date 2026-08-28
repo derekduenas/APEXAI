@@ -33,7 +33,13 @@ from datetime import datetime, timezone
 from apex.predators.equities.attack_geometry import (
     EquityAttackGeometry, atr, session_vwap)
 
-AUTHORITY = "SHADOW_ONLY"
+# PROMOTED 2026-08-28 by operator directive (Evolution Engine V2 §2)
+# after commissioning verified: causal decisions, two-sided setups,
+# realistic crossed-spread fills, structural stops, durable prospective
+# cards, paper accounting, failure isolation. This is an authority
+# label, not proof of edge: it may COMPETE for paper capital, nothing
+# more. Real capital remains locked.
+AUTHORITY = "PAPER_ACTIVE_EXPLORATORY"
 SLEEVE = "EQUITY_DAY_TRADER"
 THRESHOLD_SET = "EQUITY_SHADOW_V1"
 

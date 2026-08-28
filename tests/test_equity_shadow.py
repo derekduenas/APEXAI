@@ -34,8 +34,10 @@ def flat(n=40, px=100.0):
 
 # ============================================================ AUTHORITY
 
-def test_the_sleeve_declares_shadow_only():
-    assert DT.AUTHORITY == "SHADOW_ONLY"
+def test_the_sleeve_declares_paper_exploratory():
+    """Promoted per Evolution Engine V2: may compete for PAPER capital.
+    Not edge, not real capital, not production."""
+    assert DT.AUTHORITY == "PAPER_ACTIVE_EXPLORATORY"
     assert SR.resolve.__module__.startswith("apex.predators.equities")
 
 
@@ -206,8 +208,10 @@ def test_an_unknown_decision_state_is_refused():
 def test_every_decision_is_sealed_prospective_and_shadow():
     rec = _decide(flat()).as_record()
     assert rec["prospective"] is True
-    assert rec["authority"] == "SHADOW_ONLY"
-    assert rec["decision_power"] == "SHADOW_ONLY"
+    assert rec["authority"] == "PAPER_ACTIVE_EXPLORATORY"
+    assert rec["decision_power"] == "SHADOW_ONLY", \
+        "the RECORD's decision power stays SHADOW_ONLY: the sleeve "\
+        "decides nothing about capital -- the arena does"
     assert rec["threshold_set"] == "EQUITY_SHADOW_V1"
     for banned in ("order_id", "broker", "account", "live"):
         assert banned not in rec

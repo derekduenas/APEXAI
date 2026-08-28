@@ -90,6 +90,16 @@ def test_no_execution_or_broker_dependency_exists():
     exempt = {"broker.py", "sealing.py", "robinhood.py", "alpaca_fabric.py",
              "provider_interface.py", "market_state.py", "reconnect_ledger.py",
              "checkpoint_graph.py", "options_feed.py",
+             # 2026-08-28 (Evolution Engine V2): organism/health.py
+             # NAMES the fabric unit + its artifact because it IS the
+             # service-identity monitor -- SERVICE_IDENTITY_VALIDITY
+             # requires checking that the expected executable produces
+             # the expected stream, and a monitor that obfuscated which
+             # program it verifies would defeat its purpose (same
+             # reasoning as checkpoint_graph.py). It defines no
+             # placement function and imports no vendor SDK; the
+             # mechanical placement scan below still covers it.
+             "health.py",
              # 2026-08-24: evidence_registry.py NAMES artifact paths --
              # including a non-authoritative one -- because its entire
              # job is declaring which file is canonical for a governed
