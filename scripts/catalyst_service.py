@@ -67,6 +67,19 @@ def current_phase(now=None) -> dict:
                     trading_day=b["trading_day"])
 
 
+def _parallax_pass(*, session: str, close_utc: str) -> dict:
+    """PARALLAX SHADOW OBSERVATORY: measure expectation violations
+    from the day's already-sealed events. Observation only -- writes
+    to its own ledgers and nothing reads them on any trading path."""
+    from apex.catalyst.pipeline import BARS_ROOT, _atr, _load_bars
+    from apex.organism import parallax
+    return parallax.observe_session(
+        session=session, close_utc=close_utc,
+        events=eligible_events(session=session, close_utc=close_utc),
+        load_bars=lambda s: _load_bars(s, session, BARS_ROOT),
+        atr_fn=_atr)
+
+
 def do_cycle(phase: str, *, session: str, interpreter, beat=None,
              include_sec: bool = True) -> dict:
     rec = run_cycle(session=session, phase=phase,
@@ -85,6 +98,18 @@ def do_cycle(phase: str, *, session: str, interpreter, beat=None,
                 session=session, close_utc=close,
                 events=eligible_events(session=session,
                                        close_utc=close))
+            # PARALLAX observation pass -- SHADOW OBSERVATORY only.
+            # Measures expectation violations from artifacts that were
+            # already sealed pre-reaction; writes to its own ledgers;
+            # nothing downstream of catalyst interpretation changes,
+            # and a PARALLAX failure must never break the seal.
+            try:
+                rec["parallax_pass"] = _parallax_pass(
+                    session=session, close_utc=close)
+            except Exception as e:                  # noqa: BLE001
+                rec["parallax_pass"] = {
+                    "error": f"{type(e).__name__}", "eligible": 0,
+                    "note": "observatory failure isolated from seal"}
 
     if beat is not None:
         beat.work(

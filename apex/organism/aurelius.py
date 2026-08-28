@@ -159,6 +159,16 @@ def gather_evidence(*, as_of: str | None = None,
         ("allocator_runs", "results/organism/allocator_decisions.jsonl",
          ("session", "candidates", "results",
           "cross_sleeve_relations"), 3),
+        # PARALLAX is READ-ONLY intelligence for the CIO: expectation
+        # violations are questions to reason about, never candidates.
+        # AURELIUS may cite them; it may NOT promote them toward
+        # capital -- that path is structurally absent.
+        ("parallax_observations", "results/parallax/violations.jsonl",
+         ("parallax_id", "symbol", "expected_direction",
+          "violation_class", "expectation_debt", "relative",
+          "aligned_move_atr", "informational_vs_expressible",
+          "eligible", "commissioning_label", "label",
+          "denominator", "episode_accounting"), 6),
     ):
         try:
             rows = _rows(root / path, limit=n)
