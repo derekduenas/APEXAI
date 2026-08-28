@@ -452,3 +452,31 @@ def test_the_cio_does_not_count_voided_fundings(led):
                             book_ledger=led["book"],
                             ledger=led["book"].parent / "c2.jsonl")
     assert d["funded"] == 0, "a voided funding still counted as funded"
+
+
+def test_options_aggregate_attaches_only_when_it_is_one_trade(
+        tmp_path, monkeypatch):
+    """With 2 attacks the session aggregate is NOT a per-trade outcome
+    and must not be split; with 1 it IS the trade and attaches."""
+    import scripts.organism_service as S
+    from apex.organism import book as B
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "results/organism").mkdir(parents=True)
+    (tmp_path / "results/equities").mkdir(parents=True)
+    led = B.LEDGER
+    env = adapt_opt(opt_record(eid="o1"),
+                    _write(tmp_path / "cards.jsonl", [opt_card()]))
+    AL.allocate([env], session="2026-08-28", book_ledger=led,
+                decision_ledger=tmp_path / "d.jsonl")
+    sb = {"kind": "options_session_scoreboard", "session": "2026-08-28",
+          "attacks_raw": 1,
+          "friction": {"executable_pnl": -35.0, "mid_pnl": -20.0,
+                       "friction": 15.0,
+                       "by_primary_class": {"THESIS_WRONG": 1}}}
+    _write(tmp_path / "results/options_live_ledger.jsonl", [sb])
+    n = S.attach_new_outcomes("2026-08-28")
+    assert n == 1
+    st = B.state(ledger=led)
+    assert st["realized_pnl"] == -35.0
+    # a second call must not double-attach
+    assert S.attach_new_outcomes("2026-08-28") == 0

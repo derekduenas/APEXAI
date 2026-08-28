@@ -125,6 +125,46 @@ def attach_new_outcomes(session: str) -> int:
         return 0
     attached = 0
 
+    # OPTIONS: the sleeve seals a per-SESSION scoreboard, not a
+    # per-trade record. When the session had exactly ONE attack and the
+    # book holds exactly ONE open options funding for that session, the
+    # aggregate IS the trade and may attach. Any other shape stays
+    # PENDING rather than inventing a decomposition -- allocating an
+    # aggregate across trades is how the "6 trades -$47" sloppiness
+    # started, and we do not do it here either.
+    opt_led = Path("results/options_live_ledger.jsonl")
+    opt_open = [cid for cid, pos in open_ids.items()
+                if pos["sleeve"] == "OPTIONS"]
+    if opt_led.exists() and len(opt_open) == 1:
+        for line in opt_led.read_text().splitlines():
+            if not line.strip():
+                continue
+            try:
+                r = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if r.get("kind") != "options_session_scoreboard"                     or r.get("session") != session:
+                continue
+            f = r.get("friction") or {}
+            if r.get("attacks_raw") == 1 and                     isinstance(f.get("executable_pnl"), (int, float)):
+                cls = list((f.get("by_primary_class") or
+                            {"UNCLASSIFIED": 1}).keys())[0]
+                book.attach_outcome(
+                    candidate_id=opt_open[0], session=session,
+                    executable_pnl=f["executable_pnl"],
+                    outcome_class=("EXECUTION_FAILURE"
+                                   if cls == "EXECUTION_FAILURE"
+                                   else "THESIS_FAILURE"
+                                   if f["executable_pnl"] <= 0
+                                   else "NO_REAL_FAILURE"),
+                    detail={"source": "options_session_scoreboard",
+                            "n_attacks": 1, "primary_class": cls,
+                            "mid_pnl": f.get("mid_pnl"),
+                            "friction": f.get("friction")})
+                attached += 1
+                open_ids.pop(opt_open[0])
+                break
+
     eq_out = Path("results/equities/shadow_outcomes.jsonl")
     if eq_out.exists():
         for line in eq_out.read_text().splitlines():
