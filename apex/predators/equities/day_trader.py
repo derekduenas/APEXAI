@@ -125,16 +125,49 @@ def classify_setup(bars: list, *, direction: str,
 
 # -------------------------------------------------------------- risk
 
-def size_shadow(*, entry: float, stop: float, direction: str,
-                budget: float = SHADOW_RISK_BUDGET) -> dict:
-    """A structural stop, then size follows. Never the reverse.
+# Repair EQUITY-FRICTION-BLIND-SIZING (P1, operator-authorized
+# 2026-08-28). The prior model sized qty = budget // price_distance,
+# so a 9.46-cent stop on NVDA produced 3,170 shares whose round-trip
+# friction alone was ~0.95R -- a position DECLARED as 1R that the
+# execution model itself knew would lose ~1.95R at its ordinary stop.
+# A known execution cost is part of risk. declared_1R now means
+# ECONOMIC risk, never pre-friction chart risk.
+STOP_LOSS_TOLERANCE = 0.02      # numerical/model tolerance on 1R
 
-    Account size does not decide whether a SETUP is good, so the budget
-    is one fixed number across every symbol and session: it exists to
-    make outcomes comparable, not to be optimised.
+
+def size_shadow(*, entry: float, stop: float, direction: str,
+                budget: float = SHADOW_RISK_BUDGET,
+                spread_bps: float | None = None) -> dict:
+    """Size from the EXECUTABLE loss at the stop, not price distance.
+
+        executable_stop_loss_per_share =
+            adverse price move to the stop
+          + entry execution cost
+          + stop-exit execution cost
+
+    quantity = floor(budget / executable_stop_loss_per_share), and the
+    hard invariant follows by construction:
+    modelled_total_loss_at_stop <= budget (+ tolerance).
+
+    Costs use the incumbent modelled spread, priced CONSERVATIVELY at
+    the worse of entry/stop so the invariant holds in both directions.
+    A missing cost model REFUSES -- no silent fallback to
+    price-distance-only sizing, ever again.
+
+    This deliberately does NOT move the stop, judge the setup, or set a
+    minimum stop distance: whether ultra-tight invalidations are
+    economically viable is the FRICTION_DOMINANT_GEOMETRY research
+    question, not a threshold to invent from one trade.
     """
     if entry is None or stop is None:
         return {"valid": False, "why": "entry or stop unavailable"}
+    bps = MODELLED_SPREAD_BPS if spread_bps is None else spread_bps
+    if bps is None or bps < 0:
+        return {"valid": False,
+                "why": "execution-cost estimate unavailable: sizing "
+                       "REFUSES rather than falling back to "
+                       "price-distance-only risk",
+                "declared_1R": "NOT_ESTIMABLE"}
     risk_per_share = (entry - stop) if direction == "LONG" \
         else (stop - entry)
     if risk_per_share <= 0:
@@ -142,14 +175,29 @@ def size_shadow(*, entry: float, stop: float, direction: str,
                 "why": f"stop {stop:.4f} is not on the losing side of "
                        f"entry {entry:.4f} for a {direction}: there is "
                        f"no structural invalidation here"}
-    qty = int(budget // risk_per_share)
+    worse = max(abs(entry), abs(stop))
+    cost_side = worse * (bps / 10_000.0)      # per share, per crossing
+    eslps = risk_per_share + 2.0 * cost_side
+    qty = int(budget // eslps)
     if qty < 1:
         return {"valid": False,
-                "why": f"risk/share {risk_per_share:.4f} exceeds the "
-                       f"whole shadow budget {budget}"}
-    return {"valid": True, "risk_per_share": round(risk_per_share, 6),
+                "why": f"executable stop loss/share {eslps:.4f} "
+                       f"exceeds the whole budget {budget}"}
+    modelled_loss = round(qty * eslps, 2)
+    assert modelled_loss <= budget * (1 + STOP_LOSS_TOLERANCE), \
+        "sizing invariant violated -- refuse rather than mis-declare"
+    return {"valid": True,
+            "risk_per_share": round(risk_per_share, 6),
+            "entry_cost_per_share": round(cost_side, 6),
+            "stop_exit_cost_per_share": round(cost_side, 6),
+            "executable_stop_loss_per_share": round(eslps, 6),
             "quantity": qty,
-            "declared_1R": round(risk_per_share * qty, 2)}
+            "declared_1R": modelled_loss,
+            "modelled_total_loss_at_stop": modelled_loss,
+            "friction_fraction_of_1R": round(
+                (2.0 * cost_side * qty) / modelled_loss, 4),
+            "law": "declared_1R is ECONOMIC risk: the modelled loss at "
+                   "the structural stop, execution costs included"}
 
 
 def marketable_fill(reference: float, direction: str) -> dict:
@@ -189,6 +237,14 @@ class EquityShadowDecision:
     chase_risk: str = "UNKNOWN"
     invalidation_distance_atr: float | None = None
     extension_atr: float | None = None
+    # risk anatomy (FRICTION_DOMINANT_GEOMETRY observation fields)
+    stop_distance_price: float | None = None
+    spread_to_stop_ratio: float | None = None
+    modeled_entry_cost: float | None = None
+    modeled_stop_exit_cost: float | None = None
+    modeled_round_trip_friction: float | None = None
+    friction_fraction_of_1R: float | None = None
+    modeled_total_loss_at_stop: float | None = None
     market_state: dict = field(default_factory=dict)
     catalyst_alignment: str = "CATALYST_UNKNOWN"
     reasons: tuple = ()
@@ -295,6 +351,8 @@ def decide(*, symbol: str, session: str, bars: list, now,
     if not sized["valid"]:
         return mk("NO_VALID_STOP", reasons=(sized["why"],), **common)
 
+    rt = (sized["entry_cost_per_share"]
+          + sized["stop_exit_cost_per_share"]) * sized["quantity"]
     return mk("ATTACK_READY_SHADOW",
               entry_reference=c, entry_fill=fill["fill"],
               stop=geo.invalidation,
@@ -302,6 +360,19 @@ def decide(*, symbol: str, session: str, bars: list, now,
               quantity=sized["quantity"],
               declared_1R=sized["declared_1R"],
               friction_per_share=fill["friction_per_share"],
+              stop_distance_price=sized["risk_per_share"],
+              spread_to_stop_ratio=round(
+                  (2 * sized["entry_cost_per_share"])
+                  / sized["risk_per_share"], 4),
+              modeled_entry_cost=round(
+                  sized["entry_cost_per_share"] * sized["quantity"], 2),
+              modeled_stop_exit_cost=round(
+                  sized["stop_exit_cost_per_share"]
+                  * sized["quantity"], 2),
+              modeled_round_trip_friction=round(rt, 2),
+              friction_fraction_of_1R=sized["friction_fraction_of_1R"],
+              modeled_total_loss_at_stop=sized[
+                  "modelled_total_loss_at_stop"],
               reasons=(setup["why"],
                        f"{geo.entry_quality} location, chase "
                        f"{geo.chase_risk}"),

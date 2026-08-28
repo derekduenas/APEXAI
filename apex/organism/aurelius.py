@@ -167,6 +167,31 @@ def gather_evidence(*, as_of: str | None = None,
         except Exception as e:                          # noqa: BLE001
             ev[name] = f"UNAVAILABLE: {type(e).__name__}"
 
+    # RISK ANATOMY (added after the -1.95R stop hid behind a bare
+    # THESIS_FAILURE label): the CIO must be able to ask "why did a
+    # structural stop declared at 1R resolve at 1.95R" without a human
+    # spelunking a sleeve ledger.
+    try:
+        outs = _rows(root / "results/equities/shadow_outcomes.jsonl",
+                     limit=8)
+        anatomy = []
+        for o in outs:
+            row = {k: o.get(k) for k in
+                   ("decision_id", "symbol", "exit_reason",
+                    "declared_1R", "gross_pnl", "friction",
+                    "executable_pnl", "R", "stop_distance_atr",
+                    "time_to_stop_min", "mfe_pct", "mae_pct")}
+            if (o.get("exit_reason") == "STRUCTURAL_STOP"
+                    and isinstance(o.get("R"), (int, float))
+                    and o["R"] < -1.05):
+                row["SEMANTIC_VIOLATION"] = (
+                    f"declared 1R but the structural stop realized "
+                    f"{o['R']:.2f}R -- risk accounting defect class")
+            anatomy.append(row)
+        ev["equity_risk_anatomy"] = anatomy
+    except Exception as e:                              # noqa: BLE001
+        ev["equity_risk_anatomy"] = f"UNAVAILABLE: {type(e).__name__}"
+
     ev["canonical_economics"] = {
         "prospective_attacks": 6, "economically_resolved": 5,
         "execution_failures": 1, "executable_pnl": -47.00,

@@ -133,12 +133,16 @@ def test_risk_per_share_larger_than_the_budget_is_refused():
     assert r["valid"] is False
 
 
-def test_size_follows_the_stop_never_the_reverse():
+def test_size_follows_the_EXECUTABLE_stop_loss_never_price_alone():
+    """declared_1R = economic risk. At 2bps on a $100 stock the
+    executable stop loss is 2.04/share, so qty is 147, not 150."""
     r = DT.size_shadow(entry=100.0, stop=98.0, direction="LONG",
                        budget=300.0)
     assert r["risk_per_share"] == 2.0
-    assert r["quantity"] == 150
-    assert r["declared_1R"] == 300.0
+    assert r["executable_stop_loss_per_share"] == 2.04
+    assert r["quantity"] == 147
+    assert r["modelled_total_loss_at_stop"] <= 300.0 * 1.02
+    assert r["declared_1R"] == r["modelled_total_loss_at_stop"]
 
 
 def test_execution_crosses_the_spread_in_both_directions():
@@ -342,3 +346,82 @@ def test_resolution_is_idempotent_across_restarts(tmp_path, monkeypatch):
     assert r2["resolved"] == 0, "a restart duplicated an outcome"
     rows = [l for l in outp.read_text().splitlines() if l.strip()]
     assert len(rows) == 1
+
+
+
+# ============= P1 REPAIR: EQUITY-FRICTION-BLIND-SIZING (authorized)
+
+def test_short_sizing_is_execution_cost_aware():
+    r = DT.size_shadow(entry=225.635364, stop=225.73,
+                       direction="SHORT", budget=300.0)
+    assert r["quantity"] == 1622          # was 3170 under the defect
+    assert r["modelled_total_loss_at_stop"] <= 300.0 * 1.02
+
+
+def test_a_tiny_stop_can_no_longer_cost_double_the_declared_risk():
+    """The Friday anatomy, retrospectively validated: worst-case stop
+    loss is 1R by construction, never 1.95R."""
+    for entry, stop, d in ((225.635, 225.73, "SHORT"),
+                           (100.0, 99.98, "LONG"),
+                           (50.0, 49.999, "LONG")):
+        r = DT.size_shadow(entry=entry, stop=stop, direction=d,
+                           budget=300.0)
+        if r["valid"]:
+            assert r["modelled_total_loss_at_stop"] <= 300.0 * 1.02, \
+                f"stop at {stop} can still exceed declared risk"
+
+
+def test_wide_spread_shrinks_size_not_semantics():
+    tight = DT.size_shadow(entry=100.0, stop=99.0, direction="LONG",
+                           budget=300.0, spread_bps=2.0)
+    wide = DT.size_shadow(entry=100.0, stop=99.0, direction="LONG",
+                          budget=300.0, spread_bps=50.0)
+    assert wide["quantity"] < tight["quantity"]
+    assert wide["modelled_total_loss_at_stop"] <= 300.0 * 1.02
+
+
+def test_missing_cost_estimate_refuses_not_falls_back():
+    r = DT.size_shadow(entry=100.0, stop=99.0, direction="LONG",
+                       budget=300.0, spread_bps=-1)
+    assert r["valid"] is False
+    assert r["declared_1R"] == "NOT_ESTIMABLE"
+    assert "REFUSES" in r["why"]
+
+
+def test_a_stop_event_resolves_at_approximately_minus_one_R():
+    """The invariant end to end: sized economically, a structural stop
+    realizes ~-1.0R, never ~-2R."""
+    entry, stop = 225.635364, 225.73
+    sized = DT.size_shadow(entry=entry, stop=stop, direction="SHORT",
+                           budget=300.0)
+    dec = {"decision": "ATTACK_READY_SHADOW", "decision_id": "nv",
+           "symbol": "NVDA", "known_from": "2026-08-27T14:43:00Z",
+           "direction": "SHORT", "entry_fill": entry, "stop": stop,
+           "quantity": sized["quantity"],
+           "declared_1R": sized["declared_1R"],
+           "friction_per_share": entry * 2.0 / 10_000}
+    fut = bars([225.7, 225.75, 225.8], start_h=14, start_m=44)
+    for b in fut:
+        b["high"] = b["close"] + 0.05
+    out = SR.resolve(decision=dec, bars=fut,
+                     close_utc="2026-08-27T20:00:00Z")
+    assert out["exit_reason"] == "STRUCTURAL_STOP"
+    assert -1.05 <= out["R"] <= -0.90, \
+        f"a structural stop realized {out['R']}R"
+    assert out["time_to_stop_min"] != "NOT_APPLICABLE"
+
+
+def test_the_decision_record_carries_the_risk_anatomy():
+    b = bars([100.0] * 30 + [99.9, 99.8, 99.7, 99.6, 99.45])
+    d = DT.decide(symbol="SPY", session="2026-08-28", bars=b,
+                  now=b[-1]["event_time_utc"],
+                  known_from=b[-1]["event_time_utc"])
+    if d.decision == "ATTACK_READY_SHADOW":
+        rec = d.as_record()
+        for k in ("friction_fraction_of_1R",
+                  "modeled_total_loss_at_stop",
+                  "spread_to_stop_ratio",
+                  "modeled_round_trip_friction"):
+            assert rec.get(k) is not None, f"anatomy field {k} missing"
+        assert rec["modeled_total_loss_at_stop"] <= \
+            rec["declared_1R"] * 1.02

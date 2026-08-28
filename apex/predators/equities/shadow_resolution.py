@@ -90,6 +90,8 @@ def resolve(*, decision: dict, bars: list, close_utc) -> dict:
         exit_px, exit_t, why = fut[-1][1]["close"], fut[-1][0], \
             "OFFICIAL_CLOSE"
 
+    time_to_stop = (round((exit_t - kf).total_seconds() / 60, 1)
+                    if why == "STRUCTURAL_STOP" else "NOT_APPLICABLE")
     gross = sign * (exit_px - entry) * qty
     friction = fps * qty * 2                   # crossed in and out
     return {"kind": "equity_shadow_outcome",
@@ -103,6 +105,9 @@ def resolve(*, decision: dict, bars: list, close_utc) -> dict:
                                 if t_mfe else "NOT_ESTIMABLE"),
             "time_to_mae_min": (round((t_mae - kf).total_seconds() / 60, 1)
                                 if t_mae else "NOT_ESTIMABLE"),
+            "time_to_stop_min": time_to_stop,
+            "declared_1R": d.get("declared_1R"),
+            "stop_distance_atr": d.get("invalidation_distance_atr"),
             "gross_pnl": round(gross, 2),
             "friction": round(friction, 2),
             "executable_pnl": round(gross - friction, 2),
