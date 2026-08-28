@@ -63,8 +63,11 @@ def daily_directive(*, session: str,
 
     st = B.state(ledger=book_ledger, session=session)
     rows = _rows(book_ledger or B.LEDGER)
+    voided = {r["candidate_id"] for r in rows
+              if r.get("kind") == "paper_funding_void"}
     fundings = [r for r in rows if r.get("kind") == "paper_funding"
-                and r.get("session") == session]
+                and r.get("session") == session
+                and r["candidate_id"] not in voided]
     refusals = [r for r in rows if r.get("kind") == "paper_refusal"
                 and r.get("session") == session]
     outcomes = {r["candidate_id"]: r for r in rows

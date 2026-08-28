@@ -441,3 +441,14 @@ def test_a_voided_funding_leaves_the_economic_state(led):
     kinds = [json.loads(l)["kind"] for l in
              led["book"].read_text().splitlines() if l.strip()]
     assert "paper_funding" in kinds and "paper_funding_void" in kinds
+
+
+def test_the_cio_does_not_count_voided_fundings(led):
+    env = adapt_opt(opt_record(eid="cv"), led["cards"])
+    AL.allocate([env], session="2026-08-28", book_ledger=led["book"],
+                decision_ledger=led["dec"])
+    BK.void_funding(candidate_id="cv", why="test", ledger=led["book"])
+    d = CIO.daily_directive(session="2026-08-28",
+                            book_ledger=led["book"],
+                            ledger=led["book"].parent / "c2.jsonl")
+    assert d["funded"] == 0, "a voided funding still counted as funded"
