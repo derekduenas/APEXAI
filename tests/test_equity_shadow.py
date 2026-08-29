@@ -285,13 +285,13 @@ def test_the_liquidity_floor_is_predeclared(tmp_path, monkeypatch):
     import scripts.equity_shadow_session as S
     root = tmp_path / "bars"
     root.mkdir()
-    for sym, vol in (("SPY", 90_000), ("THIN", 100)):
+    for sym, vol in (("SPY", 90_000), ("XLB", 100)):
         (root / f"{sym}_2026-08-27.json").write_text(json.dumps(
             {"bars": bars([100.0] * 40, vol=vol)}))
     monkeypatch.setattr(S, "BARS_ROOT", root)
     uni = S.eligible_universe("2026-08-27")
     assert uni["eligible"] == ["SPY"]
-    assert uni["thin"] == ["THIN"]
+    assert uni["thin"] == ["XLB"]
     assert uni["floor_shares_per_min"] == 20_000
 
 

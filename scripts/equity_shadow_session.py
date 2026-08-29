@@ -71,15 +71,30 @@ def rth_only(bars: list) -> list:
             if RTH_OPEN_UTC <= b["event_time_utc"][11:16] <= RTH_CLOSE_UTC]
 
 
+# EQUITY_UNIVERSE_V1 -- the canonical trader's era, PINNED.
+# The universe used to be "every symbol with a bar file", which was
+# fine while the sensor captured exactly these 17. The moment the
+# sensor widened for the shadow FIELD, that glob would have silently
+# expanded the frozen trader and flooded the arena -- a quiet symbol
+# add, which the sealed universe-expansion law forbids. Canonical
+# breadth changes only through a predeclared EQUITY_UNIVERSE_V2 era.
+EQUITY_UNIVERSE_V1 = (
+    "AAPL", "IWM", "MSFT", "NVDA", "QQQ", "SPY",
+    "XLB", "XLC", "XLE", "XLF", "XLI", "XLK",
+    "XLP", "XLRE", "XLU", "XLV", "XLY")
+
+
 def eligible_universe(session: str) -> dict:
-    """Predeclared liquidity floor, measured over RTH. Reported BEFORE
-    any decision."""
+    """Predeclared liquidity floor, measured over RTH, over the PINNED
+    canonical era universe. Reported BEFORE any decision."""
     ok, thin, missing = [], [], []
     if not BARS_ROOT.exists():
         return {"eligible": [], "thin": [], "missing": [],
                 "why": f"no bar store at {BARS_ROOT}"}
     for f in sorted(BARS_ROOT.glob(f"*_{session}.json")):
         sym = f.name.split("_")[0]
+        if sym not in EQUITY_UNIVERSE_V1:
+            continue
         bars = rth_only(load_bars(sym, session))
         vols = [b.get("volume", 0) for b in bars]
         if len(bars) < day_trader.MIN_BARS:

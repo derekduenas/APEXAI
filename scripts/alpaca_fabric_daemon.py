@@ -63,6 +63,19 @@ def _intended_universe() -> list:
     # non-negotiable floor: whatever Options will decide on today
     from options_paper_session import UNIVERSE as OPTIONS_UNIVERSE
     syms |= {s.replace(".US", "") for s in OPTIONS_UNIVERSE}
+    # the EQUITY SHADOW FIELD's sealed universe (predator-evidence
+    # instrumentation): the sensor captures it so the frozen hunter can
+    # be evaluated broadly IN SHADOW. Capturing a symbol grants it no
+    # authority -- the canonical trader's universe is PINNED to
+    # EQUITY_UNIVERSE_V1 in equity_shadow_session and cannot widen by
+    # a bar file appearing.
+    field = Path("results/equities/field/universe_v1.json")
+    if field.exists():
+        try:
+            syms |= set(json.loads(
+                field.read_text().splitlines()[0]).get("symbols", []))
+        except (json.JSONDecodeError, OSError, IndexError):
+            pass          # sensor never dies because research config is bad
     return sorted(syms)
 
 
