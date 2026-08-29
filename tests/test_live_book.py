@@ -15,14 +15,23 @@ from apex.organism import live_book as LB
 PREVIEW = {"est_price": 1.25, "est_cost": 125.0, "venue": "robinhood"}
 
 
-def intent_kwargs(**over):
+def policy(tmp_path, lessons=15):
+    pp = tmp_path / "policy.json"
+    LB.seal_risk_policy(min_execution_lessons=lessons,
+                        sealed_by_operator=True, policy_path=pp)
+    return pp
+
+
+def intent_kwargs(tmp_path, **over):
     kw = dict(candidate_id="2026-08-31:001:SPY", sleeve="OPTIONS",
               symbol="SPY", expression="LONG_PUT", direction="SHORT",
               source_stream="options_evaluation",
               known_from="2026-08-31T14:00:00Z",
               declared_risk=125.0, max_loss_dollars=125.0,
+              account_equity_at_approval=4000.0,
               broker_preview=PREVIEW, operator_approved=True,
-              card_hash="abc123")
+              card_hash="abc123",
+              policy_path=policy(tmp_path))
     kw.update(over)
     return kw
 
@@ -50,33 +59,33 @@ def test_the_live_book_cannot_place_orders():
 
 def test_synthetic_intents_are_refused(tmp_path):
     with pytest.raises(LB.LiveBookViolation, match="synthetic"):
-        LB.seal_intent(**intent_kwargs(
+        LB.seal_intent(**intent_kwargs(tmp_path, 
             source_stream="manual_test_trade"),
             ledger=tmp_path / "i.jsonl")
 
 
 def test_unapproved_intents_are_refused(tmp_path):
     with pytest.raises(LB.LiveBookViolation, match="approve"):
-        LB.seal_intent(**intent_kwargs(operator_approved=False),
+        LB.seal_intent(**intent_kwargs(tmp_path, operator_approved=False),
                        ledger=tmp_path / "i.jsonl")
 
 
 def test_unbounded_loss_is_refused(tmp_path):
     with pytest.raises(LB.LiveBookViolation, match="bounded"):
-        LB.seal_intent(**intent_kwargs(max_loss_dollars=0),
+        LB.seal_intent(**intent_kwargs(tmp_path, max_loss_dollars=0),
                        ledger=tmp_path / "i.jsonl")
 
 
 def test_unpreviewed_orders_are_refused(tmp_path):
     with pytest.raises(LB.LiveBookViolation, match="preview"):
-        LB.seal_intent(**intent_kwargs(broker_preview={}),
+        LB.seal_intent(**intent_kwargs(tmp_path, broker_preview={}),
                        ledger=tmp_path / "i.jsonl")
 
 
 def test_a_valid_intent_seals_once_and_only_once(tmp_path):
     led = tmp_path / "i.jsonl"
-    r1 = LB.seal_intent(**intent_kwargs(), ledger=led)
-    r2 = LB.seal_intent(**intent_kwargs(), ledger=led)
+    r1 = LB.seal_intent(**intent_kwargs(tmp_path, ), ledger=led)
+    r2 = LB.seal_intent(**intent_kwargs(tmp_path, ), ledger=led)
     assert not r1.get("duplicate") and r2.get("duplicate")
     row = json.loads(led.read_text().splitlines()[0])
     assert row["status"] == "APPROVED_AWAITING_EXECUTION"
@@ -98,7 +107,7 @@ def _fill(ref="RH1", sym="SPY", pnl=None):
 
 def test_fills_reconcile_one_to_one_and_never_guess(tmp_path):
     il, fl = tmp_path / "i.jsonl", tmp_path / "f.jsonl"
-    LB.seal_intent(**intent_kwargs(), ledger=il)
+    LB.seal_intent(**intent_kwargs(tmp_path, ), ledger=il)
     r = LB.reconcile(broker_fills=[_fill()], session="2026-08-31",
                      intents_ledger=il, fills_ledger=fl)
     assert r["matched"] == 1 and r["unreconciled"] == 0
@@ -124,7 +133,7 @@ def test_an_orphan_fill_is_sealed_unreconciled_not_dropped(tmp_path):
 
 def test_state_reports_broker_truth_and_the_never_merge_law(tmp_path):
     il, fl = tmp_path / "i.jsonl", tmp_path / "f.jsonl"
-    LB.seal_intent(**intent_kwargs(), ledger=il)
+    LB.seal_intent(**intent_kwargs(tmp_path, ), ledger=il)
     LB.reconcile(broker_fills=[_fill(pnl=-12.5)],
                  session="2026-08-31",
                  intents_ledger=il, fills_ledger=fl)
@@ -149,3 +158,57 @@ def test_nothing_on_a_trading_path_imports_the_live_book():
                     if isinstance(n, ast.ImportFrom) else [])
             assert not any("live_book" in m for m in mods), \
                 f"{mod} consumes the live book"
+
+
+# ================================================ LIVE FITNESS GATE
+
+def test_live_can_never_increase_canonical_risk(tmp_path):
+    with pytest.raises(LB.LiveBookViolation, match="REDUCE-ONLY"):
+        LB.seal_intent(**intent_kwargs(tmp_path,
+                                       max_loss_dollars=200.0),
+                       ledger=tmp_path / "i.jsonl")
+
+
+def test_no_sealed_policy_fails_closed(tmp_path):
+    kw = intent_kwargs(tmp_path)
+    kw["policy_path"] = tmp_path / "absent.json"
+    with pytest.raises(LB.LiveBookViolation, match="FAILS *CLOSED"):
+        LB.seal_intent(**kw, ledger=tmp_path / "i.jsonl")
+
+
+def test_min_size_exceeding_tolerance_is_refused_first_class(
+        tmp_path):
+    """$279-class structure on a small account: live yields, paper
+    continues, and the refusal is sealed evidence."""
+    led = tmp_path / "i.jsonl"
+    r = LB.seal_intent(**intent_kwargs(
+        tmp_path, declared_risk=279.0, max_loss_dollars=279.0,
+        account_equity_at_approval=2500.0), ledger=led)
+    assert r["kind"] == "live_intent_refused"
+    assert r["refusal"] == "REFUSED_LIVE_MIN_SIZE"
+    assert r["policy_cap_dollars"] == round(2500.0 * 0.0667, 2)  # the SEALED fraction governs, not the raw ratio
+    assert "paper continues" in r["why"]
+    row = json.loads(led.read_text().splitlines()[0])
+    assert row["kind"] == "live_intent_refused"
+
+
+def test_a_fitting_intent_passes_the_gate(tmp_path):
+    r = LB.seal_intent(**intent_kwargs(
+        tmp_path, declared_risk=279.0, max_loss_dollars=279.0,
+        account_equity_at_approval=5000.0), ledger=tmp_path / "i.jsonl")
+    assert r["kind"] == "live_intent"           # 279 <= 5000/15=333
+
+
+def test_policy_is_an_operator_decision_with_a_floor(tmp_path):
+    with pytest.raises(LB.LiveBookViolation, match="operator"):
+        LB.seal_risk_policy(min_execution_lessons=15,
+                            sealed_by_operator=False,
+                            policy_path=tmp_path / "p.json")
+    with pytest.raises(LB.LiveBookViolation, match="survive"):
+        LB.seal_risk_policy(min_execution_lessons=1,
+                            sealed_by_operator=True,
+                            policy_path=tmp_path / "p.json")
+    pol = LB.seal_risk_policy(min_execution_lessons=20,
+                              sealed_by_operator=True,
+                              policy_path=tmp_path / "p.json")
+    assert pol["max_loss_fraction_per_intent"] == 0.05

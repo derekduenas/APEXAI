@@ -39,6 +39,22 @@ REAL_ORDER_AUTHORITY = "NONE"          # and no code path can change it
 
 INTENTS = Path("results/live/intents.jsonl")
 FILLS = Path("results/live/fills.jsonl")
+RISK_POLICY = Path("results/live/risk_policy.json")
+
+# THE LIVE FITNESS GATE (authority semantics, operator-ratified):
+#   CANONICAL STRATEGY sets the ceiling (thesis, expression, declared
+#   risk). LIVE FITNESS may only REFUSE or REDUCE. It can NEVER
+#   increase canonical risk, and it NEVER reads the broker at decision
+#   time -- account equity enters only as the operator-attested figure
+#   in the approved preview snapshot.
+#
+# The tolerance fraction is not a risk budget for alpha; at tiny-live
+# the account exists to buy EXECUTION LESSONS. The policy is therefore
+# denominated in lessons: min_execution_lessons N means the account
+# must survive N consecutive worst-case losses before exhaustion, so
+# max loss per intent = equity / N. The operator seals N; code derives
+# the fraction; nothing here invents a number.
+REDUCE_ONLY_TOLERANCE = 0.02           # matches the 1R monitoring tol
 
 NATURAL_STREAMS = ("options_evaluation", "equity_shadow_decision",
                    "btc_paper_decision")
@@ -75,15 +91,60 @@ def _rows(path: Path) -> list:
     return out
 
 
+# ------------------------------------------------------- risk policy
+
+def seal_risk_policy(*, min_execution_lessons: int,
+                     sealed_by_operator: bool,
+                     policy_path: Path | None = None) -> dict:
+    """The operator's tiny-live tolerance, sealed ONCE before any
+    intent. N lessons => the account survives N consecutive worst-case
+    losses; the per-intent fraction is derived, never invented."""
+    if not sealed_by_operator:
+        raise LiveBookViolation(
+            "the live risk policy is an operator decision; code "
+            "cannot seal it for itself")
+    if not isinstance(min_execution_lessons, int) \
+            or min_execution_lessons < 2:
+        raise LiveBookViolation(
+            "min_execution_lessons must be an integer >= 2 -- an "
+            "account that cannot survive its second lesson is not "
+            "running an experiment")
+    path = policy_path or RISK_POLICY
+    rec = {"kind": "live_risk_policy",
+           "min_execution_lessons": min_execution_lessons,
+           "max_loss_fraction_per_intent":
+           round(1.0 / min_execution_lessons, 4),
+           "meaning": "the account exists to buy execution lessons; "
+                      "it must afford N of them at worst case",
+           "sealed_utc": _now(), "sealed_by_operator": True,
+           "decision_power": AUTHORITY}
+    chain_append(path, rec)
+    return rec
+
+
+def _load_policy(policy_path: Path | None = None) -> dict:
+    path = policy_path or RISK_POLICY
+    rows = _rows(path)
+    pol = [r for r in rows if r.get("kind") == "live_risk_policy"]
+    if not pol:
+        raise LiveBookViolation(
+            "no sealed live risk policy exists -- the gate FAILS "
+            "CLOSED. Seal one with seal_risk_policy() (operator "
+            "decision) before any intent.")
+    return pol[-1]                       # latest sealed policy governs
+
+
 # ------------------------------------------------------------ intents
 
 def seal_intent(*, candidate_id: str, sleeve: str, symbol: str,
                 expression: str, direction: str,
                 source_stream: str, known_from: str,
                 declared_risk: float, max_loss_dollars: float,
+                account_equity_at_approval: float,
                 broker_preview: dict, operator_approved: bool,
                 card_hash: str | None = None,
-                ledger: Path | None = None) -> dict:
+                ledger: Path | None = None,
+                policy_path: Path | None = None) -> dict:
     """Seal ONE approved execution intent. Refuses anything synthetic:
     the candidate must name its canonical stream, its provenance, and
     carry explicit human approval. An intent is a record of permission
@@ -107,7 +168,44 @@ def seal_intent(*, candidate_id: str, sleeve: str, symbol: str,
         raise LiveBookViolation(
             "broker_preview is required: the order must have been "
             "previewed against the broker before approval")
+
+    # ---- THE LIVE FITNESS GATE: refuse or reduce, never increase.
+    if max_loss_dollars > declared_risk * (1 + REDUCE_ONLY_TOLERANCE):
+        raise LiveBookViolation(
+            f"REDUCE-ONLY VIOLATION: live max loss "
+            f"{max_loss_dollars} exceeds canonical declared risk "
+            f"{declared_risk} -- live execution can never increase "
+            f"canonical authority")
+    if not isinstance(account_equity_at_approval, (int, float)) \
+            or account_equity_at_approval <= 0:
+        raise LiveBookViolation(
+            "account_equity_at_approval must be the positive, "
+            "operator-attested Agentic equity from the approval "
+            "moment -- the gate never reads the broker itself")
+    pol = _load_policy(policy_path)
+    cap = account_equity_at_approval \
+        * pol["max_loss_fraction_per_intent"]
     path = ledger or INTENTS
+    if max_loss_dollars > cap:
+        # a natural candidate the tiny account cannot safely express
+        # is REFUSED for live, first-class -- while paper continues.
+        # That refusal is execution evidence, not a missed trade.
+        rec = {"kind": "live_intent_refused",
+               "refusal": "REFUSED_LIVE_MIN_SIZE",
+               "candidate_id": candidate_id, "sleeve": sleeve,
+               "symbol": symbol, "expression": expression,
+               "max_loss_dollars": float(max_loss_dollars),
+               "account_equity_at_approval":
+               float(account_equity_at_approval),
+               "policy_cap_dollars": round(cap, 2),
+               "policy_lessons": pol["min_execution_lessons"],
+               "why": "minimum executable size exceeds the sealed "
+                      "tiny-live tolerance; live yields, paper "
+                      "continues",
+               "refused_utc": _now(),
+               "decision_power": AUTHORITY}
+        chain_append(path, rec)
+        return rec
     if any(r.get("candidate_id") == candidate_id
            and r.get("kind") == "live_intent" for r in _rows(path)):
         return {"kind": "live_intent", "duplicate": True,
