@@ -43,6 +43,17 @@ START = "2016-01-04"
 API = "https://data.alpaca.markets/v2/stocks/{sym}/bars"
 
 
+def _et_date(t_iso: str) -> str:
+    """The EXCHANGE session date, not the UTC calendar date. UTC
+    keying stranded Friday's late extended-hours prints (post-19:00
+    EST = next-day UTC) in bogus Saturday files and made holidays
+    appear in the session calendar."""
+    from zoneinfo import ZoneInfo
+    dt = datetime.fromisoformat(t_iso.replace("Z", "+00:00"))
+    return dt.astimezone(ZoneInfo("America/New_York")) \
+        .strftime("%Y-%m-%d")
+
+
 def _get(url: str) -> dict:
     req = urllib.request.Request(url, headers={
         "APCA-API-KEY-ID": os.environ["APCA_API_KEY_ID"],
@@ -85,7 +96,7 @@ def fetch_symbol(sym: str, *, start: str = START,
         d = _get(API.format(sym=sym) + "?" + urllib.parse.urlencode(q))
         for b in d.get("bars") or []:
             t = b["t"]
-            days.setdefault(t[:10], []).append(
+            days.setdefault(_et_date(t), []).append(
                 {"event_time_utc": t.replace("+00:00", "Z"),
                  "open": b["o"], "high": b["h"], "low": b["l"],
                  "close": b["c"], "volume": b["v"]})
@@ -227,14 +238,52 @@ def integrity() -> dict:
     return rep
 
 
+def rebucket() -> dict:
+    """Re-key every existing day file by ET session date (one-time
+    repair of the UTC-dating defect; no refetch needed)."""
+    from collections import defaultdict
+    syms = sorted({f.stem.rsplit("_", 1)[0]
+                   for f in BARS.glob("*.json")})
+    stats = {"symbols": len(syms), "files_before": 0,
+             "files_after": 0, "moved_bars": 0}
+    for sym in syms:
+        buckets: dict = defaultdict(list)
+        old_files = sorted(BARS.glob(f"{sym}_*.json"))
+        stats["files_before"] += len(old_files)
+        for f in old_files:
+            for b in json.loads(f.read_text()).get("bars", []):
+                d = _et_date(b["event_time_utc"])
+                if d != f.stem.rsplit("_", 1)[1]:
+                    stats["moved_bars"] += 1
+                buckets[d].append(b)
+        for f in old_files:
+            f.unlink()
+        for day, bars in buckets.items():
+            seen, out = set(), []
+            for b in sorted(bars,
+                            key=lambda x: x["event_time_utc"]):
+                if b["event_time_utc"] not in seen:
+                    seen.add(b["event_time_utc"])
+                    out.append(b)
+            (BARS / f"{sym}_{day}.json").write_text(
+                json.dumps({"source": "alpaca_sip_raw_1m",
+                            "bars": out}))
+            stats["files_after"] += 1
+    return stats
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--probe", action="store_true")
+    ap.add_argument("--rebucket", action="store_true")
     ap.add_argument("--fetch-all", action="store_true")
     ap.add_argument("--integrity", action="store_true")
     a = ap.parse_args()
     if a.probe:
         print(json.dumps(probe(), indent=1))
+        return 0
+    if a.rebucket:
+        print(json.dumps(rebucket(), indent=1))
         return 0
     if a.fetch_all:
         for sym in ETF_CORE:
