@@ -134,16 +134,30 @@ def integrity() -> dict:
             prev = t
         rth = [b for b in bars
                if "13:30" <= b["event_time_utc"][11:16] <= "20:00"]
-        if len(rth) < 300:              # ~390 expected; <300 = gappy
+        # DENSITY metric, not a defect: a 1-minute bar exists only
+        # where trades printed, so quiet ETFs legitimately skip
+        # minutes, and half-days legitimately end early. Reported for
+        # the record; never a verdict input.
+        if len(rth) < 300:
             s["thin_days"] += 1
 
     # calendar completeness: the union of days across symbols is the
     # self-consistent session calendar; a symbol missing one of those
-    # days has a hole
-    missing = {sym: sorted(union_days - {
-        f.stem.rsplit("_", 1)[1]
-        for f in files if f.stem.rsplit("_", 1)[0] == sym})
-        for sym in per_sym}
+    # days AFTER ITS OWN INCEPTION has a hole. Pre-inception absence
+    # is history, not a defect -- the first run flagged XLC FAIL for
+    # not existing before June 2018.
+    have = {sym: {f.stem.rsplit("_", 1)[1] for f in files
+                  if f.stem.rsplit("_", 1)[0] == sym}
+            for sym in per_sym}
+    missing = {sym: sorted(d for d in union_days - have[sym]
+                           if d >= min(have[sym]))
+               for sym in per_sym}
+    post_inception_sessions = {sym: sum(1 for d in union_days
+                                        if d >= min(have[sym]))
+                               for sym in per_sym}
+    worst_missing_pct = max(
+        (len(missing[sym]) / max(post_inception_sessions[sym], 1)
+         for sym in per_sym), default=0.0)
     worst_missing = max((len(v) for v in missing.values()),
                         default=0)
 
@@ -181,7 +195,7 @@ def integrity() -> dict:
     total_nm = sum(s["non_monotonic"] for s in per_sym.values())
     verdict = "PASS" if (files and total_dupes == 0 and total_nm == 0
                          and overlap["close_mismatches"] == 0
-                         and worst_missing < len(union_days) * 0.02) \
+                         and worst_missing_pct < 0.02) \
         else "FAIL"
     rep = {"kind": "etf_corpus_integrity",
            "corpus_version": manifest,
@@ -194,6 +208,10 @@ def integrity() -> dict:
                          "corporate actions explicit, not silent)",
            "duplicates": total_dupes, "non_monotonic": total_nm,
            "worst_symbol_missing_days": worst_missing,
+           "worst_missing_pct_post_inception":
+           round(worst_missing_pct, 4),
+           "inception_by_symbol": {sym: min(have[sym])
+                                   for sym in per_sym},
            "missing_by_symbol": {k: len(v) for k, v in
                                  missing.items()},
            "thin_days_by_symbol": {k: s["thin_days"]
