@@ -51,7 +51,14 @@ def phase_at(now_utc: datetime, session: str, *,
              open_utc, close_utc, trading_day: bool) -> dict:
     """Which catalyst phase the calendar says we are in."""
     if not trading_day:
-        return {"phase": "IDLE", "why": f"{session} is not a trading day"}
+        # same shape as every other return: the service loop reads
+        # "session" unconditionally, and this branch first executed on
+        # the first weekend after go-live -- where its missing key
+        # crash-looped the service all Saturday morning
+        return {"kind": "catalyst_phase", "phase": "IDLE",
+                "session": session, "poll_seconds": None,
+                "why": f"{session} is not a trading day",
+                "decision_power": "SHADOW_CONTEXT_ONLY"}
 
     def et_anchor(hh, mm):
         return to_utc(f"{session} {hh:02d}:{mm:02d}:00",

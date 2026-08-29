@@ -921,3 +921,18 @@ def test_a_tape_too_thin_for_an_atr_is_unmeasurable_not_a_crash(tmp_path):
                            ledger=tmp_path / "r.jsonl")
     assert out["reactions_written"] == 0
     assert out["unmeasurable"] == 1
+
+
+def test_weekend_phase_carries_the_same_shape_as_trading_days():
+    """The non-trading-day branch first executed on the first weekend
+    after go-live and crash-looped the service: it returned a dict
+    without "session" while the loop reads it unconditionally. Every
+    branch of phase_at now returns the full shape."""
+    from apex.catalyst.premarket import phase_at
+    from datetime import datetime, timezone
+    ph = phase_at(datetime(2026, 8, 29, 12, 0, tzinfo=timezone.utc),
+                  "2026-08-29", open_utc=None, close_utc=None,
+                  trading_day=False)
+    assert ph["phase"] == "IDLE"
+    assert ph["session"] == "2026-08-29"
+    assert "poll_seconds" in ph
