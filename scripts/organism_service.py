@@ -125,45 +125,83 @@ def attach_new_outcomes(session: str) -> int:
         return 0
     attached = 0
 
-    # OPTIONS: the sleeve seals a per-SESSION scoreboard, not a
-    # per-trade record. When the session had exactly ONE attack and the
-    # book holds exactly ONE open options funding for that session, the
-    # aggregate IS the trade and may attach. Any other shape stays
-    # PENDING rather than inventing a decomposition -- allocating an
-    # aggregate across trades is how the "6 trades -$47" sloppiness
-    # started, and we do not do it here either.
+    # OPTIONS: PER-TRADE join on the sealed attack-card hash. The
+    # sleeve has ALWAYS sealed one options_outcome + one adjacent
+    # options_friction_attribution per attack; only this attachment
+    # path was blind to them (it consumed the session scoreboard,
+    # which forced the n==1 special case). The candidate's card_hash
+    # travels in the funding's sleeve_payload, the outcome carries
+    # sealed_card_hash, and the friction row is the NEXT row the same
+    # single-writer loop appends -- a deterministic pair. Identity
+    # mismatch => the pair is refused and the position stays PENDING
+    # with a visible why; nothing is ever guessed.
     opt_led = Path("results/options_live_ledger.jsonl")
-    opt_open = [cid for cid, pos in open_ids.items()
-                if pos["sleeve"] == "OPTIONS"]
-    if opt_led.exists() and len(opt_open) == 1:
+    opt_open = {cid: pos for cid, pos in open_ids.items()
+                if pos["sleeve"] == "OPTIONS"}
+    if opt_led.exists() and opt_open:
+        rows = []
         for line in opt_led.read_text().splitlines():
             if not line.strip():
                 continue
             try:
-                r = json.loads(line)
+                rows.append(json.loads(line))
             except json.JSONDecodeError:
                 continue
-            if r.get("kind") != "options_session_scoreboard"                     or r.get("session") != session:
-                continue
-            f = r.get("friction") or {}
-            if r.get("attacks_raw") == 1 and                     isinstance(f.get("executable_pnl"), (int, float)):
-                cls = list((f.get("by_primary_class") or
-                            {"UNCLASSIFIED": 1}).keys())[0]
+        by_hash = {}
+        for i, r in enumerate(rows):
+            if r.get("kind") == "options_outcome" \
+                    and r.get("sealed_card_hash"):
+                nxt = rows[i + 1] if i + 1 < len(rows) else {}
+                by_hash[r["sealed_card_hash"]] = (r, nxt)
+        for cid, pos in list(opt_open.items()):
+            h = (pos.get("sleeve_payload") or {}).get("card_hash")
+            if not h or h not in by_hash:
+                continue                       # not resolved yet
+            oc, fr = by_hash[h]
+            if fr.get("kind") != "options_friction_attribution" \
+                    or fr.get("executable_pnl") != oc.get("pnl") \
+                    or fr.get("expression") != oc.get("expression"):
                 book.attach_outcome(
-                    candidate_id=opt_open[0], session=session,
-                    executable_pnl=f["executable_pnl"],
-                    outcome_class=("EXECUTION_FAILURE"
-                                   if cls == "EXECUTION_FAILURE"
-                                   else "THESIS_FAILURE"
-                                   if f["executable_pnl"] <= 0
-                                   else "NO_REAL_FAILURE"),
-                    detail={"source": "options_session_scoreboard",
-                            "n_attacks": 1, "primary_class": cls,
-                            "mid_pnl": f.get("mid_pnl"),
-                            "friction": f.get("friction")})
+                    candidate_id=cid, session=session,
+                    executable_pnl="NOT_ESTIMABLE",
+                    outcome_class="EXECUTION_FAILURE",
+                    detail={"source": "options_per_trade_join",
+                            "why": "outcome/attribution pair failed "
+                                   "identity check -- refused to "
+                                   "guess", "card_hash": h})
                 attached += 1
-                open_ids.pop(opt_open[0])
-                break
+                open_ids.pop(cid)
+                continue
+            book.attach_outcome(
+                candidate_id=cid, session=session,
+                executable_pnl=fr["executable_pnl"],
+                outcome_class=("EXECUTION_FAILURE"
+                               if fr.get("primary_class")
+                               == "EXECUTION_FAILURE"
+                               else "THESIS_FAILURE"
+                               if fr["executable_pnl"] <= 0
+                               else "NO_REAL_FAILURE"),
+                detail={"source": "options_per_trade_join",
+                        "card_hash": h,
+                        "primary_class": fr.get("primary_class"),
+                        "r_multiple": oc.get("r_multiple"),
+                        "declared_1R_dollars":
+                        oc.get("declared_1R_dollars"),
+                        "expression": oc.get("expression"),
+                        "total_friction": fr.get("total_friction"),
+                        "entry_friction": fr.get("entry_friction"),
+                        "exit_friction": fr.get("exit_friction"),
+                        "friction_cost_share":
+                        fr.get("friction_cost_share"),
+                        "mid_change": oc.get("mid_change"),
+                        "mfe": oc.get("mfe"), "mae": oc.get("mae"),
+                        "time_to_mfe_min": oc.get("time_to_mfe_min"),
+                        "time_to_mae_min": oc.get("time_to_mae_min"),
+                        "theta_impact": oc.get("theta_impact"),
+                        "spread_impact": oc.get("spread_impact"),
+                        "friction_verdict": fr.get("friction_verdict")})
+            attached += 1
+            open_ids.pop(cid)
 
     eq_out = Path("results/equities/shadow_outcomes.jsonl")
     if eq_out.exists():

@@ -454,10 +454,29 @@ def test_the_cio_does_not_count_voided_fundings(led):
     assert d["funded"] == 0, "a voided funding still counted as funded"
 
 
-def test_options_aggregate_attaches_only_when_it_is_one_trade(
+def _opt_pair(h="hash_SPY", pnl=-35.0, cls="THESIS_WRONG",
+              expr="LONG_PUT"):
+    """One per-trade outcome + its adjacent attribution row, shaped
+    from the REAL ledger rows observed on DO (keys verified 2026-08-29)."""
+    oc = {"kind": "options_outcome", "sealed_card_hash": h,
+          "pnl": pnl, "r_multiple": round(pnl / 335.0, 4),
+          "expression": expr, "declared_1R_dollars": 335.0,
+          "mid_change": pnl + 15.0, "mfe": 12.0, "mae": -40.0,
+          "time_to_mfe_min": 22.0, "time_to_mae_min": 61.0,
+          "theta_impact": -3.0, "spread_impact": -8.0}
+    fr = {"kind": "options_friction_attribution",
+          "executable_pnl": pnl, "expression": expr,
+          "primary_class": cls, "total_friction": 15.0,
+          "entry_friction": 8.0, "exit_friction": 7.0,
+          "friction_cost_share": 0.43,
+          "friction_verdict": "FRICTION_MATERIAL"}
+    return oc, fr
+
+
+def test_options_attach_joins_the_per_trade_pair_by_card_hash(
         tmp_path, monkeypatch):
-    """With 2 attacks the session aggregate is NOT a per-trade outcome
-    and must not be split; with 1 it IS the trade and attaches."""
+    """The sleeve always sealed per-trade anatomy; the organism now
+    consumes it. The n==1 scoreboard hack is gone."""
     import scripts.organism_service as S
     from apex.organism import book as B
     monkeypatch.chdir(tmp_path)
@@ -468,18 +487,65 @@ def test_options_aggregate_attaches_only_when_it_is_one_trade(
                     _write(tmp_path / "cards.jsonl", [opt_card()]))
     AL.allocate([env], session="2026-08-28", book_ledger=led,
                 decision_ledger=tmp_path / "d.jsonl")
-    sb = {"kind": "options_session_scoreboard", "session": "2026-08-28",
-          "attacks_raw": 1,
-          "friction": {"executable_pnl": -35.0, "mid_pnl": -20.0,
-                       "friction": 15.0,
-                       "by_primary_class": {"THESIS_WRONG": 1}}}
-    _write(tmp_path / "results/options_live_ledger.jsonl", [sb])
+    oc, fr = _opt_pair()
+    _write(tmp_path / "results/options_live_ledger.jsonl", [oc, fr])
     n = S.attach_new_outcomes("2026-08-28")
     assert n == 1
     st = B.state(ledger=led)
     assert st["realized_pnl"] == -35.0
+    outcome = [json.loads(l) for l in led.read_text().splitlines()
+               if '"paper_outcome"' in l][-1]
+    d = outcome["detail"]
+    assert d["source"] == "options_per_trade_join"
+    assert d["primary_class"] == "THESIS_WRONG"
+    assert d["total_friction"] == 15.0
+    assert d["r_multiple"] == round(-35.0 / 335.0, 4)
+    assert d["mfe"] == 12.0 and d["time_to_mae_min"] == 61.0
     # a second call must not double-attach
     assert S.attach_new_outcomes("2026-08-28") == 0
+
+
+def test_a_broken_outcome_attribution_pair_is_refused_not_guessed(
+        tmp_path, monkeypatch):
+    """Identity check: attribution executable_pnl must equal outcome
+    pnl and expressions must match; otherwise the attachment refuses
+    with NOT_ESTIMABLE instead of inventing economics."""
+    import scripts.organism_service as S
+    from apex.organism import book as B
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "results/organism").mkdir(parents=True)
+    (tmp_path / "results/equities").mkdir(parents=True)
+    led = B.LEDGER
+    env = adapt_opt(opt_record(eid="o1"),
+                    _write(tmp_path / "cards.jsonl", [opt_card()]))
+    AL.allocate([env], session="2026-08-28", book_ledger=led,
+                decision_ledger=tmp_path / "d.jsonl")
+    oc, fr = _opt_pair()
+    fr["executable_pnl"] = -99.0           # identity broken
+    _write(tmp_path / "results/options_live_ledger.jsonl", [oc, fr])
+    n = S.attach_new_outcomes("2026-08-28")
+    assert n == 1
+    outcome = [json.loads(l) for l in led.read_text().splitlines()
+               if '"paper_outcome"' in l][-1]
+    assert outcome["executable_pnl"] == "NOT_ESTIMABLE"
+    assert "refused to guess" in outcome["detail"]["why"]
+
+
+def test_an_unresolved_options_position_stays_pending(tmp_path,
+                                                      monkeypatch):
+    import scripts.organism_service as S
+    from apex.organism import book as B
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "results/organism").mkdir(parents=True)
+    (tmp_path / "results/equities").mkdir(parents=True)
+    led = B.LEDGER
+    env = adapt_opt(opt_record(eid="o1"),
+                    _write(tmp_path / "cards.jsonl", [opt_card()]))
+    AL.allocate([env], session="2026-08-28", book_ledger=led,
+                decision_ledger=tmp_path / "d.jsonl")
+    _write(tmp_path / "results/options_live_ledger.jsonl", [])
+    assert S.attach_new_outcomes("2026-08-28") == 0
+    assert B.state(ledger=led)["open_positions"] == 1
 
 
 def test_baselines_are_computed_but_never_fund(led):

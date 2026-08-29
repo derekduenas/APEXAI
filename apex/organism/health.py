@@ -30,6 +30,8 @@ COMPONENTS = {
                "results/outbox/equity_shadow_decisions.jsonl", 1200),
     "EQUITY_FIELD": ("apex-equity-field", "equity_field_session",
                      "results/equities/field/decisions.jsonl", 1200),
+    "BTC_RESOLVER": ("apex-btc-resolver", "btc_window_resolver",
+                     "results/btc/window_outcomes.jsonl", 7200),
     "BTC": ("apex-btc-paper", "btc_paper_session",
             "results/btc/paper_ledger.jsonl", 1800),
     "BTC_DERIVATIVES": ("apex-btc-derivatives",

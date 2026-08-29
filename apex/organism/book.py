@@ -92,9 +92,14 @@ def state(*, ledger: Path | None = None,
                     f["symbol"], "UNKNOWN") == fam), 2)
                 for fam in {INDEX_FAMILY.get(f["symbol"], "UNKNOWN")
                             for f in open_pos}},
-            "positions": [{k: f[k] for k in
+            # sleeve_payload rides along because the per-trade outcome
+            # join needs the attack-card hash it carries; a keep-list
+            # that strips it is how the options attribution stayed
+            # blind (the AURELIUS keep-list lesson, third occurrence)
+            "positions": [{k: f.get(k) for k in
                            ("candidate_id", "sleeve", "symbol",
-                            "direction", "expression", "funded_risk")}
+                            "direction", "expression", "funded_risk",
+                            "sleeve_payload")}
                           for f in open_pos],
             "resolved": len(outcomes),
             "execution_failures": sum(
