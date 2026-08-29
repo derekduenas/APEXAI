@@ -178,6 +178,16 @@ def gather_evidence(*, as_of: str | None = None,
          ("parallax_id", "symbol", "expected_direction",
           "violation_class", "expectation_debt", "label",
           "aligned_move_atr", "measured_utc"), 6),
+        # PREDATOR EVIDENCE, never organism economics: the field tape
+        # answers "does the hunter find edge" across the sealed broad
+        # universe; the paper book answers "does the organism make
+        # money". AURELIUS must never pool them.
+        ("equity_field_outcomes",
+         "results/equities/field/outcomes.jsonl",
+         ("decision_id", "symbol", "sector", "original_decision",
+          "counterfactual", "direction", "setup_type", "exit_reason",
+          "R", "signed_horizons", "mfe_pct", "mae_pct",
+          "declared_1R", "known_from", "era"), 10),
     ):
         try:
             rows = _rows(root / path, limit=n)
