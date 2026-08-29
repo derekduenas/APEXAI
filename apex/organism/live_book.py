@@ -48,12 +48,19 @@ RISK_POLICY = Path("results/live/risk_policy.json")
 #   time -- account equity enters only as the operator-attested figure
 #   in the approved preview snapshot.
 #
-# The tolerance fraction is not a risk budget for alpha; at tiny-live
-# the account exists to buy EXECUTION LESSONS. The policy is therefore
-# denominated in lessons: min_execution_lessons N means the account
-# must survive N consecutive worst-case losses before exhaustion, so
-# max loss per intent = equity / N. The operator seals N; code derives
-# the fraction; nothing here invents a number.
+# POLICY SHAPE (operator decision 2026-08-29): TWO ABSOLUTE-DOLLAR
+# CEILINGS, deliberately NOT scaled by account equity -- funding the
+# account with more cash is never permission for more experimental
+# risk. The account exists to buy EXECUTION LESSONS whose expected
+# cost is friction; the ceilings bound the tail:
+#   max_loss_per_intent_dollars   ceiling per intent, tracks the
+#                                 INSTRUMENT (one-contract quantum)
+#   experiment_budget_dollars     worst-case total for the ENTIRE
+#                                 tiny-live phase; exhaustion forces
+#                                 operator review, never a quiet reset
+# Open intents count against the budget as COMMITTED worst-case until
+# resolved -- otherwise two simultaneous intents could pass a budget
+# neither violates alone. Any increase is a separate operator decision.
 REDUCE_ONLY_TOLERANCE = 0.02           # matches the 1R monitoring tol
 
 NATURAL_STREAMS = ("options_evaluation", "equity_shadow_decision",
@@ -93,33 +100,63 @@ def _rows(path: Path) -> list:
 
 # ------------------------------------------------------- risk policy
 
-def seal_risk_policy(*, min_execution_lessons: int,
+def seal_risk_policy(*, max_loss_per_intent_dollars: float,
+                     experiment_budget_dollars: float,
                      sealed_by_operator: bool,
                      policy_path: Path | None = None) -> dict:
-    """The operator's tiny-live tolerance, sealed ONCE before any
-    intent. N lessons => the account survives N consecutive worst-case
-    losses; the per-intent fraction is derived, never invented."""
+    """The operator's tiny-live ceilings, sealed before any intent.
+    Absolute dollars by design: the experiment's risk never inflates
+    with account funding."""
     if not sealed_by_operator:
         raise LiveBookViolation(
             "the live risk policy is an operator decision; code "
             "cannot seal it for itself")
-    if not isinstance(min_execution_lessons, int) \
-            or min_execution_lessons < 2:
+    if not (isinstance(max_loss_per_intent_dollars, (int, float))
+            and max_loss_per_intent_dollars > 0
+            and isinstance(experiment_budget_dollars, (int, float))
+            and experiment_budget_dollars
+            >= max_loss_per_intent_dollars):
         raise LiveBookViolation(
-            "min_execution_lessons must be an integer >= 2 -- an "
-            "account that cannot survive its second lesson is not "
-            "running an experiment")
+            "ceilings must be positive and the experiment budget must "
+            "afford at least one worst-case intent")
     path = policy_path or RISK_POLICY
     rec = {"kind": "live_risk_policy",
-           "min_execution_lessons": min_execution_lessons,
-           "max_loss_fraction_per_intent":
-           round(1.0 / min_execution_lessons, 4),
-           "meaning": "the account exists to buy execution lessons; "
-                      "it must afford N of them at worst case",
+           "max_loss_per_intent_dollars":
+           float(max_loss_per_intent_dollars),
+           "experiment_budget_dollars":
+           float(experiment_budget_dollars),
+           "meaning": "CEILINGS for an execution experiment, never "
+                      "capital-allocation targets; funding level is "
+                      "not permission; increases are a separate "
+                      "operator decision after review",
            "sealed_utc": _now(), "sealed_by_operator": True,
            "decision_power": AUTHORITY}
     chain_append(path, rec)
     return rec
+
+
+def experiment_exposure(*, intents_ledger: Path | None = None,
+                        fills_ledger: Path | None = None) -> dict:
+    """Realized live losses + committed worst-case of unresolved
+    intents. Open intents COUNT -- two simultaneous intents must not
+    pass a budget neither violates alone."""
+    intents = [r for r in _rows(intents_ledger or INTENTS)
+               if r.get("kind") == "live_intent"
+               and not r.get("duplicate")]
+    fills = _rows(fills_ledger or FILLS)
+    resolved_ids = {f.get("candidate_id") for f in fills
+                    if f.get("kind") == "live_fill"
+                    and isinstance(f.get("broker_realized_pnl"),
+                                   (int, float))}
+    realized_losses = -sum(
+        min(0.0, f["broker_realized_pnl"]) for f in fills
+        if f.get("kind") == "live_fill"
+        and isinstance(f.get("broker_realized_pnl"), (int, float)))
+    committed = sum(i["max_loss_dollars"] for i in intents
+                    if i["candidate_id"] not in resolved_ids)
+    return {"realized_losses": round(realized_losses, 2),
+            "committed_open_worst_case": round(committed, 2),
+            "total_at_risk": round(realized_losses + committed, 2)}
 
 
 def _load_policy(policy_path: Path | None = None) -> dict:
@@ -183,29 +220,42 @@ def seal_intent(*, candidate_id: str, sleeve: str, symbol: str,
             "operator-attested Agentic equity from the approval "
             "moment -- the gate never reads the broker itself")
     pol = _load_policy(policy_path)
-    cap = account_equity_at_approval \
-        * pol["max_loss_fraction_per_intent"]
     path = ledger or INTENTS
-    if max_loss_dollars > cap:
-        # a natural candidate the tiny account cannot safely express
-        # is REFUSED for live, first-class -- while paper continues.
-        # That refusal is execution evidence, not a missed trade.
-        rec = {"kind": "live_intent_refused",
-               "refusal": "REFUSED_LIVE_MIN_SIZE",
+
+    def _refuse(refusal, why, extra=None):
+        rec = {"kind": "live_intent_refused", "refusal": refusal,
                "candidate_id": candidate_id, "sleeve": sleeve,
                "symbol": symbol, "expression": expression,
                "max_loss_dollars": float(max_loss_dollars),
                "account_equity_at_approval":
                float(account_equity_at_approval),
-               "policy_cap_dollars": round(cap, 2),
-               "policy_lessons": pol["min_execution_lessons"],
-               "why": "minimum executable size exceeds the sealed "
-                      "tiny-live tolerance; live yields, paper "
-                      "continues",
-               "refused_utc": _now(),
+               "why": why, "refused_utc": _now(),
                "decision_power": AUTHORITY}
+        rec.update(extra or {})
         chain_append(path, rec)
         return rec
+
+    if max_loss_dollars > pol["max_loss_per_intent_dollars"]:
+        # a natural candidate the experiment cannot safely express is
+        # REFUSED for live, first-class -- while paper continues.
+        return _refuse(
+            "REFUSED_LIVE_MIN_SIZE",
+            "minimum executable size exceeds the sealed per-intent "
+            "ceiling; live yields, paper continues",
+            {"per_intent_ceiling":
+             pol["max_loss_per_intent_dollars"]})
+    exp = experiment_exposure(intents_ledger=path,
+                              fills_ledger=None)
+    if exp["total_at_risk"] + max_loss_dollars \
+            > pol["experiment_budget_dollars"]:
+        return _refuse(
+            "REFUSED_LIVE_BUDGET",
+            "realized losses plus committed open worst-case plus "
+            "this intent would exceed the sealed experiment budget; "
+            "exhaustion forces operator review, never a quiet reset",
+            {"experiment_budget":
+             pol["experiment_budget_dollars"],
+             "exposure_before_intent": exp})
     if any(r.get("candidate_id") == candidate_id
            and r.get("kind") == "live_intent" for r in _rows(path)):
         return {"kind": "live_intent", "duplicate": True,

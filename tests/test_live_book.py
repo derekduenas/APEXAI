@@ -15,10 +15,12 @@ from apex.organism import live_book as LB
 PREVIEW = {"est_price": 1.25, "est_cost": 125.0, "venue": "robinhood"}
 
 
-def policy(tmp_path, lessons=15):
+def policy(tmp_path, cap=300.0, budget=600.0):
     pp = tmp_path / "policy.json"
-    LB.seal_risk_policy(min_execution_lessons=lessons,
-                        sealed_by_operator=True, policy_path=pp)
+    if not pp.exists():
+        LB.seal_risk_policy(max_loss_per_intent_dollars=cap,
+                            experiment_budget_dollars=budget,
+                            sealed_by_operator=True, policy_path=pp)
     return pp
 
 
@@ -176,39 +178,70 @@ def test_no_sealed_policy_fails_closed(tmp_path):
         LB.seal_intent(**kw, ledger=tmp_path / "i.jsonl")
 
 
-def test_min_size_exceeding_tolerance_is_refused_first_class(
-        tmp_path):
-    """$279-class structure on a small account: live yields, paper
+def test_over_ceiling_structures_are_refused_first_class(tmp_path):
+    """$350 structure vs the $300 ceiling: live yields, paper
     continues, and the refusal is sealed evidence."""
     led = tmp_path / "i.jsonl"
     r = LB.seal_intent(**intent_kwargs(
-        tmp_path, declared_risk=279.0, max_loss_dollars=279.0,
-        account_equity_at_approval=2500.0), ledger=led)
+        tmp_path, declared_risk=350.0, max_loss_dollars=350.0),
+        ledger=led)
     assert r["kind"] == "live_intent_refused"
     assert r["refusal"] == "REFUSED_LIVE_MIN_SIZE"
-    assert r["policy_cap_dollars"] == round(2500.0 * 0.0667, 2)  # the SEALED fraction governs, not the raw ratio
+    assert r["per_intent_ceiling"] == 300.0
     assert "paper continues" in r["why"]
-    row = json.loads(led.read_text().splitlines()[0])
-    assert row["kind"] == "live_intent_refused"
 
 
-def test_a_fitting_intent_passes_the_gate(tmp_path):
+def test_the_279_structure_fits_the_operator_ceiling(tmp_path):
     r = LB.seal_intent(**intent_kwargs(
-        tmp_path, declared_risk=279.0, max_loss_dollars=279.0,
-        account_equity_at_approval=5000.0), ledger=tmp_path / "i.jsonl")
-    assert r["kind"] == "live_intent"           # 279 <= 5000/15=333
+        tmp_path, declared_risk=279.0, max_loss_dollars=279.0),
+        ledger=tmp_path / "i.jsonl")
+    assert r["kind"] == "live_intent"
 
 
-def test_policy_is_an_operator_decision_with_a_floor(tmp_path):
+def test_open_intents_commit_against_the_experiment_budget(tmp_path):
+    """Two $279 open intents on a $600 budget: the second fits
+    (558 <= 600) and the THIRD is REFUSED_LIVE_BUDGET -- open
+    worst-case counts as committed until resolved."""
+    led = tmp_path / "i.jsonl"
+    pp = policy(tmp_path)
+    for n, cid in enumerate(("A", "B", "C")):
+        r = LB.seal_intent(**{**intent_kwargs(tmp_path),
+                              "candidate_id": f"2026-08-31:00{n}:SPY",
+                              "declared_risk": 279.0,
+                              "max_loss_dollars": 279.0,
+                              "policy_path": pp}, ledger=led)
+        if cid in ("A", "B"):
+            assert r["kind"] == "live_intent"
+        else:
+            assert r["refusal"] == "REFUSED_LIVE_BUDGET"
+            assert r["exposure_before_intent"][
+                "committed_open_worst_case"] == 558.0
+
+
+def test_funding_the_account_more_changes_nothing(tmp_path):
+    """The crucial improvement: ceilings are absolute -- a fat
+    account raises no limit."""
+    r = LB.seal_intent(**intent_kwargs(
+        tmp_path, declared_risk=350.0, max_loss_dollars=350.0,
+        account_equity_at_approval=1_000_000.0),
+        ledger=tmp_path / "i.jsonl")
+    assert r["refusal"] == "REFUSED_LIVE_MIN_SIZE"
+
+
+def test_policy_is_an_operator_decision_with_sane_ceilings(tmp_path):
     with pytest.raises(LB.LiveBookViolation, match="operator"):
-        LB.seal_risk_policy(min_execution_lessons=15,
+        LB.seal_risk_policy(max_loss_per_intent_dollars=300,
+                            experiment_budget_dollars=600,
                             sealed_by_operator=False,
                             policy_path=tmp_path / "p.json")
-    with pytest.raises(LB.LiveBookViolation, match="survive"):
-        LB.seal_risk_policy(min_execution_lessons=1,
+    with pytest.raises(LB.LiveBookViolation, match="afford"):
+        LB.seal_risk_policy(max_loss_per_intent_dollars=300,
+                            experiment_budget_dollars=100,
                             sealed_by_operator=True,
                             policy_path=tmp_path / "p.json")
-    pol = LB.seal_risk_policy(min_execution_lessons=20,
+    pol = LB.seal_risk_policy(max_loss_per_intent_dollars=300,
+                              experiment_budget_dollars=600,
                               sealed_by_operator=True,
                               policy_path=tmp_path / "p.json")
-    assert pol["max_loss_fraction_per_intent"] == 0.05
+    assert pol["experiment_budget_dollars"] == 600.0
+    assert "never" in pol["meaning"]
