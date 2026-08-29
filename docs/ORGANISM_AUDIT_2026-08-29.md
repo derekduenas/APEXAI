@@ -152,10 +152,25 @@ This is the single most valuable open question the organism owns.
 **What stands between APEX and sustained 100–200%?**
 Not architecture. Not intelligence. Not risk plumbing.
 **We do not yet have enough prospective evidence to know whether ANY predator
-has positive after-cost expectancy.** And the binding constraint on evidence
-is not session count — it is **candidate throughput**: 7+1+0 funded-eligible
-candidates across all sleeves, ever. At ~1–2/day, discriminating expectancy
-from noise takes months of calendar time.
+has positive after-cost expectancy.** Candidate throughput is low (7+1+0
+funded-eligible candidates across all sleeves, ever) — but the CAUSE of low
+throughput is NOT YET IDENTIFIED, and the candidate causes have radically
+different solutions (operator taxonomy, sealed):
+
+```text
+A. the market simply offered few valid opportunities
+B. the universe is unnecessarily narrow
+C. APEX sees opportunities and refuses them CORRECTLY
+D. APEX sees opportunities but geometry blocks them INCORRECTLY
+E. thesis formation itself is too restrictive
+F. data/state representation is missing opportunities
+```
+
+Our own evidence already makes D the most interesting live hypothesis
+(the chase/geometry near-miss population), which is exactly what the sealed
+near-miss cohort exists to discriminate. Bottleneck, stated honestly:
+**PROSPECTIVE EVIDENCE STARVATION, WITH THE CAUSE OF LOW CANDIDATE
+THROUGHPUT NOT YET IDENTIFIED.**
 
 The three evidence questions that matter most (everything else waits):
 1. **CHASE-BAND / opportunity capture** — do the 25 chase refusals protect
@@ -209,20 +224,66 @@ core, causally honest, economically ruthless, hard to fool, willing to hold
 cash. What it is missing is not a component — it is **at-bats**. Concretely:
 
 1. **Protect the freeze.** The single highest-EV action for the next 10
-   sessions is to change nothing and let the counters grow. Every past
-   improvement that mattered came from a defect found by REAL flow.
+   sessions is to change nothing and let the counters grow. The
+   highest-value defects to date have disproportionately been exposed by
+   real prospective flow — though deliberate static attack matters too:
+   the weekend crash loop was found because this audit attacked the
+   runtime on a Saturday.
 2. **The chase-band question is the crown jewel.** It is the one place where
    the data already hints the hunter may be leaving the actual edge on the
    table (thesis right, geometry refused). Do not tune it — let the sealed
    near-miss cohort resolve it. If it resolves toward capture, that is worth
    more than any new faculty ever proposed.
-3. **Treat throughput as the review-gate variable.** At checkpoint (session
-   10), the first question should be: what governed, predeclared expansion
-   grows CANDIDATES/day without lowering standards? (Universe breadth is the
-   obvious lever — more independent names, same thresholds — and it also
-   attacks the concentration problem. Proposal for then, not now.)
-4. **Kill on schedule.** If options is still net-negative after friction at
-   10+ sessions with no expression-layer explanation, say so and shrink it.
-   The organism's edge over humans is that it can actually do this.
+3. **Treat throughput-cause identification as the review-gate work.** At
+   checkpoint, first identify WHICH of causes A–F is operating; only then
+   consider the lever. If B (narrow universe) is implicated, universe
+   breadth is the cleanest expansion — same thesis logic, same thresholds,
+   same kernel, same arena, same evidence law — but it is an EXPERIMENT
+   that changes opportunity distribution, sector diversity, liquidity,
+   friction, simultaneous-candidate frequency, and the census denominator.
+   When that day comes: predeclare EQUITY_UNIVERSE_V2 prospectively with
+   eligibility RULES (never cherry-picked names), treat it as an ERA
+   BOUNDARY, and analyze V2 outcomes separately. No quiet symbol adds, no
+   pooling across eras.
+4. **OPTIONS CHECKPOINT = 10 PROSPECTIVE SESSIONS — review, never a
+   trigger** (operator law, superseding this audit's original "kill on
+   schedule" phrasing, which violated our own evidence doctrine: ten
+   sessions is a review checkpoint, not an economic sample size). At
+   checkpoint, REVIEW ECONOMICS — do not automatically KEEP / KILL /
+   PROMOTE / TUNE. Evaluate: resolved executable trades, independent
+   opportunity episodes, net expectancy, friction anatomy, thesis-vs-
+   expression failures, regime diversity, baseline comparison, selection
+   denominator, uncertainty. Ten sessions with nine executable trades is
+   nowhere near enough to kill a mechanism unless the failures are
+   STRUCTURAL, not statistical. If evidence remains insufficient:
+   NOT_ESTIMABLE, plus the observation that would resolve it.
 
-The market writes the next spec. Monday is session #5.
+## 11. OPERATOR RATIFICATION — FINAL SEALED STATUS (2026-08-29)
+
+Three corrections ratified into this document (defect-discovery phrasing,
+the Options checkpoint law, the throughput-cause taxonomy) — each replacing
+an over-claim that could have pushed a bad decision later. The operator's
+framing supersedes: APEX has finished building its digestive system; now we
+learn whether the food it finds contains calories. Candidate throughput is
+not the North Star — ECONOMIC OPPORTUNITY CAPTURE is. Few opportunities ×
+high information content × good location × honest risk × low friction ×
+correct allocation = extreme geometric compounding, at whatever trade
+frequency the market decides.
+
+```text
+ARCHITECTURE             COMPLETE ENOUGH
+ORGANISM                 COHERENT
+REAL CAPITAL             LOCKED
+EDGE                     NOT_ESTIMABLE
+RETURN CAPABILITY        NOT_ESTIMABLE
+100-200% NORTH STAR      UNCHANGED
+$10M STRETCH GOAL        UNCHANGED
+
+PRIMARY TASK NOW:
+GENERATE CLEAN PROSPECTIVE ECONOMIC EVIDENCE
+
+MONDAY:
+RUN UNCHANGED.
+```
+
+No more architecture until the market identifies a missing organ.
