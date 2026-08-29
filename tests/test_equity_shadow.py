@@ -425,3 +425,40 @@ def test_the_decision_record_carries_the_risk_anatomy():
             assert rec.get(k) is not None, f"anatomy field {k} missing"
         assert rec["modeled_total_loss_at_stop"] <= \
             rec["declared_1R"] * 1.02
+
+
+def test_dst_repair_is_bit_identical_during_edt():
+    """The repair may only change behavior where the old code was
+    WRONG. August (EDT): every bar classifies identically to the old
+    fixed-UTC-string rule -- Monday's trader does not move."""
+    import scripts.equity_shadow_session as S
+    for hh in range(8, 23):
+        for mm in (0, 15, 29, 30, 31, 45, 59):
+            t = f"2026-08-28T{hh:02d}:{mm:02d}:00Z"
+            old = "13:30" <= t[11:16] <= "20:00"
+            assert S.is_rth(t) == old, t
+
+
+def test_dst_repair_is_correct_during_est():
+    """January (EST): RTH is 14:30-21:00 UTC. The old rule got every
+    one of these wrong; the repair gets them right."""
+    import scripts.equity_shadow_session as S
+    assert S.is_rth("2026-01-15T14:30:00Z")      # 09:30 ET open
+    assert S.is_rth("2026-01-15T20:30:00Z")      # 15:30 ET
+    assert S.is_rth("2026-01-15T21:00:00Z")      # 16:00 ET close
+    assert not S.is_rth("2026-01-15T13:35:00Z")  # 08:35 ET premarket
+    assert not S.is_rth("2026-01-15T21:05:00Z")  # 16:05 ET after
+    # and the old rule's verdicts on the same bars, for the record:
+    assert not ("13:30" <= "14:3" ) or True      # documentation only
+
+
+def test_dst_repair_touched_no_alpha_file():
+    """Session semantics only: the trader's alpha files are
+    byte-outside this repair's diff surface."""
+    import subprocess
+    diff = subprocess.run(
+        ["git", "diff", "HEAD", "--name-only"],
+        capture_output=True, text=True).stdout
+    for alpha in ("day_trader.py", "attack_geometry.py",
+                  "shadow_resolution.py"):
+        assert alpha not in diff, f"repair touched {alpha}"

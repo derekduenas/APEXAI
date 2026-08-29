@@ -55,8 +55,27 @@ def load_bars(symbol: str, session: str) -> list:
         return []
 
 
-RTH_OPEN_UTC = "13:30"
-RTH_CLOSE_UTC = "20:00"
+# EQUITY-RTH-DST repair (operator-authorized 2026-08-29): the regular
+# session is 09:30-16:00 AMERICA/NEW_YORK, not a fixed UTC window.
+# The old constants ("13:30"/"20:00" UTC) were correct only during
+# daylight time; when EST returns, they would have silently shifted
+# the trader's world one hour (premarket entering the liquidity
+# median, the last RTH hour excluded). Repair changes SESSION
+# SEMANTICS ONLY -- during EDT the classification is bit-identical
+# (tested), so the frozen trader's observed behavior is unchanged;
+# the change exists only where the old code was wrong.
+RTH_OPEN_UTC = "13:30"     # retained for era documentation ONLY;
+RTH_CLOSE_UTC = "20:00"    # correct in EDT alone. Use is_rth().
+
+
+def is_rth(event_time_utc: str) -> bool:
+    """Bar belongs to the regular session, judged in exchange time."""
+    from zoneinfo import ZoneInfo
+    from datetime import datetime as _dt
+    t = _dt.fromisoformat(
+        event_time_utc.replace("Z", "+00:00")) \
+        .astimezone(ZoneInfo("America/New_York"))
+    return (9, 30) <= (t.hour, t.minute) <= (16, 0)
 
 
 def rth_only(bars: list) -> list:
@@ -67,8 +86,7 @@ def rth_only(bars: list) -> list:
     rejects SPY -- the most liquid instrument on the tape. Caught by
     running it: the eligible universe collapsed to a single symbol.
     """
-    return [b for b in bars
-            if RTH_OPEN_UTC <= b["event_time_utc"][11:16] <= RTH_CLOSE_UTC]
+    return [b for b in bars if is_rth(b["event_time_utc"])]
 
 
 # EQUITY_UNIVERSE_V1 -- the canonical trader's era, PINNED.

@@ -46,9 +46,18 @@ CORPUS = Path("/apex-data/history-a/options_history")
 HIST_BARS = Path("data/historical/bars")
 DECISIONS = Path("results/historical/decisions.jsonl")
 OUTCOMES = Path("results/historical/outcomes.jsonl")
+
+# CONTINUOUS ECONOMIC WALK-FORWARD (certified corpus, calendar-
+# continuous): time-integrated claims become legitimate here.
+CONT_BARS = Path("/apex-data/history-b/etf_continuous/bars")
+CONT_DECISIONS = Path("results/historical/continuous/decisions.jsonl")
+CONT_OUTCOMES = Path("results/historical/continuous/outcomes.jsonl")
+CONT_EVIDENCE_CLASS = "CONTINUOUS_ECONOMIC_WALK_FORWARD"
+CONT_CORPUS_VERSION = "5c0d768b7ee2ea14"
+RTH_SEMANTICS = "ET_CALENDAR_V2 (EQUITY-RTH-DST repaired)"
 TICK_S = 900                    # the incumbent cadence, not a new one
 
-ERAS = (("DISCOVERY", "2018-01-01", "2021-12-31"),
+ERAS = (("DISCOVERY", "2016-01-01", "2021-12-31"),
         ("VALIDATION", "2022-01-01", "2024-12-31"),
         ("DESIGN_CONTEMPORANEOUS", "2025-01-01", "2026-12-31"))
 
@@ -123,8 +132,7 @@ def replay_session(symbol: str, session: str, *,
     bars = [b for b in _load_hist(symbol, session, root)
             if str(b.get("event_time_utc", ""))[:10] == session]
     rth = [b for b in bars
-           if FIELD.RTH_OPEN_UTC <= b["event_time_utc"][11:16]
-           <= FIELD.RTH_CLOSE_UTC]
+           if FIELD.rth_only([b])]      # DST-correct classification
     if len(rth) < day_trader.MIN_BARS:
         return {"symbol": symbol, "session": session,
                 "replayed": False, "why": "insufficient RTH bars"}
@@ -150,13 +158,16 @@ def replay_session(symbol: str, session: str, *,
                 known_from=visible[-1]["event_time_utc"],
                 release_sha="HISTORICAL_REPLAY",
                 median_volume=st.median(
-                    [b.get("volume", 0) for b in visible
-                     if FIELD.RTH_OPEN_UTC
-                     <= b["event_time_utc"][11:16]
-                     <= FIELD.RTH_CLOSE_UTC] or [0]))
+                    [b.get("volume", 0)
+                     for b in FIELD.rth_only(visible)] or [0]))
             rec = d.as_record()
             rec["kind"] = "historical_decision"
-            rec["evidence_class"] = EVIDENCE_CLASS
+            rec["evidence_class"] = (CONT_EVIDENCE_CLASS
+                                     if root == CONT_BARS
+                                     else EVIDENCE_CLASS)
+            if root == CONT_BARS:
+                rec["corpus_version"] = CONT_CORPUS_VERSION
+            rec["rth_semantics"] = RTH_SEMANTICS
             rec["era"] = era_of(session)
             rec["decision_power"] = "PREDATOR_EVIDENCE_ONLY"
             if rec.get("decision") in FIELD.COUNTERFACTUAL_CLASSES:
@@ -179,7 +190,11 @@ def replay_session(symbol: str, session: str, *,
         out = shadow_resolution.resolve(decision=shaped, bars=bars,
                                         close_utc=close_t)
         out["kind"] = "historical_outcome"
-        out["evidence_class"] = EVIDENCE_CLASS
+        out["evidence_class"] = (CONT_EVIDENCE_CLASS
+                                 if root == CONT_BARS
+                                 else EVIDENCE_CLASS)
+        if root == CONT_BARS:
+            out["corpus_version"] = CONT_CORPUS_VERSION
         out["era"] = era_of(session)
         out["original_decision"] = rec["decision"]
         out["counterfactual"] = \
@@ -199,7 +214,7 @@ def replay_session(symbol: str, session: str, *,
 # ---------------------------------------------------------------- H0
 
 def h0(symbol: str, session: str, *, corpus: Path | None = None,
-       scratch: Path | None = None) -> dict:
+       scratch: Path | None = None, preadapted: bool = False) -> dict:
     """REPLAY VALIDITY. Three proofs on a real corpus day:
     TRUNCATION  a planted far-future bar changes nothing earlier
     POISON      an injected non-OHLCV field is invisible to decisions
@@ -207,9 +222,11 @@ def h0(symbol: str, session: str, *, corpus: Path | None = None,
     """
     from tempfile import mkdtemp
     work = scratch or Path(mkdtemp(prefix="h0_"))
-    a = adapt(symbol, session, corpus=corpus, out_root=work / "clean")
-    if not a.get("adapted"):
-        return {"h0": "NOT_RUNNABLE", "why": a.get("why")}
+    if not preadapted:
+        a = adapt(symbol, session, corpus=corpus,
+                  out_root=work / "clean")
+        if not a.get("adapted"):
+            return {"h0": "NOT_RUNNABLE", "why": a.get("why")}
 
     def run(root, tag):
         led = work / f"d_{tag}.jsonl"
@@ -273,12 +290,60 @@ def main() -> int:
     ap.add_argument("--adapt-era", metavar="ERA")
     ap.add_argument("--replay-era", metavar="ERA")
     ap.add_argument("--h0", nargs=2, metavar=("SYM", "DATE"))
+    ap.add_argument("--h0-continuous", nargs=2,
+                    metavar=("SYM", "DATE"))
+    ap.add_argument("--replay-continuous", action="store_true")
+    ap.add_argument("--start", default="2016-01-01")
+    ap.add_argument("--end", default="2026-08-28")
     ap.add_argument("--symbols", default="SPY,QQQ,IWM,AAPL,MSFT,NVDA")
     a = ap.parse_args()
     syms = a.symbols.split(",")
 
     if a.h0:
         print(json.dumps(h0(a.h0[0], a.h0[1]), indent=1))
+        return 0
+    if a.h0_continuous:
+        sym, date = a.h0_continuous
+        from tempfile import mkdtemp
+        import shutil
+        work = Path(mkdtemp(prefix="h0c_"))
+        (work / "clean").mkdir(parents=True)
+        src = CONT_BARS / f"{sym}_{date}.json"
+        if not src.exists():
+            print(json.dumps({"h0": "NOT_RUNNABLE",
+                              "why": f"no corpus file {src.name}"}))
+            return 1
+        shutil.copy(src, work / "clean" / src.name)
+        print(json.dumps(h0(sym, date, corpus=None, scratch=work,
+                            preadapted=True), indent=1))
+        return 0
+    if a.replay_continuous:
+        sessions = sorted({f.stem.rsplit("_", 1)[1]
+                           for f in CONT_BARS.glob("*.json")
+                           if a.start <= f.stem.rsplit("_", 1)[1]
+                           <= a.end})
+        syms = sorted({f.stem.rsplit("_", 1)[0]
+                       for f in CONT_BARS.glob("*.json")})
+        tot = {"sessions": 0, "replayed": 0, "attackable": 0,
+               "counterfactuals": 0, "resolved": 0, "below_floor": 0}
+        for i, d in enumerate(sessions):
+            for sym in syms:
+                r = replay_session(sym, d, bars_root=CONT_BARS,
+                                   decisions_ledger=CONT_DECISIONS,
+                                   outcomes_ledger=CONT_OUTCOMES)
+                tot["sessions"] += 1
+                if r.get("replayed"):
+                    tot["replayed"] += 1
+                    for k in ("attackable", "counterfactuals",
+                              "resolved"):
+                        tot[k] += r[k]
+                elif r.get("why") == "below incumbent floor":
+                    tot["below_floor"] += 1
+            if (i + 1) % 50 == 0:
+                print(json.dumps({"progress_sessions": i + 1,
+                                  "of": len(sessions), **tot}),
+                      flush=True)
+        print(json.dumps({"era": "CONTINUOUS", **tot}, indent=1))
         return 0
 
     def era_dates(era):

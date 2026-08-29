@@ -117,6 +117,13 @@ def fetch_symbol(sym: str, *, start: str = START,
             "last_day": max(days) if days else None}
 
 
+def _is_rth_et(t_iso: str) -> bool:
+    from zoneinfo import ZoneInfo
+    t = datetime.fromisoformat(t_iso.replace("Z", "+00:00")) \
+        .astimezone(ZoneInfo("America/New_York"))
+    return (9, 30) <= (t.hour, t.minute) <= (16, 0)
+
+
 def integrity() -> dict:
     """The full operator checklist. PASS is a prerequisite for any
     economic use; the manifest hash versions the artifact."""
@@ -144,7 +151,7 @@ def integrity() -> dict:
             seen.add(t)
             prev = t
         rth = [b for b in bars
-               if "13:30" <= b["event_time_utc"][11:16] <= "20:00"]
+               if _is_rth_et(b["event_time_utc"])]
         # DENSITY metric, not a defect: a 1-minute bar exists only
         # where trades printed, so quiet ETFs legitimately skip
         # minutes, and half-days legitimately end early. Reported for
