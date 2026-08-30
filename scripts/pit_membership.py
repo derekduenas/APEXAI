@@ -48,6 +48,22 @@ PRUNE_ANYDAY_DV = 50e6
 
 DATA = "https://data.alpaca.markets/v2/stocks/bars"
 ASSETS = "https://api.alpaca.markets/v2/assets"
+CORP = "https://data.alpaca.markets/v1/corporate-actions"
+CACHE = OUT / "daily_dollar_volume_cache.json.gz"
+
+# ETF/fund exclusion (mechanical, predeclared): the single-name
+# universe is COMMON STOCKS; the us_equity directory also lists funds.
+ETF_NAME_TOKENS = ("ETF", "ETN", "FUND", "TRUST", "SHARES", "INDEX",
+                   "ISHARES", "SPDR", "VANGUARD", "PROSHARES",
+                   "DIREXION", "INVESCO QQQ")
+KNOWN_ETPS = {"SPY", "QQQ", "IWM", "DIA", "EEM", "EFA", "GDX", "GLD",
+              "SLV", "USO", "XLB", "XLC", "XLE", "XLF", "XLI", "XLK",
+              "XLP", "XLRE", "XLU", "XLV", "XLY", "SQQQ", "TQQQ",
+              "SPXU", "UVXY", "VXX", "SVXY", "TLT", "HYG", "LQD",
+              "SOXL", "SOXS", "SMH", "SOXX", "ARKK", "KWEB", "FXI",
+              "EWZ", "XBI", "IBB", "KRE", "XOP", "GDXJ", "UNG",
+              "TZA", "TNA", "SPXL", "SPXS", "SDS", "SSO", "QID",
+              "QLD", "IEF", "SH", "RSP", "VTI", "VOO", "IVV"}
 
 
 def _get(url: str) -> dict:
@@ -64,8 +80,44 @@ def _get(url: str) -> dict:
             time.sleep(2 ** attempt)
 
 
-def list_symbols() -> list:
-    syms = set()
+def _is_fundlike(name: str, symbol: str) -> bool:
+    up = (name or "").upper()
+    return symbol in KNOWN_ETPS or any(t in up
+                                       for t in ETF_NAME_TOKENS)
+
+
+def corporate_action_symbols() -> tuple:
+    """Dead and renamed symbols the directory forgot -- TWTR, ATVI
+    and friends live only here. Also returns rename chains
+    (old->new) for entity dedupe."""
+    dead, renames = set(), {}
+    types = ("name_change", "cash_merger", "stock_merger",
+             "stock_and_cash_merger", "redemption",
+             "worthless_removal")
+    y0, y1 = int(START[:4]), int(END[:4])
+    for year in range(y0, y1 + 1):
+        for ty in types:
+            try:
+                d = _get(CORP + "?" + urllib.parse.urlencode(
+                    {"types": ty, "start": f"{year}-01-01",
+                     "end": f"{year}-12-31", "limit": 1000}))
+            except Exception:                          # noqa: BLE001
+                continue
+            for key, rows in (d.get("corporate_actions")
+                              or {}).items():
+                for r in rows:
+                    for f in ("old_symbol", "symbol",
+                              "acquiree_symbol", "target_symbol"):
+                        v = r.get(f)
+                        if v and v.isalpha() and len(v) <= 5:
+                            dead.add(v)
+                    if ty == "name_change" and r.get("old_symbol")                             and r.get("new_symbol"):
+                        renames[r["old_symbol"]] = r["new_symbol"]
+    return dead, renames
+
+
+def list_symbols() -> tuple:
+    syms, fundlike = set(), set()
     for status in ("active", "inactive"):
         rows = _get(f"{ASSETS}?status={status}&asset_class=us_equity")
         for a in rows:
@@ -73,14 +125,29 @@ def list_symbols() -> list:
                                      "AMEX", "BATS", "NYSEARCA"):
                 s = a.get("symbol", "")
                 if s and s.isalpha() and len(s) <= 5:
-                    syms.add(s)
-    return sorted(syms)
+                    if _is_fundlike(a.get("name", ""), s):
+                        fundlike.add(s)
+                    else:
+                        syms.add(s)
+    dead, renames = corporate_action_symbols()
+    dead -= fundlike
+    return sorted(syms | dead), fundlike, renames
 
 
 def run() -> dict:
-    symbols = list_symbols()
+    import gzip
+    symbols, fundlike, renames = list_symbols()
     kept: dict[str, dict] = {}          # sym -> {date: dollar_vol}
     pruned = fetched = 0
+    if CACHE.exists():
+        cached = json.loads(gzip.open(CACHE).read())
+        kept = cached["kept"]
+        pruned, fetched = cached["pruned"], cached["fetched"]
+        symbols = [s for s in symbols if s not in cached["seen"]]
+        print(json.dumps({"cache": "loaded",
+                          "remaining_symbols": len(symbols)}),
+              flush=True)
+    seen = set(kept)
     B = 200
     for i in range(0, len(symbols), B):
         batch = symbols[i:i + B]
@@ -106,14 +173,37 @@ def run() -> dict:
                 break
         for sym, days in acc.items():
             fetched += 1
+            seen.add(sym)
             if best[sym] >= PRUNE_ANYDAY_DV:
                 kept[sym] = days
             else:
                 pruned += 1
+        seen.update(batch)
         print(json.dumps({"batch": i // B,
                           "of": (len(symbols) + B - 1) // B,
                           "kept": len(kept), "pruned": pruned}),
               flush=True)
+
+    import gzip
+    OUT.mkdir(parents=True, exist_ok=True)
+    with gzip.open(CACHE, "wt") as fh:
+        fh.write(json.dumps({"kept": kept, "pruned": pruned,
+                             "fetched": fetched,
+                             "seen": sorted(seen)}))
+
+    # ENTITY DEDUPE: a rename chain (FB->META) makes the same company
+    # rankable under two symbols, because bars for the CURRENT symbol
+    # include pre-rename history. Collapse each chain onto the OLD
+    # symbol for dates before the rename by removing the new symbol's
+    # pre-existence duplicates: keep the symbol whose own listing era
+    # covers the date. Practical rule: if old and new both ranked,
+    # drop the NEW symbol's days that exactly duplicate the OLD's.
+    for old_s, new_s in renames.items():
+        if old_s in kept and new_s in kept:
+            dup = [d for d, v in kept[new_s].items()
+                   if kept[old_s].get(d) == v]
+            for d in dup:
+                del kept[new_s][d]
 
     # session calendar = union of dates among kept symbols
     calendar = sorted({d for days in kept.values() for d in days})
@@ -145,6 +235,7 @@ def run() -> dict:
         if member_month is None:
             continue
         distinct.update(top)
+        top = [t for t in top if t not in fundlike]
         chain_append(MEMBERSHIP, {
             "kind": "pit_membership", "member_month": member_month,
             "decided_asof": asof_date,
