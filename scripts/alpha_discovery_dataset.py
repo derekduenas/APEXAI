@@ -133,7 +133,9 @@ def build(limit_sessions: int | None = None) -> dict:
     prior_close: dict[str, float] = {}
 
     rows, meta = [], []
-    n_sessions = 0
+    chunks, mchunks = [], []            # float32 chunks -- the
+    n_sessions = 0                       # Python-list version OOMed
+                                         # at 5.3GB / session 2000
     for day in sessions:
         month = day[:7]
         members = mem_months.get(month, [])
@@ -315,19 +317,33 @@ def build(limit_sessions: int | None = None) -> dict:
         for s in SECTOR_ETFS:
             if etf.get(s) is not None:
                 sector_daily[s].append(float(etf[s][4][-1]))
+        if len(rows) >= 150_000:
+            chunks.append(np.array(rows, dtype=np.float32))
+            mchunks.append((np.array([m[0] for m in meta]),
+                            np.array([m[1] for m in meta]),
+                            np.array([m[2] for m in meta],
+                                     dtype=np.int16)))
+            rows, meta = [], []
         if n_sessions % 100 == 0:
+            done = sum(len(c) for c in chunks) + len(rows)
             print(json.dumps({"sessions": n_sessions,
-                              "rows": len(rows)}), flush=True)
+                              "rows": done}), flush=True)
 
     OUT.mkdir(parents=True, exist_ok=True)
-    X = np.array(rows, dtype=np.float32)
+    if rows:
+        chunks.append(np.array(rows, dtype=np.float32))
+        mchunks.append((np.array([m[0] for m in meta]),
+                        np.array([m[1] for m in meta]),
+                        np.array([m[2] for m in meta],
+                                 dtype=np.int16)))
+    X = np.concatenate(chunks) if chunks else np.zeros((0, 1))
     np.savez_compressed(
         OUT / "dataset.npz", X=X,
-        day=np.array([m[0] for m in meta]),
-        sym=np.array([m[1] for m in meta]),
-        tick=np.array([m[2] for m in meta], dtype=np.int16),
+        day=np.concatenate([m[0] for m in mchunks]),
+        sym=np.concatenate([m[1] for m in mchunks]),
+        tick=np.concatenate([m[2] for m in mchunks]),
         fields=np.array(list(FIELDS) + list(FWD)))
-    rep = {"rows": len(rows), "sessions": n_sessions,
+    rep = {"rows": int(len(X)), "sessions": n_sessions,
            "fields": list(FIELDS) + list(FWD)}
     (OUT / "schema.json").write_text(json.dumps(rep, indent=1))
     print(json.dumps(rep))
