@@ -8,6 +8,17 @@ Funding is IDEMPOTENT on candidate_id -- a redelivered outbox record or
 a restart must never fund the same claim twice -- and outcomes are
 APPENDED against sealed fundings, never merged into them.
 
+NUMERIC INTEGRITY (BOOK_NUMERIC_INTEGRITY_V2). Every number written
+here is validated at the write boundary, because this ledger is
+append-only: a malformed value sealed into the chain cannot be edited
+out afterwards, only annotated. One NaN executable_pnl silently
+disabled both the session drawdown halt and the available-capital
+check by propagating through state()'s sums, since NaN defeats every
+comparison by returning False. Prevention at the write is the only
+real fix; state() additionally REPORTS contamination it inherits from
+records sealed before this contract existed, and never hides it by
+dropping them -- a silently cleaned state would be a fabricated one.
+
 decision_power: ACCOUNTING_ONLY -- the book records allocation, it
 neither selects nor sizes.
 """
@@ -19,6 +30,8 @@ from pathlib import Path
 
 from apex.capital.arena import INDEX_FAMILY
 from apex.governance.chain_ledger import chain_append
+from apex.organism.numeric_integrity import (require_book_numbers,
+                                             scan_ledger_integrity)
 from apex.organism.risk_kernel import STARTING_PAPER_CAPITAL
 
 LEDGER = Path("results/organism/paper_book.jsonl")
@@ -75,6 +88,33 @@ def state(*, ledger: Path | None = None,
     def _risk(pred):
         return sum(f["funded_risk"] for f in open_pos if pred(f))
 
+    # CERTIFIED aggregate exposure. The semantically correct basis for
+    # aggregate risk is a sum of verified BOUNDS, not a sum of labels
+    # -- so only positions whose sealed certificate carries authority
+    # contribute. Everything else is counted separately as research
+    # exposure rather than being folded in at its label value, which
+    # is exactly the accounting fiction that hid 148x leverage.
+    def _er(f):
+        er = f.get("economic_risk")
+        return er if isinstance(er, dict) else {}
+
+    certified_open = [f for f in open_pos
+                      if _er(f).get("certified_risk_authority")
+                      and isinstance(_er(f).get("certified_max_loss"),
+                                     (int, float))]
+    uncertified_open = [f for f in open_pos if f not in certified_open]
+    open_certified_risk = sum(_er(f)["certified_max_loss"]
+                              for f in certified_open)
+    uncertified_notional = sum(
+        _er(f).get("gross_notional") or 0.0 for f in uncertified_open)
+
+    # Contamination is REPORTED, never repaired here. If a legacy row
+    # carries a malformed number the aggregates above stay poisoned on
+    # purpose, and RISK_INPUT_INTEGRITY_V2 refuses downstream -- which
+    # is the fail-closed outcome. Dropping the row would produce a
+    # clean-looking state that no longer describes the ledger.
+    integrity = scan_ledger_integrity(rows)
+
     return {"kind": "paper_book_state", "as_of": _now(),
             "starting_capital": STARTING_PAPER_CAPITAL,
             "realized_pnl": round(realized, 2),
@@ -101,10 +141,17 @@ def state(*, ledger: Path | None = None,
                             "direction", "expression", "funded_risk",
                             "sleeve_payload")}
                           for f in open_pos],
+            "open_certified_risk": round(open_certified_risk, 2),
+            "certified_aggregate_basis":
+                "SUM_OF_VERIFIED_CERTIFIED_MAX_LOSS",
+            "open_uncertified_positions": len(uncertified_open),
+            "open_uncertified_notional": round(uncertified_notional, 2),
             "resolved": len(outcomes),
             "execution_failures": sum(
                 1 for o in outcomes.values()
                 if o.get("outcome_class") == "EXECUTION_FAILURE"),
+            "integrity": integrity["integrity"],
+            "integrity_violations": integrity["contaminated_records"],
             "decision_power": "ACCOUNTING_ONLY"}
 
 
@@ -135,6 +182,12 @@ def fund(env: dict, *, arena_action: str, arena_reasons: list,
            "arena_reasons": arena_reasons,
            "risk_kernel": {"threshold_set": kernel["threshold_set"],
                            "approved": kernel["approved"]},
+           # the BOUND is sealed beside the label, so the record can
+           # never again be read as if declared_risk were the maximum
+           # the organism could lose
+           "economic_risk": kernel.get("economic_risk",
+                                       {"certificate": "ABSENT"}),
+           "risk_warnings": kernel.get("warnings", []),
            "catalyst_context": ({k: catalyst_ctx[k] for k in
                                  ("directional_support", "environment",
                                   "events_known",
@@ -145,6 +198,7 @@ def fund(env: dict, *, arena_action: str, arena_reasons: list,
            "sleeve_payload": env["sleeve_payload"],
            "prospective": True, "outcome": "PENDING",
            "decision_power": "ACCOUNTING_ONLY"}
+    require_book_numbers(rec)
     return chain_append(path, rec)
 
 
@@ -152,11 +206,19 @@ def refuse(env: dict, *, stage: str, reasons: list,
            session: str = "UNKNOWN",
            ledger: Path | None = None) -> dict:
     """A refusal is first-class evidence -- sealed with the same care
-    as a funding, because refusal value is measured, not assumed."""
+    as a funding, because refusal value is measured, not assumed.
+
+    Deliberately NOT numerically validated: a malformed declared_risk
+    is frequently the REASON for the refusal, and a validator here
+    would make the organism unable to record the very defect it just
+    caught. Refusals record; only fundings commit capital."""
     rec = {"kind": "paper_refusal", "session": session,
            "candidate_id": env["candidate_id"], "sleeve": env["sleeve"],
            "symbol": env["symbol"], "direction": env["direction"],
            "declared_risk": env["declared_risk"],
+           # the exact value as it arrived, so a malformed size stays
+           # legible even where the numeric field cannot represent it
+           "declared_risk_repr": repr(env["declared_risk"]),
            "refused_at_stage": stage, "reasons": reasons,
            "known_from": env["known_from"], "refused_utc": _now(),
            "decision_power": "ACCOUNTING_ONLY"}
@@ -177,6 +239,7 @@ def attach_outcome(*, candidate_id: str, session: str,
            "attached_utc": _now(),
            "law": "appended against a sealed funding, never merged",
            "decision_power": "ACCOUNTING_ONLY"}
+    require_book_numbers(rec, allow_not_estimable=True)
     return chain_append(ledger or LEDGER, rec)
 
 

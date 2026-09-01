@@ -134,13 +134,16 @@ def test_risk_per_share_larger_than_the_budget_is_refused():
 
 
 def test_size_follows_the_EXECUTABLE_stop_loss_never_price_alone():
-    """declared_1R = economic risk. At 2bps on a $100 stock the
-    executable stop loss is 2.04/share, so qty is 147, not 150."""
+    """declared_1R = economic risk. RISK-005 (2026-09-01): this
+    asserted 2.04/share and qty 147, which charged the ENTRY crossing
+    twice -- `entry` here is the executable fill, so risk_per_share
+    already contains it. Canonical is one EXIT crossing: 2.02/share
+    and qty 148."""
     r = DT.size_shadow(entry=100.0, stop=98.0, direction="LONG",
                        budget=300.0)
     assert r["risk_per_share"] == 2.0
-    assert r["executable_stop_loss_per_share"] == 2.04
-    assert r["quantity"] == 147
+    assert r["executable_stop_loss_per_share"] == 2.02
+    assert r["quantity"] == 148
     assert r["modelled_total_loss_at_stop"] <= 300.0 * 1.02
     assert r["declared_1R"] == r["modelled_total_loss_at_stop"]
 
@@ -271,7 +274,14 @@ def test_friction_is_charged_on_both_sides():
            "friction_per_share": 0.02}
     out = SR.resolve(decision=dec, bars=bars([100.0, 100.0], start_m=31),
                      close_utc="2026-08-27T20:00:00Z")
-    assert out["friction"] == pytest.approx(0.4)     # 0.02 * 10 * 2
+    # RISK-005: BOTH crossings are still borne -- the invariant this
+    # test defends is intact -- but the ENTRY crossing is paid inside
+    # entry_fill, which `gross` is measured from. Only the EXIT
+    # crossing may appear as an explicit friction line, or the entry
+    # is billed twice. (This fixture uses a round entry_fill=100.0
+    # that hides the embedded slippage; production fills always come
+    # from marketable_fill and always contain it.)
+    assert out["friction"] == pytest.approx(0.2)     # 0.02 * 10 * 1
 
 
 def test_the_exit_rule_is_predeclared_not_chosen_per_trade():
@@ -354,7 +364,13 @@ def test_resolution_is_idempotent_across_restarts(tmp_path, monkeypatch):
 def test_short_sizing_is_execution_cost_aware():
     r = DT.size_shadow(entry=225.635364, stop=225.73,
                        direction="SHORT", budget=300.0)
-    assert r["quantity"] == 1622          # was 3170 under the defect
+    # THREE SCHEMAS, ONE FIXTURE -- the whole of RISK-005 in one line:
+    #   3170  price-distance only, no execution cost at all (the NVDA
+    #         era; understated planned risk)
+    #   1622  entry crossing counted TWICE (overstated planned risk)
+    #   2146  CANONICAL: entry crossing embedded in the fill, exit
+    #         crossing added once
+    assert r["quantity"] == 2146
     assert r["modelled_total_loss_at_stop"] <= 300.0 * 1.02
 
 

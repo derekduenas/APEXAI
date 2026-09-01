@@ -93,7 +93,14 @@ def resolve(*, decision: dict, bars: list, close_utc) -> dict:
     time_to_stop = (round((exit_t - kf).total_seconds() / 60, 1)
                     if why == "STRUCTURAL_STOP" else "NOT_APPLICABLE")
     gross = sign * (exit_px - entry) * qty
-    friction = fps * qty * 2                   # crossed in and out
+    # RISK-005 (2026-09-01). This was `fps * qty * 2`. `gross` is
+    # measured from `entry` = entry_fill, the EXECUTABLE fill, which
+    # ALREADY crossed the spread on the way in -- so only the EXIT
+    # crossing may be charged here. The old x2 billed the entry
+    # crossing twice, exactly as the sizer did; because the same
+    # phantom crossing sat in both the realized loss and declared_1R,
+    # R cancelled to ~-1.0 and the pair of defects hid each other.
+    friction = fps * qty                       # EXIT crossing only
     return {"kind": "equity_shadow_outcome",
             "decision_id": d["decision_id"], "symbol": d["symbol"],
             "resolvable": True, "exit_reason": why,

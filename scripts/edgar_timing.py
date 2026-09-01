@@ -34,6 +34,24 @@ NY = ZoneInfo("America/New_York")
 UA = "APEX research derek@apex.local"
 
 
+def _input_provenance(path):
+    """A DECISION_SEMANTIC_INPUT is mutable by necessity but may never
+    change SILENTLY: its identity is sealed beside the decision it
+    shaped, so any edit is visible and attributable in the chain."""
+    import hashlib
+    from datetime import datetime, timezone
+    p = Path(path)
+    if not p.exists():
+        return {"path": str(p), "status": "ABSENT"}
+    b = p.read_bytes()
+    return {"path": str(p), "status": "PRESENT",
+            "sha256": hashlib.sha256(b).hexdigest(),
+            "bytes": len(b),
+            "mtime_utc": datetime.fromtimestamp(
+                p.stat().st_mtime, timezone.utc).isoformat(),
+            "class": "DECISION_SEMANTIC_INPUT"}
+
+
 def _get(url):
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     for a in range(3):
@@ -147,6 +165,7 @@ def main():
             rec["why"] = ("no CIK" if not cik
                           else "no matching 2.02 8-K yet")
             n_uncert += 1
+        rec["ticker_map_provenance"] = _input_provenance(TICKERS)
         chain_append(LEDGER, rec)
     print(json.dumps({"certified": n_cert,
                       "uncertified": n_uncert,

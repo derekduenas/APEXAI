@@ -34,6 +34,7 @@ from apex.capital.arena import INDEX_FAMILY, PortfolioState, compete
 from apex.catalyst import context as catalyst_context
 from apex.governance.chain_ledger import chain_append
 from apex.organism import book, candidate, risk_kernel
+from apex.organism.risk_certificate import certify
 from apex.organism.cross_predator import SleeveObservation, assemble
 
 DECISION_LEDGER = Path("results/organism/allocator_decisions.jsonl")
@@ -234,7 +235,18 @@ def allocate(envs: list, *, session: str,
             state_out = f"REFUSED_ARENA_{d['action']}"
         else:
             fam = INDEX_FAMILY.get(env["symbol"], "UNKNOWN")
+            # the economic bound, derived from the expression itself,
+            # before any limit is consulted -- a label is not a bound
+            cert = certify(expression=env["expression"],
+                           direction=env["direction"],
+                           declared_risk=env["declared_risk"],
+                           sleeve_payload=env.get("sleeve_payload"))
             k = risk_kernel.check(
+                certificate=cert,
+                expression=env["expression"],
+                direction=env["direction"],
+                sleeve_payload=env.get("sleeve_payload"),
+                open_certified_risk=st["open_certified_risk"],
                 declared_risk=env["declared_risk"],
                 symbol=env["symbol"], beta_family=fam,
                 open_risk=st["open_risk"],

@@ -30,3 +30,7 @@ secrets/*
 
 # unrelated tool state; churns constantly and would keep HASH_LINEAGE dirty
 .claude-flow/
+
+# generated daily-closes cache; a DECISION_SEMANTIC_INPUT whose
+# identity is sealed per-tick as universe_provenance, not versioned here
+exports/

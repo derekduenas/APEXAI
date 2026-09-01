@@ -135,6 +135,9 @@ def classify_setup(bars: list, *, direction: str,
 STOP_LOSS_TOLERANCE = 0.02      # numerical/model tolerance on 1R
 
 
+SIZING_SEMANTICS = "CANONICAL_V1"
+
+
 def size_shadow(*, entry: float, stop: float, direction: str,
                 budget: float = SHADOW_RISK_BUDGET,
                 spread_bps: float | None = None) -> dict:
@@ -177,7 +180,16 @@ def size_shadow(*, entry: float, stop: float, direction: str,
                        f"no structural invalidation here"}
     worse = max(abs(entry), abs(stop))
     cost_side = worse * (bps / 10_000.0)      # per share, per crossing
-    eslps = risk_per_share + 2.0 * cost_side
+    # RISK-005 (2026-09-01), SIZING_SEMANTICS CANONICAL_V1. This was
+    # `+ 2.0 * cost_side`, which counted the ENTRY crossing twice:
+    # `entry` here is the EXECUTABLE fill from marketable_fill(), which
+    # has already crossed the spread, so `risk_per_share` = entry-stop
+    # ALREADY contains one crossing. Only the EXIT crossing may be
+    # added. Measured on the real book the double count overstated
+    # planned risk by +33.1% (IWM) and +36.0% (XLE), which under the
+    # capital-growth doctrine is a GROWTH defect -- systematic
+    # under-sizing -- not merely a cosmetic one.
+    eslps = risk_per_share + 1.0 * cost_side
     qty = int(budget // eslps)
     if qty < 1:
         return {"valid": False,
@@ -193,11 +205,16 @@ def size_shadow(*, entry: float, stop: float, direction: str,
             "executable_stop_loss_per_share": round(eslps, 6),
             "quantity": qty,
             "declared_1R": modelled_loss,
+            "sizing_semantics": SIZING_SEMANTICS,
+            "entry_slippage_embedded_in_entry": round(
+                cost_side * qty, 2),
             "modelled_total_loss_at_stop": modelled_loss,
             "friction_fraction_of_1R": round(
                 (2.0 * cost_side * qty) / modelled_loss, 4),
             "law": "declared_1R is ECONOMIC risk: the modelled loss at "
-                   "the structural stop, execution costs included"}
+                   "the structural stop, execution costs included "
+                   "ONCE -- the entry crossing is already embedded in "
+                   "the executable fill and is never added again"}
 
 
 def marketable_fill(reference: float, direction: str) -> dict:

@@ -79,7 +79,14 @@ def from_options(outbox_record: dict, *, attack_ledger=None) -> dict:
                                                "UNKNOWN"),
                         "chase_risk": p.get("chase_risk"),
                         "card_hash": j.get("card_hash"),
+                        # the upstream AGGREGATE, carried as a CLAIM
+                        # for Risk to check -- never as the input the
+                        # bound is derived from
                         "net_debit": j.get("net_debit"),
+                        # the PRIMARY FACTS the bound IS derived from
+                        "legs": j.get("legs"),
+                        "expiration": j.get("expiration"),
+                        "multiplier": 100.0,
                         "risk_source": "options_live_attack"})
 
 

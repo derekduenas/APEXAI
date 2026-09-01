@@ -101,7 +101,7 @@ def join_attack_card(payload: dict, *, ledger: Path | None = None,
         return {"joined": False, "why": f"no attack ledger at {path}",
                 "capital_decision": "NOT_ESTIMABLE"}
 
-    cards = []
+    cards, leg_cards = [], {}
     for line in path.read_text().splitlines():
         if not line.strip():
             continue
@@ -112,6 +112,12 @@ def join_attack_card(payload: dict, *, ledger: Path | None = None,
         if (r.get("kind") == "options_live_attack"
                 and r.get("symbol") == sym and str(r.get("T")) == t):
             cards.append(r)
+        # PRIMARY FACTS. The sealed options_live_card carries the leg
+        # economics and joins by an IDENTICAL card_hash. Risk must be
+        # able to DERIVE the debit rather than consume the same
+        # aggregate the certificate consumed.
+        elif r.get("kind") == "options_live_card" and r.get("card_hash"):
+            leg_cards[r["card_hash"]] = r
 
     if len(cards) != 1:
         return {"joined": False, "matches": len(cards),
@@ -148,9 +154,13 @@ def join_attack_card(payload: dict, *, ledger: Path | None = None,
                        "card that did not yet exist",
                 "capital_decision": "NOT_ESTIMABLE"}
 
+    leg_card = leg_cards.get(card.get("card_hash")) or {}
     return {"joined": True, "declared_risk": float(risk),
             "expression": card.get("expression", "UNKNOWN"),
             "net_debit": card.get("net_debit"),
+            "legs": leg_card.get("legs"),
+            "expiration": leg_card.get("expiration"),
+            "leg_card_debit": leg_card.get("debit"),
             "card_hash": card.get("card_hash"),
             "card_T": card.get("T"),
             "law": "declared risk is READ from a sealed governed "

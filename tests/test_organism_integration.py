@@ -103,14 +103,39 @@ def test_B_equity_only_candidate_funds(led):
         "EQUITY"
 
 
-def test_C_btc_only_candidate_funds(led):
+def test_C_btc_candidate_is_refused_for_want_of_a_risk_certificate(led):
+    """CHANGED IN PHASE 1, DELIBERATELY. This previously asserted
+    FUNDED. It funded because declared_risk was accepted as if it were
+    a maximum loss; it is not, it is an intent. No contract
+    specification (multiplier / point value) for PBTCUCZ50 is recorded
+    anywhere in this repository, so the position's maximum loss was
+    never derivable -- and apex/organism/path_intelligence.py already
+    holds the standing rule that a multiplier is never guessed.
+
+    Funding a position whose maximum loss is unknowable is the exact
+    defect Phase 1 exists to remove, so the refusal is the correct
+    behaviour and the old PASS was the money path being false.
+
+    CAPABILITY IMPACT: the BTC sleeve cannot fund until it records its
+    contract specification alongside the attack geometry. Zero BTC
+    positions have ever been funded in production, so no live
+    capability is lost by this fence."""
     env = CA.from_btc(btc_record())
     run = AL.allocate([env], session="2026-08-28",
                       book_ledger=led["book"],
                       decision_ledger=led["dec"])
-    assert run["results"][0]["state"] == "FUNDED"
-    assert BK.state(ledger=led["book"])["positions"][0]["symbol"] == \
-        "PBTCUCZ50"
+    assert run["results"][0]["state"] == "REFUSED_RISK_KERNEL"
+    refusals = [r for r in _rows(led["book"])
+                if r.get("kind") == "paper_refusal"]
+    assert refusals and any("UNBOUNDABLE_BTC_PERP" in str(r["reasons"])
+                            for r in refusals)
+    assert BK.state(ledger=led["book"])["open_positions"] == 0
+
+
+def _rows(path):
+    import json
+    return [json.loads(x) for x in path.read_text().splitlines()
+            if x.strip()]
 
 
 # ================== D — same underlying across sleeves = redundancy

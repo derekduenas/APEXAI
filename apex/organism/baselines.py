@@ -27,6 +27,7 @@ decision_power: NONE_DIAGNOSTIC.
 from __future__ import annotations
 
 from apex.organism import risk_kernel
+from apex.organism.risk_certificate import certify
 
 POLICIES = ("CASH", "EQUAL_RISK_ALL_ELIGIBLE", "FIRST_VALID_CANDIDATE")
 CATALYST_BASELINE = "MARKET_ONLY"
@@ -36,6 +37,13 @@ def _kernel_ok(env: dict, book_state: dict) -> bool:
     from apex.capital.arena import INDEX_FAMILY
     fam = INDEX_FAMILY.get(env["symbol"], "UNKNOWN")
     k = risk_kernel.check(
+        certificate=certify(expression=env["expression"],
+                            direction=env["direction"],
+                            declared_risk=env["declared_risk"],
+                            sleeve_payload=env.get("sleeve_payload")),
+        expression=env["expression"], direction=env["direction"],
+        sleeve_payload=env.get("sleeve_payload"),
+        open_certified_risk=book_state["open_certified_risk"],
         declared_risk=env["declared_risk"], symbol=env["symbol"],
         beta_family=fam,
         open_risk=book_state["open_risk"],

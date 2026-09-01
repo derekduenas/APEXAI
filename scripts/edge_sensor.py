@@ -32,6 +32,24 @@ UNIVERSE_FILE = Path("exports/daily_closes_v1.json.gz")
 TOP_N = 5
 
 
+def _input_provenance(path):
+    """A DECISION_SEMANTIC_INPUT is mutable by necessity but may never
+    change SILENTLY: its identity is sealed beside the decision it
+    shaped, so any edit is visible and attributable in the chain."""
+    import hashlib
+    from datetime import datetime, timezone
+    p = Path(path)
+    if not p.exists():
+        return {"path": str(p), "status": "ABSENT"}
+    b = p.read_bytes()
+    return {"path": str(p), "status": "PRESENT",
+            "sha256": hashlib.sha256(b).hexdigest(),
+            "bytes": len(b),
+            "mtime_utc": datetime.fromtimestamp(
+                p.stat().st_mtime, timezone.utc).isoformat(),
+            "class": "DECISION_SEMANTIC_INPUT"}
+
+
 def universe():
     import gzip
     syms = sorted(json.load(gzip.open(UNIVERSE_FILE, "rt")))
@@ -119,6 +137,8 @@ def main():
     chain_append(LEDGER, {
         "kind": "edge_sensor_tick", "tick_utc": now,
         "universe_observed": len(snaps),
+        # a COUNT cannot distinguish 290 symbols from a DIFFERENT 290
+        "universe_provenance": _input_provenance(UNIVERSE_FILE),
         "top_movers": [(s, round(c, 1)) for s, c, _, _ in
                        movers[:10]],
         "subjects": subjects,
