@@ -128,15 +128,30 @@ def micro_state(trades: list, quotes: list, *,
 
     spreads = [(q["ap"] - q["bp"]) / ((q["ap"] + q["bp"]) / 2) * 1e4
                for q in good_q]
-    imbal = [(q.get("bs", 0) - q.get("as", 0))
-             / max(q.get("bs", 0) + q.get("as", 0), 1)
-             for q in good_q]
-    # microprice = size-weighted touch price
-    micro = [(q["ap"] * q.get("bs", 0) + q["bp"] * q.get("as", 0))
-             / max(q.get("bs", 0) + q.get("as", 0), 1)
-             for q in good_q]
     mids = [(q["ap"] + q["bp"]) / 2 for q in good_q]
-    micro_disp = [(m - md) / md * 1e4 for m, md in zip(micro, mids)]
+
+    # PULSE-001 (2026-09-01). These two features are SIZE-DEPENDENT and
+    # previously read `q.get("bs", 0)`, which turns "size unknown" into
+    # "size is zero": the imbalance then reports a PERFECTLY BALANCED
+    # book and the microprice collapses to 0.0, yielding a fabricated
+    # -10000 bps displacement with no status flag. Missing is not zero.
+    # Spread, returns, flow and intensity do not depend on size and are
+    # computed regardless.
+    sized_q = [q for q in good_q
+               if isinstance(q.get("bs"), (int, float))
+               and isinstance(q.get("as"), (int, float))
+               and (q["bs"] + q["as"]) > 0]
+    if len(sized_q) < 20:
+        imbal, micro_disp, sized_mids = [], [], []
+    else:
+        sized_mids = [(q["ap"] + q["bp"]) / 2 for q in sized_q]
+        imbal = [(q["bs"] - q["as"]) / (q["bs"] + q["as"])
+                 for q in sized_q]
+        # microprice = size-weighted touch price
+        micro = [(q["ap"] * q["bs"] + q["bp"] * q["as"])
+                 / (q["bs"] + q["as"]) for q in sized_q]
+        micro_disp = [(m - md) / md * 1e4
+                      for m, md in zip(micro, sized_mids)]
 
     signed = _sign_trades(trades, quotes)
     buy_v = sum(t["s"] for t in signed if t["sign"] > 0)
@@ -157,7 +172,7 @@ def micro_state(trades: list, quotes: list, *,
         if len(rets) >= 10 else NOT_ESTIMABLE)
 
     half = len(good_q) // 2
-    touch_sz = [q.get("bs", 0) + q.get("as", 0) for q in good_q]
+    touch_sz = [q["bs"] + q["as"] for q in sized_q]
     out.update({
         "trade_intensity_per_s": round(len(trades) / span, 3),
         "quote_intensity_per_s": round(len(quotes) / span, 3),
@@ -165,9 +180,11 @@ def micro_state(trades: list, quotes: list, *,
         "spread_bps_change": round(
             statistics.median(spreads[half:])
             - statistics.median(spreads[:half]), 3),
-        "nbbo_imbalance_mean": round(statistics.mean(imbal), 4),
-        "microprice_disp_bps_mean": round(
-            statistics.mean(micro_disp), 4),
+        "nbbo_imbalance_mean": (round(statistics.mean(imbal), 4)
+                                if imbal else NOT_ESTIMABLE),
+        "microprice_disp_bps_mean": (
+            round(statistics.mean(micro_disp), 4)
+            if micro_disp else NOT_ESTIMABLE),
         "signed_buy_volume": buy_v,
         "signed_sell_volume": sell_v,
         "net_signed_volume": net_flow,
@@ -177,11 +194,19 @@ def micro_state(trades: list, quotes: list, *,
         "impact_bps_per_1k_signed": (round(impact, 4)
                                      if isinstance(impact, float)
                                      else impact),
-        "touch_size_change_frac": round(
-            (statistics.median(touch_sz[half:]) + 1)
-            / (statistics.median(touch_sz[:half]) + 1) - 1, 4),
+        "touch_size_change_frac": (
+            round((statistics.median(touch_sz[len(touch_sz) // 2:]) + 1)
+                  / (statistics.median(touch_sz[:len(touch_sz) // 2])
+                     + 1) - 1, 4)
+            if len(touch_sz) >= 4 else NOT_ESTIMABLE),
         "touch_size_note": "PROXY: top-of-book quoted size only; "
                            "not depth, not queue, not cancels",
+        "sized_quote_count": len(sized_q),
+        "size_data_quality": ("VALID" if len(sized_q) >= 20
+                              else "NOT_ESTIMABLE: fewer than 20 "
+                                   "size-bearing NBBO quotes; "
+                                   "size-dependent features withheld "
+                                   "rather than zero-filled"),
         "short_horizon_vol_bps_per_min": (round(rv, 2)
                                           if isinstance(rv, float)
                                           else rv),

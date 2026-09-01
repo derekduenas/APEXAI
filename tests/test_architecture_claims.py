@@ -119,7 +119,18 @@ def test_no_execution_or_broker_dependency_exists():
              # the stronger mechanical placement scan below still
              # covers them. They are SHADOW_PROSPECTIVE_ONLY sensors
              # with zero authority.
-             "microstructure.py", "options_surface.py"}
+             "microstructure.py", "options_surface.py",
+             # 2026-09-01 (Phase 2, PULSE): the Digital Twin NAMES its
+             # market-DATA vendor in PROVENANCE strings ("alpaca_sip")
+             # and in the historical bars endpoint. Provenance that
+             # obfuscated its own source would defeat its purpose --
+             # the same reasoning that exempts checkpoint_graph.py and
+             # evidence_registry.py. Verified before exempting: these
+             # modules import ONLY the standard library and apex, pull
+             # no vendor SDK, and define no order or placement
+             # function; the mechanical placement scan below still
+             # covers them. decision_power is NONE_STATE throughout.
+             "compose.py", "historical.py", "parity.py"}
     # PATH-scoped exemptions (2026-08-20): name-based exemption of
     # "__init__.py" would blind the scan across every package, so files
     # that must name the sensor module get exempted individually.
