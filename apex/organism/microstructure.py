@@ -55,7 +55,13 @@ def fetch_ticks(symbol: str, start: str, end: str, *,
             q["page_token"] = token
         d = _get(f"{DATA}/{symbol}/{what}?"
                  + urllib.parse.urlencode(q))
-        out.extend(d.get(what, []))
+        # PULSE-002 (2026-09-01): the provider returns
+        # {"trades": null} when the window contains no ticks --
+        # the KEY EXISTS, so .get(what, []) yields None and
+        # extend() raises. A quiet tape is an EMPTY tape, not a
+        # failure, and it is quiet exactly when we most need to
+        # sense premarket and thin names.
+        out.extend(d.get(what) or [])
         token = d.get("next_page_token")
         if not token:
             break

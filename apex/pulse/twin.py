@@ -5,14 +5,32 @@ ACTUALLY LOOK LIKE AT THIS MOMENT, AND HOW MUCH OF IT DO WE ACTUALLY
 KNOW? It contains measurements and provenance. It contains no opinion,
 no forecast and no authority.
 
-THE FIELD IS THE UNIT, NOT THE NUMBER. Every measurement is a Field
-carrying value + quality + source + as_of, because the World Model
-cannot calibrate on numbers whose trustworthiness it cannot see. A
-bare float that might be missing, stale, or fabricated is worse than
-no field at all: it is a lie with a decimal point.
+THE FIELD IS THE UNIT, NOT THE NUMBER. Every measurement carries
+value + quality + source + as_of + known_from + age, because the World
+Model cannot calibrate on numbers whose trustworthiness and timing it
+cannot see.
 
-MISSING IS NEVER ZERO. The quality vocabulary distinguishes seven
-states that a single NaN would flatten into one:
+A PACKET IS NOT SYNCHRONOUS, AND MUST NOT PRETEND TO BE. Ingredients
+arrive at materially different moments:
+
+    NBBO              10:17:03.220
+    latest trade      10:17:03.841
+    Catalyst event    10:16:49
+    options snapshot  10:16:57
+    Tier-2 snapshot   10:17:04.714
+
+That is fine. Hiding it behind one timestamp is not. A "10:17 state"
+silently composed of facts from spread-out moments is a forgery with
+good intentions, so every field keeps its own clock and the packet
+reports its capture span and its oldest critical ingredient.
+
+AS_OF vs KNOWN_FROM. `as_of` is when the fact was TRUE. `known_from`
+is when APEX could first have KNOWN it. For a quote they coincide. For
+an event they do not: an 8-K filed at 02:55 and published at 03:10 was
+true at 02:55 and knowable at 03:10, and only the later one may gate a
+decision.
+
+MISSING IS NEVER ZERO. Seven states that a single NaN would flatten:
 
   VALID                 observed, fresh, sufficient
   STALE                 observed, but older than this feature tolerates
@@ -22,14 +40,7 @@ states that a single NaN would flatten into one:
   PROVIDER_ERROR        the source was asked and failed
   SESSION_INAPPLICABLE  meaningless in this session (premarket VWAP)
 
-KNOWN_FROM IS DERIVED, NOT DECLARED. A packet's known_from is the
-LATEST contributing observation time, because a state is not knowable
-before its last ingredient existed. A 10:01 packet completed at
-10:01:05 was known at 10:01:05, and saying otherwise is the same class
-of error as an open-vs-entry anchor mismatch.
-
-decision_power: NONE_STATE — this module measures and records. It
-never selects, sizes, forecasts or approves.
+decision_power: NONE_STATE.
 """
 from __future__ import annotations
 
@@ -40,7 +51,6 @@ from datetime import datetime, timezone
 
 SCHEMA_VERSION = "MARKET_TWIN_STATE_V0"
 
-# ---------------------------------------------------- quality vocabulary
 VALID = "VALID"
 STALE = "STALE"
 UNKNOWN = "UNKNOWN"
@@ -51,36 +61,64 @@ SESSION_INAPPLICABLE = "SESSION_INAPPLICABLE"
 
 QUALITIES = (VALID, STALE, UNKNOWN, NOT_AVAILABLE, NOT_ESTIMABLE,
              PROVIDER_ERROR, SESSION_INAPPLICABLE)
-# only VALID may be consumed as a measurement; everything else is an
-# explicit statement about what we do not know
 TRUSTWORTHY = (VALID,)
 
-# the vocabulary a sub-engine may already speak, mapped in rather than
-# reinvented (apex/organism/microstructure.py, options_surface.py and
-# feature_sufficiency.py all emit NOT_ESTIMABLE already)
 _ADOPT = {"NOT_ESTIMABLE": NOT_ESTIMABLE, "UNKNOWN": UNKNOWN,
           "NOT_AVAILABLE": NOT_AVAILABLE, "STALE": STALE,
           "PROVIDER_ERROR": PROVIDER_ERROR}
+
+# Fields whose age materially changes what the state MEANS. The packet
+# reports the worst of these explicitly, so a reader never has to scan
+# every field to discover that its "current" price is four minutes old.
+CRITICAL = ("mid", "spread_bps", "last_trade")
+
+# Fields that are DEFINITIONALLY historical. A prior close is supposed
+# to be a day old; counting it as capture latency would make both the
+# span and the critical-age alarm meaningless. Their individual ages
+# are still reported per field -- they are excluded from the CAPTURE
+# metrics, never hidden.
+ANCHOR = ("prior_close", "session_open", "premarket_first",
+          "premarket_high", "premarket_low", "premarket_range_bps",
+          "premarket_return_bps", "premarket_travel_bps",
+          "overnight_first_gap_bps", "premarket_observations")
 
 
 class TwinViolation(RuntimeError):
     """Raised when a packet would be sealed in an untruthful shape."""
 
 
-def _utc(ts) -> str:
+def _utc(ts) -> str | None:
+    if ts is None:
+        return None
     if isinstance(ts, datetime):
         return (ts if ts.tzinfo else ts.replace(
             tzinfo=timezone.utc)).astimezone(timezone.utc).isoformat()
     return str(ts)
 
 
+def _parse(ts) -> datetime:
+    if isinstance(ts, datetime):
+        return ts if ts.tzinfo else ts.replace(tzinfo=timezone.utc)
+    s = str(ts).strip()
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    import re
+    m = re.search(r"([+-]\d{2}:?\d{2})$", s)
+    off, base = (m.group(1), s[:m.start()]) if m else ("+00:00", s)
+    if "." in base:
+        head, _, frac = base.partition(".")
+        base = f"{head}.{frac[:6].ljust(6, '0')}"
+    return datetime.fromisoformat(base + off)
+
+
 @dataclass(frozen=True)
 class Field:
-    """One measurement and everything needed to distrust it."""
+    """One measurement, its trustworthiness, and its own clock."""
     value: object
     quality: str
     source: str = "UNSPECIFIED"
     as_of: str | None = None
+    known_from: str | None = None
     note: str | None = None
 
     def __post_init__(self):
@@ -99,44 +137,68 @@ class Field:
                 f"a {self.quality} field carries the number "
                 f"{self.value!r}: an untrustworthy field must not "
                 f"present a consumable measurement")
+        if self.as_of and self.known_from and \
+                _parse(self.known_from) < _parse(self.as_of):
+            raise TwinViolation(
+                f"known_from {self.known_from} precedes as_of "
+                f"{self.as_of}: a fact cannot be knowable before it "
+                f"is true")
 
     @property
     def usable(self) -> bool:
         return self.quality in TRUSTWORTHY
 
-    def as_record(self) -> dict:
+    def gate_time(self) -> str | None:
+        """The time that may gate a decision: when APEX could KNOW."""
+        return self.known_from or self.as_of
+
+    def age_ms(self, at) -> float | None:
+        g = self.gate_time()
+        if not g:
+            return None
+        return round((_parse(at) - _parse(g)).total_seconds() * 1000, 1)
+
+    def as_record(self, *, at=None) -> dict:
         d = {"v": self.value, "q": self.quality, "src": self.source}
         if self.as_of:
             d["as_of"] = self.as_of
+        if self.known_from and self.known_from != self.as_of:
+            d["known_from"] = self.known_from
+        if at is not None:
+            a = self.age_ms(at)
+            if a is not None:
+                d["age_ms"] = a
         if self.note:
             d["note"] = self.note
         return d
 
 
-def ok(value, *, source, as_of=None, note=None) -> Field:
+def ok(value, *, source, as_of=None, known_from=None,
+       note=None) -> Field:
     """A measurement we actually made."""
-    return Field(value, VALID, source, _utc(as_of) if as_of else None,
+    return Field(value, VALID, source, _utc(as_of), _utc(known_from),
                  note)
 
 
-def absent(quality, *, source="UNSPECIFIED", note=None) -> Field:
+def absent(quality, *, source="UNSPECIFIED", note=None,
+           as_of=None) -> Field:
     """An honest statement that we do not have the measurement."""
     if quality in TRUSTWORTHY:
         raise TwinViolation("absent() requires a non-VALID quality")
-    return Field(None, quality, source, None, note)
+    return Field(None, quality, source, _utc(as_of), None, note)
 
 
-def adopt(value, *, source, as_of=None, note=None) -> Field:
+def adopt(value, *, source, as_of=None, known_from=None,
+          note=None) -> Field:
     """Wrap a value from an engine that already speaks a sentinel
     vocabulary, honouring its verdict instead of overriding it."""
     if isinstance(value, str) and value in _ADOPT:
         return absent(_ADOPT[value], source=source, note=note)
     if value is None:
         return absent(UNKNOWN, source=source, note=note)
-    return ok(value, source=source, as_of=as_of, note=note)
+    return ok(value, source=source, as_of=as_of, known_from=known_from,
+              note=note)
 
-
-# ------------------------------------------------------------- packet
 
 @dataclass
 class TwinState:
@@ -147,27 +209,28 @@ class TwinState:
     state_complete_time: str
     market_session: str
     universe_version: str
-    tier: str                       # TIER_1_DEEP | TIER_2_BROAD
+    tier: str
     features: dict = dc_field(default_factory=dict)
     sources: dict = dc_field(default_factory=dict)
     notes: list = dc_field(default_factory=list)
+    enrichment: dict = dc_field(default_factory=dict)
     evidence_class: str = "LIVE_PROSPECTIVE"
+    capture_end: str | None = None
 
-    # ------------------------------------------------ derived truth
     def known_from(self) -> str:
-        """The LATEST contributing observation time. A state is not
-        knowable before its last ingredient existed."""
-        stamps = [f.as_of for f in self.features.values()
-                  if isinstance(f, Field) and f.as_of]
+        """The LATEST moment any ingredient became knowable. A state
+        is not knowable before its last ingredient was."""
+        stamps = [f.gate_time() for f in self.features.values()
+                  if isinstance(f, Field) and f.gate_time()]
         stamps.append(self.state_complete_time)
         return max(stamps)
 
     def quality_census(self) -> dict:
-        c = {q: 0 for q in QUALITIES}
+        c = {}
         for f in self.features.values():
             if isinstance(f, Field):
-                c[f.quality] += 1
-        return {k: v for k, v in c.items() if v}
+                c[f.quality] = c.get(f.quality, 0) + 1
+        return dict(sorted(c.items()))
 
     def missingness(self) -> float:
         total = len(self.features)
@@ -177,30 +240,32 @@ class TwinState:
                      if isinstance(f, Field) and f.usable)
         return round(1.0 - usable / total, 4)
 
-    def freshness_seconds(self) -> float | str:
-        """How old the OLDEST usable ingredient is at completion."""
-        stamps = [f.as_of for f in self.features.values()
-                  if isinstance(f, Field) and f.usable and f.as_of]
-        if not stamps:
-            return NOT_ESTIMABLE
-        end = datetime.fromisoformat(self.state_complete_time)
-        oldest = min(datetime.fromisoformat(s) for s in stamps)
-        return round((end - oldest).total_seconds(), 3)
+    def _ages(self):
+        end = self.state_complete_time
+        return {k: f.age_ms(end) for k, f in self.features.items()
+                if isinstance(f, Field) and f.usable
+                and f.age_ms(end) is not None}
 
     def state_id(self) -> str:
-        """IDENTITY, not uniqueness of execution. The same economic
-        observation recomputed after a restart or a duplicate timer
-        MUST produce the same id, so the store can recognise it as one
-        observation rather than two."""
+        """IDENTITY, not uniqueness of execution: the same economic
+        observation recomputed after a restart or duplicate timer MUST
+        produce the same id."""
         raw = "|".join((SCHEMA_VERSION, self.evidence_class, self.tier,
                         self.subject, self.scheduled_time,
                         self.universe_version))
         return hashlib.sha256(raw.encode()).hexdigest()[:32]
 
-    # ------------------------------------------------------- sealing
     def seal(self) -> dict:
         if self.market_session is None:
             raise TwinViolation("market_session is required")
+        end = self.state_complete_time
+        ages = self._ages()
+        crit = {k: v for k, v in ages.items() if k in CRITICAL}
+        span_start = min([_parse(f.gate_time())
+                          for k, f in self.features.items()
+                          if isinstance(f, Field) and f.usable
+                          and f.gate_time() and k not in ANCHOR]
+                         or [_parse(end)])
         body = {
             "kind": "market_twin_state",
             "schema_version": SCHEMA_VERSION,
@@ -210,31 +275,55 @@ class TwinState:
             "subject": self.subject,
             "scheduled_time": self.scheduled_time,
             "capture_start": self.capture_start,
-            "state_complete_time": self.state_complete_time,
+            "capture_end": self.capture_end or end,
+            "state_complete_time": end,
             "known_from": self.known_from(),
-            "capture_latency_s": round(
-                (datetime.fromisoformat(self.state_complete_time)
-                 - datetime.fromisoformat(self.capture_start)
-                 ).total_seconds(), 3),
             "market_session": self.market_session,
             "universe_version": self.universe_version,
+            "timing": {
+                "capture_latency_ms": round(
+                    (_parse(end) - _parse(self.capture_start)
+                     ).total_seconds() * 1000, 1),
+                # how far apart the OLDEST and NEWEST usable
+                # ingredients actually are -- the honest width of this
+                # "moment"
+                "capture_span_ms": round(
+                    (_parse(end) - span_start).total_seconds() * 1000,
+                    1),
+                "max_field_age_ms": max(ages.values()) if ages else None,
+                "max_capture_age_ms": (
+                    max([v for k, v in ages.items() if k not in ANCHOR],
+                        default=None)),
+                "anchor_fields_excluded_from_span": [
+                    k for k in ages if k in ANCHOR],
+                "max_critical_field_age_ms": (max(crit.values())
+                                              if crit else None),
+                "critical_fields": list(CRITICAL),
+                "law": "a packet is NOT synchronous; each field keeps "
+                       "its own clock and this block states how wide "
+                       "the moment really is. Anchors (prior close, "
+                       "premarket path) are definitionally historical "
+                       "and are excluded from the CAPTURE metrics "
+                       "while keeping their own per-field ages"},
             "sources": self.sources,
-            "features": {k: (v.as_record() if isinstance(v, Field)
-                             else v)
+            "enrichment": self.enrichment or {
+                "enriched": False,
+                "reason": "NOT_ENRICHED",
+                "why": "no enrichment was requested for this subject "
+                       "in this cycle"},
+            "features": {k: (v.as_record(at=end)
+                             if isinstance(v, Field) else v)
                          for k, v in sorted(self.features.items())},
             "data_quality": {
                 "census": self.quality_census(),
                 "missingness": self.missingness(),
-                "oldest_usable_ingredient_age_s":
-                    self.freshness_seconds(),
                 "vocabulary": list(QUALITIES),
                 "law": "only VALID may be consumed as a measurement; "
                        "every other state is an explicit statement "
                        "about what is not known"},
             "notes": self.notes,
-            "law": "measurements and provenance only -- this packet "
-                   "carries no forecast, no selection and no "
-                   "authority",
+            "law": "measurements and provenance only -- no forecast, "
+                   "no selection, no authority",
             "decision_power": "NONE_STATE"}
         body["packet_hash"] = hashlib.sha256(
             json.dumps(body, sort_keys=True,
@@ -253,6 +342,7 @@ def verify_packet(packet: dict) -> list:
             != packet.get("packet_hash"):
         problems.append("PACKET_HASH_MISMATCH: the packet was altered "
                         "after sealing")
+    kf = packet.get("known_from")
     for name, f in (packet.get("features") or {}).items():
         if not isinstance(f, dict):
             continue
@@ -266,11 +356,14 @@ def verify_packet(packet: dict) -> list:
                 f"{name}: quality {f.get('q')} but carries the number "
                 f"{f.get('v')!r} -- missing must never look like a "
                 f"measurement")
-    kf = packet.get("known_from")
-    for name, f in (packet.get("features") or {}).items():
-        if isinstance(f, dict) and f.get("as_of") and kf \
-                and f["as_of"] > kf:
+        gate = f.get("known_from") or f.get("as_of")
+        if gate and kf and _parse(gate) > _parse(kf):
             problems.append(
-                f"{name}: ingredient as_of {f['as_of']} is LATER than "
+                f"{name}: ingredient knowable at {gate} is LATER than "
                 f"the packet's known_from {kf}")
+        if f.get("as_of") and f.get("known_from") and \
+                _parse(f["known_from"]) < _parse(f["as_of"]):
+            problems.append(
+                f"{name}: known_from precedes as_of -- a fact cannot "
+                f"be knowable before it is true")
     return problems
