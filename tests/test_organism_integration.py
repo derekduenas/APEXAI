@@ -40,6 +40,28 @@ def opt_card(sym="SPY", risk=301.0):
             "net_debit": risk, "card_hash": f"hash_{sym}"}
 
 
+def opt_leg_card(sym="SPY", risk=301.0):
+    """Production seals TWO records per attack: the options_live_attack
+    (aggregates) and the options_live_card (PRIMARY LEG FACTS), joined
+    by an identical card_hash. Risk derives the bound from the legs, so
+    a fixture carrying only the aggregate is no longer certifiable --
+    which is the point of the change, not a defect in it."""
+    return {"kind": "options_live_card", "symbol": sym,
+            "T": "2026-08-28 10:00:00", "card_hash": f"hash_{sym}",
+            "expression": "LONG_PUT", "debit": risk,
+            "expiration": "2026-09-04",
+            "legs": [["BUY", "P", 100.0, round(risk / 100.0, 6)]]}
+
+
+def cards(*specs):
+    """(symbol, risk) pairs -> the sealed record PAIR production writes."""
+    out = []
+    for sym, risk in (specs or (("SPY", 301.0),)):
+        out.append(opt_card(sym=sym, risk=risk))
+        out.append(opt_leg_card(sym=sym, risk=risk))
+    return out
+
+
 def eq_record(did="EQS_1", sym="NVDA", risk=300.0, direction="LONG"):
     return {"record_kind": "equity_shadow_decision",
             "session": "2026-08-28",
@@ -72,7 +94,7 @@ def _write(path, rows):
 def led(tmp_path):
     return {"book": tmp_path / "book.jsonl",
             "dec": tmp_path / "alloc.jsonl",
-            "cards": _write(tmp_path / "cards.jsonl", [opt_card()])}
+            "cards": _write(tmp_path / "cards.jsonl", cards())}
 
 
 def adapt_opt(rec, cards):
@@ -320,16 +342,15 @@ def test_L_long_and_short_coexist(led):
 # ============== M — same catalyst, correlated exposure is visible
 
 def test_M_same_family_risk_is_capped(led, tmp_path):
-    cards = _write(tmp_path / "c2.jsonl",
-                   [opt_card(sym="SPY", risk=500.0),
-                    opt_card(sym="QQQ", risk=500.0),
-                    opt_card(sym="AAPL", risk=500.0)])
+    cards_path = _write(tmp_path / "c2.jsonl",
+                        cards(("SPY", 500.0), ("QQQ", 500.0),
+                              ("AAPL", 500.0)))
     for c in json.loads("[]") or []:
         pass
     envs = []
     for sym in ("SPY", "QQQ", "AAPL"):
         r = opt_record(eid=f"m:{sym}", sym=sym)
-        envs.append(CA.from_options(r, attack_ledger=cards))
+        envs.append(CA.from_options(r, attack_ledger=cards_path))
     run = AL.allocate(envs, session="2026-08-28",
                       book_ledger=led["book"],
                       decision_ledger=led["dec"])
@@ -509,7 +530,7 @@ def test_options_attach_joins_the_per_trade_pair_by_card_hash(
     (tmp_path / "results/equities").mkdir(parents=True)
     led = B.LEDGER
     env = adapt_opt(opt_record(eid="o1"),
-                    _write(tmp_path / "cards.jsonl", [opt_card()]))
+                    _write(tmp_path / "cards.jsonl", cards()))
     AL.allocate([env], session="2026-08-28", book_ledger=led,
                 decision_ledger=tmp_path / "d.jsonl")
     oc, fr = _opt_pair()
@@ -542,7 +563,7 @@ def test_a_broken_outcome_attribution_pair_is_refused_not_guessed(
     (tmp_path / "results/equities").mkdir(parents=True)
     led = B.LEDGER
     env = adapt_opt(opt_record(eid="o1"),
-                    _write(tmp_path / "cards.jsonl", [opt_card()]))
+                    _write(tmp_path / "cards.jsonl", cards()))
     AL.allocate([env], session="2026-08-28", book_ledger=led,
                 decision_ledger=tmp_path / "d.jsonl")
     oc, fr = _opt_pair()
@@ -565,7 +586,7 @@ def test_an_unresolved_options_position_stays_pending(tmp_path,
     (tmp_path / "results/equities").mkdir(parents=True)
     led = B.LEDGER
     env = adapt_opt(opt_record(eid="o1"),
-                    _write(tmp_path / "cards.jsonl", [opt_card()]))
+                    _write(tmp_path / "cards.jsonl", cards()))
     AL.allocate([env], session="2026-08-28", book_ledger=led,
                 decision_ledger=tmp_path / "d.jsonl")
     _write(tmp_path / "results/options_live_ledger.jsonl", [])

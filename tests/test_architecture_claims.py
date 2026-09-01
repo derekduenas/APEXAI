@@ -107,7 +107,19 @@ def test_no_execution_or_broker_dependency_exists():
              # defeat its purpose, the same reasoning that exempts
              # checkpoint_graph.py. It defines no placement function
              # and imports no SDK.
-             "evidence_registry.py"}
+             "evidence_registry.py",
+             # 2026-09-01 (Phase 1 closure): the prospective sensor
+             # lane NAMES its market-DATA endpoint for exactly the
+             # reason alpaca_fabric.py, options_feed.py and
+             # reconnect_ledger.py do. microstructure.py and
+             # options_surface.py import ONLY the standard library
+             # (json/math/os/csv/io/statistics/urllib), pull no vendor
+             # SDK, hold no broker relationship and define no order or
+             # placement function -- verified before exempting, and
+             # the stronger mechanical placement scan below still
+             # covers them. They are SHADOW_PROSPECTIVE_ONLY sensors
+             # with zero authority.
+             "microstructure.py", "options_surface.py"}
     # PATH-scoped exemptions (2026-08-20): name-based exemption of
     # "__init__.py" would blind the scan across every package, so files
     # that must name the sensor module get exempted individually.

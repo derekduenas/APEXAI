@@ -142,8 +142,11 @@ def test_mission_control_measures_every_row():
 
 
 def test_mission_control_flags_and_exits_nonzero_on_unmeasured_rows():
+    # sys.executable, not a hardcoded .venv path: the suite runs
+    # on both the Mac dev host and the cloud canonical host.
     import subprocess
-    r = subprocess.run([".venv/bin/python", "scripts/mission_control.py"],
+    import sys
+    r = subprocess.run([sys.executable, "scripts/mission_control.py"],
                        capture_output=True, text=True, timeout=300)
     # tonight the forward ledger is legitimately absent -> flags -> exit 1;
     # what we pin is the MECHANISM: flags present iff exit nonzero

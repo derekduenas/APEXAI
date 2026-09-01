@@ -166,11 +166,19 @@ def test_the_prompt_carries_only_explicit_context(tmp_path):
     the prompt is rebuilt from governed evidence each call."""
     conv = tmp_path / "c.jsonl"
     inv = _fake_invoke("ok")
-    AU.ask("first", conversations=conv, _invoke=inv)
+    # The sentinel must be a token that CANNOT occur in governed
+    # evidence. This previously used the word "first", which collided
+    # with ordinary prose in the research board ("first executable
+    # quote after trigger") and failed as the corpus grew -- a false
+    # positive that said nothing about carryover. A unique token makes
+    # the test able to detect the leak it claims to detect.
+    sentinel = "ZQX7F3A_LEAK_SENTINEL"
+    AU.ask(sentinel, conversations=conv, _invoke=inv)
     p1 = inv.last_prompt
-    AU.ask("second", conversations=conv, _invoke=inv)
+    AU.ask("second question", conversations=conv, _invoke=inv)
     p2 = inv.last_prompt
-    assert "first" not in p2, "prior exchange leaked without history"
+    assert sentinel in p1, "the question itself must reach the prompt"
+    assert sentinel not in p2, "prior exchange leaked without history"
     assert AU.IDENTITY_CONTRACT[:60] in p1 and \
         AU.IDENTITY_CONTRACT[:60] in p2
     # catalyst's brain contract is a different document entirely

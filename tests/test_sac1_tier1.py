@@ -285,7 +285,10 @@ def test_every_declared_launchd_job_has_a_plist_on_disk():
         import pytest
         pytest.skip("verifies the Mac host launchd/ops installation -- "
                     "Darwin-only by nature; cloud uses systemd (C6)")
+    # sys.executable, not a hardcoded .venv path: the suite runs
+    # on both the Mac dev host and the cloud canonical host.
     import subprocess
+    import sys
     loaded = subprocess.run(["launchctl", "list"], capture_output=True,
                             text=True).stdout
     apex_jobs = [l.split()[-1] for l in loaded.splitlines()
@@ -438,8 +441,9 @@ def test_sac1_10_rule_17_is_disabled_in_the_replay_harness():
 def test_sac1_10_a_swarm_view_in_a_replay_record_trips_the_wire():
     """Drive the tripwire rather than trusting its presence."""
     import subprocess
+    import sys
     r = subprocess.run(
-        [".venv/bin/python", "-c",
+        [sys.executable, "-c",
          "import sys; sys.path.insert(0,'scripts'); sys.path.insert(0,'.');\n"
          "import hunter_replay as hr;\n"
          "rec={'kind':'forecast_bundle','swarm_view':{'status':'OK'}};\n"

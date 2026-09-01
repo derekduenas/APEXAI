@@ -100,8 +100,11 @@ def test_captain_eyes_refuses_replay_imagery():
 
 
 def test_captain_eyes_with_no_decisions_reports_nothing_to_see():
+    # sys.executable, not a hardcoded .venv path: the suite runs
+    # on both the Mac dev host and the cloud canonical host.
     import subprocess
-    r = subprocess.run([".venv/bin/python", "scripts/captain_eyes.py",
+    import sys
+    r = subprocess.run([sys.executable, "scripts/captain_eyes.py",
                         "--latest"], capture_output=True, text=True,
                        timeout=300)
     if "no playbook decisions" in r.stdout:
