@@ -40,6 +40,9 @@ from apex.pulse.enrichment import (EnrichmentRecord,    # noqa: E402
                                    eligibility)
 from apex.pulse.premarket import PremarketPath          # noqa: E402
 from apex.pulse.rolling import RollingStore             # noqa: E402
+from apex.pulse.sources import (CatalystIndex,          # noqa: E402
+                                cross_asset_state,
+                                options_state)
 from apex.pulse.universe import (Disposition,           # noqa: E402
                                  load_universe,
                                  universe_version)
@@ -107,6 +110,12 @@ def run_cycle(*, scheduled=None, tier1=TIER_1, persist=True,
     fetch_s = round(time.monotonic() - t0, 3)
     t_capture_end = _now()
 
+    # GLOBAL state read ONCE per cycle: reading it per subject would
+    # be 313 chances to observe a different world inside one packet's
+    # worth of time. Every subject references the same state hash.
+    cat = CatalystIndex(t_start.isoformat())
+    xasset = cross_asset_state(session=session, now=t_start)
+
     disp = Disposition()
     store = RollingStore(journal=JOURNAL if persist else None)
     pm = PremarketPath(journal=PM_JOURNAL if persist else None)
@@ -173,10 +182,23 @@ def run_cycle(*, scheduled=None, tier1=TIER_1, persist=True,
             rec.budget_exceeded("deep_tape",
                                 rank=eligible.index(sym) + 1,
                                 budget=MAX_DEEP_PER_CYCLE)
-        if session in (Session.PREMARKET, Session.CLOSED):
-            rec.unavailable("options",
-                            why="US options do not trade in this "
-                                "session -- EXPECTED_ABSENCE")
+        opts = None
+        if sym in deep_budget:
+            rec.request("options")
+            q = snap.get("latestQuote") or {}
+            spot = ((q["bp"] + q["ap"]) / 2
+                    if q.get("bp") and q.get("ap") else None)
+            opts = options_state(sym, spot=spot, session=session,
+                                 now=_now())
+            st_ = opts.get("status")
+            if st_ == "SESSION_INAPPLICABLE":
+                rec.unavailable("options", why=opts["why"])
+            elif st_ == "PROVIDER_FAILURE":
+                rec.failed("options", why=opts["why"])
+            elif st_ == "DATA_NOT_AVAILABLE":
+                rec.unavailable("options", why=opts["why"])
+            else:
+                rec.succeeded("options", as_of=opts.get("as_of"))
         st = compose(subject=sym, snapshot=snap,
                      scheduled_time=t_sched.isoformat(),
                      capture_start=t_start.isoformat(),
@@ -184,6 +206,8 @@ def run_cycle(*, scheduled=None, tier1=TIER_1, persist=True,
                      complete_time=_now().isoformat(),
                      universe_version=uv, rolling=store,
                      premarket_path=pm, deep=deep,
+                     catalyst=cat.for_subject(sym),
+                     cross_asset=xasset, options=opts,
                      enrichment=rec.record(),
                      tier=TIER_1_DEEP if (sym in tier1 or deep)
                      else TIER_2_BROAD)
@@ -203,6 +227,20 @@ def run_cycle(*, scheduled=None, tier1=TIER_1, persist=True,
                         if k != "symbols"},
                      "universe_version": uv,
                      "disposition": disp.record(symbols)},
+        "catalyst": {"status": cat.status,
+                     "state_hash": cat.state_hash(),
+                     "events_causally_visible":
+                         getattr(cat, "total", 0),
+                     "subjects_with_events":
+                         len(cat.subjects_with_events()),
+                     "newest_known_from": cat.newest},
+        "cross_asset": {"source": xasset.get("source"),
+                        "state_hash": xasset.get("state_hash"),
+                        "as_of": xasset.get("as_of"),
+                        "btc_book_age_s":
+                            xasset.get("btc_book_age_s"),
+                        "btc_status": xasset.get("btc_status",
+                                                 "PRESENT")},
         "enrichment": {
             "eligible": len(eligible),
             "deep_attempted": len(deep_budget),

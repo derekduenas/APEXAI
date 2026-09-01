@@ -300,39 +300,85 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
 
     # ------------------------------- catalyst: FACT vs INTERPRETATION
     if catalyst is not None:
-        st.sources["catalyst"] = "apex.catalyst.context"
-        for k in ("events_known", "latest_event_time",
-                  "latest_event_known_from", "source_class"):
-            if k in catalyst:
-                F[f"catalyst_fact_{k}"] = adopt(
-                    catalyst[k], source="catalyst_official_record",
-                    as_of=catalyst.get("latest_event_time"),
-                    known_from=catalyst.get("latest_event_known_from"))
+        st.sources["catalyst"] = "apex.catalyst.events(fenced)"
+        status = catalyst.get("catalyst_status")
+        # the status itself is a FACT about the query, and it
+        # distinguishes "asked, nothing there" from "never asked"
+        F["catalyst_fact_status"] = adopt(
+            status, source="catalyst_official_record",
+            as_of=catalyst.get("latest_event_known_from"))
+        if not catalyst.get("queried"):
+            F["catalyst_fact_events_known"] = absent(
+                PROVIDER_ERROR, source="catalyst_official_record",
+                note=str(catalyst.get("why", status)))
+        else:
+            for k in ("events_known", "latest_event_id",
+                      "latest_event_time", "latest_event_known_from",
+                      "latest_event_first_seen", "headline",
+                      "source_class", "catalyst_state_hash",
+                      "ledger_events_causally_visible"):
+                if k in catalyst:
+                    F[f"catalyst_fact_{k}"] = adopt(
+                        catalyst[k],
+                        source="catalyst_official_record",
+                        as_of=catalyst.get("latest_event_time"),
+                        known_from=catalyst.get(
+                            "latest_event_known_from"))
         # INTERPRETATION is separately sourced and separately dated,
         # so a misclassification stays visible as a model error
-        for k in ("environment", "directional_support", "event_type",
-                  "importance", "mechanism",
-                  "reaction_disagreements"):
+        # UNATTRIBUTED classification: interpretation with no
+        # recorded interpreter. It may not borrow a model's
+        # credibility, so it gets its own source name.
+        for k in ("classification_event_type",
+                  "classification_importance"):
             if k in catalyst:
                 F[f"catalyst_semantic_{k}"] = adopt(
                     catalyst[k],
-                    source=f"catalyst_llm:"
-                           f"{catalyst.get('model_id', 'UNKNOWN')}",
-                    known_from=catalyst.get("interpretation_known_from"),
-                    note="SEMANTIC INTERPRETATION, not an official "
-                         "fact; a wrong label must remain observable "
-                         "as a model error")
+                    source="catalyst_classifier:UNATTRIBUTED",
+                    known_from=catalyst.get(
+                        "latest_event_known_from"),
+                    note="CLASSIFICATION with no recorded "
+                         "interpreter -- interpretation, not fact, "
+                         "and not attributable to a model")
+        model = catalyst.get("model_id")
+        if model:
+            for k in ("directional_expectation",
+                      "interpretation_contract"):
+                if k in catalyst:
+                    F[f"catalyst_semantic_{k}"] = adopt(
+                        catalyst[k], source=f"catalyst_llm:{model}",
+                        known_from=catalyst.get(
+                            "interpretation_known_from"),
+                        note="ATTRIBUTED SEMANTIC INTERPRETATION, not "
+                             "an official fact; a wrong label must "
+                             "remain observable as a model error")
+        elif catalyst.get("queried") and catalyst.get("events_known"):
+            F["catalyst_semantic_directional_expectation"] = absent(
+                NOT_AVAILABLE, source="catalyst_llm",
+                note="INTERPRETATION_NOT_AVAILABLE: this event has no "
+                     "attributed interpreter")
         if evidence_class == "HISTORICAL_REPLAY" and \
                 not catalyst.get("contemporaneous_interpretation"):
-            F["catalyst_semantic_environment"] = absent(
-                NOT_AVAILABLE, source="catalyst_llm",
-                note="NOT_HISTORICALLY_AVAILABLE: a current model "
-                     "reading an old event is not contemporaneous "
-                     "cognition")
+            # BOTH interpretation layers are suppressed. An
+            # unattributed classification applied today to a
+            # historical event is no more contemporaneous than an
+            # attributed one -- if anything it is worse, because it
+            # cannot even name whose opinion it is.
+            for k in ("catalyst_semantic_event_type",
+                      "catalyst_semantic_classification_event_type",
+                      "catalyst_semantic_classification_importance",
+                      "catalyst_semantic_directional_expectation"):
+                F[k] = absent(
+                    NOT_AVAILABLE, source="catalyst_llm",
+                    note="NOT_HISTORICALLY_AVAILABLE: a current model "
+                         "reading an old event is not contemporaneous "
+                         "cognition")
     else:
-        F["catalyst_fact_events_known"] = absent(
+        F["catalyst_fact_status"] = absent(
             UNKNOWN, source="catalyst_official_record",
-            note="catalyst not consulted for this subject this cycle")
+            note="CATALYST_NOT_QUERIED: this cycle never asked, which "
+                 "is materially different from asking and finding "
+                 "nothing")
 
     # -------------------------------------------------- cross-asset
     if cross_asset is not None:
@@ -351,15 +397,25 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
 
     # ------------------------------------------------ options state
     if options is not None:
-        st.sources["options"] = options.get("source",
-                                            "apex.organism."
-                                            "options_surface")
-        for k, v in options.items():
-            if k in ("source", "as_of", "status"):
-                continue
-            F[f"opt_{k}"] = adopt(v, source=options.get("source",
-                                                        "options"),
-                                  as_of=options.get("as_of"))
+        st.sources["options"] = options.get("source", "options_surface")
+        status = options.get("status")
+        src = options.get("source", "options")
+        if status in ("SESSION_INAPPLICABLE", "DATA_NOT_AVAILABLE",
+                      "PROVIDER_FAILURE", "NOT_ESTIMABLE"):
+            F["opt_state"] = absent(
+                {"SESSION_INAPPLICABLE": SESSION_INAPPLICABLE,
+                 "DATA_NOT_AVAILABLE": NOT_AVAILABLE,
+                 "PROVIDER_FAILURE": PROVIDER_ERROR,
+                 "NOT_ESTIMABLE": NOT_ESTIMABLE}[status],
+                source=src, note=str(options.get("why", status)))
+        else:
+            F["opt_state"] = ok("QUERIED", source=src,
+                                as_of=options.get("as_of"))
+            for k, v in options.items():
+                if k in ("source", "as_of", "status", "why"):
+                    continue
+                F[f"opt_{k}"] = adopt(v, source=src,
+                                      as_of=options.get("as_of"))
     elif session in (Session.PREMARKET, Session.CLOSED):
         F["opt_state"] = absent(
             SESSION_INAPPLICABLE, source="options_surface",

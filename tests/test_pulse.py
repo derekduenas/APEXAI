@@ -403,29 +403,76 @@ def test_an_undeclared_source_gets_the_strictest_rule():
 # ==================== CATALYST FACT vs INTERPRETATION =============
 
 def test_official_fact_and_model_opinion_are_separate_fields():
-    cat = {"events_known": 2, "environment": "EVENT_HEAVY",
+    cat = {"catalyst_status": "EVENTS_PRESENT", "queried": True,
+           "events_known": 2,
            "latest_event_time": "2026-09-01T02:55:00+00:00",
            "latest_event_known_from": "2026-09-01T03:10:00+00:00",
-           "model_id": "haiku-frozen-v1",
+           "classification_event_type": "EARNINGS",
+           "model_id": "LLM_DERIVED_INTERPRETATION",
+           "directional_expectation": "NEGATIVE",
            "interpretation_known_from": "2026-09-01T03:12:00+00:00"}
     p = built(catalyst=cat)
     fact = p["features"]["catalyst_fact_events_known"]
-    sem = p["features"]["catalyst_semantic_environment"]
+    attributed = p["features"][
+        "catalyst_semantic_directional_expectation"]
+    unattributed = p["features"][
+        "catalyst_semantic_classification_event_type"]
     assert fact["src"] == "catalyst_official_record"
-    assert sem["src"].startswith("catalyst_llm:haiku-frozen-v1")
-    assert "not an official fact" in sem["note"]
+    assert attributed["src"] == \
+        "catalyst_llm:LLM_DERIVED_INTERPRETATION"
+    assert "not an official fact" in attributed["note"]
+    # an UNATTRIBUTED classification may not borrow a model's name
+    assert unattributed["src"] == "catalyst_classifier:UNATTRIBUTED"
+    assert "no recorded interpreter" in unattributed["note"]
+
+
+def test_an_event_with_no_interpreter_says_so():
+    cat = {"catalyst_status": "EVENTS_PRESENT", "queried": True,
+           "events_known": 1,
+           "latest_event_known_from": "2026-09-01T03:10:00+00:00",
+           "interpretation_status": "INTERPRETATION_NOT_AVAILABLE"}
+    f = built(catalyst=cat)["features"][
+        "catalyst_semantic_directional_expectation"]
+    assert f["q"] == NOT_AVAILABLE
+    assert "no attributed interpreter" in f["note"]
+
+
+def test_asked_and_found_nothing_differs_from_never_asked():
+    asked = built(catalyst={"catalyst_status": "NO_RELEVANT_EVENT",
+                            "queried": True, "events_known": 0})
+    never = built()
+    assert asked["features"]["catalyst_fact_status"]["v"] == \
+        "NO_RELEVANT_EVENT"
+    assert never["features"]["catalyst_fact_status"]["q"] == UNKNOWN
+    assert "CATALYST_NOT_QUERIED" in \
+        never["features"]["catalyst_fact_status"]["note"]
+
+
+def test_an_unreachable_catalyst_is_a_provider_error():
+    f = built(catalyst={"catalyst_status": "CATALYST_UNAVAILABLE",
+                        "queried": False,
+                        "why": "no ledger"})["features"]
+    assert f["catalyst_fact_events_known"]["q"] == "PROVIDER_ERROR"
 
 
 def test_a_replay_refuses_present_day_cognition_about_an_old_event():
     st = compose(subject="SPY", snapshot=snap(),
                  scheduled_time=REGULAR, capture_start=REGULAR,
                  complete_time=REGULAR, universe_version="uv0",
-                 catalyst={"environment": "EVENT_HEAVY",
+                 catalyst={"catalyst_status": "EVENTS_PRESENT",
+                           "queried": True, "events_known": 1,
+                           "classification_event_type": "EARNINGS",
                            "model_id": "today-model"},
                  evidence_class="HISTORICAL_REPLAY")
-    f = st.seal()["features"]["catalyst_semantic_environment"]
-    assert f["q"] == NOT_AVAILABLE
-    assert "NOT_HISTORICALLY_AVAILABLE" in f["note"]
+    feats = st.seal()["features"]
+    # every interpretation layer, attributed or not, is suppressed
+    for k in ("catalyst_semantic_event_type",
+              "catalyst_semantic_classification_event_type",
+              "catalyst_semantic_directional_expectation"):
+        assert feats[k]["q"] == NOT_AVAILABLE, k
+        assert "NOT_HISTORICALLY_AVAILABLE" in feats[k]["note"]
+    # the FACTUAL record survives -- only cognition is refused
+    assert feats["catalyst_fact_status"]["v"] == "EVENTS_PRESENT"
 
 
 # ==================== PREMARKET PATH ==============================

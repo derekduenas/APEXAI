@@ -87,8 +87,16 @@ class TwinViolation(RuntimeError):
     """Raised when a packet would be sealed in an untruthful shape."""
 
 
+# strings a producer uses to mean "there is no timestamp here"
+_NULL_TS = {"", "NONE", "None", "null", "NULL", "N/A", "NaT",
+            "NOT_ESTIMABLE", "NOT_AVAILABLE", "UNKNOWN"}
+
+
 def _utc(ts) -> str | None:
     if ts is None:
+        return None
+    if isinstance(ts, str) and ts.strip() in _NULL_TS:
+        # an ABSENT timestamp, not a malformed one
         return None
     if isinstance(ts, datetime):
         return (ts if ts.tzinfo else ts.replace(
@@ -97,6 +105,13 @@ def _utc(ts) -> str | None:
 
 
 def _parse(ts) -> datetime:
+    """Parse either grammar this system actually contains.
+
+    PULSE-003: catalyst event_time arrives from news sources in
+    RFC-2822 ("Mon, 31 Aug 2026 13:02:01 GMT") while known_from is
+    ISO-8601. A parser that knows only one grammar crashes on the
+    other -- or silently coerces, which is worse. Anything genuinely
+    unparseable raises with the value named."""
     if isinstance(ts, datetime):
         return ts if ts.tzinfo else ts.replace(tzinfo=timezone.utc)
     s = str(ts).strip()
@@ -108,7 +123,18 @@ def _parse(ts) -> datetime:
     if "." in base:
         head, _, frac = base.partition(".")
         base = f"{head}.{frac[:6].ljust(6, '0')}"
-    return datetime.fromisoformat(base + off)
+    try:
+        return datetime.fromisoformat(base + off)
+    except ValueError:
+        pass
+    try:
+        from email.utils import parsedate_to_datetime
+        d = parsedate_to_datetime(str(ts).strip())
+        return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
+    except Exception:                                   # noqa: BLE001
+        raise TwinViolation(
+            f"unparseable timestamp {ts!r}: PULSE recognises "
+            f"ISO-8601 and RFC-2822 only, and will not guess")
 
 
 @dataclass(frozen=True)
