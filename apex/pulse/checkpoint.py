@@ -82,6 +82,30 @@ class RollingState:
             if not self.observations[s]:
                 del self.observations[s]
 
+    def assert_bounded(self, *, per_minute: int = 1) -> None:
+        """Refuse to hold more than the window can justify.
+
+        prune() trusts a caller-supplied clock. If observations are
+        stamped on a different clock than the prune cutoff, the cutoff
+        never reaches them, nothing is ever evicted, and the ring grows
+        without bound -- silently reproducing PULSE-005 through the
+        back door. That exact mismatch occurred in the off-hours
+        engineering harness, where observations carried wall-clock time
+        while pruning used backdated slots.
+
+        A bound that is only maintained by convention is not a bound.
+        """
+        limit = self.bound(subjects=max(1, len(self.observations)),
+                           per_minute=per_minute)
+        held = self.cardinality()
+        if held > limit:
+            raise UnboundedStateRefused(
+                f"rolling state holds {held} observations but its "
+                f"{self.window_minutes}-minute window over "
+                f"{len(self.observations)} subjects permits at most "
+                f"{limit}. The prune clock and the observation clock "
+                f"have diverged.")
+
     def cardinality(self) -> int:
         return sum(len(v) for v in self.observations.values())
 

@@ -118,7 +118,15 @@ class LiveProviderComposer:
             mid = ((q["bp"] + q["ap"]) / 2
                    if q.get("bp") and q.get("ap") else None)
             if mid:
-                ck.rolling.observe(sym, t_start, price=mid,
+                # Stamp the observation with the CYCLE SLOT, not the
+                # wall clock. run_cycle prunes the window by
+                # scheduled_time; if observations carry a different
+                # clock the cutoff can never reach them and the window
+                # silently stops pruning -- which is exactly the
+                # unbounded-state defect PULSE_V1 exists to prevent.
+                # An observation belongs to its cycle, not to the
+                # instant the code happened to run.
+                ck.rolling.observe(sym, scheduled_time, price=mid,
                                    volume=(snap.get("dailyBar") or {}
                                            ).get("v"))
             opts = None

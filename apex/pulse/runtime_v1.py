@@ -143,6 +143,8 @@ class PulseV1Runtime:
             ck.cycle_number += 1
             ck.session_date = day
             ck.rolling.prune_all(scheduled_time)
+            # the bound is CHECKED, not merely intended
+            ck.rolling.assert_bounded()
             info = write_atomic(self.checkpoint_path, ck,
                                 max_bytes=self.max_checkpoint_bytes)
             ck_bytes = info["bytes"]
