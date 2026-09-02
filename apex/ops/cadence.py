@@ -67,6 +67,20 @@ class Lifecycle:
                 - self.scheduled_time).total_seconds()
 
     @property
+    def clock_anomaly(self) -> bool:
+        """A cycle that finished BEFORE its slot began.
+
+        Negative occupancy is not a very fast cycle -- it means the
+        clock moved, the slot was mislabelled, or the cycle was
+        replayed out of band. Left unguarded it would pass every
+        budget check while looking like the best cycle of the day,
+        which is precisely the kind of flattering metric this module
+        exists to abolish.
+        """
+        occ = self.true_slot_occupancy_s
+        return occ is not None and occ < 0
+
+    @property
     def startup_s(self) -> float | None:
         """The region PULSE_V0's metric could not see."""
         if self.capture_start is None:
