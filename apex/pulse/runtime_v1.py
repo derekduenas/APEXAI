@@ -173,9 +173,14 @@ class PulseV1Runtime:
                 self.cycle_log.stat().st_size == 0:
             return "GENESIS"
         size = self.cycle_log.stat().st_size
+        TAIL = 65536
         with self.cycle_log.open("rb") as fh:
-            fh.seek(max(0, size - 65536))
-            tail = fh.read().decode("utf-8", errors="replace")
+            fh.seek(max(0, size - TAIL))
+            # read(TAIL), never read(): the bound belongs in the call,
+            # not merely in the preceding seek. A bare read() after a
+            # seek is bounded in EFFECT but reads as unbounded, and the
+            # whole-ledger guard is right to refuse to tell them apart.
+            tail = fh.read(TAIL).decode("utf-8", errors="replace")
         for line in reversed([x for x in tail.splitlines() if x.strip()]):
             try:
                 return json.loads(line)["entry_hash"]
