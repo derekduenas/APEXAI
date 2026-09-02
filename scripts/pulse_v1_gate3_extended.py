@@ -27,7 +27,7 @@ from apex.pulse.runtime_v1 import PulseV1Runtime          # noqa: E402
 from pulse_v1_live_composer import (LiveProviderComposer,  # noqa: E402
                                     PREBIRTH_EVIDENCE_CLASS, REGIME)
 
-OUT = Path("/apex-data/core/pulse_v1_prebirth_extended")
+OUT = Path("/apex-data/core/pulse_v1_prebirth_rth")
 CYCLES = int(sys.argv[1]) if len(sys.argv) > 1 else 90
 WINDOW = 60
 OUT.mkdir(parents=True, exist_ok=True)
