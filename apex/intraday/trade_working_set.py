@@ -128,6 +128,30 @@ MAX_OPEN_TRADES_AGGREGATE = 1_000_000       # ~2.1x measured worst aggregate
 MAX_DEDUP_KEYS_PER_SYMBOL = 250_000         # same horizon as open trades
 
 
+# ---------------------------------------------------- ORDERING SEMANTICS
+# The equivalence proof is CONDITIONAL and the condition must be
+# observable, never assumed.
+#
+# build_1m_bars does f.set_index("ts").sort_index(). pandas SKIPS that
+# sort when the index is already monotonic, so tied timestamps keep
+# arrival order -- which is what this implementation reproduces exactly
+# (40 trials / 2,319,500 trades / 40,064 tied-nanosecond pairs,
+# byte-identical). When arrival is NOT event-time monotonic, numpy's
+# unstable introsort actually runs and permutes ties as a function of
+# the WHOLE array, which cannot be reproduced from one bucket.
+#
+# So while arrival stays monotonic the equivalence claim is exact; the
+# moment it does not, the claim becomes conditional and the fabric must
+# SAY SO rather than keep asserting equivalence it no longer has.
+ORDERING_EXACT = "ORDERING_SEMANTICS_EXACT"
+ORDERING_DEGRADED = "FABRIC_ORDERING_SEMANTICS_DEGRADED"
+
+# Not yet proven: no lateness contract has been MEASURED across
+# sessions, so the declared 2-bucket tolerance stays visible as PARTIAL
+# until it is.
+LATE_TRADE_CONTRACT = "PARTIAL"
+
+
 class FabricStateBoundViolation(Exception):
     """A bound that should be unreachable in correct operation was
     reached. This is never routine: it means either the prune path is
@@ -495,6 +519,34 @@ class TradeWorkingSet:
             })
         return pd.DataFrame(rows)
 
+    # ------------------------------------------------ ordering semantics
+    def ordering_semantics(self) -> dict:
+        """Whether the conditions the equivalence proof depends on still
+        hold. This is the tripwire for a claim, not a health verdict:
+        an out-of-order print does not by itself corrupt a bar, it only
+        removes the guarantee that open/close match the old
+        implementation byte-for-byte when two prints share an identical
+        nanosecond timestamp."""
+        with self._lock:
+            ooo = self.counters["out_of_order_within_window"]
+            late = self.counters["late_after_finalize"]
+        degraded = bool(ooo or late)
+        return {
+            "state": ORDERING_DEGRADED if degraded else ORDERING_EXACT,
+            "out_of_order": ooo,
+            "late_after_finalize": late,
+            "ordering_degraded_events": ooo + late,
+            "late_trade_contract": LATE_TRADE_CONTRACT,
+            "equivalence_claim": (
+                "CONDITIONAL -- arrival is no longer event-time "
+                "monotonic, so open/close may differ from the reference "
+                "for prints sharing an identical nanosecond timestamp; "
+                "every other field is unaffected"
+                if degraded else
+                "EXACT -- arrival has been event-time monotonic for "
+                "every observation in this process"),
+        }
+
     # -------------------------------------------------------------- health
     def stats(self) -> dict:
         with self._lock:
@@ -521,6 +573,7 @@ class TradeWorkingSet:
                 "lateness_buckets": self.lateness_buckets,
                 "bound_a_semantic": "open window + %d aggregates"
                                     % self.retained_buckets,
+                "ordering_semantics": self.ordering_semantics(),
                 "bound_b_ceilings": {
                     "open_per_symbol": self.max_open_per_symbol,
                     "open_aggregate": self.max_open_aggregate,

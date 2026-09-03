@@ -46,6 +46,9 @@ def main() -> int:
         print(f"  {tier}: {len(syms)}", flush=True)
     persist_change([], alloc)
 
+    # EODHD-FABRIC-LATENT-001: this raises. The daemon is left
+    # intact deliberately -- deleting it would hide that a
+    # blocked sensor still has an entry point.
     fab = EquityRealtimeFabric(symbols=alloc["symbols"])
     fab.start()
     t_end = time.time() + a.minutes * 60

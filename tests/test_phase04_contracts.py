@@ -122,7 +122,11 @@ def test_eodhd_provider_conforms_to_the_broad_provider_protocol():
         BroadMarketDataProvider, EODHDBroadProvider,
     )
     from apex.intraday.equity_fabric import EquityRealtimeFabric
-    fab = EquityRealtimeFabric(symbols=["SPY", "QQQ"])
+    # EODHD-FABRIC-LATENT-001: inspection only -- the flag
+    # acknowledges the unbounded-retention defect, it does not
+    # repair it, and reactivation remains blocked.
+    fab = EquityRealtimeFabric(symbols=["SPY", "QQQ"],
+                               acknowledge_latent_defect=True)
     provider = EODHDBroadProvider(fab)
     assert isinstance(provider, BroadMarketDataProvider)
     ent = provider.get_entitlement()

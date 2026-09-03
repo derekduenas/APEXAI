@@ -574,3 +574,111 @@ def test_provider_interface_still_reports_known_from_and_latency():
                          "2026-09-02T13:30:00.250Z").timestamp())
     assert prov.get_known_from("SPY") is not None
     assert prov.get_latency("SPY") == 0.25
+
+
+# ===================== EODHD-FABRIC-LATENT-001 (dormant sibling) =====
+
+def test_eodhd_fabric_cannot_be_reactivated_by_accident():
+    """The EODHD sensor carries the SAME unbounded-retention defect and
+    is NOT active. It must not be startable by a scheduler, a script or
+    a future refactor without an explicit decision."""
+    from apex.intraday.equity_fabric import (EODHD_FABRIC_REACTIVATION,
+                                             EquityFabricReactivationBlocked,
+                                             EquityRealtimeFabric)
+    assert EODHD_FABRIC_REACTIVATION == "BLOCKED_PENDING_BOUNDED_STATE_REPAIR"
+    with pytest.raises(EquityFabricReactivationBlocked):
+        EquityRealtimeFabric(symbols=["SPY"])
+    with pytest.raises(EquityFabricReactivationBlocked):
+        EquityRealtimeFabric()                       # even with no symbols
+
+
+def test_eodhd_inspection_is_still_possible_but_explicit():
+    """Blocking reactivation must not make the defect unreadable."""
+    from apex.intraday.equity_fabric import EquityRealtimeFabric
+    fab = EquityRealtimeFabric(symbols=["SPY"], acknowledge_latent_defect=True)
+    assert fab.max_trades == 400_000        # the defect is still there
+    assert "SPY" in fab.trades
+
+
+def test_eodhd_daemon_entrypoint_cannot_start_it():
+    """The daemon is deliberately left in place -- deleting it would
+    hide that a blocked sensor still has an entry point -- so prove the
+    entry point is dead rather than merely unused."""
+    import ast
+    from pathlib import Path
+    src = Path("scripts/equity_fabric_daemon.py").read_text()
+    tree = ast.parse(src)
+    calls = [n for n in ast.walk(tree)
+             if isinstance(n, ast.Call)
+             and getattr(n.func, "id", None) == "EquityRealtimeFabric"]
+    assert calls, "the daemon no longer constructs it; update this test"
+    for c in calls:
+        kw = {k.arg for k in c.keywords}
+        assert "acknowledge_latent_defect" not in kw, (
+            "the daemon acquired the acknowledgement flag -- that would "
+            "silently re-enable a blocked sensor")
+
+
+# =================== ORDERING SEMANTICS ARE OBSERVABLE ===============
+
+def test_ordering_semantics_start_exact_and_degrade_on_first_violation():
+    from apex.intraday.trade_working_set import (LATE_TRADE_CONTRACT,
+                                                 ORDERING_DEGRADED,
+                                                 ORDERING_EXACT)
+    w = TradeWorkingSet(["X"], lateness_buckets=10)
+    o = w.ordering_semantics()
+    assert o["state"] == ORDERING_EXACT
+    assert o["ordering_degraded_events"] == 0
+    assert o["equivalence_claim"].startswith("EXACT")
+    assert o["late_trade_contract"] == LATE_TRADE_CONTRACT == "PARTIAL"
+
+    w.admit("X", event_s=BASE + 30, price=1.0, size=1.0)
+    w.admit("X", event_s=BASE + 10, price=1.0, size=1.0)   # out of order
+    o = w.ordering_semantics()
+    assert o["state"] == ORDERING_DEGRADED
+    assert o["out_of_order"] == 1
+    assert o["equivalence_claim"].startswith("CONDITIONAL")
+
+
+def test_late_after_finalize_also_degrades_the_claim():
+    from apex.intraday.trade_working_set import ORDERING_DEGRADED
+    w = TradeWorkingSet(["X"], lateness_buckets=1)
+    for m in range(6):
+        w.admit("X", event_s=BASE + m * 60 + 10, price=1.0, size=1.0)
+    assert w.admit("X", event_s=BASE + 5, price=1.0, size=1.0) == \
+        "LATE_AFTER_FINALIZE"
+    o = w.ordering_semantics()
+    assert o["state"] == ORDERING_DEGRADED
+    assert o["late_after_finalize"] == 1
+
+
+def test_health_publishes_the_condition_without_faking_a_failure():
+    """The condition must be visible, but a single out-of-order print
+    does not corrupt a bar -- so it must NOT flip the sensor's status
+    and train operators to ignore the signal."""
+    import apex.intraday.alpaca_fabric as af
+    from apex.intraday.trade_working_set import ORDERING_DEGRADED
+    fab = af.AlpacaRealtimeFabric(["SPY"])
+    fab.working.admit("SPY", event_s=BASE + 30, price=1.0, size=1.0)
+    h = fab.health()
+    assert h["health_axes"]["ordering_semantics_exact"] is True
+    assert h["late_trade_contract"] == "PARTIAL"
+    status_before = h["status"]
+
+    fab.working.admit("SPY", event_s=BASE + 10, price=1.0, size=1.0)
+    h = fab.health()
+    assert h["ordering_semantics"]["state"] == ORDERING_DEGRADED
+    assert h["health_axes"]["ordering_semantics_exact"] is False
+    assert h["status"] == status_before, (
+        "an ordering-condition report must not masquerade as a health "
+        "failure")
+
+
+def test_equivalence_claim_is_never_unconditional_in_the_artifact():
+    """Whatever else changes, the artifact must never assert plain
+    'exact equivalence' with no stated condition."""
+    import apex.intraday.alpaca_fabric as af
+    fab = af.AlpacaRealtimeFabric(["SPY"])
+    claim = fab.health()["ordering_semantics"]["equivalence_claim"]
+    assert claim.startswith("EXACT")
+    assert "monotonic" in claim, "the condition is not stated in the claim"

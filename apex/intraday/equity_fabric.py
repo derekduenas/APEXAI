@@ -212,13 +212,75 @@ class _Channel:
                "symbol_count": n, "last_message_age_s": age}
 
 
+# ===================================================================
+# EODHD-FABRIC-LATENT-001  --  REACTIVATION BLOCKED
+#
+# This sensor carries the SAME unbounded-retention defect that
+# OOM-killed apex-equity-fabric three times during the 2026-09-02 RTH
+# session:
+#
+#     self.trades[sym] = deque(maxlen=400_000)   # per symbol
+#     self._seen[sym]  = set()                   # cleared whole at 500k
+#
+# A per-symbol raw-trade ring sized to "a session" cannot be bounded by
+# a count: measured against APEX's own canonical bars, retaining raw
+# trades behind 800 populated buckets is 13,316,101 trades = 8.0 GiB
+# against a 2.44 GiB cap. And `seen.clear()` is bounded only by
+# amnesia -- the instant after it fires the sensor is blind to every
+# duplicate it previously knew.
+#
+# STATUS      KNOWN_DEFECT / NOT_ACTIVE
+# AUTHORITY   NO REACTIVATION
+# EVIDENCE    its health artifact has been stale since 2026-08-26 and
+#             no systemd unit executes equity_fabric_daemon.py
+#
+# REQUIRED BEFORE REACTIVATION
+#   1. bounded working-state primitive
+#      (apex/intraday/trade_working_set.py now exists and is proven)
+#   2. equivalence tests against the untouched reference builder
+#   3. a resource test exceeding the demonstrated failure volume
+#
+# This repair release deliberately does NOT fix this module. The
+# measured failure and the measured repair belong to the SIBLING
+# realtime fabric and form one clean causal chain; cleaning dormant
+# code inside that release would blur it. The guard below exists so
+# the defect cannot come back by accident instead.
+# ===================================================================
+EODHD_FABRIC_STATUS = "KNOWN_DEFECT_NOT_ACTIVE"
+EODHD_FABRIC_REACTIVATION = "BLOCKED_PENDING_BOUNDED_STATE_REPAIR"
+
+
+class EquityFabricReactivationBlocked(RuntimeError):
+    """Raised when something tries to bring the EODHD sensor back up
+    while it still carries the unbounded-retention defect."""
+
+
 class EquityRealtimeFabric:
     """Resident dual-channel WebSocket sensor: trades -> APEX's own 1m
     bars, quotes -> latest bid/ask. Both channels share ONE allocated
-    symbol set, each its own connection, each capped at MAX_SYMBOLS."""
+    symbol set, each its own connection, each capped at MAX_SYMBOLS.
+
+    REACTIVATION IS BLOCKED -- see EODHD-FABRIC-LATENT-001 above.
+    Construction requires an explicit acknowledgement so that a
+    scheduler, a script or a future refactor cannot start it silently.
+    Inspection (tests, static analysis) passes
+    acknowledge_latent_defect=True; that flag documents the defect, it
+    does not repair it."""
 
     def __init__(self, symbols: list | None = None,
-                 max_trades: int = 400_000):
+                 max_trades: int = 400_000, *,
+                 acknowledge_latent_defect: bool = False):
+        if not acknowledge_latent_defect:
+            raise EquityFabricReactivationBlocked(
+                "EODHD-FABRIC-LATENT-001: this sensor still holds "
+                "deque(maxlen=%d) of raw trades per symbol and a dedup "
+                "set bounded only by clear() at 500,000 -- the same "
+                "defect that OOM-killed apex-equity-fabric three times "
+                "on 2026-09-02. Reactivation requires a bounded "
+                "working-state primitive, equivalence tests and a "
+                "resource test, then explicit review. Pass "
+                "acknowledge_latent_defect=True only to INSPECT it."
+                % max_trades)
         self.max_trades = max_trades
         self.trades: dict[str, deque] = {}
         self.quotes: dict[str, dict] = {}
