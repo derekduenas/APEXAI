@@ -621,57 +621,110 @@ def test_eodhd_daemon_entrypoint_cannot_start_it():
 
 # =================== ORDERING SEMANTICS ARE OBSERVABLE ===============
 
-def test_ordering_semantics_start_exact_and_degrade_on_first_violation():
-    from apex.intraday.trade_working_set import (LATE_TRADE_CONTRACT,
-                                                 ORDERING_DEGRADED,
-                                                 ORDERING_EXACT)
-    w = TradeWorkingSet(["X"], lateness_buckets=10)
-    o = w.ordering_semantics()
-    assert o["state"] == ORDERING_EXACT
-    assert o["ordering_degraded_events"] == 0
-    assert o["equivalence_claim"].startswith("EXACT")
-    assert o["late_trade_contract"] == LATE_TRADE_CONTRACT == "PARTIAL"
-
+def test_generic_out_of_order_alone_does_NOT_degrade_semantic_health():
+    """An out-of-order print is usually harmless: the aggregator
+    re-sorts and every field still matches the reference. Tripping the
+    alarm on it would make the alarm meaningless."""
+    from apex.intraday.trade_working_set import SEMANTIC_HEALTH_EXACT
+    w = TradeWorkingSet(["X"], lateness_buckets=1)
     w.admit("X", event_s=BASE + 30, price=1.0, size=1.0)
-    w.admit("X", event_s=BASE + 10, price=1.0, size=1.0)   # out of order
+    w.admit("X", event_s=BASE + 10, price=2.0, size=1.0)   # out of order
+    for m in range(1, 5):
+        w.admit("X", event_s=BASE + m * 60 + 1, price=1.0, size=1.0)
     o = w.ordering_semantics()
-    assert o["state"] == ORDERING_DEGRADED
-    assert o["out_of_order"] == 1
+    assert o["out_of_order"] == 1, "the event itself must still be counted"
+    assert o["ordering_ambiguity_events"] == 0
+    assert o["semantic_health"] == SEMANTIC_HEALTH_EXACT
+    assert o["equivalence_claim"].startswith("EXACT")
+
+
+def test_ns_tie_under_non_monotonic_arrival_degrades_semantic_health():
+    """The real condition: an identical event-time NANOSECOND tie in a
+    bucket closed while that symbol's arrival was non-monotonic."""
+    from apex.intraday.trade_working_set import SEMANTIC_HEALTH_DEGRADED
+    w = TradeWorkingSet(["Y"], lateness_buckets=1)
+    w.admit("Y", event_s=BASE + 30, price=1.0, size=1.0)
+    w.admit("Y", event_s=BASE + 10, price=2.0, size=1.0)   # non-monotonic
+    w.admit("Y", event_s=BASE + 10, price=3.0, size=1.0)   # identical ns
+    for m in range(1, 5):
+        w.admit("Y", event_s=BASE + m * 60 + 1, price=1.0, size=1.0)
+    o = w.ordering_semantics()
+    assert o["semantic_health"] == SEMANTIC_HEALTH_DEGRADED
+    assert o["ordering_ambiguity_events"] == 1
     assert o["equivalence_claim"].startswith("CONDITIONAL")
+    sample = o["affected_buckets_sample"]
+    assert sample and sample[0]["symbol"] == "Y"
+    assert sample[0]["bucket_s"] == BASE
+    assert "Y" in o["symbols_with_non_monotonic_arrival"]
 
 
-def test_late_after_finalize_also_degrades_the_claim():
-    from apex.intraday.trade_working_set import ORDERING_DEGRADED
+def test_ns_tie_under_monotonic_arrival_stays_exact():
+    """Ties alone are fine -- while arrival is monotonic pandas skips
+    its sort and the reference keeps arrival order, which is what this
+    implementation reproduces. 40,064 such ties were byte-identical."""
+    from apex.intraday.trade_working_set import SEMANTIC_HEALTH_EXACT
+    w = TradeWorkingSet(["Z"], lateness_buckets=1)
+    w.admit("Z", event_s=BASE + 10, price=1.0, size=1.0)
+    w.admit("Z", event_s=BASE + 10, price=2.0, size=1.0)   # tie, in order
+    for m in range(1, 5):
+        w.admit("Z", event_s=BASE + m * 60 + 1, price=1.0, size=1.0)
+    o = w.ordering_semantics()
+    assert o["buckets_with_ns_tie"] >= 1, "the tie must still be counted"
+    assert o["ordering_ambiguity_events"] == 0
+    assert o["semantic_health"] == SEMANTIC_HEALTH_EXACT
+
+
+def test_ambiguity_sample_is_bounded():
+    """Diagnostics in a module whose entire purpose is bounded state
+    must themselves be bounded."""
+    from apex.intraday.trade_working_set import AMBIGUITY_SAMPLE_MAX
+    w = TradeWorkingSet(["X"], lateness_buckets=0)
+    for m in range(AMBIGUITY_SAMPLE_MAX * 3):
+        b = BASE + m * 60
+        w.admit("X", event_s=b + 30, price=1.0, size=1.0)
+        w.admit("X", event_s=b + 10, price=2.0, size=1.0)   # non-monotonic
+        w.admit("X", event_s=b + 10, price=3.0, size=1.0)   # tie
+    w.admit("X", event_s=BASE + AMBIGUITY_SAMPLE_MAX * 3 * 60 + 1,
+            price=1.0, size=1.0)
+    o = w.ordering_semantics()
+    assert o["ordering_ambiguity_events"] > AMBIGUITY_SAMPLE_MAX
+    assert len(o["affected_buckets_sample"]) == AMBIGUITY_SAMPLE_MAX
+
+
+def test_late_refusal_weakens_the_claim_but_is_not_ordering_ambiguity():
+    """Two distinct causes; reporting a late refusal as ordering
+    ambiguity would misname the defect."""
+    from apex.intraday.trade_working_set import SEMANTIC_HEALTH_EXACT
     w = TradeWorkingSet(["X"], lateness_buckets=1)
     for m in range(6):
         w.admit("X", event_s=BASE + m * 60 + 10, price=1.0, size=1.0)
     assert w.admit("X", event_s=BASE + 5, price=1.0, size=1.0) == \
         "LATE_AFTER_FINALIZE"
     o = w.ordering_semantics()
-    assert o["state"] == ORDERING_DEGRADED
     assert o["late_after_finalize"] == 1
+    assert o["ordering_ambiguity_events"] == 0
+    assert o["semantic_health"] == SEMANTIC_HEALTH_EXACT   # not ambiguity
+    assert o["equivalence_claim"].startswith("CONDITIONAL")  # but weakened
+    assert "refused as arriving after" in o["equivalence_claim"]
 
 
-def test_health_publishes_the_condition_without_faking_a_failure():
-    """The condition must be visible, but a single out-of-order print
-    does not corrupt a bar -- so it must NOT flip the sensor's status
-    and train operators to ignore the signal."""
+def test_health_degrades_never_fails_on_ordering_ambiguity():
     import apex.intraday.alpaca_fabric as af
-    from apex.intraday.trade_working_set import ORDERING_DEGRADED
+    from apex.intraday.trade_working_set import SEMANTIC_HEALTH_DEGRADED
     fab = af.AlpacaRealtimeFabric(["SPY"])
     fab.working.admit("SPY", event_s=BASE + 30, price=1.0, size=1.0)
+    fab.working.admit("SPY", event_s=BASE + 10, price=2.0, size=1.0)
+    fab.working.admit("SPY", event_s=BASE + 10, price=3.0, size=1.0)
+    for m in range(1, 6):
+        fab.working.admit("SPY", event_s=BASE + m * 60 + 1, price=1.0,
+                          size=1.0)
     h = fab.health()
-    assert h["health_axes"]["ordering_semantics_exact"] is True
-    assert h["late_trade_contract"] == "PARTIAL"
-    status_before = h["status"]
-
-    fab.working.admit("SPY", event_s=BASE + 10, price=1.0, size=1.0)
-    h = fab.health()
-    assert h["ordering_semantics"]["state"] == ORDERING_DEGRADED
+    assert h["semantic_health"] == SEMANTIC_HEALTH_DEGRADED
     assert h["health_axes"]["ordering_semantics_exact"] is False
-    assert h["status"] == status_before, (
-        "an ordering-condition report must not masquerade as a health "
-        "failure")
+    assert h["status"] != "FAILED", (
+        "ordering ambiguity must DEGRADE, never FAIL: the writer is "
+        "still producing and persisting bars correctly")
+    assert h["late_trade_contract"] == "PARTIAL"
 
 
 def test_equivalence_claim_is_never_unconditional_in_the_artifact():
@@ -679,6 +732,7 @@ def test_equivalence_claim_is_never_unconditional_in_the_artifact():
     'exact equivalence' with no stated condition."""
     import apex.intraday.alpaca_fabric as af
     fab = af.AlpacaRealtimeFabric(["SPY"])
-    claim = fab.health()["ordering_semantics"]["equivalence_claim"]
+    claim = fab.health()["equivalence_claim"]
     assert claim.startswith("EXACT")
     assert "monotonic" in claim, "the condition is not stated in the claim"
+    assert "tie" in claim or "nanosecond" in claim

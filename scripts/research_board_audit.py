@@ -1,22 +1,16 @@
-"""RESEARCH-BOARD-STORAGE-001 -- split-brain detector.
+"""RESEARCH BOARD AUDIT -- V2 authority and legacy integrity.
 
 On 2026-09-03 two research boards were found on this host, each a valid
-hash chain from its own GENESIS, with ZERO overlapping record ids:
+chain from its own GENESIS, with zero overlapping record ids. Nothing
+detected it for four days. The cause was a RELATIVE path resolving
+against two different working directories.
 
-    /apex-data/core/edgeforge/     56 records, last written 2026-08-30
-    /opt/apex-repo/results/...    129 records, still being written
+RESEARCH_BOARD_V2 closed that: one absolute canonical board, both
+legacy boards frozen read-only, and a reconciliation record whose
+hashed body COMMITS to both legacy files. This audit proves that
+arrangement still holds. It reads only.
 
-chain_append() is called with the RELATIVE path
-`results/edgeforge/research_board.jsonl`, which resolves against the
-process working directory:
-
-    cwd=/apex-data/runtime  (services)  -> the data volume
-    cwd=/opt/apex-repo      (sessions)  -> the root disk
-
-Nothing detected this for four days. This tool exists so that cannot
-happen again: it enumerates every board on the host and reports whether
-they are one chain or several. It READS ONLY -- reconciling a fork is a
-governance decision, not a script's.
+Exit 0 = healthy. Exit 1 = a finding.
 """
 import hashlib
 import json
@@ -24,8 +18,14 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, "/opt/apex-repo")
+from apex.governance.research_board import (            # noqa: E402
+    CANONICAL_BOARD, LEGACY_BOARDS, RECONCILIATION_RECORD_ID,
+    legacy_commitment, legacy_manifest, verify_chain)
+
 SEARCH_ROOTS = ("/apex-data", "/opt/apex-repo", "/opt/apex", "/mnt")
-NAME = "research_board.jsonl"
+findings = []
+ok = []
 
 
 def find_boards():
@@ -34,15 +34,14 @@ def find_boards():
         if not Path(root).exists():
             continue
         r = subprocess.run(
-            ["find", root, "-name", NAME, "-not", "-path", "*/.git/*",
-             "-not", "-path", "*/pytest-of-*/*"],
+            ["find", root, "-name", "research_board*.jsonl", "-not",
+             "-path", "*/.git/*", "-not", "-path", "*/pytest-of-*/*"],
             capture_output=True, text=True)
         out.extend(x for x in r.stdout.split("\n") if x.strip())
-    # De-duplicate by FILE IDENTITY (st_dev, st_ino), not by path.
-    # /apex-data/core and /mnt/volume_... are the same filesystem seen
-    # through two mount points; Path.resolve() collapses symlinks but
-    # NOT mount aliases, so resolving alone reports one board twice and
-    # would raise a false fork.
+    # De-duplicate by FILE IDENTITY, not path: /apex-data/core and
+    # /mnt/volume_... are the same filesystem through two mount points,
+    # and resolve() collapses symlinks but NOT mount aliases -- dedup by
+    # path alone reported one board twice and raised a FALSE fork.
     seen, uniq = {}, []
     for p in sorted(out):
         try:
@@ -57,92 +56,105 @@ def find_boards():
     return uniq
 
 
-def chain_report(p: Path) -> dict:
-    lines = [ln for ln in p.read_text().split("\n") if ln.strip()]
-    prev, broken_at = "GENESIS", None
-    ids = []
-    for i, ln in enumerate(lines):
-        try:
-            r = json.loads(ln)
-        except json.JSONDecodeError:
-            broken_at = i + 1
-            break
-        body = dict(r)
-        h = body.pop("entry_hash", None)
-        calc = hashlib.sha256(
-            json.dumps(body, sort_keys=True).encode()).hexdigest()
-        if calc != h or r.get("prev_hash") != prev:
-            broken_at = i + 1
-            break
-        prev = h
-        if r.get("id"):
-            ids.append(r["id"])
-    return {"path": str(p), "records": len(lines), "head": prev,
-            "intact": broken_at is None, "broken_at": broken_at,
-            "ids": set(ids),
-            "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
+bar = "=" * 76
+print(bar)
+print("RESEARCH BOARD AUDIT")
+print(bar)
 
+# --- 1. canonical V2 exists and verifies -----------------------------
+if not CANONICAL_BOARD.exists():
+    findings.append("canonical V2 board absent: %s" % CANONICAL_BOARD)
+else:
+    v = verify_chain(CANONICAL_BOARD)
+    if not v["intact"]:
+        findings.append("V2 chain BROKEN at record %s (%s)"
+                        % (v["broken_at"], v.get("reason")))
+    else:
+        ok.append("V2 chain intact, %d records, head %s"
+                  % (v["records"], v["head"][:16]))
+    recs = [json.loads(x) for x in
+            CANONICAL_BOARD.read_text().split("\n") if x.strip()]
+    if not recs or recs[0].get("id") != RECONCILIATION_RECORD_ID:
+        findings.append("V2 record 1 is not %s" % RECONCILIATION_RECORD_ID)
+    else:
+        ok.append("V2 opens with %s" % RECONCILIATION_RECORD_ID)
 
-def main() -> int:
-    boards = find_boards()
-    print("=" * 76)
-    print("RESEARCH BOARD AUDIT -- %d board(s) found" % len(boards))
-    print("=" * 76)
-    reps = []
-    for b in boards:
-        r = chain_report(b)
-        reps.append(r)
-        print("  %s" % r["path"])
-        print("     records %-5d chain %s   head %s"
-              % (r["records"], "INTACT" if r["intact"]
-                 else "BROKEN@%s" % r["broken_at"], r["head"][:16]))
-        print("     sha256  %s" % r["sha256"][:48])
-    print()
-    if len(reps) <= 1:
-        print("  SINGLE BOARD -- no split brain.")
-        return 0
-
-    print("=" * 76)
-    print("RELATIONSHIP")
-    print("=" * 76)
-    heads = {r["head"] for r in reps}
-    if len(heads) == 1:
-        print("  identical heads -- same chain, same state.")
-        return 0
-    # is any board a strict prefix of another?
-    prefix_found = False
-    for a in reps:
-        for b in reps:
-            if a is b or a["records"] >= b["records"]:
+        # --- 2. legacy boards match what V2 COMMITTED to -------------
+        committed = recs[0].get("legacy_commitments") or {}
+        for ident, path in LEGACY_BOARDS.items():
+            if not path.exists():
+                findings.append("legacy board MISSING: %s (%s)"
+                                % (ident, path))
                 continue
-            la = [ln for ln in Path(a["path"]).read_text().split("\n")
-                  if ln.strip()]
-            lb = [ln for ln in Path(b["path"]).read_text().split("\n")
-                  if ln.strip()]
-            if la == lb[:len(la)]:
-                prefix_found = True
-                print("  PREFIX: %s is records 1..%d of %s"
-                      % (a["path"], len(la), b["path"]))
-                print("     -> continuation, safely appendable "
-                      "(%d records behind)" % (len(lb) - len(la)))
-    if not prefix_found:
-        print("  RESEARCH_BOARD_FORK = TRUE")
-        print("  No board is a byte-prefix of another. These are")
-        print("  INDEPENDENT chains, not one chain with a longer branch.")
-        for i, a in enumerate(reps):
-            for b in reps[i + 1:]:
-                shared = a["ids"] & b["ids"]
-                print("     %s" % a["path"])
-                print("       <-> %s" % b["path"])
-                print("       shared record ids: %d" % len(shared))
-        print()
-        print("  DO NOT MERGE. Reconciliation is a governance decision:")
-        print("  appending one to the other would either rewrite")
-        print("  prev_hash (rewriting history) or append records whose")
-        print("  prev_hash does not link (breaking the chain).")
-        return 1
-    return 0
+            now = legacy_commitment(legacy_manifest(ident, path))
+            was = committed.get(ident)
+            if was is None:
+                findings.append("V2 made no commitment for %s" % ident)
+            elif now != was:
+                findings.append(
+                    "LEGACY BOARD ALTERED SINCE RECONCILIATION: %s\n"
+                    "        committed %s\n        now       %s"
+                    % (ident, was[:32], now[:32]))
+            else:
+                ok.append("%s unchanged since reconciliation" % ident)
 
+# --- 3. legacy boards are read-only ----------------------------------
+for ident, path in LEGACY_BOARDS.items():
+    if not path.exists():
+        continue
+    mode = path.stat().st_mode & 0o222
+    if mode:
+        findings.append("legacy board is WRITABLE (mode %o): %s"
+                        % (path.stat().st_mode & 0o777, ident))
+    else:
+        ok.append("%s frozen read-only" % ident)
 
-if __name__ == "__main__":
-    sys.exit(main())
+# --- 4. exactly one writable authority -------------------------------
+boards = find_boards()
+writable = [p for p in boards if p.stat().st_mode & 0o222]
+print("  boards on host: %d" % len(boards))
+for p in boards:
+    v = verify_chain(p)
+    w = "WRITABLE" if p.stat().st_mode & 0o222 else "read-only"
+    print("     %-58s %-9s %3d rec  %s"
+          % (str(p)[-58:], w, v["records"],
+             "INTACT" if v["intact"] else "BROKEN@%s" % v["broken_at"]))
+if len(writable) == 0:
+    findings.append("no writable board authority exists")
+elif len(writable) > 1:
+    findings.append("MULTIPLE WRITABLE BOARD AUTHORITIES (%d): %s"
+                    % (len(writable), [str(x) for x in writable]))
+elif writable[0] != CANONICAL_BOARD:
+    findings.append("the writable authority is not the canonical board: %s"
+                    % writable[0])
+else:
+    ok.append("exactly one writable authority, and it is canonical")
+
+# --- 5. no authoritative writer may pick its board from cwd ----------
+if not CANONICAL_BOARD.is_absolute():
+    findings.append("CANONICAL_BOARD is not absolute")
+else:
+    ok.append("CANONICAL_BOARD is absolute")
+
+rel = subprocess.run(
+    ["grep", "-rn", "--include=*.py", "-e",
+     r"chain_append(\s*[\"']results/", "/opt/apex-repo/apex",
+     "/opt/apex-repo/scripts"], capture_output=True, text=True)
+hits = [x for x in rel.stdout.split("\n") if x.strip()]
+if hits:
+    findings.append("relative-path board writers still present:\n        "
+                    + "\n        ".join(hits[:8]))
+else:
+    ok.append("no authoritative writer selects a board by relative path")
+
+print()
+print(bar)
+for x in ok:
+    print("  ok       %s" % x)
+for x in findings:
+    print("  FINDING  %s" % x)
+print(bar)
+print("  %s" % ("PASS -- one canonical authority, legacy intact"
+                if not findings else
+                "FAIL -- %d finding(s)" % len(findings)))
+sys.exit(1 if findings else 0)

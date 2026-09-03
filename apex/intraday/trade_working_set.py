@@ -143,8 +143,30 @@ MAX_DEDUP_KEYS_PER_SYMBOL = 250_000         # same horizon as open trades
 # So while arrival stays monotonic the equivalence claim is exact; the
 # moment it does not, the claim becomes conditional and the fabric must
 # SAY SO rather than keep asserting equivalence it no longer has.
-ORDERING_EXACT = "ORDERING_SEMANTICS_EXACT"
-ORDERING_DEGRADED = "FABRIC_ORDERING_SEMANTICS_DEGRADED"
+# SEMANTIC health is NOT operational health. The writer can be doing its
+# job perfectly while the strength of the equivalence CLAIM has weakened.
+SEMANTIC_HEALTH_EXACT = "EXACT"
+SEMANTIC_HEALTH_DEGRADED = "DEGRADED_ORDERING_AMBIGUITY"
+
+# The ambiguity is NOT "an out-of-order trade arrived". Out-of-order
+# arrival on its own changes nothing: the aggregator re-sorts, and every
+# field still matches the reference. The equivalence claim only weakens
+# where BOTH of these hold for the same bucket:
+#
+#   1. two prints share an IDENTICAL event-time nanosecond, and
+#   2. that symbol's arrival was non-monotonic, so pandas actually ran
+#      its (unstable) sort instead of skipping it
+#
+# Only then can the reference's open/close among the tied prints differ
+# from arrival order. Counting every out-of-order event instead would
+# raise the alarm constantly on a condition that is usually harmless,
+# and an alarm that cries wolf is worse than no alarm.
+ORDERING_EXACT = SEMANTIC_HEALTH_EXACT
+ORDERING_DEGRADED = SEMANTIC_HEALTH_DEGRADED
+
+# how many affected (symbol, bucket) pairs to retain for diagnosis --
+# BOUNDED, because this module exists to stop unbounded state
+AMBIGUITY_SAMPLE_MAX = 64
 
 # Not yet proven: no lateness contract has been MEASURED across
 # sessions, so the declared 2-bucket tolerance stays visible as PARTIAL
@@ -189,11 +211,15 @@ def aggregate_bucket(bucket_s: int, trades: list) -> dict:
     # does .diff().dt.total_seconds().max(); max(d)/1e9 == max(d/1e9)
     # because the division is monotone, so this is the same number.
     max_intra_ns = 0
+    has_ns_tie = False
     for a, b in zip(ordered, ordered[1:]):
         d = b[0] - a[0]
+        if d == 0:
+            has_ns_tie = True          # identical event-time nanosecond
         if d > max_intra_ns:
             max_intra_ns = d
     return {
+        "has_ns_tie": has_ns_tie,
         "bucket_s": bucket_s,
         "open": prices[0], "high": hi, "low": lo, "close": prices[-1],
         "volume": sum(t[2] for t in ordered), "trades": len(ordered),
@@ -257,9 +283,48 @@ def _coverage(agg: dict, outages) -> tuple:
     return cov, gap_ms
 
 
+def _claim(ambiguity: int, late: int) -> str:
+    """The equivalence claim weakens for TWO distinct reasons, and they
+    are not the same defect:
+
+      ordering ambiguity  a closed bucket held an identical-nanosecond
+                          tie while that symbol's arrival was
+                          non-monotonic -- open/close for THOSE buckets
+                          may differ from the reference
+
+      late refusal        a trade arrived after its minute was
+                          finalized and was refused. The reference
+                          would have folded it in by rebuilding from
+                          the whole tape. That is a genuine output
+                          difference, so it weakens the claim too --
+                          even though it is not ordering ambiguity and
+                          must not be reported as such.
+    """
+    if not ambiguity and not late:
+        return ("EXACT -- no bucket has closed with both an "
+                "identical-nanosecond tie and non-monotonic arrival, "
+                "and no trade has been refused as late; those are the "
+                "only two things that can weaken it")
+    parts = []
+    if ambiguity:
+        parts.append(
+            "%d bucket(s) closed containing prints sharing an identical "
+            "event-time nanosecond while that symbol's arrival was "
+            "non-monotonic, so the reference's open/close for those "
+            "buckets is an artifact of an unstable whole-array sort and "
+            "may differ" % ambiguity)
+    if late:
+        parts.append(
+            "%d trade(s) were refused as arriving after their minute "
+            "was finalized, which the reference would have folded in"
+            % late)
+    return "CONDITIONAL -- " + "; ".join(parts) + \
+        ". No other field and no other bucket is affected."
+
+
 class SymbolState:
     __slots__ = ("open", "finalized", "watermark", "dedup_set",
-                 "dedup_order", "seq")
+                 "dedup_order", "seq", "arrival_monotonic")
 
     def __init__(self):
         self.open: dict = {}            # bucket_s -> _Bucket
@@ -268,6 +333,11 @@ class SymbolState:
         self.dedup_set: set = set()
         self.dedup_order: deque = deque()   # (bucket_s, key), FIFO by bucket
         self.seq = 0
+        # True while every arrival for this symbol has been >= the
+        # previous one in event time. While this holds, pandas SKIPS
+        # sort_index() in the reference and ties keep arrival order --
+        # which is exactly what this implementation reproduces.
+        self.arrival_monotonic = True
 
 
 class TradeWorkingSet:
@@ -291,6 +361,7 @@ class TradeWorkingSet:
         self.max_open_aggregate = max_open_aggregate
         self.max_dedup_per_symbol = max_dedup_per_symbol
         self._st: dict = {s: SymbolState() for s in self.symbols}
+        self._ambiguous: deque = deque(maxlen=AMBIGUITY_SAMPLE_MAX)
         self._lock = threading.RLock()
         self.counters = {
             "admitted": 0, "duplicates": 0, "late_after_finalize": 0,
@@ -298,6 +369,7 @@ class TradeWorkingSet:
             "unknown_symbol": 0, "buckets_finalized": 0,
             "buckets_evicted": 0, "dedup_keys_evicted": 0,
             "bound_violations": 0, "forced_finalize": 0,
+            "ordering_ambiguity_events": 0, "buckets_with_ns_tie": 0,
             "max_arrival_lag_s": 0.0,
         }
 
@@ -347,6 +419,7 @@ class TradeWorkingSet:
                 b = st.open[bucket] = _Bucket(bucket)
             if b.trades and ns < b.trades[-1][0]:
                 self.counters["out_of_order_within_window"] += 1
+                st.arrival_monotonic = False
             st.seq += 1
             # price/size are stored AS GIVEN. The reference builds a
             # DataFrame straight from the caller's values, so coercing
@@ -361,22 +434,36 @@ class TradeWorkingSet:
                 if lag > self.counters["max_arrival_lag_s"]:
                     self.counters["max_arrival_lag_s"] = lag
 
-            self._finalize_ready(st)
+            self._finalize_ready(st, sym)
             self._expire_dedup(st)
             self._enforce_bound_b(sym, st)
             return "ACCEPTED"
 
     # ------------------------------------------------------- BOUND A work
-    def _finalize_ready(self, st: SymbolState) -> None:
-        """Close every open bucket the watermark has moved past."""
+    def _finalize_ready(self, st: SymbolState, sym: str = "?") -> None:
+        """Close every open bucket the watermark has moved past.
+
+        Finalization is where ordering ambiguity is judged, because a
+        bucket is finalized exactly once -- judging it in bars(), which
+        re-aggregates open buckets on every call, would count the same
+        bucket repeatedly."""
         if st.watermark is None:
             return
         horizon = st.watermark - self.lateness_buckets * BUCKET_S
         ready = [k for k in st.open if k < horizon]
         for k in ready:
             b = st.open.pop(k)
-            st.finalized[k] = aggregate_bucket(k, b.trades)
+            agg = aggregate_bucket(k, b.trades)
+            st.finalized[k] = agg
             self.counters["buckets_finalized"] += 1
+            if agg.get("has_ns_tie"):
+                self.counters["buckets_with_ns_tie"] += 1
+                if not st.arrival_monotonic:
+                    # BOTH conditions: a tie AND a sort that actually ran
+                    self.counters["ordering_ambiguity_events"] += 1
+                    self._ambiguous.append(
+                        {"symbol": sym, "bucket_s": k,
+                         "trades": agg["trades"]})
         if len(st.finalized) > self.retained_buckets:
             drop = sorted(st.finalized)[:len(st.finalized)
                                         - self.retained_buckets]
@@ -418,7 +505,7 @@ class TradeWorkingSet:
                 st.dedup_set.discard(k)
                 self.counters["dedup_keys_evicted"] += 1
 
-    def _force_finalize_oldest(self, st: SymbolState) -> None:
+    def _force_finalize_oldest(self, st: SymbolState) -> None:   # noqa: D401
         if not st.open:
             return
         k = min(st.open)
@@ -530,21 +617,26 @@ class TradeWorkingSet:
         with self._lock:
             ooo = self.counters["out_of_order_within_window"]
             late = self.counters["late_after_finalize"]
-        degraded = bool(ooo or late)
+            amb = self.counters["ordering_ambiguity_events"]
+            ties = self.counters["buckets_with_ns_tie"]
+            sample = list(self._ambiguous)
+            non_mono = sorted(s for s, st in self._st.items()
+                              if not st.arrival_monotonic)
+        degraded = amb > 0
         return {
-            "state": ORDERING_DEGRADED if degraded else ORDERING_EXACT,
+            "semantic_health": (SEMANTIC_HEALTH_DEGRADED if degraded
+                                else SEMANTIC_HEALTH_EXACT),
+            "state": (SEMANTIC_HEALTH_DEGRADED if degraded
+                      else SEMANTIC_HEALTH_EXACT),
+            "ordering_ambiguity_events": amb,
+            "affected_buckets_sample": sample,
+            "buckets_with_ns_tie": ties,
+            "symbols_with_non_monotonic_arrival": non_mono,
+            # kept as context, deliberately NOT the trigger
             "out_of_order": ooo,
             "late_after_finalize": late,
-            "ordering_degraded_events": ooo + late,
             "late_trade_contract": LATE_TRADE_CONTRACT,
-            "equivalence_claim": (
-                "CONDITIONAL -- arrival is no longer event-time "
-                "monotonic, so open/close may differ from the reference "
-                "for prints sharing an identical nanosecond timestamp; "
-                "every other field is unaffected"
-                if degraded else
-                "EXACT -- arrival has been event-time monotonic for "
-                "every observation in this process"),
+            "equivalence_claim": _claim(amb, late),
         }
 
     # -------------------------------------------------------------- health

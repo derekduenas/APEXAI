@@ -144,8 +144,8 @@ WORKER_JOIN_TIMEOUT_S = 5.0
 
 
 from apex.intraday.trade_working_set import (   # noqa: E402
-    LATE_TRADE_CONTRACT, ORDERING_EXACT, FabricStateBoundViolation,
-    TradeWorkingSet)
+    LATE_TRADE_CONTRACT, SEMANTIC_HEALTH_EXACT,
+    FabricStateBoundViolation, TradeWorkingSet)
 
 
 class AlpacaFabricViolation(RuntimeError):
@@ -924,17 +924,24 @@ class AlpacaRealtimeFabric:
             # visible in the artifact an operator reads, not only in an
             # exception nobody catches.
             "state_bound_ok": state_bound_ok,
-            # The equivalence claim's own precondition. NOTE: this
-            # deliberately does NOT degrade `status`. An out-of-order
-            # print does not corrupt a bar -- it only narrows what may
-            # be claimed about open/close on identical-nanosecond ties.
-            # Failing the sensor on one such print would be a false
-            # alarm and would train operators to ignore the signal; the
-            # honest move is to publish the condition, loudly, and let
-            # the claim change rather than the health verdict.
-            "ordering_semantics_exact": ordering["state"] == ORDERING_EXACT}
+            # SEMANTIC health, distinct from operational health. It
+            # trips only on the condition that can actually weaken the
+            # equivalence claim -- an identical-nanosecond tie in a
+            # bucket closed under non-monotonic arrival -- NOT on every
+            # out-of-order print, which is usually harmless and would
+            # make this cry wolf. When it trips the writer is still
+            # doing its job, so the verdict is DEGRADED, never FAILED.
+            "ordering_semantics_exact": (
+                ordering["semantic_health"] == SEMANTIC_HEALTH_EXACT)}
 
         if not state_bound_ok and status in (HEALTHY, PARTIAL):
+            status = DEGRADED
+        # Ordering ambiguity degrades, it never fails: the bars are
+        # still being produced and persisted correctly: what changed is
+        # how strong a claim may be made about open/close in the
+        # affected buckets.
+        if (ordering["semantic_health"] != SEMANTIC_HEALTH_EXACT
+                and status in (HEALTHY, PARTIAL)):
             status = DEGRADED
 
         return {"kind": "alpaca_fabric_health", "status": status,
@@ -942,6 +949,8 @@ class AlpacaRealtimeFabric:
                "working_state": self.working.stats(),
                "state_bound_error": state_bound_error,
                "ordering_semantics": ordering,
+               "semantic_health": ordering["semantic_health"],
+               "equivalence_claim": ordering["equivalence_claim"],
                "late_trade_contract": LATE_TRADE_CONTRACT,
                "transport": TRANSPORT, "authorized": authorized,
                "subscribed": subscribed,
