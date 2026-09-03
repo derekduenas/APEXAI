@@ -143,6 +143,10 @@ QUIET_RETRY_SLEEP_S = 60.0
 WORKER_JOIN_TIMEOUT_S = 5.0
 
 
+from apex.intraday.trade_working_set import (   # noqa: E402
+    FabricStateBoundViolation, TradeWorkingSet)
+
+
 class AlpacaFabricViolation(RuntimeError):
     pass
 
@@ -162,18 +166,46 @@ def _credentials() -> tuple:
     return key, secret
 
 
+# A SESSION, not a rolling 400 minutes. On 2026-08-19 the 400-bar window
+# silently erased 09:30-11:39 from SPY/QQQ *during* the session. 800
+# covers premarket 08:14 ET through post-close 19:14 ET (660 min) with
+# margin. Defined at module scope because TRADE_WORKING_SET_V1 takes it
+# as its retention contract -- the two may not drift apart.
+SESSION_BAR_WINDOW_MIN = 800
+
+
 class AlpacaRealtimeFabric:
     """ONE connection, unlimited symbols (measured plan behavior per
     Alpaca's own published entitlement table -- not yet independently
     re-measured by APEX, see the module docstring)."""
 
-    def __init__(self, symbols: list, url: str = WS_URL,
-                max_trades: int = 2_000_000):
+    def __init__(self, symbols: list, url: str = WS_URL):
         self.symbols = [s.upper().replace(".US", "") for s in symbols]
         self.url = url
-        self.trades: dict = {s: deque(maxlen=max_trades) for s in self.symbols}
+        # TRADE_WORKING_SET_V1 (2026-09-03). This replaced
+        #   self.trades = {s: deque(maxlen=2_000_000) ...}
+        #   self._seen  = {s: set() ...}          # cleared wholesale at 500k
+        # which OOM-killed this service three times inside the 2026-09-02
+        # RTH session. Neither was a bound the machine could survive: 60
+        # symbols x 2,000,000 slots is ~77 GiB on an 8 GB host, and a
+        # dedup set bounded by clear() is bounded only by amnesia.
+        #
+        # The retention contract now comes from the consumer instead of a
+        # number: bars_1m() asks for SESSION_BAR_WINDOW_MIN populated
+        # buckets, so the working set keeps those AGGREGATES plus raw
+        # trades only for minutes that can still legitimately change.
+        # See apex/intraday/trade_working_set.py for why the alternative
+        # -- a raw-trade window sized to the same job -- is structurally
+        # impossible at 8.0 GiB.
+        self.working = TradeWorkingSet(
+            self.symbols, retained_buckets=SESSION_BAR_WINDOW_MIN)
+        self._sym_set: set = set(self.symbols)
+        # provider_interface reads the LAST trade's arrival time to
+        # report known_from/latency. That is one record per symbol, not
+        # a history, so it is held explicitly rather than by keeping the
+        # whole tape alive.
+        self._last_trade: dict = {}
         self.quotes: dict = {}
-        self._seen: dict = {s: set() for s in self.symbols}
         self._lock = threading.RLock()
         self._ws = None
         self._thread = None
@@ -516,7 +548,7 @@ class AlpacaRealtimeFabric:
         with self._lock:
             self.last_msg_at = now
         sym = str(d.get("S", "")).upper()
-        if sym not in self.trades:
+        if sym not in self._sym_set:
             with self._lock:
                 self.counters["unknown_symbol"] += 1
             return
@@ -531,22 +563,34 @@ class AlpacaRealtimeFabric:
             with self._lock:
                 self.counters["future_rejected"] += 1
             return
+        # dedup identity is UNCHANGED -- the provider's own timestamp,
+        # price, size and trade id. What changed is its lifetime: keys
+        # now expire with the window in which a duplicate could still be
+        # folded in, instead of being dropped en masse at 500,000.
         key = (d.get("t"), price, size, str(d.get("i")))
         with self._lock:
             self.counters["trades"] += 1
             self._symbols_with_trades.add(sym)
-            seen = self._seen[sym]
-            if key in seen:
+            before_ooo = self.working.counters["out_of_order_within_window"]
+            outcome = self.working.admit(
+                sym, event_s=event_s, price=price, size=size,
+                conditions=d.get("c"), key=key, arrival_s=now)
+            if self.working.counters["out_of_order_within_window"] > before_ooo:
+                self.counters["out_of_order"] += 1
+            if outcome == "DUPLICATE":
                 self.counters["duplicates"] += 1
                 return
-            seen.add(key)
-            if len(seen) > 500_000:
-                seen.clear()
-            dq = self.trades[sym]
-            if dq and event_s < dq[-1]["event_s"]:
-                self.counters["out_of_order"] += 1
-            dq.append({"event_s": event_s, "price": price, "size": size,
-                       "known_from_s": now, "conditions": d.get("c")})
+            if outcome == "LATE_AFTER_FINALIZE":
+                # DECLARED LIMIT of the lateness contract: the minute
+                # this belongs to can no longer change. The old fabric
+                # would have folded it in hours later by rebuilding from
+                # the whole tape; that is the behaviour that could not
+                # be bounded. Counted, never silent.
+                self.counters["late_after_finalize"] += 1
+                return
+            if outcome != "ACCEPTED":
+                return
+            self._last_trade[sym] = {"event_s": event_s, "known_from_s": now}
 
     def _apply_quote(self, d: dict, now: float) -> None:
         with self._lock:
@@ -751,19 +795,33 @@ class AlpacaRealtimeFabric:
     # premarket 08:14 ET through post-close 19:14 ET (660 min) with
     # margin. The in-memory ring is WORKING STORAGE ONLY; the durable
     # record is the accumulating session file written by persist_bars().
-    SESSION_BAR_WINDOW_MIN = 800
+    SESSION_BAR_WINDOW_MIN = SESSION_BAR_WINDOW_MIN
 
     def bars_1m(self, symbol: str, minutes: int = SESSION_BAR_WINDOW_MIN):
         import pandas as pd
-        from apex.intraday.bar_builder import build_1m_bars
         sym = symbol.upper().replace(".US", "")
         with self._lock:
-            tr = list(self.trades.get(sym, ()))
             outages = list(self._outages)
             if self._disconnected_at is not None:
                 outages = outages + [(self._disconnected_at, time.time())]
-        return build_1m_bars(tr, outages, now=pd.Timestamp.now(tz="UTC"),
-                             symbol=sym, transport=TRANSPORT, minutes=minutes)
+        # Same bars, same schema, same coverage semantics as
+        # build_1m_bars -- proven byte-identical against it over 400
+        # randomised replays; see tests/test_trade_working_set.py.
+        return self.working.bars(sym, outages, now=pd.Timestamp.now(tz="UTC"),
+                                 transport=TRANSPORT, minutes=minutes)
+
+    def latest_trade(self, symbol: str) -> dict | None:
+        """The most recent trade's event and arrival time. This is what
+        provider_interface needs for known_from/latency -- one record
+        per symbol, which is why it does not require the tape."""
+        sym = symbol.upper().replace(".US", "")
+        with self._lock:
+            t = self._last_trade.get(sym)
+        return dict(t) if t else None
+
+    def state_stats(self) -> dict:
+        """Bounded-state telemetry (BOUND C). Operational metrics only."""
+        return self.working.stats()
 
     def latest_quote(self, symbol: str) -> dict | None:
         sym = symbol.upper().replace(".US", "")
@@ -841,6 +899,14 @@ class AlpacaRealtimeFabric:
         else:
             status = PARTIAL
 
+        try:
+            self.working.assert_bounded()
+            state_bound_ok = True
+            state_bound_error = None
+        except FabricStateBoundViolation as e:
+            state_bound_ok = False
+            state_bound_error = str(e)
+
         health_axes = {
             "process_alive": True,
             "input_progress": last is not None,
@@ -851,10 +917,19 @@ class AlpacaRealtimeFabric:
             "queue_pressure_ok": self.queue_depth_max < INGEST_QUEUE_MAX
             // 10,
             "worker_pressure_ok": self.worker_lag_s_max < 30.0,
-            "coverage_fraction": reachable_frac}
+            "coverage_fraction": reachable_frac,
+            # BOUND C surfaced EXTERNALLY. A broken prune clock has to be
+            # visible in the artifact an operator reads, not only in an
+            # exception nobody catches.
+            "state_bound_ok": state_bound_ok}
+
+        if not state_bound_ok and status in (HEALTHY, PARTIAL):
+            status = DEGRADED
 
         return {"kind": "alpaca_fabric_health", "status": status,
                "health_axes": health_axes,
+               "working_state": self.working.stats(),
+               "state_bound_error": state_bound_error,
                "transport": TRANSPORT, "authorized": authorized,
                "subscribed": subscribed,
                "symbols": list(self.symbols), "symbol_count": len(self.symbols),

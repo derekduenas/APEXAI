@@ -225,20 +225,20 @@ class AlpacaBroadProvider:
         return str(bars["event_time_utc"].iloc[-1])
 
     def get_known_from(self, symbol: str) -> str | None:
+        # TRADE_WORKING_SET_V1: the fabric no longer keeps the whole tape
+        # alive, so ask it for the one record this needs. Same value as
+        # trades[sym][-1]["known_from_s"] used to give.
         import pandas as pd
-        with self._fabric._lock:
-            tr = self._fabric.trades.get(symbol.upper().replace(".US", ""))
-        if not tr:
+        t = self._fabric.latest_trade(symbol)
+        if not t:
             return None
-        return str(pd.Timestamp(tr[-1]["known_from_s"], unit="s", tz="UTC"))
+        return str(pd.Timestamp(t["known_from_s"], unit="s", tz="UTC"))
 
     def get_latency(self, symbol: str) -> float | None:
-        with self._fabric._lock:
-            tr = self._fabric.trades.get(symbol.upper().replace(".US", ""))
-        if not tr:
+        t = self._fabric.latest_trade(symbol)
+        if not t:
             return None
-        last = tr[-1]
-        return round(last["known_from_s"] - last["event_s"], 3)
+        return round(t["known_from_s"] - t["event_s"], 3)
 
     def get_entitlement(self) -> ProviderEntitlement:
         return ProviderEntitlement(

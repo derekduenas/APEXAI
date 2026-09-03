@@ -216,13 +216,50 @@ def test_empty_ring_does_not_truncate_an_existing_session_file(tmp_path,
     assert len(d["bars"]) == 1, "an empty ring wiped the session file"
 
 
-def test_trade_buffer_is_large_enough_for_a_full_session():
+def test_buffer_is_large_enough_for_a_full_session():
     """SPY alone exceeded the old 400k trade cap by late morning, which
     is WHY the ring could not rebuild the open even before persistence
-    overwrote it."""
+    overwrote it.
+
+    2026-09-03: the REQUIREMENT is unchanged -- the fabric must still be
+    able to rebuild a full session of bars. What changed is how it is
+    met. Raising `max_trades` to 2,000,000 met it by holding every raw
+    print of the session, and that is what OOM-killed this service three
+    times on 2026-09-02 (60 symbols x 2,000,000 slots is ~77 GiB). So
+    the assertion now names the thing actually required -- a session's
+    worth of BARS -- instead of a raw-trade count that only ever
+    approximated it.
+
+    Sizing the raw window to this same job is not an option: retaining
+    every trade behind 800 populated buckets measures 13,316,101 trades
+    = 8.0 GiB against a 2.44 GiB cap.
+    """
     import inspect
+    from apex.intraday.trade_working_set import RETAINED_BUCKETS
+
+    # the old knob is gone; it cannot be set back by accident
     sig = inspect.signature(af.AlpacaRealtimeFabric.__init__)
-    assert sig.parameters["max_trades"].default >= 1_000_000
+    assert "max_trades" not in sig.parameters
+
+    # a full extended session, premarket through post-close, in BARS
+    assert RETAINED_BUCKETS >= 660
+    assert af.AlpacaRealtimeFabric.SESSION_BAR_WINDOW_MIN == RETAINED_BUCKETS
+
+    # and it must actually deliver them: 800 populated minutes in, 800 out
+    import pandas as pd
+    fab = af.AlpacaRealtimeFabric(["SPY"])
+    base = 1756800000 - (1756800000 % 60)
+    for m in range(801):
+        for k in range(3):
+            fab.working.admit("SPY", event_s=base + m * 60 + 5 + k * 10,
+                              price=100.0 + m, size=1.0)
+    bars = fab.working.bars("SPY", [],
+                            now=pd.Timestamp(base + 801 * 60, unit="s",
+                                             tz="UTC"),
+                            transport="T")
+    assert len(bars) == 800, (
+        "the fabric can no longer rebuild a full session: %d bars"
+        % len(bars))
 
 
 # ---------------------------------------------- Phase 11/12 (2026-08-20)
