@@ -124,3 +124,20 @@ def wm0e_r1_truth() -> ResearchBudget:
                    "derived, threshold 2.0 retained; replaces the iid rule "
                    "for NULL_COURT_V1")
     return b
+
+
+def wm0e_r2_truth() -> ResearchBudget:
+    """wm0e_r1_truth() PLUS what R1 taught and what R2 attempts. The
+    decision statistic's search history is not concealed."""
+    b = wm0e_r1_truth()
+    b = b.register("inference_rule_revision",
+                   "DEPENDENCE_AWARE_DM_HAC_V0#R1_STOPPED_AT_CALIBRATION",
+                   "rejected before acceptance: type-I 0.063 on MA(14) "
+                   "overlap null, 0.096 on AR(1) 0.9; Bartlett at L=MA order "
+                   "recovers 67% of LRV; kept as diagnostic only")
+    b = b.register("inference_rule_revision", "DEPENDENT_BLOCK_BOOTSTRAP_V0",
+                   "2nd revision: circular moving-block bootstrap-t on the "
+                   "loss differential, PPW automatic block length with "
+                   "floor H and cap n/6, B=1999, alpha=0.025; the NEXT "
+                   "statistical methodology attempt")
+    return b

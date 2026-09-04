@@ -59,6 +59,13 @@ from apex.world_model.inference import (INFERENCE_VERSION, WM_STAT_001,
 from apex.world_model.holdout import (HOLDOUT_VERSION, HOLDOUT_SEEDS,
                                       HOLDOUT_SEED_SET_HASH,
                                       WM_0E_DEVELOPMENT_NULL_SET_V0)
+from apex.world_model.bootstrap import (BOOTSTRAP_VERSION, B_REPLICATIONS,
+                                        ALPHA, BLOCK_RULE, CALIBRATION_ENVELOPE,
+                                        BootstrapViolation, bootstrap_test,
+                                        block_length)
+from apex.world_model.court_v2 import (COURT_VERSION_V2, MAX_FALSE_POSITIVES_V2,
+                                       CourtDefinitionV2, convene_v2,
+                                       error_control_v2)
 from apex.world_model.court_v1 import (COURT_VERSION_V1, MAX_FALSE_POSITIVES_V1,
                                        CourtDefinitionV1, convene_v1,
                                        error_control_v1)
@@ -77,6 +84,10 @@ DECISION_POWER = "NONE_RESEARCH_ISOLATION"
 TRAINING_AUTHORIZED = False
 
 __all__ = ["WORLD_MODEL_SHADOW_ENGINE", "DECISION_POWER",
+           "BOOTSTRAP_VERSION", "B_REPLICATIONS", "ALPHA", "BLOCK_RULE",
+           "CALIBRATION_ENVELOPE", "BootstrapViolation", "bootstrap_test",
+           "block_length", "COURT_VERSION_V2", "MAX_FALSE_POSITIVES_V2",
+           "CourtDefinitionV2", "convene_v2", "error_control_v2",
            "INFERENCE_VERSION", "WM_STAT_001", "HAC_LAG", "HAC_KERNEL",
            "DM_THRESHOLD", "NON_OVERLAP_VERSION", "InferenceViolation",
            "dm_hac_rule", "non_overlap_rule", "HOLDOUT_VERSION",
