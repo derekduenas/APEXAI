@@ -1,0 +1,37 @@
+"""WORLD_MODEL_SHADOW_ENGINE_V0 -- research isolation only.
+
+WHAT EXISTS HERE TODAY: an authority contract and a fail-closed data
+source boundary. Nothing else. There is no model, no corpus, no
+generator, no adapter and no Multiverse, and this package holds no
+order, trading or capital authority of any kind.
+
+It is built BEFORE any research capability on purpose. A firewall added
+after the first experiment protects nothing -- by then the question is
+already whether the result was contaminated, and that question cannot be
+answered retrospectively.
+
+Phase 2 is BLOCKED and World Model TRAINING remains FORBIDDEN. This
+package is the enforcement of that prohibition, not an exception to it.
+"""
+from __future__ import annotations
+
+from apex.world_model.authority import (AUTHORITY_DIGEST,
+                                        AUTHORITY_VERSION,
+                                        WORLD_MODEL_RESEARCH_AUTHORITY_V0,
+                                        WorldModelAuthorityViolation,
+                                        assert_authority)
+from apex.world_model.sources import (FORBIDDEN_SOURCE_CLASSES,
+                                      PERMITTED_SOURCE_CLASSES,
+                                      SOURCE_CONTRACT,
+                                      SourceAdmissionRefused, admit)
+
+WORLD_MODEL_SHADOW_ENGINE = "WORLD_MODEL_SHADOW_ENGINE_V0"
+DECISION_POWER = "NONE_RESEARCH_ISOLATION"
+TRAINING_AUTHORIZED = False
+
+__all__ = ["WORLD_MODEL_SHADOW_ENGINE", "DECISION_POWER",
+           "TRAINING_AUTHORIZED", "AUTHORITY_VERSION", "AUTHORITY_DIGEST",
+           "WORLD_MODEL_RESEARCH_AUTHORITY_V0", "assert_authority",
+           "WorldModelAuthorityViolation", "SOURCE_CONTRACT", "admit",
+           "SourceAdmissionRefused", "PERMITTED_SOURCE_CLASSES",
+           "FORBIDDEN_SOURCE_CLASSES"]
