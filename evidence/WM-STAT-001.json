@@ -1,0 +1,21 @@
+{
+ "defect_id": "WM-STAT-001",
+ "name": "IID_INFERENCE_INVALID_FOR_OVERLAPPING_FORECAST_LOSS",
+ "discovered_by": "NULL_COURT_V0, control N1 (FORWARD_TIME_DISPLACEMENT)",
+ "sittings": [
+  "COURT-a4c366b64b0d",
+  "COURT-0d4063653ce6",
+  "COURT-bad6d1f1cff0"
+ ],
+ "mechanism": [
+  "forecast horizon = 15 steps",
+  "adjacent targets overlap by 14 increments",
+  "loss differential d_t is serially dependent (rho_1 0.76-0.92 on N1)",
+  "iid stderr understates uncertainty (~4x; n_eff/n ~ 0.06)",
+  "N1 preserved temporal structure on both sides and exposed it",
+  "N2/N3 looked healthier because they DESTROYED the dependence; that does not validate iid inference"
+ ],
+ "observed": "N1 6/25 false detections vs 0.58 expected, in all three sittings; N0/N3 fluctuated 1-5 of 25 across re-keyings",
+ "status_synthetic_h15": "OPEN until NULL_COURT_V1_DEPENDENCE_AWARE passes on fresh seeds",
+ "status_real_market": "OPEN -- WORLD_MODEL_PHASE3_BLOCKER_NEGATIVE_CONTROL is not touched by this repair"
+}

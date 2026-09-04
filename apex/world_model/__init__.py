@@ -52,6 +52,16 @@ from apex.world_model.teststand import (TESTSTAND_VERSION,
 from apex.world_model.budget import (BUDGET_VERSION, BudgetViolation,
                                      ResearchBudget, wm0d_truth)
 from apex.world_model.controls import CONTROL_CONTRACT, ControlViolation
+from apex.world_model.inference import (INFERENCE_VERSION, WM_STAT_001,
+                                        HAC_LAG, HAC_KERNEL, DM_THRESHOLD,
+                                        NON_OVERLAP_VERSION, InferenceViolation,
+                                        dm_hac_rule, non_overlap_rule)
+from apex.world_model.holdout import (HOLDOUT_VERSION, HOLDOUT_SEEDS,
+                                      HOLDOUT_SEED_SET_HASH,
+                                      WM_0E_DEVELOPMENT_NULL_SET_V0)
+from apex.world_model.court_v1 import (COURT_VERSION_V1, MAX_FALSE_POSITIVES_V1,
+                                       CourtDefinitionV1, convene_v1,
+                                       error_control_v1)
 from apex.world_model.court import (COURT_VERSION, MAX_FALSE_POSITIVES,
                                     NOMINAL_ALPHA, SEED_SET, CourtDefinition,
                                     CourtViolation, convene)
@@ -67,6 +77,13 @@ DECISION_POWER = "NONE_RESEARCH_ISOLATION"
 TRAINING_AUTHORIZED = False
 
 __all__ = ["WORLD_MODEL_SHADOW_ENGINE", "DECISION_POWER",
+           "INFERENCE_VERSION", "WM_STAT_001", "HAC_LAG", "HAC_KERNEL",
+           "DM_THRESHOLD", "NON_OVERLAP_VERSION", "InferenceViolation",
+           "dm_hac_rule", "non_overlap_rule", "HOLDOUT_VERSION",
+           "HOLDOUT_SEEDS", "HOLDOUT_SEED_SET_HASH",
+           "WM_0E_DEVELOPMENT_NULL_SET_V0", "COURT_VERSION_V1",
+           "MAX_FALSE_POSITIVES_V1", "CourtDefinitionV1", "convene_v1",
+           "error_control_v1",
            "TRAINING_AUTHORIZED", "AUTHORITY_VERSION", "AUTHORITY_DIGEST",
            "WORLD_MODEL_RESEARCH_AUTHORITY_V0", "assert_authority",
            "WorldModelAuthorityViolation", "SOURCE_CONTRACT", "admit",

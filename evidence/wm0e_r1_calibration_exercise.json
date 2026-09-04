@@ -1,0 +1,577 @@
+{
+ "part_A_fixtures": {
+  "analytic_MA14": {
+   "lrv_true": 225,
+   "lrv_bartlett_L14_expected": 150.33333333333334,
+   "variance_recovery_ratio": 0.6681481481481482,
+   "t_inflation_expected": 1.223386307610833,
+   "implied_one_sided_alpha_at_2.0": 0.05104479924629246
+  },
+  "MA14_overlap_zero_mean": {
+   "reps": 2000,
+   "n": 465,
+   "iid_rejection_rate": 0.32,
+   "iid_ci95": [
+    0.29991755388542335,
+    0.34077260845076135
+   ],
+   "hac_rejection_rate": 0.063,
+   "hac_ci95": [
+    0.053166733345321605,
+    0.0745088274375267
+   ],
+   "nominal_alpha": 0.02275013194817921,
+   "hac_t_mean": 0.033521729184313474,
+   "hac_t_sd": 1.3295632466268492,
+   "median_se_inflation_vs_iid": 3.1112735234990305
+  },
+  "AR1_phi0.9_zero_mean_(dependence_beyond_L)": {
+   "reps": 2000,
+   "n": 465,
+   "iid_rejection_rate": 0.35,
+   "iid_ci95": [
+    0.32940152087999536,
+    0.37117361440015845
+   ],
+   "hac_rejection_rate": 0.0955,
+   "hac_ci95": [
+    0.08338355803317647,
+    0.10916739010563851
+   ],
+   "nominal_alpha": 0.02275013194817921,
+   "hac_t_mean": 0.026086577304033947,
+   "hac_t_sd": 1.5422096000933923,
+   "median_se_inflation_vs_iid": 2.9999217170672137
+  },
+  "AR1_phi0.5_zero_mean": {
+   "reps": 2000,
+   "n": 465,
+   "iid_rejection_rate": 0.1325,
+   "iid_ci95": [
+    0.11834328021251322,
+    0.1480658012238638
+   ],
+   "hac_rejection_rate": 0.034,
+   "hac_ci95": [
+    0.02690814464608357,
+    0.04287860895759449
+   ],
+   "nominal_alpha": 0.02275013194817921,
+   "hac_t_mean": 0.019111527104654583,
+   "hac_t_sd": 1.1096102871076923,
+   "median_se_inflation_vs_iid": 1.614093925724908
+  },
+  "iid_zero_mean": {
+   "reps": 2000,
+   "n": 465,
+   "iid_rejection_rate": 0.0265,
+   "iid_ci95": [
+    0.020316821532170043,
+    0.034498688835515705
+   ],
+   "hac_rejection_rate": 0.028,
+   "hac_ci95": [
+    0.021625107564685334,
+    0.036184651450198876
+   ],
+   "nominal_alpha": 0.02275013194817921,
+   "hac_t_mean": 0.017028416430084608,
+   "hac_t_sd": 1.0536982078284525,
+   "median_se_inflation_vs_iid": 0.9780045709782462
+  },
+  "MA14_positive_mean_mu3_power": {
+   "reps": 500,
+   "detection_rate": 0.998
+  }
+ },
+ "part_B_development_set": {
+  "N1": {
+   "role": "DEVELOPMENT DIAGNOSTIC -- observed seeds; not acceptance",
+   "judgement": {
+    "control": "N1",
+    "n": 25,
+    "detections": 2,
+    "detection_rate": 0.08,
+    "primary_t_hac": {
+     "min": -6.868803916715869,
+     "median": -0.5838851299015643,
+     "max": 2.6312142063629365,
+     "mean": -0.9907392510108721
+    },
+    "se_inflation_vs_iid": {
+     "min": 1.6858760217491942,
+     "median": 2.9397409494283555,
+     "max": 3.4744651858446707,
+     "mean": 2.7782230654564732
+    },
+    "legacy_iid_z_reference_only": {
+     "min": -17.91534310945168,
+     "median": -1.464711745584779,
+     "max": 7.986191431416875,
+     "mean": -2.410552227691756
+    },
+    "non_overlap_robustness": {
+     "detections": 2,
+     "detection_rate": 0.08,
+     "z": {
+      "min": -3.726887176604489,
+      "median": -0.6061984227113969,
+      "max": 2.2935646783746617,
+      "mean": -0.7869268955177705
+     },
+     "role": "secondary; not binding; not averaged"
+    },
+    "court_verdict": "PASS",
+    "false_positives": 2,
+    "expected_false_positives": 0.5687532987044802,
+    "max_tolerated": 5,
+    "non_overlap_consistent": true
+   },
+   "cells": [
+    {
+     "seed": 1000,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 0.16080406874414685,
+     "se_inflation_vs_iid": 3.152041122210258,
+     "legacy_iid_z_reference_only": 0.5068610373002761,
+     "non_overlap_z": -0.1526274343021728
+    },
+    {
+     "seed": 1037,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -3.6196263697631816,
+     "se_inflation_vs_iid": 1.8560291268785862,
+     "legacy_iid_z_reference_only": -6.718131970698265,
+     "non_overlap_z": -3.5639616575319697
+    },
+    {
+     "seed": 1074,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -2.3180872572715256,
+     "se_inflation_vs_iid": 2.8724911299358804,
+     "legacy_iid_z_reference_only": -6.65868508492985,
+     "non_overlap_z": -3.1140985249964315
+    },
+    {
+     "seed": 1111,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 1.5500412172705043,
+     "se_inflation_vs_iid": 3.039626213113038,
+     "legacy_iid_z_reference_only": 4.711545915421067,
+     "non_overlap_z": 1.3021912175593964
+    },
+    {
+     "seed": 1148,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -0.35056028103104103,
+     "se_inflation_vs_iid": 2.553423780309841,
+     "legacy_iid_z_reference_only": -0.8951289580167611,
+     "non_overlap_z": -0.4307375827204206
+    },
+    {
+     "seed": 1185,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -3.6365344716408217,
+     "se_inflation_vs_iid": 3.2386050499647605,
+     "legacy_iid_z_reference_only": -11.777298904226898,
+     "non_overlap_z": -2.54797692902663
+    },
+    {
+     "seed": 1222,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 0.46523230514959996,
+     "se_inflation_vs_iid": 2.4777182326959184,
+     "legacy_iid_z_reference_only": 1.152714564908315,
+     "non_overlap_z": 0.6608866242998216
+    },
+    {
+     "seed": 1259,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 0.01773192829657997,
+     "se_inflation_vs_iid": 3.422436177460635,
+     "legacy_iid_z_reference_only": 0.06068639289835322,
+     "non_overlap_z": -0.22132048989477243
+    },
+    {
+     "seed": 1296,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -4.077561777490055,
+     "se_inflation_vs_iid": 2.5781293010768387,
+     "legacy_iid_z_reference_only": -10.512481495498067,
+     "non_overlap_z": -2.931697649476616
+    },
+    {
+     "seed": 1333,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -0.5838851299015643,
+     "se_inflation_vs_iid": 3.0180073506740785,
+     "legacy_iid_z_reference_only": -1.76216961399221,
+     "non_overlap_z": -1.0044145108720801
+    },
+    {
+     "seed": 1370,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -2.1193143894904782,
+     "se_inflation_vs_iid": 3.4744651858446707,
+     "legacy_iid_z_reference_only": -7.36348406414432,
+     "non_overlap_z": -1.7676956380844437
+    },
+    {
+     "seed": 1407,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 0.41762649100006044,
+     "se_inflation_vs_iid": 2.078883580683005,
+     "legacy_iid_z_reference_only": 0.8681968549982844,
+     "non_overlap_z": -0.6061984227113969
+    },
+    {
+     "seed": 1444,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 0.7989712693687514,
+     "se_inflation_vs_iid": 3.119310487253164,
+     "legacy_iid_z_reference_only": 2.4922394595559187,
+     "non_overlap_z": 0.6496687949738826
+    },
+    {
+     "seed": 1481,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 0.7293738066156381,
+     "se_inflation_vs_iid": 3.006922135420147,
+     "legacy_iid_z_reference_only": 2.193170244108216,
+     "non_overlap_z": -0.42642469566741975
+    },
+    {
+     "seed": 1518,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -6.868803916715869,
+     "se_inflation_vs_iid": 2.6082187418180673,
+     "legacy_iid_z_reference_only": -17.91534310945168,
+     "non_overlap_z": -3.726887176604489
+    },
+    {
+     "seed": 1555,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -0.9950993070832381,
+     "se_inflation_vs_iid": 3.008670521451116,
+     "legacy_iid_z_reference_only": -2.9939259511377703,
+     "non_overlap_z": -0.26506187584770724
+    },
+    {
+     "seed": 1592,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 1.004198725235187,
+     "se_inflation_vs_iid": 2.7778714889605776,
+     "legacy_iid_z_reference_only": 2.789535008081383,
+     "non_overlap_z": 0.706948363712197
+    },
+    {
+     "seed": 1629,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -0.016521458704461922,
+     "se_inflation_vs_iid": 2.644370028410314,
+     "legacy_iid_z_reference_only": -0.043688850223697805,
+     "non_overlap_z": 0.7835702626293388
+    },
+    {
+     "seed": 1666,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 2.384547779886937,
+     "se_inflation_vs_iid": 3.349142969068768,
+     "legacy_iid_z_reference_only": 7.986191431416875,
+     "non_overlap_z": 2.151607546816137
+    },
+    {
+     "seed": 1703,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -0.6880604040508608,
+     "se_inflation_vs_iid": 2.128754593290779,
+     "legacy_iid_z_reference_only": -1.464711745584779,
+     "non_overlap_z": -1.0642622876562273
+    },
+    {
+     "seed": 1740,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -1.4167211549358207,
+     "se_inflation_vs_iid": 2.9397409494283555,
+     "legacy_iid_z_reference_only": -4.1647931930862665,
+     "non_overlap_z": -1.3878596125232217
+    },
+    {
+     "seed": 1777,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -2.53631234532053,
+     "se_inflation_vs_iid": 2.4532916858499045,
+     "legacy_iid_z_reference_only": -6.222313989493328,
+     "non_overlap_z": -1.1264531984308706
+    },
+    {
+     "seed": 1814,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -2.103793901929162,
+     "se_inflation_vs_iid": 2.9948307941202534,
+     "legacy_iid_z_reference_only": -6.300506761979859,
+     "non_overlap_z": -1.4638616085918819
+    },
+    {
+     "seed": 1851,
+     "verdict": "NO_SIGNAL",
+     "t_hac": -3.597340907873534,
+     "se_inflation_vs_iid": 1.6858760217491942,
+     "legacy_iid_z_reference_only": -6.064670778641468,
+     "non_overlap_z": -2.420070581370948
+    },
+    {
+     "seed": 1888,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 2.6312142063629365,
+     "se_inflation_vs_iid": 2.9767199687436885,
+     "legacy_iid_z_reference_only": 7.832387870122629,
+     "non_overlap_z": 2.2935646783746617
+    }
+   ]
+  },
+  "P0": {
+   "role": "DEVELOPMENT DIAGNOSTIC -- observed seeds; not acceptance",
+   "judgement": {
+    "control": "P0",
+    "n": 25,
+    "detections": 21,
+    "detection_rate": 0.84,
+    "primary_t_hac": {
+     "min": 0.22255242359834063,
+     "median": 4.09841550631229,
+     "max": 8.416951974089859,
+     "mean": 3.9424284709866195
+    },
+    "se_inflation_vs_iid": {
+     "min": 2.12015818833876,
+     "median": 2.559120060037767,
+     "max": 2.942015717069231,
+     "mean": 2.515167742017473
+    },
+    "legacy_iid_z_reference_only": {
+     "min": 0.5317725330262669,
+     "median": 10.767141992726788,
+     "max": 18.98158635746068,
+     "mean": 9.905455236983343
+    },
+    "non_overlap_robustness": {
+     "detections": 14,
+     "detection_rate": 0.56,
+     "z": {
+      "min": -0.5761584796560627,
+      "median": 2.535031200711439,
+      "max": 8.48738684135842,
+      "mean": 2.914507672729697
+     },
+     "role": "secondary; not binding; not averaged"
+    },
+    "court_verdict": "PASS",
+    "positive_direction_rate": 1.0,
+    "non_overlap_consistent": false
+   },
+   "cells": [
+    {
+     "seed": 1000,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 1.6860286888807374,
+     "se_inflation_vs_iid": 2.433940364511631,
+     "legacy_iid_z_reference_only": 4.1036932815914495,
+     "non_overlap_z": 1.4571940293555417
+    },
+    {
+     "seed": 1037,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 4.716795964731611,
+     "se_inflation_vs_iid": 2.249247137486225,
+     "legacy_iid_z_reference_only": 10.609239821779152,
+     "non_overlap_z": 2.2595746318603203
+    },
+    {
+     "seed": 1074,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 5.855439421756022,
+     "se_inflation_vs_iid": 2.5686609897304846,
+     "legacy_iid_z_reference_only": 15.04063882039472,
+     "non_overlap_z": 2.9858901998335345
+    },
+    {
+     "seed": 1111,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 2.6955919009762175,
+     "se_inflation_vs_iid": 2.3127714953155127,
+     "legacy_iid_z_reference_only": 6.234288111581153,
+     "non_overlap_z": 3.8170740228303845
+    },
+    {
+     "seed": 1148,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 4.059322764034081,
+     "se_inflation_vs_iid": 2.7099577997016087,
+     "legacy_iid_z_reference_only": 11.000593385900451,
+     "non_overlap_z": 2.535031200711439
+    },
+    {
+     "seed": 1185,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 6.264907521737861,
+     "se_inflation_vs_iid": 2.6739305063188588,
+     "legacy_iid_z_reference_only": 16.751927341641345,
+     "non_overlap_z": 3.9056052423166343
+    },
+    {
+     "seed": 1222,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 1.901169924363645,
+     "se_inflation_vs_iid": 2.5306661434091344,
+     "legacy_iid_z_reference_only": 4.811226360454781,
+     "non_overlap_z": 0.04769188913809476
+    },
+    {
+     "seed": 1259,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 5.498158295862491,
+     "se_inflation_vs_iid": 2.3893617225141544,
+     "legacy_iid_z_reference_only": 13.137088976457488,
+     "non_overlap_z": 7.58115658003664
+    },
+    {
+     "seed": 1296,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 5.07661447371338,
+     "se_inflation_vs_iid": 2.6618856449747286,
+     "legacy_iid_z_reference_only": 13.513367192648582,
+     "non_overlap_z": 1.7902717671886692
+    },
+    {
+     "seed": 1333,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 5.755712890529192,
+     "se_inflation_vs_iid": 2.377819671699201,
+     "legacy_iid_z_reference_only": 13.68604733575298,
+     "non_overlap_z": 2.7283822813823226
+    },
+    {
+     "seed": 1370,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 2.170696119298123,
+     "se_inflation_vs_iid": 2.6477206589023488,
+     "legacy_iid_z_reference_only": 5.7473969592647975,
+     "non_overlap_z": 0.2714921501511108
+    },
+    {
+     "seed": 1407,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 8.416951974089859,
+     "se_inflation_vs_iid": 2.255161537798034,
+     "legacy_iid_z_reference_only": 18.98158635746068,
+     "non_overlap_z": 8.48738684135842
+    },
+    {
+     "seed": 1444,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 3.9761206236176707,
+     "se_inflation_vs_iid": 2.4797217402427516,
+     "legacy_iid_z_reference_only": 9.859672752212306,
+     "non_overlap_z": 4.5436671165199645
+    },
+    {
+     "seed": 1481,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 2.135221955185885,
+     "se_inflation_vs_iid": 2.2432325892683767,
+     "legacy_iid_z_reference_only": 4.789799475194319,
+     "non_overlap_z": -0.5146841661599999
+    },
+    {
+     "seed": 1518,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 4.642149023421887,
+     "se_inflation_vs_iid": 2.942015717069231,
+     "legacy_iid_z_reference_only": 13.657275387884775,
+     "non_overlap_z": 3.3973768009556298
+    },
+    {
+     "seed": 1555,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 4.285482133818922,
+     "se_inflation_vs_iid": 2.709420317527855,
+     "legacy_iid_z_reference_only": 11.611172363771612,
+     "non_overlap_z": 5.633277282523369
+    },
+    {
+     "seed": 1592,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 5.087601010399812,
+     "se_inflation_vs_iid": 2.617796151820828,
+     "legacy_iid_z_reference_only": 13.318302347024384,
+     "non_overlap_z": 4.945280586900247
+    },
+    {
+     "seed": 1629,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 1.9642266776990054,
+     "se_inflation_vs_iid": 2.559120060037767,
+     "legacy_iid_z_reference_only": 5.026691893360862,
+     "non_overlap_z": 1.1696876147602935
+    },
+    {
+     "seed": 1666,
+     "verdict": "NO_SIGNAL",
+     "t_hac": 0.22255242359834063,
+     "se_inflation_vs_iid": 2.3894259358235628,
+     "legacy_iid_z_reference_only": 0.5317725330262669,
+     "non_overlap_z": -0.5761584796560627
+    },
+    {
+     "seed": 1703,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 5.2628388498040515,
+     "se_inflation_vs_iid": 2.12015818833876,
+     "legacy_iid_z_reference_only": 11.1580508813194,
+     "non_overlap_z": 3.693949334332236
+    },
+    {
+     "seed": 1740,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 2.804001093330946,
+     "se_inflation_vs_iid": 2.6149024949615773,
+     "legacy_iid_z_reference_only": 7.332189454826081,
+     "non_overlap_z": 0.22589180788599425
+    },
+    {
+     "seed": 1777,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 2.4569484809691047,
+     "se_inflation_vs_iid": 2.5108304646439277,
+     "legacy_iid_z_reference_only": 6.168981096077849,
+     "non_overlap_z": 1.9502909215053317
+    },
+    {
+     "seed": 1814,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 3.1406426802467142,
+     "se_inflation_vs_iid": 2.6097593930052647,
+     "legacy_iid_z_reference_only": 8.196321734847093,
+     "non_overlap_z": 0.8117187141413376
+    },
+    {
+     "seed": 1851,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 4.387121376287639,
+     "se_inflation_vs_iid": 2.644539339643646,
+     "legacy_iid_z_reference_only": 11.601915067384237,
+     "non_overlap_z": 7.935418495948337
+    },
+    {
+     "seed": 1888,
+     "verdict": "SIGNAL_DETECTED",
+     "t_hac": 4.09841550631229,
+     "se_inflation_vs_iid": 2.6271474856913533,
+     "legacy_iid_z_reference_only": 10.767141992726788,
+     "non_overlap_z": 1.780224952422636
+    }
+   ]
+  }
+ }
+}

@@ -31,7 +31,11 @@ BUDGET_VERSION = "WORLD_MODEL_RESEARCH_BUDGET_V0"
 CATEGORIES = ("model_family", "hyperparameter_configuration",
               "feature_family_variant", "horizon_variant", "target_variant",
               "sampling_variant", "calibration_variant", "ablation_variant",
-              "compatibility_observation")
+              "compatibility_observation",
+              # added WM-0E-R1: the decision STATISTIC is part of the search
+              # history too. A court that sits, fails, and is followed by a
+              # revised rule is an attempt, not "zero attempts".
+              "court_sitting", "defect_registered", "inference_rule_revision")
 
 
 class BudgetViolation(ValueError):
@@ -97,4 +101,26 @@ def wm0d_truth() -> ResearchBudget:
                    "z=+7.71 observed; NOT optimised against; no credit")
     b = b.register("compatibility_observation", "S3_smoke_WM0D",
                    "z=+2.97 observed; NOT optimised against; no credit")
+    return b
+
+
+def wm0e_r1_truth() -> ResearchBudget:
+    """Everything wm0d_truth() recorded, PLUS what WM-0E did. Recorded
+    before NULL_COURT_V1 sits, and committed into that court's hash."""
+    b = wm0d_truth()
+    b = b.register("court_sitting", "NULL_COURT_V0/COURT-a4c366b64b0d",
+                   "FAIL; controls V0 (padded N0); uncommitted tree; N1 6/25")
+    b = b.register("court_sitting", "NULL_COURT_V0/COURT-0d4063653ce6",
+                   "FAIL; controls V0.1; code_commit field mislabelled by a "
+                   "shell race; N0 5/25 N1 6/25 N3 4/25")
+    b = b.register("court_sitting", "NULL_COURT_V0/COURT-bad6d1f1cff0",
+                   "FAIL; canonical V0 sitting; N1 6/25")
+    b = b.register("defect_registered", "WM-STAT-001",
+                   "IID_INFERENCE_INVALID_FOR_OVERLAPPING_FORECAST_LOSS; "
+                   "found by N1; rho_1 0.76-0.92, n_eff/n ~0.06")
+    b = b.register("inference_rule_revision", "DEPENDENCE_AWARE_DM_HAC_V0",
+                   "1st revision of the decision statistic: DM loss "
+                   "differential with Newey-West/Bartlett HAC, L = H-1 = 14 "
+                   "derived, threshold 2.0 retained; replaces the iid rule "
+                   "for NULL_COURT_V1")
     return b
