@@ -1,0 +1,2 @@
+2026-09-04T15:03:50Z chain start -- waiting: observer inactive AND clock >= 20:11Z
+2026-09-04T19:03:32Z CHAIN SUPERSEDED: RESOURCE_ISOLATION_PRECONDITION_NOT_STRONG_ENOUGH -- apex-research.slice hosts production services; no compute step was reached; no acceptance seed executed

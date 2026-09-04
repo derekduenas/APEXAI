@@ -30,9 +30,14 @@ def test_running_inside_research_containment():
     """WORLD_MODEL_COMPUTE_CONTAINMENT_V0: World Model compute runs in
     apex-research.slice or not at all."""
     cg = open("/proc/self/cgroup").read()
-    assert "apex-research.slice" in cg, (
+    assert cg.strip().split("::")[-1].startswith("/wmresearch.slice/"), (
         "World Model compute must run through wm_contained.sh "
-        "(apex-research.slice); got %r" % cg.strip())
+        "(dedicated wmresearch.slice); got %r" % cg.strip())
+    # the dedicated slice holds no production service
+    import subprocess
+    tree = subprocess.run(["systemd-cgls", "--no-pager", "/wmresearch.slice"],
+                          capture_output=True, text=True).stdout
+    assert "apex-" not in tree, "production unit inside the WM slice:\n" + tree
 
 
 def _ma(rng, n, mu=0.0, h=TARGET_HORIZON_STEPS):
