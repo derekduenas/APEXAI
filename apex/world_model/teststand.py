@@ -52,15 +52,30 @@ def build_dataset(world: SyntheticWorld, subject: str, steps: range):
     return X, y, idx, outcomes
 
 
+def default_dataset(world, subject, split):
+    """The untransformed pipeline: features and targets as generated."""
+    Xtr, ytr, _, _ = build_dataset(world, subject, split.train_steps)
+    Xev, yev, ev_idx, ev_out = build_dataset(world, subject, split.eval_steps)
+    return Xtr, ytr, Xev, yev, ev_idx, ev_out
+
+
 def run_pipeline(world: SyntheticWorld, model, *, subject: str = "SYN_A",
                  code_commit: str = "UNCOMMITTED", seed: int = 0,
-                 creation_time: float | None = None) -> dict:
+                 creation_time: float | None = None,
+                 dataset=default_dataset) -> dict:
+    """`dataset` is the ONE seam a negative control may use. It replaces
+    how (X, y) are assembled; it cannot touch the model, the scaler, the
+    forecast contract, the sealing step or the grader. A null that
+    needed to change any of those would not be a null."""
     _reject_truth(model)
     T = world.config.n_steps
     split = ChronologicalSplit(n_steps=T, boundary=int(T * FIXED_BOUNDARY_FRACTION))
 
-    Xtr, ytr, _, _ = build_dataset(world, subject, split.train_steps)
-    Xev, yev, ev_idx, ev_out = build_dataset(world, subject, split.eval_steps)
+    Xtr, ytr, Xev, yev, ev_idx, ev_out = dataset(world, subject, split)
+    if not Xtr or not Xev:
+        raise StandViolation("a dataset builder returned an empty partition")
+    if len(Xev) != len(ev_idx) or len(Xev) != len(ev_out):
+        raise StandViolation("dataset builder returned misaligned eval arrays")
 
     scaler = FrozenScaler.fit(Xtr)                 # TRAIN ONLY
     model.fit(scaler.transform(Xtr), ytr)
