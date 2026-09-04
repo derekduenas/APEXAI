@@ -33,7 +33,22 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-UNIT = sys.argv[3] if len(sys.argv) > 3 else "apex-equity-fabric-v1.service"
+def _arg(i, default, cast=str):
+    """Positional argv with a safe default.
+
+    Parsed through a function, not at import time: a module that reads
+    sys.argv while being imported cannot be imported by a test runner,
+    which is how the identity defect below went untested in the first
+    place. An observer whose correctness cannot be asserted is not an
+    observer.
+    """
+    try:
+        return cast(sys.argv[i])
+    except (IndexError, ValueError, TypeError):
+        return default
+
+
+UNIT = _arg(3, "apex-equity-fabric-v1.service")
 CG = Path("/sys/fs/cgroup/apex.slice/apex-market.slice") / UNIT
 BARS = Path("/apex-data/runtime/data/live/alpaca_fabric/bars")
 HEALTH = Path("/apex-data/core/intraday/alpaca_fabric_health.json")
@@ -41,8 +56,8 @@ OUT = Path("/apex-data/core/equity_fabric_validation_profile")
 OUT.mkdir(parents=True, exist_ok=True)
 LEDGER = OUT / f"validation_{datetime.now(timezone.utc):%Y%m%d}.jsonl"
 
-MINUTES = float(sys.argv[1]) if len(sys.argv) > 1 else 400
-INTERVAL = float(sys.argv[2]) if len(sys.argv) > 2 else 60
+MINUTES = _arg(1, 400.0, float)
+INTERVAL = _arg(2, 60.0, float)
 
 # every fabric that could legitimately write the canonical bars
 WRITER_UNITS = ("apex-equity-fabric.service", "apex-equity-fabric-v1.service")
@@ -105,17 +120,92 @@ def bars_state():
             "newest_age_s": round(now - newest, 1) if newest else None}
 
 
-def health_state():
-    """The fabric's OWN report -- bounded state and semantics."""
+HEARTBEAT = Path("/apex-data/core/heartbeats/equity-fabric.json")
+
+
+def _svc_start_epoch(unit):
+    """Unit start time as epoch seconds, or None."""
+    v = sh("systemctl show %s -p ExecMainStartTimestampMonotonic --value"
+           % unit)
+    t = sh("systemctl show %s -p ExecMainStartTimestamp --value" % unit)
+    if not t or t == "n/a":
+        return None
+    import datetime
+    for fmt in ("%a %Y-%m-%d %H:%M:%S %Z", "%a %Y-%m-%d %H:%M:%S UTC"):
+        try:
+            d = datetime.datetime.strptime(t, fmt)
+            return d.replace(tzinfo=datetime.timezone.utc).timestamp()
+        except ValueError:
+            continue
+    return None
+
+
+def health_state(pid=0, unit=None):
+    """The fabric's OWN report -- bounded state and semantics.
+
+    IDENTITY IS CHECKED BEFORE ANYTHING IS ATTRIBUTED.
+
+    The artifact is a FILE. It outlives the process that wrote it. On
+    2026-09-04 this observer was pointed at an INACTIVE unit and
+    cheerfully reported raw=3466 dedup=3466 bars=446 sem=EXACT -- the
+    final numbers of a process that had been dead for 33 minutes. In a
+    validation run that is the worst possible failure: a candidate
+    could die and the evidence would keep showing healthy bounded
+    state from a corpse.
+
+    So three things must agree before any field is believed:
+      1. the unit has a live MainPID at all
+      2. the heartbeat's pid IS that MainPID
+      3. the health artifact's process_start_utc matches when systemd
+         says this instance started
+    Any disagreement returns available=False with a named reason, and
+    the caller records STALE rather than a number.
+    """
+    if not pid:
+        return {"available": False, "identity": "NO_LIVE_PROCESS",
+                "attributed": False}
     try:
         h = json.loads(HEALTH.read_text())
     except (OSError, json.JSONDecodeError):
-        return {"available": False}
+        return {"available": False, "identity": "ARTIFACT_UNREADABLE",
+                "attributed": False}
+
+    # (2) the heartbeat names the pid that wrote it
+    try:
+        hb = json.loads(HEARTBEAT.read_text())
+        hb_pid = hb.get("pid")
+    except (OSError, json.JSONDecodeError):
+        hb_pid = None
+    if hb_pid != pid:
+        return {"available": False, "identity": "STALE_ARTIFACT",
+                "attributed": False, "artifact_pid": hb_pid,
+                "live_pid": pid,
+                "why": "the heartbeat was written by pid %s, but the "
+                       "unit's live process is pid %s" % (hb_pid, pid)}
+
+    # (3) the health artifact belongs to THIS instance, not a prior one
+    started = _svc_start_epoch(unit) if unit else None
+    psu = h.get("process_start_utc")
+    if started and psu:
+        try:
+            import pandas as _pd
+            drift = abs(_pd.Timestamp(psu).timestamp() - started)
+            if drift > 120:
+                return {"available": False,
+                        "identity": "STALE_ARTIFACT_START_MISMATCH",
+                        "attributed": False,
+                        "artifact_process_start_utc": psu,
+                        "unit_start_drift_s": round(drift, 1)}
+        except Exception:                                  # noqa: BLE001
+            pass
     ws = h.get("working_state") or {}
     ordering = h.get("ordering_semantics") or {}
     c = ws.get("counters") or {}
     return {
         "available": True,
+        "identity": "CURRENT_INSTANCE",
+        "attributed": True,
+        "live_pid": pid,
         "status": h.get("status"),
         "beat_age_s": None,
         # --- BOUND A/B/C telemetry
@@ -202,7 +292,7 @@ def main():
                                   "pgmajfault"}),
             "proc": proc_status(pid),
             "bars": bars_state(),
-            "health": health_state(),
+            "health": health_state(pid, UNIT),
             "writers": writers(),
         }
         with LEDGER.open("a") as fh:
@@ -221,6 +311,8 @@ def main():
             flag += " ORDERING_AMBIGUITY"
         if (rec["memory_events"] or {}).get("max"):
             flag += " AT_MEMORY_CAP"
+        if not h.get("attributed"):
+            flag += " " + str(h.get("identity"))
         print("%s rss=%6.0fMiB raw=%-9s dedup=%-9s bars=%-7s sem=%-28s%s"
               % (rec["utc"][11:19],
                  rec["memory_current"] / 1048576,
