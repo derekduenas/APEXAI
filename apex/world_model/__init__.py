@@ -38,6 +38,17 @@ from apex.world_model.worlds import (GENERATOR_VERSION, WORLD_SCHEMA_VERSION,
                                      WORLD_TYPES, GroundTruthLeak,
                                      SyntheticWorld, WorldConfig,
                                      WorldConfigViolation, generate_world)
+from apex.world_model.grader import (GRADER_VERSION, NULL_RULE, Z_RULE,
+                                     Grade, GradingViolation, grade,
+                                     null_rule)
+from apex.world_model.models import (M0SyntheticBaseline,
+                                     ModelContractViolation, NullBaseline)
+from apex.world_model.runs import (RUN_AUTHORITY, ChronologicalSplit,
+                                   ModelRun, RunContractViolation)
+from apex.world_model.targets import (TARGET_HORIZON, OutcomeRecord,
+                                      resolve_target)
+from apex.world_model.teststand import (TESTSTAND_VERSION,
+                                        control_experiment, run_pipeline)
 from apex.world_model.quality import (QUALITY_STATES,
                                       QualityContractViolation)
 from apex.world_model.sources import (FORBIDDEN_SOURCE_CLASSES,
@@ -66,4 +77,10 @@ __all__ = ["WORLD_MODEL_SHADOW_ENGINE", "DECISION_POWER",
            "GENERATOR_VERSION", "WORLD_TYPES", "WorldConfig",
            "WorldConfigViolation", "SyntheticWorld", "generate_world",
            "GroundTruthLeak", "NULL_TYPES", "NULL_CONTRACT",
-           "make_null", "NullTransformViolation"]
+           "make_null", "NullTransformViolation", "GRADER_VERSION",
+           "NULL_RULE", "Z_RULE", "Grade", "GradingViolation", "grade",
+           "null_rule", "M0SyntheticBaseline", "NullBaseline",
+           "ModelContractViolation", "RUN_AUTHORITY", "ChronologicalSplit",
+           "ModelRun", "RunContractViolation", "TARGET_HORIZON",
+           "OutcomeRecord", "resolve_target", "TESTSTAND_VERSION",
+           "control_experiment", "run_pipeline"]

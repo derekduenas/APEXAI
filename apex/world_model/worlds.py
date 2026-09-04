@@ -65,6 +65,7 @@ import hashlib
 import math
 import random
 from dataclasses import dataclass, field as _field
+from functools import cached_property
 
 from apex.world_model.canonical import (NumericContractViolation,
                                         content_hash, strict_float)
@@ -369,8 +370,13 @@ class SyntheticWorld:
                 for s in self.subjects},
         }
 
-    @property
+    @cached_property
     def world_hash(self) -> str:
+        """Cached: the world is frozen, so its hash cannot change, and
+        recomputing a canonicalisation of EVERY observable on every
+        forecast made the test stand O(n^2). That is the whole-history
+        anti-pattern in miniature and it was caught by a 10-second
+        600-step run."""
         return content_hash(self.observable_canonical())
 
     def manifest(self) -> dict:
