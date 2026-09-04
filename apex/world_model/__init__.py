@@ -20,6 +20,20 @@ from apex.world_model.authority import (AUTHORITY_DIGEST,
                                         WORLD_MODEL_RESEARCH_AUTHORITY_V0,
                                         WorldModelAuthorityViolation,
                                         assert_authority)
+from apex.world_model.canonical import (CANONICAL_VERSION,
+                                        NumericContractViolation,
+                                        canonical_json, content_hash,
+                                        strict_float, strict_probability)
+from apex.world_model.forecast import (FORECAST_SCHEMA_VERSION, HORIZONS,
+                                       ForecastContractViolation,
+                                       PredictiveDistribution,
+                                       WorldModelForecast)
+from apex.world_model.inputs import (INFORMATION_TIERS,
+                                     INPUT_SCHEMA_VERSION, Component,
+                                     InputContractViolation,
+                                     WorldModelInput)
+from apex.world_model.quality import (QUALITY_STATES,
+                                      QualityContractViolation)
 from apex.world_model.sources import (FORBIDDEN_SOURCE_CLASSES,
                                       PERMITTED_SOURCE_CLASSES,
                                       SOURCE_CONTRACT,
@@ -34,4 +48,12 @@ __all__ = ["WORLD_MODEL_SHADOW_ENGINE", "DECISION_POWER",
            "WORLD_MODEL_RESEARCH_AUTHORITY_V0", "assert_authority",
            "WorldModelAuthorityViolation", "SOURCE_CONTRACT", "admit",
            "SourceAdmissionRefused", "PERMITTED_SOURCE_CLASSES",
-           "FORBIDDEN_SOURCE_CLASSES"]
+           "FORBIDDEN_SOURCE_CLASSES", "CANONICAL_VERSION",
+           "canonical_json", "content_hash", "strict_float",
+           "strict_probability", "NumericContractViolation",
+           "QUALITY_STATES", "QualityContractViolation",
+           "INPUT_SCHEMA_VERSION", "INFORMATION_TIERS", "Component",
+           "WorldModelInput", "InputContractViolation",
+           "FORECAST_SCHEMA_VERSION", "HORIZONS",
+           "PredictiveDistribution", "WorldModelForecast",
+           "ForecastContractViolation"]
