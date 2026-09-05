@@ -49,8 +49,25 @@ from apex.world_model.grader import null_rule
 from apex.world_model.holdout import HOLDOUT_SEEDS as V21_SEEDS
 from apex.world_model.models import M0SyntheticBaseline, NullBaseline
 
-COURT_VERSION = "FINAL_SYNTHETIC_ACCEPTANCE_COURT_V0"
-NAMESPACE = "WM0E_R7_FINAL_ACCEPTANCE_V0"
+COURT_VERSION = "FINAL_SYNTHETIC_ACCEPTANCE_COURT_V1"
+RUNNER_VERSION = "FINAL_COURT_RUNNER_V0.1"
+RUNNER_HISTORY = {
+    "V0": "COURT-FINAL-ae42a5e4fda7 (namespace WM0E_R7_FINAL_ACCEPTANCE_V0) opened 2026-09-05T18:35:33Z and "
+          "failed on its first cell: WM-IMPL-002 -- the companion world and the bootstrap result were both "
+          "bound to the name `b`, so the cell record read `.config` on a dict. 0/300 cells; RUN_INVALID; "
+          "the namespace is CONSUMED; one N0 seed pair entered computation in memory.",
+    "V0.1": "same scientific court semantics; unambiguous names (companion_world, bootstrap_result); "
+            "companion provenance read from the world object before anything is rebound; reload "
+            "validation; development-only end-to-end qualification of the exact run_cell path for all six "
+            "controls BEFORE any acceptance namespace exists. The qualification itself exposed a second latent "
+            "defect (run_cell did not create its cells/ directory; V0's chain did it externally) -- fixed inside "
+            "run_cell. IMPLEMENTATION_REPAIR."}
+CONSUMED_NAMESPACES = ("WM0E_R1_HOLDOUT_V0", "WM0E_R7_FINAL_ACCEPTANCE_V0")
+BURNED_R7_NAMESPACE = "WM0E_R7_FINAL_ACCEPTANCE_V0"
+QUALIFICATION_NAMESPACE = "WM0E_R7_1_RUNNER_QUALIFICATION_DEV_V0"     # development-only, never acceptance
+# The acceptance namespace is MINTED in a later commit. While None, nothing can
+# derive, instantiate or inspect an acceptance seed.
+NAMESPACE = None
 N_INDEX = 50
 SEED_MODULUS = 2 ** 31 - 1
 E = 1860
@@ -111,12 +128,20 @@ def r7_budget_snapshot() -> dict:
 
 
 # ---------------------------------------------------------------- §4 seeds
-def derive_seed(control: str, role: str, index: int, namespace: str = NAMESPACE) -> int:
+def _need(namespace):
+    if namespace is None:
+        raise CourtIntegrityFailure("acceptance NAMESPACE not minted; pass an explicit development namespace")
+    return namespace
+
+
+def derive_seed(control: str, role: str, index: int, namespace: str = None) -> int:
+    namespace = _need(namespace if namespace is not None else NAMESPACE)
     h = hashlib.sha256(("%s|%s|%s|%d" % (namespace, control, role, index)).encode()).digest()
     return int.from_bytes(h[:8], "big") % SEED_MODULUS
 
 
-def seed_manifest(namespace: str = NAMESPACE) -> dict:
+def seed_manifest(namespace: str = None) -> dict:
+    namespace = _need(namespace if namespace is not None else NAMESPACE)
     rows = []
     for ctl in CONTROLS:
         for i in range(N_INDEX):
@@ -135,6 +160,16 @@ def seed_manifest(namespace: str = NAMESPACE) -> dict:
             "all_seeds_count": len(all_seeds), "manifest_hash": content_hash(rows)}
 
 
+def _burned_r7_seeds() -> list:
+    m = seed_manifest(BURNED_R7_NAMESPACE)
+    return sorted({r["primary_seed"] for r in m["cells"]} | {r["companion_seed"] for r in m["cells"] if "companion_seed" in r})
+
+
+def _qualification_seeds() -> list:
+    m = seed_manifest(QUALIFICATION_NAMESPACE)
+    return sorted({r["primary_seed"] for r in m["cells"]} | {r["companion_seed"] for r in m["cells"] if "companion_seed" in r})
+
+
 def prior_seed_universe() -> dict:
     """Every seed any WM-0E research, development, acceptance or calibration
     ever touched, primary AND companion, plus fixture PRNG namespaces."""
@@ -148,7 +183,11 @@ def prior_seed_universe() -> dict:
          "R51_N1_dev_100": list(R51.DEV_SEEDS),
          "calibration_fixture_prng": [7_301_000 + k for k in range(1, 40)] + [8_100_000 + k for k in range(1, 40)]
                                      + [9_500_000 + k for k in range(0, 20)] + [9_400_001, 9_400_002],
-         "V0_court_probe_seeds": [1000, 1037]}
+         "V0_court_probe_seeds": [1000, 1037],
+         "R7_consumed_primary_and_companion_400": _burned_r7_seeds(),
+         "R7_partially_executed_N0_index0_pair": [derive_seed("N0", "feature_world", 0, BURNED_R7_NAMESPACE),
+                                                  R51.target_seed(derive_seed("N0", "feature_world", 0, BURNED_R7_NAMESPACE))],
+         "R7_1_runner_qualification_dev": _qualification_seeds()}
     return u
 
 
@@ -173,11 +212,14 @@ class FinalCourtDefinition:
     scientific_surface_hash: str
     seed_manifest_hash: str
     budget_snapshot_hash: str
+    namespace: str
+    purpose: str = "ACCEPTANCE"          # or "RUNNER_QUALIFICATION_DEVELOPMENT_ONLY"
 
     def canonical(self) -> dict:
         m0 = M0SyntheticBaseline().model_identity(); nl = NullBaseline().model_identity()
         return {"court_version": COURT_VERSION, "court_id": self.court_id, "code_commit": self.code_commit,
-                "authority": AUTHORITY, "creation_time": self.creation_time,
+                "runner": {"version": RUNNER_VERSION, "history": RUNNER_HISTORY, "source_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
+                "purpose": self.purpose, "authority": AUTHORITY, "creation_time": self.creation_time,
                 "scientific_surface_hash": self.scientific_surface_hash,
                 "M0": {"identity": {"model_id": m0["model_id"], "model_version": m0["model_version"],
                                     "configuration": m0["configuration"]}, "config_hash": content_hash(m0["configuration"])},
@@ -196,8 +238,9 @@ class FinalCourtDefinition:
                 "geometry": {"standard": R4.R4_SPLIT.canonical(), "N1": R51.N1_SPLIT.canonical(),
                              "expected_usable_and_train": EXPECTED_GEOMETRY, "T_standard": R4.T_MAX, "T_N1": R51.T_N1},
                 "executed_split_contract": TS.EXECUTED_SPLIT_CONTRACT,
-                "seeds": {"namespace": NAMESPACE, "indices": N_INDEX, "manifest_hash": self.seed_manifest_hash,
-                          "derivation": seed_manifest()["algorithm"]},
+                "seeds": {"namespace": self.namespace, "indices": N_INDEX, "manifest_hash": self.seed_manifest_hash,
+                          "derivation": seed_manifest(self.namespace)["algorithm"],
+                          "consumed_namespaces_never_reused": list(CONSUMED_NAMESPACES)},
                 "acceptance": {"null_controls": "detections <= %d / 50 PASS; >= %d FAIL" % (NULL_MAX_DETECTIONS, NULL_MAX_DETECTIONS + 1),
                                "P0": "detections >= %d / 50 AND direction >= %d / 50" % (P0_MIN_DETECTIONS, P0_MIN_DIRECTION),
                                "detection": "primary bootstrap p <= alpha with mean(d) > 0; secondaries cannot rescue",
@@ -215,17 +258,25 @@ class FinalCourtDefinition:
         return content_hash(self.canonical())
 
 
-def define(code_commit: str, creation_time: float, surface_hash: str) -> FinalCourtDefinition:
-    man = seed_manifest()
-    aud = collision_audit(man)
-    if aud["count"]:
-        raise CourtIntegrityFailure("R7 seed collisions: %s" % aud["collisions"])
+def define(code_commit: str, creation_time: float, surface_hash: str, namespace: str = None,
+           purpose: str = "ACCEPTANCE") -> FinalCourtDefinition:
+    namespace = _need(namespace if namespace is not None else NAMESPACE)
+    if purpose == "ACCEPTANCE" and namespace in CONSUMED_NAMESPACES:
+        raise CourtIntegrityFailure("namespace %s is CONSUMED and can never be reused" % namespace)
+    if purpose == "ACCEPTANCE" and namespace == QUALIFICATION_NAMESPACE:
+        raise CourtIntegrityFailure("the development qualification namespace is not acceptance")
+    man = seed_manifest(namespace)
+    if purpose == "ACCEPTANCE":
+        aud = collision_audit(man)
+        if aud["count"]:
+            raise CourtIntegrityFailure("seed collisions: %s" % aud["collisions"])
     snap = r7_budget_snapshot()
-    cid = "COURT-FINAL-%s" % content_hash({"ns": NAMESPACE, "commit": code_commit, "manifest": man["manifest_hash"],
-                                            "engine": BS.content_identity(), "surface": surface_hash})[:12]
+    cid = "COURT-FINAL-%s" % content_hash({"ns": namespace, "commit": code_commit, "manifest": man["manifest_hash"],
+                                            "engine": BS.content_identity(), "surface": surface_hash,
+                                            "runner": RUNNER_VERSION, "purpose": purpose})[:12]
     return FinalCourtDefinition(court_id=cid, code_commit=code_commit, creation_time=creation_time,
                                 scientific_surface_hash=surface_hash, seed_manifest_hash=man["manifest_hash"],
-                                budget_snapshot_hash=snap["snapshot_hash"])
+                                budget_snapshot_hash=snap["snapshot_hash"], namespace=namespace, purpose=purpose)
 
 
 # ---------------------------------------------------------------- §12 cells
@@ -242,23 +293,25 @@ def _write_once(path: str, doc: dict):
 def run_cell(defn: FinalCourtDefinition, control: str, index: int, out_dir: str) -> dict:
     if control not in CONTROLS or not (0 <= index < N_INDEX):
         raise CourtIntegrityFailure("unexpected control/index %s/%s" % (control, index))
+    os.makedirs(os.path.join(out_dir, "cells"), exist_ok=True)      # found by R7.1 qualification: V0 relied on the caller
     path = os.path.join(out_dir, "cells", "%s_%02d.json" % (control, index))
     if os.path.exists(path):
         raise CourtIntegrityFailure("duplicate cell %s/%d" % (control, index))
-    seed = derive_seed(control, PRIMARY_ROLE[control], index)
+    seed = derive_seed(control, PRIMARY_ROLE[control], index, defn.namespace)
+    companion_world = None
     if control == "N1":
         world = R51.n1_world(seed); split = R51.N1_SPLIT; ds = R51.n1_e1860_dataset(seed); model = M0SyntheticBaseline(); worlds = {"world": world.world_hash}
     else:
         world = R4.r4_world(seed); split = R4.R4_SPLIT
         if control == "N0":
-            b = R51.target_world(world); ds = R51.n0_v1_dataset(seed); model = M0SyntheticBaseline()
-            worlds = {"feature_world": world.world_hash, "target_world": b.world_hash}
-            if b.world_hash == world.world_hash or b.config.seed == seed:
+            companion_world = R51.target_world(world); ds = R51.n0_v1_dataset(seed); model = M0SyntheticBaseline()
+            worlds = {"feature_world": world.world_hash, "target_world": companion_world.world_hash}
+            if companion_world.world_hash == world.world_hash or companion_world.config.seed == seed:
                 raise CourtIntegrityFailure("N0 same-world pairing")
         elif control == "N3":
-            b = R3.shadow_world(world); ds = R3.n3_v1_dataset(seed); model = M0SyntheticBaseline()
-            worlds = {"target_world": world.world_hash, "shadow_feature_world": b.world_hash}
-            if b.world_hash == world.world_hash or b.config.seed == seed:
+            companion_world = R3.shadow_world(world); ds = R3.n3_v1_dataset(seed); model = M0SyntheticBaseline()
+            worlds = {"target_world": world.world_hash, "shadow_feature_world": companion_world.world_hash}
+            if companion_world.world_hash == world.world_hash or companion_world.config.seed == seed:
                 raise CourtIntegrityFailure("N3 same-world pairing")
         elif control == "N2":
             ds = C.n2_dataset(defn.court_id, seed); model = M0SyntheticBaseline(); worlds = {"world": world.world_hash}
@@ -274,20 +327,52 @@ def run_cell(defn: FinalCourtDefinition, control: str, index: int, out_dir: str)
     exp_eval, exp_train = EXPECTED_GEOMETRY[control]
     if m["n_eval"] != exp_eval or m["n_train"] != exp_train or es["boundary"] != 720 or es["usable_evaluation_count"] != exp_eval:
         raise CourtIntegrityFailure("geometry %s: eval %d train %d boundary %d" % (control, m["n_eval"], m["n_train"], es["boundary"]))
+    # provenance of the companion world is fixed HERE, from the world object, before any other binding
+    companion_seed = companion_world.config.seed if companion_world is not None else None
     d = np.array(I.paired_differentials(m["grades"], n["grades"]))
-    b = BS.bootstrap_test(d.tolist(), court_id=defn.court_id, control=control, seed=seed)
+    bootstrap_result = BS.bootstrap_test(d.tolist(), court_id=defn.court_id, control=control, seed=seed)
     h = I.dm_hac_rule(m["grades"], n["grades"]); nov = I.non_overlap_rule(m["grades"], n["grades"]); z = null_rule(m["grades"], n["grades"])
     c = d - d.mean(); acf1 = float((c[1:] * c[:-1]).sum() / (c * c).sum()) if (c * c).sum() > 0 else 0.0
     cell = {"cell_id": cell_id(defn.court_id, control, index, worlds), "court_id": defn.court_id, "court_hash": defn.court_hash,
             "control": control, "identity": IDENTITY[control], "index": index, "primary_seed": seed, "worlds": worlds,
-            "companion_seed": (b.config.seed if control in ("N0", "N3") else None),
-            "verdict": b["verdict"], "p": b["p_bootstrap"], "t_obs": b["t_obs"], "block_length": b["block"]["block_length"],
-            "t_star_q975": b["t_star_q"]["q975"], "mean_d": float(d.mean()), "sd_d": float(d.std(ddof=1)), "acf1_d": acf1,
+            "companion_seed": companion_seed, "namespace": defn.namespace, "purpose": defn.purpose,
+            "runner": RUNNER_VERSION,
+            "verdict": bootstrap_result["verdict"], "p": bootstrap_result["p_bootstrap"], "t_obs": bootstrap_result["t_obs"],
+            "block_length": bootstrap_result["block"]["block_length"], "block": bootstrap_result["block"],
+            "t_star_q975": bootstrap_result["t_star_q"]["q975"], "mean_d": float(d.mean()), "sd_d": float(d.std(ddof=1)), "acf1_d": acf1,
             "positive": bool(d.mean() > 0), "n_eval": m["n_eval"], "n_train": m["n_train"],
             "executed_split_hash": es["executed_split_hash"],
             "secondary": {"hac_t": h["t"], "hac_verdict": h["verdict"], "non_overlap_z": nov["z"],
                           "non_overlap_verdict": nov["verdict"], "legacy_iid_z": z["z"]}, "utc": time.time()}
     _write_once(path, cell)
+    reloaded = load_cell(path, defn)                       # the artifact must validate on reload
+    return reloaded
+
+
+def load_cell(path: str, defn: FinalCourtDefinition) -> dict:
+    """Reload a persisted cell and validate it against the court. Refuses a
+    wrong court, a seed that does not derive from (namespace, control, role,
+    index), a cell_id that does not recompute, or a corrupted artifact."""
+    try:
+        cell = json.load(open(path))
+    except (OSError, ValueError) as e:
+        raise CourtIntegrityFailure("corrupted cell artifact %s: %s" % (path, type(e).__name__))
+    for k in ("cell_id", "court_id", "court_hash", "control", "index", "primary_seed", "worlds", "verdict", "p", "t_obs", "block", "n_eval", "n_train"):
+        if k not in cell:
+            raise CourtIntegrityFailure("cell artifact missing %s" % k)
+    if cell["court_id"] != defn.court_id or cell["court_hash"] != defn.court_hash:
+        raise CourtIntegrityFailure("cell belongs to a different court")
+    if cell["control"] not in CONTROLS or not (0 <= cell["index"] < N_INDEX):
+        raise CourtIntegrityFailure("cell has unexpected control/index")
+    if cell["primary_seed"] != derive_seed(cell["control"], PRIMARY_ROLE[cell["control"]], cell["index"], defn.namespace):
+        raise CourtIntegrityFailure("cell seed does not derive from the court namespace")
+    if cell["cell_id"] != cell_id(defn.court_id, cell["control"], cell["index"], cell["worlds"]):
+        raise CourtIntegrityFailure("cell_id does not recompute")
+    if cell["control"] in ("N0", "N3") and (cell["companion_seed"] is None or len(cell["worlds"]) != 2):
+        raise CourtIntegrityFailure("two-world cell without companion provenance")
+    exp_eval, exp_train = EXPECTED_GEOMETRY[cell["control"]]
+    if cell["n_eval"] != exp_eval or cell["n_train"] != exp_train:
+        raise CourtIntegrityFailure("cell geometry mismatch on reload")
     return cell
 
 
