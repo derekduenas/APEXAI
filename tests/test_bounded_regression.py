@@ -138,6 +138,6 @@ def test_miniature_end_to_end_uncontained(tmp_path):
         rec = R.reconcile(master, shards, recs)
         assert rec["ok"], rec
         assert rec["totals"] == {"PASS": 2, "FAIL": 0, "ERROR": 0, "SKIP": 1, "XFAIL": 1, "XPASS": 0, "UNREPORTED": 0}
-        assert rec["skip_manifest"]["skips"] == {"tests/test_one.py::test_s": "mini skip"}
+        assert rec["skip_manifest"]["skips"] == {"tests/test_one.py::test_s": "Skipped: mini skip"}   # verbatim pytest reason
     finally:
         os.environ.clear(); os.environ.update(old)
