@@ -1,0 +1,317 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_court.py::test_court_hash_commits_to_seeds_rule_tolerance_and_model",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_decision_rule_and_tolerance_are_inside_the_sealed_definition",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_changing_the_rule_would_change_the_sealed_hash",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_seed_set_is_predeclared_and_not_cherry_picked",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_binomial_tail_is_correct",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_error_control_is_stated_with_its_independence_caveat",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_court_tolerates_predeclared_false_positives_not_zero",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_run_invalid_makes_a_control_INVALID_not_pass",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_verdict_taxonomy_has_distinct_words_not_one_pass_fail",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_NO_SIGNAL_is_a_value_not_an_exception",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_every_control_declares_destroys_preserves_expected",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_derangement_has_no_fixed_points_and_refuses_n_below_2",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_N0_block_derangement_preserves_X_and_breaks_pairing",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_N1_shift_is_far_beyond_latent_persistence",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_N1_recomputes_the_purge_for_the_displaced_target",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_N1_reversed_displacement_is_refused_by_the_grader",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_N2_features_come_from_a_prng_not_from_truth",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_N3_permutation_does_not_depend_on_y",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_N3_preserves_X_marginals_and_y",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_N4_random_ranker_cannot_see_outcome_or_features",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_M0_configuration_is_byte_identical_to_WM0D",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_run_control_on_a_small_world_returns_a_named_verdict",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_run_control_refuses_a_drifted_M0",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_budget_records_wm0d_truth_including_smoke_observations",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_budget_is_immutable_and_hashes_every_attempt",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_budget_refuses_hidden_duplicate_and_unknown_category",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_budget_categories_cover_the_directive",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_real_data_firewall_still_active_under_WM0E",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_court_modules_import_no_production_apex_and_no_broker",
+   "file": "tests/test_world_model_court.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_court.py::test_no_economic_vocabulary_in_court_modules",
+   "file": "tests/test_world_model_court.py"
+  }
+ ],
+ "collected_count": 30,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_court.py::test_court_hash_commits_to_seeds_rule_tolerance_and_model": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_decision_rule_and_tolerance_are_inside_the_sealed_definition": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_changing_the_rule_would_change_the_sealed_hash": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_seed_set_is_predeclared_and_not_cherry_picked": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_binomial_tail_is_correct": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_error_control_is_stated_with_its_independence_caveat": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_court_tolerates_predeclared_false_positives_not_zero": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_run_invalid_makes_a_control_INVALID_not_pass": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_verdict_taxonomy_has_distinct_words_not_one_pass_fail": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_NO_SIGNAL_is_a_value_not_an_exception": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_every_control_declares_destroys_preserves_expected": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_derangement_has_no_fixed_points_and_refuses_n_below_2": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_N0_block_derangement_preserves_X_and_breaks_pairing": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_N1_shift_is_far_beyond_latent_persistence": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_N1_recomputes_the_purge_for_the_displaced_target": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_N1_reversed_displacement_is_refused_by_the_grader": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_N2_features_come_from_a_prng_not_from_truth": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_N3_permutation_does_not_depend_on_y": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_N3_preserves_X_marginals_and_y": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_N4_random_ranker_cannot_see_outcome_or_features": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_M0_configuration_is_byte_identical_to_WM0D": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_run_control_on_a_small_world_returns_a_named_verdict": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_run_control_refuses_a_drifted_M0": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_budget_records_wm0d_truth_including_smoke_observations": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_budget_is_immutable_and_hashes_every_attempt": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_budget_refuses_hidden_duplicate_and_unknown_category": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_budget_categories_cover_the_directive": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_real_data_firewall_still_active_under_WM0E": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_court_modules_import_no_production_apex_and_no_broker": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_court.py::test_no_economic_vocabulary_in_court_modules": {
+   "file": "tests/test_world_model_court.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 30,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_court.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 162.5,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36037.service",
+   "memory_max": "1468006400",
+   "memory_peak": "119169024",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 5.88
+ }
+}

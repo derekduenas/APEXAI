@@ -1,0 +1,317 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_resolution_resolves_elapsed_horizons_and_only_those",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_resolution_is_idempotent_via_the_outcome_ledger",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_resolution_never_extrapolates_wall_clock_past_the_bars",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_outcome_corpus_is_known_from_filtered",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_newly_terminal_fires_once_per_episode_on_the_lead_horizon",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_observatory_runtime_calls_the_learning_organs",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_forecast_refuses_without_earned_support",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_forecast_with_earned_gates_is_estimable_but_uncalibrated",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_only_a_calibrated_forecast_is_an_authorization_input",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_funnel_slot_stays_empty_below_calibrated",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_adapter_builds_a_real_candidate_with_real_economics",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_adapter_refuses_negative_clock_and_stale_quotes",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_adapter_refuses_zero_dte_and_thin_depth",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_adapter_direction_down_builds_a_put",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_adapter_candidate_survives_the_engine_gates",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_frontier2_runtime_uses_the_et_session_date",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_crypto_sensor_dark_when_artifact_absent",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_crypto_sensor_dark_when_heartbeat_stale",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_crypto_sensor_live_reports_observability_not_signal",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_crypto_sensor_is_read_only_by_ast",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_forward_learning_causality_the_operator_scenario",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_forward_learning_causality_end_to_end_through_the_forecast",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_resolution_known_from_is_resolution_time_never_event_time",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_crypto_terminology_context_live_perps_not_available",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_corpus_carries_independence_accounting",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_ineligible_condition_cannot_poison_the_low",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_odd_lot_excluded_from_high_low",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_all_ineligible_minute_falls_back_not_empty",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_missing_conditions_key_is_regular_way",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  },
+  {
+   "nodeid": "tests/test_living_organism_2026_08_21.py::test_quality_flags_excise_named_fields_only_append_only",
+   "file": "tests/test_living_organism_2026_08_21.py"
+  }
+ ],
+ "collected_count": 30,
+ "collect_errors": [],
+ "results": {
+  "tests/test_living_organism_2026_08_21.py::test_resolution_resolves_elapsed_horizons_and_only_those": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_resolution_is_idempotent_via_the_outcome_ledger": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_resolution_never_extrapolates_wall_clock_past_the_bars": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_outcome_corpus_is_known_from_filtered": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_newly_terminal_fires_once_per_episode_on_the_lead_horizon": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_observatory_runtime_calls_the_learning_organs": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_forecast_refuses_without_earned_support": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_forecast_with_earned_gates_is_estimable_but_uncalibrated": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_only_a_calibrated_forecast_is_an_authorization_input": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_funnel_slot_stays_empty_below_calibrated": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_adapter_builds_a_real_candidate_with_real_economics": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_adapter_refuses_negative_clock_and_stale_quotes": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_adapter_refuses_zero_dte_and_thin_depth": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_adapter_direction_down_builds_a_put": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_adapter_candidate_survives_the_engine_gates": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_frontier2_runtime_uses_the_et_session_date": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_crypto_sensor_dark_when_artifact_absent": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_crypto_sensor_dark_when_heartbeat_stale": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_crypto_sensor_live_reports_observability_not_signal": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_crypto_sensor_is_read_only_by_ast": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_forward_learning_causality_the_operator_scenario": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_forward_learning_causality_end_to_end_through_the_forecast": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_resolution_known_from_is_resolution_time_never_event_time": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: no outcome ledger in this environment"
+  },
+  "tests/test_living_organism_2026_08_21.py::test_crypto_terminology_context_live_perps_not_available": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_corpus_carries_independence_accounting": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_ineligible_condition_cannot_poison_the_low": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_odd_lot_excluded_from_high_low": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_all_ineligible_minute_falls_back_not_empty": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_missing_conditions_key_is_regular_way": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_living_organism_2026_08_21.py::test_quality_flags_excise_named_fields_only_append_only": {
+   "file": "tests/test_living_organism_2026_08_21.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 29,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 1,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_living_organism_2026_08_21.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 164.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35893.service",
+   "memory_max": "1468006400",
+   "memory_peak": "118042624",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.4
+ }
+}

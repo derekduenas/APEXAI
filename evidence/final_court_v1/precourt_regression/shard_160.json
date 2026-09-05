@@ -1,0 +1,209 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_projection_is_deterministic",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_higher_cost_lowers_net_return",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_higher_turnover_lowers_net_return",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_positive_control_a_strong_wide_factor_is_viable",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_negative_control_a_weak_factor_is_not_viable",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_counterexample_a_narrow_factor_fails_the_breadth_gate",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_the_evaluator_exposes_no_optimiser",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_the_policy_is_fixed_and_declared",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_viability_thresholds_are_declared_constants",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_counterexample_a_bad_breadth_is_refused",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_the_projection_touches_no_candidate_or_forward_return",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_long_only_is_deterministic_and_costs_bite",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_long_only_policy_is_fixed_and_declared",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_long_only_positive_control_a_strong_sleeve_is_viable",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_long_only_negative_control_a_weak_sleeve_is_not_viable",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_counterexample_a_sleeve_below_20_names_fails_the_gate",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_long_only_viability_thresholds_are_declared_constants",
+   "file": "tests/test_portfolio_projection.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_projection.py::test_no_function_evaluates_both_policies",
+   "file": "tests/test_portfolio_projection.py"
+  }
+ ],
+ "collected_count": 18,
+ "collect_errors": [],
+ "results": {
+  "tests/test_portfolio_projection.py::test_projection_is_deterministic": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_higher_cost_lowers_net_return": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_higher_turnover_lowers_net_return": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_positive_control_a_strong_wide_factor_is_viable": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_negative_control_a_weak_factor_is_not_viable": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_counterexample_a_narrow_factor_fails_the_breadth_gate": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_the_evaluator_exposes_no_optimiser": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_the_policy_is_fixed_and_declared": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_viability_thresholds_are_declared_constants": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_counterexample_a_bad_breadth_is_refused": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_the_projection_touches_no_candidate_or_forward_return": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_long_only_is_deterministic_and_costs_bite": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_long_only_policy_is_fixed_and_declared": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_long_only_positive_control_a_strong_sleeve_is_viable": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_long_only_negative_control_a_weak_sleeve_is_not_viable": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_counterexample_a_sleeve_below_20_names_fails_the_gate": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_long_only_viability_thresholds_are_declared_constants": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_projection.py::test_no_function_evaluates_both_policies": {
+   "file": "tests/test_portfolio_projection.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 18,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_portfolio_projection.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35950.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115421184",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.52
+ }
+}

@@ -1,0 +1,326 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_dead_process_is_detected_not_assumed_fine",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_alive_but_making_no_progress_reads_as_stalled",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_beating_with_no_work_ever_is_stalled_not_healthy",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_silent_process_reads_as_stale",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_service_that_never_ran_is_not_silently_absent",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_running_the_wrong_release_is_caught",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_healthy_service_reports_healthy",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_heartbeat_writes_are_atomic",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_summary_names_what_needs_attention",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_every_state_emitted_is_declared",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_cloud_only_code_is_the_named_alarm",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_release_in_canonical_history_is_healthy",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_writable_release_is_flagged_mutable",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_running_from_the_repo_itself_is_refused",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_an_unstamped_release_cannot_be_attributed",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_pedigree_names_the_secret_backend",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_pedigree_reports_no_backend_when_there_is_none",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_pedigree_carries_what_is_needed_to_identify_the_code",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_no_current_release_refuses_rather_than_defaulting",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_freshly_restarted_daemon_is_starting_not_stalled",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_the_grace_expires_and_a_stuck_daemon_is_caught",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_daemon_that_has_worked_before_gets_no_grace",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_restart_loop_is_visible_even_when_heartbeats_look_fine",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_expecting_nothing_differs_from_declaring_nothing",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_a_service_idle_by_design_is_not_a_fault",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_suppressing_an_alarm_never_erases_the_observation",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_running_when_it_should_be_stopped_is_a_finding",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_an_undeclared_service_still_alarms",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_health_refuses_an_expectation_it_does_not_understand",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_late_and_gone_do_not_page_the_same_way",
+   "file": "tests/test_ops_hardening.py"
+  },
+  {
+   "nodeid": "tests/test_ops_hardening.py::test_every_severity_maps_a_declared_state",
+   "file": "tests/test_ops_hardening.py"
+  }
+ ],
+ "collected_count": 31,
+ "collect_errors": [],
+ "results": {
+  "tests/test_ops_hardening.py::test_a_dead_process_is_detected_not_assumed_fine": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_alive_but_making_no_progress_reads_as_stalled": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_beating_with_no_work_ever_is_stalled_not_healthy": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_a_silent_process_reads_as_stale": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_a_service_that_never_ran_is_not_silently_absent": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_running_the_wrong_release_is_caught": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_a_healthy_service_reports_healthy": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_heartbeat_writes_are_atomic": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_summary_names_what_needs_attention": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_every_state_emitted_is_declared": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_cloud_only_code_is_the_named_alarm": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_a_release_in_canonical_history_is_healthy": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_a_writable_release_is_flagged_mutable": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_running_from_the_repo_itself_is_refused": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_an_unstamped_release_cannot_be_attributed": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_pedigree_names_the_secret_backend": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_pedigree_reports_no_backend_when_there_is_none": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_pedigree_carries_what_is_needed_to_identify_the_code": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_no_current_release_refuses_rather_than_defaulting": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_a_freshly_restarted_daemon_is_starting_not_stalled": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_the_grace_expires_and_a_stuck_daemon_is_caught": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_a_daemon_that_has_worked_before_gets_no_grace": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_a_restart_loop_is_visible_even_when_heartbeats_look_fine": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_expecting_nothing_differs_from_declaring_nothing": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_a_service_idle_by_design_is_not_a_fault": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_suppressing_an_alarm_never_erases_the_observation": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_running_when_it_should_be_stopped_is_a_finding": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_an_undeclared_service_still_alarms": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_health_refuses_an_expectation_it_does_not_understand": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_late_and_gone_do_not_page_the_same_way": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ops_hardening.py::test_every_severity_maps_a_declared_state": {
+   "file": "tests/test_ops_hardening.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 31,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_ops_hardening.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35907.service",
+   "memory_max": "1468006400",
+   "memory_peak": "125104128",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.94
+ }
+}

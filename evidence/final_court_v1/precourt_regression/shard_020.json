@@ -1,0 +1,596 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_raw_evidence_is_persisted_before_any_interpretation",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_republished_document_is_not_new_evidence",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_known_from_is_retrieval_not_publication",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_same_event_from_many_outlets_is_one_event",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_different_events_stay_separate",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_entity_hints_are_deterministic_string_matching",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_dead_source_is_not_a_quiet_world",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_one_dead_adapter_does_not_kill_the_sweep",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_brain_reaching_past_the_fence_degrades_one_event_only",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_brain_citing_documents_it_never_saw_is_refused",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_valid_interpretation_is_applied_and_stamped",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_no_brain_on_this_host_still_produces_events",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_cli_json_fence_is_unwrapped",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_timeout_is_reported_not_raised",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_events_reach_the_edgeforge_outbox_without_a_verdict",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_record_that_already_knows_its_outcome_is_refused",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_consumer_does_not_invent_greeks_or_half_lives",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_candidate_without_declared_risk_is_refused",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_three_tickers_one_bet_is_caught_on_real_records",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_cash_is_a_real_competitor",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_shadow_book_rebuilds_from_its_own_sealed_decisions",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_outcome_is_appended_never_merged_into_the_seal",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_consumer_drains_a_real_v1_outbox",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_every_feed_dialect_parses[<?xml version=\"1.0\"?>\\n<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\\n         xmlns=\"http://purl.org/rss/1.0/\">\\n  <channel><title>H.15</title></channel>\\n  <item><title>Selected Interest Rates</title>\\n        <link>https://federalreserve.gov/h15</link>\\n        <description>Daily rates.</description>\\n        <date>2026-08-26</date></item>\\n</rdf:RDF>-Selected Interest]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_every_feed_dialect_parses[<?xml version=\"1.0\"?>\\n<feed xmlns=\"http://www.w3.org/2005/Atom\">\\n  <entry><title>Apple files 8-K</title>\\n         <link href=\"https://example.gov/a\"/>\\n         <updated>2026-08-26T12:00:00Z</updated>\\n         <summary>A filing.</summary></entry>\\n</feed>-Apple files]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_source_that_yields_nothing_is_named",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_reaction_is_measured_only_after_known_from",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_an_event_with_no_bars_is_unmeasurable_not_neutral",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_atr_is_never_fabricated_from_thin_data",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_minimum_world_covers_five_classes",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_dead_class_is_reported_missing_not_hidden",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_broad_discovery_can_never_assert_a_fact",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_contract_states_every_closed_vocabulary_it_enforces",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_contract_sha_tracks_the_vocabulary",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_cycle_record_says_where_it_looked",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_feed_furniture_does_not_manufacture_a_ticker",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_governed_candidate_state_is_paper_attacked",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_declared_risk_is_read_from_the_sealed_attack_card",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows0-matched 0]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows1-matched 2]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows2-not PAPER_ATTACKED]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows3-not a positive number]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows4-outcome fields]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_card_sealed_after_the_decision_is_refused",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_real_attack_now_becomes_one_sealed_shadow_decision",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_capital_never_synthesizes_risk",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_reaction_reads_the_session_ledger_not_the_cycle",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_duplicated_ledger_event_is_not_reacted_to_twice",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_reaction_rows_carry_lineage_and_evidence_class",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_the_interpreter_no_longer_drops_the_expectation",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_an_expectation_may_never_masquerade_as_a_source_fact",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_expectation_does_not_promote_verification",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_expectation_versus_observed_now_classifies[POSITIVE-closes0-FAILED_POSITIVE_REACTION]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_expectation_versus_observed_now_classifies[NEGATIVE-closes1-FAILED_NEGATIVE_REACTION]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_expectation_versus_observed_now_classifies[UNKNOWN-closes2-UNKNOWN]",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_an_expectation_formed_after_the_path_began_is_refused",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_expectation_survives_a_ledger_round_trip",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_forbidden_expectation_value_is_refused",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_expectation_cannot_reach_v1_or_authorize_anything",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_a_tape_too_thin_for_an_atr_is_unmeasurable_not_a_crash",
+   "file": "tests/test_catalyst_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_commissioning.py::test_weekend_phase_carries_the_same_shape_as_trading_days",
+   "file": "tests/test_catalyst_commissioning.py"
+  }
+ ],
+ "collected_count": 61,
+ "collect_errors": [],
+ "results": {
+  "tests/test_catalyst_commissioning.py::test_raw_evidence_is_persisted_before_any_interpretation": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_republished_document_is_not_new_evidence": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_known_from_is_retrieval_not_publication": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_same_event_from_many_outlets_is_one_event": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_different_events_stay_separate": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_entity_hints_are_deterministic_string_matching": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_dead_source_is_not_a_quiet_world": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_one_dead_adapter_does_not_kill_the_sweep": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_brain_reaching_past_the_fence_degrades_one_event_only": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_brain_citing_documents_it_never_saw_is_refused": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_valid_interpretation_is_applied_and_stamped": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_no_brain_on_this_host_still_produces_events": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_cli_json_fence_is_unwrapped": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_timeout_is_reported_not_raised": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_events_reach_the_edgeforge_outbox_without_a_verdict": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_record_that_already_knows_its_outcome_is_refused": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_consumer_does_not_invent_greeks_or_half_lives": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_candidate_without_declared_risk_is_refused": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_three_tickers_one_bet_is_caught_on_real_records": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_cash_is_a_real_competitor": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_shadow_book_rebuilds_from_its_own_sealed_decisions": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_outcome_is_appended_never_merged_into_the_seal": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_consumer_drains_a_real_v1_outbox": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_every_feed_dialect_parses[<?xml version=\"1.0\"?>\\n<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\\n         xmlns=\"http://purl.org/rss/1.0/\">\\n  <channel><title>H.15</title></channel>\\n  <item><title>Selected Interest Rates</title>\\n        <link>https://federalreserve.gov/h15</link>\\n        <description>Daily rates.</description>\\n        <date>2026-08-26</date></item>\\n</rdf:RDF>-Selected Interest]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_every_feed_dialect_parses[<?xml version=\"1.0\"?>\\n<feed xmlns=\"http://www.w3.org/2005/Atom\">\\n  <entry><title>Apple files 8-K</title>\\n         <link href=\"https://example.gov/a\"/>\\n         <updated>2026-08-26T12:00:00Z</updated>\\n         <summary>A filing.</summary></entry>\\n</feed>-Apple files]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_source_that_yields_nothing_is_named": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_reaction_is_measured_only_after_known_from": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_an_event_with_no_bars_is_unmeasurable_not_neutral": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_atr_is_never_fabricated_from_thin_data": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_minimum_world_covers_five_classes": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_dead_class_is_reported_missing_not_hidden": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_broad_discovery_can_never_assert_a_fact": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_contract_states_every_closed_vocabulary_it_enforces": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_contract_sha_tracks_the_vocabulary": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_cycle_record_says_where_it_looked": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_feed_furniture_does_not_manufacture_a_ticker": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_governed_candidate_state_is_paper_attacked": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_declared_risk_is_read_from_the_sealed_attack_card": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows0-matched 0]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows1-matched 2]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows2-not PAPER_ATTACKED]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows3-not a positive number]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_any_broken_invariant_yields_not_estimable[rows4-outcome fields]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_card_sealed_after_the_decision_is_refused": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_real_attack_now_becomes_one_sealed_shadow_decision": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_capital_never_synthesizes_risk": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_reaction_reads_the_session_ledger_not_the_cycle": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_duplicated_ledger_event_is_not_reacted_to_twice": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_reaction_rows_carry_lineage_and_evidence_class": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_the_interpreter_no_longer_drops_the_expectation": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_an_expectation_may_never_masquerade_as_a_source_fact": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_expectation_does_not_promote_verification": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_expectation_versus_observed_now_classifies[POSITIVE-closes0-FAILED_POSITIVE_REACTION]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_expectation_versus_observed_now_classifies[NEGATIVE-closes1-FAILED_NEGATIVE_REACTION]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_expectation_versus_observed_now_classifies[UNKNOWN-closes2-UNKNOWN]": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_an_expectation_formed_after_the_path_began_is_refused": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_expectation_survives_a_ledger_round_trip": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_forbidden_expectation_value_is_refused": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_expectation_cannot_reach_v1_or_authorize_anything": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_a_tape_too_thin_for_an_atr_is_unmeasurable_not_a_crash": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_commissioning.py::test_weekend_phase_carries_the_same_shape_as_trading_days": {
+   "file": "tests/test_catalyst_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 61,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_catalyst_commissioning.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35809.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116744192",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.34
+ }
+}

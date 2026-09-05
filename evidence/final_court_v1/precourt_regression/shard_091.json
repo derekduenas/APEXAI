@@ -1,0 +1,236 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_future_monster_bar_changes_nothing",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_bar_at_T_not_yet_visible",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_vwap_at_T_differs_from_final_vwap",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_rvol_uses_only_visible_volume",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_opening_range_incomplete_before_1000",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_missing_context_flags_not_fabricates",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_amd_style_excess_and_agreement",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_missing_benchmark_propagates_none",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_scanner_zero_candidates_is_legal",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_scanner_denominators_and_liquidity_refusal",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_extreme_rvol_detected",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_no_signals_in_first_30_minutes",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_hunter001_requires_every_predicate",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_hunter001_fails_closed_on_missing_input",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_hunter002_failed_up_extension_short",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_hunter002_fresh_extreme_is_a_knife_not_a_failure",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_decision_before_playbook_birth_not_eligible",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_decision_after_all_births_eligible",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_missing_dependency_kind_fails_closed",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_load_births_reads_flat_chain_entries",
+   "file": "tests/test_hunter_p1b.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p1b.py::test_realization_deterministic_and_truncation_flagged",
+   "file": "tests/test_hunter_p1b.py"
+  }
+ ],
+ "collected_count": 21,
+ "collect_errors": [],
+ "results": {
+  "tests/test_hunter_p1b.py::test_future_monster_bar_changes_nothing": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_bar_at_T_not_yet_visible": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_vwap_at_T_differs_from_final_vwap": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_rvol_uses_only_visible_volume": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_opening_range_incomplete_before_1000": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_missing_context_flags_not_fabricates": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_amd_style_excess_and_agreement": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_missing_benchmark_propagates_none": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_scanner_zero_candidates_is_legal": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_scanner_denominators_and_liquidity_refusal": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_extreme_rvol_detected": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_no_signals_in_first_30_minutes": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_hunter001_requires_every_predicate": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_hunter001_fails_closed_on_missing_input": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_hunter002_failed_up_extension_short": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_hunter002_fresh_extreme_is_a_knife_not_a_failure": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_decision_before_playbook_birth_not_eligible": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_decision_after_all_births_eligible": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_missing_dependency_kind_fails_closed": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_load_births_reads_flat_chain_entries": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p1b.py::test_realization_deterministic_and_truncation_flagged": {
+   "file": "tests/test_hunter_p1b.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 21,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_hunter_p1b.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 162.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35880.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116244480",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.86
+ }
+}

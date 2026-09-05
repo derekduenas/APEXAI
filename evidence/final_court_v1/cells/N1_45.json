@@ -1,0 +1,59 @@
+{
+ "cell_id": "d8ca2e164df575fe529d98d4a1230d2f35fcda25f90984550330d87a182f53f7",
+ "court_id": "COURT-FINAL-f6ba5c856014",
+ "court_hash": "2b6bda8e007b6a3867994eb7194f5f2b92347aaf2efaf71808c8b19ba5f17438",
+ "control": "N1",
+ "identity": "N1_TIME_DESTRUCTION_E1860_V1",
+ "index": 45,
+ "primary_seed": 1861485831,
+ "worlds": {
+  "world": "3ed8263b8879095cd8bb18389196a2e9d52e761c9aa4bbf3ccaf72200ffea595"
+ },
+ "companion_seed": null,
+ "namespace": "WM0E_R7_1_FINAL_ACCEPTANCE_V1",
+ "purpose": "ACCEPTANCE",
+ "runner": "FINAL_COURT_RUNNER_V0.1",
+ "verdict": "NO_SIGNAL",
+ "p": 1.0,
+ "t_obs": -9.790097915444477,
+ "block_length": 89,
+ "block": {
+  "rule": "l = clamp(round(b_PPW), H, floor(n/6)); b_PPW = Politis-White 2004 / Patton-Politis-White 2009 automatic block length, circular variant, on the centred differential",
+  "lower": 15,
+  "upper": 310,
+  "selector_output": {
+   "selector": "POLITIS_WHITE_2004_PPW_2009",
+   "variant": "circular",
+   "n": 1860,
+   "K_N": 5,
+   "m_max": 49,
+   "band": 0.08385231441484904,
+   "autocov_lags_available": 98,
+   "max_lag_read": 80,
+   "m_hat": 40,
+   "M": 80,
+   "G_hat": 7832.772237156796,
+   "D_hat": 320681.96848062455,
+   "b_opt": 89.28252523038131
+  },
+  "proposed": 89,
+  "block_length": 89,
+  "clamped": "none"
+ },
+ "t_star_q975": 3.852694747566906,
+ "mean_d": -2.874444881567556,
+ "sd_d": 3.693936538576163,
+ "acf1_d": 0.8614959180292441,
+ "positive": false,
+ "n_eval": 1860,
+ "n_train": 501,
+ "executed_split_hash": "886a5ecc38d7e4b5b5c1bd92eed719b1388b4bffe60ea66b6d99b98ac8b8a4f1",
+ "secondary": {
+  "hac_t": -9.790097915444477,
+  "hac_verdict": "NO_SIGNAL",
+  "non_overlap_z": -8.275994130749776,
+  "non_overlap_verdict": "NO_SIGNAL",
+  "legacy_iid_z": -33.55992853922532
+ },
+ "utc": 1788639277.5182347
+}

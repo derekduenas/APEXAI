@@ -1,0 +1,164 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_research_board.py::test_canonical_board_is_absolute",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_board_append_refuses_a_relative_path",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_board_append_refuses_every_legacy_board",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_no_authoritative_writer_selects_its_board_by_cwd",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_reconciliation_root_is_deterministic_and_order_independent",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_reconciliation_root_changes_if_a_legacy_board_changes",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_swapping_two_legacy_boards_changes_the_root",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_v2_opens_with_the_reconciliation_record_and_verifies",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_legacy_boards_still_match_what_v2_committed_to",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_legacy_boards_are_frozen_read_only",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_each_legacy_board_is_independently_intact",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_reconciliation_claims_no_false_common_history",
+   "file": "tests/test_research_board.py"
+  },
+  {
+   "nodeid": "tests/test_research_board.py::test_audit_script_passes",
+   "file": "tests/test_research_board.py"
+  }
+ ],
+ "collected_count": 13,
+ "collect_errors": [],
+ "results": {
+  "tests/test_research_board.py::test_canonical_board_is_absolute": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_board_append_refuses_a_relative_path": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_board_append_refuses_every_legacy_board": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_no_authoritative_writer_selects_its_board_by_cwd": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_reconciliation_root_is_deterministic_and_order_independent": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_reconciliation_root_changes_if_a_legacy_board_changes": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_swapping_two_legacy_boards_changes_the_root": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_v2_opens_with_the_reconciliation_record_and_verifies": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_legacy_boards_still_match_what_v2_committed_to": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_legacy_boards_are_frozen_read_only": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_each_legacy_board_is_independently_intact": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_reconciliation_claims_no_false_common_history": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_board.py::test_audit_script_passes": {
+   "file": "tests/test_research_board.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 13,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_research_board.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35959.service",
+   "memory_max": "1468006400",
+   "memory_peak": "159571968",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 5.34
+ }
+}

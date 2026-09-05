@@ -1,0 +1,74 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_unit_config.py::test_no_directive_is_in_a_section_systemd_ignores",
+   "file": "tests/test_unit_config.py"
+  },
+  {
+   "nodeid": "tests/test_unit_config.py::test_systemd_reports_no_unknown_keys",
+   "file": "tests/test_unit_config.py"
+  },
+  {
+   "nodeid": "tests/test_unit_config.py::test_no_active_apex_service_is_unbounded_in_system_slice",
+   "file": "tests/test_unit_config.py"
+  }
+ ],
+ "collected_count": 3,
+ "collect_errors": [],
+ "results": {
+  "tests/test_unit_config.py::test_no_directive_is_in_a_section_systemd_ignores": {
+   "file": "tests/test_unit_config.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unit_config.py::test_systemd_reports_no_unknown_keys": {
+   "file": "tests/test_unit_config.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unit_config.py::test_no_active_apex_service_is_unbounded_in_system_slice": {
+   "file": "tests/test_unit_config.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 3,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_unit_config.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 157.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35989.service",
+   "memory_max": "1468006400",
+   "memory_peak": "118554624",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.32
+ }
+}

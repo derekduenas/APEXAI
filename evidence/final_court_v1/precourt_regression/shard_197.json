@@ -1,0 +1,362 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_record_never_raises_even_when_the_ledger_is_unwritable",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_unknown_operation_is_normalised_not_dropped",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_recorded_error_is_readable_back_and_summarised",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_error_record_carries_no_decision_power",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_the_three_swallowing_handlers_are_actually_wired",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_options_gate_refuses_when_health_artifact_is_absent",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_options_gate_refuses_on_unhealthy_upstream",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_options_gate_refuses_on_stale_health",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_options_gate_budget_ends_exactly_at_the_close",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_options_gate_refuses_after_the_close",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_partial_upstream_still_admits",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_forensics_gate_refuses_without_close_artifacts",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_forensics_gate_admits_once_the_close_artifact_exists",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_gate_refusal_is_durable",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_gate_never_imports_decision_authority",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_observer_has_no_argument_that_can_force_a_pass",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_absent_evidence_is_never_a_pass",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_missing_rate_provenance_fails_rather_than_passes",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_unlabelled_dte_sample_fails_rather_than_passes",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_session_date_matching_uses_eastern_not_utc_prefix",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_frozen_captain_state_is_a_fail_not_a_pass",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_identical_trigger_run_is_flagged_as_phantom",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_reconstructed_anchor_can_never_certify_an_opening",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_a_crashing_item_reads_as_fail_not_as_pass",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_board_declares_zero_manual_checkboxes",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_observer_never_imports_decision_authority",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_every_item_names_the_failure_it_catches",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_both_sidecar_jobs_are_scheduled_and_classified",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_sidecar_wrappers_turn_a_refusal_into_a_clean_noop",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_post_close_job_runs_the_acceptance_board",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_the_phase1_memory_module_does_not_compete_for_canonical",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_no_second_memory_writer_is_scheduled",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_every_ops_plist_is_well_formed_xml",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_scheduled_ops_scripts_exist_and_are_executable",
+   "file": "tests/test_unattended_closure.py"
+  },
+  {
+   "nodeid": "tests/test_unattended_closure.py::test_production_error_ledger_is_protected_from_tests",
+   "file": "tests/test_unattended_closure.py"
+  }
+ ],
+ "collected_count": 35,
+ "collect_errors": [],
+ "results": {
+  "tests/test_unattended_closure.py::test_record_never_raises_even_when_the_ledger_is_unwritable": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_unknown_operation_is_normalised_not_dropped": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_recorded_error_is_readable_back_and_summarised": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_error_record_carries_no_decision_power": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_the_three_swallowing_handlers_are_actually_wired": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_options_gate_refuses_when_health_artifact_is_absent": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_options_gate_refuses_on_unhealthy_upstream": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_options_gate_refuses_on_stale_health": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_options_gate_budget_ends_exactly_at_the_close": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_options_gate_refuses_after_the_close": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_partial_upstream_still_admits": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_forensics_gate_refuses_without_close_artifacts": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_forensics_gate_admits_once_the_close_artifact_exists": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_gate_refusal_is_durable": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_gate_never_imports_decision_authority": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_observer_has_no_argument_that_can_force_a_pass": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_absent_evidence_is_never_a_pass": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_missing_rate_provenance_fails_rather_than_passes": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_unlabelled_dte_sample_fails_rather_than_passes": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_session_date_matching_uses_eastern_not_utc_prefix": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_frozen_captain_state_is_a_fail_not_a_pass": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_identical_trigger_run_is_flagged_as_phantom": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_reconstructed_anchor_can_never_certify_an_opening": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_a_crashing_item_reads_as_fail_not_as_pass": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_board_declares_zero_manual_checkboxes": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_observer_never_imports_decision_authority": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_every_item_names_the_failure_it_catches": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_both_sidecar_jobs_are_scheduled_and_classified": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_sidecar_wrappers_turn_a_refusal_into_a_clean_noop": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_post_close_job_runs_the_acceptance_board": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_the_phase1_memory_module_does_not_compete_for_canonical": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_no_second_memory_writer_is_scheduled": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_every_ops_plist_is_well_formed_xml": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_unattended_closure.py::test_scheduled_ops_scripts_exist_and_are_executable": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: verifies the Mac host launchd/ops installation -- Darwin-only by nature; cloud uses systemd (C6)"
+  },
+  "tests/test_unattended_closure.py::test_production_error_ledger_is_protected_from_tests": {
+   "file": "tests/test_unattended_closure.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 34,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 1,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_unattended_closure.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35987.service",
+   "memory_max": "1468006400",
+   "memory_peak": "118263808",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.78
+ }
+}

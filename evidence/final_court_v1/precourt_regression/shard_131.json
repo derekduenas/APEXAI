@@ -1,0 +1,164 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_thesis_right_friction_killed_is_named_explicitly",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_thesis_right_friction_survived_is_the_only_proof_of_edge",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_thesis_wrong_is_not_blamed_on_the_spread",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_right_underlying_wrong_instrument_is_its_own_diagnosis",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_no_executable_round_trip_is_execution_failure_not_zero_pnl",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_iv_crush_is_contributing_never_the_headline",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_theta_burden_is_contributing_and_not_treated_as_fatal",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_bad_entry_flags_a_spread_that_started_underwater",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_a_tight_entry_is_not_flagged",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_every_emitted_class_is_declared",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_summary_headline_points_at_execution_when_friction_dominates",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_summary_is_honest_when_nothing_gained_on_mid",
+   "file": "tests/test_options_friction_attribution.py"
+  },
+  {
+   "nodeid": "tests/test_options_friction_attribution.py::test_summary_only_totals_what_it_could_decompose",
+   "file": "tests/test_options_friction_attribution.py"
+  }
+ ],
+ "collected_count": 13,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_friction_attribution.py::test_thesis_right_friction_killed_is_named_explicitly": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_thesis_right_friction_survived_is_the_only_proof_of_edge": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_thesis_wrong_is_not_blamed_on_the_spread": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_right_underlying_wrong_instrument_is_its_own_diagnosis": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_no_executable_round_trip_is_execution_failure_not_zero_pnl": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_iv_crush_is_contributing_never_the_headline": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_theta_burden_is_contributing_and_not_treated_as_fatal": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_bad_entry_flags_a_spread_that_started_underwater": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_a_tight_entry_is_not_flagged": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_every_emitted_class_is_declared": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_summary_headline_points_at_execution_when_friction_dominates": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_summary_is_honest_when_nothing_gained_on_mid": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_friction_attribution.py::test_summary_only_totals_what_it_could_decompose": {
+   "file": "tests/test_options_friction_attribution.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 13,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_friction_attribution.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 157.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35921.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115146752",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.54
+ }
+}

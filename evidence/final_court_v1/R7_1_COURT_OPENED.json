@@ -1,0 +1,17 @@
+{
+ "R7_1_COURT_OPENED": true,
+ "court_id": "COURT-FINAL-f6ba5c856014",
+ "court_version": "FINAL_SYNTHETIC_ACCEPTANCE_COURT_V1",
+ "court_hash": "2b6bda8e007b6a3867994eb7194f5f2b92347aaf2efaf71808c8b19ba5f17438",
+ "code_commit": "f033bd0a2",
+ "R7_1_OPENING_COMMIT": "4148bce91",
+ "tree_hash": "048b611a4febcb034e5acf98da130822b1890ae6",
+ "tree_differs_from_code_commit_by": "sealed predeclaration evidence only (no code)",
+ "runner": "FINAL_COURT_RUNNER_V0.1",
+ "runner_sha256": "8ef67c48b70d4d9204a50918ab7654fb790657592337238e9f02dc7d4955119b",
+ "seed_manifest_hash": "ef3127aad7d1d04680211fdf49cfa0658f0cbb3702549bd0bbe7f4f02ff384ab",
+ "utc": "2026-09-05T19:54:28Z",
+ "precourt_regression_artifact_sha256": "e55dbc34b70cdc593c2761591522601d9407ffb3c6270a60c2613cfa62cc9b8e",
+ "acceptance_set": "CONSUMED from this instant",
+ "oom_kill_baseline": 4
+}

@@ -1,0 +1,128 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_event_bus2.py::test_unknown_event_type_refused",
+   "file": "tests/test_frontier2_event_bus2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_event_bus2.py::test_unknown_transport_refused",
+   "file": "tests/test_frontier2_event_bus2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_event_bus2.py::test_known_from_before_event_time_refused",
+   "file": "tests/test_frontier2_event_bus2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_event_bus2.py::test_emit_writes_and_reads_back",
+   "file": "tests/test_frontier2_event_bus2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_event_bus2.py::test_same_prior_and_new_state_is_not_material",
+   "file": "tests/test_frontier2_event_bus2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_event_bus2.py::test_latest_for_returns_none_when_never_fired",
+   "file": "tests/test_frontier2_event_bus2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_event_bus2.py::test_latest_for_filters_by_subject_and_type",
+   "file": "tests/test_frontier2_event_bus2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_event_bus2.py::test_read_all_on_missing_ledger_is_empty_not_a_crash",
+   "file": "tests/test_frontier2_event_bus2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_event_bus2.py::test_events_are_hash_chained",
+   "file": "tests/test_frontier2_event_bus2.py"
+  }
+ ],
+ "collected_count": 9,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_event_bus2.py::test_unknown_event_type_refused": {
+   "file": "tests/test_frontier2_event_bus2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_event_bus2.py::test_unknown_transport_refused": {
+   "file": "tests/test_frontier2_event_bus2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_event_bus2.py::test_known_from_before_event_time_refused": {
+   "file": "tests/test_frontier2_event_bus2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_event_bus2.py::test_emit_writes_and_reads_back": {
+   "file": "tests/test_frontier2_event_bus2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_event_bus2.py::test_same_prior_and_new_state_is_not_material": {
+   "file": "tests/test_frontier2_event_bus2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_event_bus2.py::test_latest_for_returns_none_when_never_fired": {
+   "file": "tests/test_frontier2_event_bus2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_event_bus2.py::test_latest_for_filters_by_subject_and_type": {
+   "file": "tests/test_frontier2_event_bus2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_event_bus2.py::test_read_all_on_missing_ledger_is_empty_not_a_crash": {
+   "file": "tests/test_frontier2_event_bus2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_event_bus2.py::test_events_are_hash_chained": {
+   "file": "tests/test_frontier2_event_bus2.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 9,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_event_bus2.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35854.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115109888",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.59
+ }
+}

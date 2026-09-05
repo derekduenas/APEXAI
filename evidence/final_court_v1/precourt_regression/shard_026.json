@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_component_registry.py::test_built_and_certified_components_have_a_real_module",
+   "file": "tests/test_component_registry.py"
+  },
+  {
+   "nodeid": "tests/test_component_registry.py::test_planned_and_absent_components_declare_no_built_module",
+   "file": "tests/test_component_registry.py"
+  },
+  {
+   "nodeid": "tests/test_component_registry.py::test_every_new_hypothesis_component_consumes_a_credit_or_is_free_discovery",
+   "file": "tests/test_component_registry.py"
+  },
+  {
+   "nodeid": "tests/test_component_registry.py::test_no_component_claims_holdout_access",
+   "file": "tests/test_component_registry.py"
+  },
+  {
+   "nodeid": "tests/test_component_registry.py::test_only_the_ml_estimator_permits_optimization",
+   "file": "tests/test_component_registry.py"
+  },
+  {
+   "nodeid": "tests/test_component_registry.py::test_every_firewall_layer_is_in_the_registry",
+   "file": "tests/test_component_registry.py"
+  },
+  {
+   "nodeid": "tests/test_component_registry.py::test_firewall_and_registry_agree_on_under_construction_layers",
+   "file": "tests/test_component_registry.py"
+  },
+  {
+   "nodeid": "tests/test_component_registry.py::test_the_named_gaps_are_present_and_unbuilt",
+   "file": "tests/test_component_registry.py"
+  },
+  {
+   "nodeid": "tests/test_component_registry.py::test_data_gaps_are_recorded_as_absent_not_planned",
+   "file": "tests/test_component_registry.py"
+  },
+  {
+   "nodeid": "tests/test_component_registry.py::test_maturity_summary_counts_every_component",
+   "file": "tests/test_component_registry.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_component_registry.py::test_built_and_certified_components_have_a_real_module": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_component_registry.py::test_planned_and_absent_components_declare_no_built_module": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_component_registry.py::test_every_new_hypothesis_component_consumes_a_credit_or_is_free_discovery": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_component_registry.py::test_no_component_claims_holdout_access": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_component_registry.py::test_only_the_ml_estimator_permits_optimization": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_component_registry.py::test_every_firewall_layer_is_in_the_registry": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_component_registry.py::test_firewall_and_registry_agree_on_under_construction_layers": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_component_registry.py::test_the_named_gaps_are_present_and_unbuilt": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_component_registry.py::test_data_gaps_are_recorded_as_absent_not_planned": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_component_registry.py::test_maturity_summary_counts_every_component": {
+   "file": "tests/test_component_registry.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_component_registry.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35815.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115097600",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.46
+ }
+}

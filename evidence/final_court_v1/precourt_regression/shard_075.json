@@ -1,0 +1,173 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_insufficient_samples_is_insufficient_data_not_a_guess",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_weak_correlation_is_observational_not_supported",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_strong_stable_relationship_is_supported_lead_lag",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_relationship_is_never_labeled_causal",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_reversed_series_reports_target_leads_honestly",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_sign_flipping_relationship_across_halves_is_detected_unstable",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_bad_status_refused_at_construction",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_determinism_same_series_twice_byte_identical",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_unsupported_edge_yields_unknown_leading_edge",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_no_observed_target_change_yet_reads_propagating_within_window",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_no_change_far_past_expected_delay_reads_stalled",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_observed_target_change_after_source_reads_propagated",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_target_change_before_source_is_a_contradiction_not_lookahead_use",
+   "file": "tests/test_frontier2_propagation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_propagation.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_propagation.py"
+  }
+ ],
+ "collected_count": 14,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_propagation.py::test_insufficient_samples_is_insufficient_data_not_a_guess": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_weak_correlation_is_observational_not_supported": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_strong_stable_relationship_is_supported_lead_lag": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_relationship_is_never_labeled_causal": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_reversed_series_reports_target_leads_honestly": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_sign_flipping_relationship_across_halves_is_detected_unstable": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_bad_status_refused_at_construction": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_determinism_same_series_twice_byte_identical": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_unsupported_edge_yields_unknown_leading_edge": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_no_observed_target_change_yet_reads_propagating_within_window": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_no_change_far_past_expected_delay_reads_stalled": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_observed_target_change_after_source_reads_propagated": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_target_change_before_source_is_a_contradiction_not_lookahead_use": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_propagation.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_propagation.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 14,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_propagation.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35864.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115171328",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.88
+ }
+}
