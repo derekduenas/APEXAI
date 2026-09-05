@@ -1,0 +1,308 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_never_reviewed_always_triggers",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_curve_state_change_triggers_review",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_identical_inputs_inside_heartbeat_window_does_not_review",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_heartbeat_fires_after_staleness_interval",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_the_2026_08_18_deadlock_cannot_recur",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_terminal_invalidate_never_resurrects",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_new_thesis_lineage_required_after_invalidate",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_assassin_refresh_required_on_evidence_change",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_assassin_refresh_not_required_on_rank_only_change",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_should_review_true_requires_a_named_trigger",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_unknown_trigger_kind_refused",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_review_without_state_change_is_captain_review",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_review_with_state_change_is_captain_state_change",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_mislabeled_state_change_refused",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_review_counts_distinguish_reviews_from_changes",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_degrade_is_heartbeat_eligible_not_frozen",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_runtime_no_longer_gates_captain_behind_compute_tier",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_trigger_comparison_uses_identical_key_sets",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_decision_power_never_grants_authority",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_adaptation_latency_measures_the_full_chain",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_no_state_change_has_no_state_change_time",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_negative_latency_is_flagged_not_averaged",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_missing_upstream_time_yields_none_not_zero",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_tier_oscillation_must_not_create_phantom_triggers",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_captain_gate_never_reintroduces_a_tier_dependency",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_compute_tier_drop_alone_emits_no_trigger",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_uncarried_tier_drop_would_have_fired_all_three",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_snapshot_key_set_is_invariant_to_every_absent_organ",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_reunderwrite.py::test_runtime_calls_the_shared_snapshot_builder",
+   "file": "tests/test_frontier2_reunderwrite.py"
+  }
+ ],
+ "collected_count": 29,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_reunderwrite.py::test_never_reviewed_always_triggers": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_curve_state_change_triggers_review": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_identical_inputs_inside_heartbeat_window_does_not_review": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_heartbeat_fires_after_staleness_interval": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_the_2026_08_18_deadlock_cannot_recur": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_terminal_invalidate_never_resurrects": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_new_thesis_lineage_required_after_invalidate": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_assassin_refresh_required_on_evidence_change": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_assassin_refresh_not_required_on_rank_only_change": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_should_review_true_requires_a_named_trigger": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_unknown_trigger_kind_refused": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_review_without_state_change_is_captain_review": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_review_with_state_change_is_captain_state_change": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_mislabeled_state_change_refused": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_review_counts_distinguish_reviews_from_changes": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_degrade_is_heartbeat_eligible_not_frozen": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_runtime_no_longer_gates_captain_behind_compute_tier": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_trigger_comparison_uses_identical_key_sets": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_decision_power_never_grants_authority": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_adaptation_latency_measures_the_full_chain": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_no_state_change_has_no_state_change_time": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_negative_latency_is_flagged_not_averaged": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_missing_upstream_time_yields_none_not_zero": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_tier_oscillation_must_not_create_phantom_triggers": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_captain_gate_never_reintroduces_a_tier_dependency": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_compute_tier_drop_alone_emits_no_trigger": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_uncarried_tier_drop_would_have_fired_all_three": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_snapshot_key_set_is_invariant_to_every_absent_organ": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_reunderwrite.py::test_runtime_calls_the_shared_snapshot_builder": {
+   "file": "tests/test_frontier2_reunderwrite.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 29,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_reunderwrite.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35309.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116551680",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.63
+ }
+}

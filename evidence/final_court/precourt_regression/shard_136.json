@@ -1,0 +1,263 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_no_yolo_prohibitions_are_named",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_no_yolo_violation_raises",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_clean_practices_pass",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_doctrine_stamp_carries_no_sizing_authority",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_defined_loss_is_bounded_volatility_not_ruin",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_undefined_loss_is_ruin_exposure",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_zero_sample_yields_insufficient_sample_not_fabricated",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_real_sample_computes_real_expectancy",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_unknown_risk_character_refused",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_exceptional_unproven_requires_all_evidence",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_exceptional_unproven_reachable_with_full_evidence",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_scaling_build_never_carries_bad_status",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_scaling_build_end_to_end",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_zero_evidence_is_unproven",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_hundred_resolved_with_streak_is_scalable",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_edge_maturity_verdict_never_carries_sizing_authority",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_growth_panel_covers_all_six_risk_tiers",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_growth_panel_with_real_sample_computes_real_stats",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_growth_panel_higher_risk_tier_shows_more_ruin_risk",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_growth_scenario_wrong_label_refused",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_all_eight_criteria_met_is_rare",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_one_missing_criterion_is_not_rare",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_missing_evidence_fails_the_criterion_not_defaults_to_pass",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_asymmetric_growth_doctrine.py::test_rare_verdict_carries_no_sizing_authority",
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py"
+  }
+ ],
+ "collected_count": 24,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_no_yolo_prohibitions_are_named": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_no_yolo_violation_raises": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_clean_practices_pass": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_doctrine_stamp_carries_no_sizing_authority": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_defined_loss_is_bounded_volatility_not_ruin": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_undefined_loss_is_ruin_exposure": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_zero_sample_yields_insufficient_sample_not_fabricated": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_real_sample_computes_real_expectancy": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_unknown_risk_character_refused": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_exceptional_unproven_requires_all_evidence": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_exceptional_unproven_reachable_with_full_evidence": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_scaling_build_never_carries_bad_status": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_scaling_build_end_to_end": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_zero_evidence_is_unproven": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_hundred_resolved_with_streak_is_scalable": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_edge_maturity_verdict_never_carries_sizing_authority": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_growth_panel_covers_all_six_risk_tiers": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_growth_panel_with_real_sample_computes_real_stats": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_growth_panel_higher_risk_tier_shows_more_ruin_risk": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_growth_scenario_wrong_label_refused": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_all_eight_criteria_met_is_rare": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_one_missing_criterion_is_not_rare": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_missing_evidence_fails_the_criterion_not_defaults_to_pass": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_asymmetric_growth_doctrine.py::test_rare_verdict_carries_no_sizing_authority": {
+   "file": "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 24,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_research_asymmetric_growth_doctrine.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.5,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35368.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115355648",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.75
+ }
+}

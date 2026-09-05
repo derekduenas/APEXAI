@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_a_completed_bar_is_invisible_before_completion",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_the_clock_never_runs_backwards",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_a_recycled_ticker_resolves_differently_across_time",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_counterexample_unmapped_and_gap_periods_fail_closed",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_counterexample_overlapping_windows_are_ambiguous_and_refuse",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_permaticker_disagreement_is_a_finding_not_an_autofix",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_a_split_is_not_an_economic_crash_in_the_analytical_series",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_counterexample_the_tradable_price_at_t_is_the_raw_print",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_the_analytical_series_refuses_undeclared_retrospective_use",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_dst_shift_moves_the_session_boundary_for_the_same_utc_hour",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_an_early_close_ends_the_regular_session",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_a_missing_minute_stays_missing_in_the_event_stream",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_counterexample_duplicate_rows_are_refused_not_averaged",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_replay_is_deterministic_and_provenance_sensitive",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_bar_visibility_in_the_stream_is_completion_time",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_critical_quality_fails_closed_and_unknown_is_valid",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_an_unvalidated_partition_is_not_replay_eligible",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_the_unwired_massive_adapter_refuses_with_remediation",
+   "file": "tests/test_intraday_p1a.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_p1a.py::test_the_broker_is_unreachable_from_replay",
+   "file": "tests/test_intraday_p1a.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_intraday_p1a.py::test_a_completed_bar_is_invisible_before_completion": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_the_clock_never_runs_backwards": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_a_recycled_ticker_resolves_differently_across_time": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_counterexample_unmapped_and_gap_periods_fail_closed": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_counterexample_overlapping_windows_are_ambiguous_and_refuse": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_permaticker_disagreement_is_a_finding_not_an_autofix": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_a_split_is_not_an_economic_crash_in_the_analytical_series": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_counterexample_the_tradable_price_at_t_is_the_raw_print": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_the_analytical_series_refuses_undeclared_retrospective_use": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_dst_shift_moves_the_session_boundary_for_the_same_utc_hour": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_an_early_close_ends_the_regular_session": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_a_missing_minute_stays_missing_in_the_event_stream": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_counterexample_duplicate_rows_are_refused_not_averaged": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_replay_is_deterministic_and_provenance_sensitive": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_bar_visibility_in_the_stream_is_completion_time": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_critical_quality_fails_closed_and_unknown_is_valid": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_an_unvalidated_partition_is_not_replay_eligible": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_the_unwired_massive_adapter_refuses_with_remediation": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_p1a.py::test_the_broker_is_unreachable_from_replay": {
+   "file": "tests/test_intraday_p1a.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 19,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_intraday_p1a.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35330.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115064832",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.69
+ }
+}

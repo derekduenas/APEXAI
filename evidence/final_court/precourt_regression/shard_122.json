@@ -1,0 +1,119 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_option_analytics_certification_gate.py::test_certified_true_requires_clean_run",
+   "file": "tests/test_option_analytics_certification_gate.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_certification_gate.py::test_no_certification_record_is_uncertified",
+   "file": "tests/test_option_analytics_certification_gate.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_certification_gate.py::test_clean_certification_reads_as_certified",
+   "file": "tests/test_option_analytics_certification_gate.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_certification_gate.py::test_stale_certification_after_source_change_is_uncertified",
+   "file": "tests/test_option_analytics_certification_gate.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_certification_gate.py::test_failed_run_never_certified",
+   "file": "tests/test_option_analytics_certification_gate.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_certification_gate.py::test_opt002_refused_when_not_certified",
+   "file": "tests/test_option_analytics_certification_gate.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_certification_gate.py::test_opt002_admitted_when_certified",
+   "file": "tests/test_option_analytics_certification_gate.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_certification_gate.py::test_opt001_never_gated_by_analytics_certification",
+   "file": "tests/test_option_analytics_certification_gate.py"
+  }
+ ],
+ "collected_count": 8,
+ "collect_errors": [],
+ "results": {
+  "tests/test_option_analytics_certification_gate.py::test_certified_true_requires_clean_run": {
+   "file": "tests/test_option_analytics_certification_gate.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_certification_gate.py::test_no_certification_record_is_uncertified": {
+   "file": "tests/test_option_analytics_certification_gate.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_certification_gate.py::test_clean_certification_reads_as_certified": {
+   "file": "tests/test_option_analytics_certification_gate.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_certification_gate.py::test_stale_certification_after_source_change_is_uncertified": {
+   "file": "tests/test_option_analytics_certification_gate.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_certification_gate.py::test_failed_run_never_certified": {
+   "file": "tests/test_option_analytics_certification_gate.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_certification_gate.py::test_opt002_refused_when_not_certified": {
+   "file": "tests/test_option_analytics_certification_gate.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_certification_gate.py::test_opt002_admitted_when_certified": {
+   "file": "tests/test_option_analytics_certification_gate.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_certification_gate.py::test_opt001_never_gated_by_analytics_certification": {
+   "file": "tests/test_option_analytics_certification_gate.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 8,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_option_analytics_certification_gate.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35354.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115302400",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.73
+ }
+}

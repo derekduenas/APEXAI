@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_execution_path.py::test_the_closure_walk_reaches_transitively_imported_modules",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_the_closure_walk_is_not_vacuous",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_counterexample_the_auditor_flags_a_missing_signal_module",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_counterexample_the_auditor_flags_a_closed_experiments_scorer",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_counterexample_the_walk_sees_from_package_import_name_form",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_each_registered_experiment_reaches_its_own_signal",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_apex_002_does_not_reach_apex_001_scoring_machinery",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_counterexample_the_per_experiment_audit_flags_a_contaminated_path",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_counterexample_an_unregistered_experiment_is_refused",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_the_dispatcher_routes_apex_002_to_the_nsi_path",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_counterexample_an_unknown_experiment_id_raises_rather_than_defaulting",
+   "file": "tests/test_execution_path.py"
+  },
+  {
+   "nodeid": "tests/test_execution_path.py::test_the_production_path_computes_its_signal_through_build_nsi_signal",
+   "file": "tests/test_execution_path.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_execution_path.py::test_the_closure_walk_reaches_transitively_imported_modules": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_the_closure_walk_is_not_vacuous": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_counterexample_the_auditor_flags_a_missing_signal_module": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_counterexample_the_auditor_flags_a_closed_experiments_scorer": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_counterexample_the_walk_sees_from_package_import_name_form": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_each_registered_experiment_reaches_its_own_signal": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_apex_002_does_not_reach_apex_001_scoring_machinery": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_counterexample_the_per_experiment_audit_flags_a_contaminated_path": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_counterexample_an_unregistered_experiment_is_refused": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_the_dispatcher_routes_apex_002_to_the_nsi_path": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_counterexample_an_unknown_experiment_id_raises_rather_than_defaulting": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_path.py::test_the_production_path_computes_its_signal_through_build_nsi_signal": {
+   "file": "tests/test_execution_path.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_execution_path.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35281.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116936704",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.37
+ }
+}

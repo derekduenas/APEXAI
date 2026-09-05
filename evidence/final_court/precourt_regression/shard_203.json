@@ -1,0 +1,164 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_verdict.py::test_the_verdict_cannot_see_the_reference",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_the_verdict_module_does_not_import_the_ledger",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_the_three_levels_stay_in_separate_objects",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_a_clean_pass",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_a_result_exactly_on_the_pre_registered_hurdle_passes",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_a_negative_ic_is_a_failure_not_a_reversal_signal",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_the_right_sign_but_weak_significance_is_inconclusive",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_disagreeing_tests_are_inconclusive_however_strong_the_primary",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_an_ic_below_threshold_but_positive_is_inconclusive_not_failed",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_interpretation_reports_both_nominal_and_measured_size",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_interpretation_states_the_t_that_would_have_given_the_nominal_size",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_a_stronger_result_sits_higher_in_the_null_distribution",
+   "file": "tests/test_verdict.py"
+  },
+  {
+   "nodeid": "tests/test_verdict.py::test_interpretation_never_returns_a_verdict",
+   "file": "tests/test_verdict.py"
+  }
+ ],
+ "collected_count": 13,
+ "collect_errors": [],
+ "results": {
+  "tests/test_verdict.py::test_the_verdict_cannot_see_the_reference": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_the_verdict_module_does_not_import_the_ledger": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_the_three_levels_stay_in_separate_objects": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_a_clean_pass": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_a_result_exactly_on_the_pre_registered_hurdle_passes": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_a_negative_ic_is_a_failure_not_a_reversal_signal": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_the_right_sign_but_weak_significance_is_inconclusive": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_disagreeing_tests_are_inconclusive_however_strong_the_primary": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_an_ic_below_threshold_but_positive_is_inconclusive_not_failed": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_interpretation_reports_both_nominal_and_measured_size": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_interpretation_states_the_t_that_would_have_given_the_nominal_size": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_a_stronger_result_sits_higher_in_the_null_distribution": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verdict.py::test_interpretation_never_returns_a_verdict": {
+   "file": "tests/test_verdict.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 13,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_verdict.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 263.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35471.service",
+   "memory_max": "1468006400",
+   "memory_peak": "224894976",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.11
+ }
+}

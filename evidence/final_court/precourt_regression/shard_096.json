@@ -1,0 +1,74 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_integrity_museum.py::test_museum_piece_is_refused_forever[ATTEMPT_1_LAB02_hollow]",
+   "file": "tests/test_integrity_museum.py"
+  },
+  {
+   "nodeid": "tests/test_integrity_museum.py::test_museum_piece_is_refused_forever[ATTEMPT_2_LAB04_blindfold]",
+   "file": "tests/test_integrity_museum.py"
+  },
+  {
+   "nodeid": "tests/test_integrity_museum.py::test_museum_pieces_fail_for_their_OWN_disease",
+   "file": "tests/test_integrity_museum.py"
+  }
+ ],
+ "collected_count": 3,
+ "collect_errors": [],
+ "results": {
+  "tests/test_integrity_museum.py::test_museum_piece_is_refused_forever[ATTEMPT_1_LAB02_hollow]": {
+   "file": "tests/test_integrity_museum.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: ATTEMPT_1_LAB02_hollow fixture absent on this machine"
+  },
+  "tests/test_integrity_museum.py::test_museum_piece_is_refused_forever[ATTEMPT_2_LAB04_blindfold]": {
+   "file": "tests/test_integrity_museum.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: ATTEMPT_2_LAB04_blindfold fixture absent on this machine"
+  },
+  "tests/test_integrity_museum.py::test_museum_pieces_fail_for_their_OWN_disease": {
+   "file": "tests/test_integrity_museum.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 1,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 2,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_integrity_museum.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35328.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115187712",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.59
+ }
+}

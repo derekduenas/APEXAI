@@ -1,0 +1,200 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_empty_watchlist",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_one_real_dict_entry",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_multiple_real_dict_entries",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_signals_list_preserved_as_tuple",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_missing_optional_rvol_is_none_not_zero",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_invalid_rvol_from_session_integrity_gate",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_unknown_signal_is_accepted_the_scanner_owns_signal_vocabulary",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_schema_version_mismatch_is_refused_not_best_effort",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_missing_schema_version_field_is_treated_as_v1_not_refused",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_duplicate_symbol_across_scans_keeps_the_stronger_entry",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_malformed_entry_is_skipped_and_recorded_never_raises",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_candidate_and_watchlist_overlap_candidate_wins",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_deterministic_tie_breaks_lexicographically_by_symbol",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_large_watchlist_is_capped_and_ordered",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_unknown_rvol_ranks_below_known_rvol_at_equal_signal_count",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_one_malformed_entry_never_kills_selection",
+   "file": "tests/test_watchlist_contract.py"
+  },
+  {
+   "nodeid": "tests/test_watchlist_contract.py::test_live_style_rehearsal_two_cycles_no_crash",
+   "file": "tests/test_watchlist_contract.py"
+  }
+ ],
+ "collected_count": 17,
+ "collect_errors": [],
+ "results": {
+  "tests/test_watchlist_contract.py::test_empty_watchlist": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_one_real_dict_entry": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_multiple_real_dict_entries": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_signals_list_preserved_as_tuple": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_missing_optional_rvol_is_none_not_zero": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_invalid_rvol_from_session_integrity_gate": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_unknown_signal_is_accepted_the_scanner_owns_signal_vocabulary": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_schema_version_mismatch_is_refused_not_best_effort": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_missing_schema_version_field_is_treated_as_v1_not_refused": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_duplicate_symbol_across_scans_keeps_the_stronger_entry": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_malformed_entry_is_skipped_and_recorded_never_raises": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_candidate_and_watchlist_overlap_candidate_wins": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_deterministic_tie_breaks_lexicographically_by_symbol": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_large_watchlist_is_capped_and_ordered": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_unknown_rvol_ranks_below_known_rvol_at_equal_signal_count": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_one_malformed_entry_never_kills_selection": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_watchlist_contract.py::test_live_style_rehearsal_two_cycles_no_crash": {
+   "file": "tests/test_watchlist_contract.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 17,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_watchlist_contract.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35473.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115490816",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.51
+ }
+}

@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_cycle_persists_packets_and_commitment",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_first_cycle_is_genesis",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_cycles_chain",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_packets_carry_none_state",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_packet_without_identity_is_refused",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_tampering_a_persisted_packet_breaks_the_cycle",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_deleting_a_persisted_packet_breaks_the_cycle",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_inserting_a_packet_breaks_the_cycle",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_reordering_persisted_packets_is_tolerated",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_restart_uses_checkpoint_not_ledger",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_missing_checkpoint_falls_back_to_bounded_rebuild",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_corrupt_checkpoint_falls_back_to_bounded_rebuild",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_checkpoint_stays_bounded_across_a_long_session",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_oversized_state_is_refused_not_silently_written",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_lifecycle_points_are_recorded",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_true_occupancy_spans_restore_and_persist",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_negative_occupancy_is_flagged_not_praised",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_restore_cost_independent_of_ledger_size",
+   "file": "tests/test_runtime_v1.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_v1.py::test_prev_hash_lookup_is_tail_only",
+   "file": "tests/test_runtime_v1.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_runtime_v1.py::test_cycle_persists_packets_and_commitment": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_first_cycle_is_genesis": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_cycles_chain": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_packets_carry_none_state": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_packet_without_identity_is_refused": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_tampering_a_persisted_packet_breaks_the_cycle": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_deleting_a_persisted_packet_breaks_the_cycle": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_inserting_a_packet_breaks_the_cycle": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_reordering_persisted_packets_is_tolerated": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_restart_uses_checkpoint_not_ledger": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_missing_checkpoint_falls_back_to_bounded_rebuild": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_corrupt_checkpoint_falls_back_to_bounded_rebuild": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_checkpoint_stays_bounded_across_a_long_session": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_oversized_state_is_refused_not_silently_written": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_lifecycle_points_are_recorded": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_true_occupancy_spans_restore_and_persist": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_negative_occupancy_is_flagged_not_praised": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_restore_cost_independent_of_ledger_size": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_v1.py::test_prev_hash_lookup_is_tail_only": {
+   "file": "tests/test_runtime_v1.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 19,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_runtime_v1.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35416.service",
+   "memory_max": "1468006400",
+   "memory_peak": "178544640",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 12.87
+ }
+}

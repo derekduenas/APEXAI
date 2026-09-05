@@ -1,0 +1,290 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_capital_cannot_even_see_the_captain",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_captain_kernel_has_no_authorization_verbs",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_the_cap_binds_at_the_moment_the_weight_is_computed",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_widening_a_stop_raises_at_the_call_that_widens_it",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_no_module_in_apex_defines_a_placement_function",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_authorization_cannot_be_constructed_at_all",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_the_transport_refuses_a_placement_tool_by_name",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_production_capital_cannot_emit_paper_eligible_without_a_forecast",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_the_analog_engine_refuses_rows_that_contradict_the_declaration",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_a_single_exploratory_row_poisons_a_forward_batch",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_unstamped_rows_are_refused_as_loudly_as_mismatched_ones",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_the_ml_trainer_requires_a_declared_class_and_verifies_it",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_forward_eligibility_is_not_mistaken_for_a_class_barrier",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_the_reserve_is_consulted_at_the_moment_units_are_spent",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_stale_quotes_are_refused_where_the_order_is_built",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_hard_data_quality_flags_block_the_capital_decision",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_every_named_safety_claim_has_a_test_in_this_file",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_the_certification_board_cannot_declare_ready_over_unmeasured_rows",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_no_route_is_distinct_from_blocked_broker_auth",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_a_probe_file_cannot_turn_a_missing_tool_into_an_empty_success",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_the_flight_deck_measures_its_rows_instead_of_asserting_them",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_the_flight_deck_does_not_call_no_transport_an_auth_problem",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_sac1_02_the_allow_list_stops_a_non_placement_broker_tool",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_sac1_02_every_allow_listed_tool_is_read_or_review_only",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_sac1_01_calibration_cannot_be_minted_from_exploratory_evidence",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_sac1_01_a_forward_report_still_mints",
+   "file": "tests/test_enforcement_doctrine.py"
+  },
+  {
+   "nodeid": "tests/test_enforcement_doctrine.py::test_sac1_01_an_unlabelled_report_cannot_mint",
+   "file": "tests/test_enforcement_doctrine.py"
+  }
+ ],
+ "collected_count": 27,
+ "collect_errors": [],
+ "results": {
+  "tests/test_enforcement_doctrine.py::test_capital_cannot_even_see_the_captain": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_captain_kernel_has_no_authorization_verbs": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_the_cap_binds_at_the_moment_the_weight_is_computed": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_widening_a_stop_raises_at_the_call_that_widens_it": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_no_module_in_apex_defines_a_placement_function": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_authorization_cannot_be_constructed_at_all": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_the_transport_refuses_a_placement_tool_by_name": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_production_capital_cannot_emit_paper_eligible_without_a_forecast": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_the_analog_engine_refuses_rows_that_contradict_the_declaration": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_a_single_exploratory_row_poisons_a_forward_batch": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_unstamped_rows_are_refused_as_loudly_as_mismatched_ones": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_the_ml_trainer_requires_a_declared_class_and_verifies_it": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_forward_eligibility_is_not_mistaken_for_a_class_barrier": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_the_reserve_is_consulted_at_the_moment_units_are_spent": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_stale_quotes_are_refused_where_the_order_is_built": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_hard_data_quality_flags_block_the_capital_decision": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_every_named_safety_claim_has_a_test_in_this_file": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_the_certification_board_cannot_declare_ready_over_unmeasured_rows": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_no_route_is_distinct_from_blocked_broker_auth": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_a_probe_file_cannot_turn_a_missing_tool_into_an_empty_success": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_the_flight_deck_measures_its_rows_instead_of_asserting_them": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_the_flight_deck_does_not_call_no_transport_an_auth_problem": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_sac1_02_the_allow_list_stops_a_non_placement_broker_tool": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_sac1_02_every_allow_listed_tool_is_read_or_review_only": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_sac1_01_calibration_cannot_be_minted_from_exploratory_evidence": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_sac1_01_a_forward_report_still_mints": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_enforcement_doctrine.py::test_sac1_01_an_unlabelled_report_cannot_mint": {
+   "file": "tests/test_enforcement_doctrine.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 27,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_enforcement_doctrine.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 165.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35274.service",
+   "memory_max": "1468006400",
+   "memory_peak": "118812672",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.26
+ }
+}

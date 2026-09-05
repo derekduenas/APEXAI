@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_valid_candidate_reaches_capital",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_risk_kills",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_cost_unknown_blocks_authorization",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_capacity_kills",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_portfolio_concentration_kills",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_regime_uncertainty_is_conservative_only",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_forecast_never_synthesized",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_governance_refusals",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_rejections_preserved_in_scoreboard",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_no_execution_reachable",
+   "file": "tests/test_hunter_capital.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_capital.py::test_end_to_end_spine_single_pipeline",
+   "file": "tests/test_hunter_capital.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_hunter_capital.py::test_valid_candidate_reaches_capital": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_risk_kills": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_cost_unknown_blocks_authorization": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_capacity_kills": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_portfolio_concentration_kills": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_regime_uncertainty_is_conservative_only": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_forecast_never_synthesized": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_governance_refusals": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_rejections_preserved_in_scoreboard": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_no_execution_reachable": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_capital.py::test_end_to_end_spine_single_pipeline": {
+   "file": "tests/test_hunter_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_hunter_capital.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 163.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35321.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116350976",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.66
+ }
+}

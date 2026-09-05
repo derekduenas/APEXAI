@@ -1,0 +1,101 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_btc_resolver.py::test_no_trader_import_no_capital_import",
+   "file": "tests/test_btc_resolver.py"
+  },
+  {
+   "nodeid": "tests/test_btc_resolver.py::test_young_windows_are_pending_never_partial",
+   "file": "tests/test_btc_resolver.py"
+  },
+  {
+   "nodeid": "tests/test_btc_resolver.py::test_mature_windows_resolve_with_aligned_geometry",
+   "file": "tests/test_btc_resolver.py"
+  },
+  {
+   "nodeid": "tests/test_btc_resolver.py::test_missing_marks_are_unmeasurable_not_invented",
+   "file": "tests/test_btc_resolver.py"
+  },
+  {
+   "nodeid": "tests/test_btc_resolver.py::test_the_full_cohort_denominator_is_reported",
+   "file": "tests/test_btc_resolver.py"
+  },
+  {
+   "nodeid": "tests/test_btc_resolver.py::test_episodes_are_contiguous_runs_first_window_convention",
+   "file": "tests/test_btc_resolver.py"
+  }
+ ],
+ "collected_count": 6,
+ "collect_errors": [],
+ "results": {
+  "tests/test_btc_resolver.py::test_no_trader_import_no_capital_import": {
+   "file": "tests/test_btc_resolver.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_resolver.py::test_young_windows_are_pending_never_partial": {
+   "file": "tests/test_btc_resolver.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_resolver.py::test_mature_windows_resolve_with_aligned_geometry": {
+   "file": "tests/test_btc_resolver.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_resolver.py::test_missing_marks_are_unmeasurable_not_invented": {
+   "file": "tests/test_btc_resolver.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_resolver.py::test_the_full_cohort_denominator_is_reported": {
+   "file": "tests/test_btc_resolver.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_resolver.py::test_episodes_are_contiguous_runs_first_window_convention": {
+   "file": "tests/test_btc_resolver.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 6,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_btc_resolver.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35247.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116383744",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.75
+ }
+}
