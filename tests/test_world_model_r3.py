@@ -35,7 +35,7 @@ def test_n3_v0_retired_not_edited_and_p0_v0_preserved():
     assert R3.N3_V0_STATUS["status"] == "RETIRED_AFTER_CONTROL_FAILURE"
     assert R3.N3_V0_STATUS["edited"] is False and R3.N3_V0_STATUS["rerun"] is False
     n3 = C.CONTROL_CONTRACT["N3"]                                   # still there, untouched
-    assert "PERMUT" in n3["name"].upper() and n3["expected"] == "NO_SIGNAL"
+    assert n3["name"] == "ROW_DERANGED_FEATURES" and n3["expected"] == "NO_SIGNAL"
     assert C.CONTROLS_VERSION == "WM0E_CONTROLS_V0.1"
     assert R3.P0_V0_STATUS["status"] == "FAIL_POWER_REQUIREMENT"
     assert R3.P0_V0_STATUS["requirement_lowered"] is False
