@@ -10,6 +10,9 @@
 # research job is killed by its own boundary and can never compete inside
 # a bounded slice with production. Existing cgroups are never touched.
 #
+# systemd-run does NOT inherit the caller's environment; the only variable
+# forwarded on request is REGRESSION_OUT (BOUNDED_FULL_REGRESSION_V0 report path).
+#
 # INFRA-RESEARCH-LOAD-UNCONTAINED-001, two failed forms before this:
 #   1. unrestricted user.slice (peak 7608 MiB of 7941; could have blocked
 #      Gate-2 had timing differed)
@@ -26,4 +29,5 @@ exec sudo -n systemd-run --quiet --wait --pipe --collect \
   --working-directory="$W" \
   --setenv=PYTHONPATH="$W" --setenv=HOME=/home/apex \
   --setenv=PYTHONDONTWRITEBYTECODE=1 --setenv=WM_CONTAINED=1 \
+  ${REGRESSION_OUT:+--setenv=REGRESSION_OUT=$REGRESSION_OUT} \
   -- "$@"

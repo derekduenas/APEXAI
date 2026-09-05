@@ -55,6 +55,7 @@ def scientific_surface_hash(root: str) -> dict:
 
 # ---------------------------------------------------------------- §2/§3 collect
 def collect_master(exec_prefix: list, out_path: str, scope: str = "tests", cwd: str | None = None) -> dict:
+    out_path = os.path.abspath(out_path)
     env = dict(os.environ, REGRESSION_OUT=out_path)
     cmd = exec_prefix + [PY if exec_prefix else sys.executable, "-m", "pytest", scope, "--collect-only", "-q",
                          "--rootdir", cwd or os.getcwd(), "-p", "no:cacheprovider", "-p", "regression.plugin"]
@@ -94,7 +95,7 @@ def _oom_count() -> int:
 
 
 def run_shard(shard: dict, exec_prefix: list, out_dir: str, cwd: str | None = None) -> dict:
-    out = os.path.join(out_dir, "shard_%03d.json" % shard["index"])
+    out = os.path.abspath(os.path.join(out_dir, "shard_%03d.json" % shard["index"]))
     if os.path.exists(out):
         os.remove(out)
     env = dict(os.environ, REGRESSION_OUT=out)
@@ -193,7 +194,7 @@ def main(argv):
     ap.add_argument("--uncontained", action="store_true", help="self-test only")
     ap.add_argument("--prior-skips", default=None)
     a = ap.parse_args(argv)
-    root = a.root; out_dir = os.path.join(root, a.out); os.makedirs(out_dir, exist_ok=True)
+    root = os.path.abspath(a.root); out_dir = os.path.abspath(os.path.join(root, a.out)); os.makedirs(out_dir, exist_ok=True)
     prefix = [] if a.uncontained else WRAPPER
     commit = subprocess.run(["git", "-C", root, "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
     dirty = subprocess.run(["git", "-C", root, "status", "--short"], capture_output=True, text=True).stdout.strip()
