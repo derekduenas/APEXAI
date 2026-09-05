@@ -1,0 +1,434 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_S0_returns_NO_SIGNAL_under_the_preregistered_rule",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_S1_positive_control_is_distinguished_from_the_null",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_the_controls_used_identical_model_configuration",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_S2_S3_smoke_compatibility_only[S2_CAUSAL_MEAN_REVERSION-params0]",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_S2_S3_smoke_compatibility_only[S3_REGIME_TRANSITION_JUMP-params1]",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_model_run_contract_is_valid_and_hashable",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_run_identity_is_deterministic",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_run_identity_excludes_creation_time",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_forecasts_are_reproducible_within_stated_tolerance",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_run_refuses_real_market_provenance",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_run_refuses_non_synthetic_world_id",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_run_refuses_wrong_authority",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_feature_extraction_accepts_only_observable_state",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_model_fit_has_no_parameter_for_a_world_or_truth",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_pipeline_refuses_a_truth_object_as_the_model",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_target_resolver_returns_one_number_not_the_truth_object",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_frozen_features_exclude_future_and_latent_truth_vocabulary",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_features_do_not_zero_fill_the_warmup",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_split_is_chronological_and_purged",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_no_training_target_depends_on_evaluation_prices",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_bad_split_refused",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_empty_partition_refused",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_scaler_is_fit_on_train_and_frozen",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_evaluation_shift_cannot_alter_training_normalisation",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_constant_column_is_centred_not_divided_by_zero",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_M0_emits_a_full_distribution_not_a_direction",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_M0_declares_it_cannot_split_epistemic_from_aleatoric",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_null_comparator_emits_a_valid_forecast_and_ignores_features",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_gaussian_distribution_refuses_bad_sigma",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_every_evaluation_forecast_is_sealed_before_truth_and_unchanged_after",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_grader_refuses_an_outcome_knowable_before_the_forecast",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_post_outcome_tampering_is_detected",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_grade_records_forecast_and_outcome_as_separate_identities",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_nan_in_training_refused",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_inf_target_refused",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_degenerate_fit_refused",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_zero_variance_target_refused_by_null",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_predict_before_fit_refused",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_null_rule_refuses_unpaired_or_mismatched_outcomes",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_aggregate_metrics_present_and_sane",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_no_economic_vocabulary_in_the_test_stand",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_test_stand_modules_import_no_production_apex_and_no_broker",
+   "file": "tests/test_world_model_teststand.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_teststand.py::test_real_data_firewall_still_active_under_WM0D",
+   "file": "tests/test_world_model_teststand.py"
+  }
+ ],
+ "collected_count": 43,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_teststand.py::test_S0_returns_NO_SIGNAL_under_the_preregistered_rule": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_S1_positive_control_is_distinguished_from_the_null": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_the_controls_used_identical_model_configuration": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_S2_S3_smoke_compatibility_only[S2_CAUSAL_MEAN_REVERSION-params0]": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_S2_S3_smoke_compatibility_only[S3_REGIME_TRANSITION_JUMP-params1]": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_model_run_contract_is_valid_and_hashable": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_run_identity_is_deterministic": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_run_identity_excludes_creation_time": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_forecasts_are_reproducible_within_stated_tolerance": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_run_refuses_real_market_provenance": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_run_refuses_non_synthetic_world_id": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_run_refuses_wrong_authority": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_feature_extraction_accepts_only_observable_state": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_model_fit_has_no_parameter_for_a_world_or_truth": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_pipeline_refuses_a_truth_object_as_the_model": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_target_resolver_returns_one_number_not_the_truth_object": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_frozen_features_exclude_future_and_latent_truth_vocabulary": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_features_do_not_zero_fill_the_warmup": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_split_is_chronological_and_purged": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_no_training_target_depends_on_evaluation_prices": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_bad_split_refused": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_empty_partition_refused": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_scaler_is_fit_on_train_and_frozen": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_evaluation_shift_cannot_alter_training_normalisation": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_constant_column_is_centred_not_divided_by_zero": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_M0_emits_a_full_distribution_not_a_direction": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_M0_declares_it_cannot_split_epistemic_from_aleatoric": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_null_comparator_emits_a_valid_forecast_and_ignores_features": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_gaussian_distribution_refuses_bad_sigma": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_every_evaluation_forecast_is_sealed_before_truth_and_unchanged_after": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_grader_refuses_an_outcome_knowable_before_the_forecast": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_post_outcome_tampering_is_detected": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_grade_records_forecast_and_outcome_as_separate_identities": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_nan_in_training_refused": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_inf_target_refused": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_degenerate_fit_refused": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_zero_variance_target_refused_by_null": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_predict_before_fit_refused": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_null_rule_refuses_unpaired_or_mismatched_outcomes": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_aggregate_metrics_present_and_sane": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_no_economic_vocabulary_in_the_test_stand": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_test_stand_modules_import_no_production_apex_and_no_broker": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_teststand.py::test_real_data_firewall_still_active_under_WM0D": {
+   "file": "tests/test_world_model_teststand.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 43,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_teststand.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 165.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35195.service",
+   "memory_max": "1468006400",
+   "memory_peak": "122314752",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 12.39
+ }
+}

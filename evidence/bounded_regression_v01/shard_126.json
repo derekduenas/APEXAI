@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_no_measurements_imposes_no_cap",
+   "file": "tests/test_option_analytics_live_quality.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_fresh_quote_deep_liquid_dividend_confirmed_is_high",
+   "file": "tests/test_option_analytics_live_quality.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_stale_quote_caps_low",
+   "file": "tests/test_option_analytics_live_quality.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_thin_depth_caps_low",
+   "file": "tests/test_option_analytics_live_quality.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_unknown_dividend_confidence_caps_low",
+   "file": "tests/test_option_analytics_live_quality.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_moderate_staleness_caps_moderate_not_low",
+   "file": "tests/test_option_analytics_live_quality.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_unknown_dividend_confidence_value_refused",
+   "file": "tests/test_option_analytics_live_quality.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_unmeasured_live_quality_does_not_degrade_existing_behavior",
+   "file": "tests/test_option_analytics_live_quality.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_stale_live_quote_degrades_state_quality_to_low",
+   "file": "tests/test_option_analytics_live_quality.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_quality.py::test_good_live_inputs_permit_high_quality",
+   "file": "tests/test_option_analytics_live_quality.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_option_analytics_live_quality.py::test_no_measurements_imposes_no_cap": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_quality.py::test_fresh_quote_deep_liquid_dividend_confirmed_is_high": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_quality.py::test_stale_quote_caps_low": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_quality.py::test_thin_depth_caps_low": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_quality.py::test_unknown_dividend_confidence_caps_low": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_quality.py::test_moderate_staleness_caps_moderate_not_low": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_quality.py::test_unknown_dividend_confidence_value_refused": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_quality.py::test_unmeasured_live_quality_does_not_degrade_existing_behavior": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_quality.py::test_stale_live_quote_degrades_state_quality_to_low": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_quality.py::test_good_live_inputs_permit_high_quality": {
+   "file": "tests/test_option_analytics_live_quality.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_option_analytics_live_quality.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35067.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115425280",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.22
+ }
+}

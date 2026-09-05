@@ -1,0 +1,209 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_every_contract_that_is_a_new_hypothesis_consumes_a_credit_or_is_free_discovery",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_no_contract_may_access_the_holdout",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[backtest]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[causal]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[discovery]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[execution]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[ml]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[monitoring]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[portfolio]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[regime]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[risk]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[statistics]",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_the_planned_layers_are_absent_as_the_audit_claims",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_discovery_cannot_reach_registration_today",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_the_evaluation_path_cannot_reach_screen_or_discovery_today",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_planned_packages_covers_every_absent_engine_named_in_the_audit",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_counterexample_the_firewall_detects_a_forbidden_import",
+   "file": "tests/test_architecture_firewalls.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_firewalls.py::test_counterexample_a_new_hypothesis_layer_with_no_governance_is_rejected",
+   "file": "tests/test_architecture_firewalls.py"
+  }
+ ],
+ "collected_count": 18,
+ "collect_errors": [],
+ "results": {
+  "tests/test_architecture_firewalls.py::test_every_contract_that_is_a_new_hypothesis_consumes_a_credit_or_is_free_discovery": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_no_contract_may_access_the_holdout": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[backtest]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[causal]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[discovery]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[execution]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[ml]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[monitoring]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[portfolio]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[regime]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[risk]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_layer_closure_obeys_its_forbidden_set[statistics]": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_the_planned_layers_are_absent_as_the_audit_claims": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_discovery_cannot_reach_registration_today": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_the_evaluation_path_cannot_reach_screen_or_discovery_today": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_planned_packages_covers_every_absent_engine_named_in_the_audit": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_counterexample_the_firewall_detects_a_forbidden_import": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_firewalls.py::test_counterexample_a_new_hypothesis_layer_with_no_governance_is_rejected": {
+   "file": "tests/test_architecture_firewalls.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 18,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_architecture_firewalls.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34943.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116826112",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.0
+ }
+}

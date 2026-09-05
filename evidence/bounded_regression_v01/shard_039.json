@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_a_development_fingerprint_is_unmistakable",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_a_confirmatory_fingerprint_is_not_development",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_synthetic_rig_is_not_development_namespaced",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_require_confirmatory_passes_a_real_fingerprint",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_require_confirmatory_refuses_a_dev_fingerprint",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_an_empty_fingerprint_is_refused_too",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_verdict_layer_refuses_a_development_dataset",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_a_spectacular_development_result_still_gets_no_verdict",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_verdict_layer_still_works_for_confirmatory_data",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_ledger_refuses_to_spend_a_credit_on_development_data",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_ledger_refuses_to_record_a_development_result",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_ledger_still_accepts_confirmatory_data",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_no_development_entry_can_exist_in_the_ledger_history",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_holdout_gate_refuses_a_development_dataset",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_holdout_gate_refuses_development_data_even_for_in_sample",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_every_development_report_is_stamped",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_banner_refuses_to_stamp_confirmatory_data",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_limitations_document_exists_and_says_what_it_must",
+   "file": "tests/test_dev_isolation.py"
+  },
+  {
+   "nodeid": "tests/test_dev_isolation.py::test_the_banner_renders_once_not_forty_times",
+   "file": "tests/test_dev_isolation.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_dev_isolation.py::test_a_development_fingerprint_is_unmistakable": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_a_confirmatory_fingerprint_is_not_development": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_synthetic_rig_is_not_development_namespaced": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_require_confirmatory_passes_a_real_fingerprint": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_require_confirmatory_refuses_a_dev_fingerprint": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_an_empty_fingerprint_is_refused_too": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_verdict_layer_refuses_a_development_dataset": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_a_spectacular_development_result_still_gets_no_verdict": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_verdict_layer_still_works_for_confirmatory_data": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_ledger_refuses_to_spend_a_credit_on_development_data": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_ledger_refuses_to_record_a_development_result": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_ledger_still_accepts_confirmatory_data": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_no_development_entry_can_exist_in_the_ledger_history": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_holdout_gate_refuses_a_development_dataset": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_holdout_gate_refuses_development_data_even_for_in_sample": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_every_development_report_is_stamped": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_banner_refuses_to_stamp_confirmatory_data": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_limitations_document_exists_and_says_what_it_must": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_dev_isolation.py::test_the_banner_renders_once_not_forty_times": {
+   "file": "tests/test_dev_isolation.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 19,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_dev_isolation.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 157.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34980.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115105792",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.88
+ }
+}

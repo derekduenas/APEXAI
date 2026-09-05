@@ -1,0 +1,326 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_a_forecast_before_its_dependency_birth_is_not_eligible",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_a_missing_dependency_birth_fails_closed",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_the_birth_boundary_is_exact_to_the_microsecond",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_a_future_dated_birth_cannot_retroactively_bless_old_decisions",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_the_birth_registry_is_append_only_and_refuses_rebirth",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_poisoning_bars_after_T_cannot_change_the_state_at_T",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_a_torn_final_line_does_not_destroy_the_ledger",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_06_a_record_written_after_a_tear_is_readable_back",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_detecting_a_mutated_payload_requires_recomputing_the_hash",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_concurrent_writers_do_not_produce_an_unreadable_ledger",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_append_cost_is_not_quadratic",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_the_intraday_fetch_cannot_be_called_without_a_governor",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_the_only_provider_url_builder_is_inside_the_governed_module",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_every_declared_launchd_job_has_a_plist_on_disk",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_the_crypto_health_artifact_is_fresher_than_its_own_log",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_06_post_tear_record_links_to_the_last_VALID_record",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_06_verification_reports_the_tear_without_losing_records",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_06_tampering_is_reported_and_not_called_damage",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_08_two_canonicalizations_exist_and_each_has_its_verifier",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_08_the_real_evidence_ledgers_verify_clean",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_09_hard_data_quality_flags_force_market_uncertain",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_09_hard_quality_flags_are_extracted_from_the_record",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_10_rule_17_is_disabled_in_the_replay_harness",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_10_a_swarm_view_in_a_replay_record_trips_the_wire",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_11_an_unhealthy_crypto_scan_is_not_reported_healthy",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_12_the_cio_cannot_change_a_kernel_directive",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_13_the_mutating_name_check_is_a_real_second_barrier",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_14_the_equity_scan_record_is_emitted_as_kind_scan",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_sac1_14_scan_records_carry_the_observability_fields",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_the_session_reporter_refuses_to_invent_a_quiet_session",
+   "file": "tests/test_sac1_tier1.py"
+  },
+  {
+   "nodeid": "tests/test_sac1_tier1.py::test_the_session_reporter_puts_validity_above_trade_count",
+   "file": "tests/test_sac1_tier1.py"
+  }
+ ],
+ "collected_count": 31,
+ "collect_errors": [],
+ "results": {
+  "tests/test_sac1_tier1.py::test_a_forecast_before_its_dependency_birth_is_not_eligible": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_a_missing_dependency_birth_fails_closed": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_the_birth_boundary_is_exact_to_the_microsecond": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_a_future_dated_birth_cannot_retroactively_bless_old_decisions": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_the_birth_registry_is_append_only_and_refuses_rebirth": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_poisoning_bars_after_T_cannot_change_the_state_at_T": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_a_torn_final_line_does_not_destroy_the_ledger": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_06_a_record_written_after_a_tear_is_readable_back": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_detecting_a_mutated_payload_requires_recomputing_the_hash": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_concurrent_writers_do_not_produce_an_unreadable_ledger": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_append_cost_is_not_quadratic": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_the_intraday_fetch_cannot_be_called_without_a_governor": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_the_only_provider_url_builder_is_inside_the_governed_module": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_every_declared_launchd_job_has_a_plist_on_disk": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: verifies the Mac host launchd/ops installation -- Darwin-only by nature; cloud uses systemd (C6)"
+  },
+  "tests/test_sac1_tier1.py::test_the_crypto_health_artifact_is_fresher_than_its_own_log": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: daemon has not written health in this environment"
+  },
+  "tests/test_sac1_tier1.py::test_sac1_06_post_tear_record_links_to_the_last_VALID_record": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_06_verification_reports_the_tear_without_losing_records": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_06_tampering_is_reported_and_not_called_damage": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_08_two_canonicalizations_exist_and_each_has_its_verifier": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_08_the_real_evidence_ledgers_verify_clean": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_09_hard_data_quality_flags_force_market_uncertain": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_09_hard_quality_flags_are_extracted_from_the_record": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_10_rule_17_is_disabled_in_the_replay_harness": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_10_a_swarm_view_in_a_replay_record_trips_the_wire": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_11_an_unhealthy_crypto_scan_is_not_reported_healthy": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_12_the_cio_cannot_change_a_kernel_directive": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_13_the_mutating_name_check_is_a_real_second_barrier": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_14_the_equity_scan_record_is_emitted_as_kind_scan": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_sac1_14_scan_records_carry_the_observability_fields": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_the_session_reporter_refuses_to_invent_a_quiet_session": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sac1_tier1.py::test_the_session_reporter_puts_validity_above_trade_count": {
+   "file": "tests/test_sac1_tier1.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 29,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 2,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_sac1_tier1.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 162.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35127.service",
+   "memory_max": "1468006400",
+   "memory_peak": "163602432",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 17.71
+ }
+}

@@ -1,0 +1,110 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_replay_causality.py::test_frozen_state_contains_no_future_rows",
+   "file": "tests/test_options_replay_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_replay_causality.py::test_underlying_respects_start_of_bar",
+   "file": "tests/test_options_replay_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_replay_causality.py::test_future_cannot_be_revealed_without_a_sealed_card",
+   "file": "tests/test_options_replay_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_replay_causality.py::test_sealed_card_is_marked_rehearsal_not_evidence",
+   "file": "tests/test_options_replay_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_replay_causality.py::test_sample_accounting_refuses_pseudo_replication",
+   "file": "tests/test_options_replay_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_replay_causality.py::test_only_causal_rows_are_loaded",
+   "file": "tests/test_options_replay_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_replay_causality.py::test_fill_convention_is_quoted_sides_only",
+   "file": "tests/test_options_replay_causality.py"
+  }
+ ],
+ "collected_count": 7,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_replay_causality.py::test_frozen_state_contains_no_future_rows": {
+   "file": "tests/test_options_replay_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_replay_causality.py::test_underlying_respects_start_of_bar": {
+   "file": "tests/test_options_replay_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_replay_causality.py::test_future_cannot_be_revealed_without_a_sealed_card": {
+   "file": "tests/test_options_replay_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_replay_causality.py::test_sealed_card_is_marked_rehearsal_not_evidence": {
+   "file": "tests/test_options_replay_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_replay_causality.py::test_sample_accounting_refuses_pseudo_replication": {
+   "file": "tests/test_options_replay_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_replay_causality.py::test_only_causal_rows_are_loaded": {
+   "file": "tests/test_options_replay_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_replay_causality.py::test_fill_convention_is_quoted_sides_only": {
+   "file": "tests/test_options_replay_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 7,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_replay_causality.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35076.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115372032",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.73
+ }
+}

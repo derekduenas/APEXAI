@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_a_thesis_is_immutable_and_hash_recoverable",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_a_thesis_without_invalidation_or_sane_risk_is_refused",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_a_playbook_without_a_mechanism_is_a_pattern_not_a_candidate",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_every_transition_needs_a_rule_and_lands_in_the_chain",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_counterexample_the_stop_can_never_widen",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_promotion_past_paper_requires_calibration_evidence",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_degraded_loses_live_eligibility_structurally",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_no_override_api_exists_for_eligibility",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_any_tripped_condition_vetoes_with_named_reasons",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_live_execution_is_disabled_and_cannot_be_reenabled_by_subclass",
+   "file": "tests/test_hunter_p0.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_p0.py::test_hunter_imports_neither_registration_nor_ledger",
+   "file": "tests/test_hunter_p0.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_hunter_p0.py::test_a_thesis_is_immutable_and_hash_recoverable": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_a_thesis_without_invalidation_or_sane_risk_is_refused": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_a_playbook_without_a_mechanism_is_a_pattern_not_a_candidate": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_every_transition_needs_a_rule_and_lands_in_the_chain": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_counterexample_the_stop_can_never_widen": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_promotion_past_paper_requires_calibration_evidence": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_degraded_loses_live_eligibility_structurally": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_no_override_api_exists_for_eligibility": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_any_tripped_condition_vetoes_with_named_reasons": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_live_execution_is_disabled_and_cannot_be_reenabled_by_subclass": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_p0.py::test_hunter_imports_neither_registration_nor_ledger": {
+   "file": "tests/test_hunter_p0.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_hunter_p0.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35031.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115171328",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.69
+ }
+}

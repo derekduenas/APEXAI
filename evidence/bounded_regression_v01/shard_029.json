@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_crosscheck.py::test_a_secondary_source_cannot_supply_anything_but_prices",
+   "file": "tests/test_crosscheck.py"
+  },
+  {
+   "nodeid": "tests/test_crosscheck.py::test_the_cross_check_cannot_return_data",
+   "file": "tests/test_crosscheck.py"
+  },
+  {
+   "nodeid": "tests/test_crosscheck.py::test_the_report_states_who_governs",
+   "file": "tests/test_crosscheck.py"
+  },
+  {
+   "nodeid": "tests/test_crosscheck.py::test_agreeing_vendors_produce_a_clean_report",
+   "file": "tests/test_crosscheck.py"
+  },
+  {
+   "nodeid": "tests/test_crosscheck.py::test_a_disagreeing_security_is_named",
+   "file": "tests/test_crosscheck.py"
+  },
+  {
+   "nodeid": "tests/test_crosscheck.py::test_a_pure_adjustment_vintage_difference_is_not_a_disagreement",
+   "file": "tests/test_crosscheck.py"
+  },
+  {
+   "nodeid": "tests/test_crosscheck.py::test_securities_the_secondary_does_not_carry_are_counted_not_dropped",
+   "file": "tests/test_crosscheck.py"
+  },
+  {
+   "nodeid": "tests/test_crosscheck.py::test_the_cross_check_is_optional",
+   "file": "tests/test_crosscheck.py"
+  },
+  {
+   "nodeid": "tests/test_crosscheck.py::test_norgate_raises_rather_than_returning_an_empty_frame",
+   "file": "tests/test_crosscheck.py"
+  },
+  {
+   "nodeid": "tests/test_crosscheck.py::test_norgate_satisfies_the_prices_only_protocol",
+   "file": "tests/test_crosscheck.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_crosscheck.py::test_a_secondary_source_cannot_supply_anything_but_prices": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crosscheck.py::test_the_cross_check_cannot_return_data": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crosscheck.py::test_the_report_states_who_governs": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crosscheck.py::test_agreeing_vendors_produce_a_clean_report": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crosscheck.py::test_a_disagreeing_security_is_named": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crosscheck.py::test_a_pure_adjustment_vintage_difference_is_not_a_disagreement": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crosscheck.py::test_securities_the_secondary_does_not_carry_are_counted_not_dropped": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crosscheck.py::test_the_cross_check_is_optional": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crosscheck.py::test_norgate_raises_rather_than_returning_an_empty_frame": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crosscheck.py::test_norgate_satisfies_the_prices_only_protocol": {
+   "file": "tests/test_crosscheck.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_crosscheck.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34970.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115077120",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.66
+ }
+}
