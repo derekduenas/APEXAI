@@ -38,7 +38,9 @@ CATEGORIES = ("model_family", "hyperparameter_configuration",
               "court_sitting", "defect_registered", "inference_rule_revision",
               # added WM-0E-R2.1: an executable that cannot run the declared
               # method is a distinct kind of attempt from a method revision
-              "implementation_repair")
+              "implementation_repair",
+              # added WM-0E-R3: control-instrument development is search too
+              "null_control_design", "positive_control_power_level")
 
 
 class BudgetViolation(ValueError):
@@ -160,4 +162,27 @@ def wm0e_r2_1_truth() -> ResearchBudget:
                    "autocovariance support extended to max(2*m_max, m_max+K_N); "
                    "same declared method; semantic-equivalence tested on "
                    "inputs V0 could execute")
+    return b
+
+
+def wm0e_r3_truth() -> ResearchBudget:
+    """wm0e_r2_1_truth() PLUS the control-instrument development of R3.
+    Every ladder level is an inspected attempt whether or not selected."""
+    b = wm0e_r2_1_truth()
+    b = b.register("null_control_design", "N3_FEATURE_PERMUTATION_V0#RETIRED",
+                   "failed acceptance 7/50 (max 5) in COURT-V2-386a408b7417; "
+                   "retired, not edited, not rerun")
+    b = b.register("null_control_design", "N3_SHADOW_FEATURE_NULL_V1",
+                   "features from an independent shadow world of the same "
+                   "declared family; targets from the target world")
+    b = b.register("positive_control_power_level", "P0_CAUSAL_TREND_V0#1.00x",
+                   "failed acceptance power 31/50 = 0.62 (required 0.80), "
+                   "direction 50/50")
+    for m in (1.5, 2.0, 3.0):
+        b = b.register("positive_control_power_level", "P0_V1_ladder#%.2fx" % m,
+                       "predeclared development power-calibration level; "
+                       "inspected under frozen M0 + bootstrap V0.1")
+    b = b.register("positive_control_power_level", "P0_V1_ladder#1.00x",
+                   "predeclared ladder base = P0 V0 magnitude; inspected "
+                   "again on fresh development seeds")
     return b

@@ -67,6 +67,10 @@ from apex.world_model.bootstrap import (BOOTSTRAP_VERSION, B_REPLICATIONS,
 from apex.world_model.court_v2 import (COURT_VERSION_V2, MAX_FALSE_POSITIVES_V2,
                                        CourtDefinitionV2, convene_v2,
                                        error_control_v2)
+from apex.world_model.controls_r3 import (N3_V1, N3_V1_CONTRACT, N3_V0_STATUS,
+                                          P0_V0_STATUS, P0_POWER_LADDER,
+                                          P0_V1_SELECTION, n3_v1_dataset,
+                                          shadow_world, predeclaration)
 from apex.world_model.court_v1 import (COURT_VERSION_V1, MAX_FALSE_POSITIVES_V1,
                                        CourtDefinitionV1, convene_v1,
                                        error_control_v1)
@@ -87,6 +91,9 @@ TRAINING_AUTHORIZED = False
 __all__ = ["WORLD_MODEL_SHADOW_ENGINE", "DECISION_POWER",
            "BOOTSTRAP_VERSION", "B_REPLICATIONS", "ALPHA", "BLOCK_RULE",
            "IMPLEMENTATION_HISTORY", "required_autocov_lags",
+           "N3_V1", "N3_V1_CONTRACT", "N3_V0_STATUS", "P0_V0_STATUS",
+           "P0_POWER_LADDER", "P0_V1_SELECTION", "n3_v1_dataset", "shadow_world",
+           "predeclaration",
            "CALIBRATION_ENVELOPE", "BootstrapViolation", "bootstrap_test",
            "block_length", "COURT_VERSION_V2", "MAX_FALSE_POSITIVES_V2",
            "CourtDefinitionV2", "convene_v2", "error_control_v2",
