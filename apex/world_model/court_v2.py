@@ -1,4 +1,4 @@
-"""NULL_COURT_V2_BLOCK_BOOTSTRAP -- acceptance court for the dependent
+"""NULL_COURT_V2.1_BLOCK_BOOTSTRAP -- acceptance court for the dependent
 block-bootstrap inference. A NEW court. NULL_COURT_V0 stays FAIL forever;
 NULL_COURT_V1 stays defined-and-never-convened forever.
 
@@ -34,7 +34,7 @@ from apex.world_model import features as _features
 from apex.world_model import inference as I
 from apex.world_model import models as _models
 from apex.world_model import targets as _targets
-from apex.world_model.budget import wm0e_r2_truth
+from apex.world_model.budget import wm0e_r2_1_truth
 from apex.world_model.canonical import content_hash
 from apex.world_model.court import (CONTROL_FAILURE, INVALID, PASS,
                                     P0_MIN_DETECTION_RATE,
@@ -49,7 +49,7 @@ from apex.world_model.models import M0SyntheticBaseline, NullBaseline
 from apex.world_model.teststand import default_dataset, run_pipeline
 from apex.world_model.worlds import S1_CAUSAL_TREND
 
-COURT_VERSION_V2 = "NULL_COURT_V2_BLOCK_BOOTSTRAP"
+COURT_VERSION_V2 = "NULL_COURT_V2.1_BLOCK_BOOTSTRAP"
 COURT_AUTHORITY_V2 = ("NONE. Synthetic acceptance court for a statistical "
                       "repair. Confers no trading, order, capital or "
                       "real-market research authority.")
@@ -110,7 +110,8 @@ class CourtDefinitionV2:
         return {"court_version": self.court_version,
                 "court_id": self.court_id, "code_commit": self.code_commit,
                 "supersedes_without_overwriting": ["NULL_COURT_V0 (FAIL)",
-                                                   "NULL_COURT_V1 (never convened)"],
+                                                   "NULL_COURT_V1 (never convened)",
+                                                   "NULL_COURT_V2 (defined; crashed at calibration; never convened)"],
                 "repairs_defect": I.WM_STAT_001["defect_id"],
                 "model_identity": self.model_identity,
                 "model_config_hash": self.model_config_hash,
@@ -181,7 +182,7 @@ def define_v2(code_commit: str, creation_time: float,
     cal_sha, _ = load_calibration(calibration_path)
     m0 = M0SyntheticBaseline().model_identity()
     nl = NullBaseline().model_identity()
-    budget = wm0e_r2_truth()
+    budget = wm0e_r2_1_truth()
     return CourtDefinitionV2(
         court_id="COURT-V2-%s" % content_hash(
             {"seeds": HOLDOUT["seed_set_hash"], "commit": code_commit,

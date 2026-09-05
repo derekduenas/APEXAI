@@ -19,7 +19,7 @@ from apex.world_model import controls as C
 from apex.world_model import court as V0
 from apex.world_model import court_v2 as V2
 from apex.world_model import inference as I
-from apex.world_model.budget import wm0e_r1_truth, wm0e_r2_truth
+from apex.world_model.budget import wm0e_r1_truth, wm0e_r2_truth, wm0e_r2_1_truth
 from apex.world_model.holdout import HOLDOUT_SEEDS, WM_0E_DEVELOPMENT_NULL_SET_V0
 from apex.world_model.targets import TARGET_HORIZON_STEPS
 
@@ -181,7 +181,7 @@ def test_court_v2_commits_to_everything_before_sitting(tmp_path):
     cal = _ok_cal(tmp_path)
     defn = V2.define_v2("TEST", 0.0, cal)
     c = defn.canonical()
-    assert c["court_version"] == "NULL_COURT_V2_BLOCK_BOOTSTRAP"
+    assert c["court_version"] == "NULL_COURT_V2.1_BLOCK_BOOTSTRAP"
     assert c["primary_inference"]["B"] == 1999
     assert c["seed_set"]["seeds"] == list(HOLDOUT_SEEDS)
     assert c["development_set_excluded"]["overlap_with_acceptance"] == 0
@@ -248,3 +248,100 @@ def test_one_cell_each_on_a_DEVELOPMENT_seed(tmp_path):
         assert cell["block_length"] >= 15
         assert 0 < cell["p_bootstrap"] <= 1
         assert "hac_t" in cell["secondary"]
+
+
+# ================================================================ WM-IMPL-001 (R2.1)
+def _v0_selector(d):
+    """VERBATIM replica of the V0 selector (the buffer bug included), kept
+    here so the defect is reproducible forever and equivalence is testable."""
+    x = np.asarray(d, dtype=float); n = len(x); c = x - x.mean()
+    K_N = max(5, int(math.ceil(math.sqrt(math.log10(n)))))
+    m_max = int(math.ceil(math.sqrt(n))) + K_N
+    band = 2.0 * math.sqrt(math.log10(n) / n)
+    R = np.array([(c[k:] * c[:n - k]).sum() / n for k in range(m_max + K_N + 1)])
+    rho = R / R[0]
+    m_hat = None
+    for m in range(0, m_max + 1):
+        if np.all(np.abs(rho[m + 1:m + K_N + 1]) < band):
+            m_hat = m; break
+    if m_hat is None: m_hat = m_max
+    M = max(1, 2 * m_hat)
+    ks = np.arange(-M, M + 1)
+    lam = BS._flat_top(ks / M)
+    Rk = R[np.abs(ks)]                       # <- IndexError when M > m_max + K_N
+    G = float((lam * np.abs(ks) * Rk).sum()); S = float((lam * Rk).sum())
+    D = (4.0 / 3.0) * S * S
+    b = ((2.0 * G * G / D) ** (1.0 / 3.0)) * (n ** (1.0 / 3.0)) if D > 0 else 0.0
+    return {"m_hat": m_hat, "M": M, "b_opt": b}
+
+
+def _ar1(seed, n, phi):
+    rng = random.Random(seed); x, out = 0.0, []
+    for _ in range(n):
+        x = phi * x + rng.gauss(0, 1); out.append(x)
+    return out
+
+
+def test_wm_impl_001_constants_and_history():
+    k = BS.selector_constants(465)
+    assert k == {"K_N": 5, "m_max": 27, "v0_buffer_lags": 32, "required_lags": 54}
+    assert BS.required_autocov_lags(270) == 2 * BS.selector_constants(270)["m_max"]
+    assert BS.BOOTSTRAP_VERSION == "DEPENDENT_BLOCK_BOOTSTRAP_V0.1"
+    assert "V0" in BS.IMPLEMENTATION_HISTORY and "V0.1" in BS.IMPLEMENTATION_HISTORY
+    assert BS.bootstrap_contract()["implementation_history"] == BS.IMPLEMENTATION_HISTORY
+
+
+@pytest.mark.parametrize("phi,seed", [(0.9, FIX + 20), (0.995, FIX + 21)])
+def test_wm_impl_001_regression_v0_raises_v01_runs(phi, seed):
+    """Legal long-memory inputs where 2*m_hat exceeds the V0 buffer."""
+    d = _ar1(seed, 465, phi)
+    with pytest.raises(IndexError):                       # the exact defect
+        _v0_selector(d)
+    out = BS.block_length(d)                              # V0.1 executes
+    sel = out["selector_output"]
+    assert sel["M"] == max(1, 2 * sel["m_hat"])           # no clamping sneaked in
+    assert sel["M"] > BS.selector_constants(465)["v0_buffer_lags"]
+    assert sel["autocov_lags_available"] >= sel["max_lag_read"]
+    assert 15 <= out["block_length"] <= 465 // 6
+
+
+def test_wm_impl_001_boundary_m_hat_equals_m_max_and_zero():
+    d = _ar1(FIX + 22, 465, 0.998)                        # never insignificant
+    sel = BS.block_length(d)["selector_output"]
+    assert sel["m_hat"] == sel["m_max"] == 27 and sel["M"] == 54
+    assert sel["autocov_lags_available"] == 54 >= sel["max_lag_read"]
+    rng = random.Random(FIX + 23)
+    w = [rng.gauss(0, 1) for _ in range(465)]             # m_hat = 0
+    sel0 = BS.block_length(w)["selector_output"]
+    assert sel0["m_hat"] == 0 and sel0["M"] == 1
+    assert BS.block_length(w)["block_length"] == 15       # floor H, unchanged
+
+
+def test_wm_impl_001_semantic_equivalence_where_v0_could_run():
+    """On every input V0 could execute, V0.1 returns the identical
+    selection (bit-identical b_opt) and the identical bootstrap result."""
+    cases = [[random.Random(FIX + 30).gauss(0, 1) for _ in range(465)],
+             _ma(random.Random(FIX + 31), 465), _ma(random.Random(FIX + 32), 270),
+             _ar1(FIX + 33, 465, 0.5)]
+    compared = 0
+    for d in cases:
+        try:
+            v0 = _v0_selector(d)
+        except IndexError:
+            continue                                      # outside V0's domain
+        v01 = BS.block_length(d)["selector_output"]
+        assert v01["m_hat"] == v0["m_hat"] and v01["M"] == v0["M"]
+        assert v01["b_opt"] == v0["b_opt"]                # same arithmetic, same float
+        compared += 1
+    assert compared >= 3, compared
+
+
+def test_budget_r2_1_distinguishes_implementation_repair():
+    b2, b21 = wm0e_r2_truth(), wm0e_r2_1_truth()
+    c = b21.counts()
+    assert c["implementation_repair"] == 1 and c["defect_registered"] == 2
+    assert c["inference_rule_revision"] == 3               # NOT 4: no method change
+    assert c["court_sitting"] == 3
+    assert len(b21.attempts) == len(b2.attempts) + 2
+    ids = [a[1] for a in b21.attempts]
+    assert "WM-IMPL-001" in ids and "DEPENDENT_BLOCK_BOOTSTRAP_V0->V0.1" in ids

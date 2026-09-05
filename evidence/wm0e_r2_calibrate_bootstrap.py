@@ -5,7 +5,7 @@ never a court seed. The envelope was written into bootstrap.py before
 this script existed; this script only measures and compares.
 Usage: calibrate_bootstrap.py <out.json>
 """
-import json, math, random, sys, time
+import json, math, random, sys, time, resource
 import numpy as np
 from apex.world_model import bootstrap as BS
 
@@ -75,6 +75,7 @@ out["pooled_ok"] = bool(pooled <= ENV["pooled_dependent_null_type1_max"])
 all_ok = all(f["envelope_ok"] for f in out["fixtures"].values()) and out["pooled_ok"]
 out["envelope_verdict"] = "PASS" if all_ok else "FAIL"
 out["elapsed_s"] = round(time.time() - t0, 1)
+out["resource_truth"] = {"ru_maxrss_MiB": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1), "cgroup": open("/proc/self/cgroup").read().strip(), "unit_memory_max": open("/sys/fs/cgroup" + open("/proc/self/cgroup").read().strip().split("::")[-1] + "/memory.max").read().strip(), "bootstrap_B": BS.B_REPLICATIONS, "tests_completed": sum(f["reps"] for f in out["fixtures"].values())}
 json.dump(out, open(OUT, "w"), indent=1)
 print("pooled dependent-null rejection: %.4f (max %.3f) -> %s" % (pooled, ENV["pooled_dependent_null_type1_max"], out["pooled_ok"]))
 print("ENVELOPE_VERDICT:", out["envelope_verdict"], " elapsed %.1fs" % out["elapsed_s"])

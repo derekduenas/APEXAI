@@ -35,7 +35,10 @@ CATEGORIES = ("model_family", "hyperparameter_configuration",
               # added WM-0E-R1: the decision STATISTIC is part of the search
               # history too. A court that sits, fails, and is followed by a
               # revised rule is an attempt, not "zero attempts".
-              "court_sitting", "defect_registered", "inference_rule_revision")
+              "court_sitting", "defect_registered", "inference_rule_revision",
+              # added WM-0E-R2.1: an executable that cannot run the declared
+              # method is a distinct kind of attempt from a method revision
+              "implementation_repair")
 
 
 class BudgetViolation(ValueError):
@@ -140,4 +143,21 @@ def wm0e_r2_truth() -> ResearchBudget:
                    "loss differential, PPW automatic block length with "
                    "floor H and cap n/6, B=1999, alpha=0.025; the NEXT "
                    "statistical methodology attempt")
+    return b
+
+
+def wm0e_r2_1_truth() -> ResearchBudget:
+    """wm0e_r2_truth() PLUS the R2 implementation failure and its repair.
+    IMPLEMENTATION_REPAIR is kept distinct from STATISTICAL_METHODOLOGY_
+    REVISION so the ledger cannot launder one as the other."""
+    b = wm0e_r2_truth()
+    b = b.register("defect_registered", "WM-IMPL-001",
+                   "R2 calibration crashed: PPW selector buffer covered lags "
+                   "<= m_max+K_N but the flat-top window reads <= 2*m_hat; "
+                   "IndexError on NULL_MA14_n465; no envelope verdict; no "
+                   "acceptance seed executed")
+    b = b.register("implementation_repair", "DEPENDENT_BLOCK_BOOTSTRAP_V0->V0.1",
+                   "autocovariance support extended to max(2*m_max, m_max+K_N); "
+                   "same declared method; semantic-equivalence tested on "
+                   "inputs V0 could execute")
     return b

@@ -72,7 +72,18 @@ from apex.world_model.inference import (HAC_KERNEL, HAC_LAG,
                                         paired_differentials)
 from apex.world_model.targets import TARGET_HORIZON, TARGET_HORIZON_STEPS
 
-BOOTSTRAP_VERSION = "DEPENDENT_BLOCK_BOOTSTRAP_V0"
+BOOTSTRAP_VERSION = "DEPENDENT_BLOCK_BOOTSTRAP_V0.1"
+IMPLEMENTATION_HISTORY = {
+    "V0": "declared method; the executable could not run the declared "
+          "Politis-White selector on long-memory input: autocovariances were "
+          "computed only through lag m_max + K_N while the flat-top window "
+          "legally reads lags up to M = 2*m_hat <= 2*m_max (WM-IMPL-001; "
+          "IndexError on the first dependent calibration fixture, "
+          "2026-09-04T20:12Z). No number was produced.",
+    "V0.1": "SAME declared statistical method; autocovariance support "
+            "extended to cover every lag the declared formula may access "
+            "(max(2*m_max, m_max + K_N)). No semantic change; no clamping "
+            "added. IMPLEMENTATION_REPAIR, not a methodology revision."}
 BOOT_NAMESPACE = "WM0E_R2_BOOT_V0"
 B_REPLICATIONS = 1999
 ALPHA = 0.025
@@ -127,6 +138,20 @@ def hac_t_rows(X: np.ndarray, lag: int = HAC_LAG) -> np.ndarray:
     return m[:, 0] / np.sqrt(lrv / n)
 
 
+def selector_constants(n: int) -> dict:
+    K_N = max(5, int(math.ceil(math.sqrt(math.log10(n)))))
+    m_max = int(math.ceil(math.sqrt(n))) + K_N
+    return {"K_N": K_N, "m_max": m_max,
+            "v0_buffer_lags": m_max + K_N,            # what V0 computed
+            "required_lags": max(2 * m_max, m_max + K_N)}
+
+
+def required_autocov_lags(n: int) -> int:
+    """Highest lag the DECLARED selector may legally read for series
+    length n. V0.1 computes autocovariances through exactly this lag."""
+    return selector_constants(n)["required_lags"]
+
+
 def _flat_top(t: np.ndarray) -> np.ndarray:
     a = np.abs(t)
     return np.where(a <= 0.5, 1.0, np.where(a <= 1.0, 2.0 * (1.0 - a), 0.0))
@@ -142,7 +167,11 @@ def politis_white_block_length(d, *, circular: bool = True) -> dict:
     K_N = max(5, int(math.ceil(math.sqrt(math.log10(n)))))
     m_max = int(math.ceil(math.sqrt(n))) + K_N
     band = 2.0 * math.sqrt(math.log10(n) / n)
-    R = np.array([(c[k:] * c[:n - k]).sum() / n for k in range(m_max + K_N + 1)])
+    # WM-IMPL-001 (V0.1): support must cover BOTH the significance scan
+    # (lags <= m_max + K_N) and the flat-top window (lags <= 2*m_hat, and
+    # m_hat <= m_max). V0 stopped at m_max + K_N and raised IndexError.
+    max_lag = required_autocov_lags(n)
+    R = np.array([(c[k:] * c[:n - k]).sum() / n for k in range(max_lag + 1)])
     rho = R / R[0] if R[0] > 0 else np.zeros_like(R)
     m_hat = None
     for m in range(0, m_max + 1):
@@ -162,6 +191,8 @@ def politis_white_block_length(d, *, circular: bool = True) -> dict:
     return {"selector": "POLITIS_WHITE_2004_PPW_2009",
             "variant": "circular" if circular else "stationary",
             "n": n, "K_N": K_N, "m_max": m_max, "band": band,
+            "autocov_lags_available": int(len(R) - 1),
+            "max_lag_read": int(max(M, m_hat + K_N)),
             "m_hat": int(m_hat), "M": int(M), "G_hat": G, "D_hat": D,
             "b_opt": float(b)}
 
@@ -233,6 +264,7 @@ def bootstrap_rule(model_grades, null_grades, **kw) -> dict:
 
 def bootstrap_contract() -> dict:
     return {"bootstrap_version": BOOTSTRAP_VERSION, "kind": BOOTSTRAP_KIND,
+            "implementation_history": IMPLEMENTATION_HISTORY,
             "hypotheses": {"H0": "no positive expected OOS loss advantage of "
                                  "M0 over the null", "H1": "positive advantage"},
             "orientation": STATISTIC_ORIENTATION,

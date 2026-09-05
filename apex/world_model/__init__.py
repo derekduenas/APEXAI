@@ -60,6 +60,7 @@ from apex.world_model.holdout import (HOLDOUT_VERSION, HOLDOUT_SEEDS,
                                       HOLDOUT_SEED_SET_HASH,
                                       WM_0E_DEVELOPMENT_NULL_SET_V0)
 from apex.world_model.bootstrap import (BOOTSTRAP_VERSION, B_REPLICATIONS,
+                                        IMPLEMENTATION_HISTORY, required_autocov_lags,
                                         ALPHA, BLOCK_RULE, CALIBRATION_ENVELOPE,
                                         BootstrapViolation, bootstrap_test,
                                         block_length)
@@ -85,6 +86,7 @@ TRAINING_AUTHORIZED = False
 
 __all__ = ["WORLD_MODEL_SHADOW_ENGINE", "DECISION_POWER",
            "BOOTSTRAP_VERSION", "B_REPLICATIONS", "ALPHA", "BLOCK_RULE",
+           "IMPLEMENTATION_HISTORY", "required_autocov_lags",
            "CALIBRATION_ENVELOPE", "BootstrapViolation", "bootstrap_test",
            "block_length", "COURT_VERSION_V2", "MAX_FALSE_POSITIVES_V2",
            "CourtDefinitionV2", "convene_v2", "error_control_v2",
