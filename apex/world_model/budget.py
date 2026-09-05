@@ -213,3 +213,20 @@ def wm0e_r5_truth() -> ResearchBudget:
                        "development validation at the selected evaluation length "
                        "(boundary 720, n_train 701, E 1860); frozen court; max 5/100")
     return b
+
+
+def wm0e_r51_truth() -> ResearchBudget:
+    """wm0e_r5_truth() PLUS: N0 V0 failed at E1860 (recorded as a design
+    attempt outcome), N0 V1 = one new null design, N1 exact-E1860 = one
+    execution-geometry validation. The 1660 result stays in the ledger."""
+    b = wm0e_r5_truth()
+    b = b.register("null_control_design", "N0_SHADOW_TARGET_NULL_V1",
+                   "features from world A, targets from an independent same-family "
+                   "world B; twin of N3_SHADOW_FEATURE_NULL_V1 with roles reversed")
+    b = b.register("null_control_validation", "N0_SHADOW_TARGET_NULL_V1@E1860",
+                   "100 paired feature/target worlds; max 5/100")
+    b = b.register("null_control_validation", "N1_TIME_DESTRUCTION_E1860_V1@E1860",
+                   "unchanged shift-200 transformation on T=2795 so 1860 usable "
+                   "pairs remain (WM-N1-GEOMETRY-001 closure); the R5 1660 result "
+                   "is retained")
+    return b
