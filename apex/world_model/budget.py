@@ -40,7 +40,9 @@ CATEGORIES = ("model_family", "hyperparameter_configuration",
               # method is a distinct kind of attempt from a method revision
               "implementation_repair",
               # added WM-0E-R3: control-instrument development is search too
-              "null_control_design", "positive_control_power_level")
+              "null_control_design", "positive_control_power_level",
+              # added WM-0E-R4: evaluation-length calibration is search too
+              "positive_control_evaluation_length")
 
 
 class BudgetViolation(ValueError):
@@ -185,4 +187,16 @@ def wm0e_r3_truth() -> ResearchBudget:
     b = b.register("positive_control_power_level", "P0_V1_ladder#1.00x",
                    "predeclared ladder base = P0 V0 magnitude; inspected "
                    "again on fresh development seeds")
+    return b
+
+
+def wm0e_r4_truth() -> ResearchBudget:
+    """wm0e_r3_truth() PLUS the four predeclared evaluation-length levels
+    of P0_POWER_CONTRACT_V2 (nested, paired, original mu). The magnitude
+    ladder is CLOSED and stays in the ledger as it failed."""
+    b = wm0e_r3_truth()
+    for L in (465, 930, 1395, 1860):
+        b = b.register("positive_control_evaluation_length", "P0_V2_eval_len#%d" % L,
+                       "nested prefix of ONE world per seed; M0 fit once on the V0 "
+                       "training interval; mu = 1.0x; frozen court")
     return b
