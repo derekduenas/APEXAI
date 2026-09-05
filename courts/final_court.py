@@ -67,7 +67,7 @@ BURNED_R7_NAMESPACE = "WM0E_R7_FINAL_ACCEPTANCE_V0"
 QUALIFICATION_NAMESPACE = "WM0E_R7_1_RUNNER_QUALIFICATION_DEV_V0"     # development-only, never acceptance
 # The acceptance namespace is MINTED in a later commit. While None, nothing can
 # derive, instantiate or inspect an acceptance seed.
-NAMESPACE = None
+NAMESPACE = "WM0E_R7_1_FINAL_ACCEPTANCE_V1"
 N_INDEX = 50
 SEED_MODULUS = 2 ** 31 - 1
 E = 1860
