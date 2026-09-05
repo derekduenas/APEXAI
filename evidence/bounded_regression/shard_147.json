@@ -1,0 +1,299 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_organism_integration.py::test_A_options_only_candidate_funds",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_B_equity_only_candidate_funds",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_C_btc_candidate_is_refused_for_want_of_a_risk_certificate",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_D_options_plus_equity_same_underlying_detected",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_E_three_independent_opportunities_compared",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_F_catalyst_contradiction_is_recorded_not_a_veto",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_F2_catalyst_never_sees_the_future",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_G_catalyst_unavailable_is_unknown_not_a_halt",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_H_arena_unavailable_fails_closed",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_I_kernel_vetoes_oversize_and_arena_cannot_override",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_I2_session_drawdown_halts_new_funding",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_J_execution_failure_is_not_a_zero",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_K_unproven_edge_locking_the_session_defers_to_cash",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_L_long_and_short_coexist",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_M_same_family_risk_is_capped",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_N_cio_produces_directive_but_has_no_mutating_surface",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_O_nothing_downstream_of_research_can_alter_the_book",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_P_restart_cannot_double_fund",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_experience_graph_as_known_at_excludes_the_future",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_no_real_order_surface_anywhere_in_the_organism",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_stale_candidate_with_outcome_is_still_refused_upstream",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_a_prior_session_candidate_is_refused_as_stale",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_a_voided_funding_leaves_the_economic_state",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_the_cio_does_not_count_voided_fundings",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_options_attach_joins_the_per_trade_pair_by_card_hash",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_a_broken_outcome_attribution_pair_is_refused_not_guessed",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_an_unresolved_options_position_stays_pending",
+   "file": "tests/test_organism_integration.py"
+  },
+  {
+   "nodeid": "tests/test_organism_integration.py::test_baselines_are_computed_but_never_fund",
+   "file": "tests/test_organism_integration.py"
+  }
+ ],
+ "collected_count": 28,
+ "collect_errors": [],
+ "results": {
+  "tests/test_organism_integration.py::test_A_options_only_candidate_funds": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_B_equity_only_candidate_funds": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_C_btc_candidate_is_refused_for_want_of_a_risk_certificate": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_D_options_plus_equity_same_underlying_detected": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_E_three_independent_opportunities_compared": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_F_catalyst_contradiction_is_recorded_not_a_veto": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_F2_catalyst_never_sees_the_future": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_G_catalyst_unavailable_is_unknown_not_a_halt": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_H_arena_unavailable_fails_closed": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_I_kernel_vetoes_oversize_and_arena_cannot_override": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_I2_session_drawdown_halts_new_funding": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_J_execution_failure_is_not_a_zero": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_K_unproven_edge_locking_the_session_defers_to_cash": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_L_long_and_short_coexist": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_M_same_family_risk_is_capped": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_N_cio_produces_directive_but_has_no_mutating_surface": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_O_nothing_downstream_of_research_can_alter_the_book": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_P_restart_cannot_double_fund": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_experience_graph_as_known_at_excludes_the_future": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_no_real_order_surface_anywhere_in_the_organism": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_stale_candidate_with_outcome_is_still_refused_upstream": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_a_prior_session_candidate_is_refused_as_stale": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_a_voided_funding_leaves_the_economic_state": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_the_cio_does_not_count_voided_fundings": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_options_attach_joins_the_per_trade_pair_by_card_hash": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_a_broken_outcome_attribution_pair_is_refused_not_guessed": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_an_unresolved_options_position_stays_pending": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_integration.py::test_baselines_are_computed_but_never_fund": {
+   "file": "tests/test_organism_integration.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 28,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_organism_integration.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34797.service",
+   "memory_max": "1468006400",
+   "memory_peak": "118001664",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.11
+ }
+}

@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_confirmed_expression_outranks_early_which_outranks_none",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_unknown_dimension_never_outranks_known_good",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_all_dimensions_present_in_every_row_even_unsupplied",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_data_quality_is_the_first_and_dominant_sort_key",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_first_elevated_at_breaks_ties_earliest_wins",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_unknown_elevation_time_sorts_after_known_in_a_tie",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_supporting_dimensions_lists_only_best_values",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_contradictions_pass_through_untouched",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_no_optimized_weight_every_dimension_is_a_named_ordinal",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_empty_candidate_list_is_a_valid_empty_map",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_determinism_same_candidates_twice_byte_identical",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_leading_edge_map.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_leading_edge_map.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_leading_edge_map.py::test_confirmed_expression_outranks_early_which_outranks_none": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_unknown_dimension_never_outranks_known_good": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_all_dimensions_present_in_every_row_even_unsupplied": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_data_quality_is_the_first_and_dominant_sort_key": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_first_elevated_at_breaks_ties_earliest_wins": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_unknown_elevation_time_sorts_after_known_in_a_tie": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_supporting_dimensions_lists_only_best_values": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_contradictions_pass_through_untouched": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_no_optimized_weight_every_dimension_is_a_named_ordinal": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_empty_candidate_list_is_a_valid_empty_map": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_determinism_same_candidates_twice_byte_identical": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_leading_edge_map.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_leading_edge_map.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_leading_edge_map.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34719.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114937856",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.96
+ }
+}

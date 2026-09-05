@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_trade_at_the_open_is_live_valid",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_premarket_observation_counts_as_reaching_the_open",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_late_first_observation_is_not_valid",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_reconstruction_can_never_claim_live_validity",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_reconstructed_record_marked_valid_is_structurally_refused",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_certify_refuses_silence_and_hindsight",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_certify_proven_when_every_symbol_is_live_valid",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_a_genuinely_late_symbol_fails_the_session",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_attribution_is_strictly_forward_in_time",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_attribution_measures_real_lead",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_baseline_playbooks_are_never_counted_as_matches",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_matched_requires_a_match_time",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_fastwatch_has_no_authority",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_cycle_advances_across_process_boundaries",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_dead_pid_between_ticks_is_not_stopped",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_missed_scheduled_runs_go_stalled",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_runtime_model_is_declared",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_manifest_entry_carries_runtime_version",
+   "file": "tests/test_phase1_1_readiness.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_1_readiness.py::test_premarket_seal_registers_into_the_manifest",
+   "file": "tests/test_phase1_1_readiness.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_phase1_1_readiness.py::test_trade_at_the_open_is_live_valid": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_premarket_observation_counts_as_reaching_the_open": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_late_first_observation_is_not_valid": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_reconstruction_can_never_claim_live_validity": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_reconstructed_record_marked_valid_is_structurally_refused": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_certify_refuses_silence_and_hindsight": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_certify_proven_when_every_symbol_is_live_valid": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_a_genuinely_late_symbol_fails_the_session": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_attribution_is_strictly_forward_in_time": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_attribution_measures_real_lead": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_baseline_playbooks_are_never_counted_as_matches": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_matched_requires_a_match_time": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_fastwatch_has_no_authority": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_cycle_advances_across_process_boundaries": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_dead_pid_between_ticks_is_not_stopped": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_missed_scheduled_runs_go_stalled": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_runtime_model_is_declared": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_manifest_entry_carries_runtime_version": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_1_readiness.py::test_premarket_seal_registers_into_the_manifest": {
+   "file": "tests/test_phase1_1_readiness.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 19,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_phase1_1_readiness.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34806.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116015104",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.69
+ }
+}

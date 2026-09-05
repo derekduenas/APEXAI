@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_zero_invalidation_distance_is_degenerate_long",
+   "file": "tests/test_degenerate_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_zero_invalidation_distance_is_degenerate_short",
+   "file": "tests/test_degenerate_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_degenerate_is_never_good_even_though_zero_passes_the_old_test",
+   "file": "tests/test_degenerate_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_degenerate_geometry_is_not_attackable_by_construction",
+   "file": "tests/test_degenerate_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_normal_positive_invalidation_is_unchanged",
+   "file": "tests/test_degenerate_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_the_epsilon_is_numerical_not_economic",
+   "file": "tests/test_degenerate_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_declared_risk_must_be_positive_on_both_expressions",
+   "file": "tests/test_degenerate_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_a_flat_tape_does_not_crash_and_is_not_good",
+   "file": "tests/test_degenerate_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_stale_quotes_are_gated_upstream_of_the_expression_arena",
+   "file": "tests/test_degenerate_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_degenerate_geometry.py::test_the_live_path_declares_its_timezone_convention",
+   "file": "tests/test_degenerate_geometry.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_degenerate_geometry.py::test_zero_invalidation_distance_is_degenerate_long": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_degenerate_geometry.py::test_zero_invalidation_distance_is_degenerate_short": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_degenerate_geometry.py::test_degenerate_is_never_good_even_though_zero_passes_the_old_test": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_degenerate_geometry.py::test_degenerate_geometry_is_not_attackable_by_construction": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_degenerate_geometry.py::test_normal_positive_invalidation_is_unchanged": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_degenerate_geometry.py::test_the_epsilon_is_numerical_not_economic": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_degenerate_geometry.py::test_declared_risk_must_be_positive_on_both_expressions": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_degenerate_geometry.py::test_a_flat_tape_does_not_crash_and_is_not_good": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_degenerate_geometry.py::test_stale_quotes_are_gated_upstream_of_the_expression_arena": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_degenerate_geometry.py::test_the_live_path_declares_its_timezone_convention": {
+   "file": "tests/test_degenerate_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_degenerate_geometry.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34687.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115380224",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.65
+ }
+}

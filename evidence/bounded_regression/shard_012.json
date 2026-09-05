@@ -1,0 +1,452 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_wrong_units_attack_conversion_refuses_without_increment",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_expired_metadata_attack_spec_without_increment_refused",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_ws_unit_unresolved_refuses_usd",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_stale_last_trade_is_ineligible",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_unknown_trade_age_is_ineligible",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_fresh_trade_is_eligible",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_staleness_policy_is_predeclared_not_tuned",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_frozen_mark_law_survives_in_source",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_daily_oi_polled_rapidly_stays_daily",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_oi_normalization_preserves_provenance_and_refuses",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_funding_cadence_mismatch_refuses_annualization",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_funding_native_preserved_first",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_missing_snapshot_level_first_is_invalid",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_sequence_gap_ack_regression_invalidates_no_silent_continue",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_resync_after_invalid_requires_fresh_snapshot",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_duplicate_same_ack_delta_is_applied_idempotently",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_crossed_book_is_invalid",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_locked_book_is_invalid",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_negative_size_is_invalid",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_markets_closed_ack_zero_refuses_prices",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_restart_during_reconstruction_book_invalid_until_snapshot",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_snapshot_divergence_probe_counts_reconstruction_errors",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_timestamp_inversion_counted_on_trades",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_pre_lineage_rows_excluded_for_all_purposes",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_post_lineage_and_outage_rows_are_eligible",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_exclusion_survives_restart_and_replay",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_real_ledger_pre_lineage_rows_are_excluded_and_preserved",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_chain_closure_bounds_forensic_interval_and_proves_post_fix",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_chain_closure_detects_post_fix_breaks",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_real_ws_ledgers_generation_law",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_lock_contention_is_observable",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_transient_divergence_classified_as_race",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_repeated_divergence_is_reconstruction_error",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_reconciliation_record_carries_the_mandated_fields",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_schema_change_attack_unknown_shape_is_excluded",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_stale_snapshot_cannot_regress_applied_state",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_stale_snapshot_still_anchors_resync_after_invalid",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_direction_flip_is_not_persistent_divergence",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_same_direction_repeat_is_still_persistent",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_reconciliation_field_renamed_honestly",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_resync_snapshot_establishes_state_at_its_ack",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_resync_refuses_deltas_older_than_the_anchor",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_resync_applies_newer_deltas_and_state_is_replay_stable",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_resync_out_of_order_event_cannot_regress_the_book",
+   "file": "tests/test_btc_l2_redteam.py"
+  },
+  {
+   "nodeid": "tests/test_btc_l2_redteam.py::test_resync_result_reconciles_with_the_next_venue_snapshot",
+   "file": "tests/test_btc_l2_redteam.py"
+  }
+ ],
+ "collected_count": 45,
+ "collect_errors": [],
+ "results": {
+  "tests/test_btc_l2_redteam.py::test_wrong_units_attack_conversion_refuses_without_increment": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_expired_metadata_attack_spec_without_increment_refused": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_ws_unit_unresolved_refuses_usd": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_stale_last_trade_is_ineligible": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_unknown_trade_age_is_ineligible": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_fresh_trade_is_eligible": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_staleness_policy_is_predeclared_not_tuned": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_frozen_mark_law_survives_in_source": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_daily_oi_polled_rapidly_stays_daily": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_oi_normalization_preserves_provenance_and_refuses": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_funding_cadence_mismatch_refuses_annualization": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_funding_native_preserved_first": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_missing_snapshot_level_first_is_invalid": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_sequence_gap_ack_regression_invalidates_no_silent_continue": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_resync_after_invalid_requires_fresh_snapshot": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_duplicate_same_ack_delta_is_applied_idempotently": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_crossed_book_is_invalid": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_locked_book_is_invalid": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_negative_size_is_invalid": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_markets_closed_ack_zero_refuses_prices": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_restart_during_reconstruction_book_invalid_until_snapshot": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_snapshot_divergence_probe_counts_reconstruction_errors": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_timestamp_inversion_counted_on_trades": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_pre_lineage_rows_excluded_for_all_purposes": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_post_lineage_and_outage_rows_are_eligible": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_exclusion_survives_restart_and_replay": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_real_ledger_pre_lineage_rows_are_excluded_and_preserved": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: no real ledger in this environment"
+  },
+  "tests/test_btc_l2_redteam.py::test_chain_closure_bounds_forensic_interval_and_proves_post_fix": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_chain_closure_detects_post_fix_breaks": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_real_ws_ledgers_generation_law": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: no real WS ledgers in this environment"
+  },
+  "tests/test_btc_l2_redteam.py::test_lock_contention_is_observable": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_transient_divergence_classified_as_race": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_repeated_divergence_is_reconstruction_error": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_reconciliation_record_carries_the_mandated_fields": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_schema_change_attack_unknown_shape_is_excluded": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_stale_snapshot_cannot_regress_applied_state": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_stale_snapshot_still_anchors_resync_after_invalid": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_direction_flip_is_not_persistent_divergence": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_same_direction_repeat_is_still_persistent": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_reconciliation_field_renamed_honestly": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_resync_snapshot_establishes_state_at_its_ack": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_resync_refuses_deltas_older_than_the_anchor": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_resync_applies_newer_deltas_and_state_is_replay_stable": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_resync_out_of_order_event_cannot_regress_the_book": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_l2_redteam.py::test_resync_result_reconciles_with_the_next_venue_snapshot": {
+   "file": "tests/test_btc_l2_redteam.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 43,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 2,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_btc_l2_redteam.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34657.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115953664",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.88
+ }
+}
