@@ -231,10 +231,15 @@ def test_no_rescue_logic_in_court_v2_and_bootstrap_source():
             assert word not in src, (mod.__name__, word)
 
 
-def test_holdout_still_unexecuted_in_this_tree():
-    import glob
-    assert not glob.glob("evidence/*court_v1*") and not glob.glob("evidence/*court_v2*")
-    assert not glob.glob("evidence/*COURT-V1*") and not glob.glob("evidence/*COURT-V2*")
+def test_holdout_executed_exactly_once_and_never_again():
+    """WM0E_R1_HOLDOUT_V0 was opened ONCE, by NULL_COURT_V2.1 on
+    2026-09-05 (COURT-V2-386a408b7417, FAIL). It is now CONSUMED: any
+    second acceptance artifact against these seeds is a violation."""
+    import glob, json
+    v21 = glob.glob("evidence/court_v21_*.json")
+    assert len(v21) == 1, v21
+    assert json.load(open(v21[0]))["definition"]["court_id"] == "COURT-V2-386a408b7417"
+    assert not glob.glob("evidence/*court_v1_*") and not glob.glob("evidence/court_v2_*")
 
 
 # ---------------------------------------------------------------- end-to-end
