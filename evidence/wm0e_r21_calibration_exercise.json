@@ -1,0 +1,287 @@
+{
+ "bootstrap_contract_hash": "af3ae117a69ee485bf8ac2fa86c7b962db7f21ab639507dffb6389ed0a2f35ac",
+ "bootstrap_contract": {
+  "bootstrap_version": "DEPENDENT_BLOCK_BOOTSTRAP_V0.1",
+  "kind": "circular moving-block bootstrap-t, centred under H0",
+  "implementation_history": {
+   "V0": "declared method; the executable could not run the declared Politis-White selector on long-memory input: autocovariances were computed only through lag m_max + K_N while the flat-top window legally reads lags up to M = 2*m_hat <= 2*m_max (WM-IMPL-001; IndexError on the first dependent calibration fixture, 2026-09-04T20:12Z). No number was produced.",
+   "V0.1": "SAME declared statistical method; autocovariance support extended to cover every lag the declared formula may access (max(2*m_max, m_max + K_N)). No semantic change; no clamping added. IMPLEMENTATION_REPAIR, not a methodology revision."
+  },
+  "hypotheses": {
+   "H0": "no positive expected OOS loss advantage of M0 over the null",
+   "H1": "positive advantage"
+  },
+  "orientation": "d_t = loss_null_t - loss_M0_t = logL_M0 - logL_null; positive mean(d) = M0 improves on the null",
+  "studentiser": "Bartlett HAC, L = 14 (= H-1), 1/n autocovariances",
+  "hac_kernel": "BARTLETT",
+  "hac_lag": 14,
+  "horizon": "H_15M",
+  "horizon_steps": 15,
+  "block_length_rule": "l = clamp(round(b_PPW), H, floor(n/6)); b_PPW = Politis-White 2004 / Patton-Politis-White 2009 automatic block length, circular variant, on the centred differential",
+  "block_lower": 15,
+  "min_blocks": 6,
+  "selector": "POLITIS_WHITE_2004_PPW_2009 (circular)",
+  "B": 1999,
+  "alpha_one_sided": 0.025,
+  "decision": "p = (1 + #{t* >= t_obs}) / (B + 1); SIGNAL_DETECTED iff mean(d) > 0 and p <= ALPHA",
+  "rng_namespace": "WM0E_R2_BOOT_V0",
+  "calibration_envelope": {
+   "alpha": 0.025,
+   "null_fixture_type1_max": 0.05,
+   "null_fixture_type1_min": 0.005,
+   "pooled_dependent_null_type1_max": 0.04,
+   "power_fixture_min": 0.8,
+   "replications_per_fixture": 400,
+   "rule": "STOP if ANY null fixture exceeds type1_max or falls below type1_min, or the pooled dependent-null rate exceeds pooled max, or power is below min. No block-rule or alpha change; a failure is sealed."
+  },
+  "numpy": "2.4.6",
+  "implementation_sha256": "19d3d70e41d1d5ebe3fee1e5483c4e26ba996fa34b812ee6b91791881b763872"
+ },
+ "envelope": {
+  "alpha": 0.025,
+  "null_fixture_type1_max": 0.05,
+  "null_fixture_type1_min": 0.005,
+  "pooled_dependent_null_type1_max": 0.04,
+  "power_fixture_min": 0.8,
+  "replications_per_fixture": 400,
+  "rule": "STOP if ANY null fixture exceeds type1_max or falls below type1_min, or the pooled dependent-null rate exceeds pooled max, or power is below min. No block-rule or alpha change; a failure is sealed."
+ },
+ "replications": 400,
+ "fixtures": {
+  "NULL_iid_n465": {
+   "is_null": true,
+   "reps": 400,
+   "n": 465,
+   "rejection_rate": 0.035,
+   "rejections": 14,
+   "ci95": [
+    0.0209610999014911,
+    0.05788565585621193
+   ],
+   "p_quantiles": {
+    "0.05": 0.040425,
+    "0.25": 0.21925,
+    "0.5": 0.47024999999999995,
+    "0.75": 0.7386250000000001
+   },
+   "frac_p_le_0.05": 0.0675,
+   "frac_p_le_0.10": 0.1325,
+   "block_length": {
+    "min": 15,
+    "median": 15,
+    "max": 23
+   },
+   "block_clamped": {
+    "lower": 399,
+    "none": 1,
+    "upper": 0
+   },
+   "t_obs_sd": 1.0780254248188401,
+   "t_obs_mean": 0.06860011873554689,
+   "envelope_ok": true
+  },
+  "NULL_MA14_n465": {
+   "is_null": true,
+   "reps": 400,
+   "n": 465,
+   "rejection_rate": 0.0225,
+   "rejections": 9,
+   "ci95": [
+    0.011881448169963291,
+    0.04220312360273175
+   ],
+   "p_quantiles": {
+    "0.05": 0.05132500000000001,
+    "0.25": 0.23975,
+    "0.5": 0.496,
+    "0.75": 0.7235
+   },
+   "frac_p_le_0.05": 0.05,
+   "frac_p_le_0.10": 0.105,
+   "block_length": {
+    "min": 15,
+    "median": 25,
+    "max": 77
+   },
+   "block_clamped": {
+    "lower": 28,
+    "none": 353,
+    "upper": 19
+   },
+   "t_obs_sd": 1.216067560875178,
+   "t_obs_mean": 0.042110625911484206,
+   "envelope_ok": true
+  },
+  "NULL_MA14_n270": {
+   "is_null": true,
+   "reps": 400,
+   "n": 270,
+   "rejection_rate": 0.045,
+   "rejections": 18,
+   "ci95": [
+    0.028651223384090457,
+    0.07000527956161895
+   ],
+   "p_quantiles": {
+    "0.05": 0.032475000000000004,
+    "0.25": 0.23325,
+    "0.5": 0.48,
+    "0.75": 0.7585
+   },
+   "frac_p_le_0.05": 0.07,
+   "frac_p_le_0.10": 0.13,
+   "block_length": {
+    "min": 15,
+    "median": 20,
+    "max": 45
+   },
+   "block_clamped": {
+    "lower": 10,
+    "none": 366,
+    "upper": 24
+   },
+   "t_obs_sd": 1.369348001575631,
+   "t_obs_mean": 0.015229671338775565,
+   "envelope_ok": true
+  },
+  "NULL_AR1_phi0.5_n465": {
+   "is_null": true,
+   "reps": 400,
+   "n": 465,
+   "rejection_rate": 0.03,
+   "rejections": 12,
+   "ci95": [
+    0.017242849034032177,
+    0.05169903312966765
+   ],
+   "p_quantiles": {
+    "0.05": 0.0535,
+    "0.25": 0.25725,
+    "0.5": 0.48124999999999996,
+    "0.75": 0.72175
+   },
+   "frac_p_le_0.05": 0.045,
+   "frac_p_le_0.10": 0.105,
+   "block_length": {
+    "min": 15,
+    "median": 15,
+    "max": 76
+   },
+   "block_clamped": {
+    "lower": 394,
+    "none": 6,
+    "upper": 0
+   },
+   "t_obs_sd": 1.0677945159950937,
+   "t_obs_mean": 0.02705989980446299,
+   "envelope_ok": true
+  },
+  "NULL_AR1_phi0.9_n465": {
+   "is_null": true,
+   "reps": 400,
+   "n": 465,
+   "rejection_rate": 0.0325,
+   "rejections": 13,
+   "ci95": [
+    0.019089659086961887,
+    0.054804659873739545
+   ],
+   "p_quantiles": {
+    "0.05": 0.043300000000000005,
+    "0.25": 0.228875,
+    "0.5": 0.5225,
+    "0.75": 0.772125
+   },
+   "frac_p_le_0.05": 0.06,
+   "frac_p_le_0.10": 0.125,
+   "block_length": {
+    "min": 16,
+    "median": 29,
+    "max": 77
+   },
+   "block_clamped": {
+    "lower": 0,
+    "none": 399,
+    "upper": 1
+   },
+   "t_obs_sd": 1.474380180115917,
+   "t_obs_mean": -0.05307112303033154,
+   "envelope_ok": true
+  },
+  "POWER_MA14_mu3_n465": {
+   "is_null": false,
+   "reps": 400,
+   "n": 465,
+   "rejection_rate": 0.9925,
+   "rejections": 397,
+   "ci95": [
+    0.9781838919722998,
+    0.9974461570370148
+   ],
+   "p_quantiles": {
+    "0.05": 0.0005,
+    "0.25": 0.0005,
+    "0.5": 0.0005,
+    "0.75": 0.001
+   },
+   "frac_p_le_0.05": 0.9975,
+   "frac_p_le_0.10": 0.9975,
+   "block_length": {
+    "min": 15,
+    "median": 26,
+    "max": 77
+   },
+   "block_clamped": {
+    "lower": 22,
+    "none": 349,
+    "upper": 29
+   },
+   "t_obs_sd": 1.3532100023377305,
+   "t_obs_mean": 5.502607523349104,
+   "envelope_ok": true
+  },
+  "POWER_AR1_phi0.9_mu1.5_n465": {
+   "is_null": false,
+   "reps": 400,
+   "n": 465,
+   "rejection_rate": 0.9025,
+   "rejections": 361,
+   "ci95": [
+    0.8694870411682052,
+    0.9278552831490519
+   ],
+   "p_quantiles": {
+    "0.05": 0.0005,
+    "0.25": 0.0005,
+    "0.5": 0.001,
+    "0.75": 0.006125
+   },
+   "frac_p_le_0.05": 0.9575,
+   "frac_p_le_0.10": 0.98,
+   "block_length": {
+    "min": 17,
+    "median": 30,
+    "max": 61
+   },
+   "block_clamped": {
+    "lower": 0,
+    "none": 400,
+    "upper": 0
+   },
+   "t_obs_sd": 1.7440528064551495,
+   "t_obs_mean": 4.960308422888305,
+   "envelope_ok": true
+  }
+ },
+ "pooled_dependent_null_rejection": 0.0325,
+ "pooled_ok": true,
+ "envelope_verdict": "PASS",
+ "elapsed_s": 291.6,
+ "resource_truth": {
+  "ru_maxrss_MiB": 67.3,
+  "cgroup": "0::/wmresearch.slice/run-u34448.service",
+  "unit_memory_max": "1468006400",
+  "bootstrap_B": 1999,
+  "tests_completed": 2800
+ }
+}
