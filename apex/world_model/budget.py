@@ -42,7 +42,9 @@ CATEGORIES = ("model_family", "hyperparameter_configuration",
               # added WM-0E-R3: control-instrument development is search too
               "null_control_design", "positive_control_power_level",
               # added WM-0E-R4: evaluation-length calibration is search too
-              "positive_control_evaluation_length")
+              "positive_control_evaluation_length",
+              # added WM-0E-R5: re-validating a null at a new geometry is research
+              "null_control_validation")
 
 
 class BudgetViolation(ValueError):
@@ -199,4 +201,15 @@ def wm0e_r4_truth() -> ResearchBudget:
         b = b.register("positive_control_evaluation_length", "P0_V2_eval_len#%d" % L,
                        "nested prefix of ONE world per seed; M0 fit once on the V0 "
                        "training interval; mu = 1.0x; frozen court")
+    return b
+
+
+def wm0e_r5_truth() -> ResearchBudget:
+    """wm0e_r4_truth() PLUS five negative-control development validations
+    at E=1860 on 100 paired target-world seeds. No new control design."""
+    b = wm0e_r4_truth()
+    for c in ("N0", "N1", "N2", "N3_SHADOW_V1", "N4"):
+        b = b.register("null_control_validation", "%s@E1860" % c,
+                       "development validation at the selected evaluation length "
+                       "(boundary 720, n_train 701, E 1860); frozen court; max 5/100")
     return b

@@ -16,6 +16,7 @@ from apex.world_model.features import (FeatureContractViolation,
 from apex.world_model.forecast import WorldModelForecast
 from apex.world_model.grader import aggregate, grade, null_rule
 from apex.world_model.models import M0SyntheticBaseline, NullBaseline
+from apex.world_model.canonical import content_hash
 from apex.world_model.runs import ChronologicalSplit, ModelRun
 from apex.world_model.targets import HORIZON_NOT_AVAILABLE, resolve_target
 from apex.world_model.worlds import GeneratorGroundTruth, SyntheticWorld
@@ -59,17 +60,43 @@ def default_dataset(world, subject, split):
     return Xtr, ytr, Xev, yev, ev_idx, ev_out
 
 
+EXECUTED_SPLIT_CONTRACT = "EXECUTED_SPLIT_V1"
+
+
+def executed_split_record(split: ChronologicalSplit, usable_eval: int) -> dict:
+    """WM-META-001: the split that actually generated the forecasts, bound
+    into the run artifact with its own hash. An auditor reads THIS, never a
+    default. Provenance only; split semantics are untouched."""
+    body = {"split_contract_id": EXECUTED_SPLIT_CONTRACT,
+            "n_steps": split.n_steps, "boundary": split.boundary,
+            "training_start": split.train_steps.start,
+            "training_end": split.train_steps.stop - 1,
+            "training_count": len(split.train_steps),
+            "purge_start": split.purged_steps.start,
+            "purge_end": split.purged_steps.stop - 1,
+            "evaluation_start": split.eval_steps.start,
+            "evaluation_end": split.eval_steps.stop - 1,
+            "usable_evaluation_count": usable_eval,
+            "forecast_horizon_steps": split.horizon_steps,
+            "warmup_steps": split.warmup_steps}
+    body["executed_split_hash"] = content_hash(body)
+    return body
+
+
 def run_pipeline(world: SyntheticWorld, model, *, subject: str = "SYN_A",
                  code_commit: str = "UNCOMMITTED", seed: int = 0,
                  creation_time: float | None = None,
-                 dataset=default_dataset) -> dict:
+                 dataset=default_dataset, split: ChronologicalSplit | None = None) -> dict:
     """`dataset` is the ONE seam a negative control may use. It replaces
     how (X, y) are assembled; it cannot touch the model, the scaler, the
     forecast contract, the sealing step or the grader. A null that
     needed to change any of those would not be a null."""
     _reject_truth(model)
     T = world.config.n_steps
-    split = ChronologicalSplit(n_steps=T, boundary=int(T * FIXED_BOUNDARY_FRACTION))
+    default_split = ChronologicalSplit(n_steps=T, boundary=int(T * FIXED_BOUNDARY_FRACTION))
+    split = default_split if split is None else split         # EXECUTED split
+    if split.n_steps != T:
+        raise StandViolation("split n_steps %d != world n_steps %d" % (split.n_steps, T))
 
     Xtr, ytr, Xev, yev, ev_idx, ev_out = dataset(world, subject, split)
     if not Xtr or not Xev:
@@ -94,7 +121,12 @@ def run_pipeline(world: SyntheticWorld, model, *, subject: str = "SYN_A",
         split=split, seed=seed,
         training_configuration={"model": model.model_identity()["configuration"],
                                 "scaler": scaler.canonical(),
-                                "boundary_fraction": FIXED_BOUNDARY_FRACTION},
+                                "executed_split": executed_split_record(split, len(Xev)),
+                                **({"NOT_EXECUTED_DEFAULT_METADATA":
+                                    {"default_split": default_split.canonical(),
+                                     "boundary_fraction": FIXED_BOUNDARY_FRACTION}}
+                                   if split.canonical() != default_split.canonical()
+                                   else {"boundary_fraction": FIXED_BOUNDARY_FRACTION})},
         creation_time=ct)
 
     # ---- forecast, and SEAL before any outcome is looked at
@@ -125,7 +157,8 @@ def run_pipeline(world: SyntheticWorld, model, *, subject: str = "SYN_A",
     return {"run": run, "scaler": scaler, "forecasts": forecasts,
             "sealed_hashes": sealed_hashes, "grades": grades,
             "aggregate": aggregate(grades), "n_train": len(Xtr),
-            "n_eval": len(Xev), "split": split.canonical()}
+            "n_eval": len(Xev), "split": split.canonical(),
+            "executed_split": executed_split_record(split, len(Xev))}
 
 
 def control_experiment(world: SyntheticWorld, *, subject: str = "SYN_A",

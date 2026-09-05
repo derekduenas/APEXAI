@@ -74,6 +74,9 @@ from apex.world_model.controls_r3 import (N3_V1, N3_V1_CONTRACT, N3_V0_STATUS,
 from apex.world_model.controls_r4 import (R4_VERSION, EVAL_LADDER, T_MAX,
                                           QUALIFICATION as R4_QUALIFICATION,
                                           r4_world, r4_dataset)
+from apex.world_model.controls_r5 import (R5_VERSION, R5_CONTROLS, R5_DEV_SEEDS,
+                                          R5_MAX_FP, r5_dataset)
+from apex.world_model.teststand import EXECUTED_SPLIT_CONTRACT, executed_split_record
 from apex.world_model.court_v1 import (COURT_VERSION_V1, MAX_FALSE_POSITIVES_V1,
                                        CourtDefinitionV1, convene_v1,
                                        error_control_v1)
@@ -97,6 +100,8 @@ __all__ = ["WORLD_MODEL_SHADOW_ENGINE", "DECISION_POWER",
            "N3_V1", "N3_V1_CONTRACT", "N3_V0_STATUS", "P0_V0_STATUS",
            "P0_POWER_LADDER", "P0_V1_SELECTION", "n3_v1_dataset", "shadow_world",
            "R4_VERSION", "EVAL_LADDER", "T_MAX", "R4_QUALIFICATION", "r4_world",
+           "R5_VERSION", "R5_CONTROLS", "R5_DEV_SEEDS", "R5_MAX_FP", "r5_dataset",
+           "EXECUTED_SPLIT_CONTRACT", "executed_split_record",
            "r4_dataset",
            "predeclaration",
            "CALIBRATION_ENVELOPE", "BootstrapViolation", "bootstrap_test",
