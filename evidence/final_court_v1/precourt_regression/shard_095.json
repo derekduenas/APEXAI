@@ -1,0 +1,173 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_identity.py::test_a_matching_pair_resolves",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_the_surrogate_key_is_not_a_ticker",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_several_independent_companies_all_resolve",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_a_recycled_ticker_does_not_join_two_different_companies",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_the_right_one_of_two_recycled_tickers_is_chosen",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_a_ticker_match_with_disagreeing_prices_is_rejected",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_small_vendor_price_differences_are_tolerated",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_too_little_overlap_to_verify_is_refused_not_guessed",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_two_equally_good_candidates_are_excluded_not_ranked",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_a_security_absent_from_the_pit_source_is_excluded_and_reported",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_nothing_is_dropped_silently",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_the_crosswalk_is_deterministic_and_hashed",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_the_report_states_every_exclusion_reason",
+   "file": "tests/test_identity.py"
+  },
+  {
+   "nodeid": "tests/test_identity.py::test_duplicate_vendor_ids_are_rejected_outright",
+   "file": "tests/test_identity.py"
+  }
+ ],
+ "collected_count": 14,
+ "collect_errors": [],
+ "results": {
+  "tests/test_identity.py::test_a_matching_pair_resolves": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_the_surrogate_key_is_not_a_ticker": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_several_independent_companies_all_resolve": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_a_recycled_ticker_does_not_join_two_different_companies": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_the_right_one_of_two_recycled_tickers_is_chosen": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_a_ticker_match_with_disagreeing_prices_is_rejected": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_small_vendor_price_differences_are_tolerated": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_too_little_overlap_to_verify_is_refused_not_guessed": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_two_equally_good_candidates_are_excluded_not_ranked": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_a_security_absent_from_the_pit_source_is_excluded_and_reported": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_nothing_is_dropped_silently": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_the_crosswalk_is_deterministic_and_hashed": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_the_report_states_every_exclusion_reason": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_identity.py::test_duplicate_vendor_ids_are_rejected_outright": {
+   "file": "tests/test_identity.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 14,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_identity.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35618.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115060736",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.67
+ }
+}

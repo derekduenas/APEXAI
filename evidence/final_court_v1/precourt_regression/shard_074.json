@@ -1,0 +1,263 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_no_pattern_active_is_all_unknown_or_none",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_zero_inputs_is_unknown_direction_not_none",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[INSTITUTIONAL_ACCUMULATION]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[INSTITUTIONAL_DISTRIBUTION]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[SHORT_PRESSURE]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[PASSIVE_FLOW]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[ETF_FLOW]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[DEALER_HEDGING]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[VOL_CONTROL]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[CTA_TREND]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[RETAIL_MOMENTUM]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[EVENT_FLOW]",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_failed_breakdown_reclaim_is_possible_short_trap_with_short_covering",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_failed_breakdown_without_elevated_rvol_has_no_driver",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_failed_breakout_is_possible_long_trap_direction_down",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_subsequent_hold_true_confirms_the_trap",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_subsequent_hold_false_makes_it_unclear_not_confirmed",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_vwap_reclaim_with_momentum_is_momentum_chase_up",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_vwap_rejection_with_momentum_is_momentum_chase_down",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_vwap_reclaim_without_elevated_rvol_fires_nothing",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_more_support_lowers_uncertainty",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_falsification_condition_always_named_when_a_pattern_fires",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_determinism_same_inputs_twice_byte_identical",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_participant_pressure.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_participant_pressure.py"
+  }
+ ],
+ "collected_count": 24,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_participant_pressure.py::test_no_pattern_active_is_all_unknown_or_none": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_zero_inputs_is_unknown_direction_not_none": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[INSTITUTIONAL_ACCUMULATION]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[INSTITUTIONAL_DISTRIBUTION]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[SHORT_PRESSURE]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[PASSIVE_FLOW]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[ETF_FLOW]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[DEALER_HEDGING]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[VOL_CONTROL]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[CTA_TREND]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[RETAIL_MOMENTUM]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_unreachable_drivers_refuse_construction[EVENT_FLOW]": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_failed_breakdown_reclaim_is_possible_short_trap_with_short_covering": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_failed_breakdown_without_elevated_rvol_has_no_driver": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_failed_breakout_is_possible_long_trap_direction_down": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_subsequent_hold_true_confirms_the_trap": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_subsequent_hold_false_makes_it_unclear_not_confirmed": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_vwap_reclaim_with_momentum_is_momentum_chase_up": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_vwap_rejection_with_momentum_is_momentum_chase_down": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_vwap_reclaim_without_elevated_rvol_fires_nothing": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_more_support_lowers_uncertainty": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_falsification_condition_always_named_when_a_pattern_fires": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_determinism_same_inputs_twice_byte_identical": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_participant_pressure.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_participant_pressure.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 24,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_participant_pressure.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35597.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115064832",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.63
+ }
+}

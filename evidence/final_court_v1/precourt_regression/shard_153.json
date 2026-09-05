@@ -1,0 +1,263 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_parallax.py::test_the_authority_is_shadow_observatory_and_nothing_stronger",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_no_trading_surface_no_score_no_threshold",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_nothing_in_the_organism_consumes_parallax",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_no_expectation_means_not_parallax_eligible",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_ambiguous_expectation_cannot_be_directionally_violated",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_an_expectation_formed_mid_reaction_is_refused",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_a_huge_move_without_a_sealed_expectation_is_simply_absent",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_old_session_under_current_rules_cannot_be_prospective",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_every_row_carries_the_taxonomy_that_classified_it",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_positive_expectation_positive_reaction",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_positive_expectation_failure",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_negative_expectation_failure",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_flat_tape_is_no_identifiable_reaction_low_debt",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_relative_dislocation_when_the_index_confirms_but_symbol_fails",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_atr_not_estimable_is_ineligible_not_a_crash",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_resolution_classes_from_later_path_only",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_horizons_of_one_event_are_one_episode",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_independence_is_never_claimed",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_a_same_family_cluster_is_correlated_not_independent",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_correlation_buckets_by_event_hour_not_measurement_hour",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_the_real_catalyst_event_dataclass_is_accepted",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_observe_session_seals_the_full_denominator",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_a_parallax_failure_never_breaks_the_catalyst_seal",
+   "file": "tests/test_parallax.py"
+  },
+  {
+   "nodeid": "tests/test_parallax.py::test_every_eligible_measurement_is_sealed_including_boring_ones",
+   "file": "tests/test_parallax.py"
+  }
+ ],
+ "collected_count": 24,
+ "collect_errors": [],
+ "results": {
+  "tests/test_parallax.py::test_the_authority_is_shadow_observatory_and_nothing_stronger": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_no_trading_surface_no_score_no_threshold": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_nothing_in_the_organism_consumes_parallax": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_no_expectation_means_not_parallax_eligible": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_ambiguous_expectation_cannot_be_directionally_violated": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_an_expectation_formed_mid_reaction_is_refused": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_a_huge_move_without_a_sealed_expectation_is_simply_absent": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_old_session_under_current_rules_cannot_be_prospective": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_every_row_carries_the_taxonomy_that_classified_it": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_positive_expectation_positive_reaction": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_positive_expectation_failure": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_negative_expectation_failure": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_flat_tape_is_no_identifiable_reaction_low_debt": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_relative_dislocation_when_the_index_confirms_but_symbol_fails": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_atr_not_estimable_is_ineligible_not_a_crash": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_resolution_classes_from_later_path_only": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_horizons_of_one_event_are_one_episode": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_independence_is_never_claimed": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_a_same_family_cluster_is_correlated_not_independent": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_correlation_buckets_by_event_hour_not_measurement_hour": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_the_real_catalyst_event_dataclass_is_accepted": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_observe_session_seals_the_full_denominator": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_a_parallax_failure_never_breaks_the_catalyst_seal": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax.py::test_every_eligible_measurement_is_sealed_including_boring_ones": {
+   "file": "tests/test_parallax.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 24,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_parallax.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35676.service",
+   "memory_max": "1468006400",
+   "memory_peak": "117043200",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.73
+ }
+}

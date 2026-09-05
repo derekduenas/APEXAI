@@ -1,0 +1,389 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_the_sleeve_declares_paper_exploratory",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_no_order_surface_exists_anywhere_in_the_sleeve",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_equity_never_imports_or_mutates_options",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_options_does_not_import_equity_day_trader",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_the_sleeve_is_structurally_two_sided",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_breakout_and_breakdown_are_named[closes0-LONG-LONG_BREAKOUT]",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_breakout_and_breakdown_are_named[closes1-SHORT-SHORT_BREAKDOWN]",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_failed_breaks_are_named_from_the_wick_not_the_close",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_an_unnameable_tape_yields_no_setup",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_a_stop_on_the_wrong_side_is_refused",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_risk_per_share_larger_than_the_budget_is_refused",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_size_follows_the_EXECUTABLE_stop_loss_never_price_alone",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_execution_crosses_the_spread_in_both_directions",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_a_thin_symbol_is_refused_before_anything_else",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_insufficient_bars_is_not_a_thesis",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_price_at_the_anchor_produces_no_thesis",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_refusals_are_first_class_states",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_an_extended_tape_is_refused_for_chase",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_a_sealed_attack_must_carry_stop_setup_and_1R",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_an_unknown_decision_state_is_refused",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_every_decision_is_sealed_prospective_and_shadow",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_only_sealed_attacks_resolve",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_an_unmatured_horizon_is_not_estimable_never_zero",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_the_structural_stop_resolves_before_the_close",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_friction_is_charged_on_both_sides",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_the_exit_rule_is_predeclared_not_chosen_per_trade",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_the_liquidity_floor_is_predeclared",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_liquidity_is_measured_over_rth_not_the_whole_file",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_resolution_is_idempotent_across_restarts",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_short_sizing_is_execution_cost_aware",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_a_tiny_stop_can_no_longer_cost_double_the_declared_risk",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_wide_spread_shrinks_size_not_semantics",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_missing_cost_estimate_refuses_not_falls_back",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_a_stop_event_resolves_at_approximately_minus_one_R",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_the_decision_record_carries_the_risk_anatomy",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_dst_repair_is_bit_identical_during_edt",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_dst_repair_is_correct_during_est",
+   "file": "tests/test_equity_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_equity_shadow.py::test_dst_repair_touched_no_alpha_file",
+   "file": "tests/test_equity_shadow.py"
+  }
+ ],
+ "collected_count": 38,
+ "collect_errors": [],
+ "results": {
+  "tests/test_equity_shadow.py::test_the_sleeve_declares_paper_exploratory": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_no_order_surface_exists_anywhere_in_the_sleeve": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_equity_never_imports_or_mutates_options": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_options_does_not_import_equity_day_trader": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_the_sleeve_is_structurally_two_sided": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_breakout_and_breakdown_are_named[closes0-LONG-LONG_BREAKOUT]": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_breakout_and_breakdown_are_named[closes1-SHORT-SHORT_BREAKDOWN]": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_failed_breaks_are_named_from_the_wick_not_the_close": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_an_unnameable_tape_yields_no_setup": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_a_stop_on_the_wrong_side_is_refused": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_risk_per_share_larger_than_the_budget_is_refused": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_size_follows_the_EXECUTABLE_stop_loss_never_price_alone": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_execution_crosses_the_spread_in_both_directions": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_a_thin_symbol_is_refused_before_anything_else": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_insufficient_bars_is_not_a_thesis": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_price_at_the_anchor_produces_no_thesis": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_refusals_are_first_class_states": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_an_extended_tape_is_refused_for_chase": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_a_sealed_attack_must_carry_stop_setup_and_1R": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_an_unknown_decision_state_is_refused": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_every_decision_is_sealed_prospective_and_shadow": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_only_sealed_attacks_resolve": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_an_unmatured_horizon_is_not_estimable_never_zero": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_the_structural_stop_resolves_before_the_close": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_friction_is_charged_on_both_sides": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_the_exit_rule_is_predeclared_not_chosen_per_trade": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_the_liquidity_floor_is_predeclared": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_liquidity_is_measured_over_rth_not_the_whole_file": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_resolution_is_idempotent_across_restarts": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_short_sizing_is_execution_cost_aware": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_a_tiny_stop_can_no_longer_cost_double_the_declared_risk": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_wide_spread_shrinks_size_not_semantics": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_missing_cost_estimate_refuses_not_falls_back": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_a_stop_event_resolves_at_approximately_minus_one_R": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_the_decision_record_carries_the_risk_anatomy": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_dst_repair_is_bit_identical_during_edt": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_dst_repair_is_correct_during_est": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_equity_shadow.py::test_dst_repair_touched_no_alpha_file": {
+   "file": "tests/test_equity_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 38,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_equity_shadow.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35568.service",
+   "memory_max": "1468006400",
+   "memory_peak": "118321152",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.74
+ }
+}

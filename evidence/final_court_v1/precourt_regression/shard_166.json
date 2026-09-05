@@ -1,0 +1,209 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_registration.py::test_the_shipped_pre_registration_is_signed",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_unsigned_registration_refuses_real_data",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_a_signed_registration_is_accepted",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_the_live_protocol_matches_the_hash_conventions_pins",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_editing_the_protocol_after_freezing_is_detected",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_an_unmodified_protocol_passes_the_pin_check",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_in_sample_is_unlocked_and_free",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_the_holdout_refuses_to_open_without_a_hand_made_token",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_the_holdout_opens_once_with_a_token_and_spends_a_credit",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_the_same_experiment_cannot_reopen_the_holdout",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_deleting_the_token_does_not_restore_the_credit",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_one_experiment_costs_one_credit_across_both_its_periods",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_the_budget_runs_out",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_a_tampered_ledger_blocks_the_holdout",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_an_unsigned_registration_cannot_open_the_holdout_either",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_a_stale_token_from_another_experiment_does_not_unlock",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_a_token_naming_the_active_experiment_is_accepted",
+   "file": "tests/test_registration.py"
+  },
+  {
+   "nodeid": "tests/test_registration.py::test_an_empty_token_authorises_nothing",
+   "file": "tests/test_registration.py"
+  }
+ ],
+ "collected_count": 18,
+ "collect_errors": [],
+ "results": {
+  "tests/test_registration.py::test_the_shipped_pre_registration_is_signed": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_unsigned_registration_refuses_real_data": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_a_signed_registration_is_accepted": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_the_live_protocol_matches_the_hash_conventions_pins": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_editing_the_protocol_after_freezing_is_detected": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_an_unmodified_protocol_passes_the_pin_check": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_in_sample_is_unlocked_and_free": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_the_holdout_refuses_to_open_without_a_hand_made_token": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_the_holdout_opens_once_with_a_token_and_spends_a_credit": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_the_same_experiment_cannot_reopen_the_holdout": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_deleting_the_token_does_not_restore_the_credit": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_one_experiment_costs_one_credit_across_both_its_periods": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_the_budget_runs_out": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_a_tampered_ledger_blocks_the_holdout": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_an_unsigned_registration_cannot_open_the_holdout_either": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_a_stale_token_from_another_experiment_does_not_unlock": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_a_token_naming_the_active_experiment_is_accepted": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_registration.py::test_an_empty_token_authorises_nothing": {
+   "file": "tests/test_registration.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 18,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_registration.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35689.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116514816",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 5.23
+ }
+}

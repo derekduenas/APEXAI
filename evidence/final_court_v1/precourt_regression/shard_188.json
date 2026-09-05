@@ -1,0 +1,227 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_on_message_does_no_parsing_on_the_reader_thread",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_reader_enqueues_and_worker_parses",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_full_queue_drops_and_counts_rather_than_blocking",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_dropped_frames_are_visible_in_health",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_ping_timeout_is_margin_not_the_fix",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_worker_survives_a_poison_frame",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_worker_thread_starts_before_the_reader",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_stop_wakes_and_joins_the_worker",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_bar_window_covers_a_whole_session_not_400_minutes",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_persist_merges_and_never_erases_earlier_bars",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_the_forming_minute_is_superseded_not_duplicated",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_an_unreadable_session_file_is_never_overwritten",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_empty_ring_does_not_truncate_an_existing_session_file",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_buffer_is_large_enough_for_a_full_session",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_reconnect_reason_is_no_longer_hardcoded",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_on_error_is_separate_from_on_close",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_close_frame_is_captured",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_reconnect_event_accepts_telemetry",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_health_is_multi_axis_transport_churn_is_degraded_not_failed",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  },
+  {
+   "nodeid": "tests/test_sensor_repair_2026_08_19.py::test_quiet_transport_full_coverage_is_healthy",
+   "file": "tests/test_sensor_repair_2026_08_19.py"
+  }
+ ],
+ "collected_count": 20,
+ "collect_errors": [],
+ "results": {
+  "tests/test_sensor_repair_2026_08_19.py::test_on_message_does_no_parsing_on_the_reader_thread": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_reader_enqueues_and_worker_parses": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_full_queue_drops_and_counts_rather_than_blocking": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_dropped_frames_are_visible_in_health": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_ping_timeout_is_margin_not_the_fix": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_worker_survives_a_poison_frame": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_worker_thread_starts_before_the_reader": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_stop_wakes_and_joins_the_worker": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_bar_window_covers_a_whole_session_not_400_minutes": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_persist_merges_and_never_erases_earlier_bars": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_the_forming_minute_is_superseded_not_duplicated": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_an_unreadable_session_file_is_never_overwritten": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_empty_ring_does_not_truncate_an_existing_session_file": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_buffer_is_large_enough_for_a_full_session": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_reconnect_reason_is_no_longer_hardcoded": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_on_error_is_separate_from_on_close": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_close_frame_is_captured": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_reconnect_event_accepts_telemetry": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_health_is_multi_axis_transport_churn_is_degraded_not_failed": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_sensor_repair_2026_08_19.py::test_quiet_transport_full_coverage_is_healthy": {
+   "file": "tests/test_sensor_repair_2026_08_19.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 20,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_sensor_repair_2026_08_19.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35711.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116862976",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.53
+ }
+}

@@ -1,0 +1,236 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_spy_confirmed_none_before_next_ex_div",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_spy_real_schedule_after_ex_div",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_aapl_confirmed_none_within_safe_window",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_aapl_refused_beyond_safe_window",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_unknown_symbol_refused",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_rate_source_age_grows_with_time",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_rate_curve_is_never_sourced_assumed",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_select_contracts_filters_missing_quotes",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_select_contracts_filters_far_dated",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_select_contracts_bounds_strikes_per_expiry",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_runtime_script_never_imports_production_authority",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_runtime_script_no_order_placement_keyword",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_watchdog_and_certify_scripts_never_import_production_authority",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_select_contracts_prefers_near_atm",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_all_four_dte_buckets_are_declared",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_a_bucket_with_no_liquid_contract_stays_empty",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_static_rate_never_reaches_a_live_analytics_state",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_no_rate_curve_makes_the_state_refuse_not_guess",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_static_rate_constants_are_labeled_non_live",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_quote_staleness_is_measured_from_arrival_not_cycle_start",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_runtime.py::test_fetch_precedes_the_observation_clock",
+   "file": "tests/test_option_analytics_live_runtime.py"
+  }
+ ],
+ "collected_count": 21,
+ "collect_errors": [],
+ "results": {
+  "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_spy_confirmed_none_before_next_ex_div": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_spy_real_schedule_after_ex_div": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_aapl_confirmed_none_within_safe_window": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_aapl_refused_beyond_safe_window": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_dividend_schedule_unknown_symbol_refused": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_rate_source_age_grows_with_time": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_rate_curve_is_never_sourced_assumed": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_select_contracts_filters_missing_quotes": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_select_contracts_filters_far_dated": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_select_contracts_bounds_strikes_per_expiry": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_runtime_script_never_imports_production_authority": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_runtime_script_no_order_placement_keyword": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_watchdog_and_certify_scripts_never_import_production_authority": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_select_contracts_prefers_near_atm": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_all_four_dte_buckets_are_declared": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_a_bucket_with_no_liquid_contract_stays_empty": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_static_rate_never_reaches_a_live_analytics_state": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_no_rate_curve_makes_the_state_refuse_not_guess": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_static_rate_constants_are_labeled_non_live": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_quote_staleness_is_measured_from_arrival_not_cycle_start": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_runtime.py::test_fetch_precedes_the_observation_clock": {
+   "file": "tests/test_option_analytics_live_runtime.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 21,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_option_analytics_live_runtime.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 163.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35650.service",
+   "memory_max": "1468006400",
+   "memory_peak": "119119872",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.74
+ }
+}

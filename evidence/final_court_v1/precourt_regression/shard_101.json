@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_an_annulled_spend_allows_a_replacement",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_counterexample_a_second_spend_without_annulment_is_refused",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_counterexample_the_replacement_itself_blocks_a_third_run",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_counterexample_a_second_annulment_is_refused",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_counterexample_excess_annulments_cannot_bank_capacity",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_counterexample_annulment_without_a_prior_spend_is_refused",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_counterexample_annulment_cannot_reach_another_experiment",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_counterexample_a_spend_that_produced_a_result_cannot_be_annulled",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_an_annulment_requires_a_written_reason",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_annulment_appends_and_leaves_the_chain_verifiable",
+   "file": "tests/test_ledger_annulment.py"
+  },
+  {
+   "nodeid": "tests/test_ledger_annulment.py::test_counterexample_deleting_the_spend_would_break_the_chain",
+   "file": "tests/test_ledger_annulment.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_ledger_annulment.py::test_an_annulled_spend_allows_a_replacement": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_counterexample_a_second_spend_without_annulment_is_refused": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_counterexample_the_replacement_itself_blocks_a_third_run": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_counterexample_a_second_annulment_is_refused": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_counterexample_excess_annulments_cannot_bank_capacity": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_counterexample_annulment_without_a_prior_spend_is_refused": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_counterexample_annulment_cannot_reach_another_experiment": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_counterexample_a_spend_that_produced_a_result_cannot_be_annulled": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_an_annulment_requires_a_written_reason": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_annulment_appends_and_leaves_the_chain_verifiable": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_ledger_annulment.py::test_counterexample_deleting_the_spend_would_break_the_chain": {
+   "file": "tests/test_ledger_annulment.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_ledger_annulment.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35624.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115085312",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.57
+ }
+}

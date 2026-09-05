@@ -1,0 +1,434 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_wave1.py::test_active_service_cannot_be_unbounded",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_active_service_cannot_live_in_system_slice",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_memory_high_above_max_is_incoherent",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_headroom_plan_is_derived_from_measurement",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_headroom_plan_refuses_unmeasured",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_valid_plan_contains_global_oom",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_working_set_exceeding_allocatable_is_fatal",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_aggregate_max_over_ram_without_proven_exclusivity_is_fatal",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_proven_exclusivity_permits_higher_aggregate",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_service_at_its_cap_is_reported",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_zero_swap_is_surfaced",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_research_yields_before_factual_input",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_inactive_ungoverned_unit_is_still_a_landmine",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_substrate_signals_alone_are_never_healthy",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_running_process_with_dead_economic_job_is_failed",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_scheduled_inactive_is_not_failure",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_clean_session_end_is_not_stale",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_missing_intervals_produce_evidence_gap",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_valid_chain_with_short_denominator_is_evidence_gap",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_restart_does_not_restore_health",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_genuinely_healthy_writer",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_expected_denominator_comes_from_schedule",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_true_occupancy_not_internal_work",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_oom_killed_slot_classified_from_kernel_not_app",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_overrun_collision_classified",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_missed_no_invocation_distinct_from_oom",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_completed_late_vs_on_time",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_reconciliation_reproduces_pulse_v0",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_latency_reports_both_distributions",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_checkpoint_roundtrip",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_checkpoint_corruption_detected",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_checkpoint_invalid_json_detected",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_checkpoint_version_mismatch",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_rolling_state_is_bounded_by_window",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_oversized_checkpoint_is_refused",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_full_history_fallback_is_permanently_refused",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_recover_uses_bounded_rebuild_when_missing",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_recover_rebuilds_on_session_change",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_restore_complexity_independent_of_ledger_size",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_atomic_write_leaves_no_partial",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_orphan_heartbeat_is_not_an_active_organ",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_missing_heartbeat_for_registered_service_is_reported",
+   "file": "tests/test_wave1.py"
+  },
+  {
+   "nodeid": "tests/test_wave1.py::test_decommissioned_heartbeat_is_registered_not_orphan",
+   "file": "tests/test_wave1.py"
+  }
+ ],
+ "collected_count": 43,
+ "collect_errors": [],
+ "results": {
+  "tests/test_wave1.py::test_active_service_cannot_be_unbounded": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_active_service_cannot_live_in_system_slice": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_memory_high_above_max_is_incoherent": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_headroom_plan_is_derived_from_measurement": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_headroom_plan_refuses_unmeasured": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_valid_plan_contains_global_oom": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_working_set_exceeding_allocatable_is_fatal": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_aggregate_max_over_ram_without_proven_exclusivity_is_fatal": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_proven_exclusivity_permits_higher_aggregate": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_service_at_its_cap_is_reported": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_zero_swap_is_surfaced": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_research_yields_before_factual_input": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_inactive_ungoverned_unit_is_still_a_landmine": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_substrate_signals_alone_are_never_healthy": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_running_process_with_dead_economic_job_is_failed": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_scheduled_inactive_is_not_failure": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_clean_session_end_is_not_stale": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_missing_intervals_produce_evidence_gap": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_valid_chain_with_short_denominator_is_evidence_gap": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_restart_does_not_restore_health": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_genuinely_healthy_writer": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_expected_denominator_comes_from_schedule": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_true_occupancy_not_internal_work": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_oom_killed_slot_classified_from_kernel_not_app": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_overrun_collision_classified": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_missed_no_invocation_distinct_from_oom": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_completed_late_vs_on_time": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_reconciliation_reproduces_pulse_v0": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_latency_reports_both_distributions": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_checkpoint_roundtrip": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_checkpoint_corruption_detected": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_checkpoint_invalid_json_detected": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_checkpoint_version_mismatch": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_rolling_state_is_bounded_by_window": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_oversized_checkpoint_is_refused": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_full_history_fallback_is_permanently_refused": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_recover_uses_bounded_rebuild_when_missing": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_recover_rebuilds_on_session_change": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_restore_complexity_independent_of_ledger_size": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_atomic_write_leaves_no_partial": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_orphan_heartbeat_is_not_an_active_organ": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_missing_heartbeat_for_registered_service_is_reported": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_wave1.py::test_decommissioned_heartbeat_is_registered_not_orphan": {
+   "file": "tests/test_wave1.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 43,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_wave1.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 163.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35765.service",
+   "memory_max": "1468006400",
+   "memory_peak": "119877632",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.79
+ }
+}

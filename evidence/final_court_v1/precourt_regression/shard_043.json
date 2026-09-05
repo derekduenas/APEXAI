@@ -1,0 +1,182 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_missing_token_raises_with_no_fallback",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_redaction_strips_the_token_everywhere",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_availability_never_contains_the_token",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_chunks_are_gapless_nonoverlapping_and_bounded",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_counterexample_no_span_ever_exceeds_120_days",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_chunking_is_deterministic",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_quota_exhaustion_pauses_rather_than_errors",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_backoff_is_bounded_and_respects_retry_after",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_utc_epoch_parsing_and_ordering",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_empty_valid_response_yields_empty_frame_not_error",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_cache_hit_and_corruption_quarantine",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_malformed_response_is_refused_with_redaction",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_delisted_intraday_is_never_plain_supported",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_unsubscribed_capabilities_refuse_rather_than_fake",
+   "file": "tests/test_eodhd_adapter.py"
+  },
+  {
+   "nodeid": "tests/test_eodhd_adapter.py::test_provider_limitation_is_distinct_from_kernel_failure",
+   "file": "tests/test_eodhd_adapter.py"
+  }
+ ],
+ "collected_count": 15,
+ "collect_errors": [],
+ "results": {
+  "tests/test_eodhd_adapter.py::test_missing_token_raises_with_no_fallback": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_redaction_strips_the_token_everywhere": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_availability_never_contains_the_token": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_chunks_are_gapless_nonoverlapping_and_bounded": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_counterexample_no_span_ever_exceeds_120_days": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_chunking_is_deterministic": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_quota_exhaustion_pauses_rather_than_errors": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_backoff_is_bounded_and_respects_retry_after": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_utc_epoch_parsing_and_ordering": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_empty_valid_response_yields_empty_frame_not_error": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_cache_hit_and_corruption_quarantine": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_malformed_response_is_refused_with_redaction": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_delisted_intraday_is_never_plain_supported": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_unsubscribed_capabilities_refuse_rather_than_fake": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eodhd_adapter.py::test_provider_limitation_is_distinct_from_kernel_failure": {
+   "file": "tests/test_eodhd_adapter.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 15,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_eodhd_adapter.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35566.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115204096",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.9
+ }
+}

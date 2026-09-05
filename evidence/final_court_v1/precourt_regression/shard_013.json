@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_entry_refuses_without_a_sealed_card",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_resolution_refuses_a_mismatched_card",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_an_unattackable_geometry_cannot_be_filled",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_a_long_pays_the_ask_and_records_the_half_spread",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_fill_size_is_capped_by_resting_liquidity",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_1R_is_the_declared_invalidation_loss_not_the_realized_one",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_r_multiple_divides_by_declared_1R",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_invalidation_exits_at_the_first_touch",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_a_gap_through_invalidation_is_not_flattered_to_1R",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_ambiguous_observations_resolve_against_us",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_target_exits_when_reached_cleanly",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_horizon_exit_marks_out_at_the_last_valid_book",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_invalid_books_are_skipped_never_traded",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_no_valid_path_withholds_rather_than_guessing",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_the_friction_identity_holds_exactly",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_a_flat_mid_still_loses_the_spread",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_outcome_is_stamped_prospective_and_powerless",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_every_window_lands_in_exactly_one_declared_cohort",
+   "file": "tests/test_btc_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_btc_paper_execution.py::test_batch_and_follow_evidence_classes_can_never_be_conflated",
+   "file": "tests/test_btc_paper_execution.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_btc_paper_execution.py::test_entry_refuses_without_a_sealed_card": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_resolution_refuses_a_mismatched_card": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_an_unattackable_geometry_cannot_be_filled": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_a_long_pays_the_ask_and_records_the_half_spread": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_fill_size_is_capped_by_resting_liquidity": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_1R_is_the_declared_invalidation_loss_not_the_realized_one": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_r_multiple_divides_by_declared_1R": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_invalidation_exits_at_the_first_touch": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_a_gap_through_invalidation_is_not_flattered_to_1R": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_ambiguous_observations_resolve_against_us": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_target_exits_when_reached_cleanly": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_horizon_exit_marks_out_at_the_last_valid_book": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_invalid_books_are_skipped_never_traded": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_no_valid_path_withholds_rather_than_guessing": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_the_friction_identity_holds_exactly": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_a_flat_mid_still_loses_the_spread": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_outcome_is_stamped_prospective_and_powerless": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_every_window_lands_in_exactly_one_declared_cohort": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_paper_execution.py::test_batch_and_follow_evidence_classes_can_never_be_conflated": {
+   "file": "tests/test_btc_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 19,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_btc_paper_execution.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35536.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115486720",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.43
+ }
+}

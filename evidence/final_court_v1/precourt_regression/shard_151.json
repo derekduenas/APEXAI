@@ -1,0 +1,182 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_full_lifecycle_submit_fill_position_exit_pnl",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_sell_side_fill_is_adverse_too",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_limit_order_refuses_to_fill_through_its_limit",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_cancel_only_from_submitted",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_resubmitting_same_client_order_id_is_idempotent",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_duplicate_prevention_survives_restart",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_restart_recovery_replays_exact_state",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_default_level_is_observe_and_paper_modes_are_refused",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_no_live_mode_exists_to_request",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_ladder_promotions_are_one_step_and_operator_authorized",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_live_trading_host_is_refused_by_the_url_law",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_alpaca_paper_adapter_refuses_without_dedicated_paper_keys",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_package_import_closure_cannot_reach_live_execution",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_live_api_host_never_appears_in_package_source",
+   "file": "tests/test_paper_execution_commissioning.py"
+  },
+  {
+   "nodeid": "tests/test_paper_execution_commissioning.py::test_every_blotter_event_is_hash_chained",
+   "file": "tests/test_paper_execution_commissioning.py"
+  }
+ ],
+ "collected_count": 15,
+ "collect_errors": [],
+ "results": {
+  "tests/test_paper_execution_commissioning.py::test_full_lifecycle_submit_fill_position_exit_pnl": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_sell_side_fill_is_adverse_too": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_limit_order_refuses_to_fill_through_its_limit": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_cancel_only_from_submitted": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_resubmitting_same_client_order_id_is_idempotent": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_duplicate_prevention_survives_restart": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_restart_recovery_replays_exact_state": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_default_level_is_observe_and_paper_modes_are_refused": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_no_live_mode_exists_to_request": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_ladder_promotions_are_one_step_and_operator_authorized": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_live_trading_host_is_refused_by_the_url_law": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_alpaca_paper_adapter_refuses_without_dedicated_paper_keys": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_package_import_closure_cannot_reach_live_execution": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_live_api_host_never_appears_in_package_source": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_execution_commissioning.py::test_every_blotter_event_is_hash_chained": {
+   "file": "tests/test_paper_execution_commissioning.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 15,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_paper_execution_commissioning.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35674.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116391936",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.4
+ }
+}

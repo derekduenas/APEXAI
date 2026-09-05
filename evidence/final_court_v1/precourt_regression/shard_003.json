@@ -1,0 +1,119 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_architecture_claims.py::test_no_machine_learning_dependency_exists",
+   "file": "tests/test_architecture_claims.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_claims.py::test_no_execution_or_broker_dependency_exists",
+   "file": "tests/test_architecture_claims.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_claims.py::test_no_causal_inference_dependency_exists",
+   "file": "tests/test_architecture_claims.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_claims.py::test_the_discovery_layer_cannot_reach_registration_or_the_ledger",
+   "file": "tests/test_architecture_claims.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_claims.py::test_the_screen_cannot_be_read_by_the_evaluation_path",
+   "file": "tests/test_architecture_claims.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_claims.py::test_the_evaluation_path_reaches_no_research_discovery_module",
+   "file": "tests/test_architecture_claims.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_claims.py::test_the_certified_layers_the_audit_claims_are_actually_present",
+   "file": "tests/test_architecture_claims.py"
+  },
+  {
+   "nodeid": "tests/test_architecture_claims.py::test_the_absent_layers_the_audit_claims_have_no_module",
+   "file": "tests/test_architecture_claims.py"
+  }
+ ],
+ "collected_count": 8,
+ "collect_errors": [],
+ "results": {
+  "tests/test_architecture_claims.py::test_no_machine_learning_dependency_exists": {
+   "file": "tests/test_architecture_claims.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_claims.py::test_no_execution_or_broker_dependency_exists": {
+   "file": "tests/test_architecture_claims.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_claims.py::test_no_causal_inference_dependency_exists": {
+   "file": "tests/test_architecture_claims.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_claims.py::test_the_discovery_layer_cannot_reach_registration_or_the_ledger": {
+   "file": "tests/test_architecture_claims.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_claims.py::test_the_screen_cannot_be_read_by_the_evaluation_path": {
+   "file": "tests/test_architecture_claims.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_claims.py::test_the_evaluation_path_reaches_no_research_discovery_module": {
+   "file": "tests/test_architecture_claims.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_claims.py::test_the_certified_layers_the_audit_claims_are_actually_present": {
+   "file": "tests/test_architecture_claims.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_architecture_claims.py::test_the_absent_layers_the_audit_claims_have_no_module": {
+   "file": "tests/test_architecture_claims.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 8,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_architecture_claims.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 190.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35525.service",
+   "memory_max": "1468006400",
+   "memory_peak": "148385792",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.62
+ }
+}

@@ -32,13 +32,19 @@ def qual(tmp_path_factory):
     return {"out": out, "defn": defn, "cells": cells}
 
 
-def test_no_acceptance_namespace_exists_during_qualification():
-    assert F.NAMESPACE is None
+def test_qualification_never_touches_an_acceptance_namespace():
+    """At the repair commit (0b92c0b7a) NAMESPACE was None and this suite
+    passed with the acceptance tests skipped -- that is the historical proof
+    that no acceptance seed existed during qualification. The PERMANENT
+    invariant is phase-independent: the qualification namespace is a
+    development namespace, distinct from any acceptance or consumed one, and
+    it can never be used for acceptance."""
+    assert "DEV" in QUAL_NS and QUAL_NS not in F.CONSUMED_NAMESPACES and QUAL_NS != F.NAMESPACE
     with pytest.raises(F.CourtIntegrityFailure):
-        F.seed_manifest()                                # nothing to derive
-    with pytest.raises(F.CourtIntegrityFailure):
-        F.derive_seed("N2", "world", 0)
-    assert QUAL_NS not in F.CONSUMED_NAMESPACES and "DEV" in QUAL_NS
+        F.define("X", 0.0, FROZEN_SURFACE, namespace=QUAL_NS, purpose="ACCEPTANCE")
+    if F.NAMESPACE is None:
+        with pytest.raises(F.CourtIntegrityFailure):
+            F.seed_manifest()
 
 
 def test_runner_identity_and_frozen_contracts():

@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_new_genome_has_all_thirteen_domains_unattributed",
+   "file": "tests/test_frontier2_edge_genome.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_real_status_without_real_basis_refused",
+   "file": "tests/test_frontier2_edge_genome.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_real_status_with_real_basis_is_allowed",
+   "file": "tests/test_frontier2_edge_genome.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_unknown_domain_refused",
+   "file": "tests/test_frontier2_edge_genome.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_unknown_status_refused",
+   "file": "tests/test_frontier2_edge_genome.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_set_domain_attribution_is_append_only_new_object",
+   "file": "tests/test_frontier2_edge_genome.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_set_domain_attribution_unknown_domain_refused",
+   "file": "tests/test_frontier2_edge_genome.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_no_numeric_attribution_field_anywhere",
+   "file": "tests/test_frontier2_edge_genome.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_determinism_same_build_twice_byte_identical",
+   "file": "tests/test_frontier2_edge_genome.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_edge_genome.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_edge_genome.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_edge_genome.py::test_new_genome_has_all_thirteen_domains_unattributed": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_edge_genome.py::test_real_status_without_real_basis_refused": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_edge_genome.py::test_real_status_with_real_basis_is_allowed": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_edge_genome.py::test_unknown_domain_refused": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_edge_genome.py::test_unknown_status_refused": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_edge_genome.py::test_set_domain_attribution_is_append_only_new_object": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_edge_genome.py::test_set_domain_attribution_unknown_domain_refused": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_edge_genome.py::test_no_numeric_attribution_field_anywhere": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_edge_genome.py::test_determinism_same_build_twice_byte_identical": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_edge_genome.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_edge_genome.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_edge_genome.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35587.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114987008",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.7
+ }
+}

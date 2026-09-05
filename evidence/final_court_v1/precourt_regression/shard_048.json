@@ -1,0 +1,254 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_adapter_has_no_placement_method_at_all",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_adapter_refuses_any_tool_outside_read_review_allowlist",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_live_authorization_cannot_be_constructed",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_tripwire_catches_a_smuggled_placement_surface",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_package_defines_no_placement_functions",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_readiness_has_no_order_sent_state_and_seal_is_immutable",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_full_chain_reaches_order_ready_only_when_everything_passes",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_kill_chain_refuses_bad_decisions[mutate0-evidence_eligibility]",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_kill_chain_refuses_bad_decisions[mutate1-data_health]",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_kill_chain_refuses_bad_decisions[mutate2-decision_freshness]",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_capital_must_say_paper_eligible",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_unauthenticated_broker_blocks_and_never_fabricates",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_missing_capability_is_named_never_emulated",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_duplicate_intent_refused_across_a_restart",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_intent_id_is_deterministic",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_kill_switch_halts_everything_and_is_file_backed",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_expression_refuses_to_originate_a_thesis_from_a_chain",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_uncalibrated_forecast_yields_diagnostic_only_never_fake_ev",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_missing_option_capability_appears_as_unavailable_candidate",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_illiquid_chain_pushes_to_stock",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_payoff_grid_is_deterministic_and_bounded",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_greeks_are_never_invented",
+   "file": "tests/test_execution_erd1.py"
+  },
+  {
+   "nodeid": "tests/test_execution_erd1.py::test_sac1_15_an_unknown_quote_age_cannot_pass_the_freshness_gate",
+   "file": "tests/test_execution_erd1.py"
+  }
+ ],
+ "collected_count": 23,
+ "collect_errors": [],
+ "results": {
+  "tests/test_execution_erd1.py::test_adapter_has_no_placement_method_at_all": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_adapter_refuses_any_tool_outside_read_review_allowlist": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_live_authorization_cannot_be_constructed": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_tripwire_catches_a_smuggled_placement_surface": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_package_defines_no_placement_functions": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_readiness_has_no_order_sent_state_and_seal_is_immutable": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_full_chain_reaches_order_ready_only_when_everything_passes": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_kill_chain_refuses_bad_decisions[mutate0-evidence_eligibility]": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_kill_chain_refuses_bad_decisions[mutate1-data_health]": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_kill_chain_refuses_bad_decisions[mutate2-decision_freshness]": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_capital_must_say_paper_eligible": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_unauthenticated_broker_blocks_and_never_fabricates": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_missing_capability_is_named_never_emulated": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_duplicate_intent_refused_across_a_restart": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_intent_id_is_deterministic": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_kill_switch_halts_everything_and_is_file_backed": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_expression_refuses_to_originate_a_thesis_from_a_chain": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_uncalibrated_forecast_yields_diagnostic_only_never_fake_ev": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_missing_option_capability_appears_as_unavailable_candidate": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_illiquid_chain_pushes_to_stock": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_payoff_grid_is_deterministic_and_bounded": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_greeks_are_never_invented": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_execution_erd1.py::test_sac1_15_an_unknown_quote_age_cannot_pass_the_freshness_gate": {
+   "file": "tests/test_execution_erd1.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 23,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_execution_erd1.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35571.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116334592",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.75
+ }
+}

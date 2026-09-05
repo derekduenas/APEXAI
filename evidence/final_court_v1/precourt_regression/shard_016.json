@@ -1,0 +1,128 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_btc_semantics.py::test_ticks_convert_via_the_specific_products_spec_never_hardcoded",
+   "file": "tests/test_btc_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_btc_semantics.py::test_conversion_refuses_without_an_increment",
+   "file": "tests/test_btc_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_btc_semantics.py::test_none_price_stays_none_never_zero",
+   "file": "tests/test_btc_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_btc_semantics.py::test_charts_usd_is_never_multiplied_by_the_increment",
+   "file": "tests/test_btc_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_btc_semantics.py::test_oi_cadence_law_unknown_is_never_realtime",
+   "file": "tests/test_btc_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_btc_semantics.py::test_poller_uses_live_spec_settlement_not_the_expired_products",
+   "file": "tests/test_btc_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_btc_semantics.py::test_poller_carries_full_conversion_metadata",
+   "file": "tests/test_btc_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_btc_semantics.py::test_funding_mark_is_never_in_realtime_reconciliation",
+   "file": "tests/test_btc_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_btc_semantics.py::test_price_semantic_types_registry",
+   "file": "tests/test_btc_semantics.py"
+  }
+ ],
+ "collected_count": 9,
+ "collect_errors": [],
+ "results": {
+  "tests/test_btc_semantics.py::test_ticks_convert_via_the_specific_products_spec_never_hardcoded": {
+   "file": "tests/test_btc_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_semantics.py::test_conversion_refuses_without_an_increment": {
+   "file": "tests/test_btc_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_semantics.py::test_none_price_stays_none_never_zero": {
+   "file": "tests/test_btc_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_semantics.py::test_charts_usd_is_never_multiplied_by_the_increment": {
+   "file": "tests/test_btc_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_semantics.py::test_oi_cadence_law_unknown_is_never_realtime": {
+   "file": "tests/test_btc_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_semantics.py::test_poller_uses_live_spec_settlement_not_the_expired_products": {
+   "file": "tests/test_btc_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_semantics.py::test_poller_carries_full_conversion_metadata": {
+   "file": "tests/test_btc_semantics.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: no live ledger in this environment"
+  },
+  "tests/test_btc_semantics.py::test_funding_mark_is_never_in_realtime_reconciliation": {
+   "file": "tests/test_btc_semantics.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: no live ledger"
+  },
+  "tests/test_btc_semantics.py::test_price_semantic_types_registry": {
+   "file": "tests/test_btc_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 7,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 2,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_btc_semantics.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35539.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114810880",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.57
+ }
+}

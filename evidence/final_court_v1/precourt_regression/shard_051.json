@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_expression_engine.py::test_long_call_payoff_hand_computed_at_expiry",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_call_debit_spread_payoff_hand_computed",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_collar_payoff_hand_computed",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_defined_risk_only_no_naked_shorts",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_stock_wins_on_modest_edge_high_iv_wide_spread",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_wider_spread_strictly_worsens_the_candidate",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_theta_is_integrated_over_the_holding_period",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_an_overconfident_distribution_changes_the_selection",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_no_code_path_reaches_live_data_or_orders",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_uncalibrated_output_cannot_become_a_recommendation",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_counterexample_a_calibrated_output_may_recommend",
+   "file": "tests/test_expression_engine.py"
+  },
+  {
+   "nodeid": "tests/test_expression_engine.py::test_contract_violations_are_refused",
+   "file": "tests/test_expression_engine.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_expression_engine.py::test_long_call_payoff_hand_computed_at_expiry": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_call_debit_spread_payoff_hand_computed": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_collar_payoff_hand_computed": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_defined_risk_only_no_naked_shorts": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_stock_wins_on_modest_edge_high_iv_wide_spread": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_wider_spread_strictly_worsens_the_candidate": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_theta_is_integrated_over_the_holding_period": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_an_overconfident_distribution_changes_the_selection": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_no_code_path_reaches_live_data_or_orders": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_uncalibrated_output_cannot_become_a_recommendation": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_counterexample_a_calibrated_output_may_recommend": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_expression_engine.py::test_contract_violations_are_refused": {
+   "file": "tests/test_expression_engine.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_expression_engine.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35574.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115138560",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.55
+ }
+}

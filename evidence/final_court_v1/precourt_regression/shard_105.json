@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_perturbation_actually_destroys_the_future",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_truncation_removes_every_row_after_the_date",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_audit_targets_cover_everything_decided_before_the_trade",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_the_real_pipeline_has_no_lookahead",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_audit_runs_both_modes",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_audit_catches_a_one_day_lookahead",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_audit_names_the_date_and_component_it_caught",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_a_clean_component_is_not_flagged",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_lookahead_visibly_inflates_the_ic",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_report_is_a_frozen_value_object",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_audit_refuses_a_date_outside_the_calendar",
+   "file": "tests/test_lookahead_audit.py"
+  },
+  {
+   "nodeid": "tests/test_lookahead_audit.py::test_audit_refuses_a_date_with_no_computable_features",
+   "file": "tests/test_lookahead_audit.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_lookahead_audit.py::test_perturbation_actually_destroys_the_future": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_truncation_removes_every_row_after_the_date": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_audit_targets_cover_everything_decided_before_the_trade": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_the_real_pipeline_has_no_lookahead": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_audit_runs_both_modes": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_audit_catches_a_one_day_lookahead": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_audit_names_the_date_and_component_it_caught": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_a_clean_component_is_not_flagged": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_lookahead_visibly_inflates_the_ic": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_report_is_a_frozen_value_object": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_audit_refuses_a_date_outside_the_calendar": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_lookahead_audit.py::test_audit_refuses_a_date_with_no_computable_features": {
+   "file": "tests/test_lookahead_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_lookahead_audit.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 228.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35628.service",
+   "memory_max": "1468006400",
+   "memory_peak": "184082432",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 66.08
+ }
+}

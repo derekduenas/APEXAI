@@ -1,0 +1,128 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_hunter_phase2.py::test_random_baseline_is_deterministic_not_rerollable",
+   "file": "tests/test_hunter_phase2.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_phase2.py::test_baseline_directions_fail_closed_on_missing_inputs",
+   "file": "tests/test_hunter_phase2.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_phase2.py::test_baseline_records_same_machinery_and_dedupe",
+   "file": "tests/test_hunter_phase2.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_phase2.py::test_baseline_realization_skips_geometry",
+   "file": "tests/test_hunter_phase2.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_phase2.py::test_neff_caps_by_session_day_cells",
+   "file": "tests/test_hunter_phase2.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_phase2.py::test_scoreboard_scores_only_eligible_and_restricts_subjects",
+   "file": "tests/test_hunter_phase2.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_phase2.py::test_selected_vs_rejected_same_instrument_cohorts",
+   "file": "tests/test_hunter_phase2.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_phase2.py::test_scoreboard_refuses_mixed_evidence",
+   "file": "tests/test_hunter_phase2.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_phase2.py::test_ledger_roundtrip_flat_shape",
+   "file": "tests/test_hunter_phase2.py"
+  }
+ ],
+ "collected_count": 9,
+ "collect_errors": [],
+ "results": {
+  "tests/test_hunter_phase2.py::test_random_baseline_is_deterministic_not_rerollable": {
+   "file": "tests/test_hunter_phase2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_phase2.py::test_baseline_directions_fail_closed_on_missing_inputs": {
+   "file": "tests/test_hunter_phase2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_phase2.py::test_baseline_records_same_machinery_and_dedupe": {
+   "file": "tests/test_hunter_phase2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_phase2.py::test_baseline_realization_skips_geometry": {
+   "file": "tests/test_hunter_phase2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_phase2.py::test_neff_caps_by_session_day_cells": {
+   "file": "tests/test_hunter_phase2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_phase2.py::test_scoreboard_scores_only_eligible_and_restricts_subjects": {
+   "file": "tests/test_hunter_phase2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_phase2.py::test_selected_vs_rejected_same_instrument_cohorts": {
+   "file": "tests/test_hunter_phase2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_phase2.py::test_scoreboard_refuses_mixed_evidence": {
+   "file": "tests/test_hunter_phase2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_phase2.py::test_ledger_roundtrip_flat_shape": {
+   "file": "tests/test_hunter_phase2.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 9,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_hunter_phase2.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 163.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35616.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116117504",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.95
+ }
+}

@@ -1,0 +1,263 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_the_package_grants_nothing",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_missing_manifest_refuses",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_malformed_manifest_refuses",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_a_dropped_prohibition_is_a_widened_permission",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_a_widened_prohibition_refuses",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_runtime_mutation_of_the_manifest_is_detected",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_forbidden_source_class_refused[REAL_HISTORICAL_LABEL]",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_forbidden_source_class_refused[REAL_PROSPECTIVE_OUTCOME]",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_forbidden_source_class_refused[BOOK_PNL]",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_forbidden_source_class_refused[REAL_EXECUTION_RESULT]",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_unknown_source_class_refused_not_defaulted",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_caller_CANNOT_launder_real_evidence_by_declaring_it_synthetic",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_symlink_into_real_evidence_is_refused",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_dotdot_traversal_out_of_the_fixture_root_is_refused",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_every_declared_real_evidence_root_is_actually_denied",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_a_file_merely_present_in_the_fixture_root_is_not_a_fixture",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_missing_provenance_manifest_refuses",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_content_changed_after_declaration_refuses",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_the_provenance_record_wins_over_the_caller",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_a_properly_declared_fixture_IS_admitted",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_admission_refuses_when_the_authority_is_broken",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_the_package_has_no_broker_or_placement_surface",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_the_only_apex_imports_are_within_world_model",
+   "file": "tests/test_world_model_authority.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_authority.py::test_no_bypass_switch_exists",
+   "file": "tests/test_world_model_authority.py"
+  }
+ ],
+ "collected_count": 24,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_authority.py::test_the_package_grants_nothing": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_missing_manifest_refuses": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_malformed_manifest_refuses": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_a_dropped_prohibition_is_a_widened_permission": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_a_widened_prohibition_refuses": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_runtime_mutation_of_the_manifest_is_detected": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_forbidden_source_class_refused[REAL_HISTORICAL_LABEL]": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_forbidden_source_class_refused[REAL_PROSPECTIVE_OUTCOME]": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_forbidden_source_class_refused[BOOK_PNL]": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_forbidden_source_class_refused[REAL_EXECUTION_RESULT]": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_unknown_source_class_refused_not_defaulted": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_caller_CANNOT_launder_real_evidence_by_declaring_it_synthetic": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_symlink_into_real_evidence_is_refused": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_dotdot_traversal_out_of_the_fixture_root_is_refused": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_every_declared_real_evidence_root_is_actually_denied": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_a_file_merely_present_in_the_fixture_root_is_not_a_fixture": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_missing_provenance_manifest_refuses": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_content_changed_after_declaration_refuses": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_the_provenance_record_wins_over_the_caller": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_a_properly_declared_fixture_IS_admitted": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_admission_refuses_when_the_authority_is_broken": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_the_package_has_no_broker_or_placement_surface": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_the_only_apex_imports_are_within_world_model": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_authority.py::test_no_bypass_switch_exists": {
+   "file": "tests/test_world_model_authority.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 24,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_authority.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35767.service",
+   "memory_max": "1468006400",
+   "memory_peak": "118784000",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.09
+ }
+}
