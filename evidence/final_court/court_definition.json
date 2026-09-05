@@ -1,0 +1,207 @@
+{
+ "definition": {
+  "court_version": "FINAL_SYNTHETIC_ACCEPTANCE_COURT_V0",
+  "court_id": "COURT-FINAL-ae42a5e4fda7",
+  "code_commit": "bd6366c48",
+  "authority": "SYNTHETIC_RESEARCH_ONLY",
+  "creation_time": 1757000000.0,
+  "scientific_surface_hash": "f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d",
+  "M0": {
+   "identity": {
+    "model_id": "M0_SYNTHETIC_BASELINE_V0",
+    "model_version": "0.1.0",
+    "configuration": {
+     "ridge_lambda": 1.0,
+     "residual": "gaussian",
+     "bias_penalised": false
+    }
+   },
+   "config_hash": "b6aec556e20cf6617cf7797cb0ef0d84a1819f13d857131e2e0517ae49ddc925"
+  },
+  "null_comparator": {
+   "model_id": "N_BASELINE_NULL_V0",
+   "model_version": "0.1.0"
+  },
+  "inference": {
+   "contract_hash": "af3ae117a69ee485bf8ac2fa86c7b962db7f21ab639507dffb6389ed0a2f35ac",
+   "version": "DEPENDENT_BLOCK_BOOTSTRAP_V0.1",
+   "B": 1999,
+   "alpha": 0.025,
+   "decision": "p = (1 + #{t* >= t_obs}) / (B + 1); SIGNAL_DETECTED iff mean(d) > 0 and p <= ALPHA",
+   "block_rule": "l = clamp(round(b_PPW), H, floor(n/6)); b_PPW = Politis-White 2004 / Patton-Politis-White 2009 automatic block length, circular variant, on the centred differential"
+  },
+  "secondary_diagnostics_only": {
+   "hac": "DEPENDENCE_AWARE_DM_HAC_V0",
+   "non_overlap": "NON_OVERLAP_ROBUSTNESS_V0"
+  },
+  "controls": {
+   "N0": "N0_SHADOW_TARGET_NULL_V1",
+   "N1": "N1_TIME_DESTRUCTION_E1860_V1",
+   "N2": "N2_NOISE_FEATURES (controls.py V0.1)",
+   "N3": "N3_SHADOW_FEATURE_NULL_V1",
+   "N4": "N4_RANDOM_RANKER (controls.py V0.1)",
+   "P0": "P0_CAUSAL_TREND_POWERED_V2"
+  },
+  "control_source_sha256": {
+   "controls.py": "6e92de2d84af9491faf6e902b06df0fa679f5c92803c145f035f688ce4896673",
+   "controls_r3.py": "cec658d50d0810021d7052c02a2c5c001db8ce7f383eb49694385ac7ca682538",
+   "controls_r4.py": "2a1cf380d5d897ab169feec82ee7444f63e9c54bde37edb261061bd2a43dc584",
+   "controls_r5.py": "d0e78d7d0d9e57481959004b0532fa54d54a2db7d129eeee1cfabcf809a9608f",
+   "controls_r51.py": "c989d70e410dca0f8aafd154425587a3d8b56e233cd6db84863215bf47442c30"
+  },
+  "control_contracts": {
+   "N0": {
+    "name": "N0_SHADOW_TARGET_NULL_V1",
+    "replaces": "N0_BLOCK_NULL_V0 (FAILED_E1860; not edited)",
+    "construction": "X_A -> y_B for training AND evaluation; A = feature world (dev seed), B = independent same-family world (namespace-derived)",
+    "destroys": "any feature->target linkage (worlds share nothing)",
+    "preserves": "feature temporal dependence/regime persistence/marginal evolution; target temporal dependence/regime persistence/marginal evolution",
+    "no_permutation": true,
+    "twin_of": "N3_SHADOW_FEATURE_NULL_V1 (roles reversed)",
+    "expected": "NO_SIGNAL"
+   },
+   "N1": {
+    "name": "N1_TIME_DESTRUCTION_E1860_V1",
+    "transformation": "controls.n1_dataset UNCHANGED (FORWARD_TIME_DISPLACEMENT, shift 200, purge recomputed)",
+    "transformation_sha256": "4eee9cd175e96fcdf82d11be120f691f4070ed1ca14fe9909afc4f8927e8be87",
+    "displacement": 200,
+    "T": 2795,
+    "boundary": 720,
+    "source_evaluation_steps": 2061,
+    "final_usable_evaluation": 1860,
+    "train_pairs": 501,
+    "run_invalid_if_usable_differs": true,
+    "expected": "NO_SIGNAL"
+   },
+   "N2": {
+    "name": "NOISE_FEATURES",
+    "destroys": "all information in X",
+    "preserves": "y and outcome records exactly; X shape",
+    "expected": "NO_SIGNAL"
+   },
+   "N3": {
+    "name": "N3_SHADOW_FEATURE_NULL_V1",
+    "replaces": "N3_FEATURE_PERMUTATION_V0 (retired, not edited)",
+    "construction": "features <- independent shadow world of the same declared family/config; targets <- target world; same split/subject",
+    "destroys": "the target world's causal feature->target linkage",
+    "preserves": "feature serial dependence, regime persistence and marginal evolution (in distribution); target temporal structure",
+    "donor_rule": "shadow seed = sha256(WM0E_R3_N3_SHADOW_V1|target_seed)[:8] mod 2^31-1; never chosen from outcomes; latent identities never synchronised",
+    "boundary": "only ObservableState crosses; generator truth of either world never reaches model input",
+    "expected": "NO_SIGNAL"
+   },
+   "N4": {
+    "name": "RANDOM_RANKER",
+    "destroys": "any use of features (the model ignores x)",
+    "preserves": "the training sd, exactly as the null comparator",
+    "expected": "NO_SIGNAL"
+   },
+   "P0": {
+    "identity": "P0_CAUSAL_TREND_POWERED_V2",
+    "mu_multiplier": 1.0,
+    "params": {
+     "mu": 0.0015,
+     "flip_prob": 0.02
+    },
+    "sigma": 0.002,
+    "E": 1860
+   }
+  },
+  "geometry": {
+   "standard": {
+    "split_version": "WM0D_CHRONOLOGICAL_PURGED_SPLIT_V0",
+    "n_steps": 2595,
+    "boundary": 720,
+    "horizon_steps": 15,
+    "warmup_steps": 5,
+    "train": [
+     5,
+     705
+    ],
+    "purged": [
+     706,
+     719
+    ],
+    "eval": [
+     720,
+     2580
+    ],
+    "law": "every training target reads prices <= p_boundary; the purge removes training samples whose label would read evaluation-period prices"
+   },
+   "N1": {
+    "split_version": "WM0D_CHRONOLOGICAL_PURGED_SPLIT_V0",
+    "n_steps": 2795,
+    "boundary": 720,
+    "horizon_steps": 15,
+    "warmup_steps": 5,
+    "train": [
+     5,
+     705
+    ],
+    "purged": [
+     706,
+     719
+    ],
+    "eval": [
+     720,
+     2780
+    ],
+    "law": "every training target reads prices <= p_boundary; the purge removes training samples whose label would read evaluation-period prices"
+   },
+   "expected_usable_and_train": {
+    "N0": [
+     1860,
+     701
+    ],
+    "N1": [
+     1860,
+     501
+    ],
+    "N2": [
+     1860,
+     701
+    ],
+    "N3": [
+     1860,
+     701
+    ],
+    "N4": [
+     1860,
+     701
+    ],
+    "P0": [
+     1860,
+     701
+    ]
+   },
+   "T_standard": 2595,
+   "T_N1": 2795
+  },
+  "executed_split_contract": "EXECUTED_SPLIT_V1",
+  "seeds": {
+   "namespace": "WM0E_R7_FINAL_ACCEPTANCE_V0",
+   "indices": 50,
+   "manifest_hash": "fa9d5c2a91ccd95c6226ceb1eb8b8bef92aa850bbd68cae103a283cc48b7250f",
+   "derivation": "primary = int.from_bytes(sha256(namespace|control|role|index)[:8], big) mod 2^31-1; companion = the frozen control's own namespace function of the primary seed (R51.target_seed for N0, R3.shadow_seed for N3)"
+  },
+  "acceptance": {
+   "null_controls": "detections <= 5 / 50 PASS; >= 6 FAIL",
+   "P0": "detections >= 40 / 50 AND direction >= 45 / 50",
+   "detection": "primary bootstrap p <= alpha with mean(d) > 0; secondaries cannot rescue",
+   "family": "N0_SHADOW_TARGET_NULL_V1 and N3_SHADOW_FEATURE_NULL_V1 are role-reversed variants of ONE two-independent-world null family; useful as distinct directionality checks; NOT independent evidence streams. Primary acceptance is per control; no pooled or independence-based family test promotes the court."
+  },
+  "cells_expected": 300,
+  "resource_contract": {
+   "slice": "wmresearch.slice",
+   "unit_memory_max": "1400M",
+   "wrapper": "wm_contained.sh"
+  },
+  "research_budget_snapshot_hash": "bc2f1ce47a433cc1d8ee9b68d6e5bed040d547a4fee3913fbdb10def8e378239",
+  "precourt_regression": "REQUIRED to PASS on this exact commit before opening; its artifact sha256 is recorded in the R7_COURT_OPENED record (it cannot exist before this definition is committed)",
+  "rescue_logic": "NONE",
+  "development_inside_court": "NONE"
+ },
+ "court_hash": "cc9ecb3f5cdef1c5f0b9e037b36adaad5bc2b6946d8b38a11d412c18ca730bb7",
+ "status": "SEALED_BEFORE_OUTCOMES",
+ "R7_ACCEPTANCE_SET_STATUS": "SEALED_UNCONSUMED",
+ "R7_PRIOR_SEED_COLLISIONS": 0
+}
