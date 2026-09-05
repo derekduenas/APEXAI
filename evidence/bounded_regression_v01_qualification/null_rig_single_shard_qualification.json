@@ -1,0 +1,74 @@
+{
+ "module": "tests/test_null_rig.py",
+ "expected_nodeids": [
+  "tests/test_null_rig.py::test_deferred_assertions_are_declared",
+  "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_fast",
+  "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_full",
+  "tests/test_null_rig.py::test_null_decile_spread_is_centred_on_zero",
+  "tests/test_null_rig.py::test_null_ic_series_has_the_autocorrelation_the_overlap_implies",
+  "tests/test_null_rig.py::test_null_panel_produces_a_real_cross_section",
+  "tests/test_null_rig.py::test_positive_control_is_recovered_and_scales",
+  "tests/test_null_rig.py::test_random_walk_decile_spread_is_not_significant",
+  "tests/test_null_rig.py::test_random_walk_ic_is_not_significant",
+  "tests/test_null_rig.py::test_shuffled_score_destroys_ic",
+  "tests/test_null_rig.py::test_shuffled_score_on_real_data",
+  "tests/test_null_rig.py::test_the_fast_sweep_declares_itself_underpowered"
+ ],
+ "observed_nodeids": [
+  "tests/test_null_rig.py::test_deferred_assertions_are_declared",
+  "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_fast",
+  "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_full",
+  "tests/test_null_rig.py::test_null_decile_spread_is_centred_on_zero",
+  "tests/test_null_rig.py::test_null_ic_series_has_the_autocorrelation_the_overlap_implies",
+  "tests/test_null_rig.py::test_null_panel_produces_a_real_cross_section",
+  "tests/test_null_rig.py::test_positive_control_is_recovered_and_scales",
+  "tests/test_null_rig.py::test_random_walk_decile_spread_is_not_significant",
+  "tests/test_null_rig.py::test_random_walk_ic_is_not_significant",
+  "tests/test_null_rig.py::test_shuffled_score_destroys_ic",
+  "tests/test_null_rig.py::test_shuffled_score_on_real_data",
+  "tests/test_null_rig.py::test_the_fast_sweep_declares_itself_underpowered"
+ ],
+ "NULL_RIG_NODEID_IDENTITY": "PASS",
+ "returncode": 0,
+ "elapsed_s": 172.02,
+ "oom_delta": 0,
+ "unit_cgroup": "/wmresearch.slice/run-u34935.service",
+ "unit_memory_max": "1468006400",
+ "cgroup_peak_MiB": 698,
+ "ru_maxrss_MiB": 752.5,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 1,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "problems": [],
+ "outcomes": {
+  "tests/test_null_rig.py::test_random_walk_ic_is_not_significant": "PASS",
+  "tests/test_null_rig.py::test_random_walk_decile_spread_is_not_significant": "PASS",
+  "tests/test_null_rig.py::test_null_panel_produces_a_real_cross_section": "PASS",
+  "tests/test_null_rig.py::test_null_ic_series_has_the_autocorrelation_the_overlap_implies": "PASS",
+  "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_fast": "PASS",
+  "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_full": "PASS",
+  "tests/test_null_rig.py::test_the_fast_sweep_declares_itself_underpowered": "PASS",
+  "tests/test_null_rig.py::test_null_decile_spread_is_centred_on_zero": "PASS",
+  "tests/test_null_rig.py::test_shuffled_score_destroys_ic": "PASS",
+  "tests/test_null_rig.py::test_shuffled_score_on_real_data": "SKIP",
+  "tests/test_null_rig.py::test_deferred_assertions_are_declared": "PASS",
+  "tests/test_null_rig.py::test_positive_control_is_recovered_and_scales": "PASS"
+ },
+ "skips": {
+  "tests/test_null_rig.py::test_shuffled_score_on_real_data": "Skipped: DEFERRED until a real vendor is wired (Stage 4): shuffled APEX Score produces IC ~ 0 on REAL data (kickoff Stage 2, item 3)"
+ },
+ "NULL_RIG_SINGLE_SHARD": "PASS",
+ "R6_failed_shard": {
+  "unit": "run-u34764",
+  "killed_after_s": 55.0,
+  "cap": "1400M"
+ },
+ "resource_margin": "adequate",
+ "reduction_vs_failed_shard": "R6 shard exceeded 1400 MiB (killed); repaired peak 698 MiB"
+}

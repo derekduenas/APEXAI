@@ -23,7 +23,7 @@ import sys
 import time
 from pathlib import Path
 
-RUNNER_VERSION = "BOUNDED_FULL_REGRESSION_V0"
+RUNNER_VERSION = "BOUNDED_FULL_REGRESSION_V0.1"
 SHARD_LAW = "ONE_MODULE_PER_FRESH_PROCESS"
 WRAPPER = ["/home/apex/bin/wm_contained.sh"]
 PY = "/opt/apex/shared/venv/bin/python"
