@@ -1,0 +1,25 @@
+{
+ "name": "PRIOR_SKIP_MANIFEST_FOR_R7_1",
+ "source": "R7 pre-court complete manifest (19)",
+ "skips": {
+  "tests/test_btc_l2_redteam.py::test_real_ledger_pre_lineage_rows_are_excluded_and_preserved": "Skipped: no real ledger in this environment",
+  "tests/test_btc_l2_redteam.py::test_real_ws_ledgers_generation_law": "Skipped: no real WS ledgers in this environment",
+  "tests/test_btc_semantics.py::test_funding_mark_is_never_in_realtime_reconciliation": "Skipped: no live ledger",
+  "tests/test_btc_semantics.py::test_poller_carries_full_conversion_metadata": "Skipped: no live ledger in this environment",
+  "tests/test_commissioning_foundation.py::test_layer1_acceptance_record_exists_and_is_read_only": "Skipped: acceptance record not present in this environment",
+  "tests/test_commissioning_foundation.py::test_layer3_reconciliation_record_exists": "Skipped: no reconciliation record in this environment",
+  "tests/test_commissioning_foundation.py::test_real_friday_continuity_reads_the_damage": "Skipped: no real Friday session file",
+  "tests/test_commissioning_foundation.py::test_sentinel_is_installed_and_running": "Skipped: sentinel not yet started in this environment",
+  "tests/test_curve_v2.py::test_non_degeneracy_on_real_thursday_bars_descriptive_only": "Skipped: no live bar data in this environment",
+  "tests/test_decision_organism_v1.py::test_market_state_series_are_known_from_safe": "Skipped: no live bar data in this environment",
+  "tests/test_integrity_museum.py::test_museum_piece_is_refused_forever[ATTEMPT_1_LAB02_hollow]": "Skipped: ATTEMPT_1_LAB02_hollow fixture absent on this machine",
+  "tests/test_integrity_museum.py::test_museum_piece_is_refused_forever[ATTEMPT_2_LAB04_blindfold]": "Skipped: ATTEMPT_2_LAB04_blindfold fixture absent on this machine",
+  "tests/test_living_organism_2026_08_21.py::test_resolution_known_from_is_resolution_time_never_event_time": "Skipped: no outcome ledger in this environment",
+  "tests/test_null_rig.py::test_shuffled_score_on_real_data": "Skipped: DEFERRED until a real vendor is wired (Stage 4): shuffled APEX Score produces IC ~ 0 on REAL data (kickoff Stage 2, item 3)",
+  "tests/test_pattern_observatory.py::test_options_surface_reproduces_the_real_2026_08_19_finding": "Skipped: production options live capture absent in this environment (Mac-only data, not code)",
+  "tests/test_sac1_tier1.py::test_every_declared_launchd_job_has_a_plist_on_disk": "Skipped: verifies the Mac host launchd/ops installation -- Darwin-only by nature; cloud uses systemd (C6)",
+  "tests/test_sac1_tier1.py::test_the_crypto_health_artifact_is_fresher_than_its_own_log": "Skipped: daemon has not written health in this environment",
+  "tests/test_snapshot_corrections.py::test_reits_are_typed_non_common_so_section_3_excludes_them": "Skipped: production snapshot not present",
+  "tests/test_unattended_closure.py::test_scheduled_ops_scripts_exist_and_are_executable": "Skipped: verifies the Mac host launchd/ops installation -- Darwin-only by nature; cloud uses systemd (C6)"
+ }
+}
