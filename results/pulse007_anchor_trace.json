@@ -1,0 +1,994 @@
+{
+ "kind": "pulse007_anchor_trace",
+ "version": "ANCHOR_TRACE_V1",
+ "law": "the live packet is fixed evidence; the replay side is what the CURRENT historical factory selects. Vendor history is subsequently revised data: these reads establish WHAT IS SELECTED, not what was knowable then.",
+ "subjects": {
+  "AAL": {
+   "subject_class": "degraded_subject",
+   "state_id": "e1810b8437d519ac0a7f112a149c6098",
+   "live": {
+    "prior_close": {
+     "v": 13.43,
+     "q": "VALID",
+     "as_of": "2026-08-31T04:00:00Z"
+    },
+    "prior_close_return_bps": {
+     "v": -93.08,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.405159959Z"
+    },
+    "cash_open_return_bps": {
+     "v": 77.26,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.405159959Z"
+    },
+    "overnight_gap_bps": {
+     "v": -169.02,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_open": {
+     "v": 13.203,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_high": {
+     "v": 13.39,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_low": {
+     "v": 13.18,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_volume": {
+     "v": 4037112,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_vwap": {
+     "v": 13.273207,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "mid": {
+     "v": 13.305,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.405159959Z"
+    },
+    "spread_bps": {
+     "v": 7.516,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.405159959Z"
+    },
+    "nbbo_size_imbalance": {
+     "v": 0.5833,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.405159959Z"
+    },
+    "touch_size": {
+     "v": 2400,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.405159959Z"
+    },
+    "last_trade": {
+     "v": 13.31,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:00.430805889Z"
+    },
+    "prior_close_session_date": "2026-08-31",
+    "daily_bar_stamp": "2026-09-01T04:00:00Z",
+    "daily_bar_session_date": "2026-09-01",
+    "quote_as_of": "2026-09-01T13:45:01.405159959Z",
+    "packet_scheduled_time": "2026-09-01T13:45:00+00:00",
+    "packet_complete_time": "2026-09-01T13:45:17.100852+00:00",
+    "quote_lag_after_scheduled_s": 1.405
+   },
+   "replay_current_code": {
+    "day_start_used_by_current_code": "2026-09-01T00:00:00+00:00",
+    "day_start_in_exchange_local": "2026-08-31T20:00:00-04:00",
+    "intraday_returned": 176,
+    "intraday_selected": 175,
+    "daily_returned": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z",
+     "2026-08-31T04:00:00Z"
+    ],
+    "daily_selected": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z"
+    ],
+    "daily_dropped_by_width_filter": [
+     "2026-08-31T04:00:00Z"
+    ],
+    "prevDailyBar": {
+     "t": "2026-08-28T04:00:00Z",
+     "c": 13.64,
+     "session_date": "2026-08-28"
+    },
+    "dailyBar": {
+     "o": 13.45,
+     "o_from_bar_t": "2026-09-01T08:00:00Z",
+     "o_bar_in_exchange_local": "2026-09-01T04:00:00-04:00",
+     "o_bar_session": "PREMARKET",
+     "o_bar_session_date": "2026-09-01",
+     "h": 13.51,
+     "l": 13.18,
+     "c": 13.31,
+     "v": 4031871,
+     "first_bar_t": "2026-09-01T08:00:00Z",
+     "last_bar_t": "2026-09-01T13:44:00Z"
+    },
+    "bars_before_cash_open": 160,
+    "cash_open_bar": {
+     "t": "2026-09-01T13:30:00Z",
+     "o": 13.2
+    }
+   },
+   "recomputed": {
+    "replay_prior_close": 13.64,
+    "replay_prior_close_return_bps": -245.6,
+    "replay_cash_open_return_bps": -107.81,
+    "replay_overnight_gap_bps": -139.3,
+    "cash_open_return_bps_if_rth_open_used": 79.55
+   }
+  },
+  "AAOI": {
+   "subject_class": "enriched_subject",
+   "state_id": "befd933272a9c8a6632d6864c91e81db",
+   "live": {
+    "prior_close": {
+     "v": 107.69,
+     "q": "VALID",
+     "as_of": "2026-08-31T04:00:00Z"
+    },
+    "prior_close_return_bps": {
+     "v": -539.98,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.275217469Z"
+    },
+    "cash_open_return_bps": {
+     "v": -246.53,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.275217469Z"
+    },
+    "overnight_gap_bps": {
+     "v": -300.86,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_open": {
+     "v": 104.45,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_high": {
+     "v": 105.74,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_low": {
+     "v": 101.6,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_volume": {
+     "v": 980010,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_vwap": {
+     "v": 103.335082,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "mid": {
+     "v": 101.875,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.275217469Z"
+    },
+    "spread_bps": {
+     "v": 14.724,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.275217469Z"
+    },
+    "nbbo_size_imbalance": {
+     "v": 0.6,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.275217469Z"
+    },
+    "touch_size": {
+     "v": 1500,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.275217469Z"
+    },
+    "last_trade": {
+     "v": 101.8245,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.113125549Z"
+    },
+    "prior_close_session_date": "2026-08-31",
+    "daily_bar_stamp": "2026-09-01T04:00:00Z",
+    "daily_bar_session_date": "2026-09-01",
+    "quote_as_of": "2026-09-01T13:45:01.275217469Z",
+    "packet_scheduled_time": "2026-09-01T13:45:00+00:00",
+    "packet_complete_time": "2026-09-01T13:45:17.449279+00:00",
+    "quote_lag_after_scheduled_s": 1.275
+   },
+   "replay_current_code": {
+    "day_start_used_by_current_code": "2026-09-01T00:00:00+00:00",
+    "day_start_in_exchange_local": "2026-08-31T20:00:00-04:00",
+    "intraday_returned": 194,
+    "intraday_selected": 193,
+    "daily_returned": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z",
+     "2026-08-31T04:00:00Z"
+    ],
+    "daily_selected": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z"
+    ],
+    "daily_dropped_by_width_filter": [
+     "2026-08-31T04:00:00Z"
+    ],
+    "prevDailyBar": {
+     "t": "2026-08-28T04:00:00Z",
+     "c": 106.23,
+     "session_date": "2026-08-28"
+    },
+    "dailyBar": {
+     "o": 106.11,
+     "o_from_bar_t": "2026-09-01T08:00:00Z",
+     "o_bar_in_exchange_local": "2026-09-01T04:00:00-04:00",
+     "o_bar_session": "PREMARKET",
+     "o_bar_session_date": "2026-09-01",
+     "h": 107.39,
+     "l": 101.6,
+     "c": 101.9,
+     "v": 963673,
+     "first_bar_t": "2026-09-01T08:00:00Z",
+     "last_bar_t": "2026-09-01T13:44:00Z"
+    },
+    "bars_before_cash_open": 178,
+    "cash_open_bar": {
+     "t": "2026-09-01T13:30:00Z",
+     "o": 104.45
+    }
+   },
+   "recomputed": {
+    "replay_prior_close": 106.23,
+    "replay_prior_close_return_bps": -409.96,
+    "replay_cash_open_return_bps": -399.11,
+    "replay_overnight_gap_bps": -11.3,
+    "cash_open_return_bps_if_rth_open_used": -246.53
+   }
+  },
+  "AAPL": {
+   "subject_class": "liquid_megacap",
+   "state_id": "54b4e073a0cb3a1b8143374d463d4217",
+   "live": {
+    "prior_close": {
+     "v": 316.85,
+     "q": "VALID",
+     "as_of": "2026-08-31T04:00:00Z"
+    },
+    "prior_close_return_bps": {
+     "v": 72.59,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.298268834Z"
+    },
+    "cash_open_return_bps": {
+     "v": 68.46,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.298268834Z"
+    },
+    "overnight_gap_bps": {
+     "v": 4.1,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_open": {
+     "v": 316.98,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_high": {
+     "v": 319.34,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_low": {
+     "v": 314.73,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_volume": {
+     "v": 3952666,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_vwap": {
+     "v": 317.466699,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "mid": {
+     "v": 319.15,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.298268834Z"
+    },
+    "spread_bps": {
+     "v": 2.507,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.298268834Z"
+    },
+    "nbbo_size_imbalance": {
+     "v": 0.0,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.298268834Z"
+    },
+    "touch_size": {
+     "v": 160,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.298268834Z"
+    },
+    "last_trade": {
+     "v": 319.135,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.242510064Z"
+    },
+    "prior_close_session_date": "2026-08-31",
+    "daily_bar_stamp": "2026-09-01T04:00:00Z",
+    "daily_bar_session_date": "2026-09-01",
+    "quote_as_of": "2026-09-01T13:45:01.298268834Z",
+    "packet_scheduled_time": "2026-09-01T13:45:00+00:00",
+    "packet_complete_time": "2026-09-01T13:45:19.457430+00:00",
+    "quote_lag_after_scheduled_s": 1.298
+   },
+   "replay_current_code": {
+    "day_start_used_by_current_code": "2026-09-01T00:00:00+00:00",
+    "day_start_in_exchange_local": "2026-08-31T20:00:00-04:00",
+    "intraday_returned": 316,
+    "intraday_selected": 315,
+    "daily_returned": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z",
+     "2026-08-31T04:00:00Z"
+    ],
+    "daily_selected": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z"
+    ],
+    "daily_dropped_by_width_filter": [
+     "2026-08-31T04:00:00Z"
+    ],
+    "prevDailyBar": {
+     "t": "2026-08-28T04:00:00Z",
+     "c": 319.7,
+     "session_date": "2026-08-28"
+    },
+    "dailyBar": {
+     "o": 316.55,
+     "o_from_bar_t": "2026-09-01T08:00:00Z",
+     "o_bar_in_exchange_local": "2026-09-01T04:00:00-04:00",
+     "o_bar_session": "PREMARKET",
+     "o_bar_session_date": "2026-09-01",
+     "h": 319.34,
+     "l": 314.73,
+     "c": 319.15,
+     "v": 3949593,
+     "first_bar_t": "2026-09-01T08:00:00Z",
+     "last_bar_t": "2026-09-01T13:44:00Z"
+    },
+    "bars_before_cash_open": 300,
+    "cash_open_bar": {
+     "t": "2026-09-01T13:30:00Z",
+     "o": 316.98
+    }
+   },
+   "recomputed": {
+    "replay_prior_close": 319.7,
+    "replay_prior_close_return_bps": -17.2,
+    "replay_cash_open_return_bps": 82.14,
+    "replay_overnight_gap_bps": -98.53,
+    "cash_open_return_bps_if_rth_open_used": 68.46
+   }
+  },
+  "NKLA": {
+   "subject_class": "elevated_mover",
+   "state_id": "4f2fbb7a5ff48288be41fd959d972d37",
+   "live": {
+    "prior_close": {
+     "v": 0.2568,
+     "q": "VALID",
+     "as_of": "2025-02-24T05:00:00Z"
+    },
+    "prior_close_return_bps": {
+     "v": -2869.94,
+     "q": "VALID",
+     "as_of": "2025-02-26T00:59:59.255814551Z"
+    },
+    "cash_open_return_bps": {
+     "v": -2039.13,
+     "q": "VALID",
+     "as_of": "2025-02-26T00:59:59.255814551Z"
+    },
+    "overnight_gap_bps": {
+     "v": -1043.61,
+     "q": "VALID",
+     "as_of": "2025-02-25T05:00:00Z"
+    },
+    "session_open": {
+     "v": 0.23,
+     "q": "VALID",
+     "as_of": "2025-02-25T05:00:00Z"
+    },
+    "session_high": {
+     "v": 0.25,
+     "q": "VALID",
+     "as_of": "2025-02-25T05:00:00Z"
+    },
+    "session_low": {
+     "v": 0.175,
+     "q": "VALID",
+     "as_of": "2025-02-25T05:00:00Z"
+    },
+    "session_volume": {
+     "v": 37074204,
+     "q": "VALID",
+     "as_of": "2025-02-25T05:00:00Z"
+    },
+    "session_vwap": {
+     "v": 0.201437,
+     "q": "VALID",
+     "as_of": "2025-02-25T05:00:00Z"
+    },
+    "mid": {
+     "v": null,
+     "q": "STALE",
+     "as_of": null
+    },
+    "spread_bps": {
+     "v": null,
+     "q": "STALE",
+     "as_of": null
+    },
+    "nbbo_size_imbalance": {
+     "v": null,
+     "q": "STALE",
+     "as_of": null
+    },
+    "touch_size": {
+     "v": null,
+     "q": "STALE",
+     "as_of": null
+    },
+    "last_trade": {
+     "v": null,
+     "q": "STALE",
+     "as_of": null
+    },
+    "prior_close_session_date": "2025-02-24",
+    "daily_bar_stamp": "2025-02-25T05:00:00Z",
+    "daily_bar_session_date": "2025-02-25",
+    "quote_as_of": null,
+    "packet_scheduled_time": "2026-09-01T13:45:00+00:00",
+    "packet_complete_time": "2026-09-01T13:45:24.889034+00:00",
+    "quote_lag_after_scheduled_s": null
+   },
+   "replay_current_code": {
+    "day_start_used_by_current_code": "2026-09-01T00:00:00+00:00",
+    "day_start_in_exchange_local": "2026-08-31T20:00:00-04:00",
+    "intraday_returned": 0,
+    "intraday_selected": 0,
+    "daily_returned": [],
+    "daily_selected": [],
+    "daily_dropped_by_width_filter": []
+   },
+   "recomputed": {}
+  },
+  "SPY": {
+   "subject_class": "SPY_index",
+   "state_id": "104c28bf4fbbb0ca74db5ed1e9922368",
+   "live": {
+    "prior_close": {
+     "v": 767.05,
+     "q": "VALID",
+     "as_of": "2026-08-31T04:00:00Z"
+    },
+    "prior_close_return_bps": {
+     "v": -66.88,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.669149633Z"
+    },
+    "cash_open_return_bps": {
+     "v": -1.18,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.669149633Z"
+    },
+    "overnight_gap_bps": {
+     "v": -65.71,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_open": {
+     "v": 762.01,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_high": {
+     "v": 762.3999,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_low": {
+     "v": 761.17,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_volume": {
+     "v": 3472090,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_vwap": {
+     "v": 761.806896,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "mid": {
+     "v": 761.92,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.669149633Z"
+    },
+    "spread_bps": {
+     "v": 0.525,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.669149633Z"
+    },
+    "nbbo_size_imbalance": {
+     "v": -0.5294,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.669149633Z"
+    },
+    "touch_size": {
+     "v": 680,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.669149633Z"
+    },
+    "last_trade": {
+     "v": 761.91,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:45:01.559840694Z"
+    },
+    "prior_close_session_date": "2026-08-31",
+    "daily_bar_stamp": "2026-09-01T04:00:00Z",
+    "daily_bar_session_date": "2026-09-01",
+    "quote_as_of": "2026-09-01T13:45:01.669149633Z",
+    "packet_scheduled_time": "2026-09-01T13:45:00+00:00",
+    "packet_complete_time": "2026-09-01T13:45:30.958344+00:00",
+    "quote_lag_after_scheduled_s": 1.669
+   },
+   "replay_current_code": {
+    "day_start_used_by_current_code": "2026-09-01T00:00:00+00:00",
+    "day_start_in_exchange_local": "2026-08-31T20:00:00-04:00",
+    "intraday_returned": 334,
+    "intraday_selected": 333,
+    "daily_returned": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z",
+     "2026-08-31T04:00:00Z"
+    ],
+    "daily_selected": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z"
+    ],
+    "daily_dropped_by_width_filter": [
+     "2026-08-31T04:00:00Z"
+    ],
+    "prevDailyBar": {
+     "t": "2026-08-28T04:00:00Z",
+     "c": 769.35,
+     "session_date": "2026-08-28"
+    },
+    "dailyBar": {
+     "o": 766.4,
+     "o_from_bar_t": "2026-09-01T08:00:00Z",
+     "o_bar_in_exchange_local": "2026-09-01T04:00:00-04:00",
+     "o_bar_session": "PREMARKET",
+     "o_bar_session_date": "2026-09-01",
+     "h": 767.84,
+     "l": 761.17,
+     "c": 761.96,
+     "v": 3471172,
+     "first_bar_t": "2026-09-01T08:00:00Z",
+     "last_bar_t": "2026-09-01T13:44:00Z"
+    },
+    "bars_before_cash_open": 318,
+    "cash_open_bar": {
+     "t": "2026-09-01T13:30:00Z",
+     "o": 762.03
+    }
+   },
+   "recomputed": {
+    "replay_prior_close": 769.35,
+    "replay_prior_close_return_bps": -96.58,
+    "replay_cash_open_return_bps": -58.46,
+    "replay_overnight_gap_bps": -38.34,
+    "cash_open_return_bps_if_rth_open_used": -1.44
+   }
+  },
+  "TDOC": {
+   "subject_class": "ordinary_subject",
+   "state_id": "567d494baf4fd251458576f11605b7d1",
+   "live": {
+    "prior_close": {
+     "v": 6.34,
+     "q": "VALID",
+     "as_of": "2026-08-31T04:00:00Z"
+    },
+    "prior_close_return_bps": {
+     "v": -23.66,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:44:59.993460487Z"
+    },
+    "cash_open_return_bps": {
+     "v": 120.0,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:44:59.993460487Z"
+    },
+    "overnight_gap_bps": {
+     "v": -141.96,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_open": {
+     "v": 6.25,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_high": {
+     "v": 6.335,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_low": {
+     "v": 6.25,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_volume": {
+     "v": 87577,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "session_vwap": {
+     "v": 6.276556,
+     "q": "VALID",
+     "as_of": "2026-09-01T04:00:00Z"
+    },
+    "mid": {
+     "v": 6.325,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:44:59.993460487Z"
+    },
+    "spread_bps": {
+     "v": 15.81,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:44:59.993460487Z"
+    },
+    "nbbo_size_imbalance": {
+     "v": -0.3333,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:44:59.993460487Z"
+    },
+    "touch_size": {
+     "v": 600,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:44:59.993460487Z"
+    },
+    "last_trade": {
+     "v": 6.325,
+     "q": "VALID",
+     "as_of": "2026-09-01T13:44:59.326208055Z"
+    },
+    "prior_close_session_date": "2026-08-31",
+    "daily_bar_stamp": "2026-09-01T04:00:00Z",
+    "daily_bar_session_date": "2026-09-01",
+    "quote_as_of": "2026-09-01T13:44:59.993460487Z",
+    "packet_scheduled_time": "2026-09-01T13:45:00+00:00",
+    "packet_complete_time": "2026-09-01T13:45:30.982203+00:00",
+    "quote_lag_after_scheduled_s": -0.007
+   },
+   "replay_current_code": {
+    "day_start_used_by_current_code": "2026-09-01T00:00:00+00:00",
+    "day_start_in_exchange_local": "2026-08-31T20:00:00-04:00",
+    "intraday_returned": 23,
+    "intraday_selected": 22,
+    "daily_returned": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z",
+     "2026-08-31T04:00:00Z"
+    ],
+    "daily_selected": [
+     "2026-08-25T04:00:00Z",
+     "2026-08-26T04:00:00Z",
+     "2026-08-27T04:00:00Z",
+     "2026-08-28T04:00:00Z"
+    ],
+    "daily_dropped_by_width_filter": [
+     "2026-08-31T04:00:00Z"
+    ],
+    "prevDailyBar": {
+     "t": "2026-08-28T04:00:00Z",
+     "c": 6.5,
+     "session_date": "2026-08-28"
+    },
+    "dailyBar": {
+     "o": 6.32,
+     "o_from_bar_t": "2026-09-01T11:09:00Z",
+     "o_bar_in_exchange_local": "2026-09-01T07:09:00-04:00",
+     "o_bar_session": "PREMARKET",
+     "o_bar_session_date": "2026-09-01",
+     "h": 6.335,
+     "l": 6.25,
+     "c": 6.325,
+     "v": 85763,
+     "first_bar_t": "2026-09-01T11:09:00Z",
+     "last_bar_t": "2026-09-01T13:44:00Z"
+    },
+    "bars_before_cash_open": 7,
+    "cash_open_bar": {
+     "t": "2026-09-01T13:30:00Z",
+     "o": 6.25
+    }
+   },
+   "recomputed": {
+    "replay_prior_close": 6.5,
+    "replay_prior_close_return_bps": -269.23,
+    "replay_cash_open_return_bps": 7.91,
+    "replay_overnight_gap_bps": -276.92,
+    "cash_open_return_bps_if_rth_open_used": 120.0
+   }
+  }
+ },
+ "vendor_reads": [
+  {
+   "label": "AAL intraday(current rule)",
+   "symbol": "AAL",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-09-01T00:00:00+00:00",
+    "end": "2026-09-01T13:45:00+00:00",
+    "timeframe": "1Min",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:23.698508+00:00",
+   "elapsed_s": 0.135,
+   "response_sha256": "8005ec91ee3fecb9b46f56325d930cbb74387918bd16a752d3602770daba42d4",
+   "bar_count": 176,
+   "next_page_token": null
+  },
+  {
+   "label": "AAL daily(current rule)",
+   "symbol": "AAL",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-08-24T13:45:00+00:00",
+    "end": "2026-09-01T00:00:00+00:00",
+    "timeframe": "1Day",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:23.737822+00:00",
+   "elapsed_s": 0.039,
+   "response_sha256": "afb7aed3aaf2277f138080ce7a8d0b31045652dc6a6a2cd1fa4ba0768b1988eb",
+   "bar_count": 5,
+   "next_page_token": null
+  },
+  {
+   "label": "AAOI intraday(current rule)",
+   "symbol": "AAOI",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-09-01T00:00:00+00:00",
+    "end": "2026-09-01T13:45:00+00:00",
+    "timeframe": "1Min",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:23.810775+00:00",
+   "elapsed_s": 0.065,
+   "response_sha256": "7e9275010b7a18c4968a00e96186f8cb4e5e61d4858d54fba148bd258fe5161c",
+   "bar_count": 194,
+   "next_page_token": null
+  },
+  {
+   "label": "AAOI daily(current rule)",
+   "symbol": "AAOI",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-08-24T13:45:00+00:00",
+    "end": "2026-09-01T00:00:00+00:00",
+    "timeframe": "1Day",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:23.854465+00:00",
+   "elapsed_s": 0.043,
+   "response_sha256": "c248d36e9c09faf62b3c421e0f51c1aa092330d1f543130ea1b170d3380efa3c",
+   "bar_count": 5,
+   "next_page_token": null
+  },
+  {
+   "label": "AAPL intraday(current rule)",
+   "symbol": "AAPL",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-09-01T00:00:00+00:00",
+    "end": "2026-09-01T13:45:00+00:00",
+    "timeframe": "1Min",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:23.912158+00:00",
+   "elapsed_s": 0.054,
+   "response_sha256": "a34cadf780a4a2c6629797a1871bdf3db27ba689575ba891cb33fd94ecec98d7",
+   "bar_count": 316,
+   "next_page_token": null
+  },
+  {
+   "label": "AAPL daily(current rule)",
+   "symbol": "AAPL",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-08-24T13:45:00+00:00",
+    "end": "2026-09-01T00:00:00+00:00",
+    "timeframe": "1Day",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:23.953405+00:00",
+   "elapsed_s": 0.041,
+   "response_sha256": "2b13d7df94821bd44f80f742eaea5abc1258d44d3f45516db34863e9e1491dac",
+   "bar_count": 5,
+   "next_page_token": null
+  },
+  {
+   "label": "NKLA intraday(current rule)",
+   "symbol": "NKLA",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-09-01T00:00:00+00:00",
+    "end": "2026-09-01T13:45:00+00:00",
+    "timeframe": "1Min",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:23.994993+00:00",
+   "elapsed_s": 0.037,
+   "response_sha256": "3ca31903c076b978e61928111e5a547a1f971f9838b75ea4f194ee57f2476d1d",
+   "bar_count": 0,
+   "next_page_token": null
+  },
+  {
+   "label": "NKLA daily(current rule)",
+   "symbol": "NKLA",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-08-24T13:45:00+00:00",
+    "end": "2026-09-01T00:00:00+00:00",
+    "timeframe": "1Day",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:24.035936+00:00",
+   "elapsed_s": 0.041,
+   "response_sha256": "3ca31903c076b978e61928111e5a547a1f971f9838b75ea4f194ee57f2476d1d",
+   "bar_count": 0,
+   "next_page_token": null
+  },
+  {
+   "label": "SPY intraday(current rule)",
+   "symbol": "SPY",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-09-01T00:00:00+00:00",
+    "end": "2026-09-01T13:45:00+00:00",
+    "timeframe": "1Min",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:24.094464+00:00",
+   "elapsed_s": 0.058,
+   "response_sha256": "0f098c5e01b908d27b846850d70393b19e880ef1f8e678a837fdb98b6dd817cd",
+   "bar_count": 334,
+   "next_page_token": null
+  },
+  {
+   "label": "SPY daily(current rule)",
+   "symbol": "SPY",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-08-24T13:45:00+00:00",
+    "end": "2026-09-01T00:00:00+00:00",
+    "timeframe": "1Day",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:24.137536+00:00",
+   "elapsed_s": 0.043,
+   "response_sha256": "05b763baaefde1a9231f6dc2bff07e67290b0dfb7958386341a8f2d0df45e343",
+   "bar_count": 5,
+   "next_page_token": null
+  },
+  {
+   "label": "TDOC intraday(current rule)",
+   "symbol": "TDOC",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-09-01T00:00:00+00:00",
+    "end": "2026-09-01T13:45:00+00:00",
+    "timeframe": "1Min",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:24.179677+00:00",
+   "elapsed_s": 0.037,
+   "response_sha256": "00523d332d23acf832f6c773d6e52da0922830509e4551d61de151dc1beee96a",
+   "bar_count": 23,
+   "next_page_token": null
+  },
+  {
+   "label": "TDOC daily(current rule)",
+   "symbol": "TDOC",
+   "endpoint": "/v2/stocks/{sym}/bars",
+   "params": {
+    "start": "2026-08-24T13:45:00+00:00",
+    "end": "2026-09-01T00:00:00+00:00",
+    "timeframe": "1Day",
+    "limit": 10000,
+    "feed": "sip",
+    "adjustment": "raw"
+   },
+   "retrieved_utc": "2026-09-06T14:34:24.216769+00:00",
+   "elapsed_s": 0.037,
+   "response_sha256": "b97a2934a5faf14842fd0ae77fdfefe2a6cd56179b730d45bfb411657927a796",
+   "bar_count": 5,
+   "next_page_token": null
+  }
+ ],
+ "revision_limitation": "Alpaca /v2/stocks/{sym}/bars returns history AS IT STANDS AT RETRIEVAL TIME. A bar corrected after 2026-09-01 is indistinguishable here from the value that was published then. These reads therefore prove WHICH RECORD THE SELECTOR PICKS; they cannot prove as-known-at availability."
+}

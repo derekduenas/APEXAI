@@ -1,0 +1,19 @@
+{
+ "kind": "pulse007_incidental_finding",
+ "id": "ORCHESTRATOR-OOM-LOOP-001",
+ "found_while": "attributing the OOM kill of this brick's own first regression attempt",
+ "status": "REPORTED, NOT ACTED ON -- this brick may not change services",
+ "utc": "2026-09-06T15:00:09.671116+00:00",
+ "finding": "apex-orchestrator.service is OOM-killed at its own 512M cgroup limit roughly every 31 seconds and restarted, continuously, for at least seven days. systemctl reports it 'active/running' between kills, so a liveness check that samples the unit state sees a healthy service.",
+ "constraint": "CONSTRAINT_MEMCG on /apex.slice/apex-market.slice/apex-orchestrator.service -- the service exceeds its OWN limit. This is not global host pressure and is not caused by research load.",
+ "not_caused_by_this_brick": {
+  "evidence": "the kill rate is ~114/hour for every hour of every day in the window, including hours before this brick began at 14:43Z",
+  "this_bricks_own_kill": "one kill inside wmresearch.slice (the first regression attempt), contained by design; slice oom_kill 4 -> 5"
+ },
+ "why_it_matters": "the orchestrator is the always-on calendar-aware trigger and WORK VERIFIER. A verifier that dies every 31 seconds cannot verify, and the standing law is that heartbeats must measure WORK, not presence. Any Phase-2 commissioning window scheduled through it is unreliable until this is understood.",
+ "kills_per_hour_last_24h": "17 2026-09-06T04\n    114 2026-09-06T05\n    114 2026-09-06T06\n    114 2026-09-06T07\n    114 2026-09-06T08\n    114 2026-09-06T09\n    114 2026-09-06T10\n    114 2026-09-06T11\n    114 2026-09-06T12\n    113 2026-09-06T13\n    113 2026-09-06T14",
+ "oom_kills_by_cgroup_last_7d": "1156 oom_memcg=/apex.slice/apex-market.slice/apex-orchestrator.service\n    185 oom_memcg=/apex.slice/apex-market.slice/apex-btc-paper.service\n      9 oom_memcg=/apex.slice/apex-market.slice/apex-equity-fabric.service\n      2 oom_memcg=/apex.slice/apex-research.slice/apex-btc-resolver.service\n      1 oom_memcg=/wmresearch.slice/run-u34764.service\n      1 oom_memcg=/wmresearch.slice/run-u34452.service\n      1 oom_memcg=/wmresearch.slice/run-u34410.service\n      1 oom_memcg=/wmresearch.slice/run-u33914.service",
+ "unit_state": "NRestarts=1156\nExecMainStartTimestamp=Sun 2026-09-06 15:00:08 UTC\nSlice=apex-market.slice\nMemoryMax=536870912\nActiveState=active\nSubState=running",
+ "wmresearch_slice_memory_events": "low 0 high 0 max 213 oom 5 oom_kill 5 oom_group_kill 0",
+ "recommended_disposition": "a separate bounded brick: measure the orchestrator's working set before proposing any limit, per RESOURCE_PROFILE_V1 -- a current MemoryPeak after a restart is not evidence of required capacity. Do not raise the cap on a guess."
+}

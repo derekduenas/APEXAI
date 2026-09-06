@@ -1,0 +1,269 @@
+{
+ "kind": "pulse007_quote_residual",
+ "version": "QUOTE_RESIDUAL_V1",
+ "question": "after the anchor repair, why do nbbo_size_imbalance and spread_bps still differ between live and replay?",
+ "categories": {
+  "a": "same semantics, different selected event/timestamp",
+  "b": "different source conventions",
+  "c": "missing or truncated tape",
+  "d": "implementation defect"
+ },
+ "subjects": {
+  "AAL": {
+   "live": {
+    "as_of": "2026-09-01T13:45:01.405159959Z",
+    "mid": 13.305,
+    "spread_bps": 7.516,
+    "nbbo_size_imbalance": 0.5833,
+    "touch_size": 2400
+   },
+   "tape": {
+    "quotes_in_window": 332,
+    "window": [
+     "2026-09-01T13:44:40+00:00",
+     "2026-09-01T13:45:04.405159+00:00"
+    ],
+    "sha256": "14574fb0205549d1c801fdb77b623c8a2d75d3d5d126106a76d4ed6526926b46"
+   },
+   "replay_picks_at_scheduled_time": {
+    "t": "2026-09-01T13:44:59.712389223Z",
+    "bp": 13.3,
+    "ap": 13.31,
+    "bs": 1900,
+    "as": 1200,
+    "mid": 13.305,
+    "spread_bps": 7.516,
+    "nbbo_size_imbalance": 0.2258,
+    "touch_size": 3100
+   },
+   "tape_quote_at_live_as_of": {
+    "t": "2026-09-01T13:45:01.405159959Z",
+    "bp": 13.3,
+    "ap": 13.31,
+    "bs": 1900,
+    "as": 500,
+    "mid": 13.305,
+    "spread_bps": 7.516,
+    "nbbo_size_imbalance": 0.5833,
+    "touch_size": 2400
+   },
+   "events_between_scheduled_and_live_as_of": 7,
+   "same_quote_event": false,
+   "live_matches_tape_at_its_own_as_of": {
+    "mid": true,
+    "spread_bps": true,
+    "nbbo_size_imbalance": true,
+    "touch_size": true
+   },
+   "category": "a",
+   "finding": "both feeders read the same SIP NBBO with the same convention; they select DIFFERENT events because the live packet's quote is the one current when PULSE captured (1.405s after the scheduled slot) while the replay reconstructs at the scheduled slot exactly. 7 NBBO updates fall between them."
+  },
+  "AAOI": {
+   "live": {
+    "as_of": "2026-09-01T13:45:01.275217469Z",
+    "mid": 101.875,
+    "spread_bps": 14.724,
+    "nbbo_size_imbalance": 0.6,
+    "touch_size": 1500
+   },
+   "tape": {
+    "quotes_in_window": 148,
+    "window": [
+     "2026-09-01T13:44:40+00:00",
+     "2026-09-01T13:45:04.275217+00:00"
+    ],
+    "sha256": "1e8205d7f4db1e05fb61d483cb148dae2e5627b474342388a04b2c35a6fff2da"
+   },
+   "replay_picks_at_scheduled_time": {
+    "t": "2026-09-01T13:44:59.490379744Z",
+    "bp": 101.9,
+    "ap": 102,
+    "bs": 100,
+    "as": 300,
+    "mid": 101.95,
+    "spread_bps": 9.809,
+    "nbbo_size_imbalance": -0.5,
+    "touch_size": 400
+   },
+   "tape_quote_at_live_as_of": {
+    "t": "2026-09-01T13:45:01.275217469Z",
+    "bp": 101.8,
+    "ap": 101.95,
+    "bs": 1200,
+    "as": 300,
+    "mid": 101.875,
+    "spread_bps": 14.724,
+    "nbbo_size_imbalance": 0.6,
+    "touch_size": 1500
+   },
+   "events_between_scheduled_and_live_as_of": 36,
+   "same_quote_event": false,
+   "live_matches_tape_at_its_own_as_of": {
+    "mid": true,
+    "spread_bps": true,
+    "nbbo_size_imbalance": true,
+    "touch_size": true
+   },
+   "category": "a",
+   "finding": "both feeders read the same SIP NBBO with the same convention; they select DIFFERENT events because the live packet's quote is the one current when PULSE captured (1.275s after the scheduled slot) while the replay reconstructs at the scheduled slot exactly. 36 NBBO updates fall between them."
+  },
+  "AAPL": {
+   "live": {
+    "as_of": "2026-09-01T13:45:01.298268834Z",
+    "mid": 319.15,
+    "spread_bps": 2.507,
+    "nbbo_size_imbalance": 0.0,
+    "touch_size": 160
+   },
+   "tape": {
+    "quotes_in_window": 1216,
+    "window": [
+     "2026-09-01T13:44:40+00:00",
+     "2026-09-01T13:45:04.298268+00:00"
+    ],
+    "sha256": "7587b335bd116e36b336bb363d01cdb8d1d06a184e7fa0e37913d66bfda12f38"
+   },
+   "replay_picks_at_scheduled_time": {
+    "t": "2026-09-01T13:44:59.954542411Z",
+    "bp": 319.11,
+    "ap": 319.19,
+    "bs": 40,
+    "as": 80,
+    "mid": 319.15,
+    "spread_bps": 2.507,
+    "nbbo_size_imbalance": -0.3333,
+    "touch_size": 120
+   },
+   "tape_quote_at_live_as_of": {
+    "t": "2026-09-01T13:45:01.298268834Z",
+    "bp": 319.11,
+    "ap": 319.19,
+    "bs": 80,
+    "as": 80,
+    "mid": 319.15,
+    "spread_bps": 2.507,
+    "nbbo_size_imbalance": 0.0,
+    "touch_size": 160
+   },
+   "events_between_scheduled_and_live_as_of": 30,
+   "same_quote_event": false,
+   "live_matches_tape_at_its_own_as_of": {
+    "mid": true,
+    "spread_bps": true,
+    "nbbo_size_imbalance": true,
+    "touch_size": true
+   },
+   "category": "a",
+   "finding": "both feeders read the same SIP NBBO with the same convention; they select DIFFERENT events because the live packet's quote is the one current when PULSE captured (1.298s after the scheduled slot) while the replay reconstructs at the scheduled slot exactly. 30 NBBO updates fall between them."
+  },
+  "NKLA": {
+   "live": {
+    "as_of": null,
+    "mid": null,
+    "spread_bps": null,
+    "nbbo_size_imbalance": null,
+    "touch_size": null
+   },
+   "category": "c",
+   "finding": "the live packet carries no two-sided NBBO at all; nothing to compare. Coverage question, not a value question."
+  },
+  "SPY": {
+   "live": {
+    "as_of": "2026-09-01T13:45:01.669149633Z",
+    "mid": 761.92,
+    "spread_bps": 0.525,
+    "nbbo_size_imbalance": -0.5294,
+    "touch_size": 680
+   },
+   "tape": {
+    "quotes_in_window": 2770,
+    "window": [
+     "2026-09-01T13:44:40+00:00",
+     "2026-09-01T13:45:04.669149+00:00"
+    ],
+    "sha256": "772d5a4949af7d4cb534ea5c8d5ce72788a997e3504c5005e8633e0ac2b63ace"
+   },
+   "replay_picks_at_scheduled_time": {
+    "t": "2026-09-01T13:44:59.991363044Z",
+    "bp": 761.93,
+    "ap": 761.96,
+    "bs": 80,
+    "as": 160,
+    "mid": 761.945,
+    "spread_bps": 0.394,
+    "nbbo_size_imbalance": -0.3333,
+    "touch_size": 240
+   },
+   "tape_quote_at_live_as_of": {
+    "t": "2026-09-01T13:45:01.669149633Z",
+    "bp": 761.9,
+    "ap": 761.94,
+    "bs": 160,
+    "as": 520,
+    "mid": 761.92,
+    "spread_bps": 0.525,
+    "nbbo_size_imbalance": -0.5294,
+    "touch_size": 680
+   },
+   "events_between_scheduled_and_live_as_of": 473,
+   "same_quote_event": false,
+   "live_matches_tape_at_its_own_as_of": {
+    "mid": true,
+    "spread_bps": true,
+    "nbbo_size_imbalance": true,
+    "touch_size": true
+   },
+   "category": "a",
+   "finding": "both feeders read the same SIP NBBO with the same convention; they select DIFFERENT events because the live packet's quote is the one current when PULSE captured (1.669s after the scheduled slot) while the replay reconstructs at the scheduled slot exactly. 473 NBBO updates fall between them."
+  },
+  "TDOC": {
+   "live": {
+    "as_of": "2026-09-01T13:44:59.993460487Z",
+    "mid": 6.325,
+    "spread_bps": 15.81,
+    "nbbo_size_imbalance": -0.3333,
+    "touch_size": 600
+   },
+   "tape": {
+    "quotes_in_window": 14,
+    "window": [
+     "2026-09-01T13:44:40+00:00",
+     "2026-09-01T13:45:02.993460+00:00"
+    ],
+    "sha256": "8f684fe66ace940d5afb8d86d8572c1d16e3e05de4d7d3c17daca2b618e47ed4"
+   },
+   "replay_picks_at_scheduled_time": {
+    "t": "2026-09-01T13:44:59.993460487Z",
+    "bp": 6.32,
+    "ap": 6.33,
+    "bs": 200,
+    "as": 400,
+    "mid": 6.325,
+    "spread_bps": 15.81,
+    "nbbo_size_imbalance": -0.3333,
+    "touch_size": 600
+   },
+   "tape_quote_at_live_as_of": {
+    "t": "2026-09-01T13:44:59.993460487Z",
+    "bp": 6.32,
+    "ap": 6.33,
+    "bs": 200,
+    "as": 400,
+    "mid": 6.325,
+    "spread_bps": 15.81,
+    "nbbo_size_imbalance": -0.3333,
+    "touch_size": 600
+   },
+   "events_between_scheduled_and_live_as_of": 0,
+   "same_quote_event": true,
+   "live_matches_tape_at_its_own_as_of": {
+    "mid": true,
+    "spread_bps": true,
+    "nbbo_size_imbalance": true,
+    "touch_size": true
+   },
+   "category": "a",
+   "finding": "same event, same values; no residual from the quote path"
+  }
+ }
+}
