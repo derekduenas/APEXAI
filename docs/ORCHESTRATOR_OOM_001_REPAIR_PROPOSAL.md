@@ -111,3 +111,74 @@ records unchanged.
 R1 touches a primitive shared by every ledger writer on the host, so it deserves
 its own review and its own regression, separately from R2. R1 first stops the
 loop; R2 prevents it recurring.
+
+---
+
+# Corrections, added 2026-09-06 after review of R1
+
+Additive. Nothing above is deleted; where a statement above is wrong, the
+correction is here and the original stays visible.
+
+## 1. R2 alone cannot recover the running service
+
+The proposal above says "either fix alone stops the loop." That is wrong for
+R2 and right only for R1.
+
+R2 bounds FUTURE deferral entries. It cannot help the service that is failing
+now, because the oversized record is already on disk: a 262,275-byte final
+record sits at the end of a 438 MB ledger, and every start reads the whole
+file before R2's code is ever reached. Bounding what a future tick would write
+does not shrink a record that was written yesterday.
+
+Only R1 recovers the current service, and it does so without touching data,
+because the existing final record fits inside the widened window. R2 remains
+necessary to stop the condition recurring, but it is a preventative, not a
+recovery.
+
+## 2. The read ceiling is not a memory budget
+
+The proposal above says the peak after repair is "bounded by the 8 MiB
+ceiling." That conflates bytes read with process memory. Decoding those bytes
+to text and parsing candidate lines as JSON allocate on top of the read, so the
+process figure is several times the window.
+
+Measured, rather than estimated, inside the same 512 MiB cap:
+
+| Case | Bytes read | Process peak |
+|---|---|---|
+| Production shape, 438.8 MB fixture | one widening to 512 KiB | 16.7 MiB maxrss, 7.6 MiB cgroup |
+| Worst case, widening to the ceiling | 8 MiB | 39.2 MiB maxrss, 30.0 MiB cgroup |
+| Refusal beyond the ceiling | 8 MiB | 40.4 MiB maxrss |
+
+Keep the two apart. What the repair GUARANTEES is the read: no single read
+exceeds MAX_TAIL_SEARCH_BYTES, the total across the widening is under twice
+that, and neither figure depends on ledger size. What the table reports is
+MEASURED process memory on three specific fixtures, of which 40.4 MiB is the
+highest observed value, not a proven universal bound. Process memory also
+depends on record sizes, line counts and interpreter behaviour, none of which
+these three fixtures exhaust.
+
+On the evidence available the measured peaks sit near 8 percent of the
+existing cap, which is why no cap change is proposed. That is a judgement from
+measurement, not a guarantee, and a ledger with a very different record shape
+should be measured rather than assumed.
+
+## 3. Production recovery is unverified
+
+Everything measured here was measured on disposable fixtures on a development
+branch. The service has not been repaired, restarted, or deployed, and the
+production loop is still running.
+
+R1 is expected to end it, because the production ledger's final record is
+262,275 bytes and the widened window contains it. Expected is not verified.
+Verification requires a separate authorized commissioning step that deploys the
+release and then observes the restart counter stop advancing, the heartbeat's
+last-work timestamp advance every 60 seconds, and the completed-work count
+resume climbing. Until that has been done and its evidence returned, the
+correct status of production recovery is UNVERIFIED.
+
+## 4. Sequencing, restated
+
+1. R1, this brick: implemented and evidenced, not deployed.
+2. Deployment and production verification: a separate authorized step.
+3. R2: still unimplemented, and still required so the condition cannot recur.
