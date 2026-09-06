@@ -1,0 +1,24 @@
+{
+ "kind": "pulse007_bounded_regression",
+ "version": "PULSE007_SHARDED_REGRESSION_V1",
+ "law": "one fresh contained process per test module; the slice ceiling is not raised",
+ "commit": "21ab39bc1",
+ "tree": "41918c1e46ae21b5bc52c456e6907d562981cf7a",
+ "shards": 212,
+ "totals": {
+  "PASS": 3790,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 18,
+  "XFAIL": 0,
+  "XPASS": 0
+ },
+ "slice_oom_kill_before": 10,
+ "slice_oom_kill_after": 11,
+ "problem_shards": [
+  "tests/test_null_rig.py(rc=1)"
+ ],
+ "acceptance_surface_on_this_branch": "NONE (no apex/world_model, no courts/, no seed machinery)",
+ "utc": "2026-09-06T19:13:41.028448+00:00",
+ "verdict": "FAIL"
+}
