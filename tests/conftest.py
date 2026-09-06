@@ -43,8 +43,16 @@ def config():
     return load_config("experiment", "costs", "synthetic")
 
 
-@lru_cache(maxsize=64)
-def _run(seed: int, alpha: float):
+def _compute(seed: int, alpha: float):
+    """The pipeline run itself -- UNCHANGED body (was the cached `_run`).
+
+    TEST-NULL-RIG-MEMORY-001: `_run` used to be lru_cache(maxsize=64) over
+    this function, so every sweep seed's whole PipelineOutput (+90 MiB each,
+    measured) stayed alive for the module's lifetime -- 40 seeds could not fit
+    the 1400M bounded research contract. The sweep only ever reads five
+    scalars per seed, so it now goes through `_sweep_row` (scalars cached,
+    outputs discarded) and the heavy cache is kept small for the few
+    single-panel consumers. Nothing about the computation changed."""
     config = load_config("experiment", "costs", "synthetic")
     overrides = {
         "panel.n_securities": config.get("null_rig.n_securities"),
@@ -56,6 +64,25 @@ def _run(seed: int, alpha: float):
     output = build_panel_pipeline(source.load(), config)
     period = config.period("in_sample")
     return output, evaluate(output, config, period["start"], config.get("null_rig.end"))
+
+
+# Heavy cache: whole (output, evaluation) pairs, for consumers that need the
+# panel itself (null_run, run_factory, null_ic_series). Bounded at 4 entries
+# (was 64): the distinct keys those consumers use number six, and the two that
+# fall out of the LRU are never re-requested.
+_run = lru_cache(maxsize=4)(_compute)
+HEAVY_CACHE_MAXSIZE = 4
+
+_SWEEP_FIELDS = ("mean_ic", "t_stat", "n_periods", "spread_annual", "spread_t")
+
+
+@lru_cache(maxsize=64)
+def _sweep_row(seed: int, alpha: float) -> tuple:
+    """Scalars only. The PipelineOutput built here is dropped on return."""
+    _, evaluation = _compute(seed, alpha)
+    return (float(evaluation.ic_daily.mean), float(evaluation.ic_daily.t_stat),
+            int(evaluation.ic_daily.n_periods), float(evaluation.deciles.spread_annualised_gross),
+            float(evaluation.deciles.spread_t_stat))
 
 
 @pytest.fixture(scope="session")
@@ -74,17 +101,8 @@ def null_sweep(config, n_seeds: int) -> pd.DataFrame:
     base = int(config.get("null_rig.base_seed"))
     rows = []
     for i in range(n_seeds):
-        _, evaluation = _run(base + i, 0.0)
-        rows.append(
-            {
-                "seed": base + i,
-                "mean_ic": evaluation.ic_daily.mean,
-                "t_stat": evaluation.ic_daily.t_stat,
-                "n_periods": evaluation.ic_daily.n_periods,
-                "spread_annual": evaluation.deciles.spread_annualised_gross,
-                "spread_t": evaluation.deciles.spread_t_stat,
-            }
-        )
+        row = _sweep_row(base + i, 0.0)                 # scalars; output not retained
+        rows.append({"seed": base + i, **dict(zip(_SWEEP_FIELDS, row))})
     return pd.DataFrame(rows)
 
 
