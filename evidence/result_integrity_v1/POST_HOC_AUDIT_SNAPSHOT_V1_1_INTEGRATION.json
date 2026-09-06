@@ -1,0 +1,871 @@
+{
+ "audit_version": "RESULT_AUDIT_REGISTRY_V1.1",
+ "audit_history": {
+  "V1": "14 required checks; commitment block computed V1 before V1.1 unconditionally (integration defect, Astra 2026-09-06)",
+  "V1.1": "explicit commitment version contract selected from the caller's request before payload inspection"
+ },
+ "validator": "RESULT_VALIDATOR_V1.1",
+ "court_dir": "/opt/apex-research/world-model-shadow/evidence/final_court_v1",
+ "root_dir": "/opt/apex-research/world-model-shadow",
+ "commitment_contract": {
+  "required": [
+   "V1",
+   "V1.1"
+  ],
+  "non_required": [],
+  "selection": "explicit",
+  "supplied_roots": {
+   "V1": true,
+   "V1.1": true
+  },
+  "supplied_but_not_required": [],
+  "law": "only required versions are computed and judged; no fallback between versions; a required version without a root is BLOCKED"
+ },
+ "required_checks": [
+  {
+   "id": "DEFINITION_REDERIVES",
+   "requirement": "court_definition.json re-derives through define(): court_id and court_hash match the sealed file"
+  },
+  {
+   "id": "SURFACE_UNCHANGED",
+   "requirement": "scientific_surface_hash(root) equals the definition's sealed scientific_surface_hash"
+  },
+  {
+   "id": "RUNNER_UNCHANGED",
+   "requirement": "sha256(courts/final_court.py) equals the opening marker's runner_sha256 and the definition's runner.source_sha256"
+  },
+  {
+   "id": "OPENING_MARKER_IDENTITY",
+   "requirement": "opening marker names this court (id, hash, version, code commit) and is a one-way open record"
+  },
+  {
+   "id": "SEED_MANIFEST_LINKAGE",
+   "requirement": "seed_manifest.json recomputes from its rows and equals the definition's and the marker's manifest hash"
+  },
+  {
+   "id": "REGRESSION_LINKAGE",
+   "requirement": "pre-court regression artifact: sha256 equals marker and aggregate, verdict PASS, repo_commit == opening commit, surface unchanged"
+  },
+  {
+   "id": "INVENTORY",
+   "requirement": "exactly one well-named cell file per expected (control, index); no missing, unexpected, misnamed or duplicate cells"
+  },
+  {
+   "id": "CELL_VALIDATION",
+   "requirement": "every cell passes the frozen reader AND RESULT_VALIDATOR (types, domains, provenance, decision consistency)"
+  },
+  {
+   "id": "MANIFEST_AGREEMENT",
+   "requirement": "every cell's primary and companion seed equals its sealed manifest row"
+  },
+  {
+   "id": "AGGREGATE_AGREEMENT",
+   "requirement": "aggregate artifact: identity, counts, embedded cells semantically equal to files, stored judgement equals recount"
+  },
+  {
+   "id": "RECOUNT_MATCHES_STORED",
+   "requirement": "detections/directions recounted from numeric fields with the sealed rule equal the stored strings and counts; verdicts recomputed from sealed thresholds equal stored verdicts and status"
+  },
+  {
+   "id": "FROZEN_JUDGE_AGREES",
+   "requirement": "courts.final_court.judge() over the cell files equals the stored judgement"
+  },
+  {
+   "id": "COMMITMENT_AGREEMENT",
+   "requirement": "for EVERY REQUIRED commitment version (explicit contract, selected before payload inspection): the root over the cell files equals the root over the aggregate's embedded cells; a required version that cannot serialise is FAIL; non-required versions do not participate"
+  },
+  {
+   "id": "COMMITMENT_MATCHES_TRUSTED_ROOT",
+   "requirement": "for EVERY REQUIRED commitment version: the root over the cell files verifies against the trusted root the caller supplied independently of the payload; no root for a required version is BLOCKED; no fallback between versions"
+  }
+ ],
+ "historical_statistical_recomputation": "NOT_PERFORMED (no world generated, no forecast, no bootstrap re-run)",
+ "definition": {
+  "sealed_surface": "f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d"
+ },
+ "commitment": {
+  "V1": {
+   "contract": "RESULT_COMMITMENT_V1",
+   "required": true,
+   "executed": true,
+   "root_files": "0f94101ee20bb311db1e4cb5b6816fe3b19af67ddfa1941c74a9727fea624578",
+   "root_aggregate": "0f94101ee20bb311db1e4cb5b6816fe3b19af67ddfa1941c74a9727fea624578",
+   "agreement": "PASS",
+   "trusted_root": "0f94101ee20bb311db1e4cb5b6816fe3b19af67ddfa1941c74a9727fea624578",
+   "verification": "PASS"
+  },
+  "V1.1": {
+   "contract": "RESULT_COMMITMENT_V1.1",
+   "required": true,
+   "executed": true,
+   "root_files": "212b2f1cceb57db17193152102855882356a5a033ebd7664c411bc92d5764840",
+   "root_aggregate": "212b2f1cceb57db17193152102855882356a5a033ebd7664c411bc92d5764840",
+   "agreement": "PASS",
+   "trusted_root": "212b2f1cceb57db17193152102855882356a5a033ebd7664c411bc92d5764840",
+   "verification": "PASS"
+  }
+ },
+ "checks": {
+  "DEFINITION_REDERIVES": {
+   "status": "PASS",
+   "evidence": {
+    "court_id": "COURT-FINAL-f6ba5c856014",
+    "court_hash_recomputed": "2b6bda8e007b6a3867994eb7194f5f2b92347aaf2efaf71808c8b19ba5f17438",
+    "court_hash_stored": "2b6bda8e007b6a3867994eb7194f5f2b92347aaf2efaf71808c8b19ba5f17438",
+    "court_id_stored": "COURT-FINAL-f6ba5c856014",
+    "sealed_status": "SEALED_BEFORE_OUTCOMES",
+    "namespace": "WM0E_R7_1_FINAL_ACCEPTANCE_V1",
+    "purpose": "ACCEPTANCE"
+   }
+  },
+  "SURFACE_UNCHANGED": {
+   "status": "PASS",
+   "evidence": {
+    "sealed": "f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d",
+    "now": "f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d"
+   }
+  },
+  "RUNNER_UNCHANGED": {
+   "status": "PASS",
+   "evidence": {
+    "runner_sha256_now": "8ef67c48b70d4d9204a50918ab7654fb790657592337238e9f02dc7d4955119b",
+    "marker_runner_sha256": "8ef67c48b70d4d9204a50918ab7654fb790657592337238e9f02dc7d4955119b",
+    "definition_runner_sha256": "8ef67c48b70d4d9204a50918ab7654fb790657592337238e9f02dc7d4955119b",
+    "marker_runner": "FINAL_COURT_RUNNER_V0.1",
+    "runner_version_now": "FINAL_COURT_RUNNER_V0.1"
+   }
+  },
+  "OPENING_MARKER_IDENTITY": {
+   "status": "PASS",
+   "evidence": {
+    "marker_court_id": "COURT-FINAL-f6ba5c856014",
+    "marker_court_hash": "2b6bda8e007b6a3867994eb7194f5f2b92347aaf2efaf71808c8b19ba5f17438",
+    "marker_code_commit": "f033bd0a2",
+    "marker_version": "FINAL_SYNTHETIC_ACCEPTANCE_COURT_V1",
+    "opened_flag": {
+     "R7_1_COURT_OPENED": true
+    },
+    "utc": "2026-09-05T19:54:28Z",
+    "opening_commit": "4148bce91"
+   }
+  },
+  "INVENTORY": {
+   "status": "PASS",
+   "evidence": {
+    "expected": 300,
+    "found_files": 300,
+    "misnamed": [],
+    "missing": [],
+    "unexpected": [],
+    "cells_dir_present": true,
+    "unique_cell_ids": 300,
+    "duplicate_cell_ids": {},
+    "duplicate_control_index": {}
+   }
+  },
+  "CELL_VALIDATION": {
+   "status": "PASS",
+   "evidence": {
+    "cells_read": 300,
+    "failing_cells": 0,
+    "failures": {}
+   }
+  },
+  "MANIFEST_AGREEMENT": {
+   "status": "PASS",
+   "evidence": {
+    "rows": 300,
+    "failures": []
+   }
+  },
+  "AGGREGATE_AGREEMENT": {
+   "status": "PASS",
+   "evidence": {
+    "stored_status": "PASS",
+    "failures": []
+   }
+  },
+  "SEED_MANIFEST_LINKAGE": {
+   "status": "PASS",
+   "evidence": {
+    "file_hash": "ef3127aad7d1d04680211fdf49cfa0658f0cbb3702549bd0bbe7f4f02ff384ab",
+    "recomputed": "ef3127aad7d1d04680211fdf49cfa0658f0cbb3702549bd0bbe7f4f02ff384ab",
+    "definition": "ef3127aad7d1d04680211fdf49cfa0658f0cbb3702549bd0bbe7f4f02ff384ab",
+    "marker": "ef3127aad7d1d04680211fdf49cfa0658f0cbb3702549bd0bbe7f4f02ff384ab",
+    "namespace": "WM0E_R7_1_FINAL_ACCEPTANCE_V1"
+   }
+  },
+  "REGRESSION_LINKAGE": {
+   "status": "PASS",
+   "evidence": {
+    "artifact_sha256": "e55dbc34b70cdc593c2761591522601d9407ffb3c6270a60c2613cfa62cc9b8e",
+    "marker_sha256": "e55dbc34b70cdc593c2761591522601d9407ffb3c6270a60c2613cfa62cc9b8e",
+    "aggregate_sha256": "e55dbc34b70cdc593c2761591522601d9407ffb3c6270a60c2613cfa62cc9b8e",
+    "verdict": "PASS",
+    "repo_commit": "4148bce91",
+    "opening_commit": "4148bce91",
+    "dirty": false,
+    "surface_after": "f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d",
+    "totals": {
+     "PASS": 3993,
+     "FAIL": 0,
+     "ERROR": 0,
+     "SKIP": 19,
+     "XFAIL": 0,
+     "XPASS": 0,
+     "UNREPORTED": 0
+    }
+   }
+  },
+  "RECOUNT_MATCHES_STORED": {
+   "status": "PASS",
+   "evidence": {
+    "counts_match_stored": true,
+    "verdicts_match_stored": true,
+    "status_matches": true,
+    "all_cells_valid": true,
+    "stored_status": "PASS",
+    "recount": {
+     "N0": {
+      "cells": 50,
+      "detections": 1,
+      "direction": 8,
+      "detected_indices": [
+       22
+      ],
+      "verdict": "PASS"
+     },
+     "N1": {
+      "cells": 50,
+      "detections": 1,
+      "direction": 8,
+      "detected_indices": [
+       0
+      ],
+      "verdict": "PASS"
+     },
+     "N2": {
+      "cells": 50,
+      "detections": 0,
+      "direction": 4,
+      "detected_indices": [],
+      "verdict": "PASS"
+     },
+     "N3": {
+      "cells": 50,
+      "detections": 0,
+      "direction": 3,
+      "detected_indices": [],
+      "verdict": "PASS"
+     },
+     "N4": {
+      "cells": 50,
+      "detections": 0,
+      "direction": 0,
+      "detected_indices": [],
+      "verdict": "PASS"
+     },
+     "P0": {
+      "cells": 50,
+      "detections": 45,
+      "direction": 46,
+      "detected_indices": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15,
+       16,
+       17,
+       19,
+       20,
+       21,
+       22,
+       23,
+       24,
+       25,
+       26,
+       27,
+       28,
+       30,
+       31,
+       32,
+       33,
+       34,
+       35,
+       36,
+       37,
+       38,
+       39,
+       41,
+       42,
+       43,
+       44,
+       46,
+       47,
+       48,
+       49
+      ],
+      "verdict": "PASS"
+     }
+    },
+    "recount_all_pass": true
+   }
+  },
+  "FROZEN_JUDGE_AGREES": {
+   "status": "PASS",
+   "evidence": {
+    "equal": true,
+    "frozen_all_pass": true,
+    "stored_all_pass": true
+   }
+  },
+  "COMMITMENT_AGREEMENT": {
+   "status": "PASS",
+   "evidence": {
+    "required_versions": [
+     "V1",
+     "V1.1"
+    ],
+    "executed_versions": [
+     "V1",
+     "V1.1"
+    ],
+    "non_required_versions": [],
+    "selection": "explicit",
+    "supplied_but_not_required": [],
+    "per_version": {
+     "V1": {
+      "contract": "RESULT_COMMITMENT_V1",
+      "required": true,
+      "executed": true,
+      "root_files": "0f94101ee20bb311db1e4cb5b6816fe3b19af67ddfa1941c74a9727fea624578",
+      "root_aggregate": "0f94101ee20bb311db1e4cb5b6816fe3b19af67ddfa1941c74a9727fea624578",
+      "agreement": "PASS",
+      "trusted_root": "0f94101ee20bb311db1e4cb5b6816fe3b19af67ddfa1941c74a9727fea624578",
+      "verification": "PASS"
+     },
+     "V1.1": {
+      "contract": "RESULT_COMMITMENT_V1.1",
+      "required": true,
+      "executed": true,
+      "root_files": "212b2f1cceb57db17193152102855882356a5a033ebd7664c411bc92d5764840",
+      "root_aggregate": "212b2f1cceb57db17193152102855882356a5a033ebd7664c411bc92d5764840",
+      "agreement": "PASS",
+      "trusted_root": "212b2f1cceb57db17193152102855882356a5a033ebd7664c411bc92d5764840",
+      "verification": "PASS"
+     }
+    }
+   }
+  },
+  "COMMITMENT_MATCHES_TRUSTED_ROOT": {
+   "status": "PASS",
+   "evidence": {
+    "required_versions": [
+     "V1",
+     "V1.1"
+    ],
+    "executed_versions": [
+     "V1",
+     "V1.1"
+    ],
+    "non_required_versions": [],
+    "selection": "explicit",
+    "supplied_but_not_required": [],
+    "per_version": {
+     "V1": {
+      "contract": "RESULT_COMMITMENT_V1",
+      "required": true,
+      "executed": true,
+      "root_files": "0f94101ee20bb311db1e4cb5b6816fe3b19af67ddfa1941c74a9727fea624578",
+      "root_aggregate": "0f94101ee20bb311db1e4cb5b6816fe3b19af67ddfa1941c74a9727fea624578",
+      "agreement": "PASS",
+      "trusted_root": "0f94101ee20bb311db1e4cb5b6816fe3b19af67ddfa1941c74a9727fea624578",
+      "verification": "PASS"
+     },
+     "V1.1": {
+      "contract": "RESULT_COMMITMENT_V1.1",
+      "required": true,
+      "executed": true,
+      "root_files": "212b2f1cceb57db17193152102855882356a5a033ebd7664c411bc92d5764840",
+      "root_aggregate": "212b2f1cceb57db17193152102855882356a5a033ebd7664c411bc92d5764840",
+      "agreement": "PASS",
+      "trusted_root": "212b2f1cceb57db17193152102855882356a5a033ebd7664c411bc92d5764840",
+      "verification": "PASS"
+     }
+    }
+   }
+  }
+ },
+ "overall": "PASS",
+ "exit_code": 0,
+ "report": {
+  "validator": "RESULT_VALIDATOR_V1.1",
+  "court_id": "COURT-FINAL-f6ba5c856014",
+  "court_hash": "2b6bda8e007b6a3867994eb7194f5f2b92347aaf2efaf71808c8b19ba5f17438",
+  "namespace": "WM0E_R7_1_FINAL_ACCEPTANCE_V1",
+  "purpose": "ACCEPTANCE",
+  "failures": [],
+  "cell_failures": {},
+  "file_sha256": {
+   "N0_00.json": "a97bd0f5ffcce9c7afebdb21f5bd9a37d407e076feabece073f6a1ef841b42eb",
+   "N0_01.json": "f4ab28f5b05a367d016bf1d2786068a6d168bdabe1a922178bf8dd29e3d28c6d",
+   "N0_02.json": "c79caa19e0155a445bff4351d8562f5b2a3222ce319337036d645d6d2ecfab06",
+   "N0_03.json": "a68e23a0beb069b51e2fc147ff736809b7c2d572d73c5d432036abe6a077dd50",
+   "N0_04.json": "5c786cd17791d4c9019c2128dc9f2fc55595576041fff08e03ca4a8128af2176",
+   "N0_05.json": "e0fcd28e19217027c138324760ee9bdc733bca8f6d6f9adafc54d8d1c4397aef",
+   "N0_06.json": "997e7ba8b672e122f118a8cfd5cce3a3f142ba688bbe11a91db6429748facb96",
+   "N0_07.json": "2b269ef0084f4e138751e25f4404c34a3c8d864c472c1852c6d6a6672aa2206e",
+   "N0_08.json": "312a3cc48bb97449806d508a6d52cf122d6e789682a75787b3a84d0fbb2732e6",
+   "N0_09.json": "52d9f9c6ee70901f562cd5e0d1f91e5b4561c415e64ad7ab217cb28e0d752088",
+   "N0_10.json": "6e7656739a120e867f2c66a74ca273cce54c11150b46b5a1225acb10c2ddfc95",
+   "N0_11.json": "89ab6d10e7266d592a40ac762f45f19fefc6f32580458eff5a6992c04c21c3a9",
+   "N0_12.json": "30fe395b54e322228f0c7ffca472b1dc309e0a11f1fe39865086e77e87462877",
+   "N0_13.json": "b6a5af3e6f973768632521e438e6899c0c1aa3105ee867d07a849bc75a7516e9",
+   "N0_14.json": "5d31a43ee2ea07ddd1a0fb9475e9047b3513bf0e6f4dc7056aa19cc1ba9908e4",
+   "N0_15.json": "7dced8c8ce5016c1d35012c718082fcc143dc3e643b90cfb06778a265f6061f0",
+   "N0_16.json": "21efae0354303f920bed8a876146dd31061cf25859bef1a97bbb4194a5a3c438",
+   "N0_17.json": "843baf529f3328adcaeb9ef02c8d455cbe3ab18301f6474283da29c0fdb52eac",
+   "N0_18.json": "850ec7e80aac3dc6095b70740d35dbca45fe70b9073d3fbeefcd3966e9ead377",
+   "N0_19.json": "bd23ff98fabbd1dbe09108542d8fb2a4a6bf643c5d3f71092de5eda6d5148f43",
+   "N0_20.json": "5f389dcfff52703cdf68b5a9e50e69af387eb78250acccf0fddea650fff10474",
+   "N0_21.json": "00501ef3accf00758e73eba46d9bd5100d3f8bbc7e0e97c8b1423acae8b9ec95",
+   "N0_22.json": "9dbe8ebcd4f41a97d486c2751397f371cefcdc5f108c94a3c62b063815de9c46",
+   "N0_23.json": "1f5cd37638157e459235538ae1794057a55b4857a6dea4103f5fd028a03fa43e",
+   "N0_24.json": "499987f4992f3bf06faeb6fd0e50aeb5ddf413a7f0fe2d0a852fa69f9e88b30f",
+   "N0_25.json": "c6af5ecec61c6e114cb5f551e0166b356508ae49e5b274eba23a73355b3fcb4b",
+   "N0_26.json": "1064739348c4822614f0d6a65642416d384d2a6fe9daf48a0ea993fcaeda99cc",
+   "N0_27.json": "1c88094aa54cdb1c37a9125090a771ed6d2da3fd2ba878456d78027333b1a02b",
+   "N0_28.json": "24b0c84dd31dcb31134e97054e8dcf7847c2d282bd9d45f29b1fb35a36cdc8cf",
+   "N0_29.json": "ee844eb70485bfbc0372432d9a8f409f5e47d015579bc8caa4a7d65c34d31bd3",
+   "N0_30.json": "77b5a37722792d815d956f275ce1a825deba23089542df422ff9f3ef564e3d5f",
+   "N0_31.json": "20fffa5c7b4349c9b1e43d108aaaa2139a20a0025030abccf22d4f3b557aea34",
+   "N0_32.json": "0c160a24db56b53ca7ea6c8d1c0d754dd4e93b8c0909320e805e30b9a2314098",
+   "N0_33.json": "8899f530c533491ebdf009625149ce90e10d19273d64e65e732c752aa7ba65ef",
+   "N0_34.json": "df2428397bc992f45bdac86f468cba21f45c6bbaab8861cec15814be9a0fefd5",
+   "N0_35.json": "67fa8ca961379373b114a6d84d8a37dce6ae8dea6e2c038af300ab61a4f868ee",
+   "N0_36.json": "8e42d4aadbe74b6953fa280482e425d13c556df7017e973cedfefb095b355f77",
+   "N0_37.json": "6219d3d8034736ddaa44c11ba67ce13ede60b7b95dd88eb55b178dfecfdb9308",
+   "N0_38.json": "abd20d787a8c1f289ea3001454f75d76d215ffbf50c51ad586d556a3094c4ea0",
+   "N0_39.json": "3d4b56a5a53d316018639d3297ac350d28c8ed098a7ac3a8ad0c17b241d9203a",
+   "N0_40.json": "a849b8a2a874e1ec55e02dbf64395af2417384b790e8dbcc70fdd5ced3d3be56",
+   "N0_41.json": "1119b90a3ce719748573e4172c055f50a40b5017fd1b97324d9842d0d55ae702",
+   "N0_42.json": "ebbbe554afa434ce7f2963c2c739bf1a60703ba7df2dcf8811d09033ee572988",
+   "N0_43.json": "ba355bf6dddbdd3d039e76a6a91c14e99ad3dd0e2852788692db0b72ef1011b4",
+   "N0_44.json": "9134ff744670171b98cd6041615230e63f3ecf538c8e42dd5ccd8264c0321c13",
+   "N0_45.json": "8d4a28bd88351821f91e296cfe63af4af1f466fc274c147f0607453ab7df142f",
+   "N0_46.json": "fac9c88bc477a8c46c441274940f5d295118a3b0e4685fda4a53942bc0d5fd83",
+   "N0_47.json": "0027f42ef306523bf2bac1721accf834ed92bc78d3d475254f2cb47a995a3482",
+   "N0_48.json": "90f9109bb746022fcf8420a25bc6a4b1f019c9c6698a31601e5d4f36241b6164",
+   "N0_49.json": "0392877cbc9bfe05e5dc57a3f717e23bec4d0c06c9d076415788425cc5042a9e",
+   "N1_00.json": "f3d086fe5370388ba8dcbfd8a0d7cddea5b0f3b8c190f4ae73bd5379f7d0f5ac",
+   "N1_01.json": "c19472636c265937ed4b8098633a3786e86ffb9ae15a527d8b0d64c9fa8308f1",
+   "N1_02.json": "577a6f2fff33d580b88438a946a7d547ff61918addf5e5b57fafffb7bf841743",
+   "N1_03.json": "0205efdf58aa09d9c4a619bffa8269ff1377b9fb7f3de86e993ae0a41fd0c9b2",
+   "N1_04.json": "006f673075d5e12ae5754e1e4c255beb4417824b1080dcd5c3843b4fb7515c65",
+   "N1_05.json": "306c041da464bc575f0ba32b6257ad150d39767137b7dea870feced37cf1d7b0",
+   "N1_06.json": "cf39dc118d710e9bb6d44dfa35ad2e1aef0bdcda0679fc62958d4802a48179e1",
+   "N1_07.json": "0fef64241e40898f8160bbde28133015ffc62a8bb44a27af5519190d75188585",
+   "N1_08.json": "6f9a7a1935666dbf408a2f546fffce7b53f4ffde48ce673e800738baeda6f9aa",
+   "N1_09.json": "a2e7c79e3071d344bd67de87af778a7699a1b6d7cd0995a4499e44a029a79ae0",
+   "N1_10.json": "a9c4b6a435c1fe1c2d719dbde11096439a1445ed8e5ddbe115c3aa4351dcc8da",
+   "N1_11.json": "e7364b4dfe44eb6eee9981e8a3d1330a0260b8e1bfe23df738348d0ac8ff53f6",
+   "N1_12.json": "9e2ee10290daf06ae7b529b897d9c6985d67a209aeff640f74ef2f55e9e95b5e",
+   "N1_13.json": "fae03f7799c9112e7998e9a7e3e02bd5338c04241a2f2f84ce2793745dac611b",
+   "N1_14.json": "88ed745d98b9e352058ba45be58528dc2a03b7fa502a9c9f04312fe5d666e4e3",
+   "N1_15.json": "139256b1e78cd7327c68958666ddbdef3c3c8fdc2f913855868be943e37d9bae",
+   "N1_16.json": "fe73cb202f6c60ba2044d9efd361a112401a59cef0dd717e8db5fd83ce42d4a5",
+   "N1_17.json": "5bc7e92bcf35d28b65817ebcf116a4505e005c2d8f1b9f0ba90916abe347d908",
+   "N1_18.json": "cf29c31d9dcccbee091a9cae648a211043f00f12f6d477ff3eb4325aede46bd3",
+   "N1_19.json": "a310fbaae931d200c1ae93a025dce34eaebff0c624fe24be914385b57b3b0419",
+   "N1_20.json": "26389f8869ebfcab4a6ef4d9ab3ce136783a3b3d8c4b52feab688607e7491f7b",
+   "N1_21.json": "b164a9efc589684976625b69345734c905f607aa77e94bfc9a9ddf67daeb06f3",
+   "N1_22.json": "3ad0d4ba46ec6d990b19eba139af48033e348595b62caff5601ffdf39033cdd9",
+   "N1_23.json": "f0dd29dd65600837cee212c977801855239431566603dae87a36e87e8687ed76",
+   "N1_24.json": "116164e8a9f220b73152c45139d9c0e2415db3c87a7f45fca98063e493e7aca1",
+   "N1_25.json": "0a0fcb6abcd4d8c007818e3400cef8b0d5076019d333d79f97c84fc39ba12117",
+   "N1_26.json": "dcd4812133f480720342f71b9b77d870d9995767e40028b897d9ee2646f2a84b",
+   "N1_27.json": "15c3ec630ca8bab7309f48eaa0aa3cc8f8659aab6001ec7215cc9f5eee8b39d6",
+   "N1_28.json": "a2e89244faa6aabdeff614495c8c10f403a6362682b6f2c29aa31036468dcc3c",
+   "N1_29.json": "013918b680466f44e635f4fbc126f2e074ced5a67794c88e30e4fc6920158d4c",
+   "N1_30.json": "a675a6d9f3955fbcb1321c99ac6dc6885f4d34da84dac71d4dd952c94051de4e",
+   "N1_31.json": "69d3c451e6318f5084198fe06abfc0c977c37fc5ff664c68f7b33a49d48eae6a",
+   "N1_32.json": "c178fdee216d5b97a6616b939e060fa2b2e19770a8fb1f8ec5931fa6962b9124",
+   "N1_33.json": "4ca8fff7796ae2430ed3e28daa30437f74ca3bd2d8b574cd2588a6e1624c8261",
+   "N1_34.json": "f4dd3761735cef5ab6101b7830500880e7dd96d844bfaf5fdf19c762a9735316",
+   "N1_35.json": "8687f658d437b53519c65a7f46f873c9b5167bfb1ed546f5037a821ba944f401",
+   "N1_36.json": "e116c99e77c8aeb061d57fad7728ff840f0859d89863f47bd5b27c78716361c3",
+   "N1_37.json": "9386d93511bd79ecd7c51b8df7ee0be52881f9aeeffe4e660fdc754549d63917",
+   "N1_38.json": "a60f853408d924d61bfaee610ac1d079fedff1e7b617a3f3f171934c5d38e128",
+   "N1_39.json": "599878151b3b0dece3f06ed75ec95f4aee0f45646bfbca78e7e2244fa4e27b11",
+   "N1_40.json": "ef0c6ac9ce75aa9b5990bd139d26a4d33d6da049804383f5e46c77fb2d83e456",
+   "N1_41.json": "0c0481f049208c81312febbe4076f145736c25f4053b843a6cbe93760aaf7c5c",
+   "N1_42.json": "9250d769f1944ab51fd28c034d79b18e0567854e0ee34ff5337fef0e94c9cde6",
+   "N1_43.json": "e9a090261838c5e561ed66982b02392ee6b91183dbfca71f8bf4256c6526e856",
+   "N1_44.json": "a62b51570f94e62da07ce07c7ce50f73be228c12d323718dcf30ee60d4dee4d8",
+   "N1_45.json": "79901114f622730698fd57816436e7bb0aea7d3464356fb4ba2765cccf5dcfe8",
+   "N1_46.json": "4b3910a94fd6f9e14b64f2d624eb1cda08fd935d8754166b035bc918b7ba545c",
+   "N1_47.json": "77c9e14ba8f20d89122d0a18f05acb03861d295e5e934d71ee81952463828061",
+   "N1_48.json": "8c668627849d5400abbd52dbe5a14d3bf7ba33bd9cebc34fb31138cb46a56160",
+   "N1_49.json": "3acadd89f2b355b1e2d23912c4eb0ec4eb664ee90da30eb6e3a9f5bd566936d4",
+   "N2_00.json": "2065028cc192301a663e5789a9f161a6fdb91e4378768344334ae281ab32ea64",
+   "N2_01.json": "cc0e3f80efc7e09404a35c493fe99344fbc2c1d8f267fded9e78fa080cd41a17",
+   "N2_02.json": "3548277c4dc846bdbfa10cf4faf398d8adb0c4c3f71681a02b693bb0cb828f5e",
+   "N2_03.json": "7cf775302ad6a7cdf9eac36d3d5106612332ab4e256e3ed7864dc1404fef707f",
+   "N2_04.json": "fd9ccea95fee93b1a0ca1db1a6a164946add55f35728c3a765e41ddbbf265b94",
+   "N2_05.json": "5770b9701574964b85c51329360e7700cf764cb4d63e1428f1296ccb22acba6a",
+   "N2_06.json": "df3ae138d73a05585f2b8e451af72e71b4e46239635389fa7bd4ac6d65849bc3",
+   "N2_07.json": "08214b169386e2831d99e267bc459a0b76cd24a2a2f259dc1d700f925096713d",
+   "N2_08.json": "df5b201075dea5e5a8dd895a706aff4e2b2b03aa03c2cbb990a8137fed7f844b",
+   "N2_09.json": "74741bb8784fa9b203f32cb5778f4425f827af62f312b604d640fd382bf8ffca",
+   "N2_10.json": "73a4ce7e789a4f1652a6cd2c05b39bf82683735c37847d4617268eb2e55d1f57",
+   "N2_11.json": "32f2682c8f3a2c0b182d634632672afd93a1ecf82c3b1d62d7be8ea6b6b5749a",
+   "N2_12.json": "9e8dcec05b17b81bb5ccc1b1b1055c17002c876e16283447368f0d4c97962985",
+   "N2_13.json": "322ede7deb93d21486aa6bc7acacf0b47bb310637ad009825b0941e7e3cf5eb0",
+   "N2_14.json": "2f07fc1c8c3176d6e58910f7ba1ef5056bce0ad9a81f8391ba20263659212185",
+   "N2_15.json": "d3551c3df8d6a1b4d05282e2d3ce8d629f9ff0683541e85ed91266c53d9bd423",
+   "N2_16.json": "824ab6d277293aa6386b222fdb189e40786340d1e3c8a53822d6bd7d1cca6645",
+   "N2_17.json": "3ff9407dc6864c399b84f48bd93e133a694079291d99b19e33286b3d2d514f67",
+   "N2_18.json": "a2b2be6a9f60f1cb907794f6edfeb4c61243ea1185212081224118c5855f7182",
+   "N2_19.json": "553f221f9543ee3027888c5cdede76d44246fc42437012bc3f444ecd92e385ee",
+   "N2_20.json": "305e90c46f45d61f1fd05fdf1e9effc47f3565062faaa9c7ab11c4949769d6ec",
+   "N2_21.json": "cd7cde2b7f2f3ce5d1337614167f10256d99858d22febc5c4b63c20542858893",
+   "N2_22.json": "fb255ce537bd1ac9d8e89dd3e34652a896a2d42366ba1294ece6745b2577698f",
+   "N2_23.json": "8fa6c9e1f0346b38fae2484bf56fea7bc05e228d892d4eaf43a08344c2daae87",
+   "N2_24.json": "2d3ced3f2c7cf3865d3eb6add777b342fd86761b742f5626cad1867294f6088d",
+   "N2_25.json": "e5f255c3a04a6f4d43697a756671f9b9067d4c9a97f7e72263da00e8f4b43ec6",
+   "N2_26.json": "44a664a5fa27aae7a4fbf6a26b3726ac0d067a25df0e78eab2e960a0e0397366",
+   "N2_27.json": "5b9c383609608f40596eba50fab4b6fbce9db7dc76b1fbd8c931f9e67fdd8b86",
+   "N2_28.json": "b7f6b3b00391962f6e68240fd4c41e632dd5524a81af4e8d2f7bfc41f285ce84",
+   "N2_29.json": "6493c70d070e6af85fb8df1767e3ec5480ffc21b477bfbfd84b597bee2bfe183",
+   "N2_30.json": "4c9953e24fa6c718b080d9cf5b5a3239cc5f2443d0e610d6885aa5a9033b0e75",
+   "N2_31.json": "0d21654c1495807d8862f2bba3939c7f0e266928d85112cacd8118cf59262bb9",
+   "N2_32.json": "72a243df70ef825d04ed4217fed92ff043a5112a613ce2dabd77766bfa711a67",
+   "N2_33.json": "238d06f0587c4c31e2ec6059ef8b04fd56d119eba891a0112981442433869ae3",
+   "N2_34.json": "0d8f41b23a90ad59ee2a7558a0e06b94a8995698e3c937ccc5a379a0c1035849",
+   "N2_35.json": "c3a83134072fa4a150f075614cd1b82fb27f902b11a8f68e9865641b79ddfd99",
+   "N2_36.json": "3dde55cd85c4853e88bcc99271e5545379d2f85a1efc30cb7ce210be7a0c24d0",
+   "N2_37.json": "a3f8856dc2ef42486ecc4e82a638be668e65f04750e71d479a01e0d88d59ceec",
+   "N2_38.json": "8d29b9546e236f0f80cd721bd7b9602f87aaeefb3edf1f808b340cb1cf27752b",
+   "N2_39.json": "b0d7da272116eb7e432fbdd0eb9deb4b0c27aaeaf903ac1740d65a7a771db893",
+   "N2_40.json": "f18ce72815fc820d2dbfe560a2f174b88e493f65e069ac4f5e42f298c33ae421",
+   "N2_41.json": "d30575c48bca424fdec338358c82c876d0316ee263e0c06bfc6e28588472a528",
+   "N2_42.json": "b4db17e6b5844a12f816fb96667c660e3dc32aee41e2ec52fc822b7522d0a6ad",
+   "N2_43.json": "d154f661cc740bc6a997f98c13abcaea0beabdbd580cdbcd6de97205db11b1ac",
+   "N2_44.json": "00e650feef1c3942d0a520a640d012557c30a47ea2a8dc23363a23b0c22cfbe6",
+   "N2_45.json": "fb9fecd3c96ab44a521a3acd4e8b15a6b72e11584744bcda33730477b3771351",
+   "N2_46.json": "688c7113b35a353802d8633ce37cb61bf842c4923bdb84358a4e45f9a7e231b0",
+   "N2_47.json": "d2146610a2000816484fe4f72c64f882639e19443163ac0402c536129fe3cfa7",
+   "N2_48.json": "6872e3f1fb29b10da906e3adf505fac9417340a758a094fd207b6d665a4dd4ca",
+   "N2_49.json": "a9d47505c32e194d540b670a70cb6209a5cc74bb2683a9aa9d31723d6e51fe2a",
+   "N3_00.json": "4da1f1ad1951a122649f71002acd688c513f41fbafc1a7160dc6ba34bd637c55",
+   "N3_01.json": "1053f4635b2ac6fb02d0cb97003df948aef11e8ce4f6a44d41bb3ba828b49712",
+   "N3_02.json": "770686c81faf765915e1fccaedb401f2aeebcd05280c07c861fb218a25045dd4",
+   "N3_03.json": "ffb6190ae285f7c4ab146dbe1b472f661c4bfd16c1fc8fdbd8ee28891c9c52e6",
+   "N3_04.json": "10c88e1be72a9e30c742cde206a5ce12f8f7b443786738960a913ebdb21398ce",
+   "N3_05.json": "6e3a8369381fd5aee351160a113996ba97c3bd890d35757003ed611cf205a4cc",
+   "N3_06.json": "313b05e636c87840939459422d9c51322c54466c189b79e37ecde47c3b12e5e8",
+   "N3_07.json": "42901a147a9297bb46005428d6059154c87cd5248f9c0fb6d9f33b3af0a08930",
+   "N3_08.json": "92a4e1c323d5d95ae83a33137857d73d2abb8f16c53fa6ca539745d5150561ec",
+   "N3_09.json": "5f1892e950632f5f0f51f245a5dd41a13dc47ce3968b84ae2466ef41e1a3e9aa",
+   "N3_10.json": "274a7a54ebe889b3152086ce9d3c5c6b858be6d16d31ca94aacf9749b0451b9b",
+   "N3_11.json": "988abee0799986f5d6bdf69f05c71b783a6939849faed67d01ef4bdc8a9b6368",
+   "N3_12.json": "7ffc9898de7a92926f1ded3c5762a7b4c58d1722e506ad4fe95c59f5402cb59d",
+   "N3_13.json": "937d93d44633d08ff2aff7fa68cdf0627ee7cf7b4eb82318144919108bc0014f",
+   "N3_14.json": "e6a55b34a95c3ee7a0988674a7dbb8d75ab0897cbd9578bc4b8c60fc064dded5",
+   "N3_15.json": "d233665d8ac0faf127122a4d83a1f8f72130fff26cb0fd14f04929fc3f9451b2",
+   "N3_16.json": "efe7084546c1aa0851bbc2770c2a07bbb171076cf642864e93c9557900b54b34",
+   "N3_17.json": "af81453adf9f87a8cdaf7a0a92e8f53e55b146f655442e04b6e932b897c2ba5d",
+   "N3_18.json": "04c11bcf0d439d993c47e2dcf38c11d5a9a63e4d830a8e35ede1a88c33c72c7d",
+   "N3_19.json": "d536b4e52ff65d4ac616cb3430bf0c031818a629e0188901078b4613828ba020",
+   "N3_20.json": "62194f7128cdcd734b7fd5c157d3c939c60dafe6c8ed98020c855dcb461cb586",
+   "N3_21.json": "f020756360d072ecda3bc56671b226c16dc43026e9b041be3e8ae9b78434d94e",
+   "N3_22.json": "979bd4137366dce271dcff5e5f5f058e8fc949b264777e0e93e1a66764a092d2",
+   "N3_23.json": "17f8d08abc3a8be8dfff03164e755ff0ae93ee2a95725f85f74c32f4406d7417",
+   "N3_24.json": "381383a697f640f5fa69bb55c8661aeaca63b999519803a55edc73796d6df354",
+   "N3_25.json": "b2dc081652cd08184df08bf725674e0106a3e4f5ac0310f508ec3b8f3df4e5fd",
+   "N3_26.json": "767f4c47b09334189c23420d822577fdc5426b83b6e10a47b09bb648c3d223f9",
+   "N3_27.json": "b98b264fdceee9c857ff5bf20bab696b19a121f7707ddd0bae9e67e22ec07168",
+   "N3_28.json": "6f4e4986417f961ae7da55e4883dc9fa9aeb11ee29b3b529ee5edd2e4b155f39",
+   "N3_29.json": "6af666b64e8153b83043f94b206b920222097d779c0f89c330073578d63f1b9d",
+   "N3_30.json": "309a9bd885ea3240b71ce7024400fd3d7f28baae60792be58f618ed10b20221d",
+   "N3_31.json": "841b7769e1f5f91012cb3ee759d9bb078495098afd292933103484438a4e7f11",
+   "N3_32.json": "588e4662d163dffede1599f1986340bb93fff4d345b2f2ecb6babcc2c72fcaa0",
+   "N3_33.json": "53eeb135ec119a8e078ea25511eee82ae4d134bd15508ee29d4c90d6d8229a63",
+   "N3_34.json": "95a63ae05695f99f8fecbd67d81382258cd04387dd42f7ae1cf09455028660d2",
+   "N3_35.json": "317e57445fde2149108b2147568cc93c6dc7832eab7665726b913e88a169fd7c",
+   "N3_36.json": "d83e0fb3aa62b925aaaf16d8d8318e4634cacda100ab9c4aa172a0eff2c9d739",
+   "N3_37.json": "7d32e85113fe57fd5fa065b2488ec2a646c2d5df5cdf2f053ecf6b11d8fe1154",
+   "N3_38.json": "65d5914c958614b3a1929214ce685fa9c05deae4cf0696d84d37c642ac97bdae",
+   "N3_39.json": "637cbb9a6fb8c564ca383c4ed973ed78fe19e912617ec058f51260dbf9870fd6",
+   "N3_40.json": "5a99e9deb61f7bf693095e62862ff20c2c8e6e1283a36496eedfea463547d145",
+   "N3_41.json": "3eb535f4ae54cb3b1a5218fb87f47d720a2409ac477db25863a51035bfd052c4",
+   "N3_42.json": "a0827d28088c8a844a0fe9acf6a9c2b63c788ea9a4a1c2704563919dcdae5091",
+   "N3_43.json": "d01b4d78e082cd5d65c94207e1c9faf718f171cd3c7b7e21e551fa908ffea694",
+   "N3_44.json": "2e591fd478b1501923f238e566d1f9dd874a745435803805bf74d7f78b149e7d",
+   "N3_45.json": "76ae60f89267d8033317e1e4e9e9bf2e271869fc83b1b627263b4719837e244c",
+   "N3_46.json": "ee7f4836030e6c39b596518ae068064ce709ffca733c3228595777ff1d5a258e",
+   "N3_47.json": "54f0ba4a3f251ad20c30031cf65e858a6497ac53d7ea009d1d1d465501be6587",
+   "N3_48.json": "3fd871a4e0631a16e3f10f8045bc7408ff3a0d913b9b6e72dbe9681c6d64cd37",
+   "N3_49.json": "13aaf9a5611edda91691b3790bc753147b270c227380ba13c1c5bc2bfde1133b",
+   "N4_00.json": "6df4783c0b16718c9bd5b238070026a8665b1948823af4ab09d27b633f7b12c5",
+   "N4_01.json": "561848722b32604f88ef3a85b431eba2bb7283a3fcd80ad92049b4ba9ae9958c",
+   "N4_02.json": "dbadd1606851cb200ba16435a482221e5240922dcf87db9bb017bc4ad7a38975",
+   "N4_03.json": "f56bbf3a0a12f8426a61ccbb4981c47626d386e791e889118ec0b6ff87da8c24",
+   "N4_04.json": "e3067b9ee8af61c449c66971d141d3d3dc77ec77c4485a390630f8aa0f04d87f",
+   "N4_05.json": "db69f609b20a89f5c1c2830adf6ce95beb0513d3d224a743da5457028f535bcb",
+   "N4_06.json": "a6e45d6997e0bccae17b4a949388387138ed48f7f00452fb10c3e8444f32d376",
+   "N4_07.json": "15dc04ebef0a4dcd7f41809c6099b4fc81210a26e108cc2360078f0e19771138",
+   "N4_08.json": "03c7450ed57d79a01879a837a2b30cdbb6e4f859ec45af80d7cc10f6464a2921",
+   "N4_09.json": "5a218a829fbf331d50f37f932e9136df526807de518f7410dcc09ec7117c0834",
+   "N4_10.json": "d5f94c1d068a96556259dce9c1a0d276d37641133e3ba4e3c0cc8708fd104133",
+   "N4_11.json": "d0beee7eeed8720d0fe9b110090c1e990426e3ed28d57b850c2e3ffb9b0c76d8",
+   "N4_12.json": "43afde427431982c56e140313c102f10fec9ce362e37fb4ea78f7aaf46bd199c",
+   "N4_13.json": "68c36ff70858993f4d0f1225038b7909fe15e51763d90b50131c04089f620e94",
+   "N4_14.json": "c6dacc3f8b6341d751c18ff6fd1425d3e2312b0cd595aa8d029ccc9ec19a5cf4",
+   "N4_15.json": "c0e12abde750a4c7678e47ec63b96ed7985a3e609e76e3184398f2c808ff771f",
+   "N4_16.json": "d21da9230a5f17cf391951d89010d74bc1a2627ad00232abfc83be99c759a3df",
+   "N4_17.json": "356c5d182a5259981e34506d4d2ad3c37384c34dce6e77b553f90458d9064ab5",
+   "N4_18.json": "1bd4e2183960ba9c9dfbd8787235e660dc732b9c0a852a0912965666c2f60bdb",
+   "N4_19.json": "66f9efff0274bb785209374aaabfe6512177553da62b624ee1a4a3bea086ce68",
+   "N4_20.json": "83819c00d45f04698fb6e653f135694d97bb0f9f7a90b7887116e2451f78e482",
+   "N4_21.json": "d253d46dac8fb35c405457214d00c250a6a3ffae34408bd13e1c6f90a4e36eba",
+   "N4_22.json": "0b62d8c0ac4c20c7e52d7e9fe2fe784df26a6cf267b773baaa8672f1ecf75d6e",
+   "N4_23.json": "8605466c2d3c6d382cf71b78c19f28987aead67d97d352e9771c267608bb8071",
+   "N4_24.json": "6cc5b1903faa376907db0ad4e179fa26508eaf90ef5c5d5c3150b2fa19149da4",
+   "N4_25.json": "7c8d253fa000447ecd6d4c65e316591bda34360b3bf37c3a76edd92cc9f45c2e",
+   "N4_26.json": "1d59265fa45fc736e76e519dd9fc4010f8d79d327e3c2e5f13d06e8236431f1d",
+   "N4_27.json": "e95385742c68b303b437a4f18cb0bb1d0ae10ea705b0c304dc5c884aa82e16dc",
+   "N4_28.json": "2404decdfe1ad1bfc2ac1008f246c4a5117750f0abb5748432c071ebcaa84fb6",
+   "N4_29.json": "ebf4db88771039c96ba31e3a2865b138f1946b1bf88ff4fca4bcd43d3e33f477",
+   "N4_30.json": "e4a56c09d1a007528c74177b1dc0a50b8e39fe83eac205218ea08eb86bfd8ac4",
+   "N4_31.json": "2dc04cdd74000734cdcec3683ff3ee0a6e70e02549f9692c3757fa5629f386a9",
+   "N4_32.json": "d4d7d909e998620a6ff683b7495ddc4e05c9faa70915d64d55e9d1d6e7498008",
+   "N4_33.json": "f7df0f46e95739d4de41ab995d23d352c96f6d92ab4b25ef5749b3b1e66321e5",
+   "N4_34.json": "0d91bb53eb408aaa5abba9b30f9d6490011a032fe578bc339eed465c48e48dc2",
+   "N4_35.json": "49fceb12ffe6d9cebe4a1bf0b0d5cf923551ac7ccfd7c2b09b22149df1430207",
+   "N4_36.json": "73ef3c9fa267d86184c71de96e8571b6ca8b9d7caa61f2483ddfb59eb2968a21",
+   "N4_37.json": "e13d8ee370db6585387fd11709776e8d1f133d1894962213ed9abf9bb2144a6c",
+   "N4_38.json": "7cfd8b4a5fd80dc85b4a0e6fc14bc0d5348e11085ee5cf76a70bc7057ae3051b",
+   "N4_39.json": "f8342dc41919d668cd34071dfa304b027232e32ab8eb139adfbba4169aee12d2",
+   "N4_40.json": "75413972899912cf0558675cd23ae9a12b059cd52ad9330a47cdbbd1aac5ebb0",
+   "N4_41.json": "4c4273297c8fe21fddd09227709cf55b39c80ae9ede5199d0d482987beb9a2db",
+   "N4_42.json": "bc0f82a649be92904b29dc47dcfeed7fe1892ab0b1a0a5bae6f9805774619789",
+   "N4_43.json": "182beaf0c3db03baaec0f836c245026c7c324fef1458cba54a8616cf342950d5",
+   "N4_44.json": "d607e532d884cbaebbfe0dbbe354f35677bd464d0dc748759173395fc0760e82",
+   "N4_45.json": "cfd9ec14b924fd7c6b5b0fba8fb03bc6d53478662acd01716e11e7d4935ed32f",
+   "N4_46.json": "25111eb9c69a6482e358afe641351a487ca7fa9cafcb5bbada155048dea70136",
+   "N4_47.json": "d7267fd31efedbd0d8c4118f099682596d1cfe527eb0c84e7d233e2be6aa8a7a",
+   "N4_48.json": "608a47c7c5b46c3250701ae8b3d67c546fc54956316d45220911b8124a272d2a",
+   "N4_49.json": "5544686ee18090c7276ebeb8bf64441bf0292701ac77dfbb735da5dda0c1ef4a",
+   "P0_00.json": "4816568d2c95c78e614516a9b2377b62432ca8ff24c9b37d8788b81ba425d17e",
+   "P0_01.json": "c21d3c2abfe344b82197c9930e6d3c0613670ec18770f0df2147b229614998bb",
+   "P0_02.json": "f526e5362f3328cc69117b2544c31b8c2064defb8b4ac6b34a3fb37933598054",
+   "P0_03.json": "21fc34113a09b1028c346994a553a22581db2006c162c49ca35ab11083a85690",
+   "P0_04.json": "64d74690393021acdc417fb4c74dbdb71a2e2ca19d646304b4ef1534aa094574",
+   "P0_05.json": "81f88752e33a723acfbac0ed1835bc040829bd7e17ed653fe53c28f84587ab0b",
+   "P0_06.json": "e71859bb0c3a4ac72973a552a54d247325b70ca1a019987e757a4a042bfdb637",
+   "P0_07.json": "7157ea80a7d1ba56b28048240ba4515739ddd81238d52a525805bdbbc275880a",
+   "P0_08.json": "fc89ef90e926103d934686bf7e863d7951a9ab649feca884a5111be0089b5e75",
+   "P0_09.json": "98dca1494a447e715cadebbbef505dd55233ecaa3d77b9d0e48072e86f255c2b",
+   "P0_10.json": "00da8f231ea6482d2eb41150469d077ad2c44befedee5585660288bbf63b2815",
+   "P0_11.json": "f98fad3c740988e4ddb57a8c856fc3738edad50994919edd842756c759677a21",
+   "P0_12.json": "757f2eb09dea1387ec6ec7979c8fbb18d9d81fd00a949636f34d9ac103c570bf",
+   "P0_13.json": "d451510cbb134cd63f8c41f0b053a9c304b5e83b8a236f7a9d973716437da598",
+   "P0_14.json": "eeb0686b93f154bcd6a3a8d6d1b39eb5ce08c94f23b9e41d2c813e835a12b90b",
+   "P0_15.json": "bdbe04c8b402bf0ab12aa84cd1e12bb99acaa96cc4a23f5218c308e24ddce268",
+   "P0_16.json": "0958d82db37d55f422b6b936a76d3221b114eca27408ceab89b1ffdd836f6375",
+   "P0_17.json": "f2e964a267dffaab3b135f297a709b1e11e51fa1c79c5cafd66cda3134d6625f",
+   "P0_18.json": "ab2bcc6f68af63be9f6f673be6ef2488b1f2cb6a17b04011073cf144c95b6786",
+   "P0_19.json": "6562692f7cafff1ee486a8d058bac35768866e3496b3008a1ca50b11f53075a6",
+   "P0_20.json": "233479374077d17b5bd76408aea4f09aaffe3b2626f9152ef78cf13efe2aeaaa",
+   "P0_21.json": "82135560f4625ddc7e89e50f81ce36e4fb3f06ff5381b3caa6b72d05fec8d62a",
+   "P0_22.json": "e71d68866fede119bab4b503d33bbcb5d81da93259acd72ee8f5178dd59e4b84",
+   "P0_23.json": "f9aca331b3b6d0e2e2fc915eea27276d6334e249dc71960c53508b0eae5c6a79",
+   "P0_24.json": "29076a707472f307f291d7d24ae5405a8543c8adbb8229570ce652652e5866c2",
+   "P0_25.json": "784bf838c87d8a64c10980882e70bb31f7766babf4f27d9a5dc242d0a24ba2da",
+   "P0_26.json": "24c47a1193378e91dc077db60f5bcb6a3f12153e60f4caf93d12e60f89d58812",
+   "P0_27.json": "4f4fddf5033a0f563d5801b93e69bce8e173c1c3bf6069c8d6c228e0aeedd54c",
+   "P0_28.json": "c936868a78f2c58178f80d8a4340d934f6db6931abec351588a1ce732c37650a",
+   "P0_29.json": "2237bc5b84ca9c6e88219de2f12838bd64d0e7a5f2d2efcbee04c191a667982d",
+   "P0_30.json": "1de1bb406324fd18bd3c98939f2dcbfc4baf1d4ea3cc409ddd228eb0434a2baa",
+   "P0_31.json": "265073fbc1bba7abe27b44d5d451b705dc5246f7ad2137c468c6a80453a29033",
+   "P0_32.json": "bab55157c9dd3ef5ebd1bc3a37a29ffe7b3d7d08fa01d3040bb3a1afa606375e",
+   "P0_33.json": "abc01ae18531453b46420e5229cc8bb658e8fd9473c47ed90c78bbff0b16a92b",
+   "P0_34.json": "00906e8c581aaeac4629f122aa9c7dfac445d604e7ab11ee2294af2c90b0af31",
+   "P0_35.json": "58b62a5fcdd70f3e913927929b932d4ee0e56e0c9c9112c390de8770fec87fea",
+   "P0_36.json": "85c6e9e59d365c234f41872978eb794cd4cda2565051577c384ffa177f9cadf9",
+   "P0_37.json": "8dd3d49024aa979ef51a041d75915982cff67325eb2bf309f1263d8bf4982ad9",
+   "P0_38.json": "75fbb612cc809b1827ac4f6046c9bf5b941ee93c468c2992b0da818b26bbfbab",
+   "P0_39.json": "e9f7e43a16d8067887cc7902d1f601fce90c1624362b27b395c857e5a2e40e1e",
+   "P0_40.json": "30a7a5a80db4f99fee6be88bcf1e54fa3db6e6bf392e31f164037ac4ebeb2a5d",
+   "P0_41.json": "790b385c2118faef2c1238e48530ca0a24f2c8795222d50d7f97b3f9ec198b0d",
+   "P0_42.json": "59a324698d2befa654c162618f0cf7dd94063d81203a052e7adb7aab25d1ea81",
+   "P0_43.json": "80c7772e7ea6b46f798aa48afb3edd4356503da09a129aacb099831484b1b427",
+   "P0_44.json": "f59c0ba8a13aa73bf0da45d11f6d64eb53ba09c5a30f2469f81a3dc047f678ec",
+   "P0_45.json": "59fcf9004800eb98e7eb6db4aa0bb369469988e4fdca0d49beb2d881dba2aba0",
+   "P0_46.json": "ae744668dabf71783d46bc998fb06e23447675b2e32957c9b1fb858fa6b1c529",
+   "P0_47.json": "81b367a6e1717c157e587745b9eed72c95388186d18d244d4da9a676d7bd3389",
+   "P0_48.json": "053c3422430a4eec7655eedd63543d8f71adfcda3bb82b29b708c25a55a48a7f",
+   "P0_49.json": "0e8bb31e15af4dd08c6047b791ad1905d77b353e82098d19f913f90809cb0000",
+   "seed_manifest.json": "1b997281197ab9c89aa449e675d44ed2d899c491395b316edb40f579a414ca07",
+   "FINAL_SYNTHETIC_ACCEPTANCE_COURT_V1.json": "a9e0dffa7bde8ef52dc19af9c2dd1fc577377222a06ddfd60c94e163a27c497a"
+  },
+  "inventory": {
+   "expected": 300,
+   "found_files": 300,
+   "misnamed": [],
+   "missing": [],
+   "unexpected": [],
+   "cells_dir_present": true,
+   "unique_cell_ids": 300,
+   "duplicate_cell_ids": {},
+   "duplicate_control_index": {}
+  },
+  "manifest": {
+   "rows": 300,
+   "failures": [],
+   "status": "PRESENT"
+  },
+  "aggregate": {
+   "failures": [],
+   "status": "PASS",
+   "present": true
+  },
+  "recount": {
+   "controls": {
+    "N0": {
+     "cells": 50,
+     "detections": 1,
+     "direction": 8,
+     "detected_indices": [
+      22
+     ],
+     "stored_verdict_detections": 1,
+     "stored_positive_count": 8,
+     "stored_matches_recount": true,
+     "rule": "detections <= 5 of 50",
+     "verdict": "PASS"
+    },
+    "N1": {
+     "cells": 50,
+     "detections": 1,
+     "direction": 8,
+     "detected_indices": [
+      0
+     ],
+     "stored_verdict_detections": 1,
+     "stored_positive_count": 8,
+     "stored_matches_recount": true,
+     "rule": "detections <= 5 of 50",
+     "verdict": "PASS"
+    },
+    "N2": {
+     "cells": 50,
+     "detections": 0,
+     "direction": 4,
+     "detected_indices": [],
+     "stored_verdict_detections": 0,
+     "stored_positive_count": 4,
+     "stored_matches_recount": true,
+     "rule": "detections <= 5 of 50",
+     "verdict": "PASS"
+    },
+    "N3": {
+     "cells": 50,
+     "detections": 0,
+     "direction": 3,
+     "detected_indices": [],
+     "stored_verdict_detections": 0,
+     "stored_positive_count": 3,
+     "stored_matches_recount": true,
+     "rule": "detections <= 5 of 50",
+     "verdict": "PASS"
+    },
+    "N4": {
+     "cells": 50,
+     "detections": 0,
+     "direction": 0,
+     "detected_indices": [],
+     "stored_verdict_detections": 0,
+     "stored_positive_count": 0,
+     "stored_matches_recount": true,
+     "rule": "detections <= 5 of 50",
+     "verdict": "PASS"
+    },
+    "P0": {
+     "cells": 50,
+     "detections": 45,
+     "direction": 46,
+     "detected_indices": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      41,
+      42,
+      43,
+      44,
+      46,
+      47,
+      48,
+      49
+     ],
+     "stored_verdict_detections": 45,
+     "stored_positive_count": 46,
+     "stored_matches_recount": true,
+     "rule": "detections >= 40 AND direction >= 45 of 50",
+     "verdict": "PASS"
+    }
+   },
+   "all_pass": true,
+   "rule_source": "mean_d > 0 and p <= 0.025 (bootstrap.ALPHA); thresholds from courts.final_court"
+  },
+  "ok": true
+ },
+ "LABEL": "POST_HOC_AUDIT_SNAPSHOT -- created AFTER outcomes (2026-09-06T04:32:54Z). NOT a pre-outcome seal. The V1.1 commitment root below is a NEW post-hoc anchor computed by this run; the V1 root it was verified against was anchored at commit 9d1fca897 on 2026-09-06. Neither establishes integrity during the earlier unanchored interval.",
+ "elapsed_s": 5.9
+}

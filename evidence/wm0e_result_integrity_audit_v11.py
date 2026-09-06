@@ -34,11 +34,13 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--trusted-root-v1", default=None)
     ap.add_argument("--trusted-root-v11", default=None)
+    ap.add_argument("--require", default=None, help="explicit commitment contract, e.g. V1,V1.1 (default: the versions whose trusted root is supplied)")
     ap.add_argument("--court", default=COURT)
     ap.add_argument("--out", default=OUT)
     a = ap.parse_args(argv)
     t0 = time.time()
-    res = RA.run_audit(a.court, ROOT, trusted_root_v1=a.trusted_root_v1, trusted_root_v11=a.trusted_root_v11)
+    versions = tuple(v.strip() for v in a.require.split(",") if v.strip()) if a.require else None
+    res = RA.run_audit(a.court, ROOT, trusted_root_v1=a.trusted_root_v1, trusted_root_v11=a.trusted_root_v11, commitment_versions=versions)
     res["LABEL"] = ("POST_HOC_AUDIT_SNAPSHOT -- created AFTER outcomes (%s). NOT a pre-outcome seal. The V1.1 commitment root below "
                     "is a NEW post-hoc anchor computed by this run; the V1 root it was verified against was anchored at commit "
                     "9d1fca897 on 2026-09-06. Neither establishes integrity during the earlier unanchored interval."

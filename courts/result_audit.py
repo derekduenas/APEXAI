@@ -1,4 +1,4 @@
-"""RESULT_AUDIT_REGISTRY_V1 -- the required-check registry for a sealed court.
+"""RESULT_AUDIT_REGISTRY_V1.1 -- the required-check registry for a sealed court.
 
 Astra's review of V1 found that the audit's final verdict was a hand-written
 boolean expression that recorded some checks (surface unchanged, runner
@@ -8,16 +8,36 @@ required check has a status of PASS, FAIL or BLOCKED and carries its own
 evidence; the overall status is PASS only when EVERY required check is
 PASS. Missing or unreadable evidence is BLOCKED, never a silent PASS.
 
+V1.1 (Astra integration finding): the V1 registry computed the
+RESULT_COMMITMENT_V1 root unconditionally before V1.1, so a payload carrying
+a producer-legitimate diagnostic infinity could never reach the working
+V1.1 verification. The commitment VERSION CONTRACT is now an explicit input
+selected from the caller's request BEFORE any payload value is inspected:
+
+    commitment_versions   explicit tuple of required versions, e.g. ("V1.1",)
+                          or ("V1", "V1.1"); if omitted, the required set is
+                          exactly the versions for which a trusted root was
+                          supplied.
+
+  - Only REQUIRED versions are computed for the two commitment checks.
+  - A required version whose serialisation fails is FAIL for that version;
+    there is no fallback to another version.
+  - A required version without a trusted root is BLOCKED; a supplied root
+    for a NON-required version is recorded as supplied-but-not-required and
+    is never used.
+  - If several versions are required, every one must verify.
+  - Non-required versions do not participate and are never PASS.
+  - No required version at all -> both commitment checks BLOCKED.
+
 THIS IS A CONSISTENCY AUDIT, NOT A STATISTICAL REPRODUCTION. No world is
 generated, no forecast produced, no bootstrap re-run. A PASS says the
 artifacts are internally consistent with the sealed protocol and with each
 other, and that their result fields agree with a separately trusted
-commitment when one is supplied. It says nothing about markets.
+commitment. It says nothing about markets.
 
 TRUST MODEL (see result_validator): protocol sealed before outcomes; result
 commitments anchored when results are produced; later reads verified against
-a separately trusted root. The trusted roots are CALLER inputs here. Without
-one the commitment check is BLOCKED, not PASS.
+a separately trusted root. The trusted roots are CALLER inputs here.
 """
 from __future__ import annotations
 
@@ -29,9 +49,14 @@ from courts import final_court as F
 from courts import result_validator as RV
 from regression import runner as RR
 
-AUDIT_VERSION = "RESULT_AUDIT_REGISTRY_V1"
+AUDIT_VERSION = "RESULT_AUDIT_REGISTRY_V1.1"
+AUDIT_HISTORY = {"V1": "14 required checks; commitment block computed V1 before V1.1 unconditionally (integration defect, Astra 2026-09-06)",
+                 "V1.1": "explicit commitment version contract selected from the caller's request before payload inspection"}
 PASS, FAIL, BLOCKED = "PASS", "FAIL", "BLOCKED"
 EXIT_CODES = {PASS: 0, FAIL: 2, BLOCKED: 3}
+COMMITMENT_VERSIONS = {"V1": (RV.court_commitment, RV.verify_commitment, RV.COMMITMENT_VERSION),
+                       "V1.1": (RV.court_commitment_v11, RV.verify_commitment_v11, RV.COMMITMENT_VERSION_V11)}
+VERSION_ORDER = ("V1", "V1.1")
 
 REQUIRED_CHECKS = (
     ("DEFINITION_REDERIVES", "court_definition.json re-derives through define(): court_id and court_hash match the sealed file"),
@@ -46,8 +71,8 @@ REQUIRED_CHECKS = (
     ("AGGREGATE_AGREEMENT", "aggregate artifact: identity, counts, embedded cells semantically equal to files, stored judgement equals recount"),
     ("RECOUNT_MATCHES_STORED", "detections/directions recounted from numeric fields with the sealed rule equal the stored strings and counts; verdicts recomputed from sealed thresholds equal stored verdicts and status"),
     ("FROZEN_JUDGE_AGREES", "courts.final_court.judge() over the cell files equals the stored judgement"),
-    ("COMMITMENT_AGREEMENT", "RESULT_COMMITMENT (V1 and V1.1) roots over the cell files equal the roots over the aggregate's embedded cells"),
-    ("COMMITMENT_MATCHES_TRUSTED_ROOT", "the V1 root over the cell files equals a trusted root supplied by the caller independently of the payload"),
+    ("COMMITMENT_AGREEMENT", "for EVERY REQUIRED commitment version (explicit contract, selected before payload inspection): the root over the cell files equals the root over the aggregate's embedded cells; a required version that cannot serialise is FAIL; non-required versions do not participate"),
+    ("COMMITMENT_MATCHES_TRUSTED_ROOT", "for EVERY REQUIRED commitment version: the root over the cell files verifies against the trusted root the caller supplied independently of the payload; no root for a required version is BLOCKED; no fallback between versions"),
 )
 CHECK_IDS = tuple(c for c, _ in REQUIRED_CHECKS)
 
@@ -81,13 +106,100 @@ def overall_status(checks: dict) -> str:
     return PASS
 
 
+def select_commitment_versions(commitment_versions, trusted_root_v1, trusted_root_v11) -> dict:
+    """The verification CONTRACT, fixed from caller inputs alone -- no payload
+    value is consulted. Explicit `commitment_versions` wins; otherwise the
+    required set is exactly the versions with a supplied trusted root."""
+    supplied = {"V1": trusted_root_v1, "V1.1": trusted_root_v11}
+    if commitment_versions is not None:
+        req = tuple(dict.fromkeys(commitment_versions))
+        unknown = [v for v in req if v not in COMMITMENT_VERSIONS]
+        if unknown:
+            raise ValueError("unknown commitment version(s) %s; known: %s" % (unknown, list(COMMITMENT_VERSIONS)))
+        selection = "explicit"
+    else:
+        req = tuple(v for v in VERSION_ORDER if supplied[v] is not None)
+        selection = "derived_from_supplied_trusted_roots"
+    req = tuple(v for v in VERSION_ORDER if v in req)
+    return {"required": req, "non_required": tuple(v for v in VERSION_ORDER if v not in req), "selection": selection,
+            "supplied_roots": {v: (r is not None) for v, r in supplied.items()},
+            "supplied_but_not_required": [v for v in VERSION_ORDER if supplied[v] is not None and v not in req],
+            "law": "only required versions are computed and judged; no fallback between versions; a required version without a root is BLOCKED"}
+
+
+def _aggregate_statuses(statuses):
+    if not statuses:
+        return BLOCKED
+    if any(s == FAIL for s in statuses):
+        return FAIL
+    if any(s != PASS for s in statuses):
+        return BLOCKED
+    return PASS
+
+
+def commitment_checks(cells: list, agg_cells, contract: dict, trusted_root_v1, trusted_root_v11) -> tuple:
+    """The two commitment checks, computed ONLY for the required versions.
+    Returns (agreement_check, trusted_root_check, per_version_evidence)."""
+    roots = {"V1": trusted_root_v1, "V1.1": trusted_root_v11}
+    per = {}
+    for v in VERSION_ORDER:
+        commit_fn, verify_fn, contract_id = COMMITMENT_VERSIONS[v]
+        e = {"contract": contract_id, "required": v in contract["required"]}
+        if v not in contract["required"]:
+            e["status"] = "NOT_REQUIRED -- does not participate; never PASS"
+            e["trusted_root_supplied_but_ignored"] = roots[v] is not None
+            try:                                                        # informational only: an anchor a later caller may adopt
+                e["informational_root_files"] = commit_fn(cells)["root"]
+            except RV.CommitmentFailure as ex:
+                e["informational_error"] = str(ex)
+            per[v] = e
+            continue
+        e["executed"] = True
+        try:
+            e["root_files"] = commit_fn(cells)["root"]
+        except RV.CommitmentFailure as ex:
+            e["files_error"] = str(ex)
+        if isinstance(agg_cells, list):
+            try:
+                e["root_aggregate"] = commit_fn(agg_cells)["root"]
+            except RV.CommitmentFailure as ex:
+                e["aggregate_error"] = str(ex)
+        if "files_error" in e or "aggregate_error" in e:
+            e["agreement"] = FAIL
+        elif "root_aggregate" not in e:
+            e["agreement"] = BLOCKED; e["agreement_reason"] = "aggregate unavailable"
+        else:
+            e["agreement"] = PASS if e["root_files"] == e["root_aggregate"] else FAIL
+        if roots[v] is None:
+            e["verification"] = BLOCKED; e["verification_reason"] = "required version %s has no trusted root supplied by the caller" % v
+        else:
+            e["trusted_root"] = roots[v]
+            try:
+                verify_fn(cells, roots[v]); e["verification"] = PASS
+            except RV.CommitmentFailure as ex:
+                e["verification"] = FAIL; e["verification_reason"] = str(ex)
+        per[v] = e
+    req = contract["required"]
+    common = {"required_versions": list(req), "executed_versions": [v for v in req if per[v].get("executed")],
+              "non_required_versions": list(contract["non_required"]), "selection": contract["selection"],
+              "supplied_but_not_required": contract["supplied_but_not_required"], "per_version": per}
+    if not req:
+        reason = "no commitment version required: no explicit contract and no trusted root supplied; a root stored next to the payload is not evidence"
+        return (_check(BLOCKED, reason=reason, **common), _check(BLOCKED, reason=reason, **common), per)
+    agreement = _check(_aggregate_statuses([per[v]["agreement"] for v in req]), **common)
+    trusted = _check(_aggregate_statuses([per[v]["verification"] for v in req]), **common)
+    return agreement, trusted, per
+
+
 def run_audit(court_dir: str, root_dir: str, *, trusted_root_v1: str | None = None, trusted_root_v11: str | None = None,
-              expected_indices=None, marker_name: str = "R7_1_COURT_OPENED.json",
+              commitment_versions=None, expected_indices=None, marker_name: str = "R7_1_COURT_OPENED.json",
               regression_rel: str = "precourt_regression/BOUNDED_FULL_REGRESSION_V0.json",
               aggregate_name: str = "FINAL_SYNTHETIC_ACCEPTANCE_COURT_V1.json") -> dict:
     """Read-only. Returns the registry with an overall status and exit code."""
+    contract = select_commitment_versions(commitment_versions, trusted_root_v1, trusted_root_v11)   # BEFORE any payload is read
     checks = {}
-    out = {"audit_version": AUDIT_VERSION, "validator": RV.VALIDATOR_VERSION, "court_dir": court_dir, "root_dir": root_dir,
+    out = {"audit_version": AUDIT_VERSION, "audit_history": AUDIT_HISTORY, "validator": RV.VALIDATOR_VERSION,
+           "court_dir": court_dir, "root_dir": root_dir, "commitment_contract": contract,
            "required_checks": [{"id": c, "requirement": r} for c, r in REQUIRED_CHECKS],
            "historical_statistical_recomputation": "NOT_PERFORMED (no world generated, no forecast, no bootstrap re-run)"}
 
@@ -208,10 +320,10 @@ def run_audit(court_dir: str, root_dir: str, *, trusted_root_v1: str | None = No
                                               opening_commit=opening_commit, dirty=rj.get("worktree_dirty"),
                                               surface_after=rj.get("scientific_surface_hash_after"), totals=rj.get("totals"))
 
-    # ---- recount vs stored; frozen judge; commitments
+    # ---- recount vs stored; frozen judge; commitments (required versions only)
     if rep is None or not rep["cells"]:
         for c in ("RECOUNT_MATCHES_STORED", "FROZEN_JUDGE_AGREES", "COMMITMENT_AGREEMENT", "COMMITMENT_MATCHES_TRUSTED_ROOT"):
-            checks[c] = _check(BLOCKED, reason="no validated cells")
+            checks[c] = _check(BLOCKED, reason="no validated cells", required_versions=list(contract["required"]))
     else:
         rc = rep["recount"]
         n_index = len(list(range(F.N_INDEX)) if expected_indices is None else list(expected_indices))
@@ -241,36 +353,11 @@ def run_audit(court_dir: str, root_dir: str, *, trusted_root_v1: str | None = No
                                                        frozen_all_pass=fj.get("all_pass"), stored_all_pass=stored_j.get("all_pass") if isinstance(stored_j, dict) else None)
         except Exception as e:                                  # noqa: BLE001
             checks["FROZEN_JUDGE_AGREES"] = _check(FAIL, reason="judge() raised %s: %s" % (type(e).__name__, e))
-        try:
-            files_v1 = RV.court_commitment(list(rep["cells"].values()))
-            files_v11 = RV.court_commitment_v11(list(rep["cells"].values()))
-            if isinstance(agg, dict) and isinstance(agg.get("cells"), list):
-                agg_v1 = RV.court_commitment(agg["cells"]); agg_v11 = RV.court_commitment_v11(agg["cells"])
-                ok = files_v1["root"] == agg_v1["root"] and files_v11["root"] == agg_v11["root"]
-                checks["COMMITMENT_AGREEMENT"] = _check(PASS if ok else FAIL, v1_root_files=files_v1["root"], v1_root_aggregate=agg_v1["root"],
-                                                        v11_root_files=files_v11["root"], v11_root_aggregate=agg_v11["root"])
-            else:
-                checks["COMMITMENT_AGREEMENT"] = _check(BLOCKED, reason="aggregate unavailable", v1_root_files=files_v1["root"], v11_root_files=files_v11["root"])
-            out["commitment"] = {"v1": {"version": files_v1["version"], "root": files_v1["root"], "cells": files_v1["cells"]},
-                                 "v11": {"version": files_v11["version"], "root": files_v11["root"], "cells": files_v11["cells"],
-                                         "representation": files_v11["representation"], "entries": files_v11["entries"]}}
-            if trusted_root_v1 is None and trusted_root_v11 is None:
-                checks["COMMITMENT_MATCHES_TRUSTED_ROOT"] = _check(BLOCKED, reason="no trusted root supplied by the caller; a root stored next to the payload is not evidence",
-                                                                   v1_root_files=files_v1["root"], v11_root_files=files_v11["root"])
-            else:
-                ev = {"v1_root_files": files_v1["root"], "v11_root_files": files_v11["root"], "trusted_root_v1": trusted_root_v1, "trusted_root_v11": trusted_root_v11}
-                oks = []
-                for label, root, fn in (("v1", trusted_root_v1, RV.verify_commitment), ("v11", trusted_root_v11, RV.verify_commitment_v11)):
-                    if root is None:
-                        continue
-                    try:
-                        fn(list(rep["cells"].values()), root); oks.append(True); ev[label + "_verified"] = True
-                    except RV.CommitmentFailure as e:
-                        oks.append(False); ev[label + "_verified"] = False; ev[label + "_reason"] = str(e)
-                checks["COMMITMENT_MATCHES_TRUSTED_ROOT"] = _check(PASS if all(oks) else FAIL, **ev)
-        except RV.CommitmentFailure as e:
-            checks["COMMITMENT_AGREEMENT"] = _check(FAIL, reason=str(e))
-            checks["COMMITMENT_MATCHES_TRUSTED_ROOT"] = _check(BLOCKED, reason="commitment could not be computed: %s" % e)
+        agg_cells = agg.get("cells") if isinstance(agg, dict) and isinstance(agg.get("cells"), list) else None
+        agreement, trusted, per = commitment_checks(list(rep["cells"].values()), agg_cells, contract, trusted_root_v1, trusted_root_v11)
+        checks["COMMITMENT_AGREEMENT"] = agreement
+        checks["COMMITMENT_MATCHES_TRUSTED_ROOT"] = trusted
+        out["commitment"] = per
 
     out["checks"] = checks
     out["overall"] = overall_status(checks)
