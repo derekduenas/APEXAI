@@ -59,8 +59,11 @@ def test_contract_is_stated_and_machine_readable():
     assert c["absence_precedence"] == [PROVIDER_ERROR, NOT_AVAILABLE, UNKNOWN, NOT_ESTIMABLE]
     assert c["contaminating"] == [STALE]
     assert "OMITTED" in c["representation"]
-    assert C.COMPOSER_VERSION == "PULSE_COMPOSE_V0.1"
+    # the composer version advances with later bricks; what PULSE-009 pins is
+    # that V0.1 exists and still records the defect it closed.
+    assert C.COMPOSER_VERSION.startswith("PULSE_COMPOSE_V0.")
     assert "DERIVED-FIELD-STALENESS-001" in C.COMPOSER_HISTORY["V0"]
+    assert "dependency map" in C.COMPOSER_HISTORY["V0.1"]
 
 
 @pytest.mark.parametrize("name", sorted(D.DEPENDENCIES))
@@ -347,5 +350,14 @@ def test_NKLA_inputs_recomposed_under_the_repair_produce_no_valid_derived_number
         assert "tolerance" in ff[name]["note"], name
     # the age itself is still reported -- that is the number that says why
     assert ff["quote_age_s"]["q"] == VALID and ff["quote_age_s"]["v"] > 47_000_000
-    # and the independent anchor is still readable
-    assert ff["prior_close"]["q"] == VALID and ff["prior_close"]["v"] == 0.2568
+    # UPDATED BY PULSE-010, not relaxed. When PULSE-009 was written the anchor
+    # had no freshness rule at all, so NKLA's 2025-02-24 prior_close was VALID
+    # and this test asserted exactly that: the QUOTE's staleness must not reach
+    # it. ANCHOR_FRESHNESS_POLICY_V1 now judges the anchor on its OWN terms and
+    # refuses it for its OWN reason. The PULSE-009 invariant is unchanged and
+    # is asserted where it belongs -- in
+    # test_a_stale_quote_does_not_contaminate_independent_fields, where a FRESH
+    # anchor survives a stale quote.
+    assert ff["prior_close"]["q"] == STALE and ff["prior_close"]["v"] is None
+    assert "immediately preceding session" in ff["prior_close"]["note"]
+    assert "tolerance" not in ff["prior_close"]["note"]     # its own reason, not the quote's

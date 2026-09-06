@@ -133,8 +133,11 @@ DEPENDENCIES = {
                     "premarket_observations")},
 }
 # Fields that are NOT derived: read straight from one source, no propagation.
-INDEPENDENT_FIELDS = ("prior_close", "session_open", "session_high", "session_low",
-                      "session_vwap", "session_volume", "last_trade", "last_minute_volume")
+# prior_close_session is PULSE-010 provenance: which exchange session the
+# anchor belongs to. Read from one source, computes nothing.
+INDEPENDENT_FIELDS = ("prior_close", "prior_close_session", "session_open", "session_high",
+                      "session_low", "session_vwap", "session_volume", "last_trade",
+                      "last_minute_volume")
 
 
 class DerivationViolation(RuntimeError):

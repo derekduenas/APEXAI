@@ -25,13 +25,25 @@ import re
 from datetime import datetime, timezone
 
 from apex.intraday.sessions import Session, classify
-from apex.pulse import derived, freshness
+from apex.pulse import anchor_freshness, derived, freshness
 from apex.pulse.twin import (NOT_AVAILABLE, NOT_ESTIMABLE,
                              PROVIDER_ERROR, SESSION_INAPPLICABLE,
                              STALE, UNKNOWN, TwinState, absent, adopt,
                              ok)
 
-COMPOSER_VERSION = "PULSE_COMPOSE_V0.1"
+# ANCHOR_FRESHNESS_POLICY_V1 classification -> the governed quality state it
+# takes. Kept distinct on purpose: a stale anchor, an absent one and an
+# undated one are three different facts and must not be flattened into one.
+_ANCHOR_QUALITY = {
+    anchor_freshness.SESSIONS_MISSED: STALE,
+    anchor_freshness.NO_PRIOR_SESSION: NOT_AVAILABLE,
+    anchor_freshness.UNDATED: NOT_ESTIMABLE,
+    anchor_freshness.NOT_A_PRIOR_SESSION: NOT_ESTIMABLE,
+    anchor_freshness.NOT_A_TRADING_SESSION: NOT_ESTIMABLE,
+    anchor_freshness.CALENDAR_UNRESOLVED: NOT_ESTIMABLE,
+}
+
+COMPOSER_VERSION = "PULSE_COMPOSE_V0.2"
 COMPOSER_HISTORY = {
     "V0": "the freshness verdict was applied where a value was READ and did not travel to what "
           "was BUILT from it. NKLA 2026-09-01: mid/spread_bps/nbbo_size_imbalance STALE on a "
@@ -43,7 +55,14 @@ COMPOSER_HISTORY = {
             "otherwise it carries the ingredient's absence reason or STALE, with the culprit "
             "named, and no value. Independent fields are untouched: a stale quote does not reach "
             "prior_close. The rolling and premarket stores are only OBSERVED with a usable mid, "
-            "so an untrusted price cannot enter PULSE's own memory."}
+            "so an untrusted price cannot enter PULSE's own memory.",
+    "V0.2": "PULSE-010: the prior-session anchor is judged by ANCHOR_FRESHNESS_POLICY_V1 -- "
+            "VALID only when its session is the exchange's immediately preceding regular "
+            "session. NKLA 2026-09-01 carried a prior_close from 2025-02-24 marked VALID "
+            "(LIVE-ANCHOR-STALENESS-V1). The anchor now carries its own quality and the "
+            "PULSE-009 dependency map does the rest: prior_close_return_bps, "
+            "overnight_gap_bps and relative_volume follow it, while the current session's "
+            "cash open and aggregates do not."}
 
 TIER_1_DEEP = "TIER_1_DEEP"
 TIER_2_BROAD = "TIER_2_BROAD"
@@ -196,11 +215,31 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
     # single source, and the derived fields are then built FROM THEM rather
     # than from raw locals. That is the whole repair: dependency, in one
     # direction, visible in the code.
-    F["prior_close"] = (ok(prev, source="alpaca_sip",
-                           as_of=(snapshot.get("prevDailyBar") or {}
-                                  ).get("t"))
-                        if prev else absent(NOT_AVAILABLE,
-                                            source="alpaca_sip"))
+    # PULSE-010: the anchor is judged in SESSIONS against the exchange
+    # calendar, never in seconds. A real number from the wrong session is
+    # still the wrong number, and PULSE-009 propagation carries the verdict
+    # to everything built on it.
+    prev_bar = snapshot.get("prevDailyBar") or {}
+    anchor_verdict = anchor_freshness.classify_prior_close(
+        anchor_stamp=prev_bar.get("t"),
+        packet_session_date=scheduled_time,
+        present=bool(prev_bar) and prev is not None)
+    st.sources["anchor_freshness"] = anchor_freshness.ANCHOR_FRESHNESS_POLICY_VERSION
+    if anchor_verdict["fresh"]:
+        F["prior_close"] = ok(prev, source="alpaca_sip", as_of=prev_bar.get("t"),
+                              note=anchor_verdict["why"])
+    else:
+        F["prior_close"] = absent(_ANCHOR_QUALITY[anchor_verdict["classification"]],
+                                  source="alpaca_sip", as_of=prev_bar.get("t") or None,
+                                  note=anchor_verdict["why"])
+    F["prior_close_session"] = (
+        ok(anchor_verdict["anchor_session_date"], source="alpaca_sip",
+           as_of=prev_bar.get("t"),
+           note="the exchange session this anchor belongs to; expected %s"
+                % anchor_verdict.get("expected_anchor_session"))
+        if anchor_verdict.get("anchor_session_date")
+        else absent(NOT_AVAILABLE, source="alpaca_sip",
+                    note=anchor_verdict["why"]))
 
     # ------------------------------------------- session structure
     for name, key in (("session_high", "h"), ("session_low", "l"),
@@ -234,14 +273,20 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
     F["vwap_distance_bps"] = derived.derive(
         "vwap_distance_bps", D, lambda: _bps(F["mid"].value, day.get("vw")), as_of=qt)
 
-    pv = (snapshot.get("prevDailyBar") or {}).get("v")
+    pv = prev_bar.get("v")
+    # the prior-session VOLUME comes off the same bar as the prior close, so
+    # it inherits the same anchor verdict: one stale bar, one verdict.
+    prior_volume_field = (
+        derived.raw_field(pv, source="alpaca_sip", as_of=prev_bar.get("t"),
+                          note="requires a session and a prior-session volume; a ONE-SESSION "
+                               "baseline, never one computed with future sessions")
+        if anchor_verdict["fresh"]
+        else absent(_ANCHOR_QUALITY[anchor_verdict["classification"]], source="alpaca_sip",
+                    as_of=prev_bar.get("t") or None, note=anchor_verdict["why"]))
     F["relative_volume"] = derived.derive(
         "relative_volume",
         {"session_volume": F["session_volume"],
-         "raw:prior_session.volume": derived.raw_field(
-             pv, source="alpaca_sip", as_of=(snapshot.get("prevDailyBar") or {}).get("t"),
-             note="requires a session and a prior-session volume; a ONE-SESSION "
-                  "baseline, never one computed with future sessions")},
+         "raw:prior_session.volume": prior_volume_field},
         lambda: round(day["v"] / pv, 4) if pv else None, as_of=day.get("t"))
     F["last_minute_volume"] = (
         ok(minute["v"], source="alpaca_sip", as_of=minute.get("t"))
