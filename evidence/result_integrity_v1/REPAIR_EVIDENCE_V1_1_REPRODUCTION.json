@@ -1,0 +1,109 @@
+{
+ "base_commit": "d0f3f967ff643399e4dca712c81fb97c15fba226",
+ "base_validator_version": "RESULT_VALIDATOR_V1",
+ "repaired_validator_version": "RESULT_VALIDATOR_V1.1",
+ "method": "V1 code loaded from git object d0f3f967f; real courts.final_court identity helpers; one real development cell per probe",
+ "fixture": {
+  "namespace": "WM0E_R7_1_RUNNER_QUALIFICATION_DEV_V0",
+  "purpose": "RUNNER_QUALIFICATION_DEVELOPMENT_ONLY",
+  "control": "N0",
+  "index": 0,
+  "cell_id": "14e5013a2e2226c5832852c4b9d45b0cbed58533f9aab701051eb6554da87166",
+  "v1_accepts_genuine": true,
+  "v11_accepts_genuine": true
+ },
+ "finding_1_incomplete_numeric_validation": {
+  "probes": {
+   "selector_G_hat_NaN": {
+    "V1_accepts": true,
+    "V1_failures": [],
+    "V1_1_refuses": true,
+    "V1_1_reasons": [
+     "selector.G_hat is not a finite real number: nan"
+    ]
+   },
+   "selector_K_N_True": {
+    "V1_accepts": true,
+    "V1_failures": [],
+    "V1_1_refuses": true,
+    "V1_1_reasons": [
+     "selector.K_N is bool (True), not an int"
+    ]
+   },
+   "companion_seed_float": {
+    "V1_accepts": true,
+    "V1_failures": [],
+    "V1_1_refuses": true,
+    "V1_1_reasons": [
+     "companion_seed 955303241.0 (float) is not an int in [0, 2^31-1)"
+    ]
+   }
+  },
+  "reproduced": true,
+  "repaired": true
+ },
+ "finding_2_verdict_did_not_enforce_all_checks": {
+  "old_expression": "\"PASS\" if (rep[\"ok\"] and snap[\"definition\"][\"court_hash_matches\"]\n                                                                 and snap[\"opening_marker\"][\"court_hash_matches\"]\n                                                                 and snap[\"opening_marker\"][\"precourt_regression_sha_matches\"]\n                                                                 and snap[\"frozen_judge_over_files_equals_stored_judgement\"]) else \"FAIL\"",
+  "old_expression_participants": [
+   "definition.court_hash_matches",
+   "opening_marker.court_hash_matches",
+   "opening_marker.precourt_regression_sha_matches"
+  ],
+  "recorded_but_not_enforced": [
+   "surface_unchanged_now",
+   "runner_unchanged_now",
+   "seed_manifest_hash_matches"
+  ],
+  "old_expression_with_those_three_false": "PASS",
+  "reproduced": true,
+  "registry_version": "RESULT_AUDIT_REGISTRY_V1",
+  "registry_required_checks": [
+   "DEFINITION_REDERIVES",
+   "SURFACE_UNCHANGED",
+   "RUNNER_UNCHANGED",
+   "OPENING_MARKER_IDENTITY",
+   "SEED_MANIFEST_LINKAGE",
+   "REGRESSION_LINKAGE",
+   "INVENTORY",
+   "CELL_VALIDATION",
+   "MANIFEST_AGREEMENT",
+   "AGGREGATE_AGREEMENT",
+   "RECOUNT_MATCHES_STORED",
+   "FROZEN_JUDGE_AGREES",
+   "COMMITMENT_AGREEMENT",
+   "COMMITMENT_MATCHES_TRUSTED_ROOT"
+  ],
+  "registry_overall_when_each_fails_blocked_or_absent": {
+   "SURFACE_UNCHANGED_FAIL": "FAIL",
+   "SURFACE_UNCHANGED_BLOCKED": "BLOCKED",
+   "SURFACE_UNCHANGED_ABSENT": "BLOCKED",
+   "RUNNER_UNCHANGED_FAIL": "FAIL",
+   "RUNNER_UNCHANGED_BLOCKED": "BLOCKED",
+   "RUNNER_UNCHANGED_ABSENT": "BLOCKED",
+   "SEED_MANIFEST_LINKAGE_FAIL": "FAIL",
+   "SEED_MANIFEST_LINKAGE_BLOCKED": "BLOCKED",
+   "SEED_MANIFEST_LINKAGE_ABSENT": "BLOCKED"
+  },
+  "repaired": true
+ },
+ "finding_3_validator_commitment_disagreement": {
+  "fixture": "development N0 cell with secondary.non_overlap_z=+inf (verdict SIGNAL_DETECTED, consistent) and legacy_iid_z=-inf",
+  "V1_validator_accepts": true,
+  "V1_cell_digest": "REFUSED: $.secondary.legacy_iid_z is non-finite (-inf); a commitment over NaN is meaningless",
+  "reproduced": true,
+  "V1_1_validator_accepts": true,
+  "V1_1_digest": "924fa0b2aa465283bda69bb96ecee92208e24302c967ef2268a8747e06f6505a",
+  "V1_1_commit_root": "6dc25ac207d36407031e33ff6e6507e8a493db4f4287f8eadc5b73bf6fcc3d03",
+  "V1_1_verified": true,
+  "sign_flip_changes_digest": true,
+  "string_minus_inf": {
+   "validator_refuses": true,
+   "commitment": "ACCEPTED_AS_STRING (digest differs: True)"
+  },
+  "representation": "tagged-leaf canonical JSON: n | b:true/false | i:<int> | f:<repr> | inf:+ | inf:- | s:<str>; sorted keys; ASCII; NaN refused; infinity only at ['secondary.non_overlap_z', 'secondary.legacy_iid_z']",
+  "repaired": true
+ },
+ "elapsed_s": 4.8,
+ "all_three_reproduced_on_base": true,
+ "all_three_repaired": true
+}
