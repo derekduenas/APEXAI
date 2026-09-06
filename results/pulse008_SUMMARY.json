@@ -1,0 +1,654 @@
+{
+ "kind": "pulse008_summary",
+ "version": "PULSE008_SUMMARY_V1",
+ "base_commit": "dc4a9c11e6b3bbd63ff8ed5c0a4a55609b1360f8",
+ "final_commit": "dca97890cd436ea36d10e15d43db9f7a69656411",
+ "branch": "pulse-008-observation-time",
+ "worktree_clean": false,
+ "changed_files": [
+  "apex/pulse/historical.py",
+  "apex/pulse/observation.py",
+  "results/pulse008_mirror_run_v2_1_observation_time.json",
+  "results/pulse008_mirror_run_v2_1_observation_time_boundary_fixed.json",
+  "results/pulse008_query_bound_probe_v1.json",
+  "results/pulse008_tape_reach_probe_v1.json",
+  "scripts/mirror_run_v2.py",
+  "scripts/pulse008_query_bound_probe.py",
+  "scripts/pulse008_tape_probe.py",
+  "tests/test_pulse_anchors.py",
+  "tests/test_pulse_observation.py"
+ ],
+ "authoritative_timestamp": {
+  "selected": "features[*].as_of of the quote-derived block",
+  "why": "the composer stamps every quote-derived field from one NBBO event time, so the packet already records what it observed, per ingredient. This is the twin's own law: a packet is not synchronous and every field keeps its own clock.",
+  "unanimity_observed": {
+   "SPY_index": 10,
+   "degraded_subject": 10,
+   "enriched_subject": 10,
+   "liquid_megacap": 10,
+   "ordinary_subject": 10
+  },
+  "rejected": {
+   "scheduled_time": "the slot the cycle was due; nothing was read then",
+   "capture_start/capture_end": "IDENTICAL across all six subjects -- one bulk snapshot fetch. Used only as the upper causal bound.",
+   "state_complete_time/known_from": "+17.1s to +31.0s per subject, after enrichment; reconstructing a quote there imports tape the live quote field never saw"
+  },
+  "observation_times_used": {
+   "SPY_index": "2026-09-01T13:45:01.669149633Z",
+   "degraded_subject": "2026-09-01T13:45:01.405159959Z",
+   "enriched_subject": "2026-09-01T13:45:01.275217469Z",
+   "liquid_megacap": "2026-09-01T13:45:01.298268834Z",
+   "ordinary_subject": "2026-09-01T13:44:59.993460487Z"
+  },
+  "what_moved": "the quote ingredient only; bar ingredients stay bounded by the slot (TDOC observed 7 ms BEFORE its slot, so one packet-level instant is wrong in both directions)"
+ },
+ "quote_boundary_defect": {
+  "id": "QUOTE-BOUNDARY-001",
+  "found": "while measuring why sizes still disagreed after the timestamps matched",
+  "cause": "the vendor's `end` bound does not return the event AT the boundary, so a query with end = t never contained the quote live used and the local filter took the previous event",
+  "truncation_refuted": {
+   "AAL": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "AAOI": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "AAPL": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "SPY": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "TDOC": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ]
+  },
+  "evidence": {
+   "AAL": {
+    "exact_event_present_by_query_margin": {
+     "0": false,
+     "1": true,
+     "3": true
+    },
+    "gap_ms_by_margin": {
+     "0": 172.98,
+     "1": 0.0,
+     "3": 0.0
+    },
+    "matches_live_by_margin": {
+     "0": {
+      "imbalance": false,
+      "touch": false,
+      "mid": true
+     },
+     "1": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     },
+     "3": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     }
+    }
+   },
+   "AAOI": {
+    "exact_event_present_by_query_margin": {
+     "0": false,
+     "1": true,
+     "3": true
+    },
+    "gap_ms_by_margin": {
+     "0": 0.548,
+     "1": 0.0,
+     "3": 0.0
+    },
+    "matches_live_by_margin": {
+     "0": {
+      "imbalance": false,
+      "touch": false,
+      "mid": true
+     },
+     "1": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     },
+     "3": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     }
+    }
+   },
+   "AAPL": {
+    "exact_event_present_by_query_margin": {
+     "0": false,
+     "1": true,
+     "3": true
+    },
+    "gap_ms_by_margin": {
+     "0": 107.876,
+     "1": 0.0,
+     "3": 0.0
+    },
+    "matches_live_by_margin": {
+     "0": {
+      "imbalance": false,
+      "touch": false,
+      "mid": false
+     },
+     "1": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     },
+     "3": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     }
+    }
+   },
+   "SPY": {
+    "exact_event_present_by_query_margin": {
+     "0": false,
+     "1": true,
+     "3": true
+    },
+    "gap_ms_by_margin": {
+     "0": 1.604,
+     "1": 0.0,
+     "3": 0.0
+    },
+    "matches_live_by_margin": {
+     "0": {
+      "imbalance": false,
+      "touch": false,
+      "mid": true
+     },
+     "1": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     },
+     "3": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     }
+    }
+   },
+   "TDOC": {
+    "exact_event_present_by_query_margin": {
+     "0": false,
+     "1": true,
+     "3": true
+    },
+    "gap_ms_by_margin": {
+     "0": 666.88,
+     "1": 0.0,
+     "3": 0.0
+    },
+    "matches_live_by_margin": {
+     "0": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     },
+     "1": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     },
+     "3": {
+      "imbalance": true,
+      "touch": true,
+      "mid": true
+     }
+    }
+   }
+  },
+  "repair": "widen the vendor QUERY past the instant; the local `<= t` filter is unchanged and remains the only thing that admits an event"
+ },
+ "per_field_before_after": {
+  "SPY_index": {
+   "cash_open_return_bps": {
+    "live": -1.18,
+    "replay_at_scheduled": -0.85,
+    "replay_at_observation_pre_boundary_fix": -1.18,
+    "replay_at_observation_final": -1.18,
+    "observed_before": "SEMANTICALLY_EQUIVALENT",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "mid": {
+    "live": 761.92,
+    "replay_at_scheduled": 761.945,
+    "replay_at_observation_pre_boundary_fix": 761.92,
+    "replay_at_observation_final": 761.92,
+    "observed_before": "SEMANTICALLY_EQUIVALENT",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "nbbo_size_imbalance": {
+    "live": -0.5294,
+    "replay_at_scheduled": -0.3333,
+    "replay_at_observation_pre_boundary_fix": -0.625,
+    "replay_at_observation_final": -0.5294,
+    "observed_before": "APPROXIMATE",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "prior_close_return_bps": {
+    "live": -66.88,
+    "replay_at_scheduled": -66.55,
+    "replay_at_observation_pre_boundary_fix": -66.88,
+    "replay_at_observation_final": -66.88,
+    "observed_before": "SEMANTICALLY_EQUIVALENT",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "spread_bps": {
+    "live": 0.525,
+    "replay_at_scheduled": 0.394,
+    "replay_at_observation_pre_boundary_fix": 0.525,
+    "replay_at_observation_final": 0.525,
+    "observed_before": "SEMANTICALLY_EQUIVALENT",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "vwap_distance_bps": {
+    "live": 1.48,
+    "replay_at_scheduled": 1.77,
+    "replay_at_observation_pre_boundary_fix": 1.44,
+    "replay_at_observation_final": 1.44,
+    "observed_before": "SEMANTICALLY_EQUIVALENT",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   }
+  },
+  "degraded_subject": {
+   "nbbo_size_imbalance": {
+    "live": 0.5833,
+    "replay_at_scheduled": 0.2258,
+    "replay_at_observation_pre_boundary_fix": 0.6,
+    "replay_at_observation_final": 0.5833,
+    "observed_before": "APPROXIMATE",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   }
+  },
+  "elevated_mover": {
+   "cash_open_return_bps": {
+    "live": -2039.13,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "catalyst_fact_events_known": {
+    "live": 0,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "last_trade": {
+    "live": null,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "NOT_AVAILABLE",
+    "observed_after": null
+   },
+   "micro_net_signed_volume": {
+    "live": null,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "NOT_AVAILABLE",
+    "observed_after": null
+   },
+   "micro_spread_bps_median": {
+    "live": null,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "NOT_AVAILABLE",
+    "observed_after": null
+   },
+   "mid": {
+    "live": null,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "NOT_AVAILABLE",
+    "observed_after": null
+   },
+   "nbbo_size_imbalance": {
+    "live": null,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "NOT_AVAILABLE",
+    "observed_after": null
+   },
+   "opt_state": {
+    "live": null,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "NOT_AVAILABLE",
+    "observed_after": null
+   },
+   "overnight_gap_bps": {
+    "live": -1043.61,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "prior_close": {
+    "live": 0.2568,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "prior_close_return_bps": {
+    "live": -2869.94,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "ret_10m_bps": {
+    "live": 0.0,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "ret_15m_bps": {
+    "live": 0.0,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "ret_1m_bps": {
+    "live": null,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "NOT_AVAILABLE",
+    "observed_after": null
+   },
+   "ret_5m_bps": {
+    "live": 0.0,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "session_high": {
+    "live": 0.25,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "session_low": {
+    "live": 0.175,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "session_volume": {
+    "live": 37074204,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "session_vwap": {
+    "live": 0.201437,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   },
+   "spread_bps": {
+    "live": null,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "NOT_AVAILABLE",
+    "observed_after": null
+   },
+   "vwap_distance_bps": {
+    "live": -910.31,
+    "replay_at_scheduled": null,
+    "replay_at_observation_pre_boundary_fix": null,
+    "replay_at_observation_final": null,
+    "observed_before": "LIVE_ONLY",
+    "observed_after": null
+   }
+  },
+  "enriched_subject": {
+   "cash_open_return_bps": {
+    "live": -246.53,
+    "replay_at_scheduled": -239.35,
+    "replay_at_observation_pre_boundary_fix": -246.53,
+    "replay_at_observation_final": -246.53,
+    "observed_before": "APPROXIMATE",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "mid": {
+    "live": 101.875,
+    "replay_at_scheduled": 101.95,
+    "replay_at_observation_pre_boundary_fix": 101.875,
+    "replay_at_observation_final": 101.875,
+    "observed_before": "SEMANTICALLY_EQUIVALENT",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "nbbo_size_imbalance": {
+    "live": 0.6,
+    "replay_at_scheduled": -0.5,
+    "replay_at_observation_pre_boundary_fix": 0.7143,
+    "replay_at_observation_final": 0.6,
+    "observed_before": "APPROXIMATE",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "prior_close_return_bps": {
+    "live": -539.98,
+    "replay_at_scheduled": -533.01,
+    "replay_at_observation_pre_boundary_fix": -539.98,
+    "replay_at_observation_final": -539.98,
+    "observed_before": "APPROXIMATE",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "spread_bps": {
+    "live": 14.724,
+    "replay_at_scheduled": 9.809,
+    "replay_at_observation_pre_boundary_fix": 14.724,
+    "replay_at_observation_final": 14.724,
+    "observed_before": "APPROXIMATE",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   },
+   "vwap_distance_bps": {
+    "live": -141.3,
+    "replay_at_scheduled": -133.01,
+    "replay_at_observation_pre_boundary_fix": -140.27,
+    "replay_at_observation_final": -140.27,
+    "observed_before": "APPROXIMATE",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   }
+  },
+  "liquid_megacap": {
+   "nbbo_size_imbalance": {
+    "live": 0.0,
+    "replay_at_scheduled": -0.3333,
+    "replay_at_observation_pre_boundary_fix": -0.3333,
+    "replay_at_observation_final": 0.0,
+    "observed_before": "APPROXIMATE",
+    "observed_after": "SEMANTICALLY_EQUIVALENT"
+   }
+  }
+ },
+ "unresolved_fields": {},
+ "refused_comparisons": [
+  {
+   "subject_class": "elevated_mover",
+   "subject": "NKLA",
+   "stage": "OBSERVATION_TIME",
+   "error": "STALE_BEYOND_POLICY: the unanimous quote-derived as_of is 2025-02-26T00:59:59.255814551Z, which is sip_quote: 47738702.5s exceeds the 120s REGULAR tolerance. It is not an observation of this cycle. Note the packet marked the RAW quote fields STALE for the same reason and still stamped the DERIVED fields VALID."
+  }
+ ],
+ "mirror": {
+  "before_pulse008": {
+   "verdicts": {
+    "SPY_index": "DECLARATION_CONTRADICTED_BY_REALITY",
+    "degraded_subject": "DECLARATION_CONTRADICTED_BY_REALITY",
+    "elevated_mover": "MIRROR_CONSISTENT",
+    "enriched_subject": "DECLARATION_CONTRADICTED_BY_REALITY",
+    "liquid_megacap": "DECLARATION_CONTRADICTED_BY_REALITY",
+    "ordinary_subject": "MIRROR_CONSISTENT"
+   },
+   "coverage": "INCOMPLETE",
+   "declarations": "BLOCKED"
+  },
+  "observation_time_only": {
+   "verdicts": {
+    "SPY_index": "DECLARATION_CONTRADICTED_BY_REALITY",
+    "degraded_subject": "DECLARATION_CONTRADICTED_BY_REALITY",
+    "enriched_subject": "DECLARATION_CONTRADICTED_BY_REALITY",
+    "liquid_megacap": "DECLARATION_CONTRADICTED_BY_REALITY",
+    "ordinary_subject": "MIRROR_CONSISTENT"
+   },
+   "violations": {
+    "SPY_index": [
+     "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=-0.5294 replay=-0.625 (rel 0.18058179)"
+    ],
+    "degraded_subject": [
+     "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.5833 replay=0.6 (rel 0.02863021)"
+    ],
+    "enriched_subject": [
+     "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.6 replay=0.7143 (rel 0.1905)"
+    ],
+    "liquid_megacap": [
+     "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.0 replay=-0.3333 (rel 333299999.99999994)"
+    ]
+   }
+  },
+  "observation_time_plus_boundary_fix": {
+   "verdicts": {
+    "SPY_index": "MIRROR_CONSISTENT",
+    "degraded_subject": "MIRROR_CONSISTENT",
+    "enriched_subject": "MIRROR_CONSISTENT",
+    "liquid_megacap": "MIRROR_CONSISTENT",
+    "ordinary_subject": "MIRROR_CONSISTENT"
+   },
+   "violations": {},
+   "coverage": "INCOMPLETE",
+   "coverage_reasons": [
+    "1 comparison(s) never produced a result"
+   ],
+   "anchor": "BLOCKED",
+   "declarations": "BLOCKED"
+  }
+ },
+ "bounded_regression": {
+  "commit": "dca97890c",
+  "tree": "6c433367d2e968a4993196ac7aac12cd019ee43f",
+  "shards": 209,
+  "totals": {
+   "PASS": 3651,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 18,
+   "XFAIL": 0,
+   "XPASS": 0
+  },
+  "slice_oom_kill_before": 7,
+  "slice_oom_kill_after": 8,
+  "problem_shards": [
+   "tests/test_null_rig.py(rc=1)"
+  ],
+  "verdict": "FAIL",
+  "problem_shard_attribution": {
+   "finding": "tests/test_null_rig.py OOM-killed in its 1400M shard; slice oom_kill 7->8",
+   "pre_existing": true,
+   "control": "PULSE-007 ran the SAME module at the BASE commit 7969dbbd1 in a clean git worktree with none of this work present; it died identically and incremented the slice counter. Re-running that control here would repeat a settled measurement, so the PULSE-007 control is cited rather than duplicated.",
+   "control_evidence": "results/pulse007_SUMMARY.json -> bounded_regression.problem_shard_attribution",
+   "touches_pulse008_code": "no -- the module imports nothing from apex.pulse",
+   "known_defect": "TEST-NULL-RIG-MEMORY-001, repaired on world-model-shadow-v0, not on main",
+   "disposition": "reported, not repaired; memory limits not raised; result not relabelled"
+  },
+  "tree_note": "the tested tree differs from the final commit only by scripts/pulse008_shard_regression.sh, the untracked runner that executed the run; it is imported by nothing"
+ },
+ "preservation": {
+  "original_failed_mirror_evidence": {
+   "path": "results/pulse/mirror_tests.jsonl",
+   "sha256": "8d0211e77da9ab347cbedac917a81cd59b1872619d183d64ad19188a5d8698e1"
+  },
+  "pulse007_evidence": {
+   "pulse007_mirror_run_v2_final.json": "f4e3b4b96dc3b60ecad13da3ba1c396db6354f9d761fa316f075b7f325f39f09",
+   "pulse007_frozen_packets.jsonl": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+   "pulse007_frozen_manifest.json": "3557bac4fc0a973558a08c60847e3d5c16a0737e7ad5a163a4b77bccbe4591c8",
+   "pulse007_anchor_trace.json": "1a89ddd42ddd1f00cfe5eefbeb4cd89baae0345e8536ba3c61329c7108c04d6a",
+   "pulse007_SUMMARY.json": "52590b4edcee732b929da2121e6d6649dbdbea126bf9e2c7f01ac2dd337e09a1"
+  },
+  "declarations_and_tolerances_unchanged": true,
+  "frozen_packets_unchanged_since_pulse007": true,
+  "world_model_worktree": "d01e961b6",
+  "production_release": "/opt/apex/releases/5eff1cf5e00f21b02c537f25bcd74b1c1d317546"
+ },
+ "incidental_findings_reported_not_acted_on": {
+  "DERIVED-FIELD-STALENESS-001": "the composer marked NKLA's RAW quote fields STALE (a 553-day-old NBBO) and marked the DERIVED fields computed from that same stale mid VALID, including prior_close_return_bps = -2869.94. Staleness is applied to the raw fields and not propagated to what is derived from them. A live-composer defect; not this brick.",
+  "ORCHESTRATOR-OOM-LOOP-001": "unchanged from PULSE-007; still open, not touched"
+ },
+ "verdicts": {
+  "OBSERVATION_TIME_CONTRACT": "DEFINED",
+  "OBSERVATION_TIME_RECONCILIATION": "RESOLVED_FOR_EVERY_RECONCILABLE_SUBJECT",
+  "MIRROR_COVERAGE": "INCOMPLETE",
+  "MIRROR_UNDER_ORIGINAL_DECLARATIONS": "BLOCKED",
+  "HISTORICAL_AS_KNOWN_AVAILABILITY": "NOT_PROVEN",
+  "PHASE_2": "OPEN",
+  "WORLD_MODEL_REAL_DATA_ADMISSION": "NOT_AUTHORIZED"
+ },
+ "verdict_notes": {
+  "OBSERVATION_TIME_RECONCILIATION": "every field that could be compared now agrees: 5 of 6 subjects MIRROR_CONSISTENT with an empty violation list, under the ORIGINAL declarations and the ORIGINAL tolerances.",
+  "MIRROR_COVERAGE": "INCOMPLETE because NKLA is refused as STALE_BEYOND_POLICY. Five of six is not a pass and the runner does not report one.",
+  "MIRROR_UNDER_ORIGINAL_DECLARATIONS": "BLOCKED, not FAIL: there are zero violations, but coverage is incomplete, so the status cannot be PASS.",
+  "HISTORICAL_AS_KNOWN_AVAILABILITY": "unchanged. The vendor still returns history as it stands at retrieval; nothing here establishes when a value became available."
+ }
+}
