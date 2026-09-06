@@ -61,11 +61,18 @@ for _v, _f in (("APCA_API_KEY_ID", "ALPACA_API_KEY_ID"),
             os.environ[_v] = open(_p).read().strip()
 
 from apex.pulse import anchors                              # noqa: E402
+from apex.pulse import observation as OBS                   # noqa: E402
 from apex.pulse.historical import FACTORY_VERSION, twin_as_of   # noqa: E402
 from apex.pulse.mirror import CORE_FIELDS, MIRROR_VERSION, mirror  # noqa: E402
 from apex.pulse.parity import MATRIX                        # noqa: E402
 
-RUNNER_VERSION = "MIRROR_RUN_V2"
+RUNNER_VERSION = "MIRROR_RUN_V2.1"
+RUNNER_HISTORY = {
+    "V2": "fixed packets, fail-closed coverage, three separate statuses, write-once output",
+    "V2.1": "PULSE-008: --reconstruct-at {scheduled,observation}. In observation mode the "
+            "QUOTE ingredient is selected at the instant the sealed packet records having "
+            "observed one (OBSERVATION_TIME_CONTRACT_V1) while the bar ingredients stay "
+            "bounded by the scheduled slot. Default is `scheduled`: unchanged from V2."}
 ANCHOR_FIELDS = ("prior_close", "prior_close_return_bps",
                  "cash_open_return_bps", "overnight_gap_bps")
 COMPARED = ("SEMANTICALLY_EQUIVALENT", "APPROXIMATE")
@@ -104,6 +111,12 @@ def main(argv=None):
     ap.add_argument("--packets", required=True)
     ap.add_argument("--out", required=True, help="versioned destination; refuses to overwrite")
     ap.add_argument("--label", default="PULSE007_POST_REPAIR")
+    ap.add_argument("--reconstruct-at", choices=("scheduled", "observation"), default="scheduled",
+                    help="scheduled: reconstruct everything at the packet's slot (V2 behaviour). "
+                         "observation: select the QUOTE at the instant the packet records having "
+                         "observed one; bars stay bounded by the slot.")
+    ap.add_argument("--baseline", default=None,
+                    help="a prior run artifact to diff per field against")
     a = ap.parse_args(argv)
     if os.path.exists(a.out):
         print("refusing to overwrite existing evidence:", a.out)
@@ -119,8 +132,28 @@ def main(argv=None):
                              "stage": "FROZEN_INPUT", "error": e["load_error"]})
             print("%-16s %-5s INPUT UNUSABLE: %s" % (cls, sym, e["load_error"]))
             continue
+        obs_rec, quote_at = None, None
+        if a.reconstruct_at == "observation":
+            obs_rec = OBS.observation_time(e["packet"])
+            if obs_rec["status"] != OBS.RESOLVED:
+                failures.append({"subject_class": cls, "subject": sym, "scheduled_time": t,
+                                 "stage": "OBSERVATION_TIME", "error": "%s: %s"
+                                 % (obs_rec["status"], obs_rec["reason"]),
+                                 "provenance": obs_rec})
+                print("%-16s %-5s OBSERVATION TIME %s: %s" % (cls, sym, obs_rec["status"],
+                                                              obs_rec["reason"][:90]))
+                continue
+            quote_at = obs_rec["observation_time"]
+            # causal bound, asserted rather than assumed
+            ce = e["packet"].get("capture_end")
+            if ce and OBS._dt(quote_at) > OBS._dt(ce):
+                failures.append({"subject_class": cls, "subject": sym, "scheduled_time": t,
+                                 "stage": "CAUSAL_BOUND",
+                                 "error": "observation time %s exceeds capture_end %s" % (quote_at, ce)})
+                continue
         try:
-            replay = twin_as_of(sym, t)
+            replay = (twin_as_of(sym, t, quote_as_of=quote_at) if quote_at
+                      else twin_as_of(sym, t))
         except Exception as ex:                              # noqa: BLE001
             failures.append({"subject_class": cls, "subject": sym, "scheduled_time": t,
                              "stage": "RECONSTRUCTION", "error": "%s: %s" % (type(ex).__name__, ex)})
@@ -131,6 +164,10 @@ def main(argv=None):
         m["frozen_state_id"] = e.get("state_id")
         m["original_verdict"] = e.get("original_verdict")
         m["original_violations"] = e.get("original_violations")
+        m["reconstruct_at"] = a.reconstruct_at
+        m["observation_time_used"] = quote_at
+        m["observation_time_provenance"] = obs_rec
+        m["bar_cutoff_used"] = t
         m["replay_anchor_provenance"] = next(
             (n for n in (replay.get("notes") or []) if str(n).startswith("anchor_provenance:")), None)
         counts = m["classification_counts"]
@@ -169,7 +206,35 @@ def main(argv=None):
     anchor_status = (BLOCKED if coverage == INCOMPLETE else (FAIL if anchor_viol else PASS))
     mirror_status = (BLOCKED if coverage == INCOMPLETE else (FAIL if all_viol else PASS))
 
-    doc = {"kind": "pulse_mirror_run", "runner": RUNNER_VERSION, "mirror": MIRROR_VERSION,
+    per_field = {}
+    if a.baseline and os.path.exists(a.baseline):
+        base = json.load(open(a.baseline))
+        by = {r["subject_class"]: {x["field"]: x for x in r["rows"]} for r in base.get("results", [])}
+        for m in results:
+            b = by.get(m["subject_class"], {})
+            rows = {}
+            for r in m["rows"]:
+                o = b.get(r["field"], {})
+                if o.get("observed") == r["observed"] and o.get("replay_value") == r["replay_value"]:
+                    continue
+                rows[r["field"]] = {"live": r["live_value"],
+                                    "replay_before": o.get("replay_value"),
+                                    "replay_after": r["replay_value"],
+                                    "observed_before": o.get("observed"),
+                                    "observed_after": r["observed"],
+                                    "rel_diff_before": o.get("relative_difference"),
+                                    "rel_diff_after": r.get("relative_difference")}
+            per_field[m["subject_class"]] = rows
+
+    doc = {"kind": "pulse_mirror_run", "runner": RUNNER_VERSION, "runner_history": RUNNER_HISTORY,
+           "mirror": MIRROR_VERSION,
+           "reconstruct_at": a.reconstruct_at,
+           "observation_contract": OBS.OBSERVATION_CONTRACT if a.reconstruct_at == "observation" else None,
+           "observation_times_used": {m["subject_class"]: m.get("observation_time_used") for m in results},
+           "baseline_artifact": a.baseline,
+           "per_field_before_after": per_field,
+           "unresolved_fields": {m["subject_class"]: [v.split(":")[0] for v in m["declaration_violations"]]
+                                 for m in results if m["declaration_violations"]},
            "factory": FACTORY_VERSION, "anchor_contract": anchors.ANCHOR_CONTRACT,
            "label": a.label, "utc": datetime.now(timezone.utc).isoformat(),
            "frozen_manifest": a.manifest, "frozen_packets": a.packets,
@@ -191,7 +256,14 @@ def main(argv=None):
     with os.fdopen(fd, "w") as fh:
         json.dump(doc, fh, indent=1, default=str)
 
-    print("\nMIRROR_COVERAGE:                     %s %s" % (coverage, cov_reasons or ""))
+    print("\nreconstruct_at: %s" % a.reconstruct_at)
+    for m in results:
+        if m.get("observation_time_used"):
+            print("  %-16s observed %s (%+.3fs from slot, %d fields agree)"
+                  % (m["subject_class"], m["observation_time_used"],
+                     m["observation_time_provenance"]["offset_from_scheduled_s"],
+                     m["observation_time_provenance"]["field_count"]))
+    print("MIRROR_COVERAGE:                     %s %s" % (coverage, cov_reasons or ""))
     print("ANCHOR_STATUS:                       %s %s" % (anchor_status, list(anchor_viol) or ""))
     print("MIRROR_UNDER_ORIGINAL_DECLARATIONS:  %s %s" % (mirror_status, list(all_viol) or ""))
     print("wrote", a.out)

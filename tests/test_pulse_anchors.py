@@ -54,8 +54,11 @@ def test_contract_is_stated_and_names_the_defects_it_closes():
     assert c["leak_discipline"]["current_session_daily_bar_fields_used"] == ["o"]
     assert set(c["leak_discipline"]["rebuilt_from_minute_bars"]) == {"h", "l", "c", "v", "vw"}
     assert "does NOT establish as-known-at" in c["correction_availability"]
-    assert H.FACTORY_VERSION == "HISTORICAL_MARKET_TWIN_FACTORY_V0.1"
+    # the factory version advances with later bricks; what PULSE-007 pins is that
+    # V0.1 exists and still records the two defects it closed.
+    assert H.FACTORY_VERSION.startswith("HISTORICAL_MARKET_TWIN_FACTORY_V0.")
     assert "ANCHOR-001" in H.FACTORY_HISTORY["V0"] and "ANCHOR-002" in H.FACTORY_HISTORY["V0"]
+    assert "apex.pulse.anchors" in H.FACTORY_HISTORY["V0.1"]
 
 
 # ---------------------------------------------------------------- session windows
