@@ -25,13 +25,25 @@ import re
 from datetime import datetime, timezone
 
 from apex.intraday.sessions import Session, classify
-from apex.pulse import freshness
+from apex.pulse import derived, freshness
 from apex.pulse.twin import (NOT_AVAILABLE, NOT_ESTIMABLE,
                              PROVIDER_ERROR, SESSION_INAPPLICABLE,
                              STALE, UNKNOWN, TwinState, absent, adopt,
                              ok)
 
-COMPOSER_VERSION = "PULSE_COMPOSE_V0"
+COMPOSER_VERSION = "PULSE_COMPOSE_V0.1"
+COMPOSER_HISTORY = {
+    "V0": "the freshness verdict was applied where a value was READ and did not travel to what "
+          "was BUILT from it. NKLA 2026-09-01: mid/spread_bps/nbbo_size_imbalance STALE on a "
+          "553-day-old quote, while prior_close_return_bps (-2869.94), cash_open_return_bps, "
+          "vwap_distance_bps and session_range_position were computed from that same refused mid "
+          "and marked VALID (DERIVED-FIELD-STALENESS-001)",
+    "V0.1": "PULSE-009: every derived field is built through apex.pulse.derived under a declared "
+            "dependency map. A derived field is VALID only when every ingredient is VALID; "
+            "otherwise it carries the ingredient's absence reason or STALE, with the culprit "
+            "named, and no value. Independent fields are untouched: a stale quote does not reach "
+            "prior_close. The rolling and premarket stores are only OBSERVED with a usable mid, "
+            "so an untrusted price cannot enter PULSE's own memory."}
 
 TIER_1_DEEP = "TIER_1_DEEP"
 TIER_2_BROAD = "TIER_2_BROAD"
@@ -110,29 +122,57 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
                     else absent(STALE, source="alpaca_sip",
                                 note=verdict["why"]))
 
-        F["mid"] = qual(round(mid, 6), source="alpaca_sip", as_of=qt)
-        F["spread_bps"] = qual(round((ap - bp) / mid * 1e4, 3),
-                               source="alpaca_sip", as_of=qt)
-        F["spread_rel"] = qual(round((ap - bp) / mid, 8),
-                               source="alpaca_sip", as_of=qt)
-        F["quote_age_s"] = (ok(round(age, 2), source="alpaca_sip",
-                               as_of=qt) if age is not None
-                            else absent(NOT_ESTIMABLE,
-                                        source="alpaca_sip"))
+        # PULSE-009: the ingredients are admitted ONCE, as fields with their
+        # own quality, and every quote-derived value is built from them. The
+        # freshness verdict is carried on the ingredient, so it reaches
+        # everything downstream instead of stopping at the first reader.
+        stale_note = None if verdict["fresh"] else verdict["why"]
+        ing = {
+            "raw:quote.bid": (derived.raw_field(bp, source="alpaca_sip", as_of=qt)
+                              if verdict["fresh"] else
+                              absent(STALE, source="alpaca_sip", note=stale_note)),
+            "raw:quote.ask": (derived.raw_field(ap, source="alpaca_sip", as_of=qt)
+                              if verdict["fresh"] else
+                              absent(STALE, source="alpaca_sip", note=stale_note)),
+            "raw:quote.timestamp": (ok(qt, source="alpaca_sip", as_of=qt) if qt
+                                    else absent(NOT_AVAILABLE, source="alpaca_sip")),
+        }
+        sizes_usable = (isinstance(q.get("bs"), (int, float))
+                        and isinstance(q.get("as"), (int, float))
+                        and not isinstance(q.get("bs"), bool)
+                        and not isinstance(q.get("as"), bool)
+                        and (q["bs"] + q["as"]) > 0)
         # PULSE-001: sizes are a separate question from prices
-        if isinstance(q.get("bs"), (int, float)) and \
-                isinstance(q.get("as"), (int, float)) and \
-                (q["bs"] + q["as"]) > 0:
-            F["touch_size"] = qual(q["bs"] + q["as"],
-                                   source="alpaca_sip", as_of=qt)
-            F["nbbo_size_imbalance"] = qual(
-                round((q["bs"] - q["as"]) / (q["bs"] + q["as"]), 4),
-                source="alpaca_sip", as_of=qt)
-        else:
-            for k in ("touch_size", "nbbo_size_imbalance"):
-                F[k] = absent(NOT_ESTIMABLE, source="alpaca_sip",
-                              note="quote carries no usable sizes; "
-                                   "missing size is not zero size")
+        size_absent = absent(NOT_ESTIMABLE, source="alpaca_sip",
+                             note="quote carries no usable sizes; "
+                                  "missing size is not zero size")
+        for key, val in (("raw:quote.bid_size", q.get("bs")),
+                         ("raw:quote.ask_size", q.get("as"))):
+            ing[key] = (size_absent if not sizes_usable
+                        else derived.raw_field(val, source="alpaca_sip", as_of=qt)
+                        if verdict["fresh"] else
+                        absent(STALE, source="alpaca_sip", note=stale_note))
+
+        F["mid"] = derived.derive("mid", ing, lambda: round((bp + ap) / 2, 6),
+                                  source="alpaca_sip", as_of=qt)
+        F["spread_bps"] = derived.derive(
+            "spread_bps", ing, lambda: round((ap - bp) / ((bp + ap) / 2) * 1e4, 3),
+            source="alpaca_sip", as_of=qt)
+        F["spread_rel"] = derived.derive(
+            "spread_rel", ing, lambda: round((ap - bp) / ((bp + ap) / 2), 8),
+            source="alpaca_sip", as_of=qt)
+        # DERIVED_FIELD_CONTRACT_V1, STALENESS_IS_THE_MEASUREMENT: quote_age_s
+        # reports HOW OLD the quote is, so an old quote must not delete it. It
+        # depends on the timestamp, never on the prices.
+        F["quote_age_s"] = derived.derive(
+            "quote_age_s", ing, lambda: round(age, 2) if age is not None else None,
+            source="alpaca_sip", as_of=qt)
+        F["touch_size"] = derived.derive(
+            "touch_size", ing, lambda: q["bs"] + q["as"], source="alpaca_sip", as_of=qt)
+        F["nbbo_size_imbalance"] = derived.derive(
+            "nbbo_size_imbalance", ing,
+            lambda: round((q["bs"] - q["as"]) / (q["bs"] + q["as"]), 4),
+            source="alpaca_sip", as_of=qt)
     else:
         for k in ("mid", "spread_bps", "spread_rel", "quote_age_s",
                   "touch_size", "nbbo_size_imbalance"):
@@ -152,36 +192,15 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
         F["last_trade"] = absent(NOT_AVAILABLE, source="alpaca_sip")
 
     # ----------------------------------------------------- anchors
+    # PULSE-009: the INDEPENDENT fields are built first, each from its own
+    # single source, and the derived fields are then built FROM THEM rather
+    # than from raw locals. That is the whole repair: dependency, in one
+    # direction, visible in the code.
     F["prior_close"] = (ok(prev, source="alpaca_sip",
                            as_of=(snapshot.get("prevDailyBar") or {}
                                   ).get("t"))
                         if prev else absent(NOT_AVAILABLE,
                                             source="alpaca_sip"))
-    F["prior_close_return_bps"] = (
-        ok(_bps(mid, prev), source="derived", as_of=qt)
-        if (mid and prev) else absent(
-            NOT_ESTIMABLE, source="derived",
-            note="requires both a live mid and a prior close"))
-
-    d_open = day.get("o")
-    if session in (Session.PREMARKET, Session.CLOSED):
-        for k, why in (("cash_open_return_bps",
-                        f"no cash open has occurred in "
-                        f"{session.value}"),
-                       ("overnight_gap_bps",
-                        "the gap is defined at the cash open")):
-            F[k] = absent(SESSION_INAPPLICABLE, source="derived",
-                          note=why)
-    else:
-        F["cash_open_return_bps"] = (
-            ok(_bps(mid, d_open), source="derived", as_of=qt)
-            if (mid and d_open) else absent(NOT_ESTIMABLE,
-                                            source="derived"))
-        F["overnight_gap_bps"] = (
-            ok(_bps(d_open, prev), source="derived",
-               as_of=day.get("t"))
-            if (d_open and prev) else absent(NOT_ESTIMABLE,
-                                             source="derived"))
 
     # ------------------------------------------- session structure
     for name, key in (("session_high", "h"), ("session_low", "l"),
@@ -191,35 +210,50 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
         F[name] = (ok(v, source="alpaca_sip", as_of=day.get("t"))
                    if v is not None
                    else absent(NOT_AVAILABLE, source="alpaca_sip"))
-    hi, lo = day.get("h"), day.get("l")
-    F["session_range_position"] = (
-        ok(round((mid - lo) / (hi - lo), 4), source="derived",
-           as_of=qt)
-        if (mid and hi and lo and hi > lo)
-        else absent(NOT_ESTIMABLE, source="derived",
-                    note="requires a live mid and a non-degenerate "
-                         "session range"))
-    F["vwap_distance_bps"] = (
-        ok(_bps(mid, day.get("vw")), source="derived", as_of=qt)
-        if (mid and day.get("vw")) else absent(NOT_ESTIMABLE,
-                                               source="derived"))
+
+    d_open = day.get("o")
+    premarket_or_closed = session in (Session.PREMARKET, Session.CLOSED)
+    D = {k: F[k] for k in ("mid", "prior_close", "session_open", "session_high",
+                           "session_low", "session_vwap", "session_volume")}
+
+    F["prior_close_return_bps"] = derived.derive(
+        "prior_close_return_bps", D, lambda: _bps(F["mid"].value, prev), as_of=qt)
+    F["cash_open_return_bps"] = derived.derive(
+        "cash_open_return_bps", D, lambda: _bps(F["mid"].value, d_open), as_of=qt,
+        session_inapplicable=("no cash open has occurred in %s" % session.value
+                              if premarket_or_closed else None))
+    F["overnight_gap_bps"] = derived.derive(
+        "overnight_gap_bps", D, lambda: _bps(d_open, prev), as_of=day.get("t"),
+        session_inapplicable=("the gap is defined at the cash open"
+                              if premarket_or_closed else None))
+    F["session_range_position"] = derived.derive(
+        "session_range_position", D,
+        lambda: (round((F["mid"].value - day["l"]) / (day["h"] - day["l"]), 4)
+                 if day["h"] > day["l"] else None), as_of=qt,
+        note="requires a live mid and a non-degenerate session range")
+    F["vwap_distance_bps"] = derived.derive(
+        "vwap_distance_bps", D, lambda: _bps(F["mid"].value, day.get("vw")), as_of=qt)
+
     pv = (snapshot.get("prevDailyBar") or {}).get("v")
-    F["relative_volume"] = (
-        ok(round(day["v"] / pv, 4), source="derived",
-           as_of=day.get("t"))
-        if (day.get("v") and pv)
-        else absent(NOT_ESTIMABLE, source="derived",
-                    note="requires a session and a prior-session "
-                         "volume; a ONE-SESSION baseline, never one "
-                         "computed with future sessions"))
+    F["relative_volume"] = derived.derive(
+        "relative_volume",
+        {"session_volume": F["session_volume"],
+         "raw:prior_session.volume": derived.raw_field(
+             pv, source="alpaca_sip", as_of=(snapshot.get("prevDailyBar") or {}).get("t"),
+             note="requires a session and a prior-session volume; a ONE-SESSION "
+                  "baseline, never one computed with future sessions")},
+        lambda: round(day["v"] / pv, 4) if pv else None, as_of=day.get("t"))
     F["last_minute_volume"] = (
         ok(minute["v"], source="alpaca_sip", as_of=minute.get("t"))
         if minute.get("v") is not None
         else absent(NOT_AVAILABLE, source="alpaca_sip"))
 
     # ------------------------------- rolling path (PULSE's own eyes)
-    if rolling is not None and mid:
-        rolling.observe(subject, at=now, price=mid, volume=day.get("v"))
+    # PULSE-009: observe PULSE's own memory only with a USABLE mid. Feeding a
+    # refused price into the rolling store would carry the contamination into
+    # later cycles, where no quality flag could reach it any more.
+    if rolling is not None and F["mid"].usable:
+        rolling.observe(subject, at=now, price=F["mid"].value, volume=day.get("v"))
         for m in (1, 5, 10, 15, 30, 60):
             r = rolling.ret_bps(subject, m, now=now)
             F[f"ret_{m}m_bps"] = (
@@ -237,8 +271,8 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
                 note="no rolling history for this subject yet")
 
     # ------------------------------------------- premarket path
-    if premarket_path is not None and mid:
-        premarket_path.observe(subject, at=now, price=mid,
+    if premarket_path is not None and F["mid"].usable:
+        premarket_path.observe(subject, at=now, price=F["mid"].value,
                                volume=day.get("v"))
         path = premarket_path.path(subject, at=now, prior_close=prev)
         if path["status"] == "OBSERVED":
