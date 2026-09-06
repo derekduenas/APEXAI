@@ -41,7 +41,11 @@ pattern-matching on field names.
                  absence. bool is not a number.
   INDEPENDENT    a field whose ingredients are all fine is untouched. A
                  stale QUOTE must not contaminate prior_close, which is
-                 read from the prior daily bar and shares nothing with it.
+                 read from the prior daily bar and shares nothing with it,
+                 and a stale ANCHOR must not contaminate the current
+                 session's cash open. Enforced from both ends: each caller
+                 passes exactly its declared ingredients, and derive()
+                 refuses any ingredient that was not declared.
   SESSION        SESSION_INAPPLICABLE is decided by the session, before
                  ingredients are consulted, and is never overwritten by
                  ingredient propagation.
@@ -172,6 +176,17 @@ def resolve(name: str, inputs: dict) -> tuple:
     missing = [k for k in declared if k not in inputs]
     if missing:
         raise DerivationViolation("%s: ingredients %s were not supplied" % (name, missing))
+    # PULSE-010 REPAIR: an ingredient that was not declared must not even be
+    # OFFERED. resolve() only ever consulted `declared`, so a wider dict was
+    # inert -- but it left the declaration as the single thing standing between
+    # unrelated fields and accidental coupling. A caller that hands over more
+    # than it declared is now an error, not a near miss.
+    undeclared = sorted(k for k in inputs if k not in declared)
+    if undeclared:
+        raise DerivationViolation(
+            "%s: ingredients %s were supplied but are NOT declared in DEPENDENCIES. A derived "
+            "field must receive exactly what it declares, so that a failure in an unrelated "
+            "ingredient can never reach it." % (name, undeclared))
     bad, notes = {}, {}
     for k in declared:
         f = inputs[k]

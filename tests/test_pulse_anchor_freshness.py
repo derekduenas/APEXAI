@@ -69,7 +69,9 @@ def test_the_policy_is_stated_versioned_and_measured_in_sessions():
     for k in (A.CURRENT_SESSION_OPEN, A.IMMEDIATELY_PRECEDING, A.SESSIONS_MISSED,
               A.NO_PRIOR_SESSION, A.UNDATED, A.NOT_A_PRIOR_SESSION):
         assert k in d["classifications"]
-    assert C.COMPOSER_VERSION == "PULSE_COMPOSE_V0.2"
+    # the composer version advances with later bricks; what PULSE-010 pins is
+    # that V0.2 exists and still records the defect it closed.
+    assert C.COMPOSER_VERSION.startswith("PULSE_COMPOSE_V0.2")
     assert "LIVE-ANCHOR-STALENESS-V1" in C.COMPOSER_HISTORY["V0.2"]
 
 

@@ -1,0 +1,879 @@
+{
+ "kind": "pulse010_repair_before_after",
+ "question": "does a stale prior_close reach fields that do not declare it, and does a stale quote reach fields that do not declare the mid?",
+ "before": {
+  "phase": "before",
+  "composer": "PULSE_COMPOSE_V0.2",
+  "scenarios": {
+   "fresh_quote_stale_anchor": {
+    "label": "fresh quote, stale anchor",
+    "quote_as_of": "2026-09-01T13:44:59Z",
+    "anchor_as_of": "2025-02-24T05:00:00Z",
+    "fields": {
+     "mid": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": [
+       "raw:quote.bid",
+       "raw:quote.ask"
+      ]
+     },
+     "prior_close": {
+      "q": "STALE",
+      "v": null,
+      "note": "the anchor is from 2025-02-24 but the immediately preceding session is 2026-08-31: at least one regular session passed with no print from this instrum",
+      "declared_inputs": []
+     },
+     "session_open": {
+      "q": "VALID",
+      "v": 99.5,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_high": {
+      "q": "VALID",
+      "v": 101.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_low": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_vwap": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_volume": {
+      "q": "VALID",
+      "v": 5000,
+      "note": "",
+      "declared_inputs": []
+     },
+     "prior_close_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "prior_close_return_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is f",
+      "declared_inputs": [
+       "mid",
+       "prior_close"
+      ]
+     },
+     "overnight_gap_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "overnight_gap_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2",
+      "declared_inputs": [
+       "session_open",
+       "prior_close"
+      ]
+     },
+     "relative_volume": {
+      "q": "STALE",
+      "v": null,
+      "note": "relative_volume: ingredient(s) ['raw:prior_session.volume'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the ancho",
+      "declared_inputs": [
+       "session_volume",
+       "raw:prior_session.volume"
+      ]
+     },
+     "cash_open_return_bps": {
+      "q": "VALID",
+      "v": 52.26,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "session_open"
+      ]
+     },
+     "session_range_position": {
+      "q": "VALID",
+      "v": 0.51,
+      "note": "requires a live mid and a non-degenerate session range",
+      "declared_inputs": [
+       "mid",
+       "session_high",
+       "session_low"
+      ]
+     },
+     "vwap_distance_bps": {
+      "q": "VALID",
+      "v": 0.0,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "session_vwap"
+      ]
+     }
+    }
+   },
+   "stale_quote_fresh_anchor": {
+    "label": "stale quote, fresh anchor",
+    "quote_as_of": "2025-02-26T00:59:59Z",
+    "anchor_as_of": "2026-08-31T04:00:00Z",
+    "fields": {
+     "mid": {
+      "q": "STALE",
+      "v": null,
+      "note": "mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (sip_quote: 4773",
+      "declared_inputs": [
+       "raw:quote.bid",
+       "raw:quote.ask"
+      ]
+     },
+     "prior_close": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "the anchor is the exchange's immediately preceding regular session (2026-08-31)",
+      "declared_inputs": []
+     },
+     "session_open": {
+      "q": "VALID",
+      "v": 99.5,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_high": {
+      "q": "VALID",
+      "v": 101.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_low": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_vwap": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_volume": {
+      "q": "VALID",
+      "v": 5000,
+      "note": "",
+      "declared_inputs": []
+     },
+     "prior_close_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "prior_close_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['ra",
+      "declared_inputs": [
+       "mid",
+       "prior_close"
+      ]
+     },
+     "overnight_gap_bps": {
+      "q": "VALID",
+      "v": 50.51,
+      "note": "",
+      "declared_inputs": [
+       "session_open",
+       "prior_close"
+      ]
+     },
+     "relative_volume": {
+      "q": "VALID",
+      "v": 5.0,
+      "note": "",
+      "declared_inputs": [
+       "session_volume",
+       "raw:prior_session.volume"
+      ]
+     },
+     "cash_open_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:",
+      "declared_inputs": [
+       "mid",
+       "session_open"
+      ]
+     },
+     "session_range_position": {
+      "q": "STALE",
+      "v": null,
+      "note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['ra",
+      "declared_inputs": [
+       "mid",
+       "session_high",
+       "session_low"
+      ]
+     },
+     "vwap_distance_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quo",
+      "declared_inputs": [
+       "mid",
+       "session_vwap"
+      ]
+     }
+    }
+   },
+   "stale_quote_stale_anchor": {
+    "label": "stale quote, stale anchor",
+    "quote_as_of": "2025-02-26T00:59:59Z",
+    "anchor_as_of": "2025-02-24T05:00:00Z",
+    "fields": {
+     "mid": {
+      "q": "STALE",
+      "v": null,
+      "note": "mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (sip_quote: 4773",
+      "declared_inputs": [
+       "raw:quote.bid",
+       "raw:quote.ask"
+      ]
+     },
+     "prior_close": {
+      "q": "STALE",
+      "v": null,
+      "note": "the anchor is from 2025-02-24 but the immediately preceding session is 2026-08-31: at least one regular session passed with no print from this instrum",
+      "declared_inputs": []
+     },
+     "session_open": {
+      "q": "VALID",
+      "v": 99.5,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_high": {
+      "q": "VALID",
+      "v": 101.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_low": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_vwap": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_volume": {
+      "q": "VALID",
+      "v": 5000,
+      "note": "",
+      "declared_inputs": []
+     },
+     "prior_close_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "prior_close_return_bps: ingredient(s) ['mid', 'prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ing",
+      "declared_inputs": [
+       "mid",
+       "prior_close"
+      ]
+     },
+     "overnight_gap_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "overnight_gap_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2",
+      "declared_inputs": [
+       "session_open",
+       "prior_close"
+      ]
+     },
+     "relative_volume": {
+      "q": "STALE",
+      "v": null,
+      "note": "relative_volume: ingredient(s) ['raw:prior_session.volume'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the ancho",
+      "declared_inputs": [
+       "session_volume",
+       "raw:prior_session.volume"
+      ]
+     },
+     "cash_open_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:",
+      "declared_inputs": [
+       "mid",
+       "session_open"
+      ]
+     },
+     "session_range_position": {
+      "q": "STALE",
+      "v": null,
+      "note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['ra",
+      "declared_inputs": [
+       "mid",
+       "session_high",
+       "session_low"
+      ]
+     },
+     "vwap_distance_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quo",
+      "declared_inputs": [
+       "mid",
+       "session_vwap"
+      ]
+     }
+    }
+   },
+   "both_fresh": {
+    "label": "both fresh",
+    "quote_as_of": "2026-09-01T13:44:59Z",
+    "anchor_as_of": "2026-08-31T04:00:00Z",
+    "fields": {
+     "mid": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": [
+       "raw:quote.bid",
+       "raw:quote.ask"
+      ]
+     },
+     "prior_close": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "the anchor is the exchange's immediately preceding regular session (2026-08-31)",
+      "declared_inputs": []
+     },
+     "session_open": {
+      "q": "VALID",
+      "v": 99.5,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_high": {
+      "q": "VALID",
+      "v": 101.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_low": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_vwap": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_volume": {
+      "q": "VALID",
+      "v": 5000,
+      "note": "",
+      "declared_inputs": []
+     },
+     "prior_close_return_bps": {
+      "q": "VALID",
+      "v": 103.03,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "prior_close"
+      ]
+     },
+     "overnight_gap_bps": {
+      "q": "VALID",
+      "v": 50.51,
+      "note": "",
+      "declared_inputs": [
+       "session_open",
+       "prior_close"
+      ]
+     },
+     "relative_volume": {
+      "q": "VALID",
+      "v": 5.0,
+      "note": "",
+      "declared_inputs": [
+       "session_volume",
+       "raw:prior_session.volume"
+      ]
+     },
+     "cash_open_return_bps": {
+      "q": "VALID",
+      "v": 52.26,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "session_open"
+      ]
+     },
+     "session_range_position": {
+      "q": "VALID",
+      "v": 0.51,
+      "note": "requires a live mid and a non-degenerate session range",
+      "declared_inputs": [
+       "mid",
+       "session_high",
+       "session_low"
+      ]
+     },
+     "vwap_distance_bps": {
+      "q": "VALID",
+      "v": 0.0,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "session_vwap"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "after": {
+  "phase": "after",
+  "composer": "PULSE_COMPOSE_V0.2.1",
+  "scenarios": {
+   "fresh_quote_stale_anchor": {
+    "label": "fresh quote, stale anchor",
+    "quote_as_of": "2026-09-01T13:44:59Z",
+    "anchor_as_of": "2025-02-24T05:00:00Z",
+    "fields": {
+     "mid": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": [
+       "raw:quote.bid",
+       "raw:quote.ask"
+      ]
+     },
+     "prior_close": {
+      "q": "STALE",
+      "v": null,
+      "note": "the anchor is from 2025-02-24 but the immediately preceding session is 2026-08-31: at least one regular session passed with no print from this instrum",
+      "declared_inputs": []
+     },
+     "session_open": {
+      "q": "VALID",
+      "v": 99.5,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_high": {
+      "q": "VALID",
+      "v": 101.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_low": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_vwap": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_volume": {
+      "q": "VALID",
+      "v": 5000,
+      "note": "",
+      "declared_inputs": []
+     },
+     "prior_close_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "prior_close_return_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is f",
+      "declared_inputs": [
+       "mid",
+       "prior_close"
+      ]
+     },
+     "overnight_gap_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "overnight_gap_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2",
+      "declared_inputs": [
+       "session_open",
+       "prior_close"
+      ]
+     },
+     "relative_volume": {
+      "q": "STALE",
+      "v": null,
+      "note": "relative_volume: ingredient(s) ['raw:prior_session.volume'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the ancho",
+      "declared_inputs": [
+       "session_volume",
+       "raw:prior_session.volume"
+      ]
+     },
+     "cash_open_return_bps": {
+      "q": "VALID",
+      "v": 52.26,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "session_open"
+      ]
+     },
+     "session_range_position": {
+      "q": "VALID",
+      "v": 0.51,
+      "note": "requires a live mid and a non-degenerate session range",
+      "declared_inputs": [
+       "mid",
+       "session_high",
+       "session_low"
+      ]
+     },
+     "vwap_distance_bps": {
+      "q": "VALID",
+      "v": 0.0,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "session_vwap"
+      ]
+     }
+    }
+   },
+   "stale_quote_fresh_anchor": {
+    "label": "stale quote, fresh anchor",
+    "quote_as_of": "2025-02-26T00:59:59Z",
+    "anchor_as_of": "2026-08-31T04:00:00Z",
+    "fields": {
+     "mid": {
+      "q": "STALE",
+      "v": null,
+      "note": "mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (sip_quote: 4773",
+      "declared_inputs": [
+       "raw:quote.bid",
+       "raw:quote.ask"
+      ]
+     },
+     "prior_close": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "the anchor is the exchange's immediately preceding regular session (2026-08-31)",
+      "declared_inputs": []
+     },
+     "session_open": {
+      "q": "VALID",
+      "v": 99.5,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_high": {
+      "q": "VALID",
+      "v": 101.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_low": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_vwap": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_volume": {
+      "q": "VALID",
+      "v": 5000,
+      "note": "",
+      "declared_inputs": []
+     },
+     "prior_close_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "prior_close_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['ra",
+      "declared_inputs": [
+       "mid",
+       "prior_close"
+      ]
+     },
+     "overnight_gap_bps": {
+      "q": "VALID",
+      "v": 50.51,
+      "note": "",
+      "declared_inputs": [
+       "session_open",
+       "prior_close"
+      ]
+     },
+     "relative_volume": {
+      "q": "VALID",
+      "v": 5.0,
+      "note": "",
+      "declared_inputs": [
+       "session_volume",
+       "raw:prior_session.volume"
+      ]
+     },
+     "cash_open_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:",
+      "declared_inputs": [
+       "mid",
+       "session_open"
+      ]
+     },
+     "session_range_position": {
+      "q": "STALE",
+      "v": null,
+      "note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['ra",
+      "declared_inputs": [
+       "mid",
+       "session_high",
+       "session_low"
+      ]
+     },
+     "vwap_distance_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quo",
+      "declared_inputs": [
+       "mid",
+       "session_vwap"
+      ]
+     }
+    }
+   },
+   "stale_quote_stale_anchor": {
+    "label": "stale quote, stale anchor",
+    "quote_as_of": "2025-02-26T00:59:59Z",
+    "anchor_as_of": "2025-02-24T05:00:00Z",
+    "fields": {
+     "mid": {
+      "q": "STALE",
+      "v": null,
+      "note": "mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (sip_quote: 4773",
+      "declared_inputs": [
+       "raw:quote.bid",
+       "raw:quote.ask"
+      ]
+     },
+     "prior_close": {
+      "q": "STALE",
+      "v": null,
+      "note": "the anchor is from 2025-02-24 but the immediately preceding session is 2026-08-31: at least one regular session passed with no print from this instrum",
+      "declared_inputs": []
+     },
+     "session_open": {
+      "q": "VALID",
+      "v": 99.5,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_high": {
+      "q": "VALID",
+      "v": 101.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_low": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_vwap": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_volume": {
+      "q": "VALID",
+      "v": 5000,
+      "note": "",
+      "declared_inputs": []
+     },
+     "prior_close_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "prior_close_return_bps: ingredient(s) ['mid', 'prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ing",
+      "declared_inputs": [
+       "mid",
+       "prior_close"
+      ]
+     },
+     "overnight_gap_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "overnight_gap_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2",
+      "declared_inputs": [
+       "session_open",
+       "prior_close"
+      ]
+     },
+     "relative_volume": {
+      "q": "STALE",
+      "v": null,
+      "note": "relative_volume: ingredient(s) ['raw:prior_session.volume'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the ancho",
+      "declared_inputs": [
+       "session_volume",
+       "raw:prior_session.volume"
+      ]
+     },
+     "cash_open_return_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:",
+      "declared_inputs": [
+       "mid",
+       "session_open"
+      ]
+     },
+     "session_range_position": {
+      "q": "STALE",
+      "v": null,
+      "note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['ra",
+      "declared_inputs": [
+       "mid",
+       "session_high",
+       "session_low"
+      ]
+     },
+     "vwap_distance_bps": {
+      "q": "STALE",
+      "v": null,
+      "note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quo",
+      "declared_inputs": [
+       "mid",
+       "session_vwap"
+      ]
+     }
+    }
+   },
+   "both_fresh": {
+    "label": "both fresh",
+    "quote_as_of": "2026-09-01T13:44:59Z",
+    "anchor_as_of": "2026-08-31T04:00:00Z",
+    "fields": {
+     "mid": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": [
+       "raw:quote.bid",
+       "raw:quote.ask"
+      ]
+     },
+     "prior_close": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "the anchor is the exchange's immediately preceding regular session (2026-08-31)",
+      "declared_inputs": []
+     },
+     "session_open": {
+      "q": "VALID",
+      "v": 99.5,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_high": {
+      "q": "VALID",
+      "v": 101.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_low": {
+      "q": "VALID",
+      "v": 99.0,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_vwap": {
+      "q": "VALID",
+      "v": 100.02,
+      "note": "",
+      "declared_inputs": []
+     },
+     "session_volume": {
+      "q": "VALID",
+      "v": 5000,
+      "note": "",
+      "declared_inputs": []
+     },
+     "prior_close_return_bps": {
+      "q": "VALID",
+      "v": 103.03,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "prior_close"
+      ]
+     },
+     "overnight_gap_bps": {
+      "q": "VALID",
+      "v": 50.51,
+      "note": "",
+      "declared_inputs": [
+       "session_open",
+       "prior_close"
+      ]
+     },
+     "relative_volume": {
+      "q": "VALID",
+      "v": 5.0,
+      "note": "",
+      "declared_inputs": [
+       "session_volume",
+       "raw:prior_session.volume"
+      ]
+     },
+     "cash_open_return_bps": {
+      "q": "VALID",
+      "v": 52.26,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "session_open"
+      ]
+     },
+     "session_range_position": {
+      "q": "VALID",
+      "v": 0.51,
+      "note": "requires a live mid and a non-degenerate session range",
+      "declared_inputs": [
+       "mid",
+       "session_high",
+       "session_low"
+      ]
+     },
+     "vwap_distance_bps": {
+      "q": "VALID",
+      "v": 0.0,
+      "note": "",
+      "declared_inputs": [
+       "mid",
+       "session_vwap"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "field_level_differences_before_vs_after": {
+  "fresh_quote_stale_anchor": {},
+  "stale_quote_fresh_anchor": {},
+  "stale_quote_stale_anchor": {},
+  "both_fresh": {}
+ },
+ "behaviour_changed": false
+}

@@ -43,7 +43,7 @@ _ANCHOR_QUALITY = {
     anchor_freshness.CALENDAR_UNRESOLVED: NOT_ESTIMABLE,
 }
 
-COMPOSER_VERSION = "PULSE_COMPOSE_V0.2"
+COMPOSER_VERSION = "PULSE_COMPOSE_V0.2.1"
 COMPOSER_HISTORY = {
     "V0": "the freshness verdict was applied where a value was READ and did not travel to what "
           "was BUILT from it. NKLA 2026-09-01: mid/spread_bps/nbbo_size_imbalance STALE on a "
@@ -62,7 +62,13 @@ COMPOSER_HISTORY = {
             "(LIVE-ANCHOR-STALENESS-V1). The anchor now carries its own quality and the "
             "PULSE-009 dependency map does the rest: prior_close_return_bps, "
             "overnight_gap_bps and relative_volume follow it, while the current session's "
-            "cash open and aggregates do not."}
+            "cash open and aggregates do not.",
+    "V0.2.1": "PULSE-010 REPAIR: every derived call receives EXACTLY the ingredients it "
+              "declares, read from DEPENDENCIES rather than restated, and derive() now "
+              "REFUSES an undeclared ingredient. The previous shared dict was inert -- "
+              "resolve() consulted only the declared list, and independence was measured "
+              "to hold -- but it left the declaration as the single thing preventing "
+              "accidental coupling between unrelated fields."}
 
 TIER_1_DEEP = "TIER_1_DEEP"
 TIER_2_BROAD = "TIER_2_BROAD"
@@ -172,24 +178,33 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
                         if verdict["fresh"] else
                         absent(STALE, source="alpaca_sip", note=stale_note))
 
-        F["mid"] = derived.derive("mid", ing, lambda: round((bp + ap) / 2, 6),
+        # PULSE-010 REPAIR: each call receives EXACTLY its declared ingredients.
+        # `only` reads the declaration rather than restating it, so the wiring
+        # cannot drift from the map it is supposed to obey.
+        def only(name):
+            return {k: ing[k] for k in derived.DEPENDENCIES[name]["inputs"]}
+
+        F["mid"] = derived.derive("mid", only("mid"), lambda: round((bp + ap) / 2, 6),
                                   source="alpaca_sip", as_of=qt)
         F["spread_bps"] = derived.derive(
-            "spread_bps", ing, lambda: round((ap - bp) / ((bp + ap) / 2) * 1e4, 3),
+            "spread_bps", only("spread_bps"),
+            lambda: round((ap - bp) / ((bp + ap) / 2) * 1e4, 3),
             source="alpaca_sip", as_of=qt)
         F["spread_rel"] = derived.derive(
-            "spread_rel", ing, lambda: round((ap - bp) / ((bp + ap) / 2), 8),
+            "spread_rel", only("spread_rel"), lambda: round((ap - bp) / ((bp + ap) / 2), 8),
             source="alpaca_sip", as_of=qt)
         # DERIVED_FIELD_CONTRACT_V1, STALENESS_IS_THE_MEASUREMENT: quote_age_s
         # reports HOW OLD the quote is, so an old quote must not delete it. It
         # depends on the timestamp, never on the prices.
         F["quote_age_s"] = derived.derive(
-            "quote_age_s", ing, lambda: round(age, 2) if age is not None else None,
+            "quote_age_s", only("quote_age_s"),
+            lambda: round(age, 2) if age is not None else None,
             source="alpaca_sip", as_of=qt)
         F["touch_size"] = derived.derive(
-            "touch_size", ing, lambda: q["bs"] + q["as"], source="alpaca_sip", as_of=qt)
+            "touch_size", only("touch_size"), lambda: q["bs"] + q["as"],
+            source="alpaca_sip", as_of=qt)
         F["nbbo_size_imbalance"] = derived.derive(
-            "nbbo_size_imbalance", ing,
+            "nbbo_size_imbalance", only("nbbo_size_imbalance"),
             lambda: round((q["bs"] - q["as"]) / (q["bs"] + q["as"]), 4),
             source="alpaca_sip", as_of=qt)
     else:
@@ -252,26 +267,35 @@ def compose(*, subject, snapshot, scheduled_time, capture_start,
 
     d_open = day.get("o")
     premarket_or_closed = session in (Session.PREMARKET, Session.CLOSED)
-    D = {k: F[k] for k in ("mid", "prior_close", "session_open", "session_high",
-                           "session_low", "session_vwap", "session_volume")}
+
+    # PULSE-010 REPAIR: exactly the declared ingredients, per field. A shared
+    # dict spanning the quote, the anchor and the session aggregates used to be
+    # handed to all five; the map kept it harmless, but the wiring is now the
+    # map rather than merely compatible with it.
+    def anchored(name):
+        return {k: F[k] for k in derived.DEPENDENCIES[name]["inputs"]}
 
     F["prior_close_return_bps"] = derived.derive(
-        "prior_close_return_bps", D, lambda: _bps(F["mid"].value, prev), as_of=qt)
+        "prior_close_return_bps", anchored("prior_close_return_bps"),
+        lambda: _bps(F["mid"].value, prev), as_of=qt)
     F["cash_open_return_bps"] = derived.derive(
-        "cash_open_return_bps", D, lambda: _bps(F["mid"].value, d_open), as_of=qt,
+        "cash_open_return_bps", anchored("cash_open_return_bps"),
+        lambda: _bps(F["mid"].value, d_open), as_of=qt,
         session_inapplicable=("no cash open has occurred in %s" % session.value
                               if premarket_or_closed else None))
     F["overnight_gap_bps"] = derived.derive(
-        "overnight_gap_bps", D, lambda: _bps(d_open, prev), as_of=day.get("t"),
+        "overnight_gap_bps", anchored("overnight_gap_bps"),
+        lambda: _bps(d_open, prev), as_of=day.get("t"),
         session_inapplicable=("the gap is defined at the cash open"
                               if premarket_or_closed else None))
     F["session_range_position"] = derived.derive(
-        "session_range_position", D,
+        "session_range_position", anchored("session_range_position"),
         lambda: (round((F["mid"].value - day["l"]) / (day["h"] - day["l"]), 4)
                  if day["h"] > day["l"] else None), as_of=qt,
         note="requires a live mid and a non-degenerate session range")
     F["vwap_distance_bps"] = derived.derive(
-        "vwap_distance_bps", D, lambda: _bps(F["mid"].value, day.get("vw")), as_of=qt)
+        "vwap_distance_bps", anchored("vwap_distance_bps"),
+        lambda: _bps(F["mid"].value, day.get("vw")), as_of=qt)
 
     pv = prev_bar.get("v")
     # the prior-session VOLUME comes off the same bar as the prior close, so
