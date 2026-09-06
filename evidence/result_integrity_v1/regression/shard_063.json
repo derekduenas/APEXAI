@@ -1,0 +1,209 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_empty_points_is_no_support",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_one_point_is_insufficient_history_but_has_a_level",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_two_points_gives_velocity_not_curvature",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_constant_acceleration_series_yields_expected_curvature_sign",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_flat_series_is_supported_with_zero_curvature",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_future_dated_points_are_excluded_not_used",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_unknown_dimension_name_refused",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_all_dimensions_present_in_output_even_when_unsupplied",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_rising_price_and_rs_gives_positive_transition_with_confirmation",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_rs_leads_price_lagging_is_early_positive_curvature_not_confirmed",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_falling_price_is_negative_transition",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_disagreeing_directional_dimensions_is_mixed_not_forced",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_volatility_expansion_detected_independent_of_direction",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_no_forced_probability_the_directive_example_shape",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_limited_coverage_suppresses_breadth_scoped_states",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_full_coverage_allows_breadth_scoped_states",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_determinism_same_inputs_twice_byte_identical",
+   "file": "tests/test_frontier2_curve.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_curve.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_curve.py"
+  }
+ ],
+ "collected_count": 18,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_curve.py::test_empty_points_is_no_support": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_one_point_is_insufficient_history_but_has_a_level": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_two_points_gives_velocity_not_curvature": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_constant_acceleration_series_yields_expected_curvature_sign": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_flat_series_is_supported_with_zero_curvature": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_future_dated_points_are_excluded_not_used": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_unknown_dimension_name_refused": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_all_dimensions_present_in_output_even_when_unsupplied": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_rising_price_and_rs_gives_positive_transition_with_confirmation": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_rs_leads_price_lagging_is_early_positive_curvature_not_confirmed": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_falling_price_is_negative_transition": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_disagreeing_directional_dimensions_is_mixed_not_forced": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_volatility_expansion_detected_independent_of_direction": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_no_forced_probability_the_directive_example_shape": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_limited_coverage_suppresses_breadth_scoped_states": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_full_coverage_allows_breadth_scoped_states": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_determinism_same_inputs_twice_byte_identical": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_curve.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_curve.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 18,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_curve.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36249.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115433472",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.38
+ }
+}

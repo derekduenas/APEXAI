@@ -1,0 +1,182 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_bar_label_semantics_start_of_bar",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_option_may_enter_and_leave_the_band_intraday",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_mutating_future_prices_cannot_change_earlier_eligibility",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_ref_is_monotone_and_never_future",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_daemon_source_carries_the_law_not_the_defect",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_raw_retention_is_not_research_eligibility",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_oi_coverage_cannot_be_truncated_by_any_band",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_secrets_resolve_from_files_without_a_macos_keychain",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_a_missing_secret_still_falls_through_to_the_keychain",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_validated_work_is_not_repeated_on_restart",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_partial_work_is_retried_not_treated_as_done",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_complete_unvalidated_is_not_mistaken_for_validated",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_the_last_state_wins_so_a_retry_can_promote_a_partial",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_completion_is_never_inferred_from_file_existence",
+   "file": "tests/test_options_acquire_causality.py"
+  },
+  {
+   "nodeid": "tests/test_options_acquire_causality.py::test_a_missing_manifest_restarts_from_nothing_not_from_a_guess",
+   "file": "tests/test_options_acquire_causality.py"
+  }
+ ],
+ "collected_count": 15,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_acquire_causality.py::test_bar_label_semantics_start_of_bar": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_option_may_enter_and_leave_the_band_intraday": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_mutating_future_prices_cannot_change_earlier_eligibility": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_ref_is_monotone_and_never_future": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_daemon_source_carries_the_law_not_the_defect": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_raw_retention_is_not_research_eligibility": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_oi_coverage_cannot_be_truncated_by_any_band": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_secrets_resolve_from_files_without_a_macos_keychain": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_a_missing_secret_still_falls_through_to_the_keychain": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_validated_work_is_not_repeated_on_restart": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_partial_work_is_retried_not_treated_as_done": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_complete_unvalidated_is_not_mistaken_for_validated": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_the_last_state_wins_so_a_retry_can_promote_a_partial": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_completion_is_never_inferred_from_file_existence": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_acquire_causality.py::test_a_missing_manifest_restarts_from_nothing_not_from_a_guess": {
+   "file": "tests/test_options_acquire_causality.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 15,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_acquire_causality.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36315.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116514816",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.58
+ }
+}

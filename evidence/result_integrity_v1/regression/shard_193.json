@@ -1,0 +1,101 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_snapshot_corrections.py::test_high_low_are_put_on_the_adjusted_scale",
+   "file": "tests/test_snapshot_corrections.py"
+  },
+  {
+   "nodeid": "tests/test_snapshot_corrections.py::test_adjusted_high_low_bracket_the_adjusted_close",
+   "file": "tests/test_snapshot_corrections.py"
+  },
+  {
+   "nodeid": "tests/test_snapshot_corrections.py::test_no_cross_scale_mixing_the_ratio_is_invariant",
+   "file": "tests/test_snapshot_corrections.py"
+  },
+  {
+   "nodeid": "tests/test_snapshot_corrections.py::test_an_unadjusted_series_would_have_produced_the_bug",
+   "file": "tests/test_snapshot_corrections.py"
+  },
+  {
+   "nodeid": "tests/test_snapshot_corrections.py::test_a_zero_close_does_not_produce_infinity",
+   "file": "tests/test_snapshot_corrections.py"
+  },
+  {
+   "nodeid": "tests/test_snapshot_corrections.py::test_reits_are_typed_non_common_so_section_3_excludes_them",
+   "file": "tests/test_snapshot_corrections.py"
+  }
+ ],
+ "collected_count": 6,
+ "collect_errors": [],
+ "results": {
+  "tests/test_snapshot_corrections.py::test_high_low_are_put_on_the_adjusted_scale": {
+   "file": "tests/test_snapshot_corrections.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_snapshot_corrections.py::test_adjusted_high_low_bracket_the_adjusted_close": {
+   "file": "tests/test_snapshot_corrections.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_snapshot_corrections.py::test_no_cross_scale_mixing_the_ratio_is_invariant": {
+   "file": "tests/test_snapshot_corrections.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_snapshot_corrections.py::test_an_unadjusted_series_would_have_produced_the_bug": {
+   "file": "tests/test_snapshot_corrections.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_snapshot_corrections.py::test_a_zero_close_does_not_produce_infinity": {
+   "file": "tests/test_snapshot_corrections.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_snapshot_corrections.py::test_reits_are_typed_non_common_so_section_3_excludes_them": {
+   "file": "tests/test_snapshot_corrections.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: production snapshot not present"
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 5,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 1,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_snapshot_corrections.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36379.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114941952",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.46
+ }
+}

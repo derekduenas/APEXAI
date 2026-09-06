@@ -1,0 +1,92 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_alpaca_options_entitlement_probe.py::test_no_credentials_refuses_not_fabricates",
+   "file": "tests/test_alpaca_options_entitlement_probe.py"
+  },
+  {
+   "nodeid": "tests/test_alpaca_options_entitlement_probe.py::test_contains_greek_keys_detects_nested_delta",
+   "file": "tests/test_alpaca_options_entitlement_probe.py"
+  },
+  {
+   "nodeid": "tests/test_alpaca_options_entitlement_probe.py::test_contains_greek_keys_false_when_absent",
+   "file": "tests/test_alpaca_options_entitlement_probe.py"
+  },
+  {
+   "nodeid": "tests/test_alpaca_options_entitlement_probe.py::test_contains_greek_keys_handles_lists",
+   "file": "tests/test_alpaca_options_entitlement_probe.py"
+  },
+  {
+   "nodeid": "tests/test_alpaca_options_entitlement_probe.py::test_robinhood_note_always_present_and_honest",
+   "file": "tests/test_alpaca_options_entitlement_probe.py"
+  }
+ ],
+ "collected_count": 5,
+ "collect_errors": [],
+ "results": {
+  "tests/test_alpaca_options_entitlement_probe.py::test_no_credentials_refuses_not_fabricates": {
+   "file": "tests/test_alpaca_options_entitlement_probe.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_alpaca_options_entitlement_probe.py::test_contains_greek_keys_detects_nested_delta": {
+   "file": "tests/test_alpaca_options_entitlement_probe.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_alpaca_options_entitlement_probe.py::test_contains_greek_keys_false_when_absent": {
+   "file": "tests/test_alpaca_options_entitlement_probe.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_alpaca_options_entitlement_probe.py::test_contains_greek_keys_handles_lists": {
+   "file": "tests/test_alpaca_options_entitlement_probe.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_alpaca_options_entitlement_probe.py::test_robinhood_note_always_present_and_honest": {
+   "file": "tests/test_alpaca_options_entitlement_probe.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 5,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_alpaca_options_entitlement_probe.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 157.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36184.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114921472",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.32
+ }
+}

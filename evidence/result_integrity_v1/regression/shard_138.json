@@ -1,0 +1,209 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_no_trade_is_first_class_not_an_error",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_stock_is_first_class",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_unknown_expression_type_refused",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_out_of_scope_mechanism_refused",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_active_mechanism_reference_is_allowed",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_conservative_taker_buys_ask_sells_bid",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_missing_quote_side_is_unknown_not_zero",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_diagnostic_midpoint_is_never_canonical",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_unreachable_fill_modes_refused",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_vertical_legged_fill_marks_legging_risk",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_vertical_combo_fill_no_simultaneous_midpoint_assumption",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_all_three_panels_run_together",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_no_superiority_from_one_panel_alone",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_strictly_better_on_every_axis_is_dominant",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_mixed_result_is_not_dominant",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_too_few_comparable_dimensions_is_unknown_not_false",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_no_single_magic_score_field_exists",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_candidate_execution_scoring.py::test_decision_power_stamped",
+   "file": "tests/test_options_research_candidate_execution_scoring.py"
+  }
+ ],
+ "collected_count": 18,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_research_candidate_execution_scoring.py::test_no_trade_is_first_class_not_an_error": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_stock_is_first_class": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_unknown_expression_type_refused": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_out_of_scope_mechanism_refused": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_active_mechanism_reference_is_allowed": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_conservative_taker_buys_ask_sells_bid": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_missing_quote_side_is_unknown_not_zero": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_diagnostic_midpoint_is_never_canonical": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_unreachable_fill_modes_refused": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_vertical_legged_fill_marks_legging_risk": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_vertical_combo_fill_no_simultaneous_midpoint_assumption": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_all_three_panels_run_together": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_no_superiority_from_one_panel_alone": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_strictly_better_on_every_axis_is_dominant": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_mixed_result_is_not_dominant": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_too_few_comparable_dimensions_is_unknown_not_false": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_no_single_magic_score_field_exists": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_candidate_execution_scoring.py::test_decision_power_stamped": {
+   "file": "tests/test_options_research_candidate_execution_scoring.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 18,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_research_candidate_execution_scoring.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36324.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115081216",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.62
+ }
+}

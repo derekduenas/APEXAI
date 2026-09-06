@@ -1,0 +1,164 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_qualification_never_touches_an_acceptance_namespace",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_runner_identity_and_frozen_contracts",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N0]",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N1]",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N2]",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N3]",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N4]",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[P0]",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_six_distinct_cells_persisted_once_each",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_second_execution_of_same_cell_is_refused",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_reload_refuses_wrong_court_identity",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_reload_refuses_unexpected_seed_and_corruption",
+   "file": "tests/test_world_model_r71_qualification.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r71_qualification.py::test_acceptance_definition_refuses_consumed_and_qualification_namespaces",
+   "file": "tests/test_world_model_r71_qualification.py"
+  }
+ ],
+ "collected_count": 13,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_r71_qualification.py::test_qualification_never_touches_an_acceptance_namespace": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_runner_identity_and_frozen_contracts": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N0]": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N1]": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N2]": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N3]": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[N4]": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_end_to_end_cell_lifecycle[P0]": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_six_distinct_cells_persisted_once_each": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_second_execution_of_same_cell_is_refused": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_reload_refuses_wrong_court_identity": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_reload_refuses_unexpected_seed_and_corruption": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r71_qualification.py::test_acceptance_definition_refuses_consumed_and_qualification_namespaces": {
+   "file": "tests/test_world_model_r71_qualification.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 13,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_r71_qualification.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 291.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36441.service",
+   "memory_max": "1468006400",
+   "memory_peak": "254754816",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 29.81
+ }
+}

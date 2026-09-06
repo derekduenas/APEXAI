@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_refusals_are_counted_as_evidence_not_discarded",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_no_trade_is_a_legitimate_recorded_outcome",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_unknown_stage_or_stop_is_refused_not_silently_absorbed",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_many_attacks_in_one_session_are_not_many_samples",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_effective_count_grows_with_distinct_symbols",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_near_misses_isolate_the_single_blocking_gate",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_thesis_right_versus_profitable_is_surfaced",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_a_session_with_no_attacks_reports_honestly",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_every_pipeline_stage_appears_even_at_zero",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_campaign_rollup_preserves_the_effective_count",
+   "file": "tests/test_options_scoreboard.py"
+  },
+  {
+   "nodeid": "tests/test_options_scoreboard.py::test_scoreboard_is_stamped_prospective_and_powerless",
+   "file": "tests/test_options_scoreboard.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_scoreboard.py::test_refusals_are_counted_as_evidence_not_discarded": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_no_trade_is_a_legitimate_recorded_outcome": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_unknown_stage_or_stop_is_refused_not_silently_absorbed": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_many_attacks_in_one_session_are_not_many_samples": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_effective_count_grows_with_distinct_symbols": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_near_misses_isolate_the_single_blocking_gate": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_thesis_right_versus_profitable_is_surfaced": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_a_session_with_no_attacks_reports_honestly": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_every_pipeline_stage_appears_even_at_zero": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_campaign_rollup_preserves_the_effective_count": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_scoreboard.py::test_scoreboard_is_stamped_prospective_and_powerless": {
+   "file": "tests/test_options_scoreboard.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_scoreboard.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36333.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115335168",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.42
+ }
+}

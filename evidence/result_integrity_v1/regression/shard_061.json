@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_no_signal_at_all_is_ignore",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_strong_direction_and_entry_and_transition_is_serious",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_strong_direction_but_poor_entry_waits_for_entry",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_strong_transition_unclear_direction_waits_for_confirmation",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_moderate_transition_alone_is_develop",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_weak_transition_with_no_prior_engagement_is_watch",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_weak_transition_after_prior_engagement_is_degrade_not_watch",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_data_conflict_invalidates_an_engaged_thesis",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_data_conflict_on_a_never_engaged_thesis_only_degrades",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_invalidated_thesis_refuses_to_resurrect",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_prior_reasoning_content_never_affects_the_new_review",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_review_function_signature_has_no_prior_reasoning_parameter",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_what_changed_is_empty_when_nothing_differs",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_what_changed_reports_only_the_differing_fields",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_no_trade_words_anywhere_in_the_state_vocabulary",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_no_scalar_confidence_field_exists",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_bad_state_refused_at_construction",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_determinism_same_inputs_twice_byte_identical",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_captain_shadow.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_captain_shadow.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_captain_shadow.py::test_no_signal_at_all_is_ignore": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_strong_direction_and_entry_and_transition_is_serious": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_strong_direction_but_poor_entry_waits_for_entry": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_strong_transition_unclear_direction_waits_for_confirmation": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_moderate_transition_alone_is_develop": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_weak_transition_with_no_prior_engagement_is_watch": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_weak_transition_after_prior_engagement_is_degrade_not_watch": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_data_conflict_invalidates_an_engaged_thesis": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_data_conflict_on_a_never_engaged_thesis_only_degrades": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_invalidated_thesis_refuses_to_resurrect": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_prior_reasoning_content_never_affects_the_new_review": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_review_function_signature_has_no_prior_reasoning_parameter": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_what_changed_is_empty_when_nothing_differs": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_what_changed_reports_only_the_differing_fields": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_no_trade_words_anywhere_in_the_state_vocabulary": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_no_scalar_confidence_field_exists": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_bad_state_refused_at_construction": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_determinism_same_inputs_twice_byte_identical": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_captain_shadow.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_captain_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 19,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_captain_shadow.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36247.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115290112",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.36
+ }
+}
