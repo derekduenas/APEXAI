@@ -1,0 +1,328 @@
+{
+ "kind": "pulse010_summary",
+ "version": "PULSE010_SUMMARY_V1",
+ "base_commit": "93ee36929b04bacbf2f84839f1f547eabbc013ae",
+ "final_commit": "f2dc42828c6084b4b4a254bc2db76002dd7e6b37",
+ "branch": "pulse-010-anchor-freshness",
+ "worktree_clean": false,
+ "changed_files": [
+  "apex/pulse/anchor_freshness.py",
+  "apex/pulse/compose.py",
+  "apex/pulse/derived.py",
+  "results/pulse010_consumer_audit.json",
+  "results/pulse010_nkla_before_after.json",
+  "scripts/pulse010_diagnostic.py",
+  "tests/test_pulse_anchor_freshness.py",
+  "tests/test_pulse_derived.py"
+ ],
+ "anchor_freshness_contract": {
+  "version": "ANCHOR_FRESHNESS_POLICY_V1",
+  "defect_closed": "LIVE-ANCHOR-STALENESS-V1",
+  "measured_in": "SESSIONS, not seconds",
+  "rule": "prior_close is VALID if and only if its session is the exchange's immediately preceding regular session for this packet",
+  "why_not_seconds": "the preceding close is ~17.5h old at Tuesday's open and ~89h old after a long weekend; any seconds threshold wide enough for the second admits a bar from the previous week",
+  "calendar": "apex.intraday.sessions -- weekends, the NYSE holiday list and early closes, DST resolved per date. No naive UTC-day arithmetic.",
+  "classifications": {
+   "CURRENT_SESSION_OPEN": "the opening print of the session in progress; immutable once observed and never subject to this policy",
+   "IMMEDIATELY_PRECEDING": "VALID",
+   "SESSIONS_MISSED": "STALE -- at least one regular session passed with no print",
+   "NO_PRIOR_SESSION": "NOT_AVAILABLE -- no prior daily bar at all",
+   "UNDATED": "NOT_ESTIMABLE -- no usable session date or timestamp",
+   "NOT_A_PRIOR_SESSION": "NOT_ESTIMABLE -- the record is the current session or later",
+   "NOT_A_TRADING_SESSION": "NOT_ESTIMABLE -- the record is dated on a day the exchange was closed",
+   "CALENDAR_UNRESOLVED": "NOT_ESTIMABLE -- no trading day within the search bound"
+  },
+  "no_tuned_threshold": "the only boundary is zero missed sessions, which is the DEFINITION of 'immediately preceding', not a fitted number. Nothing here was chosen from NKLA, from P&L or from an observed result.",
+  "search_bound_days": 14,
+  "decision_power": "NONE_STATE"
+ },
+ "classification_to_quality": {
+  "SESSIONS_MISSED": "STALE",
+  "NO_PRIOR_SESSION": "NOT_AVAILABLE",
+  "UNDATED": "NOT_ESTIMABLE",
+  "NOT_A_PRIOR_SESSION": "NOT_ESTIMABLE",
+  "NOT_A_TRADING_SESSION": "NOT_ESTIMABLE",
+  "CALENDAR_UNRESOLVED": "NOT_ESTIMABLE"
+ },
+ "composer": {
+  "version": "PULSE_COMPOSE_V0.2",
+  "history": {
+   "V0": "the freshness verdict was applied where a value was READ and did not travel to what was BUILT from it. NKLA 2026-09-01: mid/spread_bps/nbbo_size_imbalance STALE on a 553-day-old quote, while prior_close_return_bps (-2869.94), cash_open_return_bps, vwap_distance_bps and session_range_position were computed from that same refused mid and marked VALID (DERIVED-FIELD-STALENESS-001)",
+   "V0.1": "PULSE-009: every derived field is built through apex.pulse.derived under a declared dependency map. A derived field is VALID only when every ingredient is VALID; otherwise it carries the ingredient's absence reason or STALE, with the culprit named, and no value. Independent fields are untouched: a stale quote does not reach prior_close. The rolling and premarket stores are only OBSERVED with a usable mid, so an untrusted price cannot enter PULSE's own memory.",
+   "V0.2": "PULSE-010: the prior-session anchor is judged by ANCHOR_FRESHNESS_POLICY_V1 -- VALID only when its session is the exchange's immediately preceding regular session. NKLA 2026-09-01 carried a prior_close from 2025-02-24 marked VALID (LIVE-ANCHOR-STALENESS-V1). The anchor now carries its own quality and the PULSE-009 dependency map does the rest: prior_close_return_bps, overnight_gap_bps and relative_volume follow it, while the current session's cash open and aggregates do not."
+  }
+ },
+ "dependency_effects": {
+  "anchor_dependent_fields_that_follow_it": [
+   "prior_close_return_bps",
+   "overnight_gap_bps",
+   "relative_volume"
+  ],
+  "current_session_fields_unaffected": [
+   "session_open",
+   "session_high",
+   "session_low",
+   "session_vwap",
+   "session_volume",
+   "cash_open_return_bps",
+   "mid",
+   "spread_bps",
+   "nbbo_size_imbalance",
+   "session_range_position",
+   "vwap_distance_bps"
+  ],
+  "mechanism": "PULSE-009's dependency map: the anchor carries its own quality and derive() refuses to run a formula on it",
+  "prior_session_volume": "comes off the same bar as the prior close and inherits the same verdict",
+  "new_provenance_field": "prior_close_session -- which exchange session the anchor belongs to, and which one was expected"
+ },
+ "nkla_before_after": {
+  "refused": {
+   "cash_open_return_bps": {
+    "before_q": "VALID",
+    "before_v": -2039.13,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this va",
+    "declared_inputs": [
+     "mid",
+     "session_open"
+    ],
+    "refused_by": "PULSE-009 dependency propagation"
+   },
+   "overnight_gap_bps": {
+    "before_q": "VALID",
+    "before_v": -1043.61,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "overnight_gap_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24 but the immediately preceding session is",
+    "declared_inputs": [
+     "session_open",
+     "prior_close"
+    ],
+    "refused_by": "PULSE-009 dependency propagation"
+   },
+   "prior_close": {
+    "before_q": "VALID",
+    "before_v": 0.2568,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "the anchor is from 2025-02-24 but the immediately preceding session is 2026-08-31: at least one regular session passed with no print from this instrument (a halt, a delisting, or a name that simply st",
+    "declared_inputs": [],
+    "refused_by": "PULSE-010 anchor freshness"
+   },
+   "prior_close_return_bps": {
+    "before_q": "VALID",
+    "before_v": -2869.94,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "prior_close_return_bps: ingredient(s) ['mid', 'prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are ",
+    "declared_inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "refused_by": "PULSE-009 dependency propagation"
+   },
+   "relative_volume": {
+    "before_q": "VALID",
+    "before_v": 0.788,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "relative_volume: ingredient(s) ['raw:prior_session.volume'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24 but the immediately preceding",
+    "declared_inputs": [
+     "session_volume",
+     "raw:prior_session.volume"
+    ],
+    "refused_by": "PULSE-009 dependency propagation"
+   },
+   "session_range_position": {
+    "before_q": "VALID",
+    "before_v": 0.108,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this ",
+    "declared_inputs": [
+     "mid",
+     "session_high",
+     "session_low"
+    ],
+    "refused_by": "PULSE-009 dependency propagation"
+   },
+   "vwap_distance_bps": {
+    "before_q": "VALID",
+    "before_v": -910.31,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this value",
+    "declared_inputs": [
+     "mid",
+     "session_vwap"
+    ],
+    "refused_by": "PULSE-009 dependency propagation"
+   }
+  },
+  "count": 7,
+  "not_attributable": [
+   "catalyst_fact_status",
+   "ret_10m_bps",
+   "ret_15m_bps",
+   "ret_30m_bps",
+   "ret_5m_bps",
+   "ret_60m_bps"
+  ],
+  "quote_age_s_retained": {
+   "q": "VALID",
+   "v": 47738725.63,
+   "why": "this field measures HOW OLD the quote is. Marking it untrustworthy because the quote is old would delete the only number that says so. It depends on the quote's TIMESTAMP, not on its prices, and it is NOT_AVAILABLE when there is no quote at all."
+  },
+  "independent": {
+   "prior_close": {
+    "before": "VALID",
+    "after": "STALE"
+   },
+   "prior_close_session": {
+    "before": null,
+    "after": "VALID"
+   },
+   "session_open": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_high": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_low": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_vwap": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_volume": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "last_trade": {
+    "before": "STALE",
+    "after": "STALE"
+   },
+   "last_minute_volume": {
+    "before": "VALID",
+    "after": "VALID"
+   }
+  },
+  "sealed_packet_untouched": true
+ },
+ "consumer_audit": {
+  "modules_touching_features": 42,
+  "anchor_field_readers": [
+   "apex/frontier/premarket.py",
+   "apex/hunter/context_builder.py",
+   "apex/pulse/anchors.py",
+   "apex/pulse/compose.py",
+   "apex/pulse/derived.py",
+   "apex/pulse/enrichment.py",
+   "apex/pulse/historical.py",
+   "apex/pulse/mirror.py",
+   "apex/pulse/observation.py",
+   "apex/pulse/parity.py",
+   "apex/pulse/premarket.py",
+   "apex/pulse/twin.py",
+   "scripts/alpha_discovery_dataset.py",
+   "scripts/chronos_survivor_archaeology.py",
+   "scripts/edgeforge_frontier_demo.py",
+   "scripts/edgeforge_spy_demo.py",
+   "scripts/mirror_run.py",
+   "scripts/mirror_run_v2.py",
+   "scripts/pulse007_proposals.py",
+   "scripts/pulse007_summary.py",
+   "scripts/pulse008_summary.py",
+   "scripts/pulse009_diagnostic.py",
+   "scripts/pulse009_summary.py",
+   "scripts/pulse_cycle.py"
+  ],
+  "anchor_readers_without_a_quality_check": [
+   "apex/frontier/premarket.py",
+   "apex/hunter/context_builder.py",
+   "apex/pulse/anchors.py",
+   "apex/pulse/enrichment.py",
+   "apex/pulse/historical.py",
+   "apex/pulse/premarket.py",
+   "scripts/alpha_discovery_dataset.py",
+   "scripts/chronos_survivor_archaeology.py",
+   "scripts/edgeforge_frontier_demo.py",
+   "scripts/edgeforge_spy_demo.py",
+   "scripts/mirror_run_v2.py",
+   "scripts/pulse007_summary.py",
+   "scripts/pulse_cycle.py"
+  ],
+  "read_value_without_any_quality_check": [
+   "scripts/pulse007_quote_residual.py",
+   "scripts/pulse008_query_bound_probe.py",
+   "scripts/pulse008_tape_probe.py"
+  ],
+  "assessment": "the only modules reading a value without checking quality are this session's own PULSE-007/008 probes, which read FROZEN packets to measure them. No live or research consumer can treat a non-VALID anchor as usable: it carries v = null, enforced by twin.Field.",
+  "structural_guarantee": "since PULSE-009 a non-VALID field carries v = null, enforced by apex.pulse.twin.Field. A consumer that ignores q now reads None instead of a plausible number -- it fails loudly rather than silently. The contract does not rely on every consumer being careful."
+ },
+ "bounded_regression": {
+  "commit": "f2dc42828",
+  "tree": "8344caef410357707f1f13eea582e74fbe4f74a6",
+  "shards": 211,
+  "totals": {
+   "PASS": 3752,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 18,
+   "XFAIL": 0,
+   "XPASS": 0
+  },
+  "slice_oom_kill_before": 9,
+  "slice_oom_kill_after": 10,
+  "problem_shards": [
+   "tests/test_null_rig.py(rc=1)"
+  ],
+  "verdict": "FAIL",
+  "problem_shard_attribution": {
+   "finding": "tests/test_null_rig.py OOM-killed in its 1400M shard; slice oom_kill 9->10",
+   "pre_existing": true,
+   "control": "PULSE-007 ran the SAME module at the BASE commit 7969dbbd1 in a clean worktree with none of this work present; it died identically. The settled control is cited rather than repeated.",
+   "control_evidence": "results/pulse007_SUMMARY.json -> bounded_regression.problem_shard_attribution",
+   "touches_pulse010_code": "no -- the module imports nothing from apex.pulse",
+   "known_defect": "TEST-NULL-RIG-MEMORY-001, repaired on world-model-shadow-v0, not on main",
+   "disposition": "reported, not repaired; limits not raised; verdict retained as FAIL"
+  }
+ },
+ "preservation": {
+  "original_failed_mirror_evidence": "8d0211e77da9ab347cbedac917a81cd59b1872619d183d64ad19188a5d8698e1",
+  "prior_brick_artifacts": {
+   "pulse007_frozen_packets.jsonl": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+   "pulse007_frozen_manifest.json": "3557bac4fc0a973558a08c60847e3d5c16a0737e7ad5a163a4b77bccbe4591c8",
+   "pulse007_mirror_run_v2_final.json": "f4e3b4b96dc3b60ecad13da3ba1c396db6354f9d761fa316f075b7f325f39f09",
+   "pulse007_SUMMARY.json": "52590b4edcee732b929da2121e6d6649dbdbea126bf9e2c7f01ac2dd337e09a1",
+   "pulse008_mirror_run_v2_1_observation_time_boundary_fixed.json": "eeb322b29dc63443a9240f30445a096a41085f5d245a3854af298f550b9464f3",
+   "pulse008_SUMMARY.json": "3c01e71c434c62f2bc768268121766f5e5b47d217b3282e0e577e870398ae99b",
+   "pulse009_nkla_before_after.json": "6485ea4ac466d61d7b2db4f43872614868dcc41881f171b069692728711a2264",
+   "pulse009_SUMMARY.json": "4f55d25840689b45b02d949596a2d4ef72cf0296f151681216121811466603d3"
+  },
+  "sealed_evidence_unchanged": true,
+  "declarations_tolerances_mirror_observation_unchanged": true,
+  "freshness_policy_version_history_preserved": true,
+  "world_model_worktree": "d01e961b6",
+  "production_release": "/opt/apex/releases/5eff1cf5e00f21b02c537f25bcd74b1c1d317546"
+ },
+ "tests_updated_not_relaxed": [
+  "test_pulse_derived.py composer version pin -> starts-with, history keys still asserted",
+  "test_pulse_derived.py NKLA prior_close VALID -> STALE, with the reason stated in place; the PULSE-009 invariant is asserted where it belongs, on a FRESH anchor"
+ ],
+ "defect_found_by_this_suite": "a DATE-ONLY vendor record was read as UTC midnight and converted to ET, moving it back one session; a bar from the CURRENT session would have passed as the immediately preceding one",
+ "verdicts": {
+  "ANCHOR_FRESHNESS_CONTRACT": "DEFINED",
+  "ANCHOR_QUALITY_ENFORCEMENT": "ENFORCED",
+  "ANCHOR_DERIVED_PROPAGATION": "ENFORCED",
+  "PULSE_COMPOSER_INTEGRITY": "REPAIRED_FOR_DERIVED_AND_ANCHOR_FIELDS",
+  "HISTORICAL_AS_KNOWN_AVAILABILITY": "NOT_PROVEN",
+  "PHASE_2": "OPEN",
+  "WORLD_MODEL_REAL_DATA_ADMISSION": "NOT_AUTHORIZED"
+ }
+}
