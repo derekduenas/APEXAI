@@ -1,0 +1,380 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_result_audit.py::test_registry_is_explicit_and_versioned",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_commitment_version_selection_is_explicit_and_deterministic",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_pristine_copy_of_the_historical_court_passes_every_required_check",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_no_trusted_root_is_blocked_never_pass",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_wrong_trusted_root_fails",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_finite_court_both_versions_required_both_must_verify",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_explicit_v11_contract_ignores_a_supplied_v1_root_rather_than_silently_using_it",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_v11_only_with_permitted_infinity_passes_both_commitment_checks",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_v11_infinity_sign_flip_fails_the_trusted_root",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_v11_coherent_payload_alteration_fails_the_trusted_root",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_v11_wrong_root_fails_and_no_root_is_blocked",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_v1_required_on_an_infinity_payload_fails_without_falling_back",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_nan_and_infinity_outside_permitted_fields_still_fail_validation_and_commitment",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_DEFINITION_REDERIVES_fails_on_a_tampered_court_hash",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_SURFACE_UNCHANGED_fails_when_the_scientific_surface_differs",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_RUNNER_UNCHANGED_fails_when_the_marker_records_a_different_runner",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_OPENING_MARKER_IDENTITY_fails_on_a_foreign_court_id",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_SEED_MANIFEST_LINKAGE_fails_when_the_marker_hash_differs",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_REGRESSION_LINKAGE_fails_when_the_artifact_is_not_the_one_the_marker_bound",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_INVENTORY_fails_on_a_missing_cell",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_CELL_VALIDATION_fails_on_a_flipped_verdict",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_CELL_VALIDATION_fails_on_nested_selector_nan_and_bool",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_MANIFEST_AGREEMENT_fails_when_a_manifest_row_disagrees_with_its_cell",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_AGGREGATE_AGREEMENT_fails_when_an_embedded_cell_differs_from_its_file",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_RECOUNT_MATCHES_STORED_fails_when_the_stored_verdict_disagrees_with_the_recount",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_FROZEN_JUDGE_AGREES_fails_on_a_changed_diagnostic_in_the_stored_judgement",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_COMMITMENT_AGREEMENT_fails_when_files_and_aggregate_commit_to_different_payloads",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[court_definition.json-blocked0]",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[R7_1_COURT_OPENED.json-blocked1]",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[seed_manifest.json-blocked2]",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[precourt_regression/BOUNDED_FULL_REGRESSION_V0.json-blocked3]",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[FINAL_SYNTHETIC_ACCEPTANCE_COURT_V1.json-blocked4]",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[cells-blocked5]",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_missing_aggregate_does_not_block_trusted_root_verification_of_the_files",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_corrupt_definition_is_BLOCKED",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_surface_BLOCKED_when_root_has_no_world_model",
+   "file": "tests/test_result_audit.py"
+  },
+  {
+   "nodeid": "tests/test_result_audit.py::test_partial_development_court_is_BLOCKED_not_PASS",
+   "file": "tests/test_result_audit.py"
+  }
+ ],
+ "collected_count": 37,
+ "collect_errors": [],
+ "results": {
+  "tests/test_result_audit.py::test_registry_is_explicit_and_versioned": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_commitment_version_selection_is_explicit_and_deterministic": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_pristine_copy_of_the_historical_court_passes_every_required_check": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_no_trusted_root_is_blocked_never_pass": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_wrong_trusted_root_fails": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_finite_court_both_versions_required_both_must_verify": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_explicit_v11_contract_ignores_a_supplied_v1_root_rather_than_silently_using_it": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_v11_only_with_permitted_infinity_passes_both_commitment_checks": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_v11_infinity_sign_flip_fails_the_trusted_root": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_v11_coherent_payload_alteration_fails_the_trusted_root": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_v11_wrong_root_fails_and_no_root_is_blocked": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_v1_required_on_an_infinity_payload_fails_without_falling_back": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_nan_and_infinity_outside_permitted_fields_still_fail_validation_and_commitment": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_DEFINITION_REDERIVES_fails_on_a_tampered_court_hash": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_SURFACE_UNCHANGED_fails_when_the_scientific_surface_differs": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_RUNNER_UNCHANGED_fails_when_the_marker_records_a_different_runner": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_OPENING_MARKER_IDENTITY_fails_on_a_foreign_court_id": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_SEED_MANIFEST_LINKAGE_fails_when_the_marker_hash_differs": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_REGRESSION_LINKAGE_fails_when_the_artifact_is_not_the_one_the_marker_bound": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_INVENTORY_fails_on_a_missing_cell": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_CELL_VALIDATION_fails_on_a_flipped_verdict": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_CELL_VALIDATION_fails_on_nested_selector_nan_and_bool": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_MANIFEST_AGREEMENT_fails_when_a_manifest_row_disagrees_with_its_cell": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_AGGREGATE_AGREEMENT_fails_when_an_embedded_cell_differs_from_its_file": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_RECOUNT_MATCHES_STORED_fails_when_the_stored_verdict_disagrees_with_the_recount": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_FROZEN_JUDGE_AGREES_fails_on_a_changed_diagnostic_in_the_stored_judgement": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_COMMITMENT_AGREEMENT_fails_when_files_and_aggregate_commit_to_different_payloads": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[court_definition.json-blocked0]": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[R7_1_COURT_OPENED.json-blocked1]": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[seed_manifest.json-blocked2]": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[precourt_regression/BOUNDED_FULL_REGRESSION_V0.json-blocked3]": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[FINAL_SYNTHETIC_ACCEPTANCE_COURT_V1.json-blocked4]": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_missing_evidence_is_BLOCKED_never_PASS[cells-blocked5]": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_missing_aggregate_does_not_block_trusted_root_verification_of_the_files": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_corrupt_definition_is_BLOCKED": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_surface_BLOCKED_when_root_has_no_world_model": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_audit.py::test_partial_development_court_is_BLOCKED_not_PASS": {
+   "file": "tests/test_result_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 37,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_result_audit.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 292.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36978.service",
+   "memory_max": "1468006400",
+   "memory_peak": "382193664",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 185.1
+ }
+}

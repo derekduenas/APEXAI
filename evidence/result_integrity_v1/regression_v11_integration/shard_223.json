@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_state.py::test_a_revised_value_cannot_be_returned_before_its_revision",
+   "file": "tests/test_world_state.py"
+  },
+  {
+   "nodeid": "tests/test_world_state.py::test_undeclared_series_are_refused_and_flags_are_immutable",
+   "file": "tests/test_world_state.py"
+  },
+  {
+   "nodeid": "tests/test_world_state.py::test_classifier_output_is_identical_with_or_without_future_data",
+   "file": "tests/test_world_state.py"
+  },
+  {
+   "nodeid": "tests/test_world_state.py::test_the_vol_threshold_is_a_trailing_quantile_not_full_sample",
+   "file": "tests/test_world_state.py"
+  },
+  {
+   "nodeid": "tests/test_world_state.py::test_a_past_label_cannot_be_overwritten",
+   "file": "tests/test_world_state.py"
+  },
+  {
+   "nodeid": "tests/test_world_state.py::test_staleness_is_infectious",
+   "file": "tests/test_world_state.py"
+  },
+  {
+   "nodeid": "tests/test_world_state.py::test_a_variable_computed_from_old_data_is_born_stale",
+   "file": "tests/test_world_state.py"
+  },
+  {
+   "nodeid": "tests/test_world_state.py::test_a_revised_only_series_cannot_enter_a_confirmatory_path",
+   "file": "tests/test_world_state.py"
+  },
+  {
+   "nodeid": "tests/test_world_state.py::test_no_notion_of_a_profitable_state_exists_in_the_module",
+   "file": "tests/test_world_state.py"
+  },
+  {
+   "nodeid": "tests/test_world_state.py::test_detection_lag_is_reported_as_a_diagnostic",
+   "file": "tests/test_world_state.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_state.py::test_a_revised_value_cannot_be_returned_before_its_revision": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_state.py::test_undeclared_series_are_refused_and_flags_are_immutable": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_state.py::test_classifier_output_is_identical_with_or_without_future_data": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_state.py::test_the_vol_threshold_is_a_trailing_quantile_not_full_sample": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_state.py::test_a_past_label_cannot_be_overwritten": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_state.py::test_staleness_is_infectious": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_state.py::test_a_variable_computed_from_old_data_is_born_stale": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_state.py::test_a_revised_only_series_cannot_enter_a_confirmatory_path": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_state.py::test_no_notion_of_a_profitable_state_exists_in_the_module": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_state.py::test_detection_lag_is_reported_as_a_diagnostic": {
+   "file": "tests/test_world_state.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_state.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u37054.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116113408",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.13
+ }
+}

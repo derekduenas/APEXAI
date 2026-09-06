@@ -1,0 +1,173 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_purged_cv_removes_overlap_inflation",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_counterexample_an_insufficient_embargo_is_refused_not_warned",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_walk_forward_train_never_reaches_unresolved_labels",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_exploration_window_refuses_validation_and_holdout_dates",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_counterexample_a_pure_in_sample_window_is_admitted",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_every_fit_in_a_sweep_is_its_own_trial",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_counterexample_underreporting_the_denominator_is_refused",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_the_dsr_is_computed_at_the_true_denominator",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_no_select_best_exists_anywhere_in_the_package",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_pbo_exposes_random_winner_selection_and_acquits_skill",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_deflated_sharpe_reference_values",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_a_regime_feature_without_labelstore_provenance_is_refused",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_a_candidate_without_correlation_to_validated_is_refused",
+   "file": "tests/test_exploration_governance.py"
+  },
+  {
+   "nodeid": "tests/test_exploration_governance.py::test_folds_are_deterministic",
+   "file": "tests/test_exploration_governance.py"
+  }
+ ],
+ "collected_count": 14,
+ "collect_errors": [],
+ "results": {
+  "tests/test_exploration_governance.py::test_purged_cv_removes_overlap_inflation": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_counterexample_an_insufficient_embargo_is_refused_not_warned": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_walk_forward_train_never_reaches_unresolved_labels": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_exploration_window_refuses_validation_and_holdout_dates": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_counterexample_a_pure_in_sample_window_is_admitted": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_every_fit_in_a_sweep_is_its_own_trial": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_counterexample_underreporting_the_denominator_is_refused": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_the_dsr_is_computed_at_the_true_denominator": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_no_select_best_exists_anywhere_in_the_package": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_pbo_exposes_random_winner_selection_and_acquits_skill": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_deflated_sharpe_reference_values": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_a_regime_feature_without_labelstore_provenance_is_refused": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_a_candidate_without_correlation_to_validated_is_refused": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_exploration_governance.py::test_folds_are_deterministic": {
+   "file": "tests/test_exploration_governance.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 14,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_exploration_governance.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36843.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115441664",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.65
+ }
+}

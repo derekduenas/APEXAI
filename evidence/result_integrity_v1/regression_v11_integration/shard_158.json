@@ -1,0 +1,209 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_hunter_progress_starts_in_starting",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_pid_alive_is_not_healthy",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_hunter_watchdog_reports_stopped_when_no_artifact",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_hunter_watchdog_flags_heartbeat_without_progress",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_hunter_watchdog_healthy_on_recent_success",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_hunter_progress_grants_no_authority",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_locate_returns_none_when_never_registered",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_register_refuses_a_nonexistent_path",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_registered_prior_is_deterministically_locatable",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_tampered_prior_is_detected",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_deleted_prior_is_detected",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_curve_metrics_on_empty_ledger_is_honest",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_curve_metrics_counts_flips_and_durations",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_curve_metrics_module_cannot_change_curve_behavior",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_memory_refuses_rule_shaped_fields",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_memory_positions_law_enforced",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_yesterday_state_is_labeled_never_current_truth",
+   "file": "tests/test_phase1_observability.py"
+  },
+  {
+   "nodeid": "tests/test_phase1_observability.py::test_same_day_memory_is_not_returned_as_yesterday_state",
+   "file": "tests/test_phase1_observability.py"
+  }
+ ],
+ "collected_count": 18,
+ "collect_errors": [],
+ "results": {
+  "tests/test_phase1_observability.py::test_hunter_progress_starts_in_starting": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_pid_alive_is_not_healthy": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_hunter_watchdog_reports_stopped_when_no_artifact": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_hunter_watchdog_flags_heartbeat_without_progress": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_hunter_watchdog_healthy_on_recent_success": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_hunter_progress_grants_no_authority": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_locate_returns_none_when_never_registered": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_register_refuses_a_nonexistent_path": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_registered_prior_is_deterministically_locatable": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_tampered_prior_is_detected": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_deleted_prior_is_detected": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_curve_metrics_on_empty_ledger_is_honest": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_curve_metrics_counts_flips_and_durations": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_curve_metrics_module_cannot_change_curve_behavior": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_memory_refuses_rule_shaped_fields": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_memory_positions_law_enforced": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_yesterday_state_is_labeled_never_current_truth": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase1_observability.py::test_same_day_memory_is_not_returned_as_yesterday_state": {
+   "file": "tests/test_phase1_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 18,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_phase1_observability.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.5,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36954.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116146176",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.58
+ }
+}

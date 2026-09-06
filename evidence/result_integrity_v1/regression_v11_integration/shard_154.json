@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_checkpoint_sees_only_bars_before_it",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_measure_without_ledger_writes_nothing",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_rendered_output_contains_no_trade_language",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_preview_is_labeled_and_appends_only_on_change",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_stats_tiers_are_never_pooled",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_independence_stays_not_estimable_in_stats",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_contaminated_mode_is_refused_without_the_flag",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_contaminated_mode_with_flag_warns_and_wires_no_generator",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_nothing_on_a_trading_path_imports_the_lab",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_commissioning_reruns_are_deduped_not_summed",
+   "file": "tests/test_parallax_lab.py"
+  },
+  {
+   "nodeid": "tests/test_parallax_lab.py::test_spec_freeze_hashes_the_actual_rules",
+   "file": "tests/test_parallax_lab.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_parallax_lab.py::test_checkpoint_sees_only_bars_before_it": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_measure_without_ledger_writes_nothing": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_rendered_output_contains_no_trade_language": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_preview_is_labeled_and_appends_only_on_change": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_stats_tiers_are_never_pooled": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_independence_stays_not_estimable_in_stats": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_contaminated_mode_is_refused_without_the_flag": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_contaminated_mode_with_flag_warns_and_wires_no_generator": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_nothing_on_a_trading_path_imports_the_lab": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_commissioning_reruns_are_deduped_not_summed": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_parallax_lab.py::test_spec_freeze_hashes_the_actual_rules": {
+   "file": "tests/test_parallax_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_parallax_lab.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36950.service",
+   "memory_max": "1468006400",
+   "memory_peak": "117170176",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.69
+ }
+}

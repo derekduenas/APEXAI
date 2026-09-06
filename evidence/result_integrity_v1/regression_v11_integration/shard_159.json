@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_long_only_weights_sum_to_one_and_ls_books_balance",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_beta_neutral_scaling_hand_computed",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_counterexample_the_scale_cap_binds_and_is_reported",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_realized_beta_is_reported_separately_from_ex_ante",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_turnover_matches_a_hand_computed_rebalance",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_a_static_book_has_zero_turnover",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_costs_apply_to_realized_turnover_never_assumed",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_unavailable_borrow_excludes_never_silently_shorts",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_borrow_carry_reduces_rung5_returns",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_a_design_layer_result_cannot_reach_a_table_untagged",
+   "file": "tests/test_portfolio_ladder.py"
+  },
+  {
+   "nodeid": "tests/test_portfolio_ladder.py::test_counterexample_a_beta_one_book_reports_beta_near_one",
+   "file": "tests/test_portfolio_ladder.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_portfolio_ladder.py::test_long_only_weights_sum_to_one_and_ls_books_balance": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_beta_neutral_scaling_hand_computed": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_counterexample_the_scale_cap_binds_and_is_reported": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_realized_beta_is_reported_separately_from_ex_ante": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_turnover_matches_a_hand_computed_rebalance": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_a_static_book_has_zero_turnover": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_costs_apply_to_realized_turnover_never_assumed": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_unavailable_borrow_excludes_never_silently_shorts": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_borrow_carry_reduces_rung5_returns": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_a_design_layer_result_cannot_reach_a_table_untagged": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_portfolio_ladder.py::test_counterexample_a_beta_one_book_reports_beta_near_one": {
+   "file": "tests/test_portfolio_ladder.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_portfolio_ladder.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 163.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36955.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116830208",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 5.35
+ }
+}

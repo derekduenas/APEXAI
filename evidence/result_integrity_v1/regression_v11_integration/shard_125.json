@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_iv_round_trip_computes_real_error",
+   "file": "tests/test_option_analytics_live_certify.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_iv_round_trip_skips_refused_states",
+   "file": "tests/test_option_analytics_live_certify.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_iv_round_trip_counts_missing_market_mid",
+   "file": "tests/test_option_analytics_live_certify.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_vendor_disagreement_stats_with_real_vendor_data",
+   "file": "tests/test_option_analytics_live_certify.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_vendor_disagreement_stats_none_when_no_vendor_data",
+   "file": "tests/test_option_analytics_live_certify.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_bsm_vs_american_disagreement_distribution_counts_levels",
+   "file": "tests/test_option_analytics_live_certify.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_stability_across_snapshots_measures_drift",
+   "file": "tests/test_option_analytics_live_certify.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_stability_ignores_single_observation_contracts",
+   "file": "tests/test_option_analytics_live_certify.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_dividend_gate_stats_categorizes_correctly",
+   "file": "tests/test_option_analytics_live_certify.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_live_certify.py::test_latency_stats_computes_mean_and_max",
+   "file": "tests/test_option_analytics_live_certify.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_option_analytics_live_certify.py::test_iv_round_trip_computes_real_error": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_certify.py::test_iv_round_trip_skips_refused_states": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_certify.py::test_iv_round_trip_counts_missing_market_mid": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_certify.py::test_vendor_disagreement_stats_with_real_vendor_data": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_certify.py::test_vendor_disagreement_stats_none_when_no_vendor_data": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_certify.py::test_bsm_vs_american_disagreement_distribution_counts_levels": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_certify.py::test_stability_across_snapshots_measures_drift": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_certify.py::test_stability_ignores_single_observation_contracts": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_certify.py::test_dividend_gate_stats_categorizes_correctly": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_live_certify.py::test_latency_stats_computes_mean_and_max": {
+   "file": "tests/test_option_analytics_live_certify.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_option_analytics_live_certify.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36921.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114843648",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.3
+ }
+}

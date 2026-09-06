@@ -1,0 +1,83 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_twin2_halflife.py::test_world_computes_rich_facets_with_typed_absences",
+   "file": "tests/test_twin2_halflife.py"
+  },
+  {
+   "nodeid": "tests/test_twin2_halflife.py::test_transition_state_online_never_revised",
+   "file": "tests/test_twin2_halflife.py"
+  },
+  {
+   "nodeid": "tests/test_twin2_halflife.py::test_halflife_refuses_then_estimates_then_routes",
+   "file": "tests/test_twin2_halflife.py"
+  },
+  {
+   "nodeid": "tests/test_twin2_halflife.py::test_routing_only_reduces_intelligence_never_adds_aggression",
+   "file": "tests/test_twin2_halflife.py"
+  }
+ ],
+ "collected_count": 4,
+ "collect_errors": [],
+ "results": {
+  "tests/test_twin2_halflife.py::test_world_computes_rich_facets_with_typed_absences": {
+   "file": "tests/test_twin2_halflife.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_twin2_halflife.py::test_transition_state_online_never_revised": {
+   "file": "tests/test_twin2_halflife.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_twin2_halflife.py::test_halflife_refuses_then_estimates_then_routes": {
+   "file": "tests/test_twin2_halflife.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_twin2_halflife.py::test_routing_only_reduces_intelligence_never_adds_aggression": {
+   "file": "tests/test_twin2_halflife.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 4,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_twin2_halflife.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36994.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116047872",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.13
+ }
+}

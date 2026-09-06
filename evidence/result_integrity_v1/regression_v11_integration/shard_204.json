@@ -1,0 +1,236 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_attribution_no_longer_reaches_into_apex_001",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_both_experiment_outputs_can_rescore_themselves",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_nsi_output_still_has_no_features_field",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_rescore_narrows_the_universe",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_production_source_exposes_exclusions",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_the_payload_would_fail_without_it",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_the_runner_hardcodes_no_success_thresholds",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_the_criteria_layer_knows_no_experiment_ids",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_the_registered_criteria_are_apex_002s",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_apex_002_cannot_pass_on_apex_001s_criteria",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_mean_ic_rule_differs_from_apex_001s",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_robustness_uses_sign_agreement_not_a_threshold",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_criteria_refuse_to_default_a_missing_threshold",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_the_verdict_takes_no_reference_distribution",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_a_spend_without_a_result_is_visible_as_incomplete",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_a_completed_experiment_looks_different",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_a_crash_before_record_result_persists_no_verdict",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_the_result_artifact_is_written_after_everything_that_can_fail",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_the_ordering_check_detects_a_reordering",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_the_smoke_gate_is_experiment_aware",
+   "file": "tests/test_validation_transaction.py"
+  },
+  {
+   "nodeid": "tests/test_validation_transaction.py::test_counterexample_an_unknown_experiment_has_no_smoke_evidence",
+   "file": "tests/test_validation_transaction.py"
+  }
+ ],
+ "collected_count": 21,
+ "collect_errors": [],
+ "results": {
+  "tests/test_validation_transaction.py::test_attribution_no_longer_reaches_into_apex_001": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_both_experiment_outputs_can_rescore_themselves": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_nsi_output_still_has_no_features_field": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_rescore_narrows_the_universe": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_production_source_exposes_exclusions": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_the_payload_would_fail_without_it": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_the_runner_hardcodes_no_success_thresholds": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_the_criteria_layer_knows_no_experiment_ids": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_the_registered_criteria_are_apex_002s": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_apex_002_cannot_pass_on_apex_001s_criteria": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_mean_ic_rule_differs_from_apex_001s": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_robustness_uses_sign_agreement_not_a_threshold": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_criteria_refuse_to_default_a_missing_threshold": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_the_verdict_takes_no_reference_distribution": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_a_spend_without_a_result_is_visible_as_incomplete": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_a_completed_experiment_looks_different": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_a_crash_before_record_result_persists_no_verdict": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_the_result_artifact_is_written_after_everything_that_can_fail": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_the_ordering_check_detects_a_reordering": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_the_smoke_gate_is_experiment_aware": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_transaction.py::test_counterexample_an_unknown_experiment_has_no_smoke_evidence": {
+   "file": "tests/test_validation_transaction.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 21,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_validation_transaction.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u37034.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115724288",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.66
+ }
+}

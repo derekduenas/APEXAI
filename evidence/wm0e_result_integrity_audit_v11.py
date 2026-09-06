@@ -57,8 +57,13 @@ def main(argv=None):
     for k, v in rc.items():
         print("   %s det %2d dir %2d %s idx %s" % (k, v["detections"], v["direction"], v["verdict"], v["detected_indices"] if len(v["detected_indices"]) < 12 else "%d indices" % len(v["detected_indices"])))
     com = res.get("commitment", {})
-    print("V1 root  (files):", com.get("v1", {}).get("root"))
-    print("V1.1 root (files):", com.get("v11", {}).get("root"))
+    print("commitment contract:", res["commitment_contract"]["required"], "(%s)" % res["commitment_contract"]["selection"])
+    for v in ("V1", "V1.1"):
+        e = com.get(v, {})
+        if e.get("required"):
+            print("  %-4s REQUIRED  root_files=%s agreement=%s verification=%s" % (v, e.get("root_files"), e.get("agreement"), e.get("verification")))
+        else:
+            print("  %-4s not required (does not participate); informational root=%s" % (v, e.get("informational_root_files", e.get("informational_error"))))
     print("OVERALL:", res["overall"], "| exit", res["exit_code"], "| statistical recomputation: NOT_PERFORMED | wrote", a.out)
     return res["exit_code"]
 

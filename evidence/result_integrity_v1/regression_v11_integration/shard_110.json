@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_the_lake_fingerprint_is_refused_where_evidence_is_required",
+   "file": "tests/test_nightly_pull.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_counterexample_a_confirmatory_fingerprint_passes_the_same_gate",
+   "file": "tests/test_nightly_pull.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_the_lake_refuses_to_live_inside_the_snapshot_tree",
+   "file": "tests/test_nightly_pull.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_counterexample_a_root_outside_snapshots_is_accepted",
+   "file": "tests/test_nightly_pull.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_the_first_pull_starts_the_day_after_the_frozen_snapshot",
+   "file": "tests/test_nightly_pull.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_a_current_lake_is_a_noop",
+   "file": "tests/test_nightly_pull.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_state_advances_only_after_a_successful_pull",
+   "file": "tests/test_nightly_pull.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_a_rerun_skips_verified_slices",
+   "file": "tests/test_nightly_pull.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_the_pull_log_is_hash_chained",
+   "file": "tests/test_nightly_pull.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull.py::test_counterexample_a_tampered_log_entry_breaks_the_chain",
+   "file": "tests/test_nightly_pull.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_nightly_pull.py::test_the_lake_fingerprint_is_refused_where_evidence_is_required": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull.py::test_counterexample_a_confirmatory_fingerprint_passes_the_same_gate": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull.py::test_the_lake_refuses_to_live_inside_the_snapshot_tree": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull.py::test_counterexample_a_root_outside_snapshots_is_accepted": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull.py::test_the_first_pull_starts_the_day_after_the_frozen_snapshot": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull.py::test_a_current_lake_is_a_noop": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull.py::test_state_advances_only_after_a_successful_pull": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull.py::test_a_rerun_skips_verified_slices": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull.py::test_the_pull_log_is_hash_chained": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull.py::test_counterexample_a_tampered_log_entry_breaks_the_chain": {
+   "file": "tests/test_nightly_pull.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_nightly_pull.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36905.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115712000",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.83
+ }
+}

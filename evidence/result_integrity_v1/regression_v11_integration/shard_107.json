@@ -1,0 +1,1046 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_long_option_bound_is_the_debit_not_the_label",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_long_option_label_may_disagree_with_its_bound",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_the_bound_is_derived_from_legs_not_from_the_aggregate",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_legs_absent_means_no_bound_even_with_a_net_debit",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_wrong_multiplier_is_refused_not_absorbed[1.0]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_wrong_multiplier_is_refused_not_absorbed[10.0]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_wrong_multiplier_is_refused_not_absorbed[1000.0]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_an_aggregate_that_contradicts_the_legs_is_refused",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_long_stock_is_stop_defined_with_no_certified_authority",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_short_stock_is_unbounded_and_carries_no_authority",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_unsupported_expression_is_not_estimable_not_zero",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[nan]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[inf]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[-inf]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[300]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[True]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[False]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[bad6]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[bad7]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_an_ABSENT_debit_claim_is_fine_because_legs_are_authority",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_stock_direction_must_be_known",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs0-one leg price modified]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs1-side flipped]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs2-leg missing]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs3-leg truncated]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs4-negative leg price]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs5-NaN leg price]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs6-invalid side token]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_contract_count_tampering_changes_the_derived_debit",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_unrecorded_contract_count_is_declared_not_assumed_silently",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_credit_structure_is_not_bounded_by_what_was_paid",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_risk_refuses_a_leg_tampered_certificate_end_to_end",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_debit_vertical_is_not_certifiable_under_this_exit_rule",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_vertical_leg_width_tampering_still_changes_the_derivation",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_the_kernel_refuses_an_uncertifiable_vertical",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_certification_is_explicitly_pre_fee_never_silently_so",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_an_uncertified_class_claims_no_completeness",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_no_leg_carries_a_quote_timestamp",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_entry_slippage_is_never_counted_twice",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_planned_risk_keeps_its_components_visible",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_stop_defined_certificate_uses_the_canonical_planned_risk",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[nan]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[inf]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[-inf]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[None]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[300]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[True]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[False]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[bad7]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[bad8]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[open_risk]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[same_underlying_risk]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[same_family_risk]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[session_realized_pnl]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[available_capital]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[open_certified_risk]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_negative_size_fails_closed_not_silently_approved",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_signed_fields_keep_their_sign",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_drawdown_halt_actually_fires_on_a_real_negative",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_missing_risk_input_is_an_absence_that_refuses",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_certificate_and_facts_are_required_with_no_defaults",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[None]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[cert1]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[cert2]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[DEFINED_MAX_LOSS]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[1.0]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_uncertifiable_risk_refuses",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_btc_refuses_with_the_missing_contract_spec_named",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_unbounded_short_funds_only_as_research_never_as_certified",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_kernel_output_carries_the_bound_for_the_book_to_seal",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits0]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits1]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits2]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits3]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits4]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits5]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits6]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits7]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_an_unbounded_position_cannot_self_grant_certified_authority",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_valid_certificate_for_a_different_position_is_refused",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_altered_quantity_changes_the_verdict",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_the_hash_covers_every_load_bearing_field",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_an_untampered_certificate_verifies_clean",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_per_trade_limit_boundary[500.0-True]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_per_trade_limit_boundary[500.01-False]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_aggregate_limit_boundary[1200.0-True]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_aggregate_limit_boundary[1200.01-False]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_certified_aggregate_binds_on_verified_bounds[1200.0-True]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_certified_aggregate_binds_on_verified_bounds[1200.01-False]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_uncertified_positions_cannot_consume_the_certified_budget",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_drawdown_halt_boundary[-999.99-True]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_drawdown_halt_boundary[-1000.0-False]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_valid_inputs_decide_exactly_as_before",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_to_seal_a_malformed_funding[nan]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_to_seal_a_malformed_funding[inf]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_to_seal_a_malformed_funding[-1.0]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_to_seal_a_malformed_funding[0.0]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_sleeve_payload_number",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[nan]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[inf]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[None]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[oops]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[True]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_accepts_real_outcomes_including_losses[0.0]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_accepts_real_outcomes_including_losses[-586.16]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_accepts_real_outcomes_including_losses[12.5]",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_execution_failure_sentinel_survives",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_a_refusal_can_still_record_the_malformed_size",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_state_reports_inherited_contamination_and_does_not_hide_it",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_nan_outcome_poisons_state_and_the_kernel_then_refuses",
+   "file": "tests/test_money_path_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_money_path_integrity.py::test_book_separates_certified_from_uncertified_exposure",
+   "file": "tests/test_money_path_integrity.py"
+  }
+ ],
+ "collected_count": 111,
+ "collect_errors": [],
+ "results": {
+  "tests/test_money_path_integrity.py::test_long_option_bound_is_the_debit_not_the_label": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_long_option_label_may_disagree_with_its_bound": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_the_bound_is_derived_from_legs_not_from_the_aggregate": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_legs_absent_means_no_bound_even_with_a_net_debit": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_wrong_multiplier_is_refused_not_absorbed[1.0]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_wrong_multiplier_is_refused_not_absorbed[10.0]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_wrong_multiplier_is_refused_not_absorbed[1000.0]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_an_aggregate_that_contradicts_the_legs_is_refused": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_long_stock_is_stop_defined_with_no_certified_authority": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_short_stock_is_unbounded_and_carries_no_authority": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_unsupported_expression_is_not_estimable_not_zero": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[nan]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[inf]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[-inf]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[300]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[True]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[False]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[bad6]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_malformed_debit_CLAIM_is_refused[bad7]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_an_ABSENT_debit_claim_is_fine_because_legs_are_authority": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_stock_direction_must_be_known": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs0-one leg price modified]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs1-side flipped]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs2-leg missing]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs3-leg truncated]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs4-negative leg price]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs5-NaN leg price]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_leg_level_tampering_is_caught[legs6-invalid side token]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_contract_count_tampering_changes_the_derived_debit": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_unrecorded_contract_count_is_declared_not_assumed_silently": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_credit_structure_is_not_bounded_by_what_was_paid": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_risk_refuses_a_leg_tampered_certificate_end_to_end": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_debit_vertical_is_not_certifiable_under_this_exit_rule": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_vertical_leg_width_tampering_still_changes_the_derivation": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_the_kernel_refuses_an_uncertifiable_vertical": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_certification_is_explicitly_pre_fee_never_silently_so": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_an_uncertified_class_claims_no_completeness": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_no_leg_carries_a_quote_timestamp": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_entry_slippage_is_never_counted_twice": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_planned_risk_keeps_its_components_visible": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_stop_defined_certificate_uses_the_canonical_planned_risk": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[nan]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[inf]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[-inf]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[None]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[300]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[True]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[False]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[bad7]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_malformed_declared_risk_fails_closed[bad8]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[open_risk]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[same_underlying_risk]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[same_family_risk]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[session_realized_pnl]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[available_capital]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_nan_in_any_risk_input_fails_closed[open_certified_risk]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_negative_size_fails_closed_not_silently_approved": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_signed_fields_keep_their_sign": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_drawdown_halt_actually_fires_on_a_real_negative": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_missing_risk_input_is_an_absence_that_refuses": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_certificate_and_facts_are_required_with_no_defaults": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[None]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[cert1]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[cert2]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[DEFINED_MAX_LOSS]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_absent_or_forged_certificate_refuses[1.0]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_uncertifiable_risk_refuses": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_btc_refuses_with_the_missing_contract_spec_named": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_unbounded_short_funds_only_as_research_never_as_certified": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_kernel_output_carries_the_bound_for_the_book_to_seal": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits0]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits1]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits2]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits3]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits4]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits5]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits6]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_risk_refuses_every_tampered_certificate[edits7]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_an_unbounded_position_cannot_self_grant_certified_authority": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_valid_certificate_for_a_different_position_is_refused": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_altered_quantity_changes_the_verdict": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_the_hash_covers_every_load_bearing_field": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_an_untampered_certificate_verifies_clean": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_per_trade_limit_boundary[500.0-True]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_per_trade_limit_boundary[500.01-False]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_aggregate_limit_boundary[1200.0-True]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_aggregate_limit_boundary[1200.01-False]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_certified_aggregate_binds_on_verified_bounds[1200.0-True]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_certified_aggregate_binds_on_verified_bounds[1200.01-False]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_uncertified_positions_cannot_consume_the_certified_budget": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_drawdown_halt_boundary[-999.99-True]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_drawdown_halt_boundary[-1000.0-False]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_valid_inputs_decide_exactly_as_before": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_to_seal_a_malformed_funding[nan]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_to_seal_a_malformed_funding[inf]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_to_seal_a_malformed_funding[-1.0]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_to_seal_a_malformed_funding[0.0]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_sleeve_payload_number": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[nan]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[inf]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[None]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[oops]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_refuses_a_malformed_outcome[True]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_accepts_real_outcomes_including_losses[0.0]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_accepts_real_outcomes_including_losses[-586.16]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_accepts_real_outcomes_including_losses[12.5]": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_execution_failure_sentinel_survives": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_a_refusal_can_still_record_the_malformed_size": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_state_reports_inherited_contamination_and_does_not_hide_it": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_nan_outcome_poisons_state_and_the_kernel_then_refuses": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_money_path_integrity.py::test_book_separates_certified_from_uncertified_exposure": {
+   "file": "tests/test_money_path_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 111,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_money_path_integrity.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36902.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116334592",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.95
+ }
+}

@@ -1,0 +1,119 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_paper_track.py::test_the_portfolio_set_is_frozen_with_its_denominator",
+   "file": "tests/test_paper_track.py"
+  },
+  {
+   "nodeid": "tests/test_paper_track.py::test_the_holdout_boundary_is_the_protocols",
+   "file": "tests/test_paper_track.py"
+  },
+  {
+   "nodeid": "tests/test_paper_track.py::test_an_empty_lake_is_refused_with_the_arming_instructions",
+   "file": "tests/test_paper_track.py"
+  },
+  {
+   "nodeid": "tests/test_paper_track.py::test_h1_a_takes_exactly_the_top_decile",
+   "file": "tests/test_paper_track.py"
+  },
+  {
+   "nodeid": "tests/test_paper_track.py::test_h1_b_takes_the_top_three_deciles",
+   "file": "tests/test_paper_track.py"
+  },
+  {
+   "nodeid": "tests/test_paper_track.py::test_h1_e_banding_holds_a_name_that_slipped_to_decile_5",
+   "file": "tests/test_paper_track.py"
+  },
+  {
+   "nodeid": "tests/test_paper_track.py::test_h3_takes_the_composite_top_not_the_gp_top",
+   "file": "tests/test_paper_track.py"
+  },
+  {
+   "nodeid": "tests/test_paper_track.py::test_control_holds_the_whole_eligible_universe",
+   "file": "tests/test_paper_track.py"
+  }
+ ],
+ "collected_count": 8,
+ "collect_errors": [],
+ "results": {
+  "tests/test_paper_track.py::test_the_portfolio_set_is_frozen_with_its_denominator": {
+   "file": "tests/test_paper_track.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_track.py::test_the_holdout_boundary_is_the_protocols": {
+   "file": "tests/test_paper_track.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_track.py::test_an_empty_lake_is_refused_with_the_arming_instructions": {
+   "file": "tests/test_paper_track.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_track.py::test_h1_a_takes_exactly_the_top_decile": {
+   "file": "tests/test_paper_track.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_track.py::test_h1_b_takes_the_top_three_deciles": {
+   "file": "tests/test_paper_track.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_track.py::test_h1_e_banding_holds_a_name_that_slipped_to_decile_5": {
+   "file": "tests/test_paper_track.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_track.py::test_h3_takes_the_composite_top_not_the_gp_top": {
+   "file": "tests/test_paper_track.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_paper_track.py::test_control_holds_the_whole_eligible_universe": {
+   "file": "tests/test_paper_track.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 8,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_paper_track.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36948.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115302400",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.37
+ }
+}

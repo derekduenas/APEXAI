@@ -1,0 +1,209 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_sentinel_sleep_detection_math",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_sentinel_is_installed_and_running",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_fabric_wrapper_is_caffeinated_with_honest_limits",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_sentinel_itself_is_not_caffeinated",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_tape_continuity_reconciles_against_persisted_reality",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_daemon_health_flips_healthy_to_degraded_on_continuity_gap",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_real_friday_continuity_reads_the_damage",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_pong_telemetry_exists_and_reconnect_events_carry_it",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_layer1_acceptance_record_exists_and_is_read_only",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_mid_minute_silence_cannot_be_complete_healthy",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_continuous_minute_stays_complete_healthy",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_layer3_reconciliation_record_exists",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_remedy_a_no_pong_fresh_data_remains_connected",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_remedy_b_no_pong_stale_data_reconnects",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_remedy_c_d_close_and_error_paths_still_reconnect",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_remedy_e_backpressure_cannot_masquerade_as_transport_failure",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_remedy_f_reason_taxonomy_and_telemetry_fields",
+   "file": "tests/test_commissioning_foundation.py"
+  },
+  {
+   "nodeid": "tests/test_commissioning_foundation.py::test_remedy_not_an_immortal_connection",
+   "file": "tests/test_commissioning_foundation.py"
+  }
+ ],
+ "collected_count": 18,
+ "collect_errors": [],
+ "results": {
+  "tests/test_commissioning_foundation.py::test_sentinel_sleep_detection_math": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_sentinel_is_installed_and_running": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: sentinel not yet started in this environment"
+  },
+  "tests/test_commissioning_foundation.py::test_fabric_wrapper_is_caffeinated_with_honest_limits": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_sentinel_itself_is_not_caffeinated": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_tape_continuity_reconciles_against_persisted_reality": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_daemon_health_flips_healthy_to_degraded_on_continuity_gap": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_real_friday_continuity_reads_the_damage": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: no real Friday session file"
+  },
+  "tests/test_commissioning_foundation.py::test_pong_telemetry_exists_and_reconnect_events_carry_it": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_layer1_acceptance_record_exists_and_is_read_only": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: acceptance record not present in this environment"
+  },
+  "tests/test_commissioning_foundation.py::test_mid_minute_silence_cannot_be_complete_healthy": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_continuous_minute_stays_complete_healthy": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_layer3_reconciliation_record_exists": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: no reconciliation record in this environment"
+  },
+  "tests/test_commissioning_foundation.py::test_remedy_a_no_pong_fresh_data_remains_connected": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_remedy_b_no_pong_stale_data_reconnects": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_remedy_c_d_close_and_error_paths_still_reconnect": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_remedy_e_backpressure_cannot_masquerade_as_transport_failure": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_remedy_f_reason_taxonomy_and_telemetry_fields": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_commissioning_foundation.py::test_remedy_not_an_immortal_connection": {
+   "file": "tests/test_commissioning_foundation.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 14,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 4,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_commissioning_foundation.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36817.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115625984",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.64
+ }
+}

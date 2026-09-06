@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_null_rig.py::test_random_walk_ic_is_not_significant",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_random_walk_decile_spread_is_not_significant",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_null_panel_produces_a_real_cross_section",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_null_ic_series_has_the_autocorrelation_the_overlap_implies",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_fast",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_full",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_the_fast_sweep_declares_itself_underpowered",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_null_decile_spread_is_centred_on_zero",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_shuffled_score_destroys_ic",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_shuffled_score_on_real_data",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_deferred_assertions_are_declared",
+   "file": "tests/test_null_rig.py"
+  },
+  {
+   "nodeid": "tests/test_null_rig.py::test_positive_control_is_recovered_and_scales",
+   "file": "tests/test_null_rig.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_null_rig.py::test_random_walk_ic_is_not_significant": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_random_walk_decile_spread_is_not_significant": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_null_panel_produces_a_real_cross_section": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_null_ic_series_has_the_autocorrelation_the_overlap_implies": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_fast": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_full": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_the_fast_sweep_declares_itself_underpowered": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_null_decile_spread_is_centred_on_zero": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_shuffled_score_destroys_ic": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_shuffled_score_on_real_data": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: DEFERRED until a real vendor is wired (Stage 4): shuffled APEX Score produces IC ~ 0 on REAL data (kickoff Stage 2, item 3)"
+  },
+  "tests/test_null_rig.py::test_deferred_assertions_are_declared": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_null_rig.py::test_positive_control_is_recovered_and_scales": {
+   "file": "tests/test_null_rig.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 1,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_null_rig.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 752.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36909.service",
+   "memory_max": "1468006400",
+   "memory_peak": "732770304",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 172.07
+ }
+}

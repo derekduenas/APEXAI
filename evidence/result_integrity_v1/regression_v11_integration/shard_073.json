@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_new_graph_starts_empty",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_add_node_returns_a_new_graph_original_unchanged",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_duplicate_node_id_refused",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_edge_cannot_forward_reference_a_missing_node",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_unknown_node_type_refused",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_unknown_edge_type_refused",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_the_four_required_questions",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_a_never_invalidated_candidate_has_no_death_reason",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_artifact_hash_is_a_reference_not_copied_content",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_decision_power_always_stamped",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_determinism_same_build_sequence_twice_byte_identical",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_opportunity_graph.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_opportunity_graph.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_opportunity_graph.py::test_new_graph_starts_empty": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_add_node_returns_a_new_graph_original_unchanged": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_duplicate_node_id_refused": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_edge_cannot_forward_reference_a_missing_node": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_unknown_node_type_refused": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_unknown_edge_type_refused": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_the_four_required_questions": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_a_never_invalidated_candidate_has_no_death_reason": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_artifact_hash_is_a_reference_not_copied_content": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_decision_power_always_stamped": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_determinism_same_build_sequence_twice_byte_identical": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_opportunity_graph.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_opportunity_graph.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_opportunity_graph.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36866.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115232768",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.57
+ }
+}
