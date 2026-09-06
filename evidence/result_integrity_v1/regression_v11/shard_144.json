@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_all_thirteen_gates_named",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_refuse_constructs_valid_verdict",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_unknown_gate_refused",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_refusal_is_scoped_to_one_candidate_not_the_subject",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_hunter_refused_insufficient_state_is_its_own_cohort",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_cohort_a_both_active",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_cohort_d_neither_active",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_cohort_c_frontier_only",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_unknown_cohort_refused",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_refusal_cohorts.py::test_five_cohort_classes_total",
+   "file": "tests/test_options_research_refusal_cohorts.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_research_refusal_cohorts.py::test_all_thirteen_gates_named": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_refusal_cohorts.py::test_refuse_constructs_valid_verdict": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_refusal_cohorts.py::test_unknown_gate_refused": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_refusal_cohorts.py::test_refusal_is_scoped_to_one_candidate_not_the_subject": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_refusal_cohorts.py::test_hunter_refused_insufficient_state_is_its_own_cohort": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_refusal_cohorts.py::test_cohort_a_both_active": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_refusal_cohorts.py::test_cohort_d_neither_active": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_refusal_cohorts.py::test_cohort_c_frontier_only": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_refusal_cohorts.py::test_unknown_cohort_refused": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_refusal_cohorts.py::test_five_cohort_classes_total": {
+   "file": "tests/test_options_research_refusal_cohorts.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_research_refusal_cohorts.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36641.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114929664",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.52
+ }
+}

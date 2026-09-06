@@ -1,0 +1,128 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_close1.py::test_day_structure_is_deterministic_and_admits_unclear",
+   "file": "tests/test_close1.py"
+  },
+  {
+   "nodeid": "tests/test_close1.py::test_late_fade_is_distinguished_from_trend",
+   "file": "tests/test_close1.py"
+  },
+  {
+   "nodeid": "tests/test_close1.py::test_memory_carries_knowledge_never_positions",
+   "file": "tests/test_close1.py"
+  },
+  {
+   "nodeid": "tests/test_close1.py::test_anti_hindsight_the_morning_seal_cannot_know_the_close",
+   "file": "tests/test_close1.py"
+  },
+  {
+   "nodeid": "tests/test_close1.py::test_before_cards_cannot_carry_setup_persistence",
+   "file": "tests/test_close1.py"
+  },
+  {
+   "nodeid": "tests/test_close1.py::test_setup_persistence_classifies_from_resolved_fields_only",
+   "file": "tests/test_close1.py"
+  },
+  {
+   "nodeid": "tests/test_close1.py::test_closing_auction_data_is_not_connected_not_fabricated",
+   "file": "tests/test_close1.py"
+  },
+  {
+   "nodeid": "tests/test_close1.py::test_h_close_persistence_preregistered_not_estimable",
+   "file": "tests/test_close1.py"
+  },
+  {
+   "nodeid": "tests/test_close1.py::test_the_closing_brief_firewall_blocks_holding_language",
+   "file": "tests/test_close1.py"
+  }
+ ],
+ "collected_count": 9,
+ "collect_errors": [],
+ "results": {
+  "tests/test_close1.py::test_day_structure_is_deterministic_and_admits_unclear": {
+   "file": "tests/test_close1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_close1.py::test_late_fade_is_distinguished_from_trend": {
+   "file": "tests/test_close1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_close1.py::test_memory_carries_knowledge_never_positions": {
+   "file": "tests/test_close1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_close1.py::test_anti_hindsight_the_morning_seal_cannot_know_the_close": {
+   "file": "tests/test_close1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_close1.py::test_before_cards_cannot_carry_setup_persistence": {
+   "file": "tests/test_close1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_close1.py::test_setup_persistence_classifies_from_resolved_fields_only": {
+   "file": "tests/test_close1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_close1.py::test_closing_auction_data_is_not_connected_not_fabricated": {
+   "file": "tests/test_close1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_close1.py::test_h_close_persistence_preregistered_not_estimable": {
+   "file": "tests/test_close1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_close1.py::test_the_closing_brief_firewall_blocks_holding_language": {
+   "file": "tests/test_close1.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 9,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_close1.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36519.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114888704",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.37
+ }
+}

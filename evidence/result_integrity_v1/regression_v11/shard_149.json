@@ -1,0 +1,227 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_no_incumbent_decision_path_imports_the_organism",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_every_organism_output_is_powerless",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_same_underlying_agreement_is_an_echo_not_confirmation",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_unmeasured_pairs_default_to_unknown_not_independent",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_contradiction_is_observed_not_scored",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_a_sleeve_with_no_view_relates_to_nothing",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_numbers_may_not_outrun_pedigree",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_undeclared_quantities_are_refused",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_an_uncalibrated_estimate_is_allowed_but_labelled",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_realized_path_refuses_an_undeclared_denominator",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_realized_path_records_what_happened_in_R",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_the_single_confidence_number_is_refused_by_construction",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_the_five_ignorances_are_named_axes",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_resolution_refuses_an_unregistered_claim",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_a_claim_resolves_once_and_only_once",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_values_outside_the_unit_interval_are_not_probabilities",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_certainty_must_be_earned_not_banned",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_reliability_refuses_to_draw_a_curve_through_noise",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_dependent_observations_do_not_impersonate_a_sample",
+   "file": "tests/test_organism_shadow.py"
+  },
+  {
+   "nodeid": "tests/test_organism_shadow.py::test_reliability_measures_when_independent_sessions_allow",
+   "file": "tests/test_organism_shadow.py"
+  }
+ ],
+ "collected_count": 20,
+ "collect_errors": [],
+ "results": {
+  "tests/test_organism_shadow.py::test_no_incumbent_decision_path_imports_the_organism": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_every_organism_output_is_powerless": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_same_underlying_agreement_is_an_echo_not_confirmation": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_unmeasured_pairs_default_to_unknown_not_independent": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_contradiction_is_observed_not_scored": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_a_sleeve_with_no_view_relates_to_nothing": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_numbers_may_not_outrun_pedigree": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_undeclared_quantities_are_refused": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_an_uncalibrated_estimate_is_allowed_but_labelled": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_realized_path_refuses_an_undeclared_denominator": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_realized_path_records_what_happened_in_R": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_the_single_confidence_number_is_refused_by_construction": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_the_five_ignorances_are_named_axes": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_resolution_refuses_an_unregistered_claim": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_a_claim_resolves_once_and_only_once": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_values_outside_the_unit_interval_are_not_probabilities": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_certainty_must_be_earned_not_banned": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_reliability_refuses_to_draw_a_curve_through_noise": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_dependent_observations_do_not_impersonate_a_sample": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_organism_shadow.py::test_reliability_measures_when_independent_sessions_allow": {
+   "file": "tests/test_organism_shadow.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 20,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_organism_shadow.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36646.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115396608",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.85
+ }
+}

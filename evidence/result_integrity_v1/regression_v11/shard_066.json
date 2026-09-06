@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_unknown_relationship_type_refused",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_unsupported_relationships_always_no_expectation_model[SECTOR_MOVE_CONSTITUENT_REFUSAL]",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_unsupported_relationships_always_no_expectation_model[RS_GROUP_STRONG_SYMBOL_WEAK]",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_unsupported_relationships_always_no_expectation_model[EVENT_STIMULUS_SURPRISE_RESPONSE]",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_missing_context_on_a_supported_relationship_is_insufficient_context",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_residual_is_observed_minus_expected_arithmetic",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_tiny_residual_is_no_violation_not_a_false_alarm",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_single_observation_is_never_persistent",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_two_matching_priors_makes_it_persistent",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_flip_flopping_history_is_transient_not_persistent",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_index_move_high_beta_refusal_uses_excess_market_as_residual",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_index_move_high_beta_refusal_missing_excess_is_insufficient_context",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_buy_pressure_declining_response_requires_elevated_rvol",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_buy_pressure_declining_response_fires_on_elevated_rvol_negative_slope",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_buy_pressure_elevated_and_rising_is_no_violation",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_missing_rvol_is_unknown_not_a_crash",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_freshness_computed_from_event_time_not_wall_clock",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_determinism_same_inputs_twice_byte_identical",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_expectation_violation.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_expectation_violation.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_expectation_violation.py::test_unknown_relationship_type_refused": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_unsupported_relationships_always_no_expectation_model[SECTOR_MOVE_CONSTITUENT_REFUSAL]": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_unsupported_relationships_always_no_expectation_model[RS_GROUP_STRONG_SYMBOL_WEAK]": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_unsupported_relationships_always_no_expectation_model[EVENT_STIMULUS_SURPRISE_RESPONSE]": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_missing_context_on_a_supported_relationship_is_insufficient_context": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_residual_is_observed_minus_expected_arithmetic": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_tiny_residual_is_no_violation_not_a_false_alarm": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_single_observation_is_never_persistent": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_two_matching_priors_makes_it_persistent": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_flip_flopping_history_is_transient_not_persistent": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_index_move_high_beta_refusal_uses_excess_market_as_residual": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_index_move_high_beta_refusal_missing_excess_is_insufficient_context": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_buy_pressure_declining_response_requires_elevated_rvol": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_buy_pressure_declining_response_fires_on_elevated_rvol_negative_slope": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_buy_pressure_elevated_and_rising_is_no_violation": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_missing_rvol_is_unknown_not_a_crash": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_freshness_computed_from_event_time_not_wall_clock": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_determinism_same_inputs_twice_byte_identical": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_expectation_violation.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_expectation_violation.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 19,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_expectation_violation.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36561.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115171328",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.27
+ }
+}

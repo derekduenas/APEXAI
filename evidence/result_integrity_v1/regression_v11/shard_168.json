@@ -1,0 +1,110 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_repo_integrity.py::test_every_python_module_in_the_package_is_tracked",
+   "file": "tests/test_repo_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_repo_integrity.py::test_every_test_module_is_tracked",
+   "file": "tests/test_repo_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_repo_integrity.py::test_config_and_registration_documents_are_tracked",
+   "file": "tests/test_repo_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_repo_integrity.py::test_no_package_directory_is_ignored",
+   "file": "tests/test_repo_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_repo_integrity.py::test_raw_vendor_snapshots_stay_ignored",
+   "file": "tests/test_repo_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_repo_integrity.py::test_no_credential_reaches_the_repository",
+   "file": "tests/test_repo_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_repo_integrity.py::test_a_clean_clone_can_import_the_package",
+   "file": "tests/test_repo_integrity.py"
+  }
+ ],
+ "collected_count": 7,
+ "collect_errors": [],
+ "results": {
+  "tests/test_repo_integrity.py::test_every_python_module_in_the_package_is_tracked": {
+   "file": "tests/test_repo_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_repo_integrity.py::test_every_test_module_is_tracked": {
+   "file": "tests/test_repo_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_repo_integrity.py::test_config_and_registration_documents_are_tracked": {
+   "file": "tests/test_repo_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_repo_integrity.py::test_no_package_directory_is_ignored": {
+   "file": "tests/test_repo_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_repo_integrity.py::test_raw_vendor_snapshots_stay_ignored": {
+   "file": "tests/test_repo_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_repo_integrity.py::test_no_credential_reaches_the_repository": {
+   "file": "tests/test_repo_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_repo_integrity.py::test_a_clean_clone_can_import_the_package": {
+   "file": "tests/test_repo_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 7,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_repo_integrity.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 162.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36668.service",
+   "memory_max": "1468006400",
+   "memory_peak": "237371392",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 5.7
+ }
+}

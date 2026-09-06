@@ -1,0 +1,317 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_valid_quote_passes",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_locked_crossed_market_detected",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_below_intrinsic_detected",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_above_upper_bound_detected",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_negative_price_detected",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_unknown_option_type_refused",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_curve_interpolates_between_points",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_no_curve_returns_none",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_tenor_outside_range_returns_none",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_assumed_source_refused",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_unsorted_points_refused",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_confirmed_no_dividends_with_events_refused",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_unconfirmed_empty_schedule_refused",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_pv_of_dividends_zero_when_confirmed_none",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_pv_of_dividends_none_when_schedule_is_none",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_pv_of_dividends_real_computation",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_dividend_after_expiry_excluded",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_year_fraction_is_fractional_not_integer_dte",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_already_expired_refused",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_one_minute_to_expiry_produces_tiny_positive_fraction",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_low_disagreement_classified_correctly",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_high_disagreement_classified_correctly",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_unknown_when_either_value_missing",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_canonical_value_averages_both_models",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_tiny_gamma_disagreement_not_manufactured_high_from_noise",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_stale_trade_only_refused",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_no_quote_at_all_returns_unknown_not_error",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_tight_spread_is_high_quality",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_wide_spread_is_low_quality",
+   "file": "tests/test_option_analytics_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_contracts.py::test_used_stale_trade_flag_is_always_false_from_solver",
+   "file": "tests/test_option_analytics_contracts.py"
+  }
+ ],
+ "collected_count": 30,
+ "collect_errors": [],
+ "results": {
+  "tests/test_option_analytics_contracts.py::test_valid_quote_passes": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_locked_crossed_market_detected": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_below_intrinsic_detected": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_above_upper_bound_detected": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_negative_price_detected": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_unknown_option_type_refused": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_curve_interpolates_between_points": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_no_curve_returns_none": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_tenor_outside_range_returns_none": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_assumed_source_refused": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_unsorted_points_refused": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_confirmed_no_dividends_with_events_refused": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_unconfirmed_empty_schedule_refused": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_pv_of_dividends_zero_when_confirmed_none": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_pv_of_dividends_none_when_schedule_is_none": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_pv_of_dividends_real_computation": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_dividend_after_expiry_excluded": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_year_fraction_is_fractional_not_integer_dte": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_already_expired_refused": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_one_minute_to_expiry_produces_tiny_positive_fraction": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_low_disagreement_classified_correctly": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_high_disagreement_classified_correctly": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_unknown_when_either_value_missing": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_canonical_value_averages_both_models": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_tiny_gamma_disagreement_not_manufactured_high_from_noise": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_stale_trade_only_refused": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_no_quote_at_all_returns_unknown_not_error": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_tight_spread_is_high_quality": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_wide_spread_is_low_quality": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_contracts.py::test_used_stale_trade_flag_is_always_false_from_solver": {
+   "file": "tests/test_option_analytics_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 30,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_option_analytics_contracts.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36620.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115277824",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.58
+ }
+}

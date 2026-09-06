@@ -1,0 +1,119 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_research_program_001.py::test_the_program_was_sealed_before_the_data_it_will_judge",
+   "file": "tests/test_research_program_001.py"
+  },
+  {
+   "nodeid": "tests/test_research_program_001.py::test_twenty_sessions_is_a_reporting_checkpoint_not_a_verdict_date",
+   "file": "tests/test_research_program_001.py"
+  },
+  {
+   "nodeid": "tests/test_research_program_001.py::test_ordinary_variance_stays_a_live_explanation",
+   "file": "tests/test_research_program_001.py"
+  },
+  {
+   "nodeid": "tests/test_research_program_001.py::test_interior_may_never_be_read_as_a_missing_variable",
+   "file": "tests/test_research_program_001.py"
+  },
+  {
+   "nodeid": "tests/test_research_program_001.py::test_thesis_quality_is_never_conflated_with_expression_quality",
+   "file": "tests/test_research_program_001.py"
+  },
+  {
+   "nodeid": "tests/test_research_program_001.py::test_the_program_cannot_move_the_live_system",
+   "file": "tests/test_research_program_001.py"
+  },
+  {
+   "nodeid": "tests/test_research_program_001.py::test_the_suspended_generator_has_no_reinstatement_deadline",
+   "file": "tests/test_research_program_001.py"
+  },
+  {
+   "nodeid": "tests/test_research_program_001.py::test_the_bias_monitor_does_not_demand_that_worlds_match_reality",
+   "file": "tests/test_research_program_001.py"
+  }
+ ],
+ "collected_count": 8,
+ "collect_errors": [],
+ "results": {
+  "tests/test_research_program_001.py::test_the_program_was_sealed_before_the_data_it_will_judge": {
+   "file": "tests/test_research_program_001.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_program_001.py::test_twenty_sessions_is_a_reporting_checkpoint_not_a_verdict_date": {
+   "file": "tests/test_research_program_001.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_program_001.py::test_ordinary_variance_stays_a_live_explanation": {
+   "file": "tests/test_research_program_001.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_program_001.py::test_interior_may_never_be_read_as_a_missing_variable": {
+   "file": "tests/test_research_program_001.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_program_001.py::test_thesis_quality_is_never_conflated_with_expression_quality": {
+   "file": "tests/test_research_program_001.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_program_001.py::test_the_program_cannot_move_the_live_system": {
+   "file": "tests/test_research_program_001.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_program_001.py::test_the_suspended_generator_has_no_reinstatement_deadline": {
+   "file": "tests/test_research_program_001.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_program_001.py::test_the_bias_monitor_does_not_demand_that_worlds_match_reality": {
+   "file": "tests/test_research_program_001.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 8,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_research_program_001.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 157.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36679.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114794496",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.52
+ }
+}
