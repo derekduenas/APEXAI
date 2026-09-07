@@ -1,0 +1,277 @@
+{
+ "kind": "milestone1_operational_recovery_candidate",
+ "version": "M1_FINAL_V1",
+ "objective": "capacity-adjusted, after-cost geometric capital growth subject to survival constraints",
+ "three_results_reported_separately": [
+  "original integration regression",
+  "supplemental external-input verification",
+  "recovery-candidate regression"
+ ],
+ "integration_regression": {
+  "candidate": "3b9a26f2c949e7e53063eea7948f0422f1e573c0",
+  "tree": "ede04a2eb2f88bdc0161e3dc372f0d8b13e4cff1",
+  "branch": "milestone1-r2",
+  "worktree": "/apex-data/tmp/m1_wt/integration",
+  "clean_at_start": true,
+  "shards": 215,
+  "totals": {
+   "PASS": 3849,
+   "SKIP": 19
+  },
+  "collected": 3868,
+  "executed": 3868,
+  "accounted": true,
+  "slice_oom": [
+   11,
+   11
+  ],
+  "problem_shards": [],
+  "verdict": "PASS",
+  "elapsed_s": 2676.4,
+  "manifest_before": "b3a79726900991b02fbc8f4d34bf923ea9fd314ac7cf0f10c20ef1fdf294ef31",
+  "manifest_after": "b3a79726900991b02fbc8f4d34bf923ea9fd314ac7cf0f10c20ef1fdf294ef31",
+  "tracked_files": 1159,
+  "tracked_changed_during_run": [],
+  "new_untracked_during_run": [],
+  "pass_delta_vs_previous": {
+   "previous_commit": "810b72c8dc8b9422ba96f41d900cfd361f5ff1da",
+   "previous_pass": 3827,
+   "now_pass": 3849,
+   "delta": 22,
+   "confirmed_from_nodeids": {
+    "tests/test_orchestrator_incident_history.py": 21,
+    "tests/test_chain_tail_bounded.py": 1,
+    "which_one": "test_no_hard_coded_checkout_path_in_this_module, added during the R1 provenance continuation AFTER the run that recorded 3827",
+    "nodeids_lost": "NONE"
+   },
+   "earlier_report_of_21_was_wrong": true
+  },
+  "mid_run_intervention": {
+   "what": "at shard 114 of 215 the shared checkout /opt/apex-repo was set to the candidate commit 3b9a26f2 with a clean tree",
+   "why": "five shards read absolute paths outside their worktree; the shared checkout was on the recovery candidate, which lacks a fixture two of them open unguarded, so those shards would have failed for a reason unrelated to the candidate",
+   "when": "before the affected shards ran",
+   "this_run_is_NOT_hermetic": true,
+   "recorded_not_erased": true
+  }
+ },
+ "supplemental_verification": {
+  "relationship": "SEPARATE AND ADDITIONAL. The original 215-shard integration run stands as recorded, including the intervention at shard 114 that set /opt/apex-repo to the candidate commit. This run does not make that one hermetic and does not erase the intervention.",
+  "modules": [
+   "tests/test_pulse_anchor_freshness.py",
+   "tests/test_pulse_derived.py",
+   "tests/test_research_board.py",
+   "tests/test_whole_ledger_guard.py",
+   "tests/test_unit_config.py"
+  ],
+  "shard_results": {
+   "tests/test_pulse_anchor_freshness.py": {
+    "rc": 0,
+    "summary": "46 passed in 0.35s"
+   },
+   "tests/test_pulse_derived.py": {
+    "rc": 0,
+    "summary": "55 passed in 0.40s"
+   },
+   "tests/test_research_board.py": {
+    "rc": 0,
+    "summary": "13 passed in 2.35s"
+   },
+   "tests/test_whole_ledger_guard.py": {
+    "rc": 0,
+    "summary": "4 passed in 5.78s"
+   },
+   "tests/test_unit_config.py": {
+    "rc": 0,
+    "summary": "3 passed in 0.83s"
+   }
+  },
+  "coverage_stated_exactly": {
+   "hashed_before_and_after": 720,
+   "of_which_real_external_inputs": 715,
+   "of_which_instrument_own_logs": 5,
+   "all_stable": true,
+   "changed": [],
+   "seen_only_in_verification_NO_before_hash_NOT_VERIFIED": [
+    "/apex-data/tmp/m1_audit/test_pulse_anchor_freshness.py.verification.audit",
+    "/apex-data/tmp/m1_audit/test_pulse_derived.py.verification.audit",
+    "/apex-data/tmp/m1_audit/test_research_board.py.verification.audit",
+    "/apex-data/tmp/m1_audit/test_unit_config.py.verification.audit",
+    "/apex-data/tmp/m1_audit/test_whole_ledger_guard.py.verification.audit"
+   ],
+   "uncovered_are_all_instrument_logs": true,
+   "no_real_test_input_uncovered": true
+  },
+  "source_scan_vs_runtime_audit": {
+   "literals_the_scan_predicted": 4,
+   "files_the_audit_observed": 720,
+   "lesson": "a source scan finds literals; it does not find what a test actually opens"
+  },
+  "categories": {
+   "shared_checkout": 678,
+   "host_systemd_units": 32,
+   "instrument_logs": 5,
+   "timezone_data": 2,
+   "research_board_data": 2,
+   "dev_null": 1
+  },
+  "audit_hook_coverage": {
+   "observes": [
+    "CPython `open` audit events raised by builtins.open, io.open and os.open in THIS interpreter",
+    "subprocess.Popen audit events, giving each child's argv and therefore its interpreter"
+   ],
+   "does_NOT_observe": [
+    "file access performed inside native or C-extension libraries that call open(2) directly without going through the Python layer -- pandas, numpy, sqlite3 and zlib can all read this way",
+    "activity inside a child process, UNLESS that child inherits PYTHONPATH and the audit environment variables and therefore loads the same hook",
+    "memory-mapped reads, and reads through an already-open descriptor passed in from elsewhere"
+   ],
+   "consequence": "the observed set is a LOWER BOUND on external dependencies, not a complete one. It is stronger than the source scan, which only finds literals, and weaker than a syscall trace."
+  },
+  "child_provenance": {
+   "python_children": [
+    "/opt/apex/shared/venv/bin/python"
+   ],
+   "non_python_children": [
+    "find",
+    "grep",
+    "systemctl",
+    "systemd-analyze"
+   ],
+   "all_python_children_used_the_parent_interpreter": true,
+   "note": "test_research_board.py names its interpreter with a literal. It resolves to the SAME interpreter the harness runs, so on this host the child ran the intended Python. That is a coincidence of configuration, not a guarantee: the literal would select the wrong interpreter on any host where the venv lives elsewhere. Registered as an open hard-coded-path finding, not repaired here."
+  },
+  "shared_checkout_pinned_throughout": true,
+  "candidate_unchanged": true,
+  "verdict": "PASS_WITH_UNCOVERED_INPUTS",
+  "verdict_note": "PASS_WITH_UNCOVERED_INPUTS is retained rather than upgraded. The uncovered set is fully explained as instrument artifacts, but the verdict records what the check actually measured."
+ },
+ "recovery_regression": {
+  "candidate": "07dcbb05caf58f1ac714bb3fe87e16d46aeb98d8",
+  "tree": "d503404df9f259c4d0a71414bad7c7f4e06aaf53",
+  "branch": "milestone1-recovery-candidate",
+  "based_on": "5eff1cf5e00f21b02c537f25bcd74b1c1d317546, the DEPLOYED release",
+  "worktree": "/apex-data/tmp/m1_wt/recovery",
+  "clean_at_start": true,
+  "mode": "focused",
+  "shards": 15,
+  "totals": {
+   "PASS": 248,
+   "SKIP": 4
+  },
+  "collected": 252,
+  "executed": 252,
+  "accounted": true,
+  "slice_oom": [
+   11,
+   11
+  ],
+  "problem_shards": [],
+  "verdict": "PASS",
+  "manifest_before": "e69eea6ca505d8f2081d286b3b41b945458d58bac42ccae428e30d816b98146b",
+  "manifest_after": "e69eea6ca505d8f2081d286b3b41b945458d58bac42ccae428e30d816b98146b",
+  "tracked_files": 988,
+  "tracked_changed_during_run": [],
+  "skips": [
+   "SKIPPED [1] tests/test_btc_l2_redteam.py:316: no real ledger in this environment",
+   "SKIPPED [1] tests/test_btc_l2_redteam.py:396: no real WS ledgers in this environment",
+   "SKIPPED [1] tests/test_sac1_tier1.py:286: verifies the Mac host launchd/ops installation -- Darwin-only by nature; cloud uses systemd (C6)",
+   "SKIPPED [1] tests/test_sac1_tier1.py:308: daemon has not written health in this environment"
+  ],
+  "external_dependency_position": {
+   "the_five_identified_modules_are_absent": true,
+   "claim": "the recovery candidate AVOIDS the five identified external dependencies, because none of those modules exists in that tree. That is NOT a claim that it has no external dependencies.",
+   "its_own_scan": {
+    "absolute_literals": 9,
+    "none_resolved_to_a_host_input": true
+   },
+   "no_newer_artifacts_supplied": "nothing from the development line was supplied to make this older candidate pass"
+  },
+  "sac1_tier1_now_passes": "31 of 31, after the authorized portability port"
+ },
+ "candidates": {
+  "integration": {
+   "commit": "3b9a26f2c949e7e53063eea7948f0422f1e573c0",
+   "contains": "PULSE-007..010, the null-rig repair, R1, R2",
+   "ahead_of_main": 17,
+   "ahead_of_deployed": 37
+  },
+  "recovery": {
+   "commit": "07dcbb05caf58f1ac714bb3fe87e16d46aeb98d8",
+   "inventory": [
+    "apex/governance/chain_ledger.py (production, R1)",
+    "scripts/apex_orchestrator.py (production, R2)",
+    "tests/test_chain_tail_bounded.py (test, new)",
+    "tests/test_orchestrator_incident_history.py (test, new)",
+    "tests/test_sac1_tier1.py (test, portability port)"
+   ],
+   "production_files": 2,
+   "test_files": 3,
+   "results_not_transferable_between_candidates": true
+  }
+ },
+ "external_dependency_inventory": {
+  "integration": {
+   "modules_scanned": 215,
+   "absolute_literals": 14,
+   "affected_modules": [
+    "tests/test_architecture_claims.py",
+    "tests/test_btc_semantics.py",
+    "tests/test_governor.py",
+    "tests/test_orchestrator_incident_history.py",
+    "tests/test_pulse_anchor_freshness.py",
+    "tests/test_pulse_derived.py",
+    "tests/test_reality_harness.py",
+    "tests/test_research_board.py",
+    "tests/test_runtime_autonomy.py",
+    "tests/test_sac1_tier1.py",
+    "tests/test_unit_config.py",
+    "tests/test_whole_ledger_guard.py"
+   ]
+  },
+  "recovery": {
+   "modules_scanned": 195,
+   "absolute_literals": 9
+  },
+  "limitation": "a source scan is a DISCOVERY AID, not proof that every runtime dependency was found. An interpreter resolved from PATH, a path built at runtime, or an import from site-packages leaves no literal to find. Runtime auditing is recorded separately."
+ },
+ "open_findings_registered_not_repaired": [
+  "tests/test_research_board.py:158 names its interpreter with a literal; on this host it resolves to the intended interpreter, which is a coincidence of configuration, not a guarantee",
+  "tests/test_whole_ledger_guard.py:43 audits /opt/apex-repo rather than its own tree",
+  "tests/test_pulse_anchor_freshness.py and tests/test_pulse_derived.py open a fixture from /opt/apex-repo/results with a bare open() and no guard",
+  "the provenance harness could scan for absolute literals and record each resolved hash as a declared external input, instead of relying on a human noticing"
+ ],
+ "documents": {
+  "deployment_and_commissioning": "docs/MILESTONE1_DEPLOYMENT.md",
+  "phase2_blockers": "docs/MILESTONE1_PHASE2_BLOCKERS.md",
+  "plugin_inventory": "docs/MILESTONE1_PLUGIN_INVENTORY.md",
+  "explicit_points": "docs/MILESTONE1_ADDENDUM.md",
+  "hardcoded_paths": "docs/MILESTONE1_HARDCODED_PATHS.md"
+ },
+ "authority": {
+  "not_done": [
+   "production deployment",
+   "service restart, stop or reconfiguration",
+   "merge to main",
+   "purchases",
+   "real-data admission",
+   "model promotion",
+   "brokerage actions",
+   "corpus construction",
+   "tournament start"
+  ],
+  "production_state": {
+   "orchestrator_MemoryMax": "536870912",
+   "release_symlink": "/opt/apex/releases/5eff1cf5e00f21b02c537f25bcd74b1c1d317546",
+   "ledger_bytes": "438867453",
+   "ledger_mtime": "2026-09-06 04:50:03.172832846 +0000"
+  }
+ },
+ "phase_2": "OPEN",
+ "real_data_admission": "NOT_AUTHORIZED",
+ "production_recovery": "UNVERIFIED until commissioned",
+ "verdict": {
+  "integration_regression": "PASS",
+  "supplemental_verification": "PASS_WITH_UNCOVERED_INPUTS",
+  "recovery_regression": "PASS",
+  "milestone": "COMPLETE, PENDING INDEPENDENT REVIEW"
+ }
+}
