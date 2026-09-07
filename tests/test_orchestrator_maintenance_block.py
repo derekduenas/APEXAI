@@ -86,28 +86,31 @@ class Rig:
         rig = self
 
         def fake_run(cmd, *a, **k):
+            cmd = list(cmd)
+            # THE LAUNCH. start() now issues `systemctl start` through
+            # subprocess.run and reads its result, so this is where process
+            # creation is observed. Record it; answer as an accepted command.
+            if cmd[:4] == list(SYSTEMCTL):
+                rig.launches.append(cmd)
+                return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
             if cmd[:2] == ["systemctl", "show"]:
                 if rig.show_raises:
                     raise OSError("systemctl unavailable")
+                if "DropInPaths" in " ".join(cmd):          # the preflight query
+                    return subprocess.CompletedProcess(
+                        cmd, rig.show_rc, stdout=str(rig.dropin), stderr="")
+                # the post-start state query: report an active unit, so an
+                # accepted launch is classified PROCESS_ACTIVE, not UNCONFIRMED
                 return subprocess.CompletedProcess(
-                    cmd, rig.show_rc, stdout=str(rig.dropin), stderr="")
+                    cmd, 0, stdout="ActiveState=active\nSubState=running\n"
+                                   "ConditionResult=yes\nConditionTimestamp=\n"
+                                   "Result=success\nExecMainStatus=0", stderr="")
             return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
 
-        def fake_popen(cmd, *a, **k):
-            # start() catches Exception, so raising here would be swallowed and
-            # silently recorded as a FAILED attempt. Record the process
-            # creation and hand back a stand-in instead; the assertions read
-            # rig.launches, which is the only honest evidence either way.
-            rig.launches.append(list(cmd))
-
-            class _Stub:
-                pid = -1
-
-                def poll(self):
-                    return None
-            return _Stub()
+        def no_popen(*a, **k):
+            raise AssertionError("Popen must not be used for launches any more")
         monkeypatch.setattr(ORCH.subprocess, "run", fake_run)
-        monkeypatch.setattr(ORCH.subprocess, "Popen", fake_popen)
+        monkeypatch.setattr(ORCH.subprocess, "Popen", no_popen)
         return rig
 
 
@@ -164,7 +167,7 @@ def test_an_unblocked_eligible_service_still_launches(monkeypatch, tmp_path):
     rig = Rig(tmp_path, marker=False).install(monkeypatch)
     state, out = run_ticks(monkeypatch, tmp_path, [spec()], 1)
     assert rig.launches, "the unblocked service was not launched"
-    assert out["actions"] and out["actions"][0]["outcome"] == "STARTED"
+    assert out["actions"] and out["actions"][0]["outcome"] == ORCH.PROCESS_ACTIVE
     assert len(state["attempts"]["equity-fabric"]["recovery"]) == 1
     assert rig.launches[0][-1] == "apex-equity-fabric.service"
     assert rig.launches[0][:4] == list(SYSTEMCTL)

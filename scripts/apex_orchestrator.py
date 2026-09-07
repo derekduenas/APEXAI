@@ -269,27 +269,104 @@ def first_work_seen(name: str) -> bool:
     return bool(r and (r.get("work_completed") or 0) > 0)
 
 
+# ------------------------------------------------- TRUTHFUL LAUNCH REPORTING
+# Spawning `systemctl start` proves that a COMMAND was launched. It does not
+# prove the unit started, and it cannot: systemd treats a unit whose
+# Condition*= fails as SKIPPED, the start job succeeds, and systemctl exits 0.
+# The only signal is ConditionResult=no on the unit afterwards. On 2026-09-04
+# three such refusals were recorded as STARTED. These states keep request,
+# systemd's answer, observed process state and confirmed work distinct.
+START_TIMEOUT_S = 30
+START_REQUESTED = "START_REQUESTED"          # command accepted; nothing more
+START_COMMAND_FAILED = "START_COMMAND_FAILED"  # nonzero exit, timeout, or spawn error
+CONDITION_REFUSED = "CONDITION_REFUSED"      # systemd skipped it: Condition*= failed
+PROCESS_ACTIVE = "PROCESS_ACTIVE"            # ActiveState=active observed afterwards
+START_UNCONFIRMED = "START_UNCONFIRMED"      # accepted, but state could not confirm it
+# WORK_CONFIRMED is not a start outcome. It is the verdict first_work_seen()
+# produces on a LATER tick, from the service's own work artifact. A process
+# being active is not evidence that it is doing anything.
+
+
+def _unit_state(unit: str) -> dict | None:
+    """Ask systemd, authoritatively, what the unit is doing now."""
+    try:
+        r = subprocess.run(["systemctl", "show", unit, "-p",
+                            "ActiveState,SubState,ConditionResult,"
+                            "ConditionTimestamp,Result,ExecMainStatus"],
+                           capture_output=True, text=True, timeout=10)
+    except Exception:                                    # noqa: BLE001
+        return None
+    if r.returncode != 0:
+        return None
+    out = {}
+    for line in r.stdout.splitlines():
+        if "=" in line:
+            k, v = line.split("=", 1)
+            out[k] = v
+    return out or None
+
+
 def start(name: str, spec) -> StartAttempt:
     if not spec.start_cmd:
         return StartAttempt(service=name,
                             attempted_utc=now().isoformat(),
-                            outcome="FAILED",
+                            outcome=START_COMMAND_FAILED,
                             detail="no start_cmd declared; this "
                                    "service cannot be auto-started "
                                    "yet and must be wired")
+    unit = _unit_of(spec)
+    requested = now().isoformat()
+    # 1. the COMMAND, bounded and with its result read rather than discarded
     try:
-        subprocess.Popen(list(spec.start_cmd),
-                         stdout=subprocess.DEVNULL,
-                         stderr=subprocess.DEVNULL,
-                         start_new_session=True)
-        return StartAttempt(service=name,
-                            attempted_utc=now().isoformat(),
-                            outcome="STARTED",
-                            detail=" ".join(spec.start_cmd))
+        r = subprocess.run(list(spec.start_cmd), capture_output=True,
+                           text=True, timeout=START_TIMEOUT_S)
+    except subprocess.TimeoutExpired:
+        return StartAttempt(service=name, attempted_utc=requested,
+                            outcome=START_COMMAND_FAILED,
+                            detail="start command did not return within %ds"
+                                   % START_TIMEOUT_S)
     except Exception as e:                               # noqa: BLE001
-        return StartAttempt(service=name,
-                            attempted_utc=now().isoformat(),
-                            outcome="FAILED", detail=repr(e))
+        return StartAttempt(service=name, attempted_utc=requested,
+                            outcome=START_COMMAND_FAILED, detail=repr(e))
+    if r.returncode != 0:
+        return StartAttempt(service=name, attempted_utc=requested,
+                            outcome=START_COMMAND_FAILED,
+                            detail="rc=%d: %s" % (r.returncode,
+                                                   (r.stderr or r.stdout).strip()[-200:]))
+    # 2. the command was ACCEPTED. That is all rc=0 means. Ask systemd what
+    #    it actually did.
+    if not unit:
+        return StartAttempt(service=name, attempted_utc=requested,
+                            outcome=START_UNCONFIRMED,
+                            detail="command rc=0 but start_cmd names no unit "
+                                   "to verify")
+    st = _unit_state(unit)
+    if st is None:
+        return StartAttempt(service=name, attempted_utc=requested,
+                            outcome=START_UNCONFIRMED,
+                            detail="command rc=0 but the unit state could not "
+                                   "be read from systemd")
+    active = st.get("ActiveState", "")
+    cond = st.get("ConditionResult", "")
+    summary = "ActiveState=%s SubState=%s ConditionResult=%s Result=%s" % (
+        active, st.get("SubState", ""), cond, st.get("Result", ""))
+    # 3. CONDITION_REFUSED, where systemd itself says so. This is the case a
+    #    preflight cannot exclude: a block may appear between our check and
+    #    systemd's evaluation. ConditionTimestamp corroborates when present;
+    #    it was observed empty on a refused unit, so state is the evidence.
+    if cond == "no" and active in ("inactive", "failed"):
+        return StartAttempt(service=name, attempted_utc=requested,
+                            outcome=CONDITION_REFUSED,
+                            detail="systemd skipped the unit (Condition*= "
+                                   "failed); %s; ConditionTimestamp=%r"
+                                   % (summary, st.get("ConditionTimestamp", "")))
+    # 4. PROCESS_ACTIVE, independently observed -- and NOT work confirmed
+    if active == "active":
+        return StartAttempt(service=name, attempted_utc=requested,
+                            outcome=PROCESS_ACTIVE, detail=summary)
+    # 5. anything else: accepted, unconfirmed. Say so.
+    return StartAttempt(service=name, attempted_utc=requested,
+                        outcome=START_UNCONFIRMED, detail=summary)
 
 
 def tick(state: dict, *, dry_run: bool) -> dict:
@@ -344,8 +421,16 @@ def tick(state: dict, *, dry_run: bool) -> dict:
                                     attempted_utc=t.isoformat(),
                                     outcome="DRY_RUN", detail="--dry-run")
                        if dry_run else start(s.name, s))
-                st["recovery"].append(att.__dict__)
-                actions.append(att.__dict__)
+                if att.outcome == CONDITION_REFUSED:
+                    # the block appeared AFTER preflight said NOT_BLOCKED.
+                    # systemd refused; that is a maintenance disposition, and
+                    # it must not spend a recovery attempt on a non-launch.
+                    _record_maintenance(st, service=s.name, at=t.isoformat(),
+                                        state=BLOCKED, detail=att.detail)
+                    actions.append(att.__dict__)
+                else:
+                    st["recovery"].append(att.__dict__)
+                    actions.append(att.__dict__)
         elif not observed[s.name] and s.externally_supervised:
             # the supervisor owns the restart; we own noticing that it
             # is not working, and saying so loudly. R2: an OBSERVATION,
