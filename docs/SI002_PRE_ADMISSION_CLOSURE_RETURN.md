@@ -21,7 +21,7 @@ PAPER_TRADING:           HELD ×3; REAL_MONEY_EXECUTION: NOT_AUTHORIZED; REAL_MA
 | `3e7df9973` | closure implementation A/B/C, tests, reproductions, reconciliation and audit artifacts |
 | `e9a1972f0` | audit targets the production constants (outside `RELEVANT_SOURCE_PATHS`) |
 | **`6be2507fb`** | **final code**: production admission root → `/etc/apex/admissions` |
-| `__DOCS__` | this return, operator package, revised proposal, spec amendments (docs only; outside `RELEVANT_SOURCE_PATHS`, so the bound tree is unchanged — re-verified after the commit) |
+| `1ca046186` | this return, operator package, revised proposal, spec amendments (docs only; outside `RELEVANT_SOURCE_PATHS`, so the bound tree is unchanged — re-verified after the commit) |
 
 Final bound source tree: **`24322971f61bcf2c02d1f98d77aa3c2ea20f1695122af03779bd64e70316dd8c`**
 (48 tracked files under the relevant paths, clean). Base: `f829f3be9`.
