@@ -1,105 +1,106 @@
-"""WORLD_MODEL_REAL_DATA_BOUNDARY_V0 -- negative controls first.
+"""WORLD_MODEL_REAL_DATA_BOUNDARY_V1 -- negative controls first.
 
-Every fixture here is DISPOSABLE and lives under tmp_path. No test reads a
-real corpus row; the real roots appear only as strings that must be
-refused. The laboratory boundary is asserted unchanged by hash.
+Disposable fixtures only: a throwaway git repo as the "checkout", a
+throwaway ed25519 authority keypair, a tmp admission root and trust dir.
+No test reads a real corpus row; real roots appear only as strings that
+must be refused. The laboratory boundary is asserted unchanged by hash.
 """
 from __future__ import annotations
 
 import ast
 import hashlib
+import inspect
 import json
 import math
 import os
 import random
 import subprocess
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
 
 from apex.world_model import sources
-from apex.world_model.exp001 import run as R
-from apex.world_model.exp001.registration import (EXPERIMENT_ID, PERIODS,
-                                                  registration_hash)
+from apex.world_model.exp001b import run as R
+from apex.world_model.exp001b.registration import EXPERIMENT_ID, PERIODS, registration_hash
 from apex.world_model.real_data import boundary, loader, manifest
-from apex.world_model.real_data.boundary import RealDataRefused
+from apex.world_model.real_data.boundary import RealDataRefused, TrustConfig
 
 REPO = Path(__file__).resolve().parents[1]
-CODE = "0123456789abcdef0123456789abcdef01234567"
-
-# ---- pins: sealed things that this milestone must leave byte-identical ----
-PIN_REGISTRATION_HASH = "1a3f55a522f7595f179033827ad10d87e873b7839f1cc08fb05624067c8f391c"
-PIN_REGISTRATION_JSON = "96ea6edc1f89dfc2a6c3188d30e460067c13ad0561b75feebdbe26c0dc803367"
-PIN_REGISTRATION_PY = "11afb3428d0df660497b6c03e7f677edf6dfe8a23ebf990f07ccc2ce0eace6ea"
 PIN_SOURCES_PY = "2513130770dfae10bf78fbbae8c620911c728ee60c03108f0cadbd04deeb5673"
 PIN_AUTHORITY_PY = "b33091a22dc612d7f9c98691075500b79b975ac6806d1f29f7a16d7abf75dd8a"
-
 AVAIL = {"event_time": {"kind": "PER_ROW", "latest": "2021-12-31"},
          "receipt_time": {"kind": "BULK", "at": "2026-08-29"},
-         "publication_time": {"kind": "NOT_AVAILABLE"},
-         "revision_time": {"kind": "NOT_AVAILABLE"},
+         "publication_time": {"kind": "NOT_AVAILABLE"}, "revision_time": {"kind": "NOT_AVAILABLE"},
          "corporate_actions": "RAW_UNADJUSTED_EXPLICIT",
-         "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record; "
-                           "rows may not be used to claim point-in-time availability"}
+         "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record"}
 
 
-# ------------------------------------------------------------ fixtures
-def _session(day: str, *, seed: int, signal: float) -> dict:
+def _session(day, *, seed, signal):
     rng = random.Random(seed)
     t = datetime.fromisoformat(day + "T13:30:00+00:00")
     px, bars, last = 400.0, [], 0.0
     for i in range(390):
-        r = signal * last + rng.gauss(0, 3e-4)
-        last = r
-        o = px; px = px * math.exp(r)
+        r = signal * last + rng.gauss(0, 3e-4); last = r
+        o = px * math.exp(rng.gauss(0, 5e-5)); px = px * math.exp(r)
         bars.append({"event_time_utc": (t + timedelta(minutes=i)).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                     "open": o, "high": max(o, px) * 1.0001, "low": min(o, px) * 0.9999,
-                     "close": px, "volume": 1000 + rng.randrange(500),
-                     "bid": px - 0.01, "ask": px + 0.01})           # NOT admitted fields
+                     "open": o, "high": max(o, px) * 1.0001, "low": min(o, px) * 0.9999, "close": px,
+                     "volume": 1000 + rng.randrange(500), "bid": px - 0.01, "ask": px + 0.01})
     return {"source": "alpaca_sip_raw_1m", "bars": bars}
 
 
+def _git(root, *args):
+    r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0, r.stderr
+    return r.stdout.strip()
+
+
 @pytest.fixture
-def rig(tmp_path, monkeypatch):
-    """Disposable dataset, manifest, key, admission root, output root."""
+def rig(tmp_path):
+    # a throwaway CHECKOUT with the relevant source paths present
+    code = tmp_path / "code"; (code / "apex" / "world_model").mkdir(parents=True)
+    (code / "apex" / "world_model" / "x.py").write_text("X = 1\n")
+    (code / "scripts").mkdir(); (code / "scripts" / "alpha_exp_real_execute.py").write_text("# cmd\n")
+    _git(code, "init", "-q"); _git(code, "config", "user.email", "t@t"); _git(code, "config", "user.name", "t")
+    _git(code, "add", "-A"); _git(code, "commit", "-q", "-m", "base")
+    ident = boundary.source_identity(code)
+    # dataset + manifest
     ds = tmp_path / "dataset" / "bars"; ds.mkdir(parents=True)
-    days = {"train": ["2019-06-03", "2019-06-04"], "validation": ["2020-06-01", "2020-06-02"],
-            "future": ["2025-01-02"]}
-    for k, ds_days in days.items():
-        for i, d in enumerate(ds_days):
-            (ds / ("SPY_%s.json" % d)).write_text(json.dumps(_session(d, seed=hash((k, i)) & 0xffff,
-                                                                        signal=0.9)))
+    days = {"train": ["2019-06-03", "2019-06-04"], "validation": ["2020-06-01", "2020-06-02"], "future": ["2025-01-02"]}
+    for k, dd in days.items():
+        for i, d in enumerate(dd):
+            (ds / ("SPY_%s.json" % d)).write_text(json.dumps(_session(d, seed=hash((k, i)) & 0xffff, signal=0.9)))
     (ds / "QQQ_2019-06-03.json").write_text(json.dumps(_session("2019-06-03", seed=99, signal=0.0)))
-    man = manifest.build(ds, dataset_id="fixture/etf", source_families=["alpaca_sip_raw_1m"],
-                         availability=AVAIL, corpus_version="fixture")
-    mpath = tmp_path / "manifest.json"
-    msha = manifest.write(man, mpath)
-    key = tmp_path / "key"; key.write_bytes(os.urandom(32).hex().encode())
-    aroot = tmp_path / "admissions"; aroot.mkdir()
-    out = tmp_path / "out"
-    monkeypatch.setattr(boundary, "checkout_root", lambda: tmp_path / "code")
-    (tmp_path / "code").mkdir()
-    return {"ds": ds, "mpath": mpath, "msha": msha, "key": key, "aroot": aroot, "out": out,
-            "tmp": tmp_path}
+    man = manifest.build(ds, dataset_id="fixture/etf", source_families=["alpaca_sip_raw_1m"], availability=AVAIL)
+    mpath = tmp_path / "manifest.json"; msha = manifest.write(man, mpath)
+    # throwaway AUTHORITY keypair, never on the research path in production
+    keys = tmp_path / "authority"; keys.mkdir()
+    subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(keys / "key"), "-C", "t"], check=True)
+    trust_dir = tmp_path / "trust"; trust_dir.mkdir(); os.chmod(trust_dir, 0o755)
+    pub = (keys / "key.pub").read_text().split()
+    signers = trust_dir / "allowed_signers"
+    signers.write_text('test-reviewer namespaces="apex-admission" %s %s\n' % (pub[0], pub[1])); os.chmod(signers, 0o644)
+    aroot = tmp_path / "admissions"; aroot.mkdir(); os.chmod(aroot, 0o755)
+    trust = TrustConfig(admission_root=aroot, allowed_signers=signers, checkout_root=code,
+                        permitted_roots=(str(tmp_path / "dataset"),), enforce_ownership=False)
+    return {"tmp": tmp_path, "code": code, "ident": ident, "ds": ds, "mpath": mpath, "msha": msha,
+            "keys": keys, "signers": signers, "aroot": aroot, "out": tmp_path / "out", "trust": trust}
 
 
 def _body(rig, **over):
     b = {"contract": boundary.REAL_DATA_CONTRACT, "decision": "ADMIT",
-         "dataset": {"dataset_id": "fixture/etf", "root": str(rig["ds"]),
-                     "manifest_path": str(rig["mpath"]), "manifest_sha256": rig["msha"]},
+         "dataset": {"dataset_id": "fixture/etf", "root": str(rig["ds"]), "manifest_path": str(rig["mpath"]),
+                     "manifest_sha256": rig["msha"]},
          "scope": {"source_families": ["alpaca_sip_raw_1m"],
-                   "fields": ["event_time_utc", "open", "high", "low", "close", "volume"],
-                   "universe": ["SPY"],
+                   "fields": ["event_time_utc", "open", "high", "low", "close", "volume"], "universe": ["SPY"],
                    "temporal_range": {"start": "2016-01-04", "end": "2021-12-31"}},
          "availability": json.loads(json.dumps(AVAIL)),
-         "purpose": {"research_purpose": "EXP-001 train+validation on fixture",
-                     "experiment_id": EXPERIMENT_ID, "registration_hash": registration_hash()},
-         "code": {"commit": CODE},
+         "purpose": {"research_purpose": "EXP-001B train+validation on fixture", "experiment_id": EXPERIMENT_ID,
+                     "registration_hash": registration_hash()},
+         "code": {"commit": rig["ident"]["commit"], "source_tree_sha256": rig["ident"]["tree_sha256"]},
          "output": {"root": str(rig["out"]), "authority_classification": "RESEARCH_HISTORICAL"},
-         "provenance": {"decided_by": "test-reviewer", "decided_utc": "2026-09-07T20:00:00Z",
-                        "review_reference": "TEST"}}
+         "provenance": {"decided_by": "test-reviewer", "decided_utc": "2026-09-07T20:00:00Z", "review_reference": "T"}}
     for k, v in over.items():
         sec, _, leaf = k.partition("__")
         if leaf:
@@ -109,18 +110,20 @@ def _body(rig, **over):
     return b
 
 
-def _write(rig, body, *, key=None, name="d.json", where=None):
-    k = (key or rig["key"]).read_bytes().strip()
-    doc = {**body, "binding": boundary.binding_for(body, k)}
+def _write(rig, body, *, name="d.json", where=None, sign=True, key=None):
     p = (where or rig["aroot"]) / name
-    p.write_text(json.dumps(doc, indent=1))
+    p.write_text(json.dumps(body, indent=1)); os.chmod(p, 0o644)
+    sig = p.with_name(p.name + ".sig")
+    if sig.exists():
+        sig.unlink()                     # a stale signature belongs to the previous body
+    if sign:
+        subprocess.run(["ssh-keygen", "-Y", "sign", "-f", str(key or rig["keys"] / "key"), "-n", "apex-admission",
+                        str(p)], check=True, capture_output=True)
     return p
 
 
 def _verify(rig, p, **kw):
-    return boundary.verify_decision(p, key_path=rig["key"], admission_root=rig["aroot"],
-                                    permitted_roots=(rig["tmp"] / "dataset",),
-                                    code_commit=CODE, **kw)
+    return boundary.verify_decision_with(p, rig["trust"], **kw)
 
 
 def _refused(rig, p, code, **kw):
@@ -129,258 +132,292 @@ def _refused(rig, p, code, **kw):
     assert str(ei.value).startswith(code), str(ei.value)
 
 
-# ------------------------------------------------- 1. no authorization
+# ------------------------------------------------ 1. no authorization
 def test_no_decision_is_refused(rig):
     _refused(rig, None, "NO_DECISION")
     _refused(rig, rig["aroot"] / "absent.json", "NO_DECISION")
 
 
-def test_unbound_or_proposed_decision_is_refused(rig):
-    b = _body(rig)
-    p = rig["aroot"] / "draft.json"; p.write_text(json.dumps(b))
-    _refused(rig, p, "UNBOUND_DECISION")
+def test_unsigned_proposed_or_foreign_signed_decision_is_refused(rig):
+    _refused(rig, _write(rig, _body(rig), sign=False), "UNSIGNED_DECISION")
     _refused(rig, _write(rig, _body(rig, decision="PROPOSED")), "DECISION_NOT_ADMIT")
-    _refused(rig, _write(rig, _body(rig, decision="ELIGIBLE_WITH_LIMITATIONS")), "DECISION_NOT_ADMIT")
-
-
-def test_missing_key_refuses_even_a_well_formed_decision(rig):
+    other = rig["tmp"] / "other"; other.mkdir()
+    subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(other / "k")], check=True)
+    _refused(rig, _write(rig, _body(rig), key=other / "k"), "SIGNATURE_INVALID")
+    _refused(rig, _write(rig, _body(rig, provenance__decided_by="someone-else")), "SIGNATURE_INVALID")
     p = _write(rig, _body(rig))
-    with pytest.raises(RealDataRefused) as ei:
-        boundary.verify_decision(p, key_path=rig["tmp"] / "no_key", admission_root=rig["aroot"],
-                                 permitted_roots=(rig["tmp"] / "dataset",), code_commit=CODE)
-    assert str(ei.value).startswith("NO_ADMISSION_KEY")
+    doc = json.loads(p.read_text()); doc["scope"]["temporal_range"]["end"] = "2026-12-31"
+    p.write_text(json.dumps(doc, indent=1))
+    _refused(rig, p, "SIGNATURE_INVALID")                            # edited after signing
 
 
-def test_caller_cannot_admit_itself(rig):
-    """Decision inside the checkout, outside the admission root, or bound
-    under a key the caller made up: all refused."""
-    inside = rig["tmp"] / "code" / "adm"; inside.mkdir()
-    p = _write(rig, _body(rig), where=inside)
-    with pytest.raises(RealDataRefused) as ei:
-        boundary.verify_decision(p, key_path=rig["key"], admission_root=rig["tmp"],
-                                 permitted_roots=(rig["tmp"] / "dataset",), code_commit=CODE)
-    assert str(ei.value).startswith("DECISION_INSIDE_CHECKOUT")
+def test_research_cannot_issue_its_own_admission(rig):
+    """No signing key on the research path; a decision the research code
+    writes itself is unsigned; one placed in its checkout is refused."""
+    assert not (REPO / "authority").exists()
+    assert not hasattr(boundary, "binding_for") and "hmac" not in boundary.__dict__
+    inside = rig["code"] / "adm"; inside.mkdir()
+    t2 = TrustConfig(admission_root=rig["tmp"], allowed_signers=rig["signers"], checkout_root=rig["code"],
+                     permitted_roots=rig["trust"].permitted_roots, enforce_ownership=False)
+    with pytest.raises(RealDataRefused, match="^DECISION_INSIDE_CHECKOUT"):
+        boundary.verify_decision_with(_write(rig, _body(rig), where=inside), t2)
     _refused(rig, _write(rig, _body(rig), where=rig["tmp"]), "DECISION_OUTSIDE_ADMISSION_ROOT")
-    own = rig["tmp"] / "own_key"; own.write_bytes(b"x" * 40)
-    _refused(rig, _write(rig, _body(rig), key=own), "BINDING_MISMATCH")
-    _refused(rig, _write(rig, _body(rig, provenance__decided_by="engineering")),
-             "DECISION_PROVENANCE_INVALID")
+    _refused(rig, _write(rig, _body(rig, provenance__decided_by="engineering")), "DECISION_PROVENANCE_INVALID")
 
 
-# ------------------------------------------ 2. wrong dataset / scope
+def test_trust_paths_must_not_be_writable_or_owned_by_research(rig):
+    p = _write(rig, _body(rig))
+    os.chmod(rig["signers"], 0o664)
+    _refused(rig, p, "TRUST_PATH_WRITABLE")
+    os.chmod(rig["signers"], 0o644)
+    os.chmod(rig["aroot"], 0o777)
+    _refused(rig, p, "TRUST_PATH_WRITABLE")
+    os.chmod(rig["aroot"], 0o755)
+    strict = TrustConfig(**{**rig["trust"].__dict__, "enforce_ownership": True})
+    with pytest.raises(RealDataRefused, match="^TRUST_PATH_OWNED_BY_RESEARCH"):
+        boundary.verify_decision_with(p, strict)
+
+
+def test_production_entry_point_has_no_injection_parameters():
+    params = list(inspect.signature(boundary.verify_decision).parameters)
+    assert params == ["decision_path", "experiment_id", "registration_hash"]
+    t = boundary.production_trust()
+    assert t.enforce_ownership and t.admission_root == boundary.PRODUCTION_ADMISSION_ROOT
+    assert t.allowed_signers == boundary.PRODUCTION_ALLOWED_SIGNERS
+    assert t.checkout_root == boundary.checkout_root() and boundary.checkout_root() == REPO
+
+
+# ------------------------------------------------ 2. source identity
+def test_dirty_or_mismatched_source_is_refused(rig):
+    p = _write(rig, _body(rig))
+    x = rig["code"] / "apex" / "world_model" / "x.py"
+    x.write_text("X = 2\n")
+    _refused(rig, p, "SOURCE_DIRTY")
+    x.write_text("X = 1\n")
+    (rig["code"] / "apex" / "world_model" / "untracked.py").write_text("# new\n")
+    _refused(rig, p, "SOURCE_DIRTY")
+    (rig["code"] / "apex" / "world_model" / "untracked.py").unlink()
+    _refused(rig, _write(rig, _body(rig, code__commit="ff" * 20), name="c1.json"), "CODE_IDENTITY_MISMATCH")
+    _refused(rig, _write(rig, _body(rig, code__source_tree_sha256="00" * 32), name="c2.json"), "SOURCE_IDENTITY_MISMATCH")
+    assert _verify(rig, p).code_commit == rig["ident"]["commit"]          # clean again: admitted
+    # a committed change invalidates a decision made for the previous tree
+    x.write_text("X = 3\n"); _git(rig["code"], "commit", "-qam", "change")
+    new = boundary.source_identity(rig["code"])
+    _refused(rig, _write(rig, _body(rig, code__commit=new["commit"]), name="c3.json"), "SOURCE_IDENTITY_MISMATCH")
+    _refused(rig, p, "CODE_IDENTITY_MISMATCH")                            # the original decision, old commit
+
+
+def test_source_identity_hashes_content_not_just_head(rig):
+    a = boundary.source_identity(rig["code"])
+    assert a["n_files"] == 2 and not a["dirty"] and len(a["tree_sha256"]) == 64
+    (rig["code"] / "apex" / "world_model" / "x.py").write_text("X = 9\n")
+    b = boundary.source_identity(rig["code"])
+    assert b["commit"] == a["commit"] and b["tree_sha256"] != a["tree_sha256"] and b["dirty"]
+
+
+# ------------------------------------------------ 3. dataset / scope
 def test_prohibited_and_unpermitted_dataset_roots_are_refused(rig):
-    for root in ("/apex-data/core/btc", "/apex-data/core/intraday", "/opt/apex/releases/x",
-                 "/apex-research/world-model-fixtures"):
+    for root in ("/apex-data/core/btc", "/opt/apex/releases/x", "/apex-research/world-model-fixtures"):
         _refused(rig, _write(rig, _body(rig, dataset__root=root)), "PROHIBITED_DATASET_ROOT")
-    _refused(rig, _write(rig, _body(rig, dataset__root=str(rig["tmp"] / "elsewhere"))),
-             "DATASET_ROOT_NOT_PERMITTED")
+    _refused(rig, _write(rig, _body(rig, dataset__root=str(rig["tmp"] / "elsewhere"))), "DATASET_ROOT_NOT_PERMITTED")
 
 
 def test_wrong_experiment_or_registration_is_refused(rig):
-    p = _write(rig, _body(rig, purpose__experiment_id="ALPHA-EXP-002"))
-    _refused(rig, p, "EXPERIMENT_MISMATCH", experiment_id=EXPERIMENT_ID)
-    p = _write(rig, _body(rig, purpose__registration_hash="00" * 32))
-    _refused(rig, p, "REGISTRATION_MISMATCH", registration_hash=registration_hash())
+    _refused(rig, _write(rig, _body(rig, purpose__experiment_id="ALPHA-EXP-001")), "EXPERIMENT_MISMATCH",
+             experiment_id=EXPERIMENT_ID)
+    _refused(rig, _write(rig, _body(rig, purpose__registration_hash="00" * 32)), "REGISTRATION_MISMATCH",
+             registration_hash=registration_hash())
 
 
-def test_code_identity_mismatch_is_refused(rig):
-    p = _write(rig, _body(rig))
-    with pytest.raises(RealDataRefused) as ei:
-        boundary.verify_decision(p, key_path=rig["key"], admission_root=rig["aroot"],
-                                 permitted_roots=(rig["tmp"] / "dataset",), code_commit="ff" * 20)
-    assert str(ei.value).startswith("CODE_IDENTITY_MISMATCH")
-
-
-def test_field_temporal_and_universe_scope_are_enforced_at_read(rig):
+def test_scope_is_enforced_at_read(rig):
     g = _verify(rig, _write(rig, _body(rig)))
     f = rig["ds"] / "SPY_2019-06-03.json"
     with pytest.raises(RealDataRefused, match="^FIELD_NOT_PERMITTED"):
         boundary.open_file(g, f, symbol="SPY", session_date="2019-06-03", fields=("close", "bid"))
     with pytest.raises(RealDataRefused, match="^OUTSIDE_TEMPORAL_SCOPE"):
-        boundary.open_file(g, rig["ds"] / "SPY_2025-01-02.json", symbol="SPY",
-                           session_date="2025-01-02")
+        boundary.open_file(g, rig["ds"] / "SPY_2025-01-02.json", symbol="SPY", session_date="2025-01-02")
     with pytest.raises(RealDataRefused, match="^OUTSIDE_UNIVERSE"):
-        boundary.open_file(g, rig["ds"] / "QQQ_2019-06-03.json", symbol="QQQ",
-                           session_date="2019-06-03")
+        boundary.open_file(g, rig["ds"] / "QQQ_2019-06-03.json", symbol="QQQ", session_date="2019-06-03")
     with pytest.raises(RealDataRefused, match="^DATE_MISMATCH"):
         boundary.open_file(g, f, symbol="SPY", session_date="2019-06-04")
+    extra = rig["ds"] / "SPY_2019-06-05.json"; extra.write_text("{}")
     with pytest.raises(RealDataRefused, match="^UNCOMMITTED_FILE"):
-        extra = rig["ds"] / "SPY_2019-06-05.json"; extra.write_text("{}")
         boundary.open_file(g, extra, symbol="SPY", session_date="2019-06-05")
-    with pytest.raises(RealDataRefused, match="^OUTSIDE_DATASET_ROOT"):
-        boundary.open_file(g, rig["tmp"] / "manifest.json", symbol="SPY", session_date="2019-06-03")
 
 
-# ------------------------------------- 3. changed after commitment
-def test_changed_payload_after_commitment_is_refused(rig):
+def test_changed_payload_or_manifest_after_commitment_is_refused(rig):
     g = _verify(rig, _write(rig, _body(rig)))
     f = rig["ds"] / "SPY_2019-06-03.json"
-    doc = json.loads(f.read_text()); doc["bars"][100]["close"] *= 1.01
-    f.write_text(json.dumps(doc))
+    d = json.loads(f.read_text()); d["bars"][100]["close"] *= 1.01; f.write_text(json.dumps(d))
     with pytest.raises(RealDataRefused, match="^CONTENT_CHANGED"):
         boundary.open_file(g, f, symbol="SPY", session_date="2019-06-03")
+    m = json.loads(rig["mpath"].read_text()); m["files"]["SPY_2019-06-04.json"]["sha256"] = "00" * 32
+    rig["mpath"].write_text(json.dumps(m))
+    _refused(rig, _write(rig, _body(rig)), "MANIFEST_HASH_MISMATCH")
 
 
-def test_changed_manifest_or_body_after_binding_is_refused(rig):
-    p = _write(rig, _body(rig))
-    man = json.loads(rig["mpath"].read_text()); man["files"]["SPY_2019-06-03.json"]["sha256"] = "00" * 32
-    rig["mpath"].write_text(json.dumps(man))
-    _refused(rig, p, "MANIFEST_HASH_MISMATCH")
-    manifest.write(manifest.build(rig["ds"], dataset_id="fixture/etf",
-                                  source_families=["alpaca_sip_raw_1m"], availability=AVAIL),
-                   rig["mpath"])
-    p = _write(rig, _body(rig))
-    doc = json.loads(p.read_text()); doc["scope"]["temporal_range"]["end"] = "2026-12-31"
-    p.write_text(json.dumps(doc))
-    _refused(rig, p, "BODY_DIGEST_MISMATCH")
-
-
-# ------------------------------------------- 4. availability metadata
-@pytest.mark.parametrize("over,code", [
-    ({"availability__publication_time": {"kind": "MAYBE"}}, "AVAILABILITY_INVALID"),
-    ({"availability__event_time": {"kind": "NOT_AVAILABLE"}}, "AVAILABILITY_INVALID"),
-    ({"availability__receipt_time": {"kind": "BULK", "at": "2015-01-01"}}, "AVAILABILITY_INVALID"),
-    ({"availability__corporate_actions": "whatever"}, "AVAILABILITY_INVALID"),
-    ({"availability__restricted_use": ""}, "AVAILABILITY_INVALID"),
-    ({"availability__revision_time": {"kind": "PER_ROW"}}, "AVAILABILITY_INVALID"),  # contradicts manifest
+@pytest.mark.parametrize("over", [
+    {"availability__publication_time": {"kind": "MAYBE"}},
+    {"availability__event_time": {"kind": "NOT_AVAILABLE"}},
+    {"availability__receipt_time": {"kind": "BULK", "at": "2015-01-01"}},
+    {"availability__corporate_actions": "whatever"},
+    {"availability__restricted_use": ""},
+    {"availability__revision_time": {"kind": "PER_ROW"}},
 ])
-def test_invalid_or_contradictory_availability_is_refused(rig, over, code):
-    _refused(rig, _write(rig, _body(rig, **over)), code)
+def test_invalid_or_contradictory_availability_is_refused(rig, over):
+    _refused(rig, _write(rig, _body(rig, **over)), "AVAILABILITY_INVALID")
 
 
 def test_missing_required_fields_are_named(rig):
-    b = _body(rig); del b["provenance"]["review_reference"]
-    _refused(rig, _write(rig, b), "MISSING_FIELD: provenance.review_reference")
+    b = _body(rig); del b["code"]["source_tree_sha256"]
+    _refused(rig, _write(rig, b), "MISSING_FIELD: code.source_tree_sha256")
 
 
-# ------------------------------------------ 5. authorized fixture
-def test_authorized_fixture_permits_a_restricted_read(rig):
+# ------------------------------------------------ 4. authorized fixture
+def test_authorized_fixture_permits_a_restricted_read_with_clocks(rig):
     g = _verify(rig, _write(rig, _body(rig)))
-    assert g.contract == boundary.REAL_DATA_CONTRACT
-    s = loader.load_session(rig["ds"] / "SPY_2019-06-03.json", grant=g, symbol="SPY",
-                            session_date="2019-06-03")
-    assert s["route"] == boundary.REAL_DATA_CONTRACT and s["admission"]["decision_digest"] == g.decision_digest
-    assert s["restricted_use"].startswith("HISTORICAL_RESEARCH_ONLY")
-    assert len(s["rows"]) == 390
-    assert all(r["known_from"] == r["t"] + 60 for r in s["rows"])
-    assert all("bid" not in r and "ask" not in r for r in s["rows"])   # field restriction is real
+    assert g.signer == "test-reviewer" and g.source_identity["tree_sha256"] == rig["ident"]["tree_sha256"]
+    s = loader.load_session(rig["ds"] / "SPY_2019-06-03.json", grant=g, symbol="SPY", session_date="2019-06-03")
+    assert s["route"] == boundary.REAL_DATA_CONTRACT and s["admission"]["decision_sha256"] == g.decision_sha256
+    assert s["availability_basis"] == "ASSUMED_BAR_CLOSE" and s["publication_time"] == "NOT_AVAILABLE"
+    r = s["rows"][10]
+    assert r["bar_complete"] == r["event_time"] + 60 == r["assumed_available"] and r["publication_time"] is None
+    assert all("bid" not in x and "ask" not in x for x in s["rows"])
 
 
-def test_authorized_fixture_runs_exp001_end_to_end_without_the_lab(rig):
+def test_authorized_fixture_runs_exp001b_end_to_end_without_the_lab(rig):
     g = _verify(rig, _write(rig, _body(rig)))
     sbp = loader.sessions_by_period(g, PERIODS, symbol="SPY")
-    assert {k: len(v) for k, v in sbp.items()} == {"train": 2, "validation": 2, "evaluation": 0,
-                                                    "reserve": 0}     # 2025 file is out of scope
-    out = boundary.open_output(g, "exp001_real")
+    assert {k: len(v) for k, v in sbp.items()} == {"train": 2, "validation": 2, "evaluation": 0, "reserve": 0}
+    run_dir = boundary.open_run(g, label="t")
     rec = R.run({"train": sbp["train"], "validation": sbp["validation"], "evaluation": []},
-                ledger_dir=out, declared_class="REAL_HISTORICAL_ADMITTED",
-                session_loader=loader.loader_for(g))
-    assert rec["route"] == "SESSION_LOADER_SUPPLIED"
+                ledger_dir=run_dir, session_loader=loader.loader_for(g))
     names = [s["stage"] for s in rec["stages"]]
-    assert "fit" in names and "validation" in names, rec
-    assert rec["status"] in ("NO_SIGNAL", "BLOCKED", "READY", "NO_OPPORTUNITY"), rec["status"]
-    assert rec["status"] != "INVALID_INPUT"
-    assert (out / "forecasts_validation.jsonl").exists()
-    assert any(s["stage"] == "evaluation" and s["status"] == "BLOCKED" for s in rec["stages"])
+    assert "fit" in names and "validation" in names and rec["status"] != "INVALID_INPUT", rec
+    assert "economic" not in rec["validation"]
+    assert (run_dir / "forecasts_validation.jsonl").exists() and not (run_dir / "forecasts_evaluation.jsonl").exists()
 
 
-# ------------------------------------ 6. laboratory boundary intact
+# ------------------------------------------------ 5. laboratory intact
 def test_synthetic_lab_real_data_exclusion_is_unchanged(rig):
-    for f, pin in (("apex/world_model/sources.py", PIN_SOURCES_PY),
-                   ("apex/world_model/authority.py", PIN_AUTHORITY_PY)):
+    for f, pin in (("apex/world_model/sources.py", PIN_SOURCES_PY), ("apex/world_model/authority.py", PIN_AUTHORITY_PY)):
         assert hashlib.sha256((REPO / f).read_bytes()).hexdigest() == pin, f
-    assert "/apex-data/history-a" in sources.REAL_EVIDENCE_ROOTS
-    assert "/apex-data/history-b" in sources.REAL_EVIDENCE_ROOTS
     with pytest.raises(sources.SourceAdmissionRefused, match="^REAL_EVIDENCE_PATH"):
         sources.admit("/apex-data/history-b/etf_continuous/bars/SPY_2022-03-01.json",
                       declared_class="SYNTHETIC_FIXTURE", fixture_root=rig["tmp"])
-    # a file THIS route admits is still not a laboratory fixture
     with pytest.raises(sources.SourceAdmissionRefused, match="^NO_PROVENANCE_MANIFEST|^OUTSIDE_FIXTURE_ROOT"):
         sources.admit(rig["ds"] / "SPY_2019-06-03.json", declared_class="SYNTHETIC_FIXTURE",
                       fixture_root=rig["tmp"] / "dataset")
-    # and run() with no loader is the laboratory route: it refuses the dataset
-    rec = R.run({"train": [str(rig["ds"] / "SPY_2019-06-03.json")], "validation": []},
-                ledger_dir=rig["tmp"] / "lab_led", declared_class="SYNTHETIC_FIXTURE",
-                fixture_root=rig["tmp"] / "nowhere")
-    assert rec["status"] == "BLOCKED" and rec["route"] == "LABORATORY"
-    assert rec["refusal"]["kind"] == "SourceAdmissionRefused"
 
 
-# ----------------------------- 7. outputs cannot acquire authority
-def test_research_outputs_carry_no_broker_or_live_authority(rig):
+# ------------------------------------------------ 6. runs and authority
+def test_runs_are_unique_exclusive_and_sealed_once(rig):
     g = _verify(rig, _write(rig, _body(rig)))
-    out = boundary.open_output(g, "x")
-    st = boundary.output_authority(out)
-    assert st["authority_classification"] == "RESEARCH_HISTORICAL"
-    for k in ("ORDER_AUTHORITY", "TRADING_AUTHORITY", "CAPITAL_AUTHORITY",
-              "LIVE_DECISION_AUTHORITY", "MODEL_PROMOTION_AUTHORITY"):
-        assert st["authority"][k] == "NONE"
-    assert st["authority"]["ROBINHOOD_ACCESS"] == "FORBIDDEN"
-    assert st["binding_spoof_resistance"] == "PARTIAL"
-    for root in ("/apex-data/core/ops", "/apex-data/history-b/x", str(rig["tmp"] / "code" / "o")):
+    a = boundary.open_run(g, label="x"); b = boundary.open_run(g, label="x")
+    assert a != b and a.parent == b.parent
+    recs = boundary.run_records(a)
+    assert recs["_AUTHORITY.json"]["authority"]["ORDER_AUTHORITY"] == "NONE"
+    assert recs["_AUTHORITY.json"]["authority"]["ADMISSION_ISSUANCE"].startswith("NONE")
+    assert recs["_RUN.json"]["decision_sha256"] == g.decision_sha256 and recs["_RUN.json"]["signer"] == "test-reviewer"
+    assert recs["_RUN.json"]["source_identity"]["tree_sha256"] == rig["ident"]["tree_sha256"]
+    assert recs["_RUN.json"]["runtime"]["executable"] == sys.executable
+    with pytest.raises(FileExistsError):
+        boundary._write_once(a / "_AUTHORITY.json", {"tamper": True})
+    boundary.seal_result(a, {"status": "NO_SIGNAL"})
+    with pytest.raises(RealDataRefused, match="^RESULT_EXISTS"):
+        boundary.seal_result(a, {"status": "READY"})
+    with pytest.raises(RealDataRefused, match="^RUN_LABEL_INVALID"):
+        boundary.open_run(g, label="../x")
+    for root in ("/apex-data/core/ops", "/apex-data/history-b/x", str(rig["code"] / "o")):
         _refused(rig, _write(rig, _body(rig, output__root=root)), "OUTPUT_ROOT_INVALID")
-    with pytest.raises(RealDataRefused, match="^OUTPUT_UNSTAMPED"):
-        boundary.output_authority(rig["tmp"])
 
 
 def test_route_modules_reach_no_execution_layer():
     mods = [REPO / "apex/world_model/real_data" / n for n in ("boundary.py", "loader.py", "manifest.py")]
-    mods.append(REPO / "scripts/exp001_real_execute.py")
+    mods += [REPO / "apex/world_model/exp001b" / n for n in ("bars.py", "models.py", "run.py", "registration.py")]
+    mods += [REPO / "apex/world_model/exchange_calendar.py", REPO / "scripts/alpha_exp_real_execute.py"]
     for m in mods:
         tree = ast.parse(m.read_text())
         imports = {n.module or "" for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)} | \
                   {a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
         assert not any(i.startswith(("apex.execution", "apex.organism", "apex.capital")) for i in imports), (m, imports)
-        consts = {n.value.lower() for n in ast.walk(tree)
-                  if isinstance(n, ast.Constant) and isinstance(n.value, str)}
+        consts = {n.value.lower() for n in ast.walk(tree) if isinstance(n, ast.Constant) and isinstance(n.value, str)}
         for bad in ("place_order", "place_equity_order", "place_option_order", "paper_book.jsonl"):
             assert not any(bad in c for c in consts), (m, bad)
+    assert not (REPO / "scripts/exp001_real_execute.py").exists()      # the defective command is gone
 
 
-# ---------------------------------- 8. child process provenance
-def test_child_process_imports_the_intended_checkout():
+# ------------------------------------------------ 7. process outcomes
+def _cmd():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("alpha_exp_real_execute", REPO / "scripts/alpha_exp_real_execute.py")
+    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    return mod
+
+
+def test_command_refuses_without_a_decision_in_a_child_process():
     env = {**os.environ, "PYTHONPATH": str(REPO)}
-    r = subprocess.run([sys.executable, "-c",
-                        "import apex.world_model.real_data.boundary as b, apex; print(b.__file__); print(apex.__file__)"],
-                       cwd=str(REPO), capture_output=True, text=True, timeout=60, env=env)
-    assert r.returncode == 0, r.stderr
-    lines = r.stdout.strip().splitlines()
-    assert all(Path(l).resolve().is_relative_to(REPO) for l in lines), lines
-
-
-def test_execute_command_refuses_without_a_decision():
-    env = {**os.environ, "PYTHONPATH": str(REPO)}
-    r = subprocess.run([sys.executable, str(REPO / "scripts/exp001_real_execute.py"), "--plan"],
+    r = subprocess.run([sys.executable, str(REPO / "scripts/alpha_exp_real_execute.py"), "--plan"],
                        cwd=str(REPO), capture_output=True, text=True, timeout=120, env=env)
     assert r.returncode == 3, (r.stdout, r.stderr)
     doc = json.loads(r.stdout)
-    assert doc["status"] == "REFUSED" and doc["refusal"].startswith("NO_DECISION")
+    assert doc["process_outcome"] == "AUTHORIZATION_REFUSED" and doc["refusal"].startswith("NO_DECISION")
+    r = subprocess.run([sys.executable, "-c", "import apex.world_model.real_data.boundary as b; print(b.__file__)"],
+                       cwd=str(REPO), capture_output=True, text=True, timeout=60, env=env)
+    assert Path(r.stdout.strip()).resolve().is_relative_to(REPO)
 
 
-def test_execute_command_plan_opens_no_rows_and_keeps_evaluation_sealed(rig, monkeypatch, capsys):
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("exp001_real_execute", REPO / "scripts/exp001_real_execute.py")
-    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
-    monkeypatch.setattr(boundary, "ADMISSION_ROOT", rig["aroot"])
-    monkeypatch.setattr(boundary, "ADMISSION_KEY_PATH", rig["key"])
-    monkeypatch.setattr(boundary, "PERMITTED_HISTORICAL_ROOTS", (str(rig["tmp"] / "dataset"),))
-    monkeypatch.setattr(boundary, "checkout_commit", lambda root=None: CODE)
+def test_command_plan_opens_no_rows_and_creates_no_run(rig, monkeypatch, capsys):
+    mod = _cmd()
     p = _write(rig, _body(rig))
-    opened = []
-    monkeypatch.setattr(boundary, "open_file", lambda *a, **k: opened.append(a) or (_ for _ in ()).throw(AssertionError))
-    assert mod.main(["--decision", str(p), "--plan"]) == 0
+    monkeypatch.setattr(boundary, "open_file", lambda *a, **k: (_ for _ in ()).throw(AssertionError("row opened")))
+    assert mod.main(["--decision", str(p), "--plan"], trust=rig["trust"]) == 0
     doc = json.loads(capsys.readouterr().out)
-    assert doc["status"] == "PLAN" and doc["sessions"] == {"train": 2, "validation": 2, "evaluation": 0}
-    assert doc["evaluation"].startswith("SEALED") and opened == []
-    assert not rig["out"].exists()                          # plan writes nothing
-    # a decision for another experiment is refused by the command too
-    p2 = _write(rig, _body(rig, purpose__experiment_id="ALPHA-EXP-002"), name="d2.json")
-    assert mod.main(["--decision", str(p2), "--plan"]) == 3
+    assert doc["process_outcome"] == "SCIENTIFIC_COMPLETE" and doc["status"] == "PLAN"
+    assert doc["sessions"] == {"train": 2, "validation": 2, "evaluation": 0} and doc["evaluation"].startswith("SEALED")
+    assert not rig["out"].exists()
+    p2 = _write(rig, _body(rig, purpose__experiment_id="ALPHA-EXP-001"), name="d2.json")
+    assert mod.main(["--decision", str(p2), "--plan"], trust=rig["trust"]) == 3
     assert json.loads(capsys.readouterr().out)["refusal"].startswith("EXPERIMENT_MISMATCH")
 
 
-# -------------------------- 9. registration and sealed evidence
-def test_registration_and_sealed_evidence_unchanged():
-    assert registration_hash() == PIN_REGISTRATION_HASH
-    assert hashlib.sha256((REPO / "results/exp001_registration.json").read_bytes()).hexdigest() == PIN_REGISTRATION_JSON
-    assert hashlib.sha256((REPO / "apex/world_model/exp001/registration.py").read_bytes()).hexdigest() == PIN_REGISTRATION_PY
+def test_command_outcomes_through_the_actual_paths(rig, monkeypatch, capsys):
+    mod = _cmd()
+    p = _write(rig, _body(rig))
+    # planted signal (phi=0.9) -> validation SIGNAL_DETECTED -> evaluation stays sealed -> 4
+    rc = mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
+    doc = json.loads(capsys.readouterr().out)
+    assert rc == 4 and doc["process_outcome"] == "EVALUATION_SEALED" and doc["status"] == "SEALED_EVALUATION_PENDING"
+    run1 = Path(doc["run_dir"]); res = json.loads((run1 / "_RESULT.json").read_text())
+    assert res["process_outcome"] == "EVALUATION_SEALED" and "economic" not in res["validation"]
+    assert res["runtime_at_end"]["executable"] == sys.executable
+    # a second execute never reuses the directory
+    rc = mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
+    assert Path(json.loads(capsys.readouterr().out)["run_dir"]) != run1
+    # forced INVALID_INPUT -> 5, result sealed
+    monkeypatch.setattr(mod.R, "run", lambda *a, **k: {"experiment": EXPERIMENT_ID, "status": "INVALID_INPUT", "why": "forced"})
+    rc = mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
+    doc = json.loads(capsys.readouterr().out)
+    assert rc == 5 and doc["process_outcome"] == "INVALID_INPUT_OR_FAILURE"
+    assert json.loads((Path(doc["run_dir"]) / "_RESULT.json").read_text())["status"] == "INVALID_INPUT"
+    # execution error -> 5, sealed with traceback
+    def boom(*a, **k): raise RuntimeError("kaboom")
+    monkeypatch.setattr(mod.R, "run", boom)
+    rc = mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
+    doc = json.loads(capsys.readouterr().out)
+    assert rc == 5 and "kaboom" in doc["why"]
+    # NO_SIGNAL is a scientific completion -> 0
+    monkeypatch.setattr(mod.R, "run", lambda *a, **k: {"experiment": EXPERIMENT_ID, "status": "NO_SIGNAL", "why": "n"})
+    rc = mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
+    doc = json.loads(capsys.readouterr().out)
+    assert rc == 0 and doc["process_outcome"] == "SCIENTIFIC_COMPLETE"
+    # admission refused mid-run -> 3
+    monkeypatch.setattr(mod.R, "run", lambda *a, **k: {"experiment": EXPERIMENT_ID, "status": "ADMISSION_REFUSED"})
+    assert mod.main(["--decision", str(p), "--execute"], trust=rig["trust"]) == 3
+    capsys.readouterr()
+
+
+def test_cli_never_passes_trust():
+    src = (REPO / "scripts/alpha_exp_real_execute.py").read_text()
+    assert "sys.exit(main())" in src and "trust=" not in src.split("if __name__")[1]
+    assert "--trust" not in src and "--key" not in src

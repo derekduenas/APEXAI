@@ -1,0 +1,149 @@
+{
+ "base_commit": "566600dca8632cd5e3831ef20304c29ae725bb0a",
+ "produced_utc": "2026-09-07T22:32:21Z",
+ "fixtures": "disposable, synthetic, under tempdir; no real corpus row read",
+ "findings": [
+  {
+   "finding": 1,
+   "title": "loader known_from is not honored by the forecast",
+   "status": "REPRODUCED",
+   "evidence": {
+    "row_t_bar_open": 1559571000.0,
+    "loader_known_from": 1559571060.0,
+    "forecast_known_from": 1559571000.0,
+    "forecast_claims_availability_seconds_before_bar_complete": 60.0
+   },
+   "introduced_in": "7f26e938f (ALPHA-EXP-001 first commit); the loader convention was added in 566600dca (STRATEGIC-INTEGRATION-002) and not threaded through"
+  },
+  {
+   "finding": 2,
+   "title": "outcome availability uses the wrong bar clock",
+   "status": "REPRODUCED",
+   "evidence": {
+    "target_bar_open": 1559571900.0,
+    "outcome_known_time_used": 1559571900.0,
+    "target_bar_complete": 1559571960.0,
+    "note": "grader accepts because forecast.known_from is also the OPEN clock; both are early by one bar"
+   },
+   "introduced_in": "7f26e938f (ALPHA-EXP-001 first commit)"
+  },
+  {
+   "finding": 3,
+   "title": "fixed UTC session filtering mishandles winter sessions and early closes",
+   "status": "REPRODUCED",
+   "evidence": {
+    "registration_SESSION_UTC": [
+     "13:30",
+     "20:00"
+    ],
+    "winter_2019-01-15": {
+     "rows_kept": 390,
+     "first_kept": "13:30Z",
+     "last_kept": "19:59Z",
+     "premarket_bars_included_08:30-09:30ET": 60,
+     "regular_bars_dropped_15:00-16:00ET": 60
+    },
+    "early_close_2019-11-29": {
+     "rows_kept": 390,
+     "last_kept": "19:59Z",
+     "post_close_bars_included_13:00-15:00ET": 120
+    }
+   },
+   "introduced_in": "7f26e938f (ALPHA-EXP-001 first commit)"
+  },
+  {
+   "finding": 4,
+   "title": "missing minutes change a row-count horizon's elapsed duration",
+   "status": "REPRODUCED",
+   "evidence": {
+    "gap_minutes_inserted": 10,
+    "row_i": 90,
+    "row_j": 105,
+    "elapsed_minutes_between_rows": 25.0,
+    "registered_horizon_minutes": 15,
+    "target_returned_for_row_i": true
+   },
+   "introduced_in": "7f26e938f (ALPHA-EXP-001 first commit)"
+  },
+  {
+   "finding": 5,
+   "title": "validation invokes economics despite the evaluation-only registration",
+   "status": "REPRODUCED",
+   "evidence": {
+    "run_status": "NO_SIGNAL",
+    "validation_keys": [
+     "dm",
+     "economic",
+     "n",
+     "n0",
+     "n0_is_no_signal",
+     "status"
+    ],
+    "validation_economic_status": "READY",
+    "registration_ECONOMIC_TEST": "On EVALUATION only, after the statistical stage"
+   },
+   "introduced_in": "7f26e938f (ALPHA-EXP-001 first commit)"
+  },
+  {
+   "finding": 6,
+   "title": "economic execution differs from the registered next-bar-open convention",
+   "status": "REPRODUCED",
+   "evidence": {
+    "registration_EXECUTION_MODEL": "NEXT_BAR_OPEN_PLUS_MODELLED_SPREAD",
+    "implementation": "realised = (y if LONG else -y) - roundtrip, y = log(close[i+15]/close[i])",
+    "row": 60,
+    "close_to_close": 0.0003876554753285806,
+    "next_bar_open_to_open": 0.000469496391659894,
+    "difference": -8.184091633131342e-05
+   },
+   "introduced_in": "7f26e938f (ALPHA-EXP-001 first commit)"
+  },
+  {
+   "finding": 7,
+   "title": "certified_1R is not certified maximum loss",
+   "status": "REPRODUCED",
+   "evidence": {
+    "label_in_run.py": "\"certified_1R\": stop + rt  (stop = rv_30)",
+    "risk_certificate_imported_by_run.py": false,
+    "law": "certification only by apex.organism.risk_certificate.certify; a stop is not a certified max loss"
+   },
+   "introduced_in": "7f26e938f (ALPHA-EXP-001 first commit)"
+  },
+  {
+   "finding": 8,
+   "title": "dirty source can retain the accepted HEAD identity",
+   "status": "REPRODUCED",
+   "evidence": {
+    "git_status_while_dirty": "M apex/world_model/exp001/models.py",
+    "verify_decision_result": "GRANT with code_commit == HEAD"
+   },
+   "introduced_in": "566600dca (STRATEGIC-INTEGRATION-002)"
+  },
+  {
+   "finding": 9,
+   "title": "an invalid experiment result can produce process exit 0",
+   "status": "REPRODUCED",
+   "evidence": {
+    "run_status_forced": "INVALID_INPUT",
+    "process_exit_code": 0
+   },
+   "introduced_in": "566600dca (STRATEGIC-INTEGRATION-002)"
+  },
+  {
+   "finding": 10,
+   "title": "reusing an output directory mixes or overwrites evidence",
+   "status": "REPRODUCED",
+   "evidence": {
+    "second_open_output_same_dir": true,
+    "authority_stamp_rewritten": false,
+    "prior_forecast_ledger_still_present_for_append": true,
+    "run_ledger_mode": "chain_append appends; result json is overwritten"
+   },
+   "introduced_in": "566600dca (STRATEGIC-INTEGRATION-002)"
+  }
+ ],
+ "summary": {
+  "reproduced": 10,
+  "refuted": 0
+ }
+}
