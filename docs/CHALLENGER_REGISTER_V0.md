@@ -27,3 +27,19 @@ NO_SIGNAL; promotion is a human decision on repeated, registered evidence.
 Search burden: nine rows enumerated before any result; each activation is
 one registered experiment; results are reported for every activated row,
 including failures. No row is installed by this register.
+
+## Addendum A entries (added at `2af98967`; none implemented)
+
+Same rules as C1–C9: listing is not permission; each row activates only
+through a registered experiment naming it, after its dependency is at least
+"tested"; results are reported for every activated row, failures included.
+
+| # | Method | 1. Information / mechanism captured | 2. Architecture location | 3. Required data and causal limitations | 4. Simpler comparator | 5. Falsification test and negative control | 6. Incremental-value criterion | 7. Compute / maintenance | 8. Build dependency → activation gate |
+|---|---|---|---|---|---|---|---|---|
+| C10 | Lyapunov-style / dynamical predictability measures | how fast nearby states diverge, i.e. an intrinsic horizon beyond which skill is not available | Predictability map (A3), as a *challenger* to measured skill | needs long, stationary-ish series; estimates are sensitive to embedding choice and noise; a divergence rate is not itself a forecast | the measured out-of-sample skill curve by horizon | does the divergence estimate predict where measured skill dies, out of sample? Negative control: phase-randomised surrogate series must show no relationship | the estimate must anticipate the skill cliff better than the measured curve's own extrapolation | low–moderate | after the predictability map has ≥ 2 registered experiments' worth of cells |
+| C11 | Sequential latent-state estimation (particle / Kalman family) for `LATENT_STATE_ESTIMATE_V0` | latent liquidity / regime / positioning state behind the observations | World Model (A1) | observation model must be justified, not assumed; filtered (not smoothed) estimates only for forecasting; positioning proxies are inferences, never facts | the observable feature set used directly (EXP-001B's `ret_1, ret_5, rv_30`) | OOS log-likelihood DM-HAC vs the direct-feature model; N0 block permutation; **state-shuffled control** (state path permuted) must show no gain | ΔLL > 2.0 HAC-t on validation **and** a non-negative after-cost readout | moderate; refit cadence declared | overlaps C1 — C11 is C1 *bound to the A1 interface*; activate at most one, and record which |
+| C12 | Correlation-adjusted ensemble weighting | how much independent information an ensemble actually contains | Multiverse / World Model weight ownership (A2) | member overlap must be measured, not assumed; equal weights over correlated members fabricate confidence | single best model by validation score | does the adjusted ensemble beat the single model OOS? Negative control: duplicate one member N times — the adjusted weighting must not change, the naive one will | improvement in OOS score **and** a stable `effective_independent_members` | low | needs ≥ 2 genuinely different models to exist |
+| C13 | Decision-value-of-information scoring | whether an observation would change a decision, not merely reduce variance | PULSE acquisition (A4) | requires a decision model and a cost model; both are assumptions and are recorded as such | "acquire if information gain > 0" | retrospective: did acquisitions ranked high by decision value change decisions more often than those ranked high by information gain alone? | measurably better decision-change rate per unit cost | low | after ≥ 10 recorded acquisition outcomes exist to score |
+
+Search burden: thirteen enumerated rows, none installed. C11 and C1 overlap
+by construction and are counted once when either activates.

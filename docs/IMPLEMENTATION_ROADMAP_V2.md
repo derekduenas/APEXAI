@@ -59,3 +59,21 @@ certification → prospective paper selection.**
 
 Live brokerage, capital deployment, model promotion, hold removal, and any
 real-data execution without an issued decision.
+
+## 4. Addendum A components (added at `2af98967`; all SPECIFIED_NOT_IMPLEMENTED)
+
+| Component | Existing code and actual callers | Responsibility / prohibited authority | Inputs → outputs | Dependencies | Missing implementation | Acceptance evidence | Activation gate |
+|---|---|---|---|---|---|---|---|
+| Latent-state estimate (A1) | none; `WorldModelForecast` uncertainty fields exist and are reused | infer latent state; **may never write the Twin**, holds no trading authority | Twin snapshot → `LATENT_STATE_ESTIMATE_V0` | admitted real data; a justified observation model | estimator, uncertainty representation, OOD measure | DM-HAC vs direct-feature comparator + state-shuffled control (C11) | a registered hypothesis naming the latent variable it improves |
+| Uncertainty ownership (A2) | `nulls.py`, `worlds.py` (synthetic) | propagate uncertainty; **assigns no probabilities of its own** | weighted starting states + parameters → `MULTIVERSE_PATH_SET_V0` | a real-data forecast to start from | path generator, `simulation_error` vs `model_uncertainty` split, ensemble overlap measure | tail coverage on a sealed period; duplicate-member negative control (C12) | after a real-data World Model forecast exists |
+| Predictability map (A3) | `grader`, `inference`, `holdout` | measure where skill exists; **`SELECTION_AUTHORITY: NONE`** | sealed scores → `PREDICTABILITY_MAP_ENTRY_V0` | ≥ 1 completed registered experiment | cell schema, registered grouping rules, search accounting | cells reproduce from sealed evidence; `INSUFFICIENT_EVIDENCE` where support is thin | ≥ 1 completed registered experiment with sealed scores |
+| PRIME consumption of the map | `economic_path.prime_select` | use maturity/skill in selection | map + forecast → selection | the map | a *separately validated* selection rule | E3-style layer-removal on sealed data | the map exists **and** the selection rule passes its own validation |
+| Information acquisition (A4) | PULSE field clocks and quality classes | propose acquisitions by decision value; **no purchasing, no browsing, no learned policy** | question → `INFORMATION_ACQUISITION_REQUEST_V0` | a decision worth informing | proposal queue, deterministic priority rule, missingness log | ≥ 10 recorded outcomes with decision-change scoring (C13) | the first acquisition question a human wants ordered |
+| Attribution taxonomy (A5) | `organism/experience.py`, `capital/counterfactual.py` | separate causes of forecast error incl. "already represented" | forecast + outcome → attribution classes | a population of outcomes | the finer taxonomy | classes distinguishable on a population, not one outcome | after the first real-data experiment produces outcomes |
+| Dashboard views 10–14 (A6) | `scripts/apex_dashboard.py` | display; read-only | artifacts → views | the above | five views | source/timestamp/version/mode on every item | when the underlying records exist; **not** restarted for this addendum |
+
+**Critical path unchanged.** None of these is on it. The route to the first
+interpretable historical result remains: operator setup → signed admission
+decision → EXP-001B train+validation → evidence. Addendum A components are
+developed only after that evidence exists, except where a registered
+hypothesis names one earlier.

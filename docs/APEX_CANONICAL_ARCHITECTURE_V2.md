@@ -212,3 +212,229 @@ and part of 2; the rest are NOT_READY and shown so.
 - The readiness map (`MILESTONE1_CHAIN_READINESS_MAP.md`) remains the
   inspected-caller record; `IMPLEMENTATION_ROADMAP_V2.md` extends it with
   the expanded components and the sequenced route.
+
+---
+
+# ADDENDUM A — probabilistic state estimation, uncertainty ownership,
+# predictability measurement and information acquisition
+
+Status: **DOCUMENTED / SPECIFIED_NOT_IMPLEMENTED**. Added at `2af98967`,
+after the pre-admission closure. Nothing here creates a new trading
+authority, changes EXP-001B, or is implemented by this milestone. Interface
+definitions live in `APEX_INTERFACES_V0.md`; activation gates live in
+`IMPLEMENTATION_ROADMAP_V2.md` and `CHALLENGER_REGISTER_V0.md`.
+
+## A0. Standing qualifications carried forward (do not lose these)
+
+These are the closure's findings, restated because later readers will meet
+this addendum first:
+
+1. **Calendar verification covers 2016–2021 only.** Dates outside that
+   window are refused (`CALENDAR_NOT_VERIFIED`).
+2. **Classifier parity ≠ calendar verification.** The parity test proves the
+   classification *logic* matches the governed module given identical
+   tables; the reconciliation proves the *tables* against the exchange
+   record. Two different pieces of evidence.
+3. **File-size corroboration is not proof of session contents.** It
+   corroborated 10 of 12 early closes and is silent on 2.
+4. **Ordinary filesystem protection does not constrain an account with
+   unrestricted sudo.** `/etc/apex/admissions` resists ordinary replacement
+   by the research account; it does **not** resist that account's
+   passwordless sudo. Only a non-privileged research identity makes the
+   ancestor checks meaningful.
+5. **Before/after source verification detects persistent change.** It does
+   not prove the absence of change-and-restore within a run, nor of
+   arbitrary privileged interference.
+6. **EXP-001B has never executed on real data.**
+7. **Evaluation remains separately blocked** (N0 not enforced on that
+   branch; calendar unverified beyond 2021).
+
+## A1. Where latent-state inference lives (and where it does not)
+
+The split is a rule about *what a record claims*, not about code location.
+
+| | **Digital Market Twin** | **World Model** |
+|---|---|---|
+| holds | sourced factual observations, their quality, timestamps and relationships | inference about latent market state from those observations |
+| claim | "this was observed, from this source, valid at this time" | "given those observations, the latent state is estimated to be …" |
+| carries | provenance, effective time, availability, revision history | provenance **of the inputs**, model identity, uncertainty |
+| may be written back to the Twin | — | **never** |
+
+The conceptual relation, stated once and not implemented here:
+
+```
+observations ~ observation_model(latent_state, measurement_uncertainty)
+```
+
+The latent state may include liquidity pressure, regime, positioning
+proxies or participant response tendencies. **Every one of these is an
+estimate with provenance and uncertainty, never a fact.** Dealer
+positioning inferred from options open interest, ownership inferred from a
+delayed disclosure, and "participants are trapped" are hypotheses; writing
+any of them into the Twin as an observation would launder an inference into
+a fact, and is forbidden by the table above.
+
+Interface: `LATENT_STATE_ESTIMATE_V0` in `APEX_INTERFACES_V0.md` §1 —
+observation-snapshot identity, inference model and version, as-of and
+availability basis, estimates or weighted samples, uncertainty
+representation, missing-data and out-of-distribution indicators,
+assumptions and limitations. **No posterior probabilities are manufactured
+and no filter is implemented in this milestone.**
+
+## A2. World Model and Multiverse: who owns which uncertainty
+
+The failure this section exists to prevent: simulating ten thousand paths
+from one starting state that was never uncertain, and reporting the spread
+of those paths as if it were the uncertainty of the forecast.
+
+| Uncertainty | Owner | Propagated by |
+|---|---|---|
+| measurement / observation error | Twin (recorded), World Model (consumed) | into the starting-state distribution |
+| latent state given observations | **World Model** | sampled starting states |
+| model parameters | **World Model** | parameter draws per path |
+| competing models (structural) | **World Model** (weights) | model index per path |
+| future disturbances | **Multiverse** | innovation draws along the path |
+| participant reactions, regime change | **Multiverse** (dynamics), World Model (initial regime belief) | scenario branches |
+
+**Ownership of probability is single.** The World Model owns every
+probability weight: over latent states, over parameters, over competing
+models. The Multiverse owns *dynamics* and consumes those weights; it
+never re-weights them and never assigns its own competing weights to the
+same quantity. Where the Multiverse needs a weight that the World Model has
+not supplied, the branch is **unweighted** and is reported as such.
+
+Four things stay separate and are never summed into one number:
+
+1. **probability-weighted forecast** — the physical distribution;
+2. **model disagreement** — dispersion *across* models, reported beside the
+   forecast, never folded into it;
+3. **unweighted stress scenarios** — no probability mass, ever;
+4. **LLM-proposed causal branches** — `UNWEIGHTED` until quantitatively
+   evaluated; an LLM may propose a branch, never price one.
+
+**Ensembles must not double-count.** Two models fitted on the same data
+with the same features are one piece of evidence with two labels. Before
+any ensemble weight is used, the register must record: the information each
+member consumes, the overlap between members, and the effective number of
+independent members (a correlation-adjusted count, not the member count).
+Equal weighting of eight correlated models is a fabricated confidence.
+
+**Sample count is not validity.** More Monte Carlo paths reduce simulation
+error *conditional on the model*. They say nothing about whether the model
+is right. Every Multiverse output carries `simulation_error` and
+`model_uncertainty` as separate fields, and the second is never reduced by
+raising the first's sample count.
+
+## A3. Empirical predictability map
+
+Placed in **evaluation and Experience**, consumed later by PRIME. It records
+where predictive skill has actually been measured — by target, horizon,
+market state or regime, information tier, model version and evidence
+maturity — and, just as importantly, where it has not.
+
+Every entry requires: out-of-sample scoring against a **declared**
+comparator; calibration evidence; effective sample support with the
+dependence treatment named; uncertainty around the estimated improvement
+(not a point estimate); the registered grouping rules that defined the cell
+*before* it was scored; and research-search accounting. A cell with
+insufficient support is `INSUFFICIENT_EVIDENCE` — an explicit state, never
+an interpolated or optimistic one.
+
+**What this must not become:** a machine that re-slices results until an
+attractive subgroup appears. Cells are registered before scoring, the
+number of cells examined is part of the search budget, and any *learned*
+selection rule over the map is a separate hypothesis requiring its own
+validation on its own data. The map is an estimate of *capability*, not a
+promise about the next forecast. Lyapunov-style predictability measures
+remain optional challengers with their own evidence requirements (C10).
+
+Interface: `PREDICTABILITY_MAP_ENTRY_V0`, `APEX_INTERFACES_V0.md` §3.
+
+## A4. Decision-value-driven information acquisition
+
+Placed in **PULSE**, informed by research and decision needs. The question
+is never "is this data interesting" but:
+
+> Could obtaining this observation change a feasible decision by enough to
+> justify its monetary cost, its latency and its operational burden?
+
+**Information gain is not economic value.** An observation can sharpen a
+distribution and change nothing about the preferred action; that
+observation is not worth buying. Conversely a cheap observation that flips
+a funding decision is worth more than a large reduction in an irrelevant
+variance.
+
+Every acquisition record names: the unresolved question; the candidate
+source and the permissions it requires; expected availability and latency;
+cost and request budget; the decision it could affect; the result
+**including failure**; and — after the fact — whether it actually changed
+the forecast or the decision.
+
+**Not now:** no autonomous paid-data purchasing, no unrestricted browsing,
+no learned acquisition policy. The first implementation is a *proposal
+queue* with auditable deterministic priorities that a human approves.
+
+**Missingness is evidence.** The record of what was requested, what was
+refused, what failed and what was never asked is kept so that later
+research cannot mistake selectively collected data for an unbiased sample.
+
+Interface: `INFORMATION_ACQUISITION_REQUEST_V0`, `APEX_INTERFACES_V0.md` §4.
+
+## A5. Attribution, extended
+
+`Experience` already separates forecast, expression, execution and sizing
+error. The addendum splits the first into causes that imply different
+repairs:
+
+| Class | Means | Repair it implies |
+|---|---|---|
+| observation / data quality | the input was wrong, late or missing | fix the feed, not the model |
+| latent-state estimation | inputs fine, state inferred wrongly | the observation model or its uncertainty |
+| dynamics / parameter | state fine, propagation wrong | the transition model |
+| omitted mechanism | nothing in the model could have produced this | new mechanism, registered |
+| regime change | the relationship itself moved | regime detection, not parameter tuning |
+| expression / execution | the view was right, the trade was not | structure, costs, timing |
+| **already represented** | the outcome sat inside the forecast distribution | **nothing — this is not an error** |
+
+The last row matters most: a loss inside the predicted distribution is the
+model working, not failing. **Every class is a diagnostic hypothesis until
+independently supported.** A single losing trade does not identify its own
+cause, and attribution over one outcome identifies at most one gross class.
+
+## A6. Dashboard requirements added (not implemented here)
+
+Added to the nine views in §4, with the same rules (source, timestamp,
+version, mode; missing stays missing):
+
+10. **observed vs inferred state**, side by side and visibly distinct;
+11. **assumed vs measured availability** (EXP-001B's `ASSUMED_BAR_CLOSE`
+    must never render as a measured publication time);
+12. **forecast uncertainty and model disagreement**, as separate quantities;
+13. **evidence behind each predictability-map cell**, including
+    `INSUFFICIENT_EVIDENCE` cells;
+14. **information-acquisition cost and status**, including refusals.
+
+The dashboard is **not** implemented or restarted by this addendum.
+Engineering, historical, prospective-paper and live displays stay distinct.
+
+## A7. Overlap analysis — what each refinement reuses
+
+Nothing here is a new subsystem; each refinement is a contract over
+machinery that exists.
+
+| Refinement | Reuses | Genuinely new | Does NOT duplicate |
+|---|---|---|---|
+| A1 latent state | `WorldModelForecast` uncertainty fields; `sources.admit` / real-data boundary provenance; Twin field clocks | the estimate record itself (`LATENT_STATE_ESTIMATE_V0`) | the Twin's factual records — it never writes them |
+| A2 uncertainty ownership | `nulls.py`, `worlds.py`, `inference.dm_hac_rule` | a written ownership rule + `simulation_error` vs `model_uncertainty` separation | the forecast contract; no second probability owner is created |
+| A3 predictability map | `grader.grade`, `inference`, `holdout`, the search-budget discipline in registrations | the cell schema and its `INSUFFICIENT_EVIDENCE` state | the courts — it scores, it does not adjudicate |
+| A4 acquisition | PULSE field clocks, quality classes; the existing manifest/admission machinery for anything acquired | the request record and its missingness log | the admission boundary — acquisition proposes, admission still decides |
+| A5 attribution | `organism/experience.py`, `capital/counterfactual.py`, `economic_path.attach` | the finer cause taxonomy incl. "already represented" | the existing error split, which it extends rather than replaces |
+| A6 dashboard | `scripts/apex_dashboard.py` view scaffolding and quality semantics | five view requirements | the data sources; all are existing artifacts |
+
+## A8. What this addendum explicitly does not do
+
+No new trading authority. No implemented filter, no manufactured
+posteriors, no ensemble weights, no acquisition automation, no dashboard
+change, no alteration to EXP-001B's registration, scope or pending baseline
+test. Every interface is `SPECIFIED_NOT_IMPLEMENTED` until a registered
+hypothesis names it and its activation gate opens.
