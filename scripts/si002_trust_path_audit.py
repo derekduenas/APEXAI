@@ -22,12 +22,14 @@ from pathlib import Path
 
 from apex.world_model.real_data import boundary
 
+# The paths PRODUCTION will actually check, plus the ones the earlier design
+# used, so the audit records both the new location and the one it replaced.
 TARGETS = {
-    "admission_root": "/apex-data/governance/admissions",
-    "allowed_signers": "/apex-data/governance/admissions/trust/allowed_signers",
+    "production_admission_root": str(boundary.PRODUCTION_ADMISSION_ROOT),
+    "production_allowed_signers": str(boundary.PRODUCTION_ALLOWED_SIGNERS),
+    "superseded_admission_root": "/apex-data/governance/admissions",
     "manifest_dir": "/apex-data/governance/admissions/manifests",
     "output_root": "/apex-data/research",
-    "proposed_alternative_trust_root": "/etc/apex/admissions",
 }
 
 
@@ -90,8 +92,9 @@ def main(out_path: str) -> int:
         rec["research_account_privilege"] = {"error": str(e)}
     # production verifier decision on the real paths, without any decision file
     try:
-        boundary._check_ancestor_chain(Path(TARGETS["admission_root"]), boundary.production_trust(),
-                                       "admission_root")
+        t = boundary.production_trust()
+        for p_, what in ((t.admission_root, "admission_root"), (t.allowed_signers, "allowed_signers")):
+            boundary._check_ancestor_chain(Path(p_), t, what)
         rec["production_trust_check"] = {"status": "WOULD_PASS"}
     except boundary.RealDataRefused as e:
         rec["production_trust_check"] = {"status": "WOULD_REFUSE", "refusal": str(e)}
