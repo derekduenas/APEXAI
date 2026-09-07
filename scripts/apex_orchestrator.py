@@ -46,6 +46,83 @@ LEDGER = Path("results/ops/orchestrator.jsonl")
 MAX_RECOVERY_ATTEMPTS = 3
 
 
+# --------------------------------------------------------------- R2
+# ORCHESTRATOR-OOM-001-R2: bounded incident history.
+#
+# MAX_RECOVERY_ATTEMPTS guarded only the branch that STARTS a service.
+# The branch for externally supervised services appended one entry per
+# tick with no cap, and state["attempts"] is cleared only on a phase
+# change. Over a weekend in phase IDLE that produced 1907 identical
+# entries for one service, and the whole list is re-serialised into
+# EVERY ledger record, so records grew 135 bytes per tick until one
+# exceeded the chain primitive's tail window.
+#
+# A deferral is an OBSERVATION -- "still missing, and its supervisor
+# owns the restart" -- not an attempt. Its information content is a
+# count and a duration, not N copies of one sentence. It is now kept as
+# a summary plus a bounded sample, and it is held SEPARATELY from real
+# recovery attempts so that repeated observations can neither consume
+# nor bypass the recovery allowance.
+MAX_DEFERRAL_DETAIL = 3
+
+
+def _service_state(state: dict, name: str, supervised_by: str) -> dict:
+    """Per-service incident state: real attempts and deferrals, apart."""
+    return state["attempts"].setdefault(name, {
+        "recovery": [],
+        "deferrals": {"count": 0, "first_utc": None, "last_utc": None,
+                      "recent": [], "supervised_by": supervised_by}})
+
+
+def _record_deferral(st: dict, *, service: str, at: str,
+                     supervised_by: str) -> None:
+    """Count it, timestamp it, and keep a BOUNDED sample: the first
+    observation and the most recent ones. The first says when the
+    service went missing; the last say it is still missing now."""
+    d = st["deferrals"]
+    d["count"] += 1
+    d["last_utc"] = at
+    if d["first_utc"] is None:
+        d["first_utc"] = at
+    d["supervised_by"] = supervised_by
+    d["recent"].append({"service": service, "attempted_utc": at,
+                        "outcome": "DEFERRED_TO_SUPERVISOR",
+                        "detail": supervised_by})
+    if len(d["recent"]) > MAX_DEFERRAL_DETAIL:
+        # keep index 0 and the last MAX_DEFERRAL_DETAIL - 1
+        del d["recent"][1:len(d["recent"]) - MAX_DEFERRAL_DETAIL + 1]
+
+
+def _attempt_history(st: dict, service: str) -> list:
+    """What rides with the alarm. Bounded by construction:
+    at most MAX_RECOVERY_ATTEMPTS real attempts, then at most one
+    summary, then at most MAX_DEFERRAL_DETAIL sampled deferrals.
+
+    RECORD FORMAT CHANGE. Before R2 a supervised service contributed one
+    entry per tick here. It now contributes a `deferral_summary` entry
+    carrying the total, the first and last observation times, and how
+    many detailed entries were kept -- followed by those entries. A
+    reader that took len(recovery_attempts) as the number of deferrals
+    will now UNDER-COUNT and must read `count` from the summary. Records
+    written before this change keep their old shape and stay readable;
+    nothing rewrites them.
+    """
+    history = list(st["recovery"])
+    d = st["deferrals"]
+    if d["count"]:
+        history.append({"kind": "deferral_summary", "service": service,
+                        "outcome": "DEFERRED_TO_SUPERVISOR",
+                        "detail": d["supervised_by"],
+                        "count": d["count"],
+                        "first_utc": d["first_utc"],
+                        "last_utc": d["last_utc"],
+                        "detail_entries_retained": len(d["recent"]),
+                        "note": "observations, not recovery attempts; the "
+                                "supervisor owns the restart"})
+        history.extend(d["recent"])
+    return history
+
+
 def now() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -143,28 +220,27 @@ def tick(state: dict, *, dry_run: bool) -> dict:
             continue
         if observed[s.name] and first_work_seen(s.name):
             continue
-        tries = state["attempts"].setdefault(s.name, [])
+        st = _service_state(state, s.name, s.supervised_by)
         if (not observed[s.name] and not s.externally_supervised
-                and len(tries) < MAX_RECOVERY_ATTEMPTS):
+                and len(st["recovery"]) < MAX_RECOVERY_ATTEMPTS):
             att = (StartAttempt(service=s.name,
                                 attempted_utc=t.isoformat(),
                                 outcome="DRY_RUN", detail="--dry-run")
                    if dry_run else start(s.name, s))
-            tries.append(att.__dict__)
+            st["recovery"].append(att.__dict__)
             actions.append(att.__dict__)
         elif not observed[s.name] and s.externally_supervised:
             # the supervisor owns the restart; we own noticing that it
-            # is not working, and saying so loudly
-            tries.append({"service": s.name,
-                          "attempted_utc": t.isoformat(),
-                          "outcome": "DEFERRED_TO_SUPERVISOR",
-                          "detail": s.supervised_by})
+            # is not working, and saying so loudly. R2: an OBSERVATION,
+            # recorded in bounded form and never counted as an attempt.
+            _record_deferral(st, service=s.name, at=t.isoformat(),
+                             supervised_by=s.supervised_by)
         v = missed_start_verdict(
             service=s.name, phase=phase, expected_lifecycle=exp,
             first_work_seen=first_work_seen(s.name),
             seconds_since_phase_start=elapsed,
             deadline_s=s.first_work_deadline_s,
-            recovery_attempts=tries,
+            recovery_attempts=_attempt_history(st, s.name),
             dependency_states={d: ("RUNNING" if observed.get(d)
                                    else "MISSING")
                                for d in s.dependencies},
