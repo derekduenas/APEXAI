@@ -1,0 +1,6 @@
+OPTIONS_PAPER_STATUS = MAINTENANCE_BLOCKED_PENDING_LAUNCH_AUTHORIZATION
+applied_utc = 2026-09-07T17:52:27Z
+reason = the recovery deployment authorization excludes launches of inactive services merely because the orchestrator deems them eligible. The recovered orchestrator (73fc712d) would issue systemctl start for this unit at the next RTH phase (demonstrated in dry-run, 2026-09-07). This is NOT a defect in the service; it is a pending authorization.
+evidence = docs/MILESTONE1_LAUNCH_RECONCILIATION.md
+authority = launch requires an explicit reviewer decision
+reversal = rm this file (or rm the drop-in and systemctl daemon-reload)
