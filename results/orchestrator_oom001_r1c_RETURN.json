@@ -1,0 +1,111 @@
+{
+ "kind": "oom001_r1_provenance_continuation",
+ "version": "OOM001_R1C_V1",
+ "base_commit": "133a3c7d79f8d463e706aa35c63656c819c93062",
+ "scope": "test-only; no production code changed",
+ "production_code_unchanged": true,
+ "changed_files": [
+  "docs/ORCHESTRATOR_OOM_001_REPAIR_PROPOSAL.md",
+  "results/orchestrator_oom001_r1c_RETURN.json",
+  "tests/test_chain_tail_bounded.py"
+ ],
+ "the_gap": {
+  "finding": "the multiprocess test inserted the literal path /opt/apex-repo into its children's import path, so a child could import a different checkout than the parent",
+  "not_a_defect_in": "the locking implementation",
+  "what_it_undermined": "the test's ability to say WHICH implementation it exercised"
+ },
+ "the_fix": {
+  "root_derivation": "ROOT = Path(__file__).resolve().parents[1]",
+  "children_report": [
+   "resolved chain_ledger module path",
+   "sha256 of that file's source",
+   "the module's MAX_TAIL_SEARCH_BYTES"
+  ],
+  "parent_asserts": "each child's module path and source hash equal the parent's own, and the parent's module lives inside ROOT",
+  "preserved": [
+   "121 records across 3 writer processes",
+   "all entry hashes distinct"
+  ],
+  "added": [
+   "every adjacent prev_hash link checked",
+   "every entry_hash recomputed from its own body",
+   "the first record is GENESIS and matches the parent's append"
+  ]
+ },
+ "self_matching_guard_corrected": {
+  "first_attempt": "assert \"opt/apex-repo\" not in source_text",
+  "why_wrong": "the assertion's own literal made the search match itself -- the same trap as the earlier read_text preservation check",
+  "replacement": "parse the module and assert no string CONSTANT is an absolute path",
+  "catches": "any hard-coded absolute path, not just this one"
+ },
+ "negative_control": {
+  "question": "does the test now bind to its own checkout rather than a fixed one?",
+  "method": "the same test file was run from a git worktree at 9e8f416b, which carries the PRE-repair primitive",
+  "pre_repair_sha256_head": "c50c8a9059c452de",
+  "repaired_sha256_head": "6ba88eb5eaad1d8d",
+  "result": "collection ERROR -- ImportError for INITIAL_TAIL_BYTES from /tmp/oom001_pre_wt/apex/governance/chain_ledger.py",
+  "interpretation": "it resolved the WORKTREE's implementation, not the one in /opt/apex-repo. Before the fix the children would have imported the repaired copy regardless.",
+  "worktree_removed": true
+ },
+ "focused_results": {
+  "containment": "wmresearch.slice, unit MemoryMax=1400M, unchanged",
+  "bounded_tail_module": {
+   "tests": 22,
+   "passed": 22
+  },
+  "with_locking_and_torn_tail_modules": {
+   "modules": [
+    "tests/test_chain_tail_bounded.py",
+    "tests/test_ledger_concurrency.py",
+    "tests/test_sac1_tier1.py",
+    "tests/test_audit_remediation.py"
+   ],
+   "passed": 66,
+   "skipped": 2,
+   "skips": [
+    "Darwin-only launchd/ops installation check",
+    "daemon has not written health in this environment"
+   ],
+   "skips_are_pre_existing": true
+  },
+  "full_regression_rerun": "not run; this continuation changes no production code and no other module's collection"
+ },
+ "regression_provenance": {
+  "question": "did the /opt/apex-repo implementation the R1 regression exercised match the tested repair commit?",
+  "retained": {
+   "commit_recorded": "810b72c8dc8b9422ba96f41d900cfd361f5ff1da",
+   "tree_recorded": "ed35f98801adf8c6d123a96c908aa4d77b688e33",
+   "tree_of_that_commit": "ed35f98801adf8c6d123a96c908aa4d77b688e33",
+   "agree": true
+  },
+  "establishes": "HEAD was the repair commit and did not move during the run",
+  "does_not_establish": "that the WORKING TREE equalled that commit; the shards ran against the working directory, and no source hash, dirty flag or git status was captured per shard",
+  "answer": "UNRESOLVED FROM RETAINED EVIDENCE -- not inferred",
+  "known_but_not_proof": [
+   "a clean status was observed at the moment 810b72c8 was committed",
+   "the primitive at HEAD today is byte-identical to 810b72c8's version"
+  ],
+  "recommendation": "record a source hash per regression run so the question is answerable from the artifact"
+ },
+ "genesis_clarification": {
+  "corrected_statement": "the repair never falls back to genesis",
+  "why_wrong": "true only of ceiling exhaustion, stated as if general",
+  "ceiling_exhausted": "raises ChainTailUnresolved, writes nothing, never links to genesis",
+  "whole_file_examined_and_garbage_only": "still yields genesis with the torn flag set -- pre-existing behaviour, preserved deliberately",
+  "distinguishing_condition": "whether the search reached byte zero"
+ },
+ "not_done": [
+  "no production code changed",
+  "R2 not implemented",
+  "no service action",
+  "nothing deployed",
+  "not merged",
+  "no real data admitted",
+  "no order placed"
+ ],
+ "phase_2": "OPEN",
+ "real_data_admission": "NOT_AUTHORIZED",
+ "production_recovery": "UNVERIFIED",
+ "primitive_sha256": "6ba88eb5eaad1d8d699f771db8e5f3615fad7ba8b88f961b6306019334d74149",
+ "evidence_commit": "f68f75710fa77799d3350f699944bf27bbd3e9ba"
+}

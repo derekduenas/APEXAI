@@ -370,23 +370,105 @@ def test_the_flock_sidecar_is_still_used(tmp_path):
     assert (tmp_path / "lockcheck.jsonl.lock").exists()
 
 
+# The checkout under test, derived from THIS FILE rather than hard-coded.
+# A literal path would let a child process import a different checkout than
+# the parent -- in a worktree, a second clone, or an installed copy -- and a
+# test that cannot say which implementation it ran proves nothing about this
+# one.
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _implementation_identity(module) -> tuple:
+    """(resolved module file, sha256 of its source). What actually ran."""
+    src = Path(module.__file__).resolve()
+    return str(src), hashlib.sha256(src.read_bytes()).hexdigest()
+
+
+CHILD = (
+    "import hashlib, json, sys\n"
+    "from pathlib import Path\n"
+    "sys.path.insert(0, {root!r})\n"
+    "from apex.governance import chain_ledger as CL\n"
+    "src = Path(CL.__file__).resolve()\n"
+    # the child says WHICH implementation it resolved, before it writes
+    "sys.stdout.write(json.dumps({{'module': str(src),\n"
+    "    'sha256': hashlib.sha256(src.read_bytes()).hexdigest(),\n"
+    "    'ceiling': CL.MAX_TAIL_SEARCH_BYTES}}) + chr(10))\n"
+    "sys.stdout.flush()\n"
+    "target = Path({ledger!r})\n"
+    "for i in range({n}):\n"
+    "    CL.chain_append(target, {{'kind': 'mp', 'tag': sys.argv[1], 'i': i}})\n"
+)
+
+
 def test_multiprocess_appends_do_not_lose_records(tmp_path):
-    """The flock layer's job: a second WRITER PROCESS on one host."""
+    """The flock layer's job: a second WRITER PROCESS on one host.
+
+    Also pins PROVENANCE. Each child reports the chain_ledger it resolved and
+    that file's hash, and the parent asserts they are the same bytes it
+    imported itself. Without that, the record count proves only that SOME
+    implementation serialised correctly -- not this one."""
+    import os
     import subprocess
     import sys
     p = tmp_path / "mp.jsonl"
-    chain_append(p, {"kind": "genesis"})
-    code = ("import sys; sys.path.insert(0, %r)\n"
-            "from apex.governance.chain_ledger import chain_append\n"
-            "from pathlib import Path\n"
-            "[chain_append(Path(%r), {'kind':'mp','tag':sys.argv[1],'i':i})"
-            " for i in range(40)]\n" % ("/opt/apex-repo", str(p)))
-    procs = [subprocess.Popen([sys.executable, "-c", code, str(t)])
+    first = chain_append(p, {"kind": "genesis"})
+    parent_module, parent_sha = _implementation_identity(CL)
+    assert Path(parent_module).is_relative_to(ROOT), (
+        "the parent imported %s, outside the checkout under test %s"
+        % (parent_module, ROOT))
+
+    code = CHILD.format(root=str(ROOT), ledger=str(p), n=40)
+    env = {**os.environ, "PYTHONPATH": str(ROOT)}
+    procs = [subprocess.Popen([sys.executable, "-c", code, str(t)],
+                              stdout=subprocess.PIPE, text=True, env=env)
              for t in range(3)]
-    assert all(x.wait() == 0 for x in procs)
+    reports = []
+    for x in procs:
+        out, _ = x.communicate()
+        assert x.returncode == 0, out
+        reports.append(json.loads(out.splitlines()[0]))
+
+    # PROVENANCE: every child ran the same bytes the parent tested
+    assert len(reports) == 3
+    for r in reports:
+        assert r["module"] == parent_module, (
+            "a child imported %s but the parent tested %s"
+            % (r["module"], parent_module))
+        assert r["sha256"] == parent_sha, "a child ran different source bytes"
+        assert r["ceiling"] == MAX_TAIL_SEARCH_BYTES
+
+    # the original assertions, kept
     rows = [json.loads(x) for x in p.read_text().splitlines() if x.strip()]
     assert len(rows) == 121
     assert len({r["entry_hash"] for r in rows}) == len(rows)
+    # and every adjacent link plus every hash recomputed from its own body
+    assert rows[0]["entry_hash"] == first["entry_hash"]
+    assert rows[0]["prev_hash"] == "GENESIS"
+    for i in range(1, len(rows)):
+        assert rows[i]["prev_hash"] == rows[i - 1]["entry_hash"], i
+    for r in rows:
+        assert r["entry_hash"] == independent_hash(r)
+
+
+def test_no_hard_coded_checkout_path_in_this_module(tmp_path):
+    """A literal path in a child would silently test another checkout.
+
+    Checked over the module's STRING CONSTANTS via the parse tree, not by
+    searching the file's text. A text search for the offending path would
+    match its own assertion and pass or fail for the wrong reason -- the
+    same trap that made an earlier preservation check report a docstring as
+    if it were code."""
+    import ast
+    tree = ast.parse(Path(__file__).read_text())
+    absolute = sorted({n.value for n in ast.walk(tree)
+                       if isinstance(n, ast.Constant) and isinstance(n.value, str)
+                       and n.value.startswith("/") and len(n.value) > 1})
+    assert not absolute, "hard-coded absolute paths: %s" % absolute
+    assert "ROOT = Path(__file__).resolve().parents[1]" in Path(__file__).read_text()
+    mod, _ = _implementation_identity(CL)
+    assert Path(mod).is_relative_to(ROOT), (
+        "the implementation under test lives outside the derived checkout")
 
 
 # --------------------------------------------- serialization is untouched

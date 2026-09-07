@@ -182,3 +182,44 @@ correct status of production recovery is UNVERIFIED.
 1. R1, this brick: implemented and evidenced, not deployed.
 2. Deployment and production verification: a separate authorized step.
 3. R2: still unimplemented, and still required so the condition cannot recur.
+
+## 5. Genesis, stated precisely
+
+An earlier summary said the repair "never falls back to genesis". That is true
+of the case it was describing and wrong as a general statement. The two paths
+are different and both are deliberate.
+
+**Ceiling exhaustion never substitutes genesis.** When the search reaches
+MAX_TAIL_SEARCH_BYTES without finding a hash, and bytes remain unexamined
+before that point, the append raises ChainTailUnresolved and writes nothing.
+It does not link to genesis, because it does not know what lies further back.
+
+**A whole file of garbage still yields genesis, unchanged from before.** When
+the search reaches the start of the file -- every byte examined -- and no
+parseable entry_hash exists anywhere in it, the previous hash is genesis and
+the torn flag is set. That is the pre-existing behaviour and it is preserved
+deliberately: there the absence of a prior record is a measurement over the
+complete file, not an assumption made because reading was inconvenient.
+
+The distinguishing condition is whether the search reached byte zero. It did:
+genesis. It stopped at the ceiling: refuse.
+
+## 6. Regression provenance, from retained evidence only
+
+The R1 regression artifact records the HEAD commit 810b72c8 and its tree
+ed35f988, and those agree, so HEAD was the repair commit and did not move
+during the run.
+
+No working-tree hash, dirty flag or status was captured per shard, and the
+shards executed against the working directory rather than the commit.
+Retained evidence therefore establishes WHICH COMMIT was checked out, and does
+not establish that the working tree equalled it at that moment. That gap is
+recorded rather than closed by inference.
+
+Two things that are known: a clean status was observed at the moment 810b72c8
+was committed, and the primitive at HEAD today is byte-identical to 810b72c8's
+version, this continuation being test-only. Neither retroactively proves the
+working tree during the run.
+
+Future regressions should record a source hash per run so this question is
+answerable from the artifact.
