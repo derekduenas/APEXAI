@@ -12,7 +12,8 @@ import math
 from datetime import datetime, timezone
 from pathlib import Path
 
-from apex.world_model import exchange_calendar as C, sources
+from apex.world_model import sources
+from . import exchange_calendar as C
 from .registration import (BAR_SECONDS, EMBARGO_MINUTES, HORIZON_MINUTES,
                            NOT_AVAILABLE_IN_CORPUS, WARMUP_MINUTES)
 

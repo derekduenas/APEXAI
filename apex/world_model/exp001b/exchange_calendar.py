@@ -6,8 +6,12 @@ per date. A fixed UTC window cannot represent it: the same UTC hour is
 regular in summer and pre-market in winter, and an early close is a
 different day, not a different clock.
 
-Per-timestamp classification is delegated to the governed machinery in
-apex.intraday.sessions.classify, fed with the multi-year tables below.
+Per-timestamp classification reproduces the governed rule of
+apex.intraday.sessions.classify (wall-clock windows in America/New_York)
+WITHOUT importing it: the World Model laboratory may import only within
+apex.world_model (frozen authority law), so parity with the production
+module is proven from the test side (tests/test_exchange_calendar.py)
+rather than by import.
 
 WHAT THE TABLES ARE
 Rule-derived observed holidays plus two explicit tables (Good Friday and
@@ -22,8 +26,6 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
-
-from apex.intraday import sessions as S
 
 ET = ZoneInfo("America/New_York")
 CALENDAR_VERSION = "NYSE_REGULAR_SESSION_CALENDAR_V0_2016_2026"
@@ -117,10 +119,22 @@ def session_bounds(session_date: str) -> dict:
 
 
 def classify_utc(ts_utc: float) -> str:
-    """Governed classification (apex.intraday.sessions.classify) with the
-    multi-year tables. Returns the Session enum's value."""
-    return S.classify(datetime.fromtimestamp(ts_utc, timezone.utc),
-                      early_closes=EARLY_CLOSES, holidays=HOLIDAYS).value
+    """Same rule as apex.intraday.sessions.classify (parity-tested):
+    PREMARKET 04:00-09:30, REGULAR 09:30-close, POSTMARKET close-20:00,
+    else CLOSED; weekends and holidays CLOSED. Exchange-local wall clock."""
+    local = datetime.fromtimestamp(ts_utc, timezone.utc).astimezone(ET)
+    d = local.date().isoformat()
+    if local.weekday() >= 5 or d in HOLIDAYS:
+        return "CLOSED"
+    close_wall = EARLY_CLOSES.get(d, REGULAR_CLOSE)
+    hm = local.strftime("%H:%M")
+    if "04:00" <= hm < REGULAR_OPEN:
+        return "PREMARKET"
+    if REGULAR_OPEN <= hm < close_wall:
+        return "REGULAR"
+    if close_wall <= hm < "20:00":
+        return "POSTMARKET"
+    return "CLOSED"
 
 
 def local_date(ts_utc: float) -> str:

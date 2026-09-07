@@ -160,7 +160,7 @@ def test_forecast_and_outcome_use_completion_clocks(tmp_path):
 def _periods(tmp_path, signal):
     days = {"train": ["2019-06-03", "2019-06-04"], "validation": ["2020-06-01", "2020-06-02"],
             "evaluation": ["2022-06-01", "2022-06-02"]}
-    docs = {"SPY_%s.json" % d: doc(d, start_utc="13:30", n=390, seed=hash((k, i)) & 0xffff, signal=signal)
+    docs = {"SPY_%s.json" % d: doc(d, start_utc="13:30", n=390, seed=1000 * ["train", "validation", "evaluation"].index(k) + i, signal=signal)
             for k, ds in days.items() for i, d in enumerate(ds)}
     root = lab(tmp_path, docs)
     sbp = {k: [str(root / ("SPY_%s.json" % d)) for d in ds] for k, ds in days.items()}

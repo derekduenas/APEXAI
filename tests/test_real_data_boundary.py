@@ -70,7 +70,7 @@ def rig(tmp_path):
     days = {"train": ["2019-06-03", "2019-06-04"], "validation": ["2020-06-01", "2020-06-02"], "future": ["2025-01-02"]}
     for k, dd in days.items():
         for i, d in enumerate(dd):
-            (ds / ("SPY_%s.json" % d)).write_text(json.dumps(_session(d, seed=hash((k, i)) & 0xffff, signal=0.9)))
+            (ds / ("SPY_%s.json" % d)).write_text(json.dumps(_session(d, seed=1000 * ["train", "validation", "future"].index(k) + i, signal=0.9)))
     (ds / "QQQ_2019-06-03.json").write_text(json.dumps(_session("2019-06-03", seed=99, signal=0.0)))
     man = manifest.build(ds, dataset_id="fixture/etf", source_families=["alpaca_sip_raw_1m"], availability=AVAIL)
     mpath = tmp_path / "manifest.json"; msha = manifest.write(man, mpath)
@@ -335,7 +335,7 @@ def test_runs_are_unique_exclusive_and_sealed_once(rig):
 def test_route_modules_reach_no_execution_layer():
     mods = [REPO / "apex/world_model/real_data" / n for n in ("boundary.py", "loader.py", "manifest.py")]
     mods += [REPO / "apex/world_model/exp001b" / n for n in ("bars.py", "models.py", "run.py", "registration.py")]
-    mods += [REPO / "apex/world_model/exchange_calendar.py", REPO / "scripts/alpha_exp_real_execute.py"]
+    mods += [REPO / "apex/world_model/exp001b/exchange_calendar.py", REPO / "scripts/alpha_exp_real_execute.py"]
     for m in mods:
         tree = ast.parse(m.read_text())
         imports = {n.module or "" for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)} | \

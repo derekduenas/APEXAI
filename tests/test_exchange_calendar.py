@@ -5,7 +5,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from apex.world_model import exchange_calendar as C
+from apex.intraday import sessions as S
+from apex.world_model.exp001b import exchange_calendar as C
 
 
 def _hm(ts):
@@ -65,7 +66,39 @@ def test_no_early_close_on_days_that_are_holidays_or_weekends():
     assert "2016-07-03" not in C.EARLY_CLOSES               # Sunday
 
 
-def test_classification_delegates_to_governed_sessions_module():
+def test_parity_with_the_governed_sessions_module_across_years():
+    """The laboratory may not import apex.intraday; prove the rule is the
+    same by running both over a grid: every 15 minutes of every 7th day
+    2016-2026 plus the DST-transition and early-close days, with the SAME
+    tables handed to the production classifier."""
+    import itertools
+    from datetime import date, timedelta
+    days = [date(2016, 1, 1) + timedelta(days=7 * k) for k in range(0, 570)]
+    days += [date(y, m, d) for y, m, d in ((2019, 3, 10), (2019, 3, 11), (2019, 11, 3), (2019, 11, 4),
+                                           (2019, 11, 29), (2019, 7, 3), (2024, 12, 24), (2018, 12, 5))]
+    n = 0
+    for d, (h, m) in itertools.product(days, [(h, m) for h in range(24) for m in (0, 15, 30, 45)]):
+        ts = datetime(d.year, d.month, d.day, h, m, tzinfo=timezone.utc).timestamp()
+        ours = C.classify_utc(ts)
+        theirs = S.classify(datetime.fromtimestamp(ts, timezone.utc), early_closes=C.EARLY_CLOSES,
+                            holidays=C.HOLIDAYS).value
+        assert ours == theirs, (d, h, m, ours, theirs)
+        n += 1
+    assert n > 50000
+
+
+def test_calendar_lives_inside_the_experiment_package_and_imports_no_production_apex():
+    import ast
+    from pathlib import Path
+    p = Path(C.__file__)
+    assert p.parent.name == "exp001b"
+    tree = ast.parse(p.read_text())
+    mods = {n.module or "" for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)} | \
+           {a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
+    assert not any(m.startswith("apex.") and not m.startswith("apex.world_model") for m in mods), mods
+
+
+def test_classification_rule():
     ts_w = datetime(2019, 1, 15, 14, 0, tzinfo=timezone.utc).timestamp()   # 09:00 ET winter
     ts_s = datetime(2019, 6, 3, 14, 0, tzinfo=timezone.utc).timestamp()    # 10:00 ET summer
     assert C.classify_utc(ts_w) == "PREMARKET" and C.classify_utc(ts_s) == "REGULAR"
