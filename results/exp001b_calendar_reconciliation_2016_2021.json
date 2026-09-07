@@ -1,0 +1,111 @@
+{
+ "authoritative_counts": {
+  "early_closes": 12,
+  "holidays": 54
+ },
+ "calendar_version": "NYSE_REGULAR_SESSION_CALENDAR_V0_2016_2026",
+ "code_table_counts": {
+  "early_closes": 12,
+  "holidays": 54
+ },
+ "corpus_cross_check": {
+  "authoritative_early_closes_not_short": [
+   "2018-07-03",
+   "2018-11-23",
+   "2018-12-24",
+   "2019-07-03",
+   "2020-11-27",
+   "2021-11-26"
+  ],
+  "authoritative_session_missing_from_corpus": [],
+  "corpus_session_on_an_authoritative_holiday": [],
+  "early_close_size_ratios": {
+   "2016-11-25": 0.658,
+   "2017-07-03": 0.677,
+   "2017-11-24": 0.697,
+   "2018-07-03": 0.768,
+   "2018-11-23": 0.755,
+   "2018-12-24": 0.875,
+   "2019-07-03": 0.738,
+   "2019-11-29": 0.641,
+   "2019-12-24": 0.523,
+   "2020-11-27": 0.74,
+   "2020-12-24": 0.658,
+   "2021-11-26": 0.976
+  },
+  "full_session_ratio_quantiles": {
+   "median": 1.001,
+   "min": 0.738,
+   "p05": 0.845
+  },
+  "limitation": "byte size is a proxy for session length only; it cannot by itself establish a close time, and a day with unusually light trading can be short without being an early close",
+  "median_file_bytes": 95679,
+  "reads": "file names, session dates and byte sizes ONLY; no bar parsed",
+  "sessions_expected_from_authoritative_calendar": 1511,
+  "sessions_present_in_corpus": 1511,
+  "short_files_below_72pct_of_median": [
+   {
+    "date": "2019-12-24",
+    "ratio_to_median": 0.523,
+    "size": 50075
+   },
+   {
+    "date": "2019-11-29",
+    "ratio_to_median": 0.641,
+    "size": 61307
+   },
+   {
+    "date": "2016-11-25",
+    "ratio_to_median": 0.658,
+    "size": 62953
+   },
+   {
+    "date": "2020-12-24",
+    "ratio_to_median": 0.658,
+    "size": 62982
+   },
+   {
+    "date": "2017-07-03",
+    "ratio_to_median": 0.677,
+    "size": 64747
+   },
+   {
+    "date": "2017-11-24",
+    "ratio_to_median": 0.697,
+    "size": 66732
+   }
+  ],
+  "short_files_not_authoritative_early_closes": [],
+  "short_files_that_are_authoritative_early_closes": [
+   "2016-11-25",
+   "2017-07-03",
+   "2017-11-24",
+   "2019-11-29",
+   "2019-12-24",
+   "2020-12-24"
+  ],
+  "source": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json"
+ },
+ "date_by_date_agreement": true,
+ "law": "every weekday in the window is compared on BOTH attributes; a match on counts alone would not be a reconciliation",
+ "mismatches": [],
+ "sources": {
+  "2016": "NYSE Group 2016 Holiday Calendar and Early Closings -- ICE IR, released 2014-12-08 (ir.theice.com/press/news-details/2014/NYSE-Group-2016-Holiday-Calendar-and-Early-Closings)",
+  "2017": "NYSE Group Announces 2017 Holiday and Early Closings Calendar -- ICE IR, released 2016-02-02",
+  "2018": "NYSE Group Announces 2018, 2019 and 2020 Holiday and Early Closings Calendar -- ICE IR, released 2017-11-27",
+  "2018-12-05": "New York Stock Exchange to Honor President George H. W. Bush -- ICE IR, 2018 (national day of mourning; NYSE, NYSE American, NYSE National, NYSE Arca closed)",
+  "2019": "NYSE Group Announces 2019, 2020 and 2021 Holiday and Early Closings Calendar -- ICE IR, released 2018-12-04",
+  "2020": "NYSE Group Announces 2019, 2020 and 2021 ... (2018-12-04) SUPERSEDES the 2017-11-27 release for 2020: the earlier release listed no Independence Day closure and an early close on Friday 2020-07-03; the later release lists Friday 2020-07-03 as the full closure and no July early close. The LATER release is used.",
+  "2021": "NYSE Group Announces 2019, 2020 and 2021 Holiday and Early Closings Calendar -- ICE IR, released 2018-12-04",
+  "conflict_noted": "A secondary aggregator reports a 2:00 p.m. close on 2016-11-25. That is SIFMA's recommended BOND-market close; the NYSE equities release for 2016 states 1:00 p.m. (crossing session to 1:30 p.m.). The primary equities source is used."
+ },
+ "unscheduled_closures": {
+  "note": "the 2020 COVID floor closure did not close the market: electronic trading continued, so no session is absent for it",
+  "result": "none found in 2016-2021 beyond 2018-12-05"
+ },
+ "weekdays_examined": 1565,
+ "window": [
+  "2016-01-04",
+  "2021-12-31"
+ ]
+}

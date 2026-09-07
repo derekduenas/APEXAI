@@ -159,7 +159,7 @@ def test_forecast_and_outcome_use_completion_clocks(tmp_path):
 # ------------------------------------------------ run semantics (F5, F6, F7)
 def _periods(tmp_path, signal):
     days = {"train": ["2019-06-03", "2019-06-04"], "validation": ["2020-06-01", "2020-06-02"],
-            "evaluation": ["2022-06-01", "2022-06-02"]}
+            "evaluation": ["2021-06-01", "2021-06-02"]}   # inside the verified calendar window
     docs = {"SPY_%s.json" % d: doc(d, start_utc="13:30", n=390, seed=1000 * ["train", "validation", "evaluation"].index(k) + i, signal=signal)
             for k, ds in days.items() for i, d in enumerate(ds)}
     root = lab(tmp_path, docs)
@@ -228,10 +228,43 @@ def test_economic_legs_follow_the_registered_convention(tmp_path):
     assert econ2["n_not_executable"] == 1 and econ2["status"] == "NO_OPPORTUNITY"
 
 
-def test_no_field_is_named_certified_1R_with_a_number():
+def test_no_field_is_named_certified_1R_at_all(tmp_path):
+    """The registration says no field named certified_1R is produced. The
+    first repair left it present with value None; a null field still invites
+    a reader to fill it in, so the key is gone entirely."""
+    import ast
     src = (REPO / "apex/world_model/exp001b/run.py").read_text()
-    assert '"certified_1R": None' in src and "stop_distance_rv30_diagnostic" in src
-    assert "risk_certificate" not in src                       # no certification produced here
+    tree = ast.parse(src)
+    consts = {n.value for n in ast.walk(tree)
+              if isinstance(n, ast.Constant) and isinstance(n.value, str)}
+    names = {n.id for n in ast.walk(tree) if isinstance(n, ast.Name)} | \
+            {n.attr for n in ast.walk(tree) if isinstance(n, ast.Attribute)}
+    assert "certified_1R" not in consts and "certified_1R" not in names
+    assert "stop_distance_rv30_diagnostic" in consts
+    assert not any("risk_certificate" in c for c in consts)    # no certification produced here
+    root = lab(tmp_path, {"s.json": doc("2019-06-05", start_utc="13:30", n=390, seed=7)})
+    s = load(root, "s.json", "2019-06-05")
+    rows = B.observable_rows(s); tg = B.targets(s, rows)
+    i = 80; r = rows[i]; y, tk, _ = tg[i]
+    params = {"k": 1.0, "a": 0.01, "b1": 0.0, "b5": 0.0, "n_train": 0, "params_hash": "x"}
+    fc = M.forecast(REG.M1["id"], params, r, input_id="i", input_hash="h", creation_time=0.0)
+    econ = R.economic_evaluation([fc], [(r, y, tk)], [s])
+
+    def keys(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                yield k
+                yield from keys(v)
+        elif isinstance(o, list):
+            for v in o:
+                yield from keys(v)
+    # KEYS, not serialised text: the registration's own prose names the field
+    # it forbids, so a substring check on the dump matches that sentence
+    assert "certified_1R" not in set(keys(econ))
+    assert econ["certification"].startswith("NONE in this experiment")
+    # the summary carries no per-row diagnostics at all; the diagnostic field
+    # exists only on the per-row records inside the function (AST check above)
+    assert "stop_distance_rv30_diagnostic" not in set(keys(econ))
 
 
 # ------------------------------------------------ governance preservation

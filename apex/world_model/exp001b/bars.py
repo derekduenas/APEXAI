@@ -38,7 +38,9 @@ def load_session(path, *, declared_class: str, fixture_root=None, symbol: str,
 def session_from_doc(doc: dict, p: Path, raw: bytes, adm: dict, *, symbol: str,
                      session_date: str) -> dict:
     try:
-        bounds = C.session_bounds(session_date)
+        # require_verified: a calendar entry that was never reconciled against
+        # the exchange record would change this session silently, not refuse
+        bounds = C.session_bounds(session_date, require_verified=True)
     except C.NotASession as e:
         raise BarsRefused("NOT_A_SESSION: %s" % e)
     bars = doc.get("bars")
@@ -81,6 +83,10 @@ def session_from_doc(doc: dict, p: Path, raw: bytes, adm: dict, *, symbol: str,
             "symbol": symbol, "session_date": session_date, "bounds": bounds,
             "n_raw_bars": len(bars), "n_regular": len(rows), "dropped_outside_session": dropped,
             "availability_basis": "ASSUMED_BAR_CLOSE", "publication_time": "NOT_AVAILABLE",
+            "calendar": {"version": C.CALENDAR_VERSION, "verified": bounds["calendar_entry_verified"],
+                         "verified_window": bounds["calendar_verified_window"],
+                         "early_close": bounds["early_close"],
+                         "expected_regular_minutes": bounds["regular_minutes"]},
             "rows": rows, "not_available": list(NOT_AVAILABLE_IN_CORPUS)}
 
 

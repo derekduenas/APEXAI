@@ -80,8 +80,11 @@ def economic_evaluation(fcs: list, rows_y: list, sessions_by_row: list) -> dict:
             realised = (leg_ret if ex == "LONG_15M" else -leg_ret) - rt
         per.append({"expression": ex, "expected_after_cost": best, "executable": True,
                     "realised_after_cost": realised,
+                    # NO field named certified_1R is produced, not even as None:
+                    # the registration forbids the name, and a null field still
+                    # invites a reader to fill it in.
                     "stop_distance_rv30_diagnostic": r["features"]["rv_30"],
-                    "certified_1R": None, "certification": "NOT_CERTIFIED",
+                    "certification": "NOT_CERTIFIED",
                     "execution": None if ex == "CASH" else
                     {"entry_time": legs["entry_time"], "exit_time": legs["exit_time"],
                      "decision_time": legs["decision_time"], "model": EXECUTION_MODEL}})

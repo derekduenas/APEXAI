@@ -105,3 +105,94 @@ def test_classification_rule():
     ts_e = datetime(2019, 11, 29, 18, 30, tzinfo=timezone.utc).timestamp()  # 13:30 ET early-close day
     assert C.classify_utc(ts_e) == "POSTMARKET"
     assert C.local_date(datetime(2019, 1, 16, 2, 0, tzinfo=timezone.utc).timestamp()) == "2019-01-15"
+
+
+# ---------------- closure pass: verification window and the false fail-closed claim
+
+def test_verification_metadata_names_its_window_and_primary_sources():
+    assert C.VERIFICATION["window"] == ("2016-01-04", "2021-12-31")
+    src = C.VERIFICATION["primary_sources"]
+    assert len(src) >= 5 and all("NYSE" in s or "New York Stock Exchange" in s for s in src)
+    assert "NOT_INDEPENDENTLY_VERIFIED" in C.VERIFICATION["outside_window"]
+
+
+def test_require_verified_refuses_dates_outside_the_reconciled_window():
+    b = C.session_bounds("2019-06-03", require_verified=True)
+    assert b["calendar_entry_verified"] and b["calendar_verified_window"] == ["2016-01-04", "2021-12-31"]
+    for d in ("2022-06-01", "2024-03-01", "2015-12-31"):
+        with pytest.raises(C.NotASession, match="^CALENDAR_NOT_VERIFIED"):
+            C.session_bounds(d, require_verified=True)
+    assert C.session_bounds("2022-06-01")["calendar_entry_verified"] is False   # permitted without the flag
+
+
+def test_committed_reconciliation_covers_this_calendar_version():
+    import json
+    from pathlib import Path
+    p = Path(__file__).resolve().parents[1] / C.VERIFICATION["reconciliation"]
+    rec = json.loads(p.read_text())
+    assert rec["calendar_version"] == C.CALENDAR_VERSION
+    assert rec["window"] == list(C.VERIFICATION["window"])
+    assert rec["date_by_date_agreement"] and rec["mismatches"] == []
+    assert rec["weekdays_examined"] > 1500
+    cc = rec["corpus_cross_check"]
+    assert cc["authoritative_session_missing_from_corpus"] == []
+    assert cc["corpus_session_on_an_authoritative_holiday"] == []
+    assert cc["short_files_not_authoritative_early_closes"] == []
+
+
+def _day(day, start_utc, n):
+    from datetime import datetime, timedelta
+    t = datetime.fromisoformat("%sT%s:00+00:00" % (day, start_utc))
+    px = 400.0
+    bars = []
+    for i in range(n):
+        bars.append({"event_time_utc": (t + timedelta(minutes=i)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                     "open": px, "high": px * 1.001, "low": px * 0.999, "close": px, "volume": 1000})
+    return {"source": "alpaca_sip_raw_1m", "bars": bars}
+
+
+def _lab_load(tmp_path, day, doc):
+    import json
+    from apex.world_model import sources
+    from apex.world_model.exp001b import bars as B
+    root = tmp_path / "lab"; root.mkdir(parents=True, exist_ok=True)
+    p = root / "s.json"; p.write_text(json.dumps(doc))
+    (root / "_PROVENANCE.json").write_text(json.dumps(
+        {"fixtures": {"s.json": {"source_class": "SYNTHETIC_FIXTURE", "sha256": sources.sha256_of(p)}}}))
+    return B.load_session(p, declared_class="SYNTHETIC_FIXTURE", fixture_root=root,
+                          symbol="SPY", session_date=day)
+
+
+def test_an_omitted_early_close_silently_admits_afternoon_bars_it_does_not_refuse(tmp_path, monkeypatch):
+    """REPRODUCTION of the corrected claim: a MISSING early-close entry does
+    not fail closed. 2019-11-29 is EST: open 14:30Z, early close 18:00Z."""
+    doc = _day("2019-11-29", "14:30", 390)                    # 14:30Z-20:59Z
+    correct = _lab_load(tmp_path / "a", "2019-11-29", doc)
+    assert correct["n_regular"] == 210 and correct["dropped_outside_session"]["after_close"] == 180
+    monkeypatch.setitem(C.__dict__, "EARLY_CLOSES", {k: v for k, v in C.EARLY_CLOSES.items()
+                                                     if k != "2019-11-29"})
+    omitted = _lab_load(tmp_path / "b", "2019-11-29", doc)
+    assert omitted["n_regular"] == 390                        # 180 post-close bars ADMITTED
+    assert omitted["dropped_outside_session"]["after_close"] == 0
+    assert omitted["bounds"]["early_close"] is False          # no refusal anywhere
+
+
+def test_an_added_early_close_silently_discards_valid_afternoon_bars(tmp_path, monkeypatch):
+    """REPRODUCTION: a WRONGLY ADDED early close drops real regular-session
+    bars, and nothing refuses. 2019-11-22 is an ordinary full session."""
+    doc = _day("2019-11-22", "14:30", 390)
+    correct = _lab_load(tmp_path / "a", "2019-11-22", doc)
+    assert correct["n_regular"] == 390 and correct["dropped_outside_session"]["after_close"] == 0
+    monkeypatch.setitem(C.__dict__, "EARLY_CLOSES", {**C.EARLY_CLOSES, "2019-11-22": "13:00"})
+    added = _lab_load(tmp_path / "b", "2019-11-22", doc)
+    assert added["n_regular"] == 210                          # 180 valid bars DISCARDED
+    assert added["dropped_outside_session"]["after_close"] == 180
+    assert added["bounds"]["early_close"] is True             # no refusal anywhere
+
+
+def test_only_a_holiday_error_fails_closed(tmp_path, monkeypatch):
+    """The one calendar error that DOES refuse, for contrast."""
+    from apex.world_model.exp001b import bars as B
+    monkeypatch.setitem(C.__dict__, "HOLIDAYS", frozenset(C.HOLIDAYS | {"2019-11-22"}))
+    with pytest.raises(B.BarsRefused, match="^NOT_A_SESSION: HOLIDAY"):
+        _lab_load(tmp_path / "c", "2019-11-22", _day("2019-11-22", "14:30", 390))

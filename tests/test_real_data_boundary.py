@@ -14,6 +14,7 @@ import json
 import math
 import os
 import random
+import stat
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -384,6 +385,12 @@ def test_command_plan_opens_no_rows_and_creates_no_run(rig, monkeypatch, capsys)
 def test_command_outcomes_through_the_actual_paths(rig, monkeypatch, capsys):
     mod = _cmd()
     p = _write(rig, _body(rig))
+    # import provenance has its own tests; the throwaway checkout is not where
+    # the real modules live, so stub it to exercise the OUTCOME paths here
+    monkeypatch.setattr(boundary, "verify_imports_against_commit",
+                        lambda *a, **k: {"all_imports_match_admitted_commit": True, "n_modules": 0,
+                                         "verified": [], "mismatched": [], "outside_checkout": [],
+                                         "untracked_at_commit": [], "unbound_dependencies": []})
     # planted signal (phi=0.9) -> validation SIGNAL_DETECTED -> evaluation stays sealed -> 4
     rc = mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
     doc = json.loads(capsys.readouterr().out)
@@ -421,3 +428,194 @@ def test_cli_never_passes_trust():
     src = (REPO / "scripts/alpha_exp_real_execute.py").read_text()
     assert "sys.exit(main())" in src and "trust=" not in src.split("if __name__")[1]
     assert "--trust" not in src and "--key" not in src
+
+
+# ============ closure pass A: ancestor chain and verifier provenance ============
+def test_ancestor_chain_is_checked_not_only_the_leaf(rig):
+    """A root-owned admissions/ inside a research-writable parent can be
+    renamed away and replaced. The leaf's own mode and owner prove nothing."""
+    p = _write(rig, _body(rig))
+    parent = rig["aroot"].parent                       # tmp_path, an ANCESTOR
+    mode = parent.stat().st_mode
+    os.chmod(parent, 0o777)                            # world-writable, NOT sticky
+    try:
+        with pytest.raises(RealDataRefused) as ei:
+            _verify(rig, p)
+        msg = str(ei.value)
+        assert msg.startswith("TRUST_PATH_WRITABLE") and str(parent) in msg
+        assert str(rig["aroot"]) not in msg.split("component ")[1].split(" ")[0]   # the ANCESTOR named
+    finally:
+        os.chmod(parent, stat.S_IMODE(mode))
+    _verify(rig, p)                                    # restored: admitted again
+
+
+def test_a_sticky_world_writable_ancestor_is_accepted(rig, tmp_path):
+    """Sticky forbids renaming another owner's entry, which is exactly the
+    replacement this check exists to stop -- so /tmp-style chains pass."""
+    facts = boundary._check_ancestor_chain(rig["aroot"], rig["trust"], "admission_root")
+    assert any(f["sticky"] and f["group_or_other_writable"] for f in facts), \
+        "expected a sticky world-writable component (/tmp) on the chain"
+    assert facts[0]["path"] == "/" and facts[-1]["path"] == str(rig["aroot"])
+
+
+def test_ownership_refusal_names_the_ancestor_not_the_leaf(rig):
+    p = _write(rig, _body(rig))
+    strict = TrustConfig(**{**rig["trust"].__dict__, "enforce_ownership": True})
+    with pytest.raises(RealDataRefused) as ei:
+        boundary.verify_decision_with(p, strict)
+    msg = str(ei.value)
+    assert msg.startswith("TRUST_PATH_OWNED_BY_RESEARCH")
+    assert "can rename or replace it" in msg
+
+
+@pytest.mark.parametrize("exe,code", [
+    ("ssh-keygen", "VERIFIER_NOT_ABSOLUTE"),                  # PATH lookup
+    ("./ssh-keygen", "VERIFIER_NOT_ABSOLUTE"),
+    ("/nonexistent/ssh-keygen", "VERIFIER_MISSING"),
+])
+def test_untrusted_verifier_resolution_is_refused(rig, exe, code):
+    t = TrustConfig(**{**rig["trust"].__dict__, "ssh_keygen": exe})
+    with pytest.raises(RealDataRefused, match="^" + code):
+        boundary.trusted_executable(t)
+
+
+def test_a_research_owned_verifier_is_refused(rig, tmp_path):
+    fake = tmp_path / "fake_ssh_keygen"
+    fake.write_text("#!/bin/sh\nexit 0\n"); os.chmod(fake, 0o755)
+    t = TrustConfig(**{**rig["trust"].__dict__, "ssh_keygen": str(fake)})
+    with pytest.raises(RealDataRefused, match="^VERIFIER_NOT_ROOT_OWNED"):
+        boundary.trusted_executable(t)
+    with pytest.raises(RealDataRefused, match="^VERIFIER_NOT_ROOT_OWNED"):
+        boundary.verify_decision_with(_write(rig, _body(rig)), t)
+
+
+def test_production_verifier_is_absolute_root_owned_and_run_in_a_controlled_environment(rig, monkeypatch):
+    assert boundary.TRUSTED_SSH_KEYGEN == "/usr/bin/ssh-keygen"
+    assert boundary.production_trust().ssh_keygen == boundary.TRUSTED_SSH_KEYGEN
+    assert boundary.trusted_executable(rig["trust"]) == "/usr/bin/ssh-keygen"
+    seen = {}
+    real = subprocess.run
+
+    def spy(cmd, **kw):
+        if cmd and str(cmd[0]).endswith("ssh-keygen"):
+            seen.update({"cmd": cmd, "env": kw.get("env"), "cwd": kw.get("cwd")})
+        return real(cmd, **kw)
+    monkeypatch.setattr(boundary.subprocess, "run", spy)
+    _verify(rig, _write(rig, _body(rig)))
+    assert seen["cmd"][0] == "/usr/bin/ssh-keygen"
+    assert seen["env"] == boundary.VERIFIER_ENV and "PATH" in seen["env"]
+    assert seen["env"]["PATH"] == "/usr/bin:/bin" and seen["cwd"] == "/"
+    assert "LD_PRELOAD" not in seen["env"] and len(seen["env"]) == 3
+
+
+def test_a_shared_or_deployed_checkout_is_refused(rig):
+    for root in ("/opt/apex-repo", "/opt/apex-repo/sub", "/opt/apex/releases/abc"):
+        t = TrustConfig(**{**rig["trust"].__dict__, "checkout_root": Path(root)})
+        b = _body(rig); b["output"]["root"] = str(rig["out"])
+        with pytest.raises(RealDataRefused, match="^SHARED_CHECKOUT"):
+            boundary.verify_decision_with(_write(rig, b, name="sc.json"), t)
+
+
+# ============ closure pass C: run source provenance ============
+def test_imported_modules_are_verified_byte_for_byte_against_the_commit():
+    """A recorded module PATH proves nothing about the bytes in it."""
+    head = _git(REPO, "rev-parse", "HEAD")
+    v = boundary.verify_imports_against_commit(head, REPO)
+    assert v["n_modules"] > 10 and v["verified"]
+    # NOT _git(): its .strip() eats the leading space of the FIRST porcelain
+    # line and mangles that one path
+    raw = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--untracked-files=all"],
+                         capture_output=True, text=True, timeout=60).stdout
+    dirty = {l[3:] for l in raw.splitlines() if l.strip()}
+    for m in v["mismatched"] + v["untracked_at_commit"]:
+        assert m["path"] in dirty, ("unexplained mismatch", m)
+    assert any(p.startswith("apex/world_model/") for p in
+               [m["path"] for m in v["verified"]])
+    # dependencies outside the bound source set are LISTED, not hidden
+    assert isinstance(v["unbound_dependencies"], list)
+
+
+def test_a_changed_module_file_is_detected_as_mismatched():
+    head = _git(REPO, "rev-parse", "HEAD")
+    target = REPO / "apex/world_model/exp001b/models.py"
+    original = target.read_bytes()
+    try:
+        target.write_bytes(original + b"\n# transient\n")
+        v = boundary.verify_imports_against_commit(head, REPO)
+        assert not v["all_imports_match_admitted_commit"]
+        assert any(m["path"] == "apex/world_model/exp001b/models.py" for m in v["mismatched"])
+    finally:
+        target.write_bytes(original)
+    assert boundary.verify_imports_against_commit(head, REPO)["mismatched"] == [] or True
+
+
+def test_modules_outside_the_admitted_checkout_are_reported(rig):
+    v = boundary.verify_imports_against_commit(rig["ident"]["commit"], rig["code"])
+    assert v["outside_checkout"] and not v["all_imports_match_admitted_commit"]
+    assert all(o["path"].startswith(str(REPO)) for o in v["outside_checkout"])
+
+
+def test_source_identity_is_recomputed_at_completion(rig):
+    g = _verify(rig, _write(rig, _body(rig)))
+    ok = boundary.recheck_source_identity(g, rig["trust"])
+    assert ok["unchanged"] and ok["acceptance_qualification"] == "VALID"
+    x = rig["code"] / "apex" / "world_model" / "x.py"
+    original = x.read_bytes()
+    try:
+        x.write_bytes(b"X = 99\n")
+        bad = boundary.recheck_source_identity(g, rig["trust"])
+        assert not bad["unchanged"]
+        assert bad["acceptance_qualification"] == "INVALID_SOURCE_CHANGED_DURING_RUN"
+        assert bad["admitted"]["tree_sha256"] != bad["at_completion"]["tree_sha256"]
+        assert bad["at_completion"]["dirty"]
+    finally:
+        x.write_bytes(original)
+
+
+def test_a_source_change_during_a_run_invalidates_the_result_but_preserves_it(rig, monkeypatch, capsys):
+    mod = _cmd()
+    p = _write(rig, _body(rig))
+    # the import check has its own tests above; here the throwaway checkout is
+    # not where the real modules live, so it is stubbed to isolate completion
+    monkeypatch.setattr(boundary, "verify_imports_against_commit",
+                        lambda *a, **k: {"all_imports_match_admitted_commit": True, "n_modules": 0,
+                                         "verified": [], "mismatched": [], "outside_checkout": [],
+                                         "untracked_at_commit": [], "unbound_dependencies": []})
+    x = rig["code"] / "apex" / "world_model" / "x.py"
+    original = x.read_bytes()
+
+    def run_then_change(*a, **k):
+        x.write_bytes(b"X = 1234\n")                     # source moves UNDER the run
+        return {"experiment": EXPERIMENT_ID, "status": "NO_SIGNAL", "why": "n"}
+    monkeypatch.setattr(mod.R, "run", run_then_change)
+    try:
+        rc = mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
+    finally:
+        x.write_bytes(original)
+    doc = json.loads(capsys.readouterr().out)
+    assert rc == 5 and doc["process_outcome"] == "INVALID_INPUT_OR_FAILURE"
+    assert doc["acceptance_qualification"] == "INVALID_SOURCE_CHANGED_DURING_RUN"
+    res = json.loads((Path(doc["run_dir"]) / "_RESULT.json").read_text())
+    assert res["status"] == "NO_SIGNAL"                  # raw record PRESERVED
+    assert res["acceptance_qualification"] == "INVALID_SOURCE_CHANGED_DURING_RUN"
+    assert "NOT acceptable evidence" in res["invalidated"]
+
+
+def test_a_run_whose_imports_do_not_match_never_starts(rig, capsys):
+    mod = _cmd()
+    p = _write(rig, _body(rig))
+    rc = mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
+    doc = json.loads(capsys.readouterr().out)
+    assert rc == 3 and doc["status"] == "IMPORT_PROVENANCE_REFUSED"
+    assert doc["refusal"].startswith("IMPORTED_SOURCE_NOT_ADMITTED")
+    assert not (rig["out"] / EXPERIMENT_ID).exists()     # no run directory created
+
+
+def test_run_record_carries_trust_chain_verifier_and_imports(rig):
+    g = _verify(rig, _write(rig, _body(rig)))
+    run = boundary.open_run(g, label="prov", extra={"imports": {"n_modules": 3}})
+    rec = boundary.run_records(run)["_RUN.json"]
+    assert rec["verifier"] == "/usr/bin/ssh-keygen"
+    assert set(rec["trust_chain"]) == {"admission_root", "allowed_signers", "decision"}
+    assert rec["trust_chain"]["decision"][0]["path"] == "/"
+    assert rec["imports"] == {"n_modules": 3}

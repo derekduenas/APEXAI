@@ -18,11 +18,26 @@ FOUR DECISIONS KEPT APART
   decision) / passed (the experiment's own sealed result). This module is
   (3) and enforces that nothing else stands in for it.
 
+WHAT CHANGED IN THE CLOSURE PASS (reviewer findings, 28153e1a)
+  * Trust is checked along the WHOLE ANCESTOR CHAIN, not just the leaf. A
+    root-owned admissions/ directory inside a research-owned parent can be
+    renamed away and replaced; leaf ownership establishes nothing. Every
+    component from / down must be non-research-owned and not
+    group/other-writable (sticky world-writable dirs like /tmp are the one
+    exception: sticky forbids renaming another owner's entry).
+  * The signature verifier is resolved through an ABSOLUTE, root-owned
+    executable whose own ancestor chain is root-owned, and is run with a
+    controlled environment -- never through PATH.
+  * Imported apex modules are verified BYTE-FOR-BYTE against the admitted
+    commit, and source identity is recomputed at completion.
+
 WHAT THIS DOES NOT PROTECT AGAINST -- STATED
-Arbitrary privileged code on the host, or an actor who can replace the
-allowed_signers file. The trust paths must therefore be OWNED BY A
-DIFFERENT UID than the research account and not writable by it; the
-verifier checks mode and (in production) ownership and refuses otherwise.
+Arbitrary privileged code, and any account that can become root. On a host
+where the research account holds sudo, NOTHING here is a boundary against
+that account: the operator must run research as an account that cannot
+become root and cannot write any component of the trust chain. The verifier
+checks what it can (ownership, mode, ancestry, executable provenance) and
+refuses otherwise; it cannot check what it cannot see.
 """
 from __future__ import annotations
 
@@ -64,6 +79,12 @@ PERMITTED_HISTORICAL_ROOTS = ("/apex-data/history-a", "/apex-data/history-b")
 # untracked or different from the decided tree hash refuses execution.
 RELEVANT_SOURCE_PATHS = ("apex/world_model", "apex/governance/chain_ledger.py",
                          "apex/intraday/sessions.py", "scripts/alpha_exp_real_execute.py")
+# A shared or deployed checkout is never a research execution checkout: other
+# processes write it, so its content cannot be bound for the length of a run.
+FORBIDDEN_CHECKOUT_ROOTS = ("/opt/apex-repo", "/opt/apex/current", "/opt/apex/releases")
+TRUSTED_SSH_KEYGEN = "/usr/bin/ssh-keygen"
+# Environment handed to the verifier subprocess. Nothing is inherited.
+VERIFIER_ENV = {"PATH": "/usr/bin:/bin", "LC_ALL": "C", "IFS": " \t\n"}
 
 AVAILABILITY_KINDS = frozenset({"PER_ROW", "PER_FILE", "BULK", "NOT_AVAILABLE"})
 CORPORATE_ACTION_TREATMENTS = frozenset({"RAW_UNADJUSTED_EXPLICIT", "ADJUSTED_DECLARED", "NOT_APPLICABLE"})
@@ -107,8 +128,9 @@ class TrustConfig:
     prohibited_roots: tuple = PROHIBITED_DATASET_ROOTS
     namespace: str = SIGNATURE_NAMESPACE
     enforce_ownership: bool = True
-    ssh_keygen: str = "ssh-keygen"
+    ssh_keygen: str = TRUSTED_SSH_KEYGEN
     relevant_source_paths: tuple = RELEVANT_SOURCE_PATHS
+    forbidden_checkout_roots: tuple = FORBIDDEN_CHECKOUT_ROOTS
 
 
 PRODUCTION_ADMISSION_ROOT = Path("/apex-data/governance/admissions")
@@ -143,6 +165,8 @@ class Grant:
     output_root: str
     authority_classification: str
     provenance: dict
+    trust_chain: dict = field(default_factory=dict)
+    verifier: str = ""
     authority: dict = field(default_factory=lambda: dict(REAL_DATA_RESEARCH_AUTHORITY_V0))
 
 
@@ -190,6 +214,66 @@ def source_identity(root: Path, paths: tuple = RELEVANT_SOURCE_PATHS) -> dict:
             "paths": list(paths), "checkout_root": str(root)}
 
 
+def verify_imports_against_commit(commit: str, root: Path,
+                                  paths: tuple = RELEVANT_SOURCE_PATHS) -> dict:
+    """Prove that the apex modules ACTUALLY IMPORTED are the admitted bytes.
+
+    Recording a module's path establishes nothing: a path can hold anything.
+    So every loaded apex.* module is hashed and compared with the blob at the
+    admitted commit, and modules outside the bound source set are listed as
+    execution dependencies the decision does not cover."""
+    root = _resolved(root)
+    bound_prefixes = tuple(paths)
+    out = {"commit": commit, "checkout_root": str(root), "n_modules": 0, "verified": [],
+           "mismatched": [], "outside_checkout": [], "untracked_at_commit": [],
+           "unbound_dependencies": []}
+    for name, mod in sorted(sys.modules.items()):
+        if not name.startswith("apex.") and name != "apex":
+            continue
+        f = getattr(mod, "__file__", None)
+        if not f:
+            continue
+        p = _resolved(f)
+        out["n_modules"] += 1
+        if not _under(p, root):
+            out["outside_checkout"].append({"module": name, "path": str(p)})
+            continue
+        rel = str(p.relative_to(root))
+        r = subprocess.run(["git", "-C", str(root), "show", "%s:%s" % (commit, rel)],
+                           capture_output=True, timeout=60)
+        if r.returncode != 0:
+            out["untracked_at_commit"].append({"module": name, "path": rel})
+            continue
+        blob = hashlib.sha256(r.stdout).hexdigest()
+        disk = sha256_of(p)
+        rec = {"module": name, "path": rel, "sha256": disk}
+        if blob != disk:
+            rec["commit_sha256"] = blob
+            out["mismatched"].append(rec)
+        else:
+            out["verified"].append(rec)
+        if not any(rel == b or rel.startswith(b.rstrip("/") + "/") for b in bound_prefixes):
+            out["unbound_dependencies"].append(rel)
+    out["all_imports_match_admitted_commit"] = not (out["mismatched"] or out["outside_checkout"]
+                                                    or out["untracked_at_commit"])
+    return out
+
+
+def recheck_source_identity(grant: "Grant", trust: TrustConfig | None = None) -> dict:
+    """Recompute source identity at COMPLETION and compare with the admitted
+    identity. A run whose relevant source moved under it is not acceptable
+    evidence, however it ended."""
+    t = trust or production_trust()
+    now = source_identity(_resolved(t.checkout_root), t.relevant_source_paths)
+    same = (now["commit"] == grant.code_commit
+            and now["tree_sha256"] == grant.source_identity["tree_sha256"]
+            and not now["dirty"])
+    return {"admitted": {k: grant.source_identity[k] for k in ("commit", "tree_sha256")},
+            "at_completion": {k: now[k] for k in ("commit", "tree_sha256", "dirty")},
+            "unchanged": same,
+            "acceptance_qualification": "VALID" if same else "INVALID_SOURCE_CHANGED_DURING_RUN"}
+
+
 def runtime_provenance() -> dict:
     mods = {n: getattr(m, "__file__", None) for n, m in sorted(sys.modules.items())
             if n.startswith("apex.") and getattr(m, "__file__", None)}
@@ -205,19 +289,81 @@ def _date(s, what) -> datetime:
         raise RealDataRefused("MALFORMED_DATE: %s=%r (want YYYY-MM-DD)" % (what, s))
 
 
-def _check_trust_path(p: Path, trust: TrustConfig, what: str) -> None:
-    """A trust path writable by the research account is no trust path."""
+def ancestors(p: Path) -> list:
+    """Every path component from the filesystem root down to p, resolved."""
+    rp = _resolved(p)
+    return list(reversed([rp] + list(rp.parents)))
+
+
+def path_facts(p) -> dict:
+    """Ownership, mode, sticky bit and research-writability of one component."""
+    st = os.stat(p)
+    mode = stat.S_IMODE(st.st_mode)
+    return {"path": str(p), "uid": st.st_uid, "gid": st.st_gid, "mode": "%o" % mode,
+            "sticky": bool(st.st_mode & stat.S_ISVTX), "dir": stat.S_ISDIR(st.st_mode),
+            "group_or_other_writable": bool(mode & (stat.S_IWGRP | stat.S_IWOTH)),
+            "owned_by_euid": st.st_uid == os.geteuid()}
+
+
+def _check_ancestor_chain(p: Path, trust: TrustConfig, what: str) -> list:
+    """Refuse unless EVERY component from / down to p is beyond the research
+    account's reach.
+
+    Leaf ownership proves nothing: a root-owned directory inside a
+    research-owned parent can be renamed away and replaced with an
+    attacker-controlled one. So the whole chain is checked.
+
+    A group/other-writable DIRECTORY is refused unless it carries the sticky
+    bit, which forbids renaming or deleting entries owned by others (this is
+    what makes /tmp usable as a chain component)."""
+    facts = []
     try:
-        st = os.stat(p)
+        chain = ancestors(p)
+        for c in chain:
+            facts.append(path_facts(c))
     except OSError as e:
         raise RealDataRefused("TRUST_PATH_MISSING: %s %s: %s" % (what, p, e)) from e
-    if st.st_mode & (stat.S_IWGRP | stat.S_IWOTH):
-        raise RealDataRefused("TRUST_PATH_WRITABLE: %s %s is group/other-writable (mode %o)"
-                              % (what, p, stat.S_IMODE(st.st_mode)))
-    if trust.enforce_ownership and st.st_uid == os.geteuid():
-        raise RealDataRefused("TRUST_PATH_OWNED_BY_RESEARCH: %s %s is owned by uid %d, the research "
-                              "account; issuance and verification must not share an owner"
-                              % (what, p, st.st_uid))
+    for f in facts:
+        c = f["path"]
+        if f["group_or_other_writable"] and not (f["dir"] and f["sticky"]):
+            raise RealDataRefused(
+                "TRUST_PATH_WRITABLE: %s -- component %s is group/other-writable (mode %s) "
+                "without the sticky bit; anything under it can be replaced" % (what, c, f["mode"]))
+        if trust.enforce_ownership and f["owned_by_euid"] and not (f["dir"] and f["sticky"]):
+            raise RealDataRefused(
+                "TRUST_PATH_OWNED_BY_RESEARCH: %s -- component %s is owned by uid %d, the account "
+                "running research; that account can rename or replace it, so nothing beneath it is "
+                "trusted. Issuance and verification must not share an owner ANYWHERE on the chain."
+                % (what, c, f["uid"]))
+    return facts
+
+
+def trusted_executable(trust: TrustConfig) -> str:
+    """Resolve the signature verifier through a trusted absolute location.
+
+    PATH is never consulted: a PATH lookup is a lookup in directories the
+    caller can influence. The executable and every component above it must
+    be root-owned and not group/other-writable."""
+    exe = trust.ssh_keygen
+    if not os.path.isabs(exe):
+        raise RealDataRefused("VERIFIER_NOT_ABSOLUTE: %r would be resolved through PATH; the "
+                              "signature verifier must be an absolute trusted path" % exe)
+    rp = _resolved(exe)
+    try:
+        facts = [path_facts(c) for c in ancestors(rp)]
+    except OSError as e:
+        raise RealDataRefused("VERIFIER_MISSING: %s: %s" % (rp, e)) from e
+    if facts[-1]["dir"] or not os.access(rp, os.X_OK):
+        raise RealDataRefused("VERIFIER_NOT_EXECUTABLE: %s" % rp)
+    for f in facts:
+        if f["uid"] != 0:
+            raise RealDataRefused("VERIFIER_NOT_ROOT_OWNED: component %s is owned by uid %d; the "
+                                  "verifier and its whole path must be root-owned"
+                                  % (f["path"], f["uid"]))
+        if f["group_or_other_writable"] and not (f["dir"] and f["sticky"]):
+            raise RealDataRefused("VERIFIER_PATH_WRITABLE: component %s is group/other-writable "
+                                  "(mode %s)" % (f["path"], f["mode"]))
+    return str(rp)
 
 
 def _check_availability(av: dict) -> None:
@@ -248,13 +394,16 @@ def _check_availability(av: dict) -> None:
 def _verify_signature(decision: Path, sig: Path, principal: str, trust: TrustConfig) -> None:
     if not sig.exists():
         raise RealDataRefused("UNSIGNED_DECISION: %s has no detached signature %s" % (decision.name, sig.name))
+    _check_ancestor_chain(sig, trust, "signature")
     if not principal or not isinstance(principal, str):
         raise RealDataRefused("DECISION_PROVENANCE_INVALID: decided_by is empty; the signer principal is unknown")
+    exe = trusted_executable(trust)
     try:
         with open(decision, "rb") as fh:
-            r = subprocess.run([trust.ssh_keygen, "-Y", "verify", "-f", str(trust.allowed_signers),
+            r = subprocess.run([exe, "-Y", "verify", "-f", str(trust.allowed_signers),
                                 "-I", principal, "-n", trust.namespace, "-s", str(sig)],
-                               stdin=fh, capture_output=True, text=True, timeout=60)
+                               stdin=fh, capture_output=True, text=True, timeout=60,
+                               env=dict(VERIFIER_ENV), cwd="/")
     except (OSError, subprocess.SubprocessError) as e:
         raise RealDataRefused("SIGNATURE_UNVERIFIABLE: %s" % e) from e
     if r.returncode != 0:
@@ -285,9 +434,10 @@ def verify_decision_with(decision_path, trust: TrustConfig, *, experiment_id=Non
     if _under(dp, croot):
         raise RealDataRefused("DECISION_INSIDE_CHECKOUT: %s lives in the code checkout; a caller may not "
                               "admit itself" % dp)
+    trust_facts = {}
     for p, what in ((aroot, "admission_root"), (_resolved(trust.allowed_signers), "allowed_signers"),
-                    (_resolved(trust.allowed_signers).parent, "trust dir"), (dp, "decision")):
-        _check_trust_path(p, trust, what)
+                    (dp, "decision")):
+        trust_facts[what] = _check_ancestor_chain(p, trust, what)
     try:
         doc = json.loads(dp.read_text())
     except (OSError, json.JSONDecodeError) as e:
@@ -382,6 +532,13 @@ def verify_decision_with(decision_path, trust: TrustConfig, *, experiment_id=Non
                               % (str(pu["registration_hash"])[:16], str(registration_hash)[:16]))
 
     # ---- code: HEAD, content and cleanliness of the relevant source ----
+    for pr in trust.forbidden_checkout_roots:
+        rp = _resolved(pr)
+        if croot == rp or rp in croot.parents:
+            raise RealDataRefused(
+                "SHARED_CHECKOUT: research may not execute from %s (under %s). A shared or deployed "
+                "checkout is written by other processes, so its content cannot be bound for the "
+                "length of a run; use a dedicated checkout." % (croot, rp))
     ident = source_identity(croot, trust.relevant_source_paths)
     if ident["dirty"]:
         raise RealDataRefused("SOURCE_DIRTY: relevant source differs from the commit: %s" % ident["dirty"][:5])
@@ -417,7 +574,8 @@ def verify_decision_with(decision_path, trust: TrustConfig, *, experiment_id=Non
                  availability=dict(av), experiment_id=pu["experiment_id"],
                  registration_hash=pu["registration_hash"], code_commit=ident["commit"],
                  source_identity=ident, output_root=str(oroot),
-                 authority_classification=out["authority_classification"], provenance=dict(prov))
+                 authority_classification=out["authority_classification"], provenance=dict(prov),
+                 trust_chain=trust_facts, verifier=trusted_executable(trust))
 
 
 # ------------------------------------------------------------------ reads
@@ -462,7 +620,7 @@ def _write_once(path: Path, obj: dict) -> None:
         json.dump(obj, fh, indent=1, sort_keys=True, default=str)
 
 
-def open_run(grant: Grant, *, label: str = "run") -> Path:
+def open_run(grant: Grant, *, label: str = "run", extra: dict | None = None) -> Path:
     """Create a UNIQUE run directory with exclusive creation and write the
     immutable identity and authority records once. Any collision refuses."""
     if "/" in label or label in ("", ".", ".."):
@@ -486,7 +644,8 @@ def open_run(grant: Grant, *, label: str = "run") -> Path:
         "decision_path": grant.decision_path, "decision_sha256": grant.decision_sha256,
         "signer": grant.signer, "dataset_id": grant.dataset_id, "manifest_sha256": grant.manifest_sha256,
         "source_identity": grant.source_identity, "runtime": runtime_provenance(),
-        "signature_mechanism": SIGNATURE_MECHANISM})
+        "signature_mechanism": SIGNATURE_MECHANISM, "verifier": grant.verifier,
+        "trust_chain": grant.trust_chain, **(extra or {})})
     return run
 
 

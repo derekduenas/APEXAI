@@ -69,8 +69,20 @@ def main(argv=None, *, trust: boundary.TrustConfig | None = None) -> int:
     if a.plan:
         return _emit("SCIENTIFIC_COMPLETE", status="PLAN", **plan)
 
+    # The modules ALREADY IMPORTED must be the admitted bytes. A recorded path
+    # proves nothing about what is in it.
+    trust_for_run = trust or boundary.production_trust()
+    imports = boundary.verify_imports_against_commit(grant.code_commit, trust_for_run.checkout_root,
+                                                     trust_for_run.relevant_source_paths)
+    if not imports["all_imports_match_admitted_commit"]:
+        return _emit("AUTHORIZATION_REFUSED", status="IMPORT_PROVENANCE_REFUSED",
+                     refusal="IMPORTED_SOURCE_NOT_ADMITTED: %d mismatched, %d outside checkout, "
+                             "%d untracked at the admitted commit"
+                             % (len(imports["mismatched"]), len(imports["outside_checkout"]),
+                                len(imports["untracked_at_commit"])),
+                     imports={k: imports[k] for k in ("mismatched", "outside_checkout", "untracked_at_commit")})
     try:
-        run_dir = boundary.open_run(grant, label=a.label)
+        run_dir = boundary.open_run(grant, label=a.label, extra={"imports": imports})
     except RealDataRefused as e:
         return _emit("INVALID_INPUT_OR_FAILURE", status="RUN_DIR_REFUSED", refusal=str(e))
     try:
@@ -80,11 +92,22 @@ def main(argv=None, *, trust: boundary.TrustConfig | None = None) -> int:
         rec = {"experiment": EXPERIMENT_ID, "status": "EXECUTION_FAILURE",
                "error": "%s: %s" % (type(e).__name__, str(e)[:400]), "traceback": traceback.format_exc()[-2000:]}
     outcome = R.STATUS.get(rec.get("status"), "INVALID_INPUT_OR_FAILURE")
-    rec["process_outcome"] = outcome
     rec["plan"] = plan
     rec["runtime_at_end"] = boundary.runtime_provenance()
+    rec["imports_at_start"] = imports
+    # Recompute source identity at COMPLETION. The raw record is preserved
+    # either way; a run whose relevant source moved under it is not evidence.
+    src = boundary.recheck_source_identity(grant, trust_for_run)
+    rec["source_identity_at_completion"] = src
+    rec["acceptance_qualification"] = src["acceptance_qualification"]
+    if not src["unchanged"]:
+        outcome = "INVALID_INPUT_OR_FAILURE"
+        rec["invalidated"] = ("relevant source changed between admission and completion; the "
+                              "scientific record below is preserved but is NOT acceptable evidence")
+    rec["process_outcome"] = outcome
     sealed = boundary.seal_result(run_dir, rec)
     return _emit(outcome, status=rec.get("status"), why=rec.get("why") or rec.get("error"),
+                 acceptance_qualification=rec["acceptance_qualification"],
                  run_dir=str(run_dir), result=str(sealed))
 
 
