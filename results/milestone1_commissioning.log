@@ -1,0 +1,51 @@
+swap: current -> /opt/apex/releases/73fc712d355032e0a66b41675ba114491b04799d   2026-09-07T15:46:07Z
+pre-deploy unit: {'Result': 'oom-kill', 'NRestarts': '4016', 'ExecMainStatus': '9'}
+ANCHOR T0=Mon 2026-09-07 15:46:21 UTC N0=4017
+  15:46:26Z NRestarts=4017 Result=success active oom=0 work=1 last=2026-09-07T15:46:21.582536+00:00 peak=12.2 MiB
+  15:47:26Z NRestarts=4017 Result=success active oom=0 work=2 last=2026-09-07T15:47:21.687592+00:00 peak=12.8 MiB
+  15:48:26Z NRestarts=4017 Result=success active oom=0 work=3 last=2026-09-07T15:48:21.791900+00:00 peak=13.1 MiB
+  15:49:26Z NRestarts=4017 Result=success active oom=0 work=4 last=2026-09-07T15:49:21.911950+00:00 peak=13.3 MiB
+  15:50:26Z NRestarts=4017 Result=success active oom=0 work=5 last=2026-09-07T15:50:22.017826+00:00 peak=13.3 MiB
+  15:51:26Z NRestarts=4017 Result=success active oom=0 work=6 last=2026-09-07T15:51:22.122278+00:00 peak=13.3 MiB
+  15:52:26Z NRestarts=4017 Result=success active oom=0 work=7 last=2026-09-07T15:52:22.218557+00:00 peak=13.3 MiB
+  15:53:26Z NRestarts=4017 Result=success active oom=0 work=8 last=2026-09-07T15:53:22.311288+00:00 peak=13.3 MiB
+  15:54:26Z NRestarts=4017 Result=success active oom=0 work=9 last=2026-09-07T15:54:22.411630+00:00 peak=13.5 MiB
+  15:55:26Z NRestarts=4017 Result=success active oom=0 work=10 last=2026-09-07T15:55:22.516218+00:00 peak=13.5 MiB
+  15:56:26Z NRestarts=4017 Result=success active oom=0 work=11 last=2026-09-07T15:56:22.612481+00:00 peak=13.5 MiB
+  15:57:26Z NRestarts=4017 Result=success active oom=0 work=12 last=2026-09-07T15:57:22.712463+00:00 peak=13.5 MiB
+  15:58:26Z NRestarts=4017 Result=success active oom=0 work=13 last=2026-09-07T15:58:22.822668+00:00 peak=13.5 MiB
+  15:59:26Z NRestarts=4017 Result=success active oom=0 work=14 last=2026-09-07T15:59:22.925113+00:00 peak=13.5 MiB
+  16:00:26Z NRestarts=4017 Result=success active oom=0 work=15 last=2026-09-07T16:00:23.038460+00:00 peak=13.5 MiB
+  16:01:26Z NRestarts=4017 Result=success active oom=0 work=16 last=2026-09-07T16:01:23.142595+00:00 peak=13.5 MiB
+  16:02:26Z NRestarts=4017 Result=success active oom=0 work=17 last=2026-09-07T16:02:23.241086+00:00 peak=13.5 MiB
+  16:03:26Z NRestarts=4017 Result=success active oom=0 work=18 last=2026-09-07T16:03:23.350820+00:00 peak=13.5 MiB
+  16:04:27Z NRestarts=4017 Result=success active oom=0 work=19 last=2026-09-07T16:04:23.453024+00:00 peak=13.5 MiB
+  16:05:27Z NRestarts=4017 Result=success active oom=0 work=20 last=2026-09-07T16:05:23.557834+00:00 peak=13.5 MiB
+  16:06:27Z NRestarts=4017 Result=success active oom=0 work=21 last=2026-09-07T16:06:23.674350+00:00 peak=13.5 MiB
+  16:07:27Z NRestarts=4017 Result=success active oom=0 work=22 last=2026-09-07T16:07:23.783115+00:00 peak=13.5 MiB
+  16:08:27Z NRestarts=4017 Result=success active oom=0 work=23 last=2026-09-07T16:08:23.903516+00:00 peak=13.5 MiB
+  16:09:27Z NRestarts=4017 Result=success active oom=0 work=24 last=2026-09-07T16:09:24.021486+00:00 peak=13.5 MiB
+  16:10:27Z NRestarts=4017 Result=success active oom=0 work=25 last=2026-09-07T16:10:24.176725+00:00 peak=13.5 MiB
+  16:11:27Z NRestarts=4017 Result=success active oom=0 work=26 last=2026-09-07T16:11:24.287764+00:00 peak=13.5 MiB
+  16:12:27Z NRestarts=4017 Result=success active oom=0 work=27 last=2026-09-07T16:12:24.392754+00:00 peak=13.5 MiB
+  16:13:27Z NRestarts=4017 Result=success active oom=0 work=28 last=2026-09-07T16:13:24.508804+00:00 peak=13.5 MiB
+  16:14:27Z NRestarts=4017 Result=success active oom=0 work=29 last=2026-09-07T16:14:24.614848+00:00 peak=13.5 MiB
+  16:15:27Z NRestarts=4017 Result=success active oom=0 work=30 last=2026-09-07T16:15:24.724003+00:00 peak=13.5 MiB
+
+COMMISSIONING VERDICT: PASS
+  restart_counter_static             True
+  no_oom_kill_since_T0               True
+  result_not_oom_kill                True
+  heartbeat_advanced                 True
+  work_completed_climbed             True
+  unit_peak_under_cap                True
+  unit_peak_max_mib                  13.5
+  ledger_growing                     True
+  newest_record_bounded              True
+  no_STARTED_outcome                 True
+  all_ledger_prefixes_identical      True
+  ops/orchestrator.jsonl                                                 prefix_identical=True size 438867453 -> 438890350
+  historical/continuous/decisions.jsonl                                  prefix_identical=True size 687925800 -> 687925800
+  btc/derivatives_ledger.jsonl                                           prefix_identical=True size 439994687 -> 440659836
+  btc/ws_book_ledger.g2.jsonl                                            prefix_identical=True size 143531010 -> 143746470
+  historical/continuous/outcomes.jsonl                                   prefix_identical=True size 65593558 -> 65593558
