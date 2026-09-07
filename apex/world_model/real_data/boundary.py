@@ -133,8 +133,15 @@ class TrustConfig:
     forbidden_checkout_roots: tuple = FORBIDDEN_CHECKOUT_ROOTS
 
 
-PRODUCTION_ADMISSION_ROOT = Path("/apex-data/governance/admissions")
-PRODUCTION_ALLOWED_SIGNERS = Path("/apex-data/governance/admissions/trust/allowed_signers")
+# The admission root and trust file must sit on an ancestor chain the research
+# account cannot touch. /apex-data is owned by that account, so ANY directory
+# beneath it can be renamed away and replaced -- measured on the host in
+# results/si002_trust_path_audit.json. /etc is root-owned and is not.
+# The dataset MANIFEST deliberately stays outside this chain: the signed
+# decision commits to its sha256, so a swapped manifest is refused by content
+# and it needs no trusted location.
+PRODUCTION_ADMISSION_ROOT = Path("/etc/apex/admissions")
+PRODUCTION_ALLOWED_SIGNERS = Path("/etc/apex/admissions/trust/allowed_signers")
 
 
 def production_trust() -> TrustConfig:

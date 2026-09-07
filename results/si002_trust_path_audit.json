@@ -8,9 +8,9 @@
   ],
   "uid": 1000
  },
- "produced_utc": "2026-09-07T23:35:09Z",
+ "produced_utc": "2026-09-07T23:36:39Z",
  "production_trust_check": {
-  "refusal": "TRUST_PATH_OWNED_BY_RESEARCH: admission_root -- component /apex-data is owned by uid 1000, the account running research; that account can rename or replace it, so nothing beneath it is trusted. Issuance and verification must not share an owner ANYWHERE on the chain.",
+  "refusal": "TRUST_PATH_MISSING: admission_root /etc/apex/admissions: [Errno 2] No such file or directory: '/etc/apex'",
   "status": "WOULD_REFUSE"
  },
  "research_account_privilege": {
@@ -137,43 +137,24 @@
     },
     {
      "dir": true,
-     "gid": 1000,
+     "gid": 0,
      "group_or_other_writable": false,
      "mode": "755",
-     "owned_by_euid": true,
+     "owned_by_euid": false,
      "parent_writable_by_euid": false,
-     "path": "/apex-data",
+     "path": "/etc",
      "sticky": false,
-     "uid": 1000,
-     "writable_by_euid": true
+     "uid": 0,
+     "writable_by_euid": false
     },
     {
-     "dir": true,
-     "gid": 1000,
-     "group_or_other_writable": true,
-     "mode": "775",
-     "owned_by_euid": true,
-     "parent_writable_by_euid": true,
-     "path": "/apex-data/governance",
-     "sticky": false,
-     "uid": 1000,
-     "writable_by_euid": true
-    },
-    {
-     "dir": true,
-     "gid": 1000,
-     "group_or_other_writable": true,
-     "mode": "775",
-     "owned_by_euid": true,
-     "parent_writable_by_euid": true,
-     "path": "/apex-data/governance/admissions",
-     "sticky": false,
-     "uid": 1000,
-     "writable_by_euid": true
+     "absent": true,
+     "error": "[Errno 2] No such file or directory: '/etc/apex'",
+     "path": "/etc/apex"
     }
    ],
-   "exists": true,
-   "path": "/apex-data/governance/admissions"
+   "exists": false,
+   "path": "/etc/apex/admissions"
   },
   "production_allowed_signers": {
    "chain": [
@@ -191,48 +172,24 @@
     },
     {
      "dir": true,
-     "gid": 1000,
+     "gid": 0,
      "group_or_other_writable": false,
      "mode": "755",
-     "owned_by_euid": true,
+     "owned_by_euid": false,
      "parent_writable_by_euid": false,
-     "path": "/apex-data",
+     "path": "/etc",
      "sticky": false,
-     "uid": 1000,
-     "writable_by_euid": true
-    },
-    {
-     "dir": true,
-     "gid": 1000,
-     "group_or_other_writable": true,
-     "mode": "775",
-     "owned_by_euid": true,
-     "parent_writable_by_euid": true,
-     "path": "/apex-data/governance",
-     "sticky": false,
-     "uid": 1000,
-     "writable_by_euid": true
-    },
-    {
-     "dir": true,
-     "gid": 1000,
-     "group_or_other_writable": true,
-     "mode": "775",
-     "owned_by_euid": true,
-     "parent_writable_by_euid": true,
-     "path": "/apex-data/governance/admissions",
-     "sticky": false,
-     "uid": 1000,
-     "writable_by_euid": true
+     "uid": 0,
+     "writable_by_euid": false
     },
     {
      "absent": true,
-     "error": "[Errno 2] No such file or directory: '/apex-data/governance/admissions/trust'",
-     "path": "/apex-data/governance/admissions/trust"
+     "error": "[Errno 2] No such file or directory: '/etc/apex'",
+     "path": "/etc/apex"
     }
    ],
    "exists": false,
-   "path": "/apex-data/governance/admissions/trust/allowed_signers"
+   "path": "/etc/apex/admissions/trust/allowed_signers"
   },
   "superseded_admission_root": {
    "chain": [
@@ -308,21 +265,13 @@
    "why": "a component whose PARENT is writable by this account can be renamed away and replaced, whatever the component's own owner and mode say"
   },
   "production_admission_root": {
-   "replaceable_components": [
-    "/apex-data",
-    "/apex-data/governance",
-    "/apex-data/governance/admissions"
-   ],
-   "research_account_can_replace_some_component": true,
+   "replaceable_components": [],
+   "research_account_can_replace_some_component": false,
    "why": "a component whose PARENT is writable by this account can be renamed away and replaced, whatever the component's own owner and mode say"
   },
   "production_allowed_signers": {
-   "replaceable_components": [
-    "/apex-data",
-    "/apex-data/governance",
-    "/apex-data/governance/admissions"
-   ],
-   "research_account_can_replace_some_component": true,
+   "replaceable_components": [],
+   "research_account_can_replace_some_component": false,
    "why": "a component whose PARENT is writable by this account can be renamed away and replaced, whatever the component's own owner and mode say"
   },
   "superseded_admission_root": {
