@@ -6,3 +6,4 @@ dropins_before=slice.conf
 dropins_after=10-maintenance-block.conf,slice.conf,
 unit_state=inactive,no,
 removal=requires explicit activation authorization; never automatic
+correction_utc=2026-09-07T17:54:07Z: the hold commit message said the unit had one journal line since deploy (a reload notice). The journal shows NO entries for apex-options-paper since 2026-09-07T15:46Z; the earlier count of 1 was the placeholder line. No launch, no reload notice, nothing.
