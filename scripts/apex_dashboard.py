@@ -222,10 +222,18 @@ def market_data():
                                           "event_time": "per bar (vendor)", "receipt_time": "bulk 2026-08-29 (not per bar)",
                                           "publication_time": "NOT_AVAILABLE", "revision_time": "NOT_AVAILABLE",
                                           "source": str(hb / "etf_continuous/integrity.jsonl"), "quality": "MEASURED"}
-    mem = _tail_json(hb / "pit_singlename/membership_v1.jsonl", 1)
+    # the file ends with a pit_membership_summary row; the card wants the last
+    # MEMBERSHIP row, so scan the tail for kind == "pit_membership"
+    tail = _tail_json(hb / "pit_singlename/membership_v1.jsonl", 8)
+    mem = [r for r in tail if r.get("kind") == "pit_membership"]
+    summ = [r for r in tail if r.get("kind") == "pit_membership_summary"]
     if mem:
-        v["sources"]["pit_singlename"] = {"latest_member_month": mem[0].get("member_month"), "decided_asof": mem[0].get("decided_asof"),
-                                          "rule": mem[0].get("rule"), "n_symbols": len(mem[0].get("symbols", [])),
+        m = mem[0]
+        v["sources"]["pit_singlename"] = {"latest_member_month": m.get("member_month"), "decided_asof": m.get("decided_asof"),
+                                          "rule": m.get("rule"), "n_symbols": len(m.get("symbols", [])),
+                                          "distinct_member_names": (summ[0].get("distinct_member_names") if summ else None),
+                                          "calendar_sessions": (summ[0].get("calendar_sessions") if summ else None),
+                                          "decision_power": (summ[0].get("decision_power") if summ else None),
                                           "source": str(hb / "pit_singlename/membership_v1.jsonl"), "quality": "MEASURED"}
     man = Path("/apex-data/history-a/options_history/manifest.jsonl")
     last = _tail_json(man, 1)
