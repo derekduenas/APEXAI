@@ -1,3 +1,5 @@
+> **AMENDED (2026-09-07).** The admission recommendation in §7 and the authorization request in §8 are WITHDRAWN: the reviewer's source inspection of `566600dc` found ten defects (seven inherited from ALPHA-EXP-001, three introduced by this milestone), all reproduced in `results/si002_reproductions.json`. See `SI002_PRE_ADMISSION_REPAIR_RETURN.md`, `EXP001B_SUCCESSOR_REGISTRATION.md`, `REAL_DATA_BOUNDARY_V1.md` and `EXP001B_ADMISSION_PACKAGE.md`. The rest of this document stands as the record of what was delivered at `566600dc`/`82e76af7`.
+
 # STRATEGIC-INTEGRATION-002 — return for independent review
 
 ```text

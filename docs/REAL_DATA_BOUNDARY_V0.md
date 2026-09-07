@@ -1,3 +1,5 @@
+> **SUPERSEDED (2026-09-07) by `REAL_DATA_BOUNDARY_V1.md`.** The reviewer's inspection of `566600dc` found that the HMAC binding left signing material on the research path, that the production entry point accepted key/root/commit overrides, that only HEAD was verified, and that output directories could be reused. V0 is kept as history; the V0 proposal `EXP001_ADMISSION_DECISION_PROPOSED.json` is withdrawn. Nothing in V0 was ever used on a real row.
+
 # WORLD_MODEL_REAL_DATA_BOUNDARY_V0 — specification and evidence
 
 Status: **IMPLEMENTED and TESTED (engineering, disposable fixtures)**.
