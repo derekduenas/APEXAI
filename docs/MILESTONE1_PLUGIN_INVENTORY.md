@@ -103,3 +103,49 @@ Plugin output, if it ever arrives, does not override canonical Book
 accounting, independent Risk authority, quantitative probability estimation, or
 the research-admission gates. Sourced facts, estimates and generated
 interpretation stay separately labelled.
+
+---
+
+# Update, 2026-09-07: availability has CHANGED since the section above
+
+The section above recorded the seven plugins as unavailable in this Claude Code
+session, with the operator's explanation that they were installed in Claude
+Chat. **That is now out of date and is superseded here.** It is kept because it
+was accurate when written.
+
+**Their skills are now present in this session.** Named skill namespaces now
+include `finance`, `financial-analysis`, `wealth-management`, `bigdata-com`,
+`daloopa`, `lseg` and `sp-global`, along with an `earnings-reviewer` agent type.
+
+**Their data servers are still NOT usable.** Every one requires an
+authentication this non-interactive session cannot perform:
+
+```
+plugin:bigdata-com:bigdata.com      plugin:daloopa:daloopa
+plugin:daloopa:daloopa-docs         plugin:lseg:lseg
+plugin:sp-global:spglobal           plugin:finance:slack
+```
+
+and one is configured but failed to connect rather than being absent:
+
+```
+plugin:finance:bigquery   "Incompatible auth server: does not support dynamic client registration"
+```
+
+**So the honest status is: instructions arrived, data did not.** A skill
+describes a workflow; the servers hold the entitlements, the coverage and the
+point-in-time semantics. Until they are authorized, every question that
+mattered in the section above is still unanswered: coverage, publication
+timestamps, revision history, point-in-time retrieval, licensing and cost.
+
+To authorize them the operator must use the claude.ai connector settings for
+claude.ai connectors, or `claude mcp` or `/mcp` in an interactive session. I
+cannot do it here and must not be given codes or tokens.
+
+**One caution that grows sharper now the skills are visible.** Several of these
+skills produce valuation opinions, scenario probabilities and recommendations.
+Those are generated interpretations, not sourced facts, and they do not override
+canonical Book accounting, independent Risk authority, quantitative probability
+estimation, or the research-admission gates. The per-family eligibility
+assessment in the blocker document applies to every one of these sources before
+any of it enters a corpus.

@@ -1,199 +1,346 @@
-# Milestone 1 — deployment and commissioning package
+# Milestone 1 — deployment and commissioning package (CORRECTED)
 
-**Prepared for review. Nothing here has been executed.** No service was
-deployed, restarted, stopped or reconfigured, and no limit was changed.
+**Supersedes the first version of this document in full.** That version is
+preserved in git history at commit `9836986f`. Every executable instruction
+below replaces the corresponding one there.
 
-## 1. The candidate
+**Prepared for review. Nothing here has been executed.**
+
+## 0. What was wrong in the superseded version
+
+| Defect | Correction |
+|---|---|
+| Deployment commands targeted `39bd4412` | The tested candidate is `07dcbb05` |
+| Inventory said four files | Five files: two production, three test |
+| Commissioning used the research slice OOM counter, 11 | That slice is unrelated. Correct counters below |
+| Ledger check used size growth plus a head sample | Full-prefix streaming hash at a recorded length |
+| Rollback described as restoring health | It restores the OOM loop, and affects only some processes |
+| Maintenance blocks called "authorization only" | Enforcement is ABSENT. It is a real prerequisite |
+
+## 1. The deployment target
 
 | | |
 |---|---|
-| Recovery candidate | `39bd44127b2ff6cb8a0a25a5590133669fb2382a` |
+| **Deploy this** | `07dcbb05caf58f1ac714bb3fe87e16d46aeb98d8` |
 | Branch | `milestone1-recovery-candidate` |
-| Based on | `5eff1cf5e00f21b02c537f25bcd74b1c1d317546`, the currently deployed release |
-| Files changed vs deployed | 2 production, 2 new test modules |
+| Based on | `5eff1cf5e00f21b02c537f25bcd74b1c1d317546`, the running release |
+| Tested by | `results/milestone1_recovery_regression.json`, 15 shards, 248 passed, 4 skipped, manifest `e69eea6ca505d8f2` unchanged |
 
-```
-apex/governance/chain_ledger.py                R1  bounded chain-tail lookup
-scripts/apex_orchestrator.py                   R2  bounded incident history
-tests/test_chain_tail_bounded.py               new
-tests/test_orchestrator_incident_history.py    new
-```
+**Historical references, not deployment targets.** `39bd4412` was an earlier
+form of this candidate, superseded by the authorized portability port and never
+deployed. `3b9a26f2` is the integration candidate, a different base, not a
+deployment target. Neither should appear in any command.
 
-Nothing else differs from what is running. None of the PULSE or World Model
-work is carried. The four files are byte-identical to those in the integration
-candidate, which is recorded, but the two candidates sit on different bases and
-neither one's regression result transfers to the other.
+### Five-file inventory against the running release
+
+| File | Kind | Change |
+|---|---|---|
+| `apex/governance/chain_ledger.py` | production | R1, bounded chain-tail lookup |
+| `scripts/apex_orchestrator.py` | production | R2, bounded incident history |
+| `tests/test_chain_tail_bounded.py` | test, new | R1 evidence |
+| `tests/test_orchestrator_incident_history.py` | test, new | R2 evidence |
+| `tests/test_sac1_tier1.py` | test, modified | interpreter portability port |
+
+Two files execute in production. Three are tests.
 
 ## 2. Affected callers
 
-`chain_append` is a shared primitive. Every writer that uses it is affected by
-R1, not only the orchestrator.
+`chain_append` is shared. R1 changes how every writer finds a previous hash.
 
-| Ledger | Size | Final record | Tail window today |
+| Ledger | Size | Final record | Tail window |
 |---|---|---|---|
-| historical/continuous/decisions.jsonl | 687.9 MB | 1,586 B | OK |
+| decisions.jsonl | 687.9 MB | 1,586 B | OK |
 | ops/orchestrator.jsonl | 438.9 MB | 262,275 B | **fails — the defect** |
 | btc/derivatives_ledger.jsonl | 416.1 MB | 6,406 B | OK |
 | btc/ws_book_ledger.g2.jsonl | 135.8 MB | 762 B | OK |
-| historical/continuous/outcomes.jsonl | 65.6 MB | 1,270 B | OK |
-
-Services holding these writers open: `apex-btc-derivatives`, `apex-btc-ws`,
-`apex-organism`, `apex-equity-shadow`, `apex-equity-field`, `apex-catalyst`,
-`apex-edgeforge-observatory`. R1 changes how each finds a previous hash. Their
-serialisation, hashing and locking are untouched, and 246 existing tests across
-the 15 modules that exercise the primitive pass on the candidate.
+| outcomes.jsonl | 65.6 MB | 1,270 B | OK |
 
 R2 changes only the orchestrator.
 
 ## 3. Prerequisites
 
-1. This package reviewed and deployment explicitly authorized. **Not authorized
-   today.**
-2. A deployment window outside a trading session. The next non-trading days
-   after the review are the immediate ones; the next trading session is
-   **Tuesday 2026-09-08**, which is the deadline for the orchestrator to be
-   working again.
-3. The two maintenance blocks currently in place stay respected:
-   `MAINTENANCE_BLOCK_btc_resolver` and `MAINTENANCE_BLOCK_equity_fabric` in
-   `/apex-data/runtime`. Deploying does not clear them and must not.
-4. Free disk for a new release directory. 143 GB free at last check.
+1. Review and explicit deployment authorization. **Not given.**
+2. **The maintenance-block prerequisite in section 7 resolved.** This is not a
+   formality; enforcement is absent.
+3. Free disk for a release directory. 143 GB free at last check.
 
 ## 4. Deployment commands
 
-Run as the deploying operator, in order, stopping on any nonzero status.
-
 ```bash
-# 1. verify the candidate is what was reviewed
-git -C /opt/apex-repo rev-parse 39bd44127b2ff6cb8a0a25a5590133669fb2382a^{commit}
+# 1. verify the candidate is exactly what was reviewed
+git -C /opt/apex-repo rev-parse 07dcbb05caf58f1ac714bb3fe87e16d46aeb98d8^{commit}
 git -C /opt/apex-repo diff --stat 5eff1cf5e00f21b02c537f25bcd74b1c1d317546 \
-    39bd44127b2ff6cb8a0a25a5590133669fb2382a
+    07dcbb05caf58f1ac714bb3fe87e16d46aeb98d8
 ```
 
 ```bash
-# 2. record the ledger bytes BEFORE anything changes
+# 2. record the FULL-PREFIX hash of every ledger before anything changes
 for L in /apex-data/runtime/results/ops/orchestrator.jsonl \
          /apex-data/core/historical/continuous/decisions.jsonl \
          /apex-data/core/btc/derivatives_ledger.jsonl \
          /apex-data/core/btc/ws_book_ledger.g2.jsonl \
          /apex-data/core/historical/continuous/outcomes.jsonl; do
-  stat -c "%n size=%s mtime=%y" "$L"; done | tee /apex-data/tmp/pre_deploy_ledgers.txt
+  N=$(stat -c %s "$L")
+  H=$(head -c "$N" "$L" | sha256sum | cut -d' ' -f1)
+  echo "$L $N $H"
+done | tee /apex-data/tmp/pre_deploy_ledger_prefixes.txt
 ```
 
 ```bash
 # 3. build the release directory from the reviewed commit
 sudo -u apex git -C /opt/apex-repo worktree add --detach \
-  /opt/apex/releases/39bd44127b2ff6cb8a0a25a5590133669fb2382a \
-  39bd44127b2ff6cb8a0a25a5590133669fb2382a
+  /opt/apex/releases/07dcbb05caf58f1ac714bb3fe87e16d46aeb98d8 \
+  07dcbb05caf58f1ac714bb3fe87e16d46aeb98d8
 ```
 
 ```bash
-# 4. swap the symlink atomically
-sudo ln -sfn /opt/apex/releases/39bd44127b2ff6cb8a0a25a5590133669fb2382a \
+# 4. record the commissioning baseline BEFORE the swap
+systemctl show apex-orchestrator.service -p NRestarts -p Result -p ExecMainStatus \
+  | tee /apex-data/tmp/pre_deploy_unit_state.txt
+sudo -n journalctl -u apex-orchestrator.service --since today --no-pager \
+  | grep -c "Failed with result" | tee /apex-data/tmp/pre_deploy_oom_count.txt
+python3 -c "import json;d=json.load(open('/apex-data/core/heartbeats/orchestrator.json'));print(d['last_work_utc'],d['work_completed'])" \
+  | tee /apex-data/tmp/pre_deploy_heartbeat.txt
+```
+
+```bash
+# 5. swap the symlink atomically
+sudo ln -sfn /opt/apex/releases/07dcbb05caf58f1ac714bb3fe87e16d46aeb98d8 \
   /opt/apex/current.new && sudo mv -T /opt/apex/current.new /opt/apex/current
 readlink -f /opt/apex/current
 ```
 
-The orchestrator is already restarting every 31 seconds, so it picks up the new
-release on its next restart without an explicit restart command. **Do not
-issue a restart for it.** Other services keep running their loaded code until
-they are next restarted, which is not part of this deployment.
+The orchestrator is restarting every 31 seconds, so it loads the new release on
+its next restart. **Issue no restart command.**
 
-## 5. Ledger-preservation checks
+## 5. Ledger preservation, corrected
 
-Run before and after. Every one must hold.
-
-```bash
-# byte counts and hashes of the first 1 MiB and last 1 MiB of each ledger
-for L in /apex-data/runtime/results/ops/orchestrator.jsonl \
-         /apex-data/core/historical/continuous/decisions.jsonl; do
-  echo "$L $(stat -c %s "$L") \
-$(head -c 1048576 "$L" | sha256sum | cut -c1-16) \
-$(tail -c 1048576 "$L" | sha256sum | cut -c1-16)"; done
-```
-
-- The orchestrator ledger must be **438,867,453 bytes** before deployment, and
-  must GROW after it, never shrink or be rewritten.
-- The head hash of every ledger must be unchanged after deployment. R1 only
-  reads; nothing in this candidate rewrites or truncates history.
-- Damaged history stays forensic. No repair, truncation or compaction is part
-  of this deployment.
-
-## 6. Commissioning criteria
-
-Judge on completed work, not on process state. `systemctl is-active` reports
-`activating` in this failure mode, and a check that substring-matches the word
-"active" is fooled by it.
-
-Observe for at least 30 minutes after the symlink swap:
-
-| Signal | Now | Required |
-|---|---|---|
-| `NRestarts` | climbing ~116/hour | **stops advancing** |
-| `Result` | `oom-kill` | not `oom-kill` |
-| Heartbeat `last_work_utc` | frozen at 2026-09-06T04:50:03Z | **advances every ~60 s** |
-| Heartbeat `work_completed` | 5661, static | **climbing** |
-| Slice `oom_kill` counter | 11 | unchanged |
-| Unit `MemoryPeak` | hits the 512 MiB cap | well under it; healthy history was 349.9 MiB |
-| Orchestrator ledger | frozen at 04:50:03Z | growing again, records bounded |
+Size growth and a head sample prove nothing about the bytes in between. The
+check is a **streaming hash of the entire byte prefix at the recorded length**.
 
 ```bash
-systemctl show apex-orchestrator.service -p NRestarts -p Result -p ActiveState -p MemoryPeak
-python3 -c "import json;d=json.load(open('/apex-data/core/heartbeats/orchestrator.json'));print(d['last_work_utc'],d['work_completed'])"
+# after commissioning: the first N bytes must be byte-identical to before
+while read L N H; do
+  NOW=$(head -c "$N" "$L" | sha256sum | cut -d' ' -f1)
+  SZ=$(stat -c %s "$L")
+  if [ "$NOW" = "$H" ]; then S=PREFIX_IDENTICAL; else S=PREFIX_CHANGED; fi
+  if [ "$SZ" -ge "$N" ]; then G=OK; else G=SHRANK; fi
+  echo "$L $S size:$G ($N -> $SZ)"
+done < /apex-data/tmp/pre_deploy_ledger_prefixes.txt
 ```
 
-Commissioning PASSES only if the restart counter is static, work is completing,
-and no ledger changed except by growth. Until that evidence exists, production
-recovery stays **UNVERIFIED**.
+Every line must read `PREFIX_IDENTICAL size:OK`. Appends after byte N are
+expected and permitted; a changed prefix or a shrinking file is a rollback
+trigger.
 
-## 7. Side effects: the orchestrator starts other services
+**Consistency limitations, stated.** These ledgers have live writers. The
+pre-deployment hash is taken over a prefix while other processes may be
+appending beyond it, which is safe for an append-only file but is not an atomic
+snapshot of the whole file. The check proves the first N bytes are unchanged at
+the moment of verification; it does not prove no writer rewrote and restored
+them, and it says nothing about bytes after N. For the orchestrator ledger
+specifically the writer is the unit being deployed, so its prefix is quiescent
+during the swap. For the four others the writers are untouched services that
+continue appending throughout.
 
-This is the part of the deployment that carries real operational risk, and it
-has nothing to do with memory.
+## 6. Commissioning measurements, corrected
 
-A working orchestrator does what a broken one cannot: it reconciles the
-expected roster against what is running and **starts what it owns**. It has
-been unable to do that for over sixteen hours. Restoring it restores that
-authority.
+The superseded version read `wmresearch.slice`. That is the **research** slice
+used by the test harness and has nothing to do with this service. Correct
+paths, resolved on the host:
 
-- It starts only services whose `supervised_by` is `orchestrator`. Today those
-  are `equity-fabric` and `options-paper`. It does **not** start `btc-paper` or
-  `edgeforge-observatory`, which are systemd-supervised; for those it is the
-  verifier and escalates.
-- Its `decision_power` is `NONE_OPERATIONAL`. It places no orders and changes
-  no trading rule.
-- **Before deploying, confirm that starting `equity-fabric` and
-  `options-paper` is currently intended.** There is a
-  `MAINTENANCE_BLOCK_equity_fabric` file in the runtime directory, and a
-  maintenance block is a statement that the service is deliberately down. The
-  deploying operator must verify that the orchestrator honours those blocks, or
-  deploy in a phase where neither service is expected to run, or lift the
-  blocks deliberately. Do not discover this by watching it start something.
-- Deploying during a non-trading phase means the roster expects neither of
-  those two services to be running, which is the low-risk window.
+| | |
+|---|---|
+| Unit slice | `apex-market.slice`, nested as `/apex.slice/apex-market.slice` |
+| Parent cgroup | `/sys/fs/cgroup/apex.slice/apex-market.slice` |
+| Unit cgroup | `.../apex-orchestrator.service`, **exists only while running** |
+| Slice memory cap | `max` — uncapped. The binding cap is the unit's 512 MiB |
 
-## 8. Rollback
+**The parent slice counter cannot attribute a kill to this service.** Five
+units share it: `apex-btc-derivatives`, `apex-btc-ws`, `apex-orchestrator`,
+`apex-organism`, `apex-thetaterminal`. Its `oom_kill` rises for any of them.
+
+### Baselines captured 2026-09-07T05:50Z
+
+| Signal | Value |
+|---|---|
+| Unit `NRestarts` | 2864 |
+| Unit `Result` | `oom-kill`, `ExecMainStatus` 9 |
+| Parent slice `oom_kill` | 3120 (shared — context only) |
+| `apex.slice` `oom_kill` | 3122 (shared — context only) |
+| Heartbeat `last_work_utc` | 2026-09-06T04:50:03Z |
+| Heartbeat `work_completed` | 5661 |
+
+### The authoritative per-unit signals
+
+1. `systemctl show ... -p NRestarts` — durable, survives the cgroup vanishing.
+2. `Result` and `ExecMainStatus`.
+3. Journal lines `Failed with result 'oom-kill'`, timestamped and attributable.
+4. The unit's own cgroup `memory.events` and `memory.peak`, readable only while
+   the process lives.
+
+### Establishing the observation baseline
+
+The first successful start is the anchor, because everything before it belongs
+to the broken release.
+
+```bash
+# the first start after the swap
+systemctl show apex-orchestrator.service -p ExecMainStartTimestamp -p NRestarts
+```
+
+Record `NRestarts` at that moment as **N0** and the start time as **T0**.
+Commissioning is then judged over at least 30 minutes from T0:
+
+| Signal | Requirement |
+|---|---|
+| `NRestarts` | still N0 — not one further restart |
+| Journal oom-kill lines after T0 | zero |
+| Heartbeat `last_work_utc` | advances every ~60 s |
+| Heartbeat `work_completed` | climbs by roughly one per minute |
+| Unit `memory.peak` while running | well under 512 MiB; healthy history was 349.9 MiB |
+| Orchestrator ledger | grows again, prefix unchanged |
+| Bounded incident records | see below |
+
+### Verifying the bounded incident record
+
+R2's purpose is that a long incident stops inflating records. Check the newest
+ledger record directly:
+
+```bash
+python3 - <<'PY'
+import json
+L="/apex-data/runtime/results/ops/orchestrator.jsonl"
+last=None
+with open(L,"rb") as fh:
+    fh.seek(max(0,fh.seek(0,2)-262144)); last=fh.read().decode("utf-8","replace").splitlines()[-1]
+r=json.loads(last)
+print("record bytes:", len(json.dumps(r,sort_keys=True)))
+for inc in r.get("incidents",[]):
+    ra=inc.get("recovery_attempts",[])
+    s=[e for e in ra if e.get("kind")=="deferral_summary"]
+    print(" incident", inc.get("service"), "history entries:", len(ra),
+          "| deferral count:", s[0]["count"] if s else "n/a")
+PY
+```
+
+Requirements: record size stays a few kilobytes and does not grow with time;
+history entries never exceed seven; and a long incident shows a
+`deferral_summary` whose `count` rises while the entry count does not.
+
+## 7. Maintenance blocks — an OPEN PREREQUISITE, not a formality
+
+**Traced read-only in the exact recovery candidate. Enforcement is absent.**
+Neither `scripts/apex_orchestrator.py` nor `apex/ops/orchestrator.py` at
+`07dcbb05` contains any reference to `MAINTENANCE_BLOCK` or to maintenance in
+any form. Two block files exist in the runtime directory:
+
+```
+/apex-data/runtime/MAINTENANCE_BLOCK_btc_resolver
+/apex-data/runtime/MAINTENANCE_BLOCK_equity_fabric
+```
+
+The orchestrator does not read them. It decides what to start from the roster
+and the session phase alone.
+
+### What it can launch
+
+It starts only services whose `supervised_by` is `orchestrator`:
+**`equity-fabric`** and **`options-paper`**. For `btc-paper` and
+`edgeforge-observatory` it is the verifier and escalates rather than starting.
+
+| When | What it may start |
+|---|---|
+| Now, a non-trading phase | neither, if the roster expects neither in this phase |
+| At the next phase transition into PREOPEN or RTH | `equity-fabric`, and `options-paper` in its phases |
+
+**A quiet deployment window is not authorization for later launches.**
+Deploying while nothing is expected to run proves only that nothing starts in
+that minute. The next phase transition happens without further human action,
+and at that moment a service under an explicit maintenance block could be
+started by a component that cannot see the block. `equity-fabric` is exactly
+such a service.
+
+### Smallest controlled arrangement, for review
+
+Not implemented; this is a proposal.
+
+1. **Preferred.** A small, test-covered change teaching the tick to treat a
+   `MAINTENANCE_BLOCK_<service>` file as `EXPECTED_IDLE` for that service, and
+   to record the block in the tick record so the suppression is visible rather
+   than silent. This is a third production change and is **outside the current
+   milestone's authorization**; it should be its own reviewed brick.
+2. **Interim, if recovery is wanted before that.** Deploy, and separately
+   arrange that the two orchestrator-supervised services cannot be started
+   without human action, by a means the deploying operator controls and can
+   verify. Do not rely on the deployment window.
+3. **Do not** lift or delete the maintenance blocks to make the problem
+   disappear. A block is a statement that a service is deliberately down.
+
+## 8. Rollback mechanics, corrected
 
 ```bash
 sudo ln -sfn /opt/apex/releases/5eff1cf5e00f21b02c537f25bcd74b1c1d317546 \
   /opt/apex/current.new && sudo mv -T /opt/apex/current.new /opt/apex/current
 ```
 
-**Rolling back restores the OOM loop.** The old reader is the defect: it reads
-the whole 438 MB ledger on every append and is killed by the 512 MiB cap. The
-oversized record is still on disk and nothing in this deployment removes it, so
-reverting returns the orchestrator to being killed every 31 seconds. Rollback
-is a way to stop a NEW problem the deployment introduced; it is not a way to
-restore healthy operation, and it must not be described as one.
+**What actually changes, and what does not.** The symlink selects code at
+process start. Swapping it back does not reach into a running process.
 
-Roll back if, and only if, one of these is observed:
+| Process | Effect of a rollback |
+|---|---|
+| `apex-orchestrator` | Restarts constantly, so it picks up the old code within ~31 s — and **returns to being OOM-killed**, because the old reader plus the oversized record on disk is exactly the defect |
+| Long-lived services holding `chain_append` in memory: `apex-btc-derivatives`, `apex-btc-ws`, `apex-organism`, `apex-catalyst`, `apex-equity-shadow`, `apex-equity-field`, `apex-edgeforge-observatory` | **No effect.** They keep executing the already-imported R1 code until they are next restarted, whenever that happens |
+| Timer-driven and one-shot units | Pick up the old code on their next invocation |
 
-1. Any ledger shrinks, is rewritten, or its head hash changes.
-2. A `ChainTailUnresolved` error appears for a ledger other than the
-   orchestrator's, meaning a writer that used to append now refuses. That
-   would be R1 declining a ledger whose tail sits beyond the 8 MiB ceiling.
-3. Any currently healthy service begins failing after the swap.
-4. The orchestrator starts a service that was deliberately blocked.
+So a rollback is partial and staggered: it restores the defect where it hurts
+and leaves the repair in place elsewhere until unrelated restarts occur. That
+mixed state is itself a reason to prefer fixing forward.
 
-For 2, the correct response after rollback is to measure that ledger's final
-record and decide whether the ceiling should be raised for that writer, with
-evidence. Do not raise it pre-emptively.
+**Rolling back does not restore healthy operation.** The oversized record
+remains on disk and nothing here removes it.
+
+### Rollback triggers
+
+1. Any ledger prefix hash changes, or any ledger shrinks.
+2. `ChainTailUnresolved` raised for any ledger other than the orchestrator's —
+   a writer that used to append now refuses.
+3. A previously healthy service begins failing after the swap.
+4. The orchestrator starts a service under a maintenance block.
+
+For trigger 2 the correct response after rollback is to measure that ledger's
+final record and decide with evidence whether its writer needs a larger
+ceiling. Do not raise it pre-emptively.
+
+### Containment actions prepared, not executed
+
+For review, in escalation order:
+
+```bash
+# A. stop the restart loop without deploying anything
+sudo systemctl stop apex-orchestrator.service
+```
+```bash
+# B. after a rollback, prevent the loop from resuming
+sudo systemctl stop apex-orchestrator.service
+sudo systemctl disable apex-orchestrator.service
+```
+```bash
+# C. confirm what a rolled-back process would load
+readlink -f /opt/apex/current
+sha256sum /opt/apex/current/apex/governance/chain_ledger.py
+```
+
+**None of these has been run and none is authorized.** Stopping the unit is a
+service action outside this milestone's authority.
+
+## 9. Remaining deployment prerequisites
+
+1. Milestone review and explicit deployment authorization.
+2. **Maintenance-block enforcement resolved** by option 1 or 2 of section 7.
+3. A decision on whether recovery precedes or follows that fix.
+4. A deploying operator able to run the ledger prefix hashes before and after
+   and to act on the rollback triggers.
+
+Production recovery remains **UNVERIFIED**. Nothing in this document has been
+executed.

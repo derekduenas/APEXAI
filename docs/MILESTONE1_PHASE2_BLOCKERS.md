@@ -1,141 +1,220 @@
-# Phase 2 — current blocker reconciliation
+# Phase 2 — blocker reconciliation (CORRECTED)
 
-From repository artifacts and read-only host evidence, 2026-09-07. Phase 2
-remains OPEN and real-data admission remains NOT_AUTHORIZED.
+**Supersedes the first version in full.** That version is preserved in git
+history at `9836986f`. Phase 2 remains OPEN; real-data admission remains
+NOT_AUTHORIZED.
 
-**Operational recovery and data validity are separate problems.** Everything in
-this milestone is operational: it makes the machine able to run. None of it
-makes any datum admissible. A perfectly healthy orchestrator changes nothing
-about whether a historical value was knowable when we model it as known.
+## What was wrong, and why it mattered
+
+The superseded D3 and D4 quoted **intermediate** PULSE-008 findings as if they
+were current, and then proposed relaxing a declaration to resolve them. Both
+were wrong. The disagreement had already been fixed by measurement, not by
+redefinition, and proposing to weaken a declaration to close an
+already-closed finding is precisely the failure mode this programme exists to
+prevent.
+
+`results/pulse008_SUMMARY.json` records three stages. Reading the middle one as
+the outcome was my error.
+
+| Stage | Verdicts | Violations |
+|---|---|---|
+| `before_pulse008` | 4 of 6 contradicted | — |
+| `observation_time_only` | 4 of 5 contradicted | `nbbo_size_imbalance` on four subjects |
+| **`observation_time_plus_boundary_fix`** | **all 5 MIRROR_CONSISTENT** | **`{}` — empty** |
+
+Operational recovery and data validity remain separate problems. Nothing in
+Milestone 1 makes any datum admissible.
+
+---
 
 ## Operational
 
 ### O1 — orchestrator production recovery
-- **Status** UNVERIFIED. The loop is live: killed ~1 s after each start, 31 s
-  cycle, ~116/hour, since 2026-09-06T04:51:05Z.
-- **Evidence** `results/orchestrator_oom001_diagnosis.json`;
-  `results/orchestrator_oom001_r1_RETURN.json`; R2 at `3b9a26f2`.
-- **Completion criterion** After an authorized deploy of `39bd4412`: restart
-  counter static, heartbeat `last_work_utc` advancing every 60 s,
-  `work_completed` climbing, no ledger changed except by growth.
-- **Smallest action** Review and authorize the deployment package, deploy in a
-  non-trading window, observe 30 minutes.
-- **Depends on** Nothing technical. Authorization only.
-- **Needs a market session?** No. **Deadline** Tuesday 2026-09-08, the next
-  trading session.
+- **Status** UNVERIFIED. Loop live since 2026-09-06T04:51:05Z. Unit
+  `NRestarts` 2864 at 05:50Z on the 7th, `Result=oom-kill`.
+- **Evidence** `results/milestone1_recovery_regression.json`;
+  `results/orchestrator_oom001_diagnosis.json`; candidate `07dcbb05`.
+- **Completion** After an authorized deploy: `NRestarts` static from the first
+  successful start, no oom-kill journal lines after it, heartbeat advancing,
+  every ledger prefix hash unchanged.
+- **Smallest action** Resolve O2, then deploy and observe 30 minutes.
+- **Depends on O2.** Not authorization alone — the earlier claim was premature.
+- **Market session?** No. **Deadline** the next trading session, 2026-09-08.
 
-### O2 — deployed release predates the PULSE work
-- **Status** OPEN by design. Production runs `5eff1cf5` (2026-08-30). PULSE-007
-  through PULSE-010, the null-rig repair and R1/R2 are all later.
-- **Completion criterion** A separate, reviewed decision about whether the
-  PULSE line is deployed at all. It is research instrumentation, not a money
-  path, and it does not have to ship to unblock Phase 2.
-- **Smallest action** None in this milestone. The recovery candidate
-  deliberately excludes it.
-- **Depends on** O1 first; do not compound two changes.
+### O2 — maintenance-block enforcement is ABSENT
+- **Status** OPEN and blocking O1. Traced read-only at `07dcbb05`: neither
+  orchestrator source file references `MAINTENANCE_BLOCK` in any form. Two
+  block files exist and are not read.
+- **Why it blocks** A working orchestrator starts `equity-fabric` and
+  `options-paper` at a phase transition. `equity-fabric` is under an explicit
+  block. Deploying in a quiet window does not authorize the launch that happens
+  at the next transition without human action.
+- **Completion** Either the tick honours the block files and records the
+  suppression, or an arrangement outside the orchestrator prevents those two
+  services starting without human action.
+- **Smallest action** A separate reviewed brick for the first. It is a third
+  production change and is outside Milestone 1's authorization.
+- **Do not** lift the blocks to make this go away.
 
 ### O3 — apex-gate2-opener.service failed
-- **Status** OPEN, unexamined. Reported in passing during the OOM diagnosis;
-  not an OOM.
-- **Completion criterion** Cause established and either repaired or registered.
-- **Smallest action** A bounded read-only diagnosis, like ORCHESTRATOR-OOM-001.
-- **Depends on** Nothing. Not on the critical path to the tournament.
+- **Status** OPEN, unexamined. `Description=GATE2 T-0 integrity gate then
+  conditional start of b125a7c5a`; state failed, exit-code.
+- **Not declared noncritical.** It is an integrity gate that conditionally
+  starts a component, so its failure may be suppressing a Phase-2 dependency.
+  Its governed dependencies have not been traced.
+- **Smallest action** A bounded read-only diagnosis, as for the orchestrator.
 
 ### O4 — historical regression working-tree identity
-- **Status** UNRESOLVED for past runs and CLOSED for new ones. Runs before this
-  milestone recorded the commit but no source manifest, so what they executed
-  cannot be proven from their artifacts.
-- **Completion criterion** Not repairable. New runs carry a before/after
-  manifest of every tracked file; the historical gap stays recorded.
-- **Smallest action** Already done for this milestone's runs.
+- **Status** UNRESOLVED for runs before Milestone 1; CLOSED for new ones.
+- Not repairable. New runs carry before/after manifests. The integration run is
+  additionally **not hermetic**: five shards read outside their worktree, and
+  the shared checkout was aligned mid-run at shard 114. Recorded, not erased.
+
+---
 
 ## Data validity
 
 ### D1 — historical as-known availability (**the binding constraint**)
-- **Status** NOT_PROVEN, unchanged across PULSE-007, 008, 009 and 010.
-- **Evidence** pulse007 note: "the vendor history endpoint returns records as
-  they stand at retrieval; nothing establishes when a value became available.
-  Corpus admission stays blocked."
-- **Why it dominates** A World Model tournament scored on history is only
-  honest if every input was knowable at the modelled instant. A vendor endpoint
-  that returns today's view of the past cannot establish that. No amount of
-  software correctness substitutes for it.
-- **Completion criterion** Either (a) documented vendor semantics giving
-  publication and revision timestamps with point-in-time retrieval, or (b) a
-  prospectively collected corpus whose availability is known by construction.
-- **Smallest action** For (a) a vendor clarification, which we do not control.
-  For (b) run the existing PULSE composer forward and accumulate its
-  observation-stamped packets, which needs no vendor cooperation.
-- **Needs** (a) vendor clarification; (b) market sessions and calendar time.
+- **Status** NOT_PROVEN, unchanged across PULSE-007 through 010.
+- **Evidence** pulse007: "the vendor history endpoint returns records as they
+  stand at retrieval; nothing establishes when a value became available."
+- **Completion** Documented publication and revision semantics with
+  point-in-time retrieval, **assessed per source and per field**, or a corpus
+  whose availability is known by construction.
+- **Needs** vendor clarification, or prospective capture, or both by family.
+- **See the research-route section.** This does not reduce to "wait".
 
-### D2 — mirror coverage incomplete
-- **Status** INCOMPLETE since PULSE-007, unchanged.
-- **Evidence** NKLA reconstructs nothing comparable; an all-LIVE_ONLY
-  comparison is a coverage hole. Its quote is 553 days old, so PULSE-008
-  refuses it as STALE_BEYOND_POLICY. Five of six is not a pass and the runner
-  does not report one.
-- **Completion criterion** Every declared subject reconstructs, or a subject
-  set whose declarations match what the vendor can actually reconstruct, chosen
-  before the run rather than after seeing results.
-- **Smallest action** Re-declare the subject set with a liveness precondition
-  and rerun the mirror. Choosing the set after seeing which subjects pass would
-  be selection, not repair.
-- **Depends on** D3 for the declaration question.
-- **Needs a market session?** Yes, for fresh quotes on a thin name.
+### D2 — mirror coverage INCOMPLETE (a coverage hole, not a disagreement)
+- **Status** INCOMPLETE. One comparison never produced a result: NKLA
+  reconstructs nothing, its quote being 553 days old, so PULSE-008 refuses it
+  as STALE_BEYOND_POLICY.
+- **Kept separate from D3 deliberately.** This is about whether a subject can
+  be compared at all. It is not evidence of any value disagreement.
+- **Completion** A subject set where every declared subject reconstructs,
+  chosen before the run. Choosing it after seeing which subjects pass would be
+  selection.
+- **Market session?** Yes, for fresh quotes on a thin name.
 
-### D3 — mirror under original declarations blocked
-- **Status** BLOCKED, not FAIL. Zero violations, but coverage is incomplete so
-  it cannot be PASS.
-- **Evidence** Under observation-time reconstruction, `nbbo_size_imbalance` is
-  declared SEMANTICALLY_EQUIVALENT yet differs on four subjects, e.g. live
-  −0.5294 against replay −0.625 on the index subject.
-- **Completion criterion** Either the declaration is corrected to what the
-  quantity actually is across a quote boundary, or the reconstruction is fixed
-  so the declaration holds.
-- **Smallest action** Decide which of those two is true for size imbalance
-  specifically. Sizes at the touch change faster than prices; a declaration of
-  exact equivalence across reconstruction may simply be wrong.
-- **Depends on** D2 for coverage.
+### D3 — mirror under original declarations BLOCKED (by coverage only)
+- **Status** BLOCKED. **Value agreement is EXACT on all five comparable
+  subjects**: `observation_time_plus_boundary_fix` records all five
+  MIRROR_CONSISTENT with an empty violation set, under the ORIGINAL
+  declarations and the ORIGINAL tolerances. It is BLOCKED solely because
+  coverage is incomplete, which is D2.
+- **WITHDRAWN from the superseded version.** The `nbbo_size_imbalance`
+  disagreements belong to the intermediate `observation_time_only` stage and
+  were resolved by the boundary fix. They are not a current defect. The
+  proposal to relax the equivalence declaration is withdrawn entirely: no
+  declaration needs relaxing, and none should be.
+- **Completion** D2 closed. Nothing else is outstanding here.
 
-### D4 — anchor repair FAIL
-- **Status** FAIL under the strict rule fixed before the run.
-- **Evidence** The two pure anchor quantities are exact on 5 of 5, closing
-  ANCHOR-001 and ANCHOR-002. The two features combining an anchor with the live
-  mid stay APPROXIMATE on AAOI for a measured quote-timing reason. The rule was
-  not relaxed.
-- **Completion criterion** Those features exact, or a declaration that a
-  live-mid composite is APPROXIMATE by nature, made on the measurement.
-- **Smallest action** Adopt the second, with the residual classification as
-  evidence. It is defensible and already measured.
+### D4 — anchor repair, PULSE-007 FAIL, not re-measured since
+- **Status** The FAIL is a **PULSE-007-era** verdict. The two pure anchor
+  quantities were exact on 5 of 5, closing ANCHOR-001 and ANCHOR-002. Two
+  features combining an anchor with the live mid stayed APPROXIMATE on AAOI,
+  for a measured quote-timing reason.
+- **The honest position.** That quote-timing cause is the same defect PULSE-008
+  fixed at the boundary. Whether the anchor verdict would now pass has **not
+  been re-measured**, and I will not claim it either way. The superseded
+  version repeated the residual as a current defect and proposed declaring the
+  composite APPROXIMATE by nature. Both withdrawn.
+- **Smallest action** Re-run the anchor comparison under the boundary fix and
+  read the result. Cheap, and it replaces speculation with a measurement.
 
-### D5 — World Model real-data admission
+### D5 — full-RTH equity-fabric commissioning
+- **Status** OPEN. Not evidenced as complete in the repository artifacts.
+  Related units exist (`apex-equity-fabric.service`, a v1 variant, a GATE2
+  opener that is failed) and `equity-fabric` is under a maintenance block.
+- **Not declared noncritical.** A fabric that has not run a full regular
+  session has not demonstrated it can carry one.
+- **Depends on** O2, since the block and the orchestrator's start authority
+  interact, and on O3 if GATE2 gates it.
+- **Needs a market session.** Yes, a full RTH session.
+
+### D6 — prospective PULSE commissioning
+- **Status** OPEN. PULSE-007 through 010 established contracts and repaired
+  the composer; none of that is a commissioned prospective collector.
+- **Completion** The composer running across live sessions, writing
+  observation-stamped packets durably, with its refusals and staleness
+  behaviour observed rather than asserted.
+- **Depends on** O1, since the orchestrator is what notices a collector that
+  fails to produce work.
+- **Needs market sessions.**
+
+### D7 — market and cross-sectional context
+- **Status** OPEN, **and I could not evidence its current state.** No
+  cross-sectional or market-context artifact was found in the integration
+  candidate's results directory.
+- **Not declared noncritical.** Absence of an artifact is not absence of a
+  requirement; it means the gate is untraced.
+- **Smallest action** Locate the governing declaration and record its status.
+
+### D8 — BTC integrity
+- **Status** OPEN, partially evidenced. Two BTC ledgers are live and healthy
+  against the chain-tail window (416.1 MB and 135.8 MB, final records 6,406 and
+  762 bytes). Their writers are unaffected by R2 and are affected by R1 only in
+  how a previous hash is found.
+- **Untraced** whether a separate BTC integrity gate is outstanding beyond
+  ledger health. Not declared noncritical.
+
+### D9 — World Model real-data admission
 - **Status** NOT_AUTHORIZED.
-- **Completion criterion** D1 satisfied, D2 and D3 resolved, and an explicit
-  admission decision.
-- **Depends on** D1, D2, D3.
+- **Depends on** D1 principally, plus D2, and on whichever of D5 to D8 the
+  admission declaration names.
+- The World Model line's own court closed at
+  `PASS_WITH_FINAL_SYNTHETIC_ACCEPTANCE_COURT_V1` — **synthetic**. That is
+  precisely the boundary this gate sits on.
 
-## Shortest defensible route to the first real-data tournament
+---
 
-The binding constraint is D1, and it is not a software problem. Two routes:
+## The research route, reconciled
 
-**Route A, vendor clarification.** Fastest if the answer is yes. Establish
-whether the history endpoint documents publication timestamps, revision
-history and point-in-time retrieval. If it does, a historical corpus becomes
-constructible and D2/D3 are the remaining work. We do not control the answer,
-and a vendor that cannot answer precisely leaves D1 exactly where it is.
+The superseded version collapsed three different things into "prospective
+collection". They are distinct, and only the third requires waiting.
 
-**Route B, prospective collection.** Slower but wholly within our control. The
-PULSE composer already stamps observation time, refuses stale inputs, and
-propagates staleness through derived fields, so packets accumulated forward
-have known availability by construction. This is the defensible route: it does
-not depend on anyone's answer, and it cannot be undermined by a later
-discovery about vendor revisions.
+### Three separate things
 
-**Recommendation: pursue B as the spine and A in parallel as a cheap read.** B
-determines the timeline; A can only shorten it. Neither is authorized here, and
-this milestone builds no corpus, admits no data, and starts no tournament.
+1. **Prospective raw collection** — capturing observations forward with
+   receipt timestamps. Necessary, not sufficient. A timestamp on capture is not
+   the same as knowing when the value became available at source.
+2. **Corpus admission** — a decision that a body of data may be used for
+   research. Requires availability semantics, durable capture, and stable
+   identity. A prospectively captured corpus is **not automatically
+   admissible**: if the capture is lossy, or restarts lose windows, or the
+   receipt time is our clock rather than the source's publication time, it
+   fails the same test the historical corpus fails.
+3. **Prospective forecast evaluation** — forecasts made before an outcome, with
+   the cutoff enforced at forecast time. This is what actually requires calendar
+   time. It cannot be simulated from history at all.
 
-Sequenced, the route is: O1 recovery commissioned, so the machine reliably
-turns up; then D2 and D3 resolved, so the mirror can report a real PASS; then
-D1 satisfied by accumulation under B; then, and only then, D5 as an explicit
-admission decision.
+### Historical eligibility is per source and per field
+
+The superseded version implied every source must wait for new observations.
+That is wrong, and it would discard usable research. The right question is asked
+per family:
+
+| Family | Availability question | Likely eligibility |
+|---|---|---|
+| Exchange daily bars, prior closes | Are they revised after publication, and is the revision visible? | Plausibly eligible if the vendor documents no silent revision |
+| Intraday quotes and trades | Same, plus whether history reflects the consolidated tape as it stood | Needs the vendor answer we do not yet have |
+| Corporate actions, splits, dividends | Announcement versus effective date, and whether history is back-adjusted | **High risk** — back-adjustment silently rewrites the past |
+| Fundamentals, filings | Filing timestamp is publication; restatements must be visible as revisions | Eligible if restatement history is exposed |
+| News and event data | Publication timestamp is the availability time | Eligible if timestamps are source, not ingest |
+
+The blocker is not "history is unusable". It is that **eligibility has not been
+assessed per family against documented semantics**, and a corpus mixing eligible
+and ineligible families inherits the weakest member.
+
+### Recommended sequence
+
+1. Assess eligibility per family against documented vendor semantics. Cheap,
+   read-only, no market session, and it may unlock historical research for
+   several families immediately.
+2. In parallel, commission prospective capture (D6) so that forecast evaluation
+   can begin accruing, since that clock cannot be started retroactively.
+3. Admit a corpus only from families that pass step 1, with the assessment
+   recorded per family.
+4. Begin prospective forecast evaluation once capture is commissioned.
+
+Neither is authorized here. This milestone builds no corpus, admits no data,
+and starts no tournament.
