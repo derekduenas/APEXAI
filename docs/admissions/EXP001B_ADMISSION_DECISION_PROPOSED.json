@@ -3,19 +3,19 @@
  "decision": "PROPOSED",
  "_read_me": [
   "PROPOSAL prepared by engineering. It admits nothing: unsigned, decision != ADMIT, and it lives",
-  "in the checkout. To become an admission the admission authority (not engineering) must:",
-  "(1) review docs/EXP001B_ADMISSION_PACKAGE.md, docs/EXP001B_SUCCESSOR_REGISTRATION.md and",
-  "    docs/REAL_DATA_BOUNDARY_V1.md;",
-  "(2) make /apex-data/governance/admissions and its trust/ subdirectory owned by a uid other than",
-  "    apex, mode 0755, and place allowed_signers (0644) there with the authority's ed25519 public",
-  "    key under the principal named in provenance.decided_by, namespaces=\"apex-admission\";",
+  "in the checkout. To become an admission the admission authority (not engineering) must follow",
+  "docs/ADMISSION_OPERATOR_PACKAGE.md, which is exact and was NOT executed:",
+  "(1) create /etc/apex/admissions and /etc/apex/admissions/trust root-owned 0755 -- the measured",
+  "    host shows /apex-data is owned by the research account, so nothing beneath it can hold trust;",
+  "(2) generate the ed25519 authority key OFF this host and install only the public line as",
+  "    /etc/apex/admissions/trust/allowed_signers (root:root 0644), principal = provenance.decided_by;",
   "(3) set decision to ADMIT, fill code.commit with the reviewed HEAD of strategic-integration-002",
-  "    (code.source_tree_sha256 below is the content hash of the relevant source at that tree and",
-  "    must still match), fill provenance;",
-  "(4) place the document under /apex-data/governance/admissions/ and sign the FILE with",
-  "    ssh-keygen -Y sign -f <authority private key> -n apex-admission <decision.json>,",
-  "    producing <decision.json>.sig beside it. The private key must not exist on the research path.",
-  "Engineering performs none of steps 2-4 and holds no signing key."
+  "    and check code.source_tree_sha256 below still matches, fill provenance;",
+  "(4) sign the FILE off-host with ssh-keygen -Y sign -n apex-admission and install the .json and",
+  "    .sig root-owned 0644 under /etc/apex/admissions/;",
+  "(5) create the output root, and run the experiment as an account that CANNOT become root --",
+  "    today's research account holds full passwordless sudo, which no code check can compensate for.",
+  "Engineering holds no signing key and performed none of these steps."
  ],
  "dataset": {
   "dataset_id": "history-b/etf_continuous",
@@ -23,33 +23,63 @@
   "manifest_path": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json",
   "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
   "corpus_version": "5c0d768b7ee2ea14",
-  "integrity_entry_hash": "64262db667672ed36fd2188fb3c8974382f54c00c11288be7c4571dda7400e77"
+  "integrity_entry_hash": "64262db667672ed36fd2188fb3c8974382f54c00c11288be7c4571dda7400e77",
+  "_manifest_location_note": "the manifest stays under /apex-data on purpose: this decision commits to its sha256, so a swapped manifest is refused by content and its location needs no trust"
  },
  "scope": {
-  "source_families": ["alpaca_sip_raw_1m"],
-  "fields": ["event_time_utc", "open", "high", "low", "close", "volume"],
-  "universe": ["SPY"],
-  "temporal_range": {"start": "2016-01-04", "end": "2021-12-31"},
+  "source_families": [
+   "alpaca_sip_raw_1m"
+  ],
+  "fields": [
+   "event_time_utc",
+   "open",
+   "high",
+   "low",
+   "close",
+   "volume"
+  ],
+  "universe": [
+   "SPY"
+  ],
+  "temporal_range": {
+   "start": "2016-01-04",
+   "end": "2021-12-31"
+  },
   "_scope_note": "train 2016-2019 and validation 2020-2021 ONLY. Evaluation 2022-2024 and reserve 2025+ are NOT in this proposal; unsealing evaluation is a separate decision with its own temporal_range and its own command."
  },
  "availability": {
-  "event_time": {"kind": "PER_ROW", "latest": "2026-08-28"},
-  "receipt_time": {"kind": "BULK", "at": "2026-08-29"},
-  "publication_time": {"kind": "NOT_AVAILABLE"},
-  "revision_time": {"kind": "NOT_AVAILABLE"},
+  "event_time": {
+   "kind": "PER_ROW",
+   "latest": "2026-08-28"
+  },
+  "receipt_time": {
+   "kind": "BULK",
+   "at": "2026-08-29"
+  },
+  "publication_time": {
+   "kind": "NOT_AVAILABLE"
+  },
+  "revision_time": {
+   "kind": "NOT_AVAILABLE"
+  },
   "corporate_actions": "RAW_UNADJUSTED_EXPLICIT",
-  "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record exists for these bars; they may not be used to claim point-in-time availability or to model vendor revisions; receipt was bulk on 2026-08-29, so no row is evidence of what was knowable before that date except by its event time; availability is ASSUMED at bar completion (event_time + 60 s) and every forecast records availability_basis = ASSUMED_BAR_CLOSE"
+  "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record exists for these bars; they may not be used to claim point-in-time availability or to model vendor revisions; receipt was bulk on 2026-08-29, so no row is evidence of what was knowable before that date except by its event time; availability is ASSUMED at bar completion (event_time + 60 s) and every forecast records availability_basis = ASSUMED_BAR_CLOSE; the exchange calendar for this window is reconciled date by date against the primary NYSE Group announcements (results/exp001b_calendar_reconciliation_2016_2021.json), and the loader refuses any date outside that window"
  },
  "purpose": {
-  "research_purpose": "ALPHA-EXP-001B train and validation stages on real SPY 1-minute bars, NYSE regular session per the exchange calendar, distributional validation only; evaluation remains sealed; no economic stage",
+  "research_purpose": "ALPHA-EXP-001B train and validation stages on real SPY 1-minute bars, NYSE regular session per the independently reconciled 2016-2021 exchange calendar, distributional validation only; evaluation remains sealed; no economic stage",
   "experiment_id": "ALPHA-EXP-001B",
   "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9"
  },
  "code": {
-  "commit": "<FILLED BY THE ADMISSION AUTHORITY: reviewed HEAD of strategic-integration-002>",
-  "source_tree_sha256": "720f1ad0d0a3a0f7dda67b8b05c39227189624af9dfe9b2170345222e1efc6e2",
-  "relevant_source_paths": ["apex/world_model", "apex/governance/chain_ledger.py", "apex/intraday/sessions.py", "scripts/alpha_exp_real_execute.py"],
-  "command": "PYTHONPATH=/apex-data/tmp/si002_wt /opt/apex/shared/venv/bin/python scripts/alpha_exp_real_execute.py --decision <path> --execute"
+  "commit": "<FILLED BY THE ADMISSION AUTHORITY: reviewed HEAD of strategic-integration-002 (code at 6be2507f)>",
+  "source_tree_sha256": "24322971f61bcf2c02d1f98d77aa3c2ea20f1695122af03779bd64e70316dd8c",
+  "relevant_source_paths": [
+   "apex/world_model",
+   "apex/governance/chain_ledger.py",
+   "apex/intraday/sessions.py",
+   "scripts/alpha_exp_real_execute.py"
+  ],
+  "command": "PYTHONPATH=<dedicated checkout> /opt/apex/shared/venv/bin/python scripts/alpha_exp_real_execute.py --decision /etc/apex/admissions/<this file> --execute"
  },
  "output": {
   "root": "/apex-data/research/exp001b",

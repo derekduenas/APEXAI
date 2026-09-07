@@ -45,36 +45,47 @@ completed, sealed result; neither authorizes evaluation.
   modelling; availability ASSUMED at bar completion, labelled on every
   forecast (`availability_basis = ASSUMED_BAR_CLOSE`).
 - Session: NYSE regular session in exchange-local time (DST-aware, early
-  closes 13:00); the calendar tables are rule-derived plus Good Friday and
-  special-closure tables for 2016–2026 and are **not independently verified
-  against each year's exchange notice** — a wrong table refuses rows, it
-  does not invent them.
+  closes 13:00). For 2016–2021 the tables are independently reconciled against
+  the primary exchange announcements (see limitation 2). A wrong table does
+  **not** refuse rows — an omitted early close silently admits post-close bars
+  and an added one silently discards valid ones, both reproduced — which is why
+  the loader refuses any date outside the reconciled window.
 
 ## 4. Unresolved limitations
 
 1. Publication/revision timing is unmeasured; results are conditional on
    the bar-close assumption.
-2. The calendar is rule-derived (see 3); two missing XLRE sessions in the
-   corpus are irrelevant to SPY.
+2. The calendar for 2016–2021 is now **independently reconciled date by date**
+   against the primary NYSE Group announcements — 1,565 weekdays, 54 holidays,
+   12 early closes, zero mismatches
+   (`results/exp001b_calendar_reconciliation_2016_2021.json`), with a
+   metadata-only corpus cross-check confirming every session and none on a
+   holiday. Early closes are corroborated by file size for 10 of 12 and
+   uncorroborated — not contradicted — for 2. Dates outside the window are
+   refused (`CALENDAR_NOT_VERIFIED`). Two missing XLRE sessions in the corpus
+   are irrelevant to SPY.
 3. EXP-001B's hypothesis is weak by design; power figures from EXP-001
    were illustrative and are not restated as expectations.
-4. Host trust paths are not yet compliant (`/apex-data/governance` owned by
-   `apex`, mode 775; no `trust/allowed_signers`); the verifier refuses
-   until an operator fixes ownership. Engineering will not do this.
+4. Host trust paths are not compliant, and the gap is larger than ownership:
+   `/apex-data` is owned by the research account, so nothing beneath it can
+   hold trust, and that account holds full passwordless sudo. The admission
+   root is therefore `/etc/apex/admissions`, which does not exist yet; the
+   verifier refuses with `TRUST_PATH_MISSING`. The exact, unexecuted remedy —
+   including a separate non-sudo research account — is
+   `ADMISSION_OPERATOR_PACKAGE.md`.
 5. Signing key custody is out of band; the verifier can only check that
    the research uid does not own the trust paths.
 
 ## 5. What is requested (one item) and what is not
 
-**Requested:** the admission authority reviews this package, brings the
-trust paths into compliance, and issues the signed decision from
+**Requested:** the admission authority reviews this package, performs
+`ADMISSION_OPERATOR_PACKAGE.md` items 1–6, and issues the signed decision from
 `docs/admissions/EXP001B_ADMISSION_DECISION_PROPOSED.json` with
 `code.commit` = the reviewed HEAD (the relevant source tree hash
-`720f1ad0…` is already fixed by the code commits `74003aef` + `28153e1a` and unchanged by
-documentation commits). Then, separately, authorize exactly:
+`24322971…` is fixed by the code commit `6be2507f` and unchanged by documentation commits). Then, separately, authorize exactly:
 
 ```text
-PYTHONPATH=/apex-data/tmp/si002_wt /opt/apex/shared/venv/bin/python scripts/alpha_exp_real_execute.py --decision <path> --execute
+PYTHONPATH=<dedicated checkout> /opt/apex/shared/venv/bin/python scripts/alpha_exp_real_execute.py --decision /etc/apex/admissions/<decision>.json --execute
 ```
 
 **Not requested and not performed:** evaluation unsealing, any economic
