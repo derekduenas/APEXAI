@@ -132,8 +132,8 @@ privilege path exists.
 
 | Commit | Content |
 |---|---|
-| `__CODE__` | `scripts/research_identity_privilege_audit.py` (read-only audit) + `results/research_identity_privilege_audit_apex.json` |
-| `__DOCS__` | Addendum A, `APEX_INTERFACES_V0.md`, C10–C13, roadmap §4, operator package Part II + wording correction, this return |
+| `52d419bc0` | `scripts/research_identity_privilege_audit.py` (read-only audit) + `results/research_identity_privilege_audit_apex.json` |
+| `4a3950754` | Addendum A, `APEX_INTERFACES_V0.md`, C10–C13, roadmap §4, operator package Part II + wording correction, this return |
 
 Document checks performed:
 
