@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -65,13 +66,109 @@ MAX_RECOVERY_ATTEMPTS = 3
 # nor bypass the recovery allowance.
 MAX_DEFERRAL_DETAIL = 3
 
+# ------------------------------------------------- MAINTENANCE BLOCKS
+# A maintenance block says a service is DELIBERATELY down pending a repair.
+# The convention has two halves, and the authoritative one is systemd:
+#
+#   a marker file   /apex-data/core/ops/MAINTENANCE_BLOCK_<name>
+#   a unit drop-in  ConditionPathExists=!<that marker path>
+#
+# systemd already refuses a start when the marker exists, so the block IS
+# enforced. What was missing is that the ORCHESTRATOR did not know. start()
+# spawns `systemctl start` with Popen and never reads the result, so a refused
+# start was recorded as outcome STARTED. On 2026-09-04 that happened three
+# times in three minutes for apex-equity-fabric: systemd logged "skipped
+# because of an unmet condition check" while the ledger recorded STARTED, and
+# three recovery attempts were spent on launches that never occurred.
+#
+# THE MAPPING IS READ FROM SYSTEMD, NOT GUESSED FROM THE NAME. A marker called
+# MAINTENANCE_BLOCK_equity_fabric governs whichever unit DECLARES it in a
+# ConditionPathExists, which is what the drop-in states; inferring the unit
+# from the filename would be a guess, and the same marker is also read by the
+# Gate-2 script for a different purpose.
+MAINTENANCE_DIR = "/apex-data/core/ops"
+MAX_MAINTENANCE_DETAIL = 3
+_COND_RE = re.compile(r"^\s*ConditionPathExists\s*=\s*!(\S+)\s*$", re.M)
+
+BLOCKED = "BLOCKED"
+NOT_BLOCKED = "NOT_BLOCKED"
+INDETERMINATE = "INDETERMINATE"
+
+
+def _unit_of(spec) -> str:
+    """The systemd unit this spec starts, taken from its own start_cmd."""
+    for token in reversed(list(spec.start_cmd)):
+        if token.endswith(".service") or token.endswith(".timer"):
+            return token
+    return ""
+
+
+def maintenance_status(spec) -> tuple:
+    """(state, detail). FAILS CLOSED: anything we cannot determine is
+    INDETERMINATE, and an INDETERMINATE service is not launched.
+
+    The blocking paths are read from the unit's own drop-ins, so the mapping
+    between marker and service is systemd's declaration rather than ours."""
+    unit = _unit_of(spec)
+    if not unit:
+        return (INDETERMINATE, "no systemd unit in start_cmd; cannot ask "
+                               "systemd whether it is blocked")
+    try:
+        r = subprocess.run(["systemctl", "show", unit, "-p", "DropInPaths",
+                            "--value"], capture_output=True, text=True,
+                           timeout=10)
+    except Exception as e:                               # noqa: BLE001
+        return (INDETERMINATE, "systemctl show failed: %r" % (e,))
+    if r.returncode != 0:
+        return (INDETERMINATE, "systemctl show returned %d" % r.returncode)
+    paths = []
+    for d in r.stdout.split():
+        try:
+            paths.extend(_COND_RE.findall(open(d).read()))
+        except OSError as e:                             # noqa: PERF203
+            return (INDETERMINATE, "drop-in %s unreadable: %s"
+                                   % (d, type(e).__name__))
+    blocking = []
+    for p in paths:
+        try:
+            if os.path.exists(p):
+                blocking.append(p)
+        except OSError as e:                             # noqa: BLE001
+            return (INDETERMINATE, "cannot stat %s: %s" % (p, type(e).__name__))
+    if blocking:
+        return (BLOCKED, "; ".join(blocking))
+    if not paths:
+        return (NOT_BLOCKED, "unit declares no maintenance condition")
+    return (NOT_BLOCKED, "declared markers absent: %s" % "; ".join(paths))
+
+
+def _record_maintenance(st: dict, *, service: str, at: str, state: str,
+                        detail: str) -> None:
+    """A maintenance disposition is NOT a recovery attempt. It is kept in its
+    own bounded structure so it can neither consume nor bypass the recovery
+    allowance, and so a long block cannot inflate the record."""
+    m = st["maintenance"]
+    m["count"] += 1
+    m["last_utc"] = at
+    m["state"] = state
+    m["detail"] = detail[:200]
+    if m["first_utc"] is None:
+        m["first_utc"] = at
+    m["recent"].append({"service": service, "observed_utc": at,
+                        "disposition": "MAINTENANCE_" + state,
+                        "detail": detail[:200]})
+    if len(m["recent"]) > MAX_MAINTENANCE_DETAIL:
+        del m["recent"][1:len(m["recent"]) - MAX_MAINTENANCE_DETAIL + 1]
+
 
 def _service_state(state: dict, name: str, supervised_by: str) -> dict:
     """Per-service incident state: real attempts and deferrals, apart."""
     return state["attempts"].setdefault(name, {
         "recovery": [],
         "deferrals": {"count": 0, "first_utc": None, "last_utc": None,
-                      "recent": [], "supervised_by": supervised_by}})
+                      "recent": [], "supervised_by": supervised_by},
+        "maintenance": {"count": 0, "first_utc": None, "last_utc": None,
+                        "recent": [], "state": None, "detail": None}})
 
 
 def _record_deferral(st: dict, *, service: str, at: str,
@@ -108,6 +205,17 @@ def _attempt_history(st: dict, service: str) -> list:
     nothing rewrites them.
     """
     history = list(st["recovery"])
+    m = st.get("maintenance") or {"count": 0}
+    if m["count"]:
+        history.append({"kind": "maintenance_disposition", "service": service,
+                        "disposition": "MAINTENANCE_" + str(m["state"]),
+                        "detail": m["detail"], "count": m["count"],
+                        "first_utc": m["first_utc"], "last_utc": m["last_utc"],
+                        "detail_entries_retained": len(m["recent"]),
+                        "note": "the service is deliberately down, or its "
+                                "block status could not be determined. NOT a "
+                                "recovery attempt and not counted as one"})
+        history.extend(m["recent"])
     d = st["deferrals"]
     if d["count"]:
         history.append({"kind": "deferral_summary", "service": service,
@@ -223,12 +331,21 @@ def tick(state: dict, *, dry_run: bool) -> dict:
         st = _service_state(state, s.name, s.supervised_by)
         if (not observed[s.name] and not s.externally_supervised
                 and len(st["recovery"]) < MAX_RECOVERY_ATTEMPTS):
-            att = (StartAttempt(service=s.name,
-                                attempted_utc=t.isoformat(),
-                                outcome="DRY_RUN", detail="--dry-run")
-                   if dry_run else start(s.name, s))
-            st["recovery"].append(att.__dict__)
-            actions.append(att.__dict__)
+            # Ask systemd, immediately before attempting, whether this service
+            # is deliberately down. Anything we cannot determine is treated as
+            # blocked: refusing to start a service we are unsure about is
+            # recoverable, starting one that was deliberately stopped is not.
+            mstate, mdetail = maintenance_status(s)
+            if mstate != NOT_BLOCKED:
+                _record_maintenance(st, service=s.name, at=t.isoformat(),
+                                    state=mstate, detail=mdetail)
+            else:
+                att = (StartAttempt(service=s.name,
+                                    attempted_utc=t.isoformat(),
+                                    outcome="DRY_RUN", detail="--dry-run")
+                       if dry_run else start(s.name, s))
+                st["recovery"].append(att.__dict__)
+                actions.append(att.__dict__)
         elif not observed[s.name] and s.externally_supervised:
             # the supervisor owns the restart; we own noticing that it
             # is not working, and saying so loudly. R2: an OBSERVATION,
@@ -259,11 +376,16 @@ def tick(state: dict, *, dry_run: bool) -> dict:
                               "unexpectedly_running":
                                   rec["unexpectedly_running"]},
            "actions": actions, "incidents": incidents,
+           "maintenance": {n: {"state": v["maintenance"]["state"],
+                               "count": v["maintenance"]["count"],
+                               "detail": v["maintenance"]["detail"]}
+                           for n, v in state["attempts"].items()
+                           if v.get("maintenance", {}).get("count")},
            "host_qualification": ({"verdict": host_q["verdict"],
                                    "blocking": host_q["blocking"]}
                                   if host_q else None),
            "decision_power": "NONE_OPERATIONAL"}
-    if (actions or incidents or rec["verdict"] != "OK"
+    if (actions or incidents or out["maintenance"] or rec["verdict"] != "OK"
             or (host_q and host_q["verdict"] == "SAFE_BLOCKED")):
         LEDGER.parent.mkdir(parents=True, exist_ok=True)
         chain_append(LEDGER, out)

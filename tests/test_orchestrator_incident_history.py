@@ -38,9 +38,14 @@ def supervised(name="btc-paper"):
 
 
 def self_started(name="options-paper"):
+    # a real systemd unit, because the launch path now asks systemd whether
+    # the service is under a maintenance block and FAILS CLOSED when it cannot
+    # tell. A start_cmd naming no unit is indeterminate by design.
     return ServiceSpec(name=name, phases_running=("RTH",), always_on=True,
                        first_work_deadline_s=1800,
-                       start_cmd=("/bin/true",), supervised_by="orchestrator")
+                       start_cmd=("/usr/bin/sudo", "-n", "/usr/bin/systemctl",
+                                  "start", "apex-options-paper.service"),
+                       supervised_by="orchestrator")
 
 
 class _Clock:
@@ -75,6 +80,15 @@ def run_ticks(monkeypatch, tmp_path, specs, n, *, phase="IDLE",
         "half_day": False})
     monkeypatch.setattr(ORCH, "now", lambda: clock["t"])
     monkeypatch.setattr(ORCH, "LEDGER", tmp_path / "ledger.jsonl")
+    # These tests are about the recovery ALLOWANCE and the bounded deferral
+    # history. The maintenance gate in front of the launch has its own module,
+    # tests/test_orchestrator_maintenance_block.py; here it is pinned open so
+    # that a blocked or indeterminate host cannot silently change what is
+    # being measured.
+    monkeypatch.setattr(ORCH, "maintenance_status",
+                        lambda spec: (ORCH.NOT_BLOCKED, "pinned open by the test"))
+    monkeypatch.setattr(ORCH.subprocess, "Popen",
+                        lambda cmd, *a, **k: type("P", (), {"pid": -1})())
     if state is None:
         state = {"attempts": {}, "host": "cloud"}
         if past_grace:
