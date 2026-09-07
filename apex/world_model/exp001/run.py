@@ -90,13 +90,23 @@ def _economic(fcs: list, rows_y: list) -> dict:
 
 
 def run(sessions_by_period: dict, *, ledger_dir, declared_class: str,
-        fixture_root=None, seed: int = 7, evaluation_unsealed: bool = False) -> dict:
+        fixture_root=None, seed: int = 7, evaluation_unsealed: bool = False,
+        session_loader=None) -> dict:
     """sessions_by_period: {"train": [paths], "validation": [paths], "evaluation": [paths]}.
-    Returns a status record. Raises nothing on refusal: refusals are results."""
+    Returns a status record. Raises nothing on refusal: refusals are results.
+
+    session_loader: callable(path) -> session. Default is the LABORATORY
+    route (sources.admit, fixtures only). The real-data route supplies its
+    own loader bound to a verified admission decision; run() never decides
+    admission itself and never sees a boolean that could."""
     t0 = time.time()
     led = Path(ledger_dir); led.mkdir(parents=True, exist_ok=True)
     rec = {"experiment": "ALPHA-EXP-001", "registration_hash": registration_hash(),
-           "declared_class": declared_class, "stages": []}
+           "declared_class": declared_class, "stages": [],
+           "route": "LABORATORY" if session_loader is None else "SESSION_LOADER_SUPPLIED"}
+    if session_loader is None:
+        def session_loader(p):
+            return B.load_session(p, declared_class=declared_class, fixture_root=fixture_root)
 
     def stage(name, **kw):
         rec["stages"].append({"stage": name, **kw})
@@ -111,7 +121,7 @@ def run(sessions_by_period: dict, *, ledger_dir, declared_class: str,
                 continue
             rows_all = []
             for p in sessions_by_period.get(period, []):
-                s = B.load_session(p, declared_class=declared_class, fixture_root=fixture_root)
+                s = session_loader(p)
                 rows = B.observable_rows(s)
                 tg = _targets(rows)
                 # EMBARGO: drop the last EMBARGO_BARS targets of each session so no
@@ -124,7 +134,8 @@ def run(sessions_by_period: dict, *, ledger_dir, declared_class: str,
                   usable_rows=len(rows_all))
     except (B.BarsRefused, Exception) as e:                 # noqa: BLE001
         kind = type(e).__name__
-        rec.update(status="BLOCKED" if kind == "SourceAdmissionRefused" else "INVALID_INPUT",
+        rec.update(status="BLOCKED" if kind in ("SourceAdmissionRefused", "RealDataRefused")
+                   else "INVALID_INPUT",
                    refusal={"kind": kind, "detail": str(e)[:600]})
         stage("admission", status=rec["status"], refusal=kind)
         rec["elapsed_s"] = round(time.time() - t0, 2)

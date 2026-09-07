@@ -30,7 +30,12 @@ def load_session(path, *, declared_class: str, fixture_root=None) -> dict:
                         fixture_root=fixture_root)
     p = Path(path)
     raw = p.read_bytes()
-    doc = json.loads(raw)
+    return session_from_doc(json.loads(raw), p, raw, adm)
+
+
+def session_from_doc(doc: dict, p: Path, raw: bytes, adm: dict) -> dict:
+    """Parse an ALREADY-ADMITTED session document. Admission is the caller's
+    problem and is recorded in `adm`; this function grants nothing."""
     bars = doc.get("bars")
     if not isinstance(bars, list) or not bars:
         raise BarsRefused("MISSING_BARS: %s has no bars" % p.name)

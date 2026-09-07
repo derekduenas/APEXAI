@@ -1,0 +1,56 @@
+{
+ "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V0",
+ "decision": "PROPOSED",
+ "_read_me": [
+  "This is a PROPOSAL prepared by engineering. It admits nothing: the boundary refuses it on",
+  "two independent grounds (decision != ADMIT; no binding). To become an admission the",
+  "admission authority must (1) review docs/EXP001_ADMISSION_PACKAGE.md and",
+  "docs/REAL_DATA_BOUNDARY_V0.md, (2) set decision to ADMIT, (3) fill code.commit with the",
+  "reviewed commit of strategic-integration-002, (4) place the document under",
+  "/apex-data/governance/admissions/ -- never inside a checkout or the output root,",
+  "(5) create /home/apex/.apex-secrets/WM_ADMISSION_KEY (>=16 bytes, mode 600) and",
+  "(6) add the binding block computed by apex.world_model.real_data.boundary.binding_for(body, key)",
+  "over the document WITHOUT the binding key. Engineering does not perform steps 2-6."
+ ],
+ "dataset": {
+  "dataset_id": "history-b/etf_continuous",
+  "root": "/apex-data/history-b/etf_continuous/bars",
+  "manifest_path": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json",
+  "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "corpus_version": "5c0d768b7ee2ea14",
+  "integrity_entry_hash": "64262db667672ed36fd2188fb3c8974382f54c00c11288be7c4571dda7400e77"
+ },
+ "scope": {
+  "source_families": ["alpaca_sip_raw_1m"],
+  "fields": ["event_time_utc", "open", "high", "low", "close", "volume"],
+  "universe": ["SPY"],
+  "temporal_range": {"start": "2016-01-04", "end": "2021-12-31"},
+  "_scope_note": "train 2016-2019 and validation 2020-2021 ONLY. The evaluation period 2022-2024 and the reserve 2025+ are NOT in this proposal; unsealing evaluation is a separate decision with its own temporal_range."
+ },
+ "availability": {
+  "event_time": {"kind": "PER_ROW", "latest": "2026-08-28"},
+  "receipt_time": {"kind": "BULK", "at": "2026-08-29"},
+  "publication_time": {"kind": "NOT_AVAILABLE"},
+  "revision_time": {"kind": "NOT_AVAILABLE"},
+  "corporate_actions": "RAW_UNADJUSTED_EXPLICIT",
+  "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record exists for these bars; they may not be used to claim point-in-time availability or to model vendor revisions; receipt was bulk on 2026-08-29, so no row is evidence of what was knowable before that date except by its event time"
+ },
+ "purpose": {
+  "research_purpose": "ALPHA-EXP-001 train and validation stages on real SPY 1-minute bars, as registered; evaluation remains sealed",
+  "experiment_id": "ALPHA-EXP-001",
+  "registration_hash": "1a3f55a522f7595f179033827ad10d87e873b7839f1cc08fb05624067c8f391c"
+ },
+ "code": {
+  "commit": "<FILLED BY THE ADMISSION AUTHORITY: reviewed commit of strategic-integration-002>",
+  "command": "PYTHONPATH=/apex-data/tmp/si002_wt /opt/apex/shared/venv/bin/python scripts/exp001_real_execute.py --decision <path> --execute"
+ },
+ "output": {
+  "root": "/apex-data/research/exp001",
+  "authority_classification": "RESEARCH_HISTORICAL"
+ },
+ "provenance": {
+  "decided_by": "<admission authority; not engineering>",
+  "decided_utc": "<ISO-8601 UTC>",
+  "review_reference": "<review record>"
+ }
+}
