@@ -331,8 +331,8 @@ def test_launch_prepares_with_every_input_resolved(rig):
     assert r["commit"] == rig["commit"] and len(r["source_tree_sha256"]) == 64
     assert r["view_files"] == len(rig["days"]) and r["experiment"] == "ALPHA-EXP-001B"
     assert r["decision_sha256"] and r["interpreter"] == str(t.python)
-    assert "<" not in plan["command"] and "--execute" in plan["command"]
-    assert "systemd-run" in plan["argv"] or "systemd-run" in plan["command"]
+    assert "<" not in plan["executable_command"] and "--execute" in plan["executable_command"]
+    assert "systemd-run" in plan["argv"] or "systemd-run" in plan["executable_command"]
 
 
 def test_launch_refuses_source_drift_and_view_drift(rig):
@@ -640,3 +640,77 @@ def test_repin_without_apply_moves_nothing(rig):
     plan = RA.run_repin(t, rig["commit"], apply=False, run=StandIn(t))
     assert plan["applied"] is False and "evidence" not in plan
     assert json.loads(t.setup_manifest.read_text())["commit"] == rig["commit"]
+
+
+# ================= operator instructions must be accurate =================
+# The generated argv carries --execute and RUNS the experiment. An earlier
+# signing document told the operator to run "the same command without --apply",
+# which is not a dry run of anything: --apply is a flag of the wrapper, not of
+# that argv. These tests exist so the instruction cannot drift again.
+
+def test_preparation_launches_nothing(rig):
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    d = _decision(rig)
+    run = StandIn(t)
+    plan = RA.run_launch(t, rig["commit"], d, apply=False, run=run)
+    assert plan["applied"] is False
+    assert "execution" not in plan
+    assert run.calls == [], run.calls          # nothing was run at all
+    assert not any("systemd-run" in " ".join(c) for c in run.calls)
+
+
+def test_the_two_operator_commands_differ_only_by_apply(rig):
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    oc = RA.prepare_launch(t, rig["commit"], _decision(rig))["operator_commands"]
+    assert "--apply" not in oc["prepare"]
+    assert oc["execute"] == oc["prepare"] + " --apply"
+    assert "research_activation.py launch" in oc["prepare"]
+    assert "--execute" not in oc["prepare"]     # that belongs to the inner argv only
+
+
+def test_the_generated_argv_is_labelled_executable_never_a_dry_run(rig):
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    plan = RA.prepare_launch(t, rig["commit"], _decision(rig))
+    assert "--execute" in plan["executable_command"]
+    assert "RUNS the experiment" in plan["EXECUTABLE_COMMAND_WARNING"]
+    assert "not a dry run" in plan["EXECUTABLE_COMMAND_WARNING"]
+
+
+def test_preparation_does_not_claim_signature_or_dataset_integrity(rig):
+    """Existence of a .sig file is not verification, and a file count is not
+    integrity. Preparation must say so itself."""
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    plan = RA.prepare_launch(t, rig["commit"], _decision(rig))
+    c = plan["checks_performed"]
+    assert c["signature_file_exists"] is True
+    assert c["signature_cryptographically_VERIFIED"] is False
+    assert c["dataset_view_file_COUNT_matches"] is True
+    assert c["dataset_view_file_HASHES_rechecked"] is False
+    e = plan["checks_not_performed_here"]
+    assert "verify_decision" in e["signature_verification"]
+    assert "VIEW_HASH_MISMATCH" in e["dataset_content_integrity"]
+
+
+def test_a_similarly_named_sibling_of_the_trust_root_is_refused(rig):
+    """A string prefix test accepted /etc/apex/admissions-other. Containment
+    does not."""
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    sibling = Path(str(t.trust_root) + "-other")
+    sibling.mkdir(parents=True, exist_ok=True)
+    d = sibling / "d.json"
+    d.write_text("{}"); d.with_name("d.json.sig").write_text("s")
+    assert str(d.resolve()).startswith(str(t.trust_root.resolve()))   # the old test passed it
+    with pytest.raises(Refused, match="DECISION_OUTSIDE_TRUST_ROOT"):
+        RA.prepare_launch(t, rig["commit"], d)
+
+
+def test_the_real_trust_root_is_still_accepted(rig):
+    """The fix must not make the legitimate path unreachable."""
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    RA.prepare_launch(t, rig["commit"], _decision(rig))

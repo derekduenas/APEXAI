@@ -176,6 +176,34 @@ def test_the_launch_uses_the_configuration_that_was_probed():
     assert _pkg()["launch"]["probe_used_identical_configuration"] is True
 
 
+def test_the_package_publishes_two_distinct_operator_commands():
+    """The published package, not just the wrapper, must carry the corrected
+    instruction: an operator reads this file."""
+    lc = _pkg()["launch"]
+    oc = lc["operator_commands"]
+    assert "--apply" not in oc["prepare"]
+    assert oc["execute"] == oc["prepare"] + " --apply"
+    assert "launches NOTHING" in oc["prepare_effect"]
+    assert "--execute" not in oc["prepare"]
+
+
+def test_the_package_labels_the_inner_argv_as_executable():
+    lc = _pkg()["launch"]
+    assert "--execute" in lc["executable_command"]
+    assert "NOT a dry run" in lc["EXECUTABLE_COMMAND_WARNING"]
+    assert "would have executed" in lc["EXECUTABLE_COMMAND_WARNING"]
+
+
+def test_the_package_does_not_overstate_what_preparation_establishes():
+    lc = _pkg()["launch"]
+    c = lc["preparation_checks_performed"]
+    assert c["signature_cryptographically_VERIFIED"] is False
+    assert c["dataset_view_file_HASHES_rechecked"] is False
+    e = lc["preparation_checks_performed_elsewhere"]
+    assert "verify_decision" in e["signature_verification"]
+    assert "VIEW_HASH_MISMATCH" in e["dataset_content_integrity"]
+
+
 def test_the_signed_scope_permits_train_and_validation_only():
     sc = _pkg()["scope"]
     assert sc["evaluation_admitted"] is False

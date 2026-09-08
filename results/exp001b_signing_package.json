@@ -76,7 +76,8 @@
   "wrapper_commit": "792a2843d18b1baf5db219a17e14fc84fa916e53"
  },
  "launch": {
-  "argv": [
+  "EXECUTABLE_COMMAND_WARNING": "This argv RUNS the experiment. It carries --execute and is NOT a dry run. Preparation and execution are distinguished by --apply on the wrapper invocation in operator_commands, never by editing this argv. An earlier version of this package told the operator to run this command without --apply, which would have executed the experiment.",
+  "executable_argv": [
    "sudo",
    "-n",
    "systemd-run",
@@ -130,8 +131,32 @@
    "/etc/apex/admissions/exp001b_admission.json",
    "--execute"
   ],
-  "command": "sudo -n systemd-run --pipe --wait --collect --slice=wmresearch.slice -p User=apexresearch -p Group=apexresearch -p MemoryMax=1400M -p TasksMax=64 -p ProtectSystem=strict -p ProtectHome=yes -p PrivateTmp=yes -p PrivateNetwork=yes -p NoNewPrivileges=yes -p RestrictSUIDSGID=yes -p TemporaryFileSystem=/apex-data/history-b -p BindReadOnlyPaths=/apex-data/research/dataset_view/etf_continuous/bars:/apex-data/history-b/etf_continuous/bars -p InaccessiblePaths=/apex-data/core -p InaccessiblePaths=/apex-data/history-a -p InaccessiblePaths=/apex-data/runtime -p ReadOnlyPaths=/apex-data/governance/admissions -p ReadOnlyPaths=/etc/apex/admissions -p ReadWritePaths=/apex-data/research/out --setenv=GIT_CONFIG_GLOBAL=/dev/null --setenv=GIT_CONFIG_NOSYSTEM=1 --setenv=PYTHONPATH=/apex-data/research/checkout --working-directory=/apex-data/research/checkout /opt/apex-runner/venv/bin/python scripts/alpha_exp_real_execute.py --decision /etc/apex/admissions/exp001b_admission.json --execute",
-  "prepare_first": "run the same command without --apply; it resolves inputs and refuses on source drift, view drift, missing signature, or a decision outside the trust root",
+  "executable_command": "sudo -n systemd-run --pipe --wait --collect --slice=wmresearch.slice -p User=apexresearch -p Group=apexresearch -p MemoryMax=1400M -p TasksMax=64 -p ProtectSystem=strict -p ProtectHome=yes -p PrivateTmp=yes -p PrivateNetwork=yes -p NoNewPrivileges=yes -p RestrictSUIDSGID=yes -p TemporaryFileSystem=/apex-data/history-b -p BindReadOnlyPaths=/apex-data/research/dataset_view/etf_continuous/bars:/apex-data/history-b/etf_continuous/bars -p InaccessiblePaths=/apex-data/core -p InaccessiblePaths=/apex-data/history-a -p InaccessiblePaths=/apex-data/runtime -p ReadOnlyPaths=/apex-data/governance/admissions -p ReadOnlyPaths=/etc/apex/admissions -p ReadWritePaths=/apex-data/research/out --setenv=GIT_CONFIG_GLOBAL=/dev/null --setenv=GIT_CONFIG_NOSYSTEM=1 --setenv=PYTHONPATH=/apex-data/research/checkout --working-directory=/apex-data/research/checkout /opt/apex-runner/venv/bin/python scripts/alpha_exp_real_execute.py --decision /etc/apex/admissions/exp001b_admission.json --execute",
+  "operator_commands": {
+   "difference": "--apply, on the wrapper invocation",
+   "execute": "sudo -n /usr/bin/python3.12 scripts/research_activation.py launch --commit 792a2843d18b1baf5db219a17e14fc84fa916e53 --decision /etc/apex/admissions/exp001b_admission.json --apply",
+   "execute_effect": "runs the registered experiment inside the sandbox",
+   "prepare": "sudo -n /usr/bin/python3.12 scripts/research_activation.py launch --commit 792a2843d18b1baf5db219a17e14fc84fa916e53 --decision /etc/apex/admissions/exp001b_admission.json",
+   "prepare_effect": "resolves and checks inputs, prints the plan, and launches NOTHING"
+  },
+  "preparation_checks_performed": {
+   "bound_source_tree_hash_matches_record": true,
+   "checkout_working_tree_clean": true,
+   "dataset_view_file_COUNT_matches": true,
+   "dataset_view_file_HASHES_rechecked": false,
+   "decision_contained_in_trust_root": true,
+   "decision_file_exists": true,
+   "interpreter_present": true,
+   "requested_commit_matches_setup_record": true,
+   "required_stages_present_in_record": true,
+   "setup_record_state_is_COMPLETE": true,
+   "signature_cryptographically_VERIFIED": false,
+   "signature_file_exists": true
+  },
+  "preparation_checks_performed_elsewhere": {
+   "dataset_content_integrity": "NOT done by preparation, which counts files only. Done by the wrapper's `verify` action, whose dataset_inventory check re-hashes every admitted file and refuses on VIEW_HASH_MISMATCH. Run `verify` immediately before launching.",
+   "signature_verification": "NOT done by preparation. Done by apex.world_model.real_data.boundary.verify_decision, called from scripts/alpha_exp_real_execute.py at execution time, which runs ssh-keygen -Y verify against /etc/apex/admissions/trust/allowed_signers. The operator can establish it in advance with the same ssh-keygen -Y verify command shown in the signing document."
+  },
   "probe_used_identical_configuration": true,
   "unit_properties": [
    "User=apexresearch",
@@ -188,6 +213,11 @@
  "state": {
   "admission_issued": false,
   "alpha_claimed": false,
+  "corrections_applied": [
+   "launch.command mislabelled as a dry run",
+   "trust-root containment was a string prefix test",
+   "preparation overstated as establishing signature and dataset integrity"
+  ],
   "disclosed_incidents": [
    "EVALUATION_READ_INCIDENT_001"
   ],

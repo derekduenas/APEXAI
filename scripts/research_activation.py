@@ -344,6 +344,17 @@ def _tree_entries(root: Path):
             yield Path(d) / n
 
 
+def _path_under(p, root) -> bool:
+    """True only when `p` is `root` or lies beneath it.
+
+    A string prefix test is not containment: "/etc/apex/admissions-other/d.json"
+    startswith "/etc/apex/admissions", so a similarly named SIBLING directory
+    passed. Both paths are resolved first so symlinks cannot dress one up as the
+    other."""
+    p, root = Path(p).resolve(), Path(root).resolve()
+    return p == root or root in p.parents
+
+
 def _mode_of(p: Path) -> str:
     return "%o" % stat.S_IMODE(os.stat(p).st_mode)
 
@@ -783,8 +794,10 @@ def prepare_launch(t: Targets, commit: str, decision: Path) -> dict:
     d = Path(decision)
     if not d.exists() or not d.with_name(d.name + ".sig").exists():
         raise ActivationRefused("DECISION_OR_SIGNATURE_MISSING: %s" % d)
-    if not str(d.resolve()).startswith(str(t.trust_root.resolve())):
-        raise ActivationRefused("DECISION_OUTSIDE_TRUST_ROOT: %s" % d)
+    if not _path_under(d, t.trust_root):
+        raise ActivationRefused("DECISION_OUTSIDE_TRUST_ROOT: %s is not inside %s "
+                                "(a similarly named sibling is not the trust root)"
+                                % (d, t.trust_root))
     cfg = launch_config(t)
     argv = _systemd_run(t, cfg, [t.python, "scripts/alpha_exp_real_execute.py",
                                  "--decision", d, "--execute"])
@@ -793,7 +806,64 @@ def prepare_launch(t: Targets, commit: str, decision: Path) -> dict:
                 "interpreter": str(t.python), "decision": str(d),
                 "decision_sha256": sha256_of(d), "view_files": n,
                 "experiment": EXPERIMENT_ID, "registration_hash": REGISTRATION_HASH},
-            "argv": argv, "command": " ".join(argv)}
+            "argv": argv,
+            "executable_command": " ".join(argv),
+            "EXECUTABLE_COMMAND_WARNING":
+                "This argv RUNS the experiment. It carries --execute and is not a dry "
+                "run in any form. Preparation and execution are distinguished by the "
+                "WRAPPER invocation in operator_commands, not by editing this argv.",
+            "operator_commands": operator_commands(t, commit, d),
+            "checks_performed": PREPARE_CHECKS_PERFORMED,
+            "checks_not_performed_here": PREPARE_CHECKS_ELSEWHERE}
+
+
+# What preparation actually establishes. Stated as data so the documentation
+# cannot drift away from the code.
+PREPARE_CHECKS_PERFORMED = {
+    "setup_record_state_is_COMPLETE": True,
+    "required_stages_present_in_record": True,
+    "requested_commit_matches_setup_record": True,
+    "checkout_working_tree_clean": True,
+    "bound_source_tree_hash_matches_record": True,
+    "dataset_view_file_COUNT_matches": True,
+    "interpreter_present": True,
+    "decision_file_exists": True,
+    "signature_file_exists": True,
+    "decision_contained_in_trust_root": True,
+    # the two that existence checks do NOT establish
+    "dataset_view_file_HASHES_rechecked": False,
+    "signature_cryptographically_VERIFIED": False,
+}
+
+PREPARE_CHECKS_ELSEWHERE = {
+    "signature_verification":
+        "NOT done by preparation. Done by "
+        "apex.world_model.real_data.boundary.verify_decision, called from "
+        "scripts/alpha_exp_real_execute.py at execution time, which runs "
+        "ssh-keygen -Y verify against /etc/apex/admissions/trust/allowed_signers. "
+        "The operator can establish it in advance with the same ssh-keygen -Y "
+        "verify command shown in the signing document.",
+    "dataset_content_integrity":
+        "NOT done by preparation, which counts files only. Done by the wrapper's "
+        "`verify` action, whose dataset_inventory check re-hashes every admitted "
+        "file and refuses on VIEW_HASH_MISMATCH. Run `verify` immediately before "
+        "launching.",
+}
+
+
+def operator_commands(t: Targets, commit: str, decision) -> dict:
+    """The two wrapper invocations, generated rather than described.
+
+    Preparation and execution differ by --apply on the WRAPPER, never by editing
+    the inner argv."""
+    base = ["sudo", "-n", t.system_python, "scripts/research_activation.py", "launch",
+            "--commit", str(commit), "--decision", str(decision)]
+    return {"prepare": " ".join(base),
+            "prepare_effect": "resolves and checks inputs, prints the plan, "
+                              "and launches NOTHING",
+            "execute": " ".join(base + ["--apply"]),
+            "execute_effect": "runs the registered experiment inside the sandbox",
+            "difference": "--apply, on the wrapper invocation"}
 
 
 def run_launch(t: Targets, commit: str, decision: Path, *, apply: bool,
@@ -1000,8 +1070,7 @@ def preflight(t: Targets, commit: str | None, decision: Path | None,
         d = Path(decision)
         chk("decision_present", d.exists(), str(d))
         chk("decision_signature_present", d.with_name(d.name + ".sig").exists(), str(d) + ".sig")
-        chk("decision_under_trust_root",
-            str(d.resolve()).startswith(str(t.trust_root.resolve())), str(t.trust_root))
+        chk("decision_under_trust_root", _path_under(d, t.trust_root), str(t.trust_root))
     rec["ok"] = not rec["blocking"]
     return rec
 
