@@ -172,7 +172,7 @@ established.
 | Commit | Content |
 |---|---|
 | `560fdc722` | interpreter + third-party provenance recorded per run; venv path-matching defect fixed; positive-capture test |
-| `__DOCS__` | probability-contract correction, activation package, sandbox probe script + artifact, updated proposal, this return |
+| `50f6664ae` | probability-contract correction, activation package, sandbox probe script + artifact, updated proposal, this return |
 
 Applicable bounded regression on `560fdc72` (24 modules touching
 `world_model`, `chain_ledger` or `exp001`, one contained shard each, as
