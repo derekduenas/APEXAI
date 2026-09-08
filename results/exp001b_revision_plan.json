@@ -1,0 +1,112 @@
+{
+ "fresh_environment": {
+  "blocking_gap": {
+   "consequence": "a second environment cannot be set up through the CLI as it stands",
+   "not_implemented_in_this_step": true,
+   "options": [
+    {
+     "note": "production defaults stay exactly as they are when the flags are absent",
+     "option": "add --research-root and --runner-root flags",
+     "recommended": true,
+     "size": "small; no change to any check, guard or default"
+    },
+    {
+     "note": "REJECTED: rollback preserves evidence by refusing to remove parents that contain it, and reusing the paths would put the new run where the old evidence lives",
+     "option": "roll back the existing environment and reuse the paths",
+     "recommended": false
+    },
+    {
+     "note": "REJECTED: nothing would be verified",
+     "option": "create the tree by hand outside the wrapper",
+     "recommended": false
+    }
+   ],
+   "what": "the CLI has no flags for research_root or runner_root; target injection is a testing interface only"
+  },
+  "derived": {
+   "activation_record": "/apex-data/research-rev2/_ACTIVATION_MANIFEST.json",
+   "checkout": "/apex-data/research-rev2/checkout",
+   "dataset_view": "/apex-data/research-rev2/dataset_view",
+   "out": "/apex-data/research-rev2/out",
+   "stage_log": "/apex-data/research-rev2/_ACTIVATION_LOG.jsonl"
+  },
+  "preserved_untouched": [
+   "/apex-data/research/checkout (pre-repair, 277e4a02)",
+   "/opt/apex-runner",
+   "/etc/apex/admissions and the signed v2 decision",
+   "the aborted run directory, read-only"
+  ],
+  "research_root": "/apex-data/research-rev2",
+  "runner_root": "/opt/apex-runner-rev2",
+  "why_a_second_runner_root": "preflight requires every destination to be free, and the existing /opt/apex-runner must be preserved intact"
+ },
+ "guard_untouched": {
+  "only_change_made": "its refusal TEXT, which called this a new experiment. It is an engineering revision of the same registered experiment. Behaviour is identical.",
+  "repin_guard": "not bypassed and not weakened. It correctly refuses to move the existing checkout across a bound-tree change; that is why a fresh checkout is required."
+ },
+ "how_each_property_will_be_verified": {
+  "activation_record": "state COMPLETE with every stage VERIFIED and its evidence, plus the append-only stage log",
+  "checkout_identity": "verify's checkout_identity check: commit equals the admitted commit, bound tree equals 06eee315eb02c697, working tree clean",
+  "dataset_view": "verify's dataset_inventory check RE-HASHES every admitted file and refuses on VIEW_HASH_MISMATCH; count must be 1511",
+  "environment": "identity (unprivileged uid, no privileged groups), venv interpreter present and executable, numpy pinned at 2.4.6, pinned.txt written, runner tree root-owned and not group- or other-writable across every entry",
+  "launcher_identity": "sha256 of scripts/research_activation.py in the fresh checkout must equal 5aeb8288647d5534, checked by the operator BEFORE invoking it",
+  "sandbox_configuration": "probe ENTERS the sandbox and measures nine properties with zero deviations; a test asserts the probed property list is identical to the launch property list, so what is measured is what will run"
+ },
+ "nothing_executed_or_signed": true,
+ "one_reviewed_revision": {
+  "commit": "ed4825684cd00ce5c70ef12bf12e3f08b684b212",
+  "contains_both": true,
+  "experiment": {
+   "bound_source_tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
+   "established_by": [
+    "tests/test_exp001b_bounded_memory.py \u2014 5 equivalence tests: sealed forecast ledger byte-identical, outcomes ledger identical, whole record identical apart from elapsed_s, dm and n0 compared value by value, and no forecast retention on a validation run",
+    "the existing exp001b suite \u2014 65 tests",
+    "results/exp001b_aligned_qualification.json \u2014 166,110 rows, both grading passes, matching an independent calculation"
+   ],
+   "identical_to_the_qualified_tree": true,
+   "n_files": 48,
+   "path": "apex/world_model/exp001b/run.py"
+  },
+  "launcher": {
+   "established_by": [
+    "tests/test_research_activation.py \u2014 outcome classification through the real CLI with controlled child processes (7), result-to-run binding (5), exit-4 contract (4), resumption (6)",
+    "tests/test_activation_verifier_review.py \u2014 verifier repairs and package self-consistency",
+    "tests/test_real_data_boundary.py \u2014 sealing through the real execute path with disposable authority (3)"
+   ],
+   "how_it_is_pinned_instead": "by the commit. The operator invokes it FROM the fresh checkout and verifies its sha256 first.",
+   "in_bound_tree": false,
+   "path": "scripts/research_activation.py",
+   "sha256": "5aeb8288647d55342278b7eff22d9875e42f280015302ea038bfe4ba91edc712",
+   "why_that_matters": "the admission cannot pin it. Matching the bound experiment hash establishes the experiment only."
+  }
+ },
+ "plan": "EXP001B_REVISION_PLAN",
+ "qualification_carried_forward": {
+  "anonymous_working_set_peak_bytes": 881557504,
+  "both_grading_passes_completed": true,
+  "cgroup_memory_peak_bytes_before_exit": 1468006400,
+  "effective_cap_bytes": 1468006400,
+  "expected_independently": 166110,
+  "explanation": "the counters show the limit was reached once and no kill occurred. Reclaim of clean page cache from the 567 MB output file is the explanation most consistent with that and with the anonymous set peaking well below the cap. It was NOT directly instrumented, so it is the supported reading rather than a conclusively established cause. Other contributions to the cgroup total were not measured separately.",
+  "explanation_status": "SUPPORTED, NOT ESTABLISHED",
+  "headroom_at_peak": "ZERO in cgroup terms. The peak equalled the cap.",
+  "match": true,
+  "memory_events": {
+   "max": 1,
+   "oom": 0,
+   "oom_group_kill": 0,
+   "oom_kill": 0
+  },
+  "practical_consequence": "the margin is not anonymous headroom. A workload that grew the anonymous set materially could still fail.",
+  "rows": 166110
+ },
+ "read_only": true,
+ "sequence_from_here": [
+  "targeted source review of this one revision",
+  "add the two root flags so a second environment can be built through the wrapper",
+  "setup the fresh environment; verify; probe",
+  "authority signs the v3 request bound to ed4825684cd00ce5c70ef12bf12e3f08b684b212",
+  "install decision and signature; verify signature on host",
+  "verify, prepare, then execute into a NEW run directory"
+ ]
+}

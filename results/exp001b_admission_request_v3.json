@@ -2,19 +2,19 @@
  "NOTE": "THIS IS A REQUEST, NOT A DECISION. Unsigned; decision is not ADMIT and provenance names no principal. The identity string is not the boundary: it selects which public key in allowed_signers must have signed. The boundary is possession of the private key, held off-host and never present on the research host, together with protection of allowed_signers. Only the admission authority may author and sign.",
  "REVISION_CLASS": {
   "aborted_attempt": "20260908T131351Z-exp001b-2054eaa4, INCOMPLETE_DUE_TO_OOM, no statistical verdict, preserved read-only",
-  "equivalence_proved": "sealed forecasts byte-identical and final statistics identical against the pre-repair source on deterministic fixtures; see tests/test_exp001b_bounded_memory.py",
+  "is_a_new_experiment": false,
   "is_a_new_hypothesis": false,
-  "kind": "ENGINEERING_REVISION_AFTER_ABORTED_ATTEMPT",
+  "kind": "BOUNDED_MEMORY_ENGINEERING_REVISION_AFTER_ABORTED_ATTEMPT",
   "learning_algorithm_changed": false,
+  "note": "changing bound code requires a fresh admission and a fresh checkout. It does not require a new registration and does not change the hypothesis.",
   "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9",
   "registration_unchanged": true,
   "statistical_procedure_changed": false
  },
- "SUPERSEDED_BY": "results/exp001b_admission_request_v3.json \u2014 v2 pinned 22ea5104, which carries the qualified run.py but NOT the later launcher repairs. v3 pins one revision containing both.",
  "SUPERSEDES": {
-  "decision_sha256": "1eafbe1fd972a45bc320acf2da0468a4a601eef7a00b7e6090499cc9cfcd0fa2",
-  "previous_source_tree": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545",
-  "why": "the source it bound was changed by a bounded-memory repair, so its code.source_tree_sha256 no longer matches; the previous admission is spent and cannot authorise the repaired source"
+  "spent_decision_sha256": "1eafbe1fd972a45bc320acf2da0468a4a601eef7a00b7e6090499cc9cfcd0fa2",
+  "v2_commit": "22ea5104c682145cbb6d5c25a336df4605c5c685",
+  "why": "v2 pinned the commit that carried the qualified run.py, but the launcher repairs \u2014 result binding, outcome classification and the exit-4 contract \u2014 landed after it. Matching the bound experiment hash does not establish launcher identity, because the launcher is not a bound path. v3 pins ONE revision containing both."
  },
  "availability": {
   "corporate_actions": "RAW_UNADJUSTED_EXPLICIT",
@@ -35,8 +35,9 @@
   }
  },
  "code": {
-  "commit": "22ea5104c682145cbb6d5c25a336df4605c5c685",
-  "note": "the bound tree MOVED because run.py is a bound path and the bounded-memory repair changed it. That is why a fresh signature is required and the previous one cannot be reused.",
+  "commit": "ed4825684cd00ce5c70ef12bf12e3f08b684b212",
+  "launcher_sha256_not_covered_by_the_bound_tree": "5aeb8288647d55342278b7eff22d9875e42f280015302ea038bfe4ba91edc712",
+  "note": "the bound tree covers the experiment. scripts/research_activation.py is NOT a bound path, so this decision cannot pin it. It is pinned by the COMMIT: invoking the launcher from the fresh checkout at this commit is what makes the reviewed launcher the one that runs. The operator verifies its sha256 before use.",
   "source_tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345"
  },
  "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
@@ -54,7 +55,7 @@
  "provenance": {
   "decided_by": "UNSIGNED_REQUEST_AWAITING_AUTHORITY",
   "decided_utc": null,
-  "review_reference": "EXP001B-BOUNDED-MEMORY-RECOVERY"
+  "review_reference": "EXP001B-REVISION-PLAN"
  },
  "purpose": {
   "experiment_id": "ALPHA-EXP-001B",

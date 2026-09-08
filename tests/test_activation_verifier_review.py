@@ -309,3 +309,49 @@ def test_the_request_pins_the_commit_that_is_actually_prepared():
                       "results" / "exp001b_admission_request.json").read_text())
     assert req["code"]["commit"] == _pkg()["identifiers"]["prepared_checkout_commit"]
     assert req["code"]["source_tree_sha256"] == _pkg()["identifiers"]["bound_source_tree_sha256"]
+
+
+# ============ the revision plan must not drift from the artifacts ==========
+def _load(name):
+    import json
+    return json.loads((Path(__file__).resolve().parents[1] / "results" / name).read_text())
+
+
+def test_the_v3_request_pins_one_revision_carrying_both_halves():
+    plan = _load("exp001b_revision_plan.json")
+    req = _load("exp001b_admission_request_v3.json")
+    rev = plan["one_reviewed_revision"]
+    assert req["code"]["commit"] == rev["commit"]
+    assert req["code"]["source_tree_sha256"] == rev["experiment"]["bound_source_tree_sha256"]
+    # the launcher is identified separately because the bound tree cannot cover it
+    assert rev["launcher"]["in_bound_tree"] is False
+    assert req["code"]["launcher_sha256_not_covered_by_the_bound_tree"] == \
+        rev["launcher"]["sha256"]
+    assert rev["experiment"]["identical_to_the_qualified_tree"] is True
+
+
+def test_the_revision_is_not_described_as_a_new_experiment():
+    req = _load("exp001b_admission_request_v3.json")
+    rc = req["REVISION_CLASS"]
+    assert rc["is_a_new_experiment"] is False
+    assert rc["is_a_new_hypothesis"] is False
+    assert rc["registration_unchanged"] is True
+    assert rc["registration_hash"] == (
+        "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9")
+
+
+def test_the_zero_headroom_disclosure_survives_and_stays_hedged():
+    q = _load("exp001b_revision_plan.json")["qualification_carried_forward"]
+    assert q["cgroup_memory_peak_bytes_before_exit"] == q["effective_cap_bytes"]
+    assert q["memory_events"]["oom_kill"] == 0 and q["memory_events"]["max"] == 1
+    assert "ZERO" in q["headroom_at_peak"]
+    # the cause is supported, not established
+    assert q["explanation_status"] == "SUPPORTED, NOT ESTABLISHED"
+    assert "not directly instrumented" in q["explanation"].lower() or \
+           "NOT directly instrumented" in q["explanation"]
+
+
+def test_the_repin_guard_is_recorded_as_untouched():
+    g = _load("exp001b_revision_plan.json")["guard_untouched"]
+    assert "not bypassed" in g["repin_guard"] and "not weakened" in g["repin_guard"]
+    assert "TEXT" in g["only_change_made"] or "text" in g["only_change_made"]
