@@ -1,0 +1,59 @@
+{
+ "NOTE": "THIS IS A REQUEST, NOT A DECISION. It is unsigned and its decision field is deliberately not ADMIT, so the boundary refuses it if it is ever presented as an admission. Only the admission authority may author and sign the decision itself.",
+ "availability": {
+  "corporate_actions": "continuous series; adjustment basis stated in the manifest",
+  "event_time": "bar timestamp, exchange local, converted to UTC",
+  "publication_time": "NOT_RECORDED_IN_THIS_DATASET",
+  "receipt_time": "NOT_RECORDED_IN_THIS_DATASET",
+  "restricted_use": "research only; no order routing; no paper or live session",
+  "revision_time": "NOT_RECORDED_IN_THIS_DATASET"
+ },
+ "code": {
+  "commit": "PENDING_FINAL_COMMIT",
+  "source_tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545"
+ },
+ "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
+ "dataset": {
+  "dataset_id": "history-b/etf_continuous",
+  "manifest_path": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json",
+  "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "root": "/apex-data/history-b/etf_continuous/bars"
+ },
+ "decision": "REQUESTED_NOT_GRANTED",
+ "output": {
+  "authority_classification": "RESEARCH_EVIDENCE",
+  "root": "/apex-data/research/out"
+ },
+ "provenance": {
+  "decided_by": "UNSIGNED_REQUEST_AWAITING_AUTHORITY",
+  "decided_utc": null,
+  "review_reference": "EXP001B-ACTIVATION-001"
+ },
+ "purpose": {
+  "experiment_id": "ALPHA-EXP-001B",
+  "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9",
+  "research_purpose": "Execute the frozen train/validation protocol of ALPHA-EXP-001B on admitted historical SPY sessions, producing a distributional result only."
+ },
+ "scope": {
+  "fields": [
+   "open",
+   "high",
+   "low",
+   "close",
+   "volume",
+   "timestamp"
+  ],
+  "source_families": [
+   "ETF_CONTINUOUS_INTRADAY_BARS"
+  ],
+  "temporal_range": {
+   "end": "2021-12-31",
+   "evaluation_period_sealed": "2022-01-01 onward is NOT admitted",
+   "sessions": 1511,
+   "start": "2016-01-04"
+  },
+  "universe": [
+   "SPY"
+  ]
+ }
+}

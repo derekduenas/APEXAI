@@ -279,9 +279,21 @@ def assert_identity(user: str, *, must_exist: bool) -> dict:
 
 
 # ----------------------------------------------------------- source ident
+# The checkout is handed to the research account, so root inspects a tree it
+# does not own and git refuses on "dubious ownership". The exception is pinned
+# to the one repo being read, and the other account's global and system config
+# is neutralised so nothing it could write can influence the inspection.
+# Residual: repo-local .git/config still applies. The checkout is cloned by
+# root from a trusted local repo and handed over within the same process, so
+# there is no window in which the research account could author it.
+_GIT_ENV = {"GIT_CONFIG_GLOBAL": "/dev/null", "GIT_CONFIG_SYSTEM": "/dev/null",
+            "PATH": "/usr/bin:/bin", "LC_ALL": "C"}
+
+
 def _git(repo: Path, *args, binary=False):
-    r = subprocess.run(["git", "-C", str(repo), *[str(a) for a in args]],
-                       capture_output=True, timeout=300)
+    r = subprocess.run(["git", "-C", str(repo), "-c", "safe.directory=%s" % repo,
+                        *[str(a) for a in args]],
+                       capture_output=True, timeout=300, env=dict(_GIT_ENV))
     if r.returncode != 0:
         raise ActivationRefused("GIT_FAILED: git %s in %s: %s"
                                 % (" ".join(map(str, args)), repo, r.stderr.decode()[:200]))
@@ -540,12 +552,28 @@ def load_setup_record(t: Targets) -> dict:
 
 
 # ----------------------------------------------------------------- setup
-def run_setup(t: Targets, commit: str, *, apply: bool, run: SystemRunner | None = None) -> dict:
+def run_setup(t: Targets, commit: str, *, apply: bool, run: SystemRunner | None = None,
+              resume: bool = False) -> dict:
     run = run or SystemRunner()
-    pre = preflight(t, commit, None)
+    prior = None
+    if resume:
+        try:
+            prior = load_setup_record(t)
+        except ActivationRefused as e:
+            raise ActivationRefused("NOTHING_TO_RESUME: %s" % e) from e
+        if prior.get("state") not in (STATE_PARTIAL, STATE_IN_PROGRESS):
+            raise ActivationRefused("NOT_RESUMABLE: recorded state is %s" % prior.get("state"))
+    pre = preflight(t, commit, None, resuming=resume)
     if not pre["ok"]:
         raise ActivationRefused("PREFLIGHT_FAILED: %s" % ", ".join(pre["blocking"]))
-    assert_identity(t.research_user, must_exist=False)
+    if prior is not None and prior.get("commit") != pre["resolved_commit"]["commit"]:
+        raise ActivationRefused("RESUME_COMMIT_MISMATCH: partial run was %s, requested %s"
+                                % (str(prior.get("commit"))[:12], pre["resolved_commit"]["commit"][:12]))
+    # Fresh: the account must NOT exist. Resuming: it may, and if it does it
+    # must still be the unprivileged account this wrapper is allowed to use --
+    # assert_identity checks group membership and privilege either way.
+    assert_identity(t.research_user,
+                    must_exist=bool(resume and account_facts(t.research_user)["present"]))
     ctx = {"ident": pre["resolved_commit"], "files": admitted_files(t)}
     plan = stages(t)
     rec = {"contract": ACTIVATION_VERSION, "action": "setup", "applied": bool(apply),
@@ -562,8 +590,25 @@ def run_setup(t: Targets, commit: str, *, apply: bool, run: SystemRunner | None 
         rec["state"] = "DRY_RUN"
         rec["note"] = "nothing executed; no object created; run with --apply to perform these stages"
         return rec
+    rec["resumed_from"] = (prior or {}).get("failed_at")
     for s in plan:
         try:
+            if resume:
+                # Ask reality first. A stage whose object already satisfies its
+                # own verifier is not redone; anything else is executed and then
+                # verified exactly as on a fresh run. Nothing is trusted because
+                # a previous record claimed it.
+                try:
+                    ev = s.verify(t, ctx)
+                    rec["stages"].append({"stage": s.name, "status": "ALREADY_VERIFIED",
+                                          "utc": now(), "evidence": ev})
+                    rec["created"].append({"object": s.obj, "class": s.cls, "kind": s.kind,
+                                           "stage": s.name, "utc": now(), "evidence": ev,
+                                           "carried_from_partial_run": True})
+                    _persist(t, rec)
+                    continue
+                except ActivationRefused:
+                    pass
             s.execute(t, ctx, run)
             ev = s.verify(t, ctx)
         except ActivationRefused as e:
@@ -847,7 +892,8 @@ def run_rollback(t: Targets, *, apply: bool, run: SystemRunner | None = None) ->
 
 
 # -------------------------------------------------------------- preflight
-def preflight(t: Targets, commit: str | None, decision: Path | None) -> dict:
+def preflight(t: Targets, commit: str | None, decision: Path | None,
+              *, resuming: bool = False) -> dict:
     rec = {"contract": ACTIVATION_VERSION, "utc": now(), "action": "preflight",
            "targets": {k: str(v) for k, v in (("research_user", t.research_user),
                                               ("runner_root", t.runner_root), ("venv", t.venv),
@@ -862,10 +908,16 @@ def preflight(t: Targets, commit: str | None, decision: Path | None) -> dict:
             rec["blocking"].append(name)
 
     a = account_facts(t.research_user)
-    chk("identity_absent", not a["present"], a if a["present"] else "%s does not exist yet" % t.research_user)
+    # A fresh run demands untouched ground. A resumption is finishing a run
+    # that already broke ground, so existing objects are the premise rather
+    # than a contradiction -- they are still each re-verified before use.
+    chk("identity_absent", (not a["present"]) or resuming,
+        a if a["present"] else "%s does not exist yet" % t.research_user)
     for label, p in (("runner_root", t.runner_root), ("research_root", t.research_root),
                      ("checkout", t.checkout), ("view", t.view)):
-        chk("destination_free:%s" % label, not p.exists(), "EXISTS" if p.exists() else "free")
+        chk("destination_free:%s" % label, (not p.exists()) or resuming,
+            ("EXISTS (resuming)" if resuming else "EXISTS") if p.exists() else "free")
+    rec["resuming"] = bool(resuming)
     chk("source_repo", t.source_repo.is_dir(), str(t.source_repo))
     chk("system_python", Path(t.system_python).exists(), t.system_python)
     chk("corpus_readable", os.access(t.corpus_root, os.R_OK), str(t.corpus_root))
@@ -911,6 +963,9 @@ def _cli(argv=None, *, targets: Targets | None = None, runner: SystemRunner | No
     ap.add_argument("--commit", default=None)
     ap.add_argument("--decision", default=None)
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--resume", action="store_true",
+                    help="finish a PARTIAL setup: re-verify each stage and perform only "
+                         "the ones reality does not already satisfy")
     ap.add_argument("--json", default=None)
     a = ap.parse_args(argv)
     t = targets or production_targets()
@@ -920,7 +975,7 @@ def _cli(argv=None, *, targets: Targets | None = None, runner: SystemRunner | No
         elif a.action == "setup":
             if not a.commit:
                 raise ActivationRefused("UNRESOLVED_INPUTS: --commit is required")
-            rec = run_setup(t, a.commit, apply=a.apply, run=runner)
+            rec = run_setup(t, a.commit, apply=a.apply, run=runner, resume=a.resume)
         elif a.action == "verify":
             rec = run_verify(t)
         elif a.action == "probe":

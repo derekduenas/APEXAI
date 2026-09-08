@@ -57,7 +57,9 @@ class StandIn(RA.SystemRunner):
                     else {"name": u, "present": False})
             return subprocess.CompletedProcess(argv, 0, "", "")
         if "-m" in argv and "venv" in argv:                     # python -m venv
-            venv = Path(argv[-1]); (venv / "bin").mkdir(parents=True)
+            # real `python -m venv` repairs an existing directory; the
+            # stand-in must too, or it cannot model a resumed run
+            venv = Path(argv[-1]); (venv / "bin").mkdir(parents=True, exist_ok=True)
             p = venv / "bin" / "python"; p.write_text(PY_STUB); os.chmod(p, 0o755)
             pip = venv / "bin" / "pip"; pip.write_text("#!/bin/sh\necho numpy==2.4.6\n"); os.chmod(pip, 0o755)
             return subprocess.CompletedProcess(argv, 0, "", "")
@@ -517,3 +519,77 @@ def test_no_market_row_is_parsed():
     src = (REPO / "scripts/research_activation.py").read_text()
     for forbidden in ("observable_rows", "load_session", "economic_evaluation", "bars.targets"):
         assert forbidden not in src
+
+
+# ============================ resumption ==================================
+# A partial setup used to be terminal: preflight demands untouched ground and
+# rollback refuses to delete a parent holding evidence, so the wrapper could
+# neither continue nor reset. Finishing the run is the only honest way out.
+
+def _partial(rig, fail_on="git"):
+    run = StandIn(rig["t"], fail_on=fail_on)
+    with pytest.raises(Refused):
+        RA.run_setup(rig["t"], rig["commit"], apply=True, run=run)
+    return run
+
+
+def test_resume_refuses_when_there_is_nothing_to_resume(rig):
+    with pytest.raises(Refused, match="NOTHING_TO_RESUME"):
+        RA.run_setup(rig["t"], rig["commit"], apply=True, run=StandIn(rig["t"]), resume=True)
+
+
+def test_resume_refuses_a_setup_that_already_completed(rig):
+    RA.run_setup(rig["t"], rig["commit"], apply=True, run=StandIn(rig["t"]))
+    with pytest.raises(Refused, match="NOT_RESUMABLE"):
+        RA.run_setup(rig["t"], rig["commit"], apply=True, run=StandIn(rig["t"]), resume=True)
+
+
+def test_resume_refuses_a_different_commit(rig):
+    _partial(rig)
+    src = rig["t"].source_repo
+    (src / "apex" / "world_model" / "x.py").write_text("X = 2\n")
+    _git(src, "add", "-A"); _git(src, "commit", "-q", "-m", "second")
+    other = _git(src, "rev-parse", "HEAD")
+    with pytest.raises(Refused, match="RESUME_COMMIT_MISMATCH"):
+        RA.run_setup(rig["t"], other, apply=True, run=StandIn(rig["t"]), resume=True)
+
+
+def test_resume_finishes_the_run_without_redoing_satisfied_stages(rig):
+    """The point of resuming is to perform what is missing and nothing else."""
+    t = rig["t"]
+    _partial(rig)
+    before = json.loads(t.setup_manifest.read_text())
+    assert before["state"] == "PARTIAL_FAILED"
+    run = StandIn(t)
+    rec = RA.run_setup(t, rig["commit"], apply=True, run=run, resume=True)
+    assert rec["state"] == "COMPLETE"
+    assert rec["resumed_from"] == before["failed_at"]
+    carried = {s["stage"] for s in rec["stages"] if s["status"] == "ALREADY_VERIFIED"}
+    redone = {s["stage"] for s in rec["stages"] if s["status"] == "VERIFIED"}
+    assert "account" in carried and "venv" in carried      # already real, not repeated
+    assert before["failed_at"] in redone                   # the missing one was performed
+    assert "adduser" not in [c[0] for c in run.calls]      # the account was NOT recreated
+    for p in (t.venv, t.python, t.checkout, t.view_bars):
+        assert p.exists()
+
+
+def test_resume_still_verifies_rather_than_trusting_the_record(rig):
+    """A carried stage is carried because reality satisfies its verifier now,
+    never because a previous record said so. Break the object and the resume
+    must rebuild or refuse -- it must not wave it through."""
+    t = rig["t"]
+    _partial(rig)
+    t.python.unlink()                                   # the recorded venv is now a lie
+    run = StandIn(t)
+    rec = RA.run_setup(t, rig["commit"], apply=True, run=run, resume=True)
+    assert rec["state"] == "COMPLETE"
+    assert "venv" in {s["stage"] for s in rec["stages"] if s["status"] == "VERIFIED"}
+    assert t.python.exists()
+
+
+def test_a_fresh_setup_still_refuses_ground_that_is_already_broken(rig):
+    """Resumption must not become a way to run setup over an existing tree."""
+    t = rig["t"]
+    _partial(rig)
+    with pytest.raises(Refused, match="PREFLIGHT_FAILED"):
+        RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))     # no resume=True

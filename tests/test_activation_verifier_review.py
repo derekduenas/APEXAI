@@ -115,3 +115,35 @@ def test_evidence_records_whether_uid_separation_was_actually_checked(tmp_path):
     ev = ra.stages(t)[9].verify(t, {})
     assert ev["uid_separation_checked"] is False
     assert ev["runner_root_uid"] == os.getuid()
+
+
+# ==================== the admission request is not an admission ===========
+REQUEST = Path(__file__).resolve().parents[1] / "results" / "exp001b_admission_request.json"
+
+
+def test_the_admission_request_is_complete_as_a_template():
+    """The authority should have to judge, not to hunt for fields. Every field
+    the boundary requires is present and filled from measurement."""
+    import json
+    from apex.world_model.real_data.boundary import REQUIRED_BODY
+    doc = json.loads(REQUEST.read_text())
+    for k, subs in REQUIRED_BODY.items():
+        assert k in doc, k
+        for sub in (subs or ()):
+            assert sub in doc[k], "%s.%s" % (k, sub)
+    assert doc["dataset"]["manifest_sha256"] == (
+        "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39")
+    assert doc["purpose"]["experiment_id"] == "ALPHA-EXP-001B"
+    assert doc["scope"]["temporal_range"]["end"] == "2021-12-31"
+
+
+def test_the_admission_request_cannot_be_used_as_an_admission():
+    """If this file were ever handed to the boundary it must be refused. The
+    decision field is not ADMIT and the provenance names no authority, so the
+    two checks that exist to stop self-admission both fire."""
+    import json
+    doc = json.loads(REQUEST.read_text())
+    assert doc["decision"] != "ADMIT"
+    assert doc["provenance"]["decided_utc"] is None
+    assert doc["provenance"]["decided_by"].upper() not in ("CALLER", "ENGINEERING", "SELF", "")
+    assert not (REQUEST.parent / (REQUEST.name + ".sig")).exists()
