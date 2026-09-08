@@ -1,0 +1,353 @@
+{
+ "contract": "EVENT_SOURCE_ELIGIBILITY_MATRIX_V0",
+ "produced_utc": "2026-09-08T01:50:55Z",
+ "statuses": [
+  "ADMISSIBLE",
+  "ADMISSIBLE_WITH_LIMITATIONS",
+  "PROSPECTIVE_ONLY",
+  "NOT_ADMISSIBLE",
+  "UNTRACED"
+ ],
+ "field_rows": [
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "actual_value",
+   "status": "NOT_ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "affected_assets",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "affected_sectors",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "affected_symbols",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "authority",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "decision_power",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "entry_hash",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "event_id",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "event_time",
+   "status": "ADMISSIBLE_WITH_LIMITATIONS"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "event_type",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "expected_value",
+   "status": "NOT_ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "factual_summary",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "first_seen",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "headline",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "importance",
+   "status": "ADMISSIBLE_WITH_LIMITATIONS"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "interpreter",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "kind",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "known_from",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "market_state_at_event",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "mechanism_hypotheses",
+   "status": "ADMISSIBLE_WITH_LIMITATIONS"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "observations",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "prev_hash",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "prior_value",
+   "status": "NOT_ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "release_sha",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "scheduled",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "surprise",
+   "status": "NOT_ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "uncertainty",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "verification",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "directional_expectation",
+   "status": "ADMISSIBLE_WITH_LIMITATIONS"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "expectation_contract_sha",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "expectation_known_from",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_events",
+   "field": "expectation_source",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "decision_power",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "entity_hints",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "entry_hash",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "first_seen_time",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "kind",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "known_from",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "law",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "locator",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "prev_hash",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "published_time",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "raw_excerpt",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "raw_text_hash",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "release_sha",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "retrieved_time",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "source",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "source_authority",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "source_observation_id",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "source_type",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "field": "title",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "claim_scope",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "decision_power",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "entry_hash",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "kind",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "prev_hash",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "cutoff_dollar_volume",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "decided_asof",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "member_month",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "rule",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "symbols",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "calendar_sessions",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "candidates_ranked",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "directory_symbols",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "distinct_member_names",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "membership_months",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "pruned_provably_safe",
+   "status": "ADMISSIBLE"
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "field": "symbols_with_bars",
+   "status": "ADMISSIBLE"
+  }
+ ]
+}

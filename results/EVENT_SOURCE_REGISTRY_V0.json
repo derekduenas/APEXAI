@@ -1,0 +1,747 @@
+{
+ "contract": "EVENT_SOURCE_CERTIFICATION_V0",
+ "produced_utc": "2026-09-08T01:50:55Z",
+ "families": {
+  "scheduled_macro_releases": {
+   "description": "FOMC/CPI/NFP style releases with a published calendar",
+   "candidates_declared": 0,
+   "candidates_present": 0,
+   "best_status": "UNTRACED",
+   "sources": []
+  },
+  "earnings_dates_and_releases": {
+   "description": "per-issuer earnings timing and content",
+   "candidates_declared": 0,
+   "candidates_present": 0,
+   "best_status": "UNTRACED",
+   "sources": []
+  },
+  "sec_filings": {
+   "description": "EDGAR 8-K/10-Q/10-K and friends",
+   "candidates_declared": 1,
+   "candidates_present": 0,
+   "best_status": "UNTRACED",
+   "sources": [
+    "edgar_events_ledger"
+   ]
+  },
+  "corporate_actions": {
+   "description": "splits, dividends, symbol changes",
+   "candidates_declared": 2,
+   "candidates_present": 2,
+   "best_status": "ADMISSIBLE_WITH_LIMITATIONS",
+   "sources": [
+    "etf_continuous_integrity",
+    "pit_singlename_membership"
+   ]
+  },
+  "analyst_revisions": {
+   "description": "estimate and rating changes",
+   "candidates_declared": 0,
+   "candidates_present": 0,
+   "best_status": "UNTRACED",
+   "sources": []
+  },
+  "news": {
+   "description": "wire and press coverage",
+   "candidates_declared": 3,
+   "candidates_present": 3,
+   "best_status": "PROSPECTIVE_ONLY",
+   "sources": [
+    "apex_catalyst_events",
+    "apex_catalyst_raw_observations",
+    "apex_catalyst_cycles"
+   ]
+  },
+  "options_implied_events": {
+   "description": "event timing implied by the option surface",
+   "candidates_declared": 1,
+   "candidates_present": 1,
+   "best_status": "NOT_AN_EVENT_SOURCE",
+   "sources": [
+    "options_history_manifest"
+   ]
+  },
+  "political_geopolitical": {
+   "description": "policy and geopolitical events",
+   "candidates_declared": 0,
+   "candidates_present": 0,
+   "best_status": "UNTRACED",
+   "sources": []
+  },
+  "social_alternative": {
+   "description": "social and alternative data",
+   "candidates_declared": 0,
+   "candidates_present": 0,
+   "best_status": "UNTRACED",
+   "sources": []
+  }
+ },
+ "sources": [
+  {
+   "source_id": "apex_catalyst_events",
+   "family": "news",
+   "provider": "APEX Catalyst (own capture)",
+   "location": "/apex-data/core/catalyst/events.jsonl",
+   "role": "EVENT_STREAM",
+   "resolved_path": "/apex-data/core/catalyst/events.jsonl",
+   "present": true,
+   "size_bytes": 11281367,
+   "mtime_utc": "2026-09-04T20:02:01Z",
+   "content_sha256": "d538ac69cbbdb8d712b0c2c147239a96231c659b798ffe6c00263e3e24e2271f",
+   "scan": {
+    "records": 5163,
+    "malformed_lines": 0,
+    "fields": {
+     "actual_value": 5163,
+     "affected_assets": 5163,
+     "affected_sectors": 5163,
+     "affected_symbols": 5163,
+     "authority": 5163,
+     "decision_power": 5163,
+     "entry_hash": 5163,
+     "event_id": 5163,
+     "event_time": 5163,
+     "event_type": 5163,
+     "expected_value": 5163,
+     "factual_summary": 5163,
+     "first_seen": 5163,
+     "headline": 5163,
+     "importance": 5163,
+     "interpreter": 5163,
+     "kind": 5163,
+     "known_from": 5163,
+     "market_state_at_event": 5163,
+     "mechanism_hypotheses": 5163,
+     "observations": 5163,
+     "prev_hash": 5163,
+     "prior_value": 5163,
+     "release_sha": 5163,
+     "scheduled": 5163,
+     "surprise": 5163,
+     "uncertainty": 5163,
+     "verification": 5163,
+     "directional_expectation": 4218,
+     "expectation_contract_sha": 4218,
+     "expectation_known_from": 4218,
+     "expectation_source": 4218
+    },
+    "time_field_formats": {
+     "first_seen:ISO8601": 5163,
+     "known_from:ISO8601": 5163,
+     "event_time:ISO8601": 2879,
+     "event_time:RFC2822": 2279,
+     "event_time:UNPARSEABLE": 5
+    },
+    "coverage_by_time_field": {
+     "event_time": {
+      "n": 5158,
+      "min": "2015-01-21T16:15:00-05:00",
+      "max": "2026-09-04T18:59:00+00:00"
+     },
+     "first_seen": {
+      "n": 5163,
+      "min": "2026-08-27T02:38:14.549526+00:00",
+      "max": "2026-09-04T20:00:06.083127+00:00"
+     },
+     "known_from": {
+      "n": 5163,
+      "min": "2026-08-27T02:38:14.549526+00:00",
+      "max": "2026-09-04T20:00:06.083127+00:00"
+     }
+    },
+    "duplicate_content_hashes": {
+     "distinct_repeated": 0,
+     "examples": {}
+    },
+    "repeated_event_ids": {
+     "EV_88012f9ee17fbc91": 2,
+     "EV_16b998957bcee929": 2,
+     "EV_37720615138aa59e": 3,
+     "EV_b7f5a8c2c314fa7b": 2,
+     "EV_5f27df19a63998ea": 2,
+     "EV_6a41b503f3562287": 2,
+     "EV_793ebcc5881605c4": 2,
+     "EV_22ccbbabf8aecc80": 2,
+     "EV_5f29c5e5c58f1539": 2,
+     "EV_355702b0487f3098": 2,
+     "EV_89b7595eff7b48f6": 3,
+     "EV_3d4ba1c5b47ae921": 2,
+     "EV_ad23dacd463086a8": 2,
+     "EV_259428a6e3ca46f8": 2,
+     "EV_39b17c7c99acc0d5": 2,
+     "EV_fad2ab3a5b6e7374": 2,
+     "EV_e97ccdb22f0f5d80": 2,
+     "EV_ec74f7037684307d": 2,
+     "EV_3413007a21040295": 2,
+     "EV_c4f7e2d51660fad6": 3,
+     "EV_c10746d86f4a52aa": 2,
+     "EV_8632cd87180900ba": 2,
+     "EV_02c317876a8b615e": 2,
+     "EV_fe9c94261875b649": 2,
+     "EV_f21dc24f91477f56": 2,
+     "EV_f3ac51402c815710": 2,
+     "EV_c58350dc5df3a9c4": 2,
+     "EV_50bded56cebec5e7": 2,
+     "EV_b83c2949ff757534": 2,
+     "EV_11628af19a5241e2": 2,
+     "EV_9fbf641cd2e90455": 2,
+     "EV_882998d69c4e9fa5": 3,
+     "EV_1e113b4cf7d33b78": 2,
+     "EV_ca93659bb245a1ea": 2,
+     "EV_dc2f872ce4e10857": 2,
+     "EV_a9d3e6c72d81f84d": 2,
+     "EV_325fa30755e820c2": 2,
+     "EV_9051d21001f87b1c": 2,
+     "EV_b27b964061f8bb3a": 2,
+     "EV_40f28672fabfe576": 2,
+     "EV_a0bf0d629aa16c0d": 2,
+     "EV_aec75eec55380c02": 2,
+     "EV_2fb495259dd8ab8d": 3,
+     "EV_06488f4910936eec": 2,
+     "EV_a37bad5490b2afc5": 2,
+     "EV_cc9e11d53ca040b7": 2,
+     "EV_64235313f85a0438": 2,
+     "EV_e817e4e9791655ec": 2,
+     "EV_9259954a2de89713": 2,
+     "EV_1156cb856b50db5e": 2,
+     "EV_44548f887c9903c6": 2,
+     "EV_9786feda6b5a973c": 2,
+     "EV_efb8ec145e8958c1": 2,
+     "EV_21f13a95266b8407": 2,
+     "EV_a5fb9ef7106b6624": 2,
+     "EV_713b5b477c6f8729": 2,
+     "EV_2b3351eff5a9ea8f": 3,
+     "EV_6d7e24fa5c185ff7": 2,
+     "EV_44422326a746615c": 3,
+     "EV_4d13462b787fe123": 2,
+     "EV_c93bfa220be3cc10": 2,
+     "EV_6c2c39e38780e497": 2,
+     "EV_557e8bf1d1e3ae1c": 2,
+     "EV_a16705940bdd96e4": 2,
+     "EV_7da3d6838827fb02": 3,
+     "EV_7fd9e1b92b87ce8e": 2,
+     "EV_8810aa8872bdd8c6": 2,
+     "EV_53c66f288ac6eb78": 2,
+     "EV_8b7d654f5e3d3098": 3,
+     "EV_0d02dd91454716f9": 2,
+     "EV_f93b19d4286fa4d2": 2,
+     "EV_5c4b1b39050c6bd6": 4,
+     "EV_f013d8d4f6bcb321": 2,
+     "EV_9d979a59096e7ed5": 2,
+     "EV_464c8fcb9baa6be0": 2,
+     "EV_18caff29d8eee436": 2,
+     "EV_bb744fc05b2226d7": 2,
+     "EV_7f9b081c8c0a4c5a": 2,
+     "EV_4fc95100f89143c1": 2,
+     "EV_03924c9e80236bec": 2,
+     "EV_66c524e6b29480ec": 2,
+     "EV_573e68cb1425c9dc": 2,
+     "EV_680155ddb81678f6": 4,
+     "EV_8abe3fefdf1c6f3d": 2,
+     "EV_d63ef6b5ff27af64": 2,
+     "EV_81f9ac7b4ee1ea63": 2,
+     "EV_88ce36da57187ca8": 2,
+     "EV_802eac15707afa7b": 2,
+     "EV_1b97ddb170a0a34d": 2,
+     "EV_589fb4b4cbfdb08b": 2,
+     "EV_b43146db92758bea": 2,
+     "EV_f41d13d0041ba567": 2,
+     "EV_1461595cda0807c7": 2,
+     "EV_ead7879415ea873e": 2,
+     "EV_2aa2a25570eca9da": 2,
+     "EV_e3cffacb579b1d54": 2,
+     "EV_3e7523b2ec4b4047": 2,
+     "EV_5174d8588a490001": 2,
+     "EV_9d9a4348d46b23e2": 2,
+     "EV_89db35863a1339cb": 2,
+     "EV_7f1f160427c0088f": 2,
+     "EV_2977a1508bb529f8": 2,
+     "EV_c08db718cdb53a81": 2,
+     "EV_7f0b6b15308e9287": 2,
+     "EV_187332195ff1a880": 2,
+     "EV_bf95463b4d5af42a": 2,
+     "EV_df2058d7f58f0425": 2,
+     "EV_a60b1d5251e81dc5": 2,
+     "EV_20ed081fe5a0435c": 2,
+     "EV_21aa9cd53972ef19": 2,
+     "EV_76e7932393f45e44": 2,
+     "EV_3ede96234943881c": 2,
+     "EV_add9b4476e1ae989": 2,
+     "EV_574a3779d98fa8b3": 2,
+     "EV_393389304ab2cd49": 2,
+     "EV_190bae76fca3ea13": 2,
+     "EV_c0f9659aff47604a": 2,
+     "EV_ae2dd9bfef9954b7": 2,
+     "EV_3a40b4b44dd72532": 2,
+     "EV_561d2a030169df10": 2,
+     "EV_2eda8c6e4e9a8583": 2,
+     "EV_71dba749ba8f12ca": 2,
+     "EV_6c8cf0caaa79eea0": 2
+    },
+    "sources": {},
+    "source_authorities": {},
+    "publication_time_present": 0,
+    "publication_equals_retrieval": 0,
+    "known_from_before_publication": 0
+   },
+   "certification": {
+    "status": "PROSPECTIVE_ONLY",
+    "role": "EVENT_STREAM",
+    "reason": "earliest known-from is 2026-08-27: the store begins when capture was switched on, so it carries no information about any earlier period",
+    "coverage_start": "2026-08-27",
+    "coverage_end": "2026-09-04",
+    "fields": {
+     "actual_value": "NOT_ADMISSIBLE",
+     "affected_assets": "ADMISSIBLE",
+     "affected_sectors": "ADMISSIBLE",
+     "affected_symbols": "ADMISSIBLE",
+     "authority": "ADMISSIBLE",
+     "decision_power": "ADMISSIBLE",
+     "entry_hash": "ADMISSIBLE",
+     "event_id": "ADMISSIBLE",
+     "event_time": "ADMISSIBLE_WITH_LIMITATIONS",
+     "event_type": "ADMISSIBLE",
+     "expected_value": "NOT_ADMISSIBLE",
+     "factual_summary": "ADMISSIBLE",
+     "first_seen": "ADMISSIBLE",
+     "headline": "ADMISSIBLE",
+     "importance": "ADMISSIBLE_WITH_LIMITATIONS",
+     "interpreter": "ADMISSIBLE",
+     "kind": "ADMISSIBLE",
+     "known_from": "ADMISSIBLE",
+     "market_state_at_event": "ADMISSIBLE",
+     "mechanism_hypotheses": "ADMISSIBLE_WITH_LIMITATIONS",
+     "observations": "ADMISSIBLE",
+     "prev_hash": "ADMISSIBLE",
+     "prior_value": "NOT_ADMISSIBLE",
+     "release_sha": "ADMISSIBLE",
+     "scheduled": "ADMISSIBLE",
+     "surprise": "NOT_ADMISSIBLE",
+     "uncertainty": "ADMISSIBLE",
+     "verification": "ADMISSIBLE",
+     "directional_expectation": "ADMISSIBLE_WITH_LIMITATIONS",
+     "expectation_contract_sha": "ADMISSIBLE",
+     "expectation_known_from": "ADMISSIBLE",
+     "expectation_source": "ADMISSIBLE"
+    },
+    "event_date_versus_known_from": {
+     "earliest_event_or_publication": "2015-01-21",
+     "earliest_known_from": "2026-08-27",
+     "note": "event dates reach back to 2015-01-21 while APEX could not have known any of them before 2026-08-27: the gap is exactly what makes this store prospective"
+    }
+   }
+  },
+  {
+   "source_id": "apex_catalyst_raw_observations",
+   "family": "news",
+   "provider": "APEX Catalyst (own capture)",
+   "location": "/apex-data/core/catalyst/raw_observations.jsonl",
+   "role": "OBSERVATION_STREAM",
+   "resolved_path": "/apex-data/core/catalyst/raw_observations.jsonl",
+   "present": true,
+   "size_bytes": 6982406,
+   "mtime_utc": "2026-09-04T20:00:06Z",
+   "content_sha256": "c0ce09b564abbf45ebadbda0efe9ee173f6b463bfb7322f973092c0b1d734fec",
+   "scan": {
+    "records": 5209,
+    "malformed_lines": 0,
+    "fields": {
+     "decision_power": 5209,
+     "entity_hints": 5209,
+     "entry_hash": 5209,
+     "first_seen_time": 5209,
+     "kind": 5209,
+     "known_from": 5209,
+     "law": 5209,
+     "locator": 5209,
+     "prev_hash": 5209,
+     "published_time": 5209,
+     "raw_excerpt": 5209,
+     "raw_text_hash": 5209,
+     "release_sha": 5209,
+     "retrieved_time": 5209,
+     "source": 5209,
+     "source_authority": 5209,
+     "source_observation_id": 5209,
+     "source_type": 5209,
+     "title": 5209
+    },
+    "time_field_formats": {
+     "retrieved_time:ISO8601": 5209,
+     "first_seen_time:ISO8601": 5209,
+     "known_from:ISO8601": 5209,
+     "published_time:ISO8601": 2899,
+     "published_time:RFC2822": 2305,
+     "published_time:UNPARSEABLE": 5
+    },
+    "coverage_by_time_field": {
+     "published_time": {
+      "n": 5204,
+      "min": "2015-01-21T16:15:00-05:00",
+      "max": "2026-09-04T18:59:00+00:00"
+     },
+     "retrieved_time": {
+      "n": 5209,
+      "min": "2026-08-27T02:38:14.549526+00:00",
+      "max": "2026-09-04T20:00:06.083127+00:00"
+     },
+     "first_seen_time": {
+      "n": 5209,
+      "min": "2026-08-27T02:38:14.549526+00:00",
+      "max": "2026-09-04T20:00:06.083127+00:00"
+     },
+     "known_from": {
+      "n": 5209,
+      "min": "2026-08-27T02:38:14.549526+00:00",
+      "max": "2026-09-04T20:00:06.083127+00:00"
+     }
+    },
+    "duplicate_content_hashes": {
+     "distinct_repeated": 26,
+     "examples": {
+      "raw_text_hash=f541cb1aca8617d0": 2,
+      "raw_text_hash=866b25f8c2500ae0": 2,
+      "raw_text_hash=62a56de10505426f": 5,
+      "raw_text_hash=8aea5238fd2ec39e": 2,
+      "raw_text_hash=1fa5b8b933ff50a4": 2
+     }
+    },
+    "repeated_event_ids": {},
+    "sources": {
+     "YAHOO_FINANCE": 2813,
+     "GOOGLE_NEWS_MARKETS": 970,
+     "GOOGLE_NEWS_GEOPOLITICS": 879,
+     "FEDERAL_REGISTER": 323,
+     "BUREAU_ECONOMIC_ANALYSIS": 41,
+     "FEDERAL_RESERVE_H15_RATES": 40,
+     "NVIDIA_NEWSROOM": 27,
+     "FEDERAL_RESERVE_PRESS": 22,
+     "APPLE_NEWSROOM": 21,
+     "FEDERAL_RESERVE_SPEECHES": 18,
+     "SEC_EDGAR": 17,
+     "FEDERAL_RESERVE_MONETARY": 15
+    },
+    "source_authorities": {
+     "AGGREGATOR": 4662,
+     "PRIMARY_OFFICIAL": 472,
+     "COMPANY_DIRECT": 75
+    },
+    "publication_time_present": 5209,
+    "publication_equals_retrieval": 0,
+    "known_from_before_publication": 0
+   },
+   "certification": {
+    "status": "PROSPECTIVE_ONLY",
+    "role": "OBSERVATION_STREAM",
+    "reason": "earliest known-from is 2026-08-27: the store begins when capture was switched on, so it carries no information about any earlier period",
+    "coverage_start": "2026-08-27",
+    "coverage_end": "2026-09-04",
+    "fields": {
+     "decision_power": "ADMISSIBLE",
+     "entity_hints": "ADMISSIBLE",
+     "entry_hash": "ADMISSIBLE",
+     "first_seen_time": "ADMISSIBLE",
+     "kind": "ADMISSIBLE",
+     "known_from": "ADMISSIBLE",
+     "law": "ADMISSIBLE",
+     "locator": "ADMISSIBLE",
+     "prev_hash": "ADMISSIBLE",
+     "published_time": "ADMISSIBLE",
+     "raw_excerpt": "ADMISSIBLE",
+     "raw_text_hash": "ADMISSIBLE",
+     "release_sha": "ADMISSIBLE",
+     "retrieved_time": "ADMISSIBLE",
+     "source": "ADMISSIBLE",
+     "source_authority": "ADMISSIBLE",
+     "source_observation_id": "ADMISSIBLE",
+     "source_type": "ADMISSIBLE",
+     "title": "ADMISSIBLE"
+    },
+    "event_date_versus_known_from": {
+     "earliest_event_or_publication": "2015-01-21",
+     "earliest_known_from": "2026-08-27",
+     "note": "event dates reach back to 2015-01-21 while APEX could not have known any of them before 2026-08-27: the gap is exactly what makes this store prospective"
+    }
+   }
+  },
+  {
+   "source_id": "apex_catalyst_cycles",
+   "family": "news",
+   "provider": "APEX Catalyst (own capture)",
+   "location": "/apex-data/core/catalyst/cycles.jsonl",
+   "role": "OPERATIONAL_LOG",
+   "resolved_path": "/apex-data/core/catalyst/cycles.jsonl",
+   "present": true,
+   "size_bytes": 761698,
+   "mtime_utc": "2026-09-04T20:02:01Z",
+   "content_sha256": "351932b1b6d7d28dc2511ab0be4c6546b9f078e71bd8fd34e2dc9df20c18e9a2",
+   "scan": {
+    "records": 640,
+    "malformed_lines": 0,
+    "fields": {
+     "actual_end": 640,
+     "actual_start": 640,
+     "coverage": 640,
+     "cycle_id": 640,
+     "decision_power": 640,
+     "entry_hash": 640,
+     "failures": 640,
+     "interpreted": 640,
+     "kind": 640,
+     "last_error": 640,
+     "llm_calls": 640,
+     "new_events": 640,
+     "new_observations": 640,
+     "phase": 640,
+     "prev_hash": 640,
+     "raw_offered": 640,
+     "release_sha": 640,
+     "scheduled_time": 640,
+     "session": 640,
+     "sources_checked": 640,
+     "sources_failed": 640,
+     "sources_succeeded": 640,
+     "updated_events": 640,
+     "coverage_classes_missing": 638,
+     "coverage_classes_reached": 638,
+     "sources_yielding_nothing": 638
+    },
+    "time_field_formats": {},
+    "coverage_by_time_field": {},
+    "duplicate_content_hashes": {
+     "distinct_repeated": 0,
+     "examples": {}
+    },
+    "repeated_event_ids": {},
+    "sources": {},
+    "source_authorities": {},
+    "publication_time_present": 0,
+    "publication_equals_retrieval": 0,
+    "known_from_before_publication": 0
+   },
+   "certification": {
+    "status": "NOT_AN_EVENT_SOURCE",
+    "role": "OPERATIONAL_LOG",
+    "reason": "this store is a operational_log, not an event stream; it carries no per-event publication or known-from field and was never meant to. Its value here is coverage and receipt evidence, recorded below.",
+    "coverage_start": null,
+    "coverage_end": null,
+    "time_fields_present": [],
+    "fields": {}
+   }
+  },
+  {
+   "source_id": "edgar_events_ledger",
+   "family": "sec_filings",
+   "provider": "SEC EDGAR via APEX event clock",
+   "location": "results/events/edgar_events.jsonl",
+   "role": "EVENT_STREAM",
+   "resolved_path": "/apex-data/tmp/es001_wt/results/events/edgar_events.jsonl",
+   "present": false,
+   "certification": {
+    "status": "UNTRACED",
+    "role": "EVENT_STREAM",
+    "reason": "declared in code or expected by family but absent on this host",
+    "fields": {}
+   }
+  },
+  {
+   "source_id": "options_history_manifest",
+   "family": "options_implied_events",
+   "provider": "ThetaData via APEX acquisition",
+   "location": "/apex-data/history-a/options_history/manifest.jsonl",
+   "role": "DATASET_MANIFEST",
+   "resolved_path": "/apex-data/history-a/options_history/manifest.jsonl",
+   "present": true,
+   "size_bytes": 889586,
+   "mtime_utc": "2026-08-24T07:09:58Z",
+   "content_sha256": "8e0e43a4402a38d0f36ff56c3a85ee525226c22a4d831d3dfa0b332918d0aefd",
+   "scan": {
+    "records": 829,
+    "malformed_lines": 0,
+    "fields": {
+     "date": 829,
+     "state": 829,
+     "symbol": 829,
+     "acquired_at": 828,
+     "oi": 737,
+     "quotes": 737,
+     "underlying": 737,
+     "note": 91,
+     "error": 1
+    },
+    "time_field_formats": {
+     "acquired_at:ISO8601": 828
+    },
+    "coverage_by_time_field": {
+     "acquired_at": {
+      "n": 828,
+      "min": "2026-08-23T14:40:39+00:00",
+      "max": "2026-08-24T07:07:38+00:00"
+     }
+    },
+    "duplicate_content_hashes": {
+     "distinct_repeated": 0,
+     "examples": {}
+    },
+    "repeated_event_ids": {},
+    "sources": {},
+    "source_authorities": {},
+    "publication_time_present": 0,
+    "publication_equals_retrieval": 0,
+    "known_from_before_publication": 0
+   },
+   "certification": {
+    "status": "NOT_AN_EVENT_SOURCE",
+    "role": "DATASET_MANIFEST",
+    "reason": "this store is a dataset_manifest, not an event stream; it carries no per-event publication or known-from field and was never meant to. Its value here is coverage and receipt evidence, recorded below.",
+    "coverage_start": "2026-08-23",
+    "coverage_end": "2026-08-24",
+    "time_fields_present": [
+     "acquired_at"
+    ],
+    "fields": {}
+   }
+  },
+  {
+   "source_id": "etf_continuous_integrity",
+   "family": "corporate_actions",
+   "provider": "Alpaca SIP via APEX acquisition",
+   "location": "/apex-data/history-b/etf_continuous/integrity.jsonl",
+   "role": "DATASET_MANIFEST",
+   "resolved_path": "/apex-data/history-b/etf_continuous/integrity.jsonl",
+   "present": true,
+   "size_bytes": 11946,
+   "mtime_utc": "2026-08-29T20:44:35Z",
+   "content_sha256": "dec62ccdc2b7bcc0c37d31e09728c7485e85d680477fcda10f0c6e3dc0bb93c3",
+   "scan": {
+    "records": 3,
+    "malformed_lines": 0,
+    "fields": {
+     "adjustment": 3,
+     "corpus_version": 3,
+     "decision_power": 3,
+     "duplicates": 3,
+     "entry_hash": 3,
+     "kind": 3,
+     "law": 3,
+     "missing_by_symbol": 3,
+     "non_monotonic": 3,
+     "per_symbol": 3,
+     "prev_hash": 3,
+     "span": 3,
+     "symbols": 3,
+     "thetadata_overlap": 3,
+     "thin_days_by_symbol": 3,
+     "union_sessions": 3,
+     "verdict": 3,
+     "worst_symbol_missing_days": 3,
+     "inception_by_symbol": 2,
+     "worst_missing_pct_post_inception": 2
+    },
+    "time_field_formats": {},
+    "coverage_by_time_field": {},
+    "duplicate_content_hashes": {
+     "distinct_repeated": 0,
+     "examples": {}
+    },
+    "repeated_event_ids": {},
+    "sources": {},
+    "source_authorities": {},
+    "publication_time_present": 0,
+    "publication_equals_retrieval": 0,
+    "known_from_before_publication": 0
+   },
+   "certification": {
+    "status": "NOT_AN_EVENT_SOURCE",
+    "role": "DATASET_MANIFEST",
+    "reason": "this store is a dataset_manifest, not an event stream; it carries no per-event publication or known-from field and was never meant to. Its value here is coverage and receipt evidence, recorded below.",
+    "coverage_start": null,
+    "coverage_end": null,
+    "time_fields_present": [],
+    "fields": {}
+   }
+  },
+  {
+   "source_id": "pit_singlename_membership",
+   "family": "corporate_actions",
+   "provider": "APEX PIT universe build",
+   "location": "/apex-data/history-b/pit_singlename/membership_v1.jsonl",
+   "role": "PIT_REFERENCE",
+   "resolved_path": "/apex-data/history-b/pit_singlename/membership_v1.jsonl",
+   "present": true,
+   "size_bytes": 145549,
+   "mtime_utc": "2026-08-30T01:59:57Z",
+   "content_sha256": "baed3bc69acedf94b69e9a378c2eddacb7215a0be44758d62b46bc463eade532",
+   "scan": {
+    "records": 125,
+    "malformed_lines": 0,
+    "fields": {
+     "claim_scope": 125,
+     "decision_power": 125,
+     "entry_hash": 125,
+     "kind": 125,
+     "prev_hash": 125,
+     "cutoff_dollar_volume": 124,
+     "decided_asof": 124,
+     "member_month": 124,
+     "rule": 124,
+     "symbols": 124,
+     "calendar_sessions": 1,
+     "candidates_ranked": 1,
+     "directory_symbols": 1,
+     "distinct_member_names": 1,
+     "membership_months": 1,
+     "pruned_provably_safe": 1,
+     "symbols_with_bars": 1
+    },
+    "time_field_formats": {
+     "decided_asof:ISO8601": 124
+    },
+    "coverage_by_time_field": {
+     "decided_asof": {
+      "n": 124,
+      "min": "2016-04-29T00:00:00+00:00",
+      "max": "2026-07-31T00:00:00+00:00"
+     }
+    },
+    "duplicate_content_hashes": {
+     "distinct_repeated": 0,
+     "examples": {}
+    },
+    "repeated_event_ids": {},
+    "sources": {},
+    "source_authorities": {},
+    "publication_time_present": 0,
+    "publication_equals_retrieval": 0,
+    "known_from_before_publication": 0
+   },
+   "certification": {
+    "status": "ADMISSIBLE_WITH_LIMITATIONS",
+    "role": "PIT_REFERENCE",
+    "reason": "point-in-time reference with decided_asof spanning 2016-04-29..2026-07-31; admissible as membership/reference at those decision dates, NOT as an event stream",
+    "coverage_start": "2016-04-29",
+    "coverage_end": "2026-07-31",
+    "fields": {
+     "claim_scope": "ADMISSIBLE",
+     "decision_power": "ADMISSIBLE",
+     "entry_hash": "ADMISSIBLE",
+     "kind": "ADMISSIBLE",
+     "prev_hash": "ADMISSIBLE",
+     "cutoff_dollar_volume": "ADMISSIBLE",
+     "decided_asof": "ADMISSIBLE",
+     "member_month": "ADMISSIBLE",
+     "rule": "ADMISSIBLE",
+     "symbols": "ADMISSIBLE",
+     "calendar_sessions": "ADMISSIBLE",
+     "candidates_ranked": "ADMISSIBLE",
+     "directory_symbols": "ADMISSIBLE",
+     "distinct_member_names": "ADMISSIBLE",
+     "membership_months": "ADMISSIBLE",
+     "pruned_provably_safe": "ADMISSIBLE",
+     "symbols_with_bars": "ADMISSIBLE"
+    }
+   }
+  }
+ ]
+}
