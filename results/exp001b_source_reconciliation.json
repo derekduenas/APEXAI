@@ -1,0 +1,51 @@
+{
+ "protected_surfaces_at_head": {
+  "checked": 57,
+  "drifted": 1,
+  "drifted_file": "apex/world_model/exp001b/run.py",
+  "why": "that file IS the repair; a bound path moving is what spends the previous admission"
+ },
+ "reconciliation": "EXECUTED_SOURCE_VERSUS_REQUESTED_COMMITMENT",
+ "repin_cannot_fix_it_and_should_not": {
+  "attempted": "repin --commit 22ea5104 (dry run, nothing moved)",
+  "refusal": "REPIN_CHANGES_EXPERIMENT_CODE: bound tree would move 616a191252be80ae -> 06eee315eb02c697. A commit that changes what runs is a new experiment, not a re-pin.",
+  "result": "REFUSED, exit 3",
+  "this_is_correct": "the guard exists precisely to stop the experiment code being swapped underneath a prepared environment. The bounded-memory repair moved a bound path, which is the case it was built for."
+ },
+ "three_things_compared": {
+  "admission_request_v2_pins": {
+   "commit": "22ea5104c682145cbb6d5c25a336df4605c5c685",
+   "source_tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345"
+  },
+  "prepared_checkout_on_the_host": {
+   "commit": "277e4a023c7f070c7421fb587cba6dfcedcb3be8",
+   "path": "/apex-data/research/checkout",
+   "source_tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545",
+   "this_is_the_PRE_REPAIR_source": true
+  },
+  "qualification_executed": {
+   "bound_source_tree": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
+   "demo_script_identical_to_committed": true,
+   "demo_script_sha256": "28baa67bad8f73375d90840c0406a2ce50ca034fed4ce7b873931c5efb710319",
+   "n_files": 48,
+   "note": "the generator was uncommitted when the run started and was committed unchanged afterwards; the bytes executed are the bytes committed",
+   "run_from": "/apex-data/tmp/mem_wt worktree"
+  }
+ },
+ "verdict": {
+  "prepared_checkout_matches_request": false,
+  "qualification_matches_request": true,
+  "statement": "the source that was qualified is the source the request binds. The PREPARED CHECKOUT is not: it still holds the pre-repair tree and cannot be used for a rerun under the v2 request."
+ },
+ "what_this_means_for_the_rerun": {
+  "a_fresh_checkout_is_required": true,
+  "aborted_run_directory": "20260908T131351Z-exp001b-2054eaa4 stays closed and read-only; no rerun reuses it",
+  "not_a_repin": "re-pinning is unavailable by design here",
+  "sequence": [
+   "review the repair",
+   "authority signs the v2 request bound to 06eee315",
+   "prepare a FRESH checkout at the admitted commit",
+   "verify, prepare, then execute into a NEW run directory"
+  ]
+ }
+}

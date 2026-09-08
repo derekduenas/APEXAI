@@ -77,3 +77,49 @@ interpretable historical result remains: operator setup → signed admission
 decision → EXP-001B train+validation → evidence. Addendum A components are
 developed only after that evidence exists, except where a registered
 hypothesis names one earlier.
+
+---
+
+## 5. Recorded priorities (operator direction, 2026-09-08)
+
+Recorded as **direction, not specification.** Nothing here is implemented,
+scheduled, or permitted by being written down, and no model behaviour changed
+when it was added. Where a priority needs detail before it can become work, that
+is said rather than guessed.
+
+### P1 — Options-only
+
+The economic path is **options-only**. Equity expression is not pursued as the
+route to an economic result.
+
+- **Status:** recorded; not scheduled.
+- **Not yet specified:** which underlyings, which structures, which horizon, and
+  how this relates to the existing options paper-exploratory work. Those are the
+  operator's to define; this entry does not assume them.
+- **Bearing on the critical path:** none. EXP-001B is a price-only distributional
+  experiment and is unaffected.
+
+### P2 — Proprietary forecasting
+
+Forecasting models are **built here**, not adopted from outside.
+
+- **Status:** recorded; not scheduled.
+- **Consequence already in force:** no external models are installed. The
+  external-component work concluded with adoption of the smallest justified
+  artifact and nothing else, and that stands.
+- **Not yet specified:** which model families, and what evidence would justify
+  building each. The challenger register is the place that gets decided, one
+  registered experiment at a time.
+
+### P3 — Fusion is downstream only
+
+Combining several forecasts or models is a **downstream challenger**, never a
+primary build. It is entered in the challenger register as **C14** and inherits
+that register's rules: listing is not permission, activation requires a
+registered experiment naming it, and its dependency rows must be tested first.
+
+**Critical path unchanged.** None of these three is on it. The route to the first
+interpretable historical result is still: review the bounded-memory repair →
+fresh signed admission → EXP-001B train+validation in a new run directory →
+evidence.
+
