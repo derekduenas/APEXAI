@@ -1,0 +1,60 @@
+{
+ "already_in_repository_before_the_read": {
+  "byte_identical_fragment": "tests/test_exchange_calendar.py:151",
+  "conclusion": "every exposed byte was reconstructible from repository files that predate the incident",
+  "filename_already_documented_in": "docs/EXP001_ADMISSION_AND_READINESS.md",
+  "fragment_commit": "3e7df9973715a54238e2c515fa69a9fd30b52aa4",
+  "fragment_date": "2026-09-07",
+  "source_name_also_in": "results/exp001b_registration.json"
+ },
+ "bytes_exposed": 60,
+ "disposition": {
+  "alternatives": [
+   "drop SPY_2022-01-03 from the evaluation set",
+   "re-seal with a later evaluation start"
+  ],
+  "blocks_note": "the admission under review concerns 2016-2021 only",
+  "blocks_train_validation_admission": false,
+  "decided_here": false,
+  "holdout_replaced": false,
+  "recommendation": "accept as immaterial and proceed; no value of any kind was exposed and there is no mechanism by which it could bias a model fit on 2016-2021",
+  "registration_amended": false
+ },
+ "evaluation_set_status": "NO LONGER DESCRIBABLE AS COMPLETELY UNTOUCHED",
+ "exposed_content_classification": {
+  "any_timestamp_value": false,
+  "note": "the prefix terminates at the space after the first key's colon, immediately before the first value token",
+  "outcomes_or_labels": false,
+  "prices": false,
+  "structural_metadata": true,
+  "volume": false
+ },
+ "file": "/apex-data/history-b/etf_continuous/bars/SPY_2022-01-03.json",
+ "file_size_bytes": 103241,
+ "fraction_of_file": 0.00058,
+ "incident_id": "EVALUATION_READ_INCIDENT_001",
+ "influence_on_research_decisions": {
+  "data_admitted": false,
+  "documentary_claim_corrected": true,
+  "experiment_run": false,
+  "feature_selected": false,
+  "model_fit": false,
+  "note": "the corrected claim follows from the test -r result alone and would be identical had the content read never been issued",
+  "parameter_estimated": false,
+  "threshold_chosen": false
+ },
+ "occurrences": 1,
+ "occurrences_note": "the only USER=apexresearch entry in the sudo log",
+ "position_in_seal": "first session of evaluation (2022-01-01..2024-12-31)",
+ "retention": {
+  "file_on_research_host": false,
+  "repository": false,
+  "research_out_dir_empty": true,
+  "session_transcript": true
+ },
+ "rule_established": "Readability of a sealed file is established with test -r, never with a content read.",
+ "severity": "DISCLOSED_NOT_MATERIAL",
+ "source_of_record": "/var/log/auth.log sudo entry, not reconstructed from memory",
+ "summary": "60 bytes read from the first session of the sealed evaluation period. test -r had already established the finding; the content read was redundant collection.",
+ "utc": "2026-09-08T03:45:53.158037+00:00"
+}

@@ -63,11 +63,48 @@ hash is identical at branch head. A test asserts the request pins the same commi
 the checkout actually holds, so the two cannot drift apart and be discovered at
 launch, after signing.
 
-Re-pinning is guarded: `repin` refuses unless the bound source tree hash is
-**byte-identical** across the two commits (`REPIN_CHANGES_EXPERIMENT_CODE`). A
-commit that changes what runs is a new experiment requiring fresh review, not a
-re-pin. The wrapper repairs do not touch any bound path, which is why this was
-permitted, and the tree hash above is unchanged throughout.
+### What bound-tree equality does and does not protect — corrected
+
+`repin` refuses unless the bound source tree hash is byte-identical across the two
+commits (`REPIN_CHANGES_EXPERIMENT_CODE`). **That guard protects the declared bound
+surface and nothing else, and the reviewer is right to narrow the earlier claim.**
+The wrapper itself sits outside that surface:
+
+```
+BOUND_SOURCE_PATHS = apex/world_model, apex/governance/chain_ledger.py,
+                     apex/intraday/sessions.py, scripts/alpha_exp_real_execute.py
+scripts/research_activation.py  ->  NOT a bound path
+```
+
+So bound-tree equality could not, on its own, establish that re-pinning left launch
+behaviour unchanged. That has to be measured separately, and it was. Loading both
+wrapper versions side by side and generating the launch command from each:
+
+| comparison across `2b4860b5` → `792a2843` | result |
+|---|---|
+| generated launch argv | **identical** |
+| launch unit properties | **identical** |
+| probe unit properties | **changed** (`MemoryMax=512M` → `1400M`) |
+
+The launch path never used the smaller cap; only the probe did. So the re-pin
+changed the probe to match the launch and left the launch itself untouched —
+established by direct comparison of the generated commands, not inferred from a
+hash that does not cover the wrapper.
+
+### The wrapper changes, and the tests covering them
+
+| change | affects launch? | covered by |
+|---|---|---|
+| `_git` gains `safe.directory` and a pinned env | drift detection only | `test_working_tree_identity_matches_the_boundary_computation` |
+| `run_setup` gains `resume` | no | `test_resume_*` (6 tests) |
+| `preflight` gains `resuming` | no | `test_a_fresh_setup_still_refuses_ground_that_is_already_broken` |
+| `launch_config` probe cap removed | **probe only** | `test_probe_uses_the_configuration_the_launch_will_use` |
+| `run_repin` added | no | `test_repin_*` (3 tests) |
+| CLI `repin` action, `--resume` flag | no | `test_cli_exit_codes` |
+
+The wrapper is byte-identical at `792a2843` and at branch head
+(`sha256 274c19a34d719558bac2bc329bc32ff6eff8e9e3a3c50ac29bcc7e13ca898e3d`), so it
+does not matter which of the two the operator invokes.
 
 ---
 
@@ -205,6 +242,9 @@ the repository can be checked against the originals.
 ## 7. WHAT THIS PACKAGE DOES NOT CLAIM
 
 It does not claim the results have been independently accepted. It does not claim
+the evaluation set is untouched: see `docs/EVALUATION_READ_INCIDENT_001.md`, which
+records a 60-byte read of one evaluation file and leaves its disposition to the
+authority. It does not claim
 the account is confined outside the sandbox, because it is not. It does not claim
 any predictive or economic result, because the experiment has not run.
 

@@ -193,8 +193,35 @@ def test_no_private_signing_key_belongs_on_the_research_host():
 
 def test_the_package_does_not_overstate_what_has_happened():
     st = _pkg()["state"]
-    assert st == {"admission_issued": False, "experiment_run": False,
-                  "alpha_claimed": False, "independently_reviewed": False}
+    assert st["admission_issued"] is False and st["experiment_run"] is False
+    assert st["alpha_claimed"] is False and st["independently_reviewed"] is False
+
+
+def test_the_evaluation_read_incident_stays_disclosed():
+    """The evaluation set is no longer untouched. That must not quietly revert
+    to a cleaner-sounding claim in a later edit."""
+    import json
+    st = _pkg()["state"]
+    assert st["evaluation_set_untouched"] is False
+    assert "EVALUATION_READ_INCIDENT_001" in st["disclosed_incidents"]
+    inc = json.loads((Path(__file__).resolve().parents[1] / "results" /
+                      "evaluation_read_incident_001.json").read_text())
+    assert inc["bytes_exposed"] == 60
+    assert inc["exposed_content_classification"]["prices"] is False
+    assert inc["exposed_content_classification"]["any_timestamp_value"] is False
+    assert inc["disposition"]["holdout_replaced"] is False
+    assert inc["disposition"]["registration_amended"] is False
+    assert inc["influence_on_research_decisions"]["model_fit"] is False
+
+
+def test_bound_tree_equality_is_not_claimed_to_protect_the_wrapper():
+    """The narrowed claim: the wrapper is outside the bound surface, so launch
+    invariance was measured rather than inferred from the hash."""
+    r = _pkg()["repin"]
+    assert r["wrapper_in_bound_surface"] is False
+    assert r["launch_argv_identical_measured"] is True
+    assert r["probe_properties_changed"] is True
+    assert r["wrapper_sha256_at_pinned_commit"] == r["wrapper_sha256_at_branch_head"]
 
 
 def test_evaluation_exclusion_is_scoped_to_the_sandboxed_process():
