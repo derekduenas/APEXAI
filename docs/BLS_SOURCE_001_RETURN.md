@@ -56,7 +56,7 @@ reason in two fields the adapter never opened.
    Three series × 8 cycles = 24 requests against BLS's unregistered allowance of
    25. Roughly 90% of cycles each day report a BLS failure.
 
-### The window is rolling, not daily
+### The reset mechanism is INFERRED, not established
 
 Reading 2026-09-04 cycle by cycle refines the mechanism:
 
@@ -78,9 +78,24 @@ identically and would not wait until the third.
 
 Second, successes resume each day at roughly the hour they were consumed the day
 before, and that hour creeps steadily forward across the week (13:37 → 14:06).
-That is a **rolling 24-hour allowance** releasing capacity as the previous day's
-requests age out, not a calendar-day reset. The mechanism is inferred from timing;
-the exhaustion itself is directly observed.
+A rolling 24-hour allowance would produce exactly that drift, whereas a
+calendar-day reset would not.
+
+**That is where the evidence stops.** A rolling window is the hypothesis most
+consistent with the timing; it is not established, and this document does not
+claim it. Two things would settle it and neither is in hand:
+
+- **Retained refusal bodies.** Nothing keeps them. The cycle log stores only the
+  rendered error string -- `{"BLS": "BLS CUUR0000SA0: unexpected shape ('series')"}`
+  -- so the provider's own `message` text, which may state the reset basis, was
+  discarded at the moment it arrived. The repaired parser surfaces that message,
+  but no caller persists it yet.
+- **Provider documentation** of the allowance and its reset basis, which was not
+  consulted for this brick.
+
+What IS established: the requests are being refused, the refusal is per-request
+rather than per-document, and the volume exceeds the unregistered allowance. The
+remedy does not depend on the reset basis being known.
 
 ### Preserved artifacts
 
@@ -196,7 +211,7 @@ and accepted/refused counters, so that a correctly idle service is legible as id
 `bls_parse.diagnostic()` provides the per-source record shape this would consume,
 but nothing is wired to emit it.
 
-**QUOTA-001** (new, found here) — the root cause is unfixed. The repair makes the
+**QUOTA-001** (new, found here) — the root cause is unfixed. It should also persist refused response bodies, without which the reset basis above cannot be settled and any future quota schedule is guesswork. The repair makes the
 service *report* quota exhaustion correctly; it does not obtain more quota. Three
 series polled every few minutes consume the unregistered allowance of 25 in about
 thirty minutes, leaving the source unavailable for roughly 23.5 hours of each
