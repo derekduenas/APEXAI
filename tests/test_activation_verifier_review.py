@@ -203,3 +203,14 @@ def test_evaluation_exclusion_is_scoped_to_the_sandboxed_process():
     assert e["holds_for"].startswith("the process")
     assert e["does_not_hold_for"] == "the research account generally"
     assert e["measured_outside_sandbox"]["evaluation_file_readable"] is True
+
+
+def test_the_request_pins_the_commit_that_is_actually_prepared():
+    """The request and the prepared checkout must not drift apart: a decision
+    pinning a commit other than the one in the checkout would be refused at
+    launch, after signing, which is the worst moment to discover it."""
+    import json
+    req = json.loads((Path(__file__).resolve().parents[1] /
+                      "results" / "exp001b_admission_request.json").read_text())
+    assert req["code"]["commit"] == _pkg()["identifiers"]["prepared_checkout_commit"]
+    assert req["code"]["source_tree_sha256"] == _pkg()["identifiers"]["bound_source_tree_sha256"]

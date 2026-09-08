@@ -56,6 +56,13 @@ The checkout was originally prepared before the ownership and resume repairs
 existed, which would have left an auditor opening it at an older tree than the one
 under review. It has been re-pinned to the final wrapper commit.
 
+The checkout is pinned at `792a2843d18b1baf5db219a17e14fc84fa916e53`, which
+carries the final wrapper. Commits after it on this branch add only documentation,
+recorded evidence and tests — none of them in a bound path — and the bound tree
+hash is identical at branch head. A test asserts the request pins the same commit
+the checkout actually holds, so the two cannot drift apart and be discovered at
+launch, after signing.
+
 Re-pinning is guarded: `repin` refuses unless the bound source tree hash is
 **byte-identical** across the two commits (`REPIN_CHANGES_EXPERIMENT_CODE`). A
 commit that changes what runs is a new experiment requiring fresh review, not a

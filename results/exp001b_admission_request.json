@@ -9,8 +9,8 @@
   "revision_time": "NOT_RECORDED_IN_THIS_DATASET"
  },
  "code": {
-  "commit": "2b4860b5e53bf9e3286786e28d50c4dd228b0964",
-  "note": "This is the commit actually checked out into the research environment and verified there, with a clean working tree. Later commits on this branch touch only the activation wrapper and tests: the bound experiment tree is byte-identical at e3ae7eec (same source_tree_sha256, same 48 files), so pinning the checked-out commit pins exactly the code that will run.",
+  "commit": "792a2843d18b1baf5db219a17e14fc84fa916e53",
+  "note": "This is the commit prepared in the research checkout and verified there. It carries the final wrapper, including the ownership, resume and repin repairs and the unified probe/launch configuration. Later commits on this branch add only documentation, recorded evidence and tests: the bound source tree is byte-identical at branch head (same 616a1912..., same 48 files), so pinning this commit pins exactly the code that will run.",
   "source_tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545"
  },
  "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",

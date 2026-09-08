@@ -6,7 +6,7 @@
   },
   "request": {
    "path": "results/exp001b_admission_request.json",
-   "sha256": "b0d32538aeec97097e5aa736f6ed94f1eedbf54d7cf9bacc9a68b3fe3cc9f301"
+   "sha256": "95017bc307bd4fe7206e33bcf58ece225ff806097a681890b3b35e741b0c2d3f"
   },
   "setup_record": {
    "path": "/apex-data/research/_ACTIVATION_MANIFEST.json",
