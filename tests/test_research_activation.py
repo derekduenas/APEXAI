@@ -112,7 +112,10 @@ def rig(tmp_path):
     _git(src, "init", "-q"); _git(src, "config", "user.email", "t@t"); _git(src, "config", "user.name", "t")
     _git(src, "add", "-A"); _git(src, "commit", "-q", "-m", "b")
     trust = tmp_path / "trust"; (trust / "trust").mkdir(parents=True)
-    t = RA.Targets(research_user="nonexistent_research_user", runner_root=tmp_path / "runner",
+    t = RA.Targets(research_user="nonexistent_research_user",
+                   runner_owner_uid=os.getuid(),   # harness is unprivileged; production is root
+                   uid_separation_exercisable=False,  # stand-in chown is a no-op; see host proof
+                   runner_root=tmp_path / "runner",
                    research_root=tmp_path / "research", source_repo=src, corpus_root=corpus,
                    manifest_path=man, trust_root=trust,
                    allowed_signers=trust / "trust" / "allowed_signers",

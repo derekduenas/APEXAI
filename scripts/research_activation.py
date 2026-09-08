@@ -84,6 +84,15 @@ class Targets:
     tasks_max: str = "64"
     expected_view_files: int = EXPECTED_VIEW_FILES
     inaccessible: tuple = ("/apex-data/core", "/apex-data/history-a", "/apex-data/runtime")
+    # The runner tree must be owned by someone the research account is not.
+    # Production hardens it to root; a test harness running unprivileged
+    # declares its own uid rather than the check being quietly relaxed.
+    runner_owner_uid: int = 0
+    # An unprivileged harness cannot hold two distinct uids, and its stand-in
+    # `chown` is a no-op, so it cannot exercise ownership separation at all.
+    # Saying so here is a declaration that travels into the evidence, rather
+    # than a check that quietly passes. Production leaves this True.
+    uid_separation_exercisable: bool = True
 
     @property
     def venv(self): return self.runner_root / "venv"
@@ -134,6 +143,7 @@ class SystemRunner:
     def mkdir(self, path: Path, mode=0o755) -> None:
         try:
             path.mkdir(mode=mode, parents=False, exist_ok=False)
+            os.chmod(path, mode)      # mkdir's mode is masked by umask; this is not
         except OSError as e:
             raise ActivationRefused("MKDIR_FAILED: %s: %s" % (path, e)) from e
 
@@ -313,15 +323,31 @@ class Stage:
     verify: object      # (t, ctx) -> dict   (raises ActivationRefused)
 
 
+def _tree_entries(root: Path):
+    """The root itself, then every entry beneath it. Symlinks are yielded, not
+    followed -- the caller decides what a link means."""
+    yield root
+    for d, dirs, files in os.walk(root, followlinks=False):
+        for n in dirs + files:
+            yield Path(d) / n
+
+
 def _mode_of(p: Path) -> str:
     return "%o" % stat.S_IMODE(os.stat(p).st_mode)
 
 
 def stages(t: Targets) -> list:
     def s_mkdir(path, mode=0o755):
-        return (lambda tt, ctx, run: run.mkdir(path, mode),
-                lambda tt, ctx: {"exists": path.is_dir(), "mode": _mode_of(path)}
-                if path.is_dir() else _raise("DIR_NOT_CREATED: %s" % path))
+        def _verify(tt, ctx):
+            if not path.is_dir():
+                _raise("DIR_NOT_CREATED: %s" % path)
+            got, want = _mode_of(path), "%o" % mode
+            if got != want:
+                # reporting the mode found is not the same as requiring the mode
+                # asked for; a world-writable evidence directory must not pass
+                _raise("DIR_MODE: %s is %s, expected %s" % (path, got, want))
+            return {"exists": True, "mode": got}
+        return (lambda tt, ctx, run: run.mkdir(path, mode), _verify)
 
     def _raise(msg):
         raise ActivationRefused(msg)
@@ -338,11 +364,19 @@ def stages(t: Targets) -> list:
 
     def v_own(tt, ctx):
         a = account_facts(tt.research_user)
-        st = os.stat(tt.research_root)
-        if a.get("present") and st.st_uid != a["uid"]:
-            raise ActivationRefused("OWNERSHIP_NOT_APPLIED: %s is uid %d, expected %d"
-                                    % (tt.research_root, st.st_uid, a["uid"]))
-        return {"research_root_uid": st.st_uid}
+        if not a.get("present"):
+            # guarding the only assertion behind "if the account exists" means a
+            # missing account turns this stage into a no-op that still reports
+            # VERIFIED. That is the V0 defect, surviving in one verifier.
+            raise ActivationRefused("OWNERSHIP_UNVERIFIABLE: account %s does not exist"
+                                    % tt.research_user)
+        wrong = [str(q) for q in _tree_entries(tt.research_root)
+                 if os.lstat(q).st_uid != a["uid"]]
+        if wrong:
+            raise ActivationRefused("OWNERSHIP_NOT_APPLIED: %d path(s) not uid %d, e.g. %s"
+                                    % (len(wrong), a["uid"], wrong[:3]))
+        return {"research_root_uid": a["uid"], "entries_checked": sum(
+            1 for _ in _tree_entries(tt.research_root))}
 
     def v_venv(tt, ctx):
         if not tt.python.exists():
@@ -380,11 +414,39 @@ def stages(t: Targets) -> list:
         return {"lines": len(tt.pinned.read_text().splitlines())}
 
     def v_harden(tt, ctx):
-        bad = [str(p) for p in (tt.runner_root, tt.venv)
-               if p.exists() and (os.stat(p).st_mode & (stat.S_IWGRP | stat.S_IWOTH))]
-        if bad:
-            raise ActivationRefused("RUNNER_GROUP_OR_OTHER_WRITABLE: %s" % bad)
-        return {"runner_root_mode": _mode_of(tt.runner_root), "uid": os.stat(tt.runner_root).st_uid}
+        """The stage exists so the research account cannot modify the runner.
+
+        Mode bits alone do not establish that: an OWNER may chmod at will, so a
+        tree owned by the research account satisfies every permission check and
+        still fails the property. Ownership is the load-bearing fact and is
+        checked first. The action is `chmod -R`, so the check is recursive too --
+        a verify weaker than the action it verifies is not a verify."""
+        expect_uid = (ctx or {}).get("expect_uid", tt.runner_owner_uid)   # production: root
+        if tt.uid_separation_exercisable and expect_uid == account_facts(tt.research_user).get("uid"):
+            raise ActivationRefused("RUNNER_OWNED_BY_RESEARCH_ACCOUNT: the account the "
+                                    "hardening exists to exclude cannot be its owner")
+        writable, wrong_owner, links = [], [], []
+        for q in _tree_entries(tt.runner_root):
+            st = os.lstat(q)
+            if stat.S_ISLNK(st.st_mode):
+                links.append(str(q))
+                continue
+            if st.st_uid != expect_uid:
+                wrong_owner.append(str(q))
+            if st.st_mode & (stat.S_IWGRP | stat.S_IWOTH):
+                writable.append(str(q))
+        if wrong_owner:
+            raise ActivationRefused("RUNNER_NOT_OWNED_BY_UID_%d: %d path(s), e.g. %s"
+                                    % (expect_uid, len(wrong_owner), wrong_owner[:3]))
+        if writable:
+            raise ActivationRefused("RUNNER_GROUP_OR_OTHER_WRITABLE: %d path(s), e.g. %s"
+                                    % (len(writable), writable[:3]))
+        return {"runner_root_mode": _mode_of(tt.runner_root),
+                "runner_root_uid": os.lstat(tt.runner_root).st_uid,
+                "uid_separation_checked": bool(tt.uid_separation_exercisable),
+                "entries_checked": len(writable) + len(wrong_owner) + sum(
+                    1 for _ in _tree_entries(tt.runner_root)),
+                "symlinks_skipped": len(links)}
 
     def x_checkout(tt, ctx, run):
         run.cmd(["git", "clone", "--no-hardlinks", tt.source_repo, tt.checkout])
@@ -546,7 +608,10 @@ def run_verify(t: Targets) -> dict:
         a = account_facts(t.research_user)
         out = {"out_owner_uid": os.stat(t.out).st_uid, "view_mode": _mode_of(t.view_bars),
                "research_uid": a.get("uid")}
-        if a.get("present") and os.stat(t.out).st_uid != a["uid"]:
+        if not a.get("present"):
+            raise ActivationRefused("PERMISSIONS_UNVERIFIABLE: account %s does not exist"
+                                    % t.research_user)
+        if os.stat(t.out).st_uid != a["uid"]:
             raise ActivationRefused("OUT_NOT_OWNED_BY_RESEARCH")
         if os.stat(t.venv).st_mode & (stat.S_IWGRP | stat.S_IWOTH):
             raise ActivationRefused("VENV_WRITABLE_BY_OTHERS")
