@@ -60,7 +60,9 @@ disturbances. Consumes World Model weights; never re-weights them.
 | `contract` | str | `MULTIVERSE_PATH_SET_V0` |
 | `starting_state_source` | str | the `LATENT_STATE_ESTIMATE_V0` id consumed — a single certain starting state is only legal if that estimate itself is degenerate, and it is then labelled `DEGENERATE_START` |
 | `uncertainty_propagated` | list | any of `STARTING_STATE`, `PARAMETERS`, `MODEL_CHOICE`, `DISTURBANCES`, `PARTICIPANT_REACTION`, `REGIME` — those **not** listed are held fixed and that is recorded |
-| `weight_owner` | const | `WORLD_MODEL` — the Multiverse assigns no probability of its own |
+| `distribution_owner` | const | `WORLD_MODEL` — owns the latent-state, parameter and model-choice distributions **and the versioned transition model** that defines the forecast |
+| `transition_model` | dict | `{id, version, source}` — the dynamics the Multiverse was asked to execute, authored and versioned by the World Model |
+| `sampling_scheme` | dict\|None | `{method, proposal, target, correction, effective_sample_size_after_weighting, validation}` — importance sampling and friends are permitted and must carry their correction; a weight without recorded provenance and correction is an unauthorised edit to the target, not a sampling weight |
 | `n_paths`, `seed` | int | reproducibility |
 | `simulation_error` | dict | Monte Carlo error of the reported quantities at this `n_paths` |
 | `model_uncertainty` | dict | dispersion attributable to model/parameter choice — **never reduced by raising `n_paths`** |
@@ -72,8 +74,13 @@ disturbances. Consumes World Model weights; never re-weights them.
 | `limitations` | list | stated |
 
 Prohibited: probability mass on an `unweighted_stress` or `proposed_branches`
-entry; an ensemble weighted by member count without the correlation
-adjustment; reporting `simulation_error` as if it were forecast uncertainty.
+entry (computational weights included — a stress branch is not a rare event
+being sampled efficiently, it is a scenario with no assigned probability);
+any change to the target distribution the World Model did not author;
+sampling weights without a declared proposal, target and correction;
+reporting proposal-distribution quantities as the forecast; an ensemble
+weighted by member count without the correlation adjustment; reporting
+`simulation_error` as if it were forecast uncertainty.
 
 ---
 

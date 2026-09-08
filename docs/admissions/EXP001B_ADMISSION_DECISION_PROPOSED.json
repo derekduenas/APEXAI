@@ -15,6 +15,9 @@
   "    .sig root-owned 0644 under /etc/apex/admissions/;",
   "(5) create the output root, and run the experiment as an account that CANNOT become root --",
   "    today's research account holds full passwordless sudo, which no code check can compensate for.",
+  "(6) create the output root and run the experiment as apexresearch -- an account that CANNOT become",
+  "    root -- under the containment in docs/RESEARCH_ACTIVATION_PACKAGE.md, which was probed read-only",
+  "    and makes evaluation-period files unreadable at the FILESYSTEM level, not only refused by the loader.",
   "Engineering holds no signing key and performed none of these steps."
  ],
  "dataset": {
@@ -71,18 +74,25 @@
   "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9"
  },
  "code": {
-  "commit": "<FILLED BY THE ADMISSION AUTHORITY: reviewed HEAD of strategic-integration-002 (code at 6be2507f)>",
-  "source_tree_sha256": "24322971f61bcf2c02d1f98d77aa3c2ea20f1695122af03779bd64e70316dd8c",
+  "commit": "<FILLED BY THE ADMISSION AUTHORITY: reviewed HEAD of strategic-integration-002 (code at 560fdc72)>",
+  "source_tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545",
   "relevant_source_paths": [
    "apex/world_model",
    "apex/governance/chain_ledger.py",
    "apex/intraday/sessions.py",
    "scripts/alpha_exp_real_execute.py"
   ],
-  "command": "PYTHONPATH=<dedicated checkout> /opt/apex/shared/venv/bin/python scripts/alpha_exp_real_execute.py --decision /etc/apex/admissions/<this file> --execute"
+  "command": "see docs/RESEARCH_ACTIVATION_PACKAGE.md section 6 -- the launch runs as apexresearch under systemd containment with a restricted dataset view; the decision path is /etc/apex/admissions/<this file>",
+  "environment": {
+   "interpreter": "/opt/apex-research/venv/bin/python (root-owned, dedicated)",
+   "third_party": [
+    "numpy==2.4.6"
+   ],
+   "note": "recorded per run in _RUN.json: interpreter realpath, binary sha256, and every loaded non-stdlib module with version, file and origin"
+  }
  },
  "output": {
-  "root": "/apex-data/research/exp001b",
+  "root": "/apex-data/research/out",
   "authority_classification": "RESEARCH_HISTORICAL"
  },
  "provenance": {

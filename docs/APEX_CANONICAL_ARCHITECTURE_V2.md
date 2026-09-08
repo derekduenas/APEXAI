@@ -296,12 +296,42 @@ of those paths as if it were the uncertainty of the forecast.
 | future disturbances | **Multiverse** | innovation draws along the path |
 | participant reactions, regime change | **Multiverse** (dynamics), World Model (initial regime belief) | scenario branches |
 
-**Ownership of probability is single.** The World Model owns every
-probability weight: over latent states, over parameters, over competing
-models. The Multiverse owns *dynamics* and consumes those weights; it
-never re-weights them and never assigns its own competing weights to the
-same quantity. Where the Multiverse needs a weight that the World Model has
-not supplied, the branch is **unweighted** and is reported as such.
+**Ownership of the distribution is single; sampling weights are a separate
+thing.** (Corrected at `560fdc72`: the first version of this rule said the
+Multiverse "never re-weights", which was too rigid and would have forbidden
+correct Monte Carlo practice.)
+
+The **World Model owns the forecast distribution**: the latent-state
+distribution, the parameter distribution, the weights over competing
+models, **and the versioned transition model** that, together with those,
+*defines* the distribution. Dynamics are part of the forecast's meaning, so
+their identity and version belong to the World Model contract.
+
+The **Multiverse executes** conditional simulation under that contract. It
+may use **computational sampling weights** — importance sampling,
+stratification, antithetic or common random numbers, rare-event tilting —
+because these are how a target distribution is estimated efficiently, not a
+change to it. Every such scheme must:
+
+- declare the **proposal** it sampled from and the **target** it estimates;
+- carry the **correction** (importance weights / likelihood ratios) with the
+  samples, so any consumer can recover the target expectation;
+- report **effective sample size after weighting**, since a tilted sampler
+  with a few dominating weights is a smaller sample than its path count;
+- be **validated** — on a case with a known answer, the weighted estimator
+  must reproduce the unweighted one within its stated Monte Carlo error.
+
+What remains prohibited is a **change to the target distribution** that the
+World Model did not author: silently re-weighting model or state
+probabilities, tilting to make an outcome look likelier, or reporting
+proposal-distribution quantities as if they were the forecast. A weight
+whose provenance and correction are not recorded is not a sampling weight —
+it is an unauthorised edit to the forecast.
+
+Where the Multiverse needs a probability the World Model has not supplied,
+the branch is **unweighted** and is reported as such. **Stress branches
+remain entirely separate** and never acquire probability mass, weighted or
+computational.
 
 Four things stay separate and are never summed into one number:
 
