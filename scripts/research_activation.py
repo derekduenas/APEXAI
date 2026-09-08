@@ -679,8 +679,15 @@ class LaunchConfig:
 
 
 def launch_config(t: Targets, *, probe: bool = False) -> LaunchConfig:
+    """One configuration, used by both the probe and the launch.
+
+    The probe used to run under a smaller memory cap, which meant the isolation
+    that was measured was not, literally, the isolation that would run. The
+    `probe` parameter is kept so callers need not change, but it no longer
+    alters a single property: a probe of a different configuration proves
+    nothing about this one."""
     props = ("User=%s" % t.research_user, "Group=%s" % t.research_user,
-             "MemoryMax=%s" % ("512M" if probe else t.memory_max), "TasksMax=%s" % t.tasks_max,
+             "MemoryMax=%s" % t.memory_max, "TasksMax=%s" % t.tasks_max,
              "ProtectSystem=strict", "ProtectHome=yes", "PrivateTmp=yes", "PrivateNetwork=yes",
              "NoNewPrivileges=yes", "RestrictSUIDSGID=yes",
              "TemporaryFileSystem=%s" % t.corpus_root.parent.parent,
@@ -813,6 +820,49 @@ def run_launch(t: Targets, commit: str, decision: Path, *, apply: bool,
     rp = t.out / ("_LAUNCH_%s.json" % started.replace(":", "").replace("-", ""))
     rp.write_text(json.dumps(plan, indent=1, sort_keys=True, default=str))
     plan["launch_record"] = str(rp)
+    return plan
+
+
+def run_repin(t: Targets, commit: str, *, apply: bool, run: SystemRunner | None = None) -> dict:
+    """Move the prepared checkout to another commit, and ONLY when that commit
+    leaves the experiment code byte-identical.
+
+    Wrapper repairs land after a checkout is prepared, and an auditor opening
+    the checkout should not find an older tree than the one under review. But
+    re-pinning must never become a way to change what runs: the bound source
+    tree hash must match exactly, or this refuses and the environment has to be
+    rebuilt under fresh review."""
+    rec = load_setup_record(t)
+    if rec["state"] != STATE_COMPLETE:
+        raise ActivationRefused("SETUP_NOT_COMPLETE: state is %s" % rec["state"])
+    new_ident = expected_tree_sha256(t.source_repo, commit)
+    plan = {"contract": ACTIVATION_VERSION, "action": "repin", "utc": now(),
+            "from": {"commit": rec["commit"], "source_tree_sha256": rec["source_tree_sha256"]},
+            "to": {"commit": new_ident["commit"], "source_tree_sha256": new_ident["tree_sha256"],
+                   "n_files": new_ident["n_files"]},
+            "bound_paths": list(BOUND_SOURCE_PATHS), "applied": bool(apply)}
+    if new_ident["tree_sha256"] != rec["source_tree_sha256"]:
+        raise ActivationRefused(
+            "REPIN_CHANGES_EXPERIMENT_CODE: bound tree would move %s -> %s. A commit that "
+            "changes what runs is a new experiment, not a re-pin."
+            % (rec["source_tree_sha256"][:16], new_ident["tree_sha256"][:16]))
+    if not apply:
+        plan["note"] = "prepared only; nothing moved"
+        return plan
+    run = run or SystemRunner()
+    if t.checkout.resolve().parent != t.research_root.resolve():
+        raise ActivationRefused("REFUSING_TO_REMOVE: %s is not directly under %s"
+                                % (t.checkout, t.research_root))
+    shutil.rmtree(t.checkout)                     # capability, never evidence
+    ctx = {"ident": new_ident, "files": admitted_files(t)}
+    stage = [x for x in stages(t) if x.name == "checkout"][0]
+    stage.execute(t, ctx, run)
+    plan["evidence"] = stage.verify(t, ctx)
+    rec["commit"] = new_ident["commit"]
+    rec["source_tree_sha256"] = new_ident["tree_sha256"]
+    rec.setdefault("repins", []).append({"utc": now(), "from": plan["from"], "to": plan["to"]})
+    _persist(t, rec)
+    plan["setup_record_updated"] = True
     return plan
 
 
@@ -959,7 +1009,8 @@ def preflight(t: Targets, commit: str | None, decision: Path | None,
 # -------------------------------------------------------------------- CLI
 def _cli(argv=None, *, targets: Targets | None = None, runner: SystemRunner | None = None) -> int:
     ap = argparse.ArgumentParser(prog="research_activation.py")
-    ap.add_argument("action", choices=["preflight", "setup", "verify", "probe", "launch", "rollback"])
+    ap.add_argument("action", choices=["preflight", "setup", "verify", "probe", "launch",
+                                       "repin", "rollback"])
     ap.add_argument("--commit", default=None)
     ap.add_argument("--decision", default=None)
     ap.add_argument("--apply", action="store_true")
@@ -980,6 +1031,10 @@ def _cli(argv=None, *, targets: Targets | None = None, runner: SystemRunner | No
             rec = run_verify(t)
         elif a.action == "probe":
             rec = run_probe(t, run=runner)
+        elif a.action == "repin":
+            if not a.commit:
+                raise ActivationRefused("UNRESOLVED_INPUTS: --commit is required")
+            rec = run_repin(t, a.commit, apply=a.apply, run=runner)
         elif a.action == "launch":
             if not a.commit or not a.decision:
                 raise ActivationRefused("UNRESOLVED_INPUTS: --commit and --decision are both required")

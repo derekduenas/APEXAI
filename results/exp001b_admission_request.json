@@ -1,5 +1,5 @@
 {
- "NOTE": "THIS IS A REQUEST, NOT A DECISION. It is unsigned and its decision field is deliberately not ADMIT, so the boundary refuses it if it is ever presented as an admission. Only the admission authority may author and sign the decision itself.",
+ "NOTE": "THIS IS A REQUEST, NOT A DECISION. It is unsigned. Its decision field is not ADMIT and its provenance names no principal, so it cannot be used as an admission. Note what does and does not provide that guarantee: the identity string is NOT the boundary -- it selects which public key in allowed_signers must have signed. The boundary is possession of the private signing key, which is held off-host and must never exist on the research host, together with protection of the allowed_signers file itself. Only the admission authority may author and sign the decision.",
  "availability": {
   "corporate_actions": "continuous series; adjustment basis stated in the manifest",
   "event_time": "bar timestamp, exchange local, converted to UTC",

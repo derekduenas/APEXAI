@@ -91,10 +91,37 @@ secrets_readable             False    corpus_writable            False
 network_reachable            False
 ```
 
-The two that matter most: **the sealed evaluation period is unreadable from inside
-the sandbox** (`SPY_2022-01-03.json` denied while `SPY_2016-01-04.json` is
-readable), and **the network is unreachable**. The evaluation seal is enforced by
-construction, not by discipline.
+### Evaluation exclusion is a property of the SANDBOXED PROCESS — measured
+
+The reviewer's second correction is also right, and rather than reword it I
+measured it. Outside the sandbox, as the research account:
+
+```
+$ sudo -u apexresearch test -r .../SPY_2022-01-03.json
+evaluation_readable_OUTSIDE_SANDBOX=true          <-- content actually read
+$ ls -l .../SPY_2022-01-03.json
+-rw-rw-r-- 1 apex apex 103241 ...                 <-- world-readable
+```
+
+**The research account CAN read evaluation files when it is not launched inside the
+sandbox.** The corpus is world-readable and no filesystem permission excludes it.
+
+The exclusion is produced entirely by the unit configuration: a
+`TemporaryFileSystem` over the corpus volume with only the 1511-file view bound
+read-only back over the corpus path. It is a property of *the process launched this
+way*, not of the account and not of the data at rest.
+
+So the seal holds exactly as far as every real run going through this launch path,
+and no further. That is a narrower claim than the earlier draft made, and it is the
+true one. A run started any other way as this account would see the evaluation
+period.
+
+### The probed configuration is now the launch configuration
+
+Found while tightening this: the probe ran under `MemoryMax=512M` while the launch
+uses `1400M`, so the isolation measured was not literally the isolation that would
+run. The probe now uses the launch configuration unchanged, and a test asserts the
+two property lists are identical.
 
 ---
 
@@ -113,14 +140,28 @@ Everything except one thing, and that thing is not mine to produce.
 | allowed signers `/etc/apex/admissions/trust/allowed_signers` | **ABSENT — authority installs** |
 | **signed admission decision** | **ABSENT — authority signs** |
 
-### Why I did not produce the signature
+### Why I did not produce the signature — corrected
 
-The boundary refuses a decision whose `decided_by` is `SELF`, `CALLER`, or
-`ENGINEERING`. Self-admission is structurally impossible *by design*, and that
-design is the product of the last several bricks. Creating the signing key and
-signing my own admission would satisfy the check while destroying the property it
-exists to protect — the same error as verifying mode bits while ignoring ownership,
-committed at the level that matters most.
+An earlier draft of this document said the boundary makes self-admission
+"structurally impossible" because it refuses `decided_by` values of `SELF`,
+`CALLER` or `ENGINEERING`. **That was wrong and the reviewer is right to strike
+it.** Rejecting a list of names stops nothing: anyone able to write the decision
+can write a different name.
+
+The accurate statement is narrower. `decided_by` is not inert metadata — it selects
+*which principal's public key* must have signed, so it is an index into the trusted
+key configuration rather than a claim that is believed. The authority boundary is
+therefore two facts and neither is a string:
+
+1. **Possession of the private signing key**, which is held off-host and must never
+   exist on the research host.
+2. **Protection of `allowed_signers`**, the trusted public-key configuration. If a
+   key can be appended to that file, the boundary is gone regardless of any name.
+
+That is why I did not create a signing key. Creating one on this host would place
+both halves of the authority in the same place as the code being admitted, which is
+the whole of what separation of authority means here. It is the same error as
+verifying mode bits while ignoring ownership, committed where it matters most.
 
 So the request is prepared and left unsigned: `results/exp001b_admission_request.json`.
 Every field the boundary requires is present and filled from measurement, so the
@@ -159,6 +200,7 @@ already covered by tests.
 | protected surfaces | **57 files, 0 drifted, 0 missing** |
 | bound source tree | `616a1912…` unchanged |
 | trust root / signing key | **not created** |
+| private key on the research host | **never — and must never be** |
 | admission | **not issued** |
 | experiment | **not run** |
 | alpha claim | **none** |
@@ -167,9 +209,9 @@ already covered by tests.
 
 ## 5. WHAT THIS DOES AND DOES NOT ESTABLISH
 
-It establishes that the research environment is real, isolated, and measured, and
-that the sealed evaluation period is protected by construction rather than by
-intention. It establishes that the wrapper's verifiers now test the properties
+It establishes that the research environment is real, and that runs launched
+through this path are isolated and measured, with the evaluation period excluded
+from the launched process. It establishes that the wrapper's verifiers now test the properties
 they exist for.
 
 It establishes **nothing whatever about whether APEX can make money.** No

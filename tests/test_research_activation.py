@@ -593,3 +593,50 @@ def test_a_fresh_setup_still_refuses_ground_that_is_already_broken(rig):
     _partial(rig)
     with pytest.raises(Refused, match="PREFLIGHT_FAILED"):
         RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))     # no resume=True
+
+
+# ============================= re-pinning =================================
+def test_probe_uses_the_configuration_the_launch_will_use(rig):
+    """A probe of a different configuration proves nothing about this one."""
+    t = rig["t"]
+    assert RA.launch_config(t, probe=True).properties == RA.launch_config(t).properties
+
+
+def test_repin_refuses_a_commit_that_changes_the_experiment_code(rig):
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    src = t.source_repo
+    (src / "apex" / "world_model" / "x.py").write_text("X = 99\n")     # bound path
+    _git(src, "add", "-A"); _git(src, "commit", "-q", "-m", "changes the experiment")
+    with pytest.raises(Refused, match="REPIN_CHANGES_EXPERIMENT_CODE"):
+        RA.run_repin(t, _git(src, "rev-parse", "HEAD"), apply=True, run=StandIn(t))
+
+
+def test_repin_moves_the_checkout_when_the_experiment_is_untouched(rig):
+    """Wrapper repairs land after a checkout is prepared. Re-pinning to them is
+    allowed precisely because the bound tree does not move."""
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    before = json.loads(t.setup_manifest.read_text())
+    src = t.source_repo
+    (src / "README_tooling.md").write_text("wrapper repair, not experiment code\n")
+    _git(src, "add", "-A"); _git(src, "commit", "-q", "-m", "tooling only")
+    newc = _git(src, "rev-parse", "HEAD")
+    plan = RA.run_repin(t, newc, apply=True, run=StandIn(t))
+    assert plan["to"]["commit"] == newc
+    assert plan["to"]["source_tree_sha256"] == before["source_tree_sha256"]
+    after = json.loads(t.setup_manifest.read_text())
+    assert after["commit"] == newc
+    assert after["source_tree_sha256"] == before["source_tree_sha256"]
+    assert RA._git(t.checkout, "rev-parse", "HEAD").strip() == newc
+    # and the launch now resolves against the re-pinned commit
+    d = rig["trust"] / "d.json"; d.write_text("{}"); d.with_name("d.json.sig").write_text("s")
+    RA.prepare_launch(t, newc, d)
+
+
+def test_repin_without_apply_moves_nothing(rig):
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    plan = RA.run_repin(t, rig["commit"], apply=False, run=StandIn(t))
+    assert plan["applied"] is False and "evidence" not in plan
+    assert json.loads(t.setup_manifest.read_text())["commit"] == rig["commit"]
