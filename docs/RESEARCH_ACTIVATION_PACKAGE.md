@@ -9,11 +9,20 @@ This supersedes, for execution purposes, the step lists in
 `ADMISSION_OPERATOR_PACKAGE.md`; that document remains the measurement
 record and the background for why each step exists.
 
+**Everything below is executed through one fail-stop wrapper**,
+`scripts/research_activation.py` (`RESEARCH_ACTIVATION_V0`). The loose shell
+snippets an earlier draft carried printed expectations and continued; the
+wrapper *aborts*. A mismatched hash, a missing or extra file, a conflicting
+destination, an unexpected identity or a partial setup each raise and exit
+non-zero, and `launch` refuses to start unless a complete setup manifest
+exists. Every command is dry-run by default and does nothing without
+`--apply`.
+
 ## 0. Four authorizations, deliberately separate
 
 | # | Authorization | Who | Grants | Does **not** grant |
 |---|---|---|---|---|
-| **A** | Operational setup | administrator (root) | the isolated runner exists: identity, environment, checkout, dataset view, trust chain | any access to data by research; no experiment runs |
+| **A** | Operational setup | administrator (root) | the isolated runner exists: identity, environment, checkout, trust chain, and a dataset view **containing copies of the admitted train/validation bytes** | reading anything outside that view; **no statistical parsing and no experiment**. Setup *does* move historical bytes — it is not a no-data step, and calling it one would be false |
 | **B** | Signed dataset admission | admission authority (off-host key) | *this* dataset, fields, universe, temporal range, experiment and code identity may be read | execution; the run still verifies everything itself |
 | **C** | Train/validation execution | operator, after A and B | one run of EXP-001B over train+validation | evaluation, economics, promotion |
 | **D** | Evaluation unsealing | reviewer, later | opening 2022–2024 | anything else; today blocked twice over (§7) |
@@ -33,6 +42,35 @@ C requires both and re-checks both. **D is not part of this package.**
 - Therefore: `/etc/apex/admissions` resists **ordinary filesystem
   replacement by `apexresearch`**. It does not resist `sudo`, and no claim
   here should be read that way.
+
+## 1b. Resolved inputs — no unchecked placeholders
+
+Two values are supplied by people, and **both are validated before anything
+happens**; the wrapper refuses non-zero if either is absent or unresolvable,
+and the launch record carries their resolved values, not the strings.
+
+```bash
+COMMIT=<the commit the reviewer approves on strategic-integration-002>
+DECISION=/etc/apex/admissions/<the decision file the authority installs>
+
+# validates both: the commit must exist and yield the expected source
+# commitment; the decision must exist, sit under the trust root and have a
+# detached signature beside it
+research_activation.py preflight --commit "$COMMIT" --decision "$DECISION"
+```
+
+`preflight` resolves `COMMIT` to its full sha and computes the
+`source_tree_sha256` the checkout **would** produce — from the repository,
+without checking anything out — so a wrong commit is caught before a single
+directory is created. At the time of writing, `ed2db569…` resolves to
+`616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545`
+(48 bound files), which equals what the boundary computes from a real
+checkout; the two computations are independent and are cross-checked by a
+test.
+
+`launch` re-resolves both and refuses `UNRESOLVED_INPUTS` if either is
+missing, `SETUP_INCOMPLETE` if the setup manifest is absent, and
+`DECISION_OR_SIGNATURE_MISSING` if the `.sig` is not beside the decision.
 
 ## 2. Step A1 — dedicated research environment (do NOT touch the production venv)
 
@@ -67,11 +105,11 @@ run itself**: `_RUN.json` carries the interpreter (realpath, version,
 sha256 of the binary, venv or not, site-packages on `sys.path`) and every
 loaded non-stdlib module with version, file and origin.
 
-*If the host has no package index at setup time*, the fallback is
-`python3 -m venv --system-site-packages`, which yields the distro's
-**numpy 1.26.4** — a different environment from the one the regression ran
-under. That is acceptable only if the applicable regression is re-run under
-it first. This is operator decision **D2** in §8.
+The pin is **`numpy==2.4.6`**, the version the regression ran under.
+The `--system-site-packages` alternative (distro numpy 1.26.4) is
+**withdrawn**: it would put the run in an environment no regression had
+exercised, and the reviewer chose the pin. If the package index is
+unreachable at setup time, setup **stops** — it does not silently fall back.
 
 ## 3. Step A2 — identity and dedicated checkout
 
@@ -84,7 +122,7 @@ id apexresearch                      # expect: only the apexresearch group
 sudo install -d -o apexresearch -g apexresearch -m 0755 /apex-data/research
 sudo install -d -o apexresearch -g apexresearch -m 0755 /apex-data/research/out
 sudo git clone --no-hardlinks /opt/apex-repo /apex-data/research/checkout
-sudo git -C /apex-data/research/checkout checkout --detach <REVIEWED_COMMIT>
+sudo git -C /apex-data/research/checkout checkout --detach "$COMMIT"
 sudo chown -R apexresearch:apexresearch /apex-data/research/checkout
 ```
 
@@ -98,33 +136,46 @@ Measured layout: `/apex-data/history-b` is its own volume (`/dev/sda`);
 `/apex-data/research` is on the root volume, so **hardlinks across them are
 impossible** (`Invalid cross-device link`, reproduced). The view is
 therefore made of **copies** — ~145 MB for 1,511 SPY sessions, on a volume
-with 143 GB free. Copies are strictly safer than hardlinks: the run cannot
-touch the corpus inodes even in principle, and every file is verified
-byte-for-byte against the manifest `sha256` at read time.
+with 143 GB free. Copies cannot touch the corpus inodes even in principle,
+and every file is verified byte-for-byte.
+
+**The view is built by the wrapper, from the committed manifest — never
+from a filename glob.** A glob follows whatever happens to be on disk; the
+manifest is what the admission decision commits to. The wrapper:
+
+1. verifies the manifest's own sha256 against the pinned value;
+2. checks the manifest's `root` equals the target corpus root;
+3. selects only entries with `symbol == SPY` and `2016-01-04 ≤
+   session_date ≤ 2021-12-31`, and refuses if any selected entry falls
+   outside that range;
+4. refuses a **duplicated** selection name;
+5. for every file: refuses a **symlink** anywhere between the corpus root
+   and the file, refuses a path that **escapes** the corpus root, refuses a
+   **missing** source, and refuses a **source hash mismatch**;
+6. copies into **fresh staging** (`dataset_view.staging`, which must not
+   pre-exist) and re-hashes every copy;
+7. **reconciles the complete inventory** — no missing name, no extra name,
+   and exactly 1,511 files — then renames staging into place atomically;
+8. on **any** failure, removes the staging directory, so a partial view can
+   never be mistaken for a complete one.
+
+It parses no market rows: bytes are hashed and copied, and only the
+manifest JSON is read.
 
 ```bash
-sudo install -d -o apexresearch -g apexresearch -m 0755 \
-     /apex-data/research/dataset_view /apex-data/research/dataset_view/etf_continuous \
-     /apex-data/research/dataset_view/etf_continuous/bars
+# dry run (default): resolves and checks everything, creates nothing
+sudo -u root /opt/apex-runner/venv/bin/python \
+     /apex-data/research/checkout/scripts/research_activation.py \
+     setup --commit "$COMMIT"
 
-# copy ONLY the admitted train+validation sessions (2016-01-04..2021-12-31, SPY)
-cd /apex-data/history-b/etf_continuous/bars
-sudo sh -c 'for f in SPY_201[6-9]-*.json SPY_202[01]-*.json; do \
-      cp -p "$f" /apex-data/research/dataset_view/etf_continuous/bars/; done'
-sudo chown -R apexresearch:apexresearch /apex-data/research/dataset_view
-sudo chmod -R a-w /apex-data/research/dataset_view
-
-# verify the view: count, date bounds, and content equality
-ls /apex-data/research/dataset_view/etf_continuous/bars | wc -l          # expect 1511
-ls /apex-data/research/dataset_view/etf_continuous/bars | sed -n '1p;$p' # expect 2016-01-04 .. 2021-12-31
-ls /apex-data/research/dataset_view/etf_continuous/bars | grep -c 'SPY_202[2-9]'  # expect 0
-cd /apex-data/history-b/etf_continuous/bars && \
-  for f in $(ls /apex-data/research/dataset_view/etf_continuous/bars); do \
-    cmp -s "$f" "/apex-data/research/dataset_view/etf_continuous/bars/$f" || echo "DIFFERS $f"; done
-find /apex-data/research/dataset_view -type l                             # expect NOTHING: no symlinks
+# apply, after the dry run is reviewed
+sudo -u root /opt/apex-runner/venv/bin/python \
+     /apex-data/research/checkout/scripts/research_activation.py \
+     setup --commit "$COMMIT" --apply
 ```
 
-The original corpus permissions are **not modified**.
+The original corpus permissions are **not modified**, and no recursive
+ownership change is applied to any pre-existing tree.
 
 ## 5. Step A4 — trust chain
 
@@ -160,7 +211,7 @@ sudo systemd-run --pipe --wait --collect --slice=wmresearch.slice \
   --setenv=GIT_CONFIG_GLOBAL=/dev/null --setenv=GIT_CONFIG_NOSYSTEM=1 \
   --working-directory=/apex-data/research/checkout \
   /opt/apex-runner/venv/bin/python scripts/alpha_exp_real_execute.py \
-  --decision /etc/apex/admissions/<decision>.json --execute
+  --decision "$DECISION" --execute
 ```
 
 | Property | Probed result (non-root) |
@@ -179,47 +230,67 @@ sudo systemd-run --pipe --wait --collect --slice=wmresearch.slice \
 `ProtectHome` warnings the probe showed and make source identity
 independent of any user or system git configuration.
 
-## 7. What this protects, and what it does not
+## 7. What this protects, against whom — and what it does not
 
-**Provides** (measured, not asserted): the research process cannot read
-evaluation or reserve session files, other symbols, other corpora, live
-evidence, or credentials; cannot write the corpus; cannot reach the
-network; cannot gain privileges (`NoNewPrivileges`); is memory-bounded; and
-writes only into its own output root.
+**Account permissions and sandbox restrictions are different things, and
+only one of them is a boundary here.**
+
+| | The `apexresearch` **account**, unsandboxed | The **research process**, launched as in §6 |
+|---|---|---|
+| evaluation-period corpus file | **CAN read it** — the corpus is world-readable (0664/0755) and `nologin` does not change that | **cannot** — the path does not exist in its mount namespace |
+| other symbols, other corpora | can read | cannot |
+| `/apex-data/core` live evidence | can read | cannot |
+| `/home/apex/.apex-secrets` | cannot (0700, different owner) | cannot |
+| corpus for writing | cannot | cannot |
+| network | can | cannot |
+
+So: **the account is not the boundary — the launch configuration is.** An
+experiment run by any other means as that account would not be isolated,
+which is why §6's configuration is the only approved way to run it and why
+the probe uses that same configuration object.
+
+`nologin` and the absent supplementary groups stop the account being *used
+interactively* and stop privilege escalation; they do not restrict reads of
+world-readable files.
+
+**Provides** (measured, non-root): the research *process* cannot read
+evaluation or reserve sessions, other symbols, other corpora, live evidence
+or credentials; cannot write the corpus; cannot reach the network; cannot
+gain privileges; is memory- and task-bounded; writes only into its own
+output root.
 
 **Does not provide:** protection against the administrator or any
-root-capable account — including today's `apex`. It is not a security
-boundary against privilege; it is a correctness boundary against the
-research identity reading what it was not admitted to read.
+root-capable account — including today's `apex`. This is a correctness
+boundary against the research identity, not a security boundary against
+privilege.
 
-**Two independent refusals now cover evaluation data**, and they are not
-the same thing: the loader refuses by temporal scope and by
-`CALENDAR_NOT_VERIFIED`, and the filesystem does not present the files at
-all. Before this package, only the first existed, and world-readable files
-meant the second claim could not be made.
+**Evaluation data is now covered twice, by different mechanisms:** the
+loader refuses by temporal scope and `CALENDAR_NOT_VERIFIED`, and the
+filesystem does not present the files at all. Before this package only the
+first existed.
 
 ## 8. Operator decisions that genuinely remain
 
-Not seven. Three, each with a concrete effect:
+**Two.** The environment decision is closed: the reviewer chose pinned
+`numpy==2.4.6` and the alternative is withdrawn.
 
 | # | Decision | Concrete effect |
 |---|---|---|
-| **D1** | Approve authorization **A** (this package) | the isolated runner exists; still no data access and no run |
-| **D2** | Research environment: pinned `numpy==2.4.6` via the package index, **or** `--system-site-packages` with distro numpy 1.26.4 | the first reproduces the environment the regression ran under; the second requires re-running the applicable regression under it first |
-| **D3** | Approve authorization **B**: issue the signed decision, naming the reviewed commit and confirming the key is generated and held off-host | the run becomes possible; the run still verifies everything itself |
+| **D1** | Approve authorization **A** and run `setup --apply` | the isolated runner exists, and the view holds copies of the admitted train/validation bytes; no experiment runs |
+| **D2** | Approve authorization **B**: issue the signed decision, key generated and held off-host | the run becomes possible; the run still verifies everything itself |
 
-Everything else previously listed as a "decision" was an implementation
-choice and has been made here against measurement: copy-based view (cross-
-device hardlinks are impossible), no ACL work (`setfacl` is absent and the
-corpus is already world-readable and non-writable to a non-`apex` account),
-`/etc/apex` as the trust root, dedicated root-owned environment rather than
-modifying the production venv.
+Everything else is an implementation choice already made against
+measurement: copy-based view (cross-device hardlinks are impossible), no
+ACL work (`setfacl` is absent; the corpus is already world-readable and
+non-writable to a non-`apex` account), `/etc/apex` as the trust root,
+`/opt/apex-runner` for the environment (because `/opt/apex-research`
+already holds the World Model shadow worktree), and pinned numpy.
 
 ## 9. Run identity (what authorization C approves)
 
 | Item | Value |
 |---|---|
-| commit | `<REVIEWED_COMMIT>` on `strategic-integration-002` |
+| commit | `$COMMIT`, resolved and recorded by `preflight`/`launch` (no placeholder reaches the run) |
 | source commitment | `source_tree_sha256 = 616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545` (48 files under the bound paths) |
 | experiment / registration | `ALPHA-EXP-001B` / `b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9` |
 | dataset manifest | `etf_continuous_SPY_manifest_v0.json`, sha256 `3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39` |
@@ -231,15 +302,33 @@ modifying the production venv.
 | expected outcomes | `0 SCIENTIFIC_COMPLETE` (incl. `NO_SIGNAL`) · `4 EVALUATION_SEALED` · `3 AUTHORIZATION_REFUSED` · `5 INVALID_INPUT_OR_FAILURE` |
 | evidence returned | `_RUN.json` (decision sha256, signer, source identity, import verification, interpreter and third-party provenance, trust chain), `_RESULT.json` (status, stages, per-period refusal counts, validation DM-HAC and N0, `acceptance_qualification`), sealed forecast ledger |
 
-## 10. Rollback (removes capability, never evidence)
+## 10. Rollback — capability only, evidence never
+
+Driven by `_ACTIVATION_MANIFEST.json`, which records **every object setup
+created** and classifies each as `capability` or `evidence`. Rollback
+removes only `capability` objects that this activation recorded creating.
+It refuses entirely if the manifest is absent, rather than guessing what it
+owns.
 
 ```bash
-sudo rm -rf /apex-data/research/dataset_view /apex-data/research/checkout
-sudo rm -rf /opt/apex-runner
-sudo deluser --remove-home apexresearch
-sudo rm -rf /etc/apex                 # admission then refuses TRUST_PATH_MISSING
-# /apex-data/research/out and its sealed runs are deliberately left in place
+# dry run: prints exactly what would be removed and what is preserved
+sudo -u root /opt/apex-runner/venv/bin/python \
+     /apex-data/research/checkout/scripts/research_activation.py rollback
 ```
 
-Nothing above touches the production venv, the release, the holds, the
-orchestrator, the corpora or their permissions.
+| Class | Objects | Rollback |
+|---|---|---|
+| capability | `/opt/apex-runner` (+venv, packages), `apexresearch` account, `/apex-data/research/checkout`, `/apex-data/research/dataset_view` | removed |
+| evidence | `/apex-data/research/out` and every sealed run under it, `_ACTIVATION_MANIFEST.json`, `pinned.txt` | **never removed** |
+| never touched | `/etc/apex`, `/etc/apex/admissions`, signed decisions, `.sig` signatures, `allowed_signers` | **never removed, not even if recorded** — a guard drops any object under the trust root from the removal list before it is acted on |
+
+The earlier draft's `sudo rm -rf /etc/apex` is **withdrawn**: it would have
+destroyed signed admission records, signatures and trust fingerprints, and
+`/etc/apex` may hold configuration this activation never created. To
+*disable* verification capability without destroying evidence, the
+authority removes or replaces `allowed_signers` itself — after recording
+its fingerprint (`ssh-keygen -lf`) — which is an admission-authority act,
+not a rollback of this setup.
+
+Nothing in rollback touches the production venv, the release, the holds,
+the orchestrator, the corpora or their permissions.
