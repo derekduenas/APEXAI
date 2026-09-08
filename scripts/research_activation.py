@@ -42,6 +42,7 @@ EXPERIMENT_ID = "ALPHA-EXP-001B"
 # must match apex.world_model.real_data.boundary.RESULT_FILE; a run that has
 # not written this has not produced a result, whatever its exit code says
 RESULT_FILE = "_RESULT.json"
+RUN_FILE = "_RUN.json"
 REGISTRATION_HASH = "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9"
 MANIFEST_SHA256 = "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39"
 SCOPE_SYMBOL, SCOPE_START, SCOPE_END = "SPY", "2016-01-04", "2021-12-31"
@@ -935,20 +936,50 @@ def classify_launch(child: dict, result_sealed: bool) -> tuple:
     return LAUNCH_COMPLETED, "the child exited 0 and sealed a result"
 
 
-def _sealed_results_since(t: Targets, since_mtime: float) -> list:
-    """Run directories that sealed a result during this launch."""
+def _run_dirs(t: Targets) -> set:
     base = t.out / EXPERIMENT_ID / "runs"
-    if not base.is_dir():
-        return []
-    found = []
-    for d in sorted(base.iterdir()):
-        r = d / RESULT_FILE
-        try:
-            if r.is_file() and r.stat().st_mtime >= since_mtime - 1:
-                found.append(str(r))
-        except OSError:
+    return {str(d) for d in base.iterdir()} if base.is_dir() else set()
+
+
+# A result whose status begins with any of these is not a completed outcome.
+_NOT_COMPLETED = ("REFUS", "INCOMPLETE", "ERROR", "FAIL", "ABORT", "INVALID")
+
+
+def _sealed_results_for(t: Targets, decision_sha256: str, before: set) -> list:
+    """Results that belong to THIS launch and record a completed outcome.
+
+    Existence was not enough. A result left by an earlier run, or by a run under
+    a different decision, would otherwise be read as this launch succeeding, and
+    a result recording a refusal would be read as a completed one. A run counts
+    only when its directory is new to this launch, its _RUN.json names the
+    decision we launched with, and its result records a completed outcome."""
+    out = []
+    for d in sorted(Path(x) for x in (_run_dirs(t) - before)):
+        rp, runp = d / RESULT_FILE, d / RUN_FILE
+        if not (rp.is_file() and runp.is_file()):
             continue
-    return found
+        try:
+            runrec = json.loads(runp.read_text())
+            res = json.loads(rp.read_text())
+        except (OSError, ValueError) as e:
+            out.append({"path": str(rp), "counted": False, "why": "unreadable: %s" % e})
+            continue
+        if decision_sha256 and runrec.get("decision_sha256") != decision_sha256:
+            out.append({"path": str(rp), "counted": False,
+                        "why": "belongs to decision %s, not the one launched"
+                               % str(runrec.get("decision_sha256"))[:16]})
+            continue
+        status = str(res.get("status") or res.get("process_outcome") or "").upper()
+        if not status:
+            out.append({"path": str(rp), "counted": False, "why": "result records no outcome"})
+            continue
+        if any(m in status for m in _NOT_COMPLETED):
+            out.append({"path": str(rp), "counted": False,
+                        "why": "result records %s, which is not a completed outcome" % status})
+            continue
+        out.append({"path": str(rp), "counted": True, "run_id": runrec.get("run_id"),
+                    "status": status})
+    return out
 
 
 def run_launch(t: Targets, commit: str, decision: Path, *, apply: bool,
@@ -960,9 +991,12 @@ def run_launch(t: Targets, commit: str, decision: Path, *, apply: bool,
         plan["ok"] = True
         return plan
     run = run or SystemRunner()
-    started, t0 = now(), time.time()
+    before = _run_dirs(t)
+    dsha = sha256_of(Path(decision)) if Path(decision).exists() else ""
+    started = now()
     child = run.run_child(plan["argv"], timeout=7200)
-    sealed = _sealed_results_since(t, t0)
+    considered = _sealed_results_for(t, dsha, before)
+    sealed = [r for r in considered if r.get("counted")]
     outcome, why = classify_launch(child, bool(sealed))
     plan["execution"] = {
         "started_utc": started, "finished_utc": now(),
@@ -972,6 +1006,8 @@ def run_launch(t: Targets, commit: str, decision: Path, *, apply: bool,
         "outcome": outcome, "outcome_evidence": why,
         "exit_code": LAUNCH_EXIT_CODES[outcome],
         "result_sealed": bool(sealed), "sealed_results": sealed,
+        "results_considered": considered,      # including the ones NOT counted, and why
+        "decision_sha256": dsha,
         # the whole of both streams: on failure these ARE the evidence
         "stdout": child.get("stdout") or "",
         "stderr": child.get("stderr") or "",

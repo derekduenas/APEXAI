@@ -373,7 +373,9 @@ def test_launch_apply_executes_and_records_the_outcome(rig):
             self.calls.append([str(a) for a in argv])
             res = t.out / RA.EXPERIMENT_ID / "runs" / "standin" / "_RESULT.json"
             res.parent.mkdir(parents=True, exist_ok=True)
-            res.write_text(json.dumps({"sealed": True}))
+            res.write_text(json.dumps({"status": "NO_SIGNAL"}))
+            res.with_name("_RUN.json").write_text(json.dumps(
+                {"run_id": "standin", "decision_sha256": RA.sha256_of(_decision(rig))}))
             return {"returncode": 0, "timed_out": False, "spawn_error": None,
                     "stdout": json.dumps({"experiment": "ALPHA-EXP-001B",
                                           "process_outcome": "SCIENTIFIC_COMPLETE",
@@ -750,14 +752,31 @@ def _cli_launch(rig, runner, tmp):
 OK_JSON = ('import json,sys,pathlib\n'
            'p=pathlib.Path(%r)\n'
            'p.parent.mkdir(parents=True,exist_ok=True)\n'
-           'p.write_text(json.dumps({"sealed":True}))\n'
+           'p.write_text(json.dumps({"status":"NO_SIGNAL"}))\n'
+           'p.with_name("_RUN.json").write_text(json.dumps('
+           '{"run_id":"r1","decision_sha256":%r}))\n'
            'print(json.dumps({"process_outcome":"COMPLETED"}))\n')
+
+
+def _dsha(rig):
+    return RA.sha256_of(_decision(rig))
+
+
+def _seal_script(res_path, dsha, status="NO_SIGNAL", run_id="r1"):
+    return ('import json,pathlib\n'
+            'p=pathlib.Path(%r)\n'
+            'p.parent.mkdir(parents=True,exist_ok=True)\n'
+            'p.write_text(json.dumps({"status":%r}))\n'
+            'p.with_name("_RUN.json").write_text(json.dumps({"run_id":%r,'
+            '"decision_sha256":%r}))\n'
+            'print(json.dumps({"process_outcome":"COMPLETED"}))\n'
+            % (str(res_path), status, run_id, dsha))
 
 
 def test_a_child_that_seals_a_result_and_exits_zero_is_the_only_success(rig, tmp_path):
     t = rig["t"]; _ready(rig)
     res = t.out / RA.EXPERIMENT_ID / "runs" / "r1" / "_RESULT.json"
-    run = Child(t, script=OK_JSON % str(res))
+    run = Child(t, script=OK_JSON % (str(res), _dsha(rig)))
     code, rec = _cli_launch(rig, run, tmp_path)
     assert rec["execution"]["outcome"] == RA.LAUNCH_COMPLETED
     assert rec["execution"]["result_sealed"] is True
@@ -828,3 +847,71 @@ def test_a_timeout_is_its_own_outcome(rig, tmp_path):
 def test_every_non_completed_outcome_exits_nonzero():
     for name, code in RA.LAUNCH_EXIT_CODES.items():
         assert (code == 0) == (name == RA.LAUNCH_COMPLETED), (name, code)
+
+
+# ======== a result counts only if it belongs to THIS run and completed ========
+
+def test_a_result_left_by_an_earlier_run_is_not_this_runs_success(rig, tmp_path):
+    """Existence is not enough. A stale result must not be adopted."""
+    t = rig["t"]; _ready(rig)
+    stale = t.out / RA.EXPERIMENT_ID / "runs" / "older" / "_RESULT.json"
+    stale.parent.mkdir(parents=True, exist_ok=True)
+    stale.write_text(json.dumps({"status": "NO_SIGNAL"}))
+    stale.with_name("_RUN.json").write_text(json.dumps(
+        {"run_id": "older", "decision_sha256": _dsha(rig)}))
+    run = Child(t, script="print('sealed nothing of my own')")
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["result_sealed"] is False
+    assert rec["execution"]["outcome"] == RA.LAUNCH_NO_RESULT
+    assert code != 0
+
+
+def test_a_result_from_a_different_decision_is_not_counted(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+    res = t.out / RA.EXPERIMENT_ID / "runs" / "other" / "_RESULT.json"
+    run = Child(t, script=_seal_script(res, "0" * 64, run_id="other"))
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["result_sealed"] is False
+    assert any("not the one launched" in r.get("why", "")
+               for r in rec["execution"]["results_considered"])
+    assert code != 0
+
+
+def test_a_result_recording_a_refusal_is_not_a_completed_outcome(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+    res = t.out / RA.EXPERIMENT_ID / "runs" / "refused" / "_RESULT.json"
+    run = Child(t, script=_seal_script(res, _dsha(rig), status="ADMISSION_REFUSED",
+                                       run_id="refused"))
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["result_sealed"] is False
+    assert any("not a completed outcome" in r.get("why", "")
+               for r in rec["execution"]["results_considered"])
+    assert code != 0
+
+
+def test_a_result_with_no_outcome_recorded_is_not_counted(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+    res = t.out / RA.EXPERIMENT_ID / "runs" / "blank" / "_RESULT.json"
+    run = Child(t, script=('import json,pathlib\n'
+                           'p=pathlib.Path(%r)\n'
+                           'p.parent.mkdir(parents=True,exist_ok=True)\n'
+                           'p.write_text(json.dumps({"note":"nothing useful"}))\n'
+                           'p.with_name("_RUN.json").write_text(json.dumps('
+                           '{"run_id":"blank","decision_sha256":%r}))\n'
+                           % (str(res), _dsha(rig))))
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["result_sealed"] is False
+    assert any("records no outcome" in r.get("why", "")
+               for r in rec["execution"]["results_considered"])
+    assert code != 0
+
+
+def test_a_result_that_does_belong_to_this_run_still_succeeds(rig, tmp_path):
+    """The tightening must not make the real success path unreachable."""
+    t = rig["t"]; _ready(rig)
+    res = t.out / RA.EXPERIMENT_ID / "runs" / "mine" / "_RESULT.json"
+    run = Child(t, script=_seal_script(res, _dsha(rig), run_id="mine"))
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["result_sealed"] is True
+    assert rec["execution"]["sealed_results"][0]["run_id"] == "mine"
+    assert rec["execution"]["outcome"] == RA.LAUNCH_COMPLETED and code == 0
