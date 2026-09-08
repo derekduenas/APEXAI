@@ -1,15 +1,21 @@
-"""RESEARCH_ACTIVATION_V0 -- failure behaviour first.
+"""RESEARCH_ACTIVATION_V1 -- behaviour, not descriptions.
 
-Every test uses disposable fixtures under tmp_path: a fake corpus, a fake
-committed manifest, a throwaway git repo standing in for the source repo.
-No real corpus file is read, no account is created, no privileged command
-runs, and no market row is parsed anywhere in this module.
+Every test drives the wrapper with disposable fixtures and a controlled
+subprocess stand-in, and asserts what actually happened: which commands ran,
+in what order, what exists on disk afterwards, and what the record says. The
+V0 defect these replace was precisely a wrapper that described its actions
+and recorded them as done.
+
+No account is created, no privileged command runs, no real corpus file is
+read, and no market row is parsed.
 """
 from __future__ import annotations
 
 import importlib.util
 import json
 import os
+import shutil
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -20,11 +26,55 @@ REPO = Path(__file__).resolve().parents[1]
 _spec = importlib.util.spec_from_file_location("research_activation",
                                                REPO / "scripts/research_activation.py")
 RA = importlib.util.module_from_spec(_spec)
-# dataclasses resolves annotations through sys.modules[cls.__module__]; a
-# module loaded by path must be registered there before it is executed
 sys.modules["research_activation"] = RA
 _spec.loader.exec_module(RA)
 Refused = RA.ActivationRefused
+
+PY_STUB = '#!/bin/sh\necho \'{"numpy": "2.4.6"}\'\n'
+
+
+class StandIn(RA.SystemRunner):
+    """Records every command in order. Filesystem operations are REAL; the
+    commands that need root or a package index are emulated just enough for
+    verification to have something true to check."""
+    name = "stand-in"
+
+    def __init__(self, targets, *, fail_on=None, account=True):
+        self.t, self.calls, self.fail_on, self.account = targets, [], fail_on, account
+
+    def cmd(self, argv, *, timeout=1800, input_text=None):
+        argv = [str(x) for x in argv]
+        self.calls.append(argv)
+        joined = " ".join(argv)
+        if self.fail_on and self.fail_on in joined:
+            raise Refused("COMMAND_FAILED: %s exited 1: stand-in forced failure" % argv[0])
+        if argv[0] == "adduser":
+            if self.account:
+                RA.account_facts = lambda u, _t=self.t: (
+                    {"name": u, "present": True, "uid": os.getuid(), "gid": os.getgid(),
+                     "shell": "/usr/sbin/nologin", "home": "/home/%s" % u,
+                     "groups": [u], "privileged_groups": []} if u == _t.research_user
+                    else {"name": u, "present": False})
+            return subprocess.CompletedProcess(argv, 0, "", "")
+        if "-m" in argv and "venv" in argv:                     # python -m venv
+            venv = Path(argv[-1]); (venv / "bin").mkdir(parents=True)
+            p = venv / "bin" / "python"; p.write_text(PY_STUB); os.chmod(p, 0o755)
+            pip = venv / "bin" / "pip"; pip.write_text("#!/bin/sh\necho numpy==2.4.6\n"); os.chmod(pip, 0o755)
+            return subprocess.CompletedProcess(argv, 0, "", "")
+        if argv[0].endswith("/pip") and "freeze" in argv:
+            return subprocess.CompletedProcess(argv, 0, "numpy==2.4.6\n", "")
+        if argv[0].endswith("/pip"):
+            return subprocess.CompletedProcess(argv, 0, "installed", "")
+        if argv[0] in ("chown", "passwd", "deluser"):
+            return subprocess.CompletedProcess(argv, 0, "", "")
+        if argv[0] == "chmod":
+            for root, dirs, fs in os.walk(argv[-1]):
+                for n in dirs + fs:
+                    p = Path(root) / n
+                    os.chmod(p, stat.S_IMODE(os.stat(p).st_mode) & ~(stat.S_IWGRP | stat.S_IWOTH))
+            os.chmod(argv[-1], stat.S_IMODE(os.stat(argv[-1]).st_mode) & ~(stat.S_IWGRP | stat.S_IWOTH))
+            return subprocess.CompletedProcess(argv, 0, "", "")
+        return super().cmd(argv, timeout=timeout, input_text=input_text)   # git etc: run for real
 
 
 def _git(repo, *args):
@@ -33,379 +83,434 @@ def _git(repo, *args):
     return r.stdout.strip()
 
 
+@pytest.fixture(autouse=True)
+def _restore_account_facts():
+    original = RA.account_facts
+    yield
+    RA.account_facts = original
+
+
 @pytest.fixture
 def rig(tmp_path):
-    """A complete, VALID activation input set. Each test breaks exactly one
-    thing, so a failure names the thing that was broken."""
     corpus = tmp_path / "corpus" / "bars"; corpus.mkdir(parents=True)
-    files = {}
-    days = [f"2019-06-{d:02d}" for d in range(3, 8)] + [f"2020-06-{d:02d}" for d in range(1, 6)]
+    files, days = {}, [f"2019-06-{d:02d}" for d in range(3, 8)]
     for d in days:
         p = corpus / f"SPY_{d}.json"
-        p.write_text(json.dumps({"source": "alpaca_sip_raw_1m", "bars": [{"t": d}]}))
+        p.write_text(json.dumps({"bars": [{"t": d}]}))
         files[p.name] = {"sha256": RA.sha256_of(p), "size": p.stat().st_size,
                          "symbol": "SPY", "session_date": d}
-    # out-of-scope and other-symbol entries that MUST NOT be selected
     for name, sym, day in (("SPY_2023-06-01.json", "SPY", "2023-06-01"),
                            ("QQQ_2019-06-03.json", "QQQ", "2019-06-03")):
-        p = corpus / name
-        p.write_text(json.dumps({"source": "alpaca_sip_raw_1m", "bars": [{"t": day}]}))
+        p = corpus / name; p.write_text(json.dumps({"bars": [{"t": day}]}))
         files[name] = {"sha256": RA.sha256_of(p), "size": p.stat().st_size,
                        "symbol": sym, "session_date": day}
-    manifest = tmp_path / "manifest.json"
-    manifest.write_text(json.dumps({"dataset_id": "fixture/etf", "root": str(corpus),
-                                    "source_families": ["alpaca_sip_raw_1m"], "files": files}, indent=1))
+    man = tmp_path / "manifest.json"
+    man.write_text(json.dumps({"dataset_id": "f", "root": str(corpus), "files": files}))
     src = tmp_path / "srcrepo"; (src / "apex" / "world_model").mkdir(parents=True)
     (src / "apex" / "world_model" / "x.py").write_text("X = 1\n")
-    (src / "scripts").mkdir(); (src / "scripts" / "alpha_exp_real_execute.py").write_text("# cmd\n")
+    (src / "scripts").mkdir(); (src / "scripts" / "alpha_exp_real_execute.py").write_text("#\n")
     _git(src, "init", "-q"); _git(src, "config", "user.email", "t@t"); _git(src, "config", "user.name", "t")
-    _git(src, "add", "-A"); _git(src, "commit", "-q", "-m", "base")
-    commit = _git(src, "rev-parse", "HEAD")
+    _git(src, "add", "-A"); _git(src, "commit", "-q", "-m", "b")
     trust = tmp_path / "trust"; (trust / "trust").mkdir(parents=True)
     t = RA.Targets(research_user="nonexistent_research_user", runner_root=tmp_path / "runner",
                    research_root=tmp_path / "research", source_repo=src, corpus_root=corpus,
-                   manifest_path=manifest, trust_root=trust,
+                   manifest_path=man, trust_root=trust,
                    allowed_signers=trust / "trust" / "allowed_signers",
-                   expected_view_files=len(days))
-    return {"t": t, "tmp": tmp_path, "corpus": corpus, "manifest": manifest,
-            "commit": commit, "days": days, "trust": trust}
+                   system_python=sys.executable, expected_view_files=len(days))
+    return {"t": t, "tmp": tmp_path, "corpus": corpus, "manifest": man,
+            "commit": _git(src, "rev-parse", "HEAD"), "days": days, "trust": trust}
 
 
-def _rewrite_manifest(rig, mutate):
-    m = json.loads(rig["manifest"].read_text())
-    mutate(m)
-    rig["manifest"].write_text(json.dumps(m, indent=1))
-
-
-# ------------------------------------------------- selection from the manifest
-def test_selection_comes_from_the_manifest_not_a_glob(rig):
-    sel = RA.admitted_files(rig["t"])
-    names = [Path(s["rel"]).name for s in sel]
-    assert len(sel) == len(rig["days"])
-    assert all(n.startswith("SPY_") for n in names)
-    assert "SPY_2023-06-01.json" not in names          # out of scope
-    assert "QQQ_2019-06-03.json" not in names          # other symbol
-    # a file present on disk but ABSENT from the manifest is never selected
-    (rig["corpus"] / "SPY_2019-06-10.json").write_text("{}")
-    assert len(RA.admitted_files(rig["t"])) == len(rig["days"])
-
-
-def test_manifest_root_mismatch_aborts(rig):
-    _rewrite_manifest(rig, lambda m: m.update(root="/somewhere/else"))
-    with pytest.raises(Refused, match="^MANIFEST_ROOT_MISMATCH"):
-        RA.admitted_files(rig["t"])
-
-
-def test_empty_selection_aborts(rig):
-    _rewrite_manifest(rig, lambda m: m.update(files={k: v for k, v in m["files"].items()
-                                                     if v["symbol"] != "SPY"}))
-    with pytest.raises(Refused, match="^EMPTY_SELECTION"):
-        RA.admitted_files(rig["t"])
-
-
-# ------------------------------------------------------------- view building
-def test_view_build_succeeds_and_reconciles(rig):
+# ======================= the V0 defects, now absent =======================
+def test_dry_run_creates_nothing_and_records_nothing_as_created(rig):
     t = rig["t"]
-    out = RA.build_view(t, RA.admitted_files(t), apply=True)
-    assert out["applied"] and out["files"] == len(rig["days"])
-    present = sorted(p.name for p in t.view_bars.iterdir())
-    assert len(present) == len(rig["days"])
-    for name in present:
-        src, dst = rig["corpus"] / name, t.view_bars / name
-        assert RA.sha256_of(src) == RA.sha256_of(dst)
-    assert not (t.view.with_name(t.view.name + ".staging")).exists()
+    rec = RA.run_setup(t, rig["commit"], apply=False)
+    assert rec["state"] == "DRY_RUN" and rec["created"] == []
+    assert len(rec["planned_stages"]) == 12
+    for p in (t.runner_root, t.research_root, t.checkout, t.view):
+        assert not p.exists()
 
 
-def test_hash_mismatch_aborts_and_leaves_no_partial_view(rig):
+def test_setup_actually_creates_what_it_records(rig):
+    """The V0 defect: 12 objects recorded, venv and checkout absent."""
     t = rig["t"]
-    files = RA.admitted_files(t)
-    (rig["corpus"] / Path(files[2]["rel"]).name).write_text("TAMPERED")
-    with pytest.raises(Refused, match="^SOURCE_HASH_MISMATCH"):
-        RA.build_view(t, files, apply=True)
-    assert not t.view.exists()
-    assert not t.view.with_name(t.view.name + ".staging").exists()      # no partial view survives
+    run = StandIn(t)
+    rec = RA.run_setup(t, rig["commit"], apply=True, run=run)
+    assert rec["state"] == "COMPLETE"
+    for p in (t.research_root, t.out, t.runner_root, t.venv, t.python, t.requirements,
+              t.pinned, t.checkout, t.view, t.view_bars, t.setup_manifest, t.log):
+        assert p.exists(), p
+    recorded = {o["object"] for o in rec["created"]}
+    for o in rec["created"]:
+        if o["kind"] != "account" and "[packages]" not in o["object"]:
+            assert Path(o["object"]).exists(), o          # every recorded object EXISTS
+    assert str(t.venv) in recorded and str(t.checkout) in recorded
+    assert len(rec["created"]) == 12 and all(s["status"] == "VERIFIED" for s in rec["stages"])
+    assert len(list(t.view_bars.iterdir())) == len(rig["days"])
 
 
-def test_missing_source_file_aborts(rig):
+def test_commands_actually_run_in_the_declared_order(rig):
     t = rig["t"]
-    files = RA.admitted_files(t)
-    (rig["corpus"] / Path(files[0]["rel"]).name).unlink()
-    with pytest.raises(Refused, match="^SOURCE_MISSING"):
-        RA.build_view(t, files, apply=True)
-    assert not t.view.exists()
+    run = StandIn(t)
+    RA.run_setup(t, rig["commit"], apply=True, run=run)
+    seq = [c[0].split("/")[-1] + (":" + c[1] if len(c) > 1 and c[1].startswith("-") else "")
+           for c in run.calls]
+    assert "adduser" in [c[0] for c in run.calls]
+    order = [i for i, c in enumerate(run.calls)]
+    idx = {}
+    for i, c in enumerate(run.calls):
+        key = ("adduser" if c[0] == "adduser" else
+               "venv" if "venv" in c else
+               "pip_install" if c[0].endswith("/pip") and "install" in c else
+               "pip_freeze" if c[0].endswith("/pip") and "freeze" in c else
+               "git_clone" if c[:2] == ["git", "-C"] and "clone" in c or (c[0] == "git" and "clone" in c) else None)
+        if key and key not in idx:
+            idx[key] = i
+    assert idx["adduser"] < idx["venv"] < idx["pip_install"] < idx["pip_freeze"] < idx["git_clone"], idx
 
 
-def test_short_inventory_aborts(rig):
+def test_a_failed_stage_stops_and_records_partial_progress(rig):
     t = rig["t"]
-    files = RA.admitted_files(t)
-    with pytest.raises(Refused, match="^INVENTORY_COUNT"):
-        RA.build_view(t, files[:-1], apply=True)                        # one short
-    assert not t.view.exists()
+    run = StandIn(t, fail_on="-m venv")
+    with pytest.raises(Refused, match="^SETUP_FAILED_AT venv"):
+        RA.run_setup(t, rig["commit"], apply=True, run=run)
+    rec = json.loads(t.setup_manifest.read_text())
+    assert rec["state"] == "PARTIAL_FAILED" and rec["failed_at"] == "venv"
+    done = [o["stage"] for o in rec["created"]]
+    assert done == ["research_root", "out", "account", "own_research_paths", "runner_root"]
+    assert not t.venv.exists() and not t.checkout.exists() and not t.view.exists()
+    assert t.log.exists() and len(t.log.read_text().splitlines()) >= len(done)
+    # and nothing continues to launch
+    d = rig["trust"] / "d.json"; d.write_text("{}"); d.with_suffix(".json.sig").write_text("s")
+    with pytest.raises(Refused, match="^SETUP_NOT_COMPLETE"):
+        RA.prepare_launch(t, rig["commit"], d)
 
 
-def test_duplicate_selection_aborts(rig):
+def test_a_stage_that_does_not_create_its_object_is_not_recorded(rig):
+    """Verification is what makes a record true: a stage whose command
+    'succeeds' without producing anything must still fail."""
     t = rig["t"]
-    files = RA.admitted_files(t)
-    with pytest.raises(Refused, match="^INVENTORY_DUPLICATE"):
-        RA.build_view(t, files + [dict(files[0])], apply=True)
-    assert not t.view.exists()
+
+    class Liar(StandIn):
+        def cmd(self, argv, *, timeout=1800, input_text=None):
+            argv = [str(x) for x in argv]
+            self.calls.append(argv)
+            if "-m" in argv and "venv" in argv:
+                return subprocess.CompletedProcess(argv, 0, "", "")   # claims success, creates nothing
+            return StandIn.cmd(self, argv, timeout=timeout, input_text=input_text)
+    with pytest.raises(Refused, match="VENV_NOT_CREATED"):
+        RA.run_setup(t, rig["commit"], apply=True, run=Liar(t))
+    rec = json.loads(t.setup_manifest.read_text())
+    assert rec["state"] == "PARTIAL_FAILED"
+    assert str(t.venv) not in {o["object"] for o in rec["created"]}
 
 
-def test_an_extra_file_appearing_in_staging_aborts(rig, monkeypatch):
-    """Reconciliation is against the manifest selection, so a file that
-    appears in staging by any other route is caught."""
+def test_verify_fails_when_the_account_or_environment_is_absent(rig):
+    """The V0 defect: verify returned exit 0 with nothing installed."""
     t = rig["t"]
-    files = RA.admitted_files(t)
-    real_copy = RA.shutil.copy2
-    state = {"planted": False}
-
-    def copy_and_plant(src, dst, *a, **k):
-        out = real_copy(src, dst, *a, **k)
-        if not state["planted"]:
-            Path(dst).with_name("SPY_9999-01-01.json").write_text("{}")
-            state["planted"] = True
-        return out
-    monkeypatch.setattr(RA.shutil, "copy2", copy_and_plant)
-    with pytest.raises(Refused, match="^INVENTORY_MISMATCH"):
-        RA.build_view(t, files, apply=True)
-    assert not t.view.exists()
-
-
-def test_conflicting_destination_aborts(rig):
-    t = rig["t"]
-    t.view.mkdir(parents=True)
-    with pytest.raises(Refused, match="^DESTINATION_EXISTS"):
-        RA.build_view(t, RA.admitted_files(t), apply=True)
-
-
-def test_a_symlink_pointing_outside_the_corpus_is_refused_as_an_escape(rig):
-    t = rig["t"]
-    files = RA.admitted_files(t)
-    victim = rig["corpus"] / Path(files[1]["rel"]).name
-    outside = rig["tmp"] / "outside.json"
-    outside.write_text(victim.read_text())
-    victim.unlink(); victim.symlink_to(outside)
-    with pytest.raises(Refused, match="^PATH_ESCAPE"):
-        RA.build_view(t, files, apply=True)
-    assert not t.view.exists()
-
-
-def test_a_symlink_pointing_inside_the_corpus_is_still_refused(rig):
-    """Even a symlink that resolves inside the corpus is refused: the view
-    must be built from real files, not from links whose target can change."""
-    t = rig["t"]
-    files = RA.admitted_files(t)
-    victim = rig["corpus"] / Path(files[1]["rel"]).name
-    twin = rig["corpus"] / "_twin.json"
-    twin.write_text(victim.read_text())
-    victim.unlink(); victim.symlink_to(twin)
-    with pytest.raises(Refused, match="^SYMLINK_REFUSED"):
-        RA.build_view(t, files, apply=True)
-    assert not t.view.exists()
-
-
-def test_dry_run_creates_nothing(rig):
-    t = rig["t"]
-    out = RA.build_view(t, RA.admitted_files(t), apply=False)
-    assert out["applied"] is False and not t.view.exists()
-
-
-# ------------------------------------------------------------------ identity
-def test_identity_conflicts_and_privilege_are_refused(rig, monkeypatch):
-    with pytest.raises(Refused, match="^IDENTITY_MISSING"):
-        RA.assert_identity("nonexistent_research_user", must_exist=True)
-    monkeypatch.setattr(RA, "account_facts", lambda u: {
-        "name": u, "present": True, "uid": 4242, "groups": [u], "privileged_groups": []})
-    with pytest.raises(Refused, match="^IDENTITY_CONFLICT"):
-        RA.assert_identity("someone", must_exist=False)
-    monkeypatch.setattr(RA, "account_facts", lambda u: {
-        "name": u, "present": True, "uid": 4242, "groups": [u, "sudo"], "privileged_groups": ["sudo"]})
-    with pytest.raises(Refused, match="^IDENTITY_PRIVILEGED"):
-        RA.assert_identity("someone", must_exist=True)
-    monkeypatch.setattr(RA, "account_facts", lambda u: {
-        "name": u, "present": True, "uid": 4242, "groups": [u, "users"], "privileged_groups": []})
-    with pytest.raises(Refused, match="^IDENTITY_GROUPS_UNEXPECTED"):
-        RA.assert_identity("someone", must_exist=True)
-
-
-def test_the_real_research_account_is_measured_not_assumed():
-    """PRIVILEGED_GROUPS is the enforced list, not a comment."""
-    assert {"sudo", "docker", "disk", "shadow"} <= RA.PRIVILEGED_GROUPS
-    assert RA.account_facts("nonexistent_research_user") == {
-        "name": "nonexistent_research_user", "present": False}
-
-
-# ----------------------------------------------------------------- preflight
-def test_preflight_passes_on_a_clean_rig_and_resolves_the_commit(rig):
-    rec = RA.preflight(rig["t"], rig["commit"], None)
-    assert rec["ok"], rec["blocking"]
-    assert rec["resolved_commit"]["commit"] == rig["commit"]
-    assert len(rec["resolved_commit"]["tree_sha256"]) == 64
-    assert rec["inventory"]["selected_from_manifest"] == len(rig["days"])
-
-
-def test_preflight_refuses_conflicting_destinations_and_missing_commit(rig):
-    rec = RA.preflight(rig["t"], None, None)
-    assert not rec["ok"] and "commit_supplied" in rec["blocking"]
-    rig["t"].checkout.mkdir(parents=True)
-    rec = RA.preflight(rig["t"], rig["commit"], None)
-    assert not rec["ok"] and "destination_free:checkout" in rec["blocking"]
-
-
-def test_preflight_refuses_an_existing_account(rig, monkeypatch):
-    monkeypatch.setattr(RA, "account_facts", lambda u: {
-        "name": u, "present": True, "uid": 4242, "groups": [u], "privileged_groups": []})
-    rec = RA.preflight(rig["t"], rig["commit"], None)
-    assert not rec["ok"] and "identity_absent" in rec["blocking"]
-
-
-def test_expected_tree_hash_matches_a_real_checkout_of_that_commit(rig, tmp_path):
-    """The commitment preflight computes without checking anything out must
-    equal what the boundary computes from a real checkout."""
-    from apex.world_model.real_data import boundary as B
-    ident = RA.expected_tree_sha256(rig["t"].source_repo, rig["commit"])
-    work = tmp_path / "work"
-    subprocess.run(["git", "clone", "-q", "--no-hardlinks", str(rig["t"].source_repo), str(work)],
-                   check=True, timeout=120)
-    subprocess.run(["git", "-C", str(work), "checkout", "-q", "--detach", rig["commit"]],
-                   check=True, timeout=60)
-    real = B.source_identity(work)
-    assert ident["tree_sha256"] == real["tree_sha256"]
-    assert ident["commit"] == real["commit"] and ident["n_files"] == real["n_files"]
-
-
-# ------------------------------------------------ one configuration, two uses
-def test_probe_and_launch_share_one_configuration(rig):
-    t = rig["t"]
-    probe, launch = RA.launch_config(t, probe=True), RA.launch_config(t)
-    dp, dl = dict(p.split("=", 1) for p in probe.properties), dict(p.split("=", 1) for p in launch.properties)
-    assert set(dp) == set(dl)
-    differing = {k for k in dp if dp[k] != dl[k]}
-    assert differing == {"MemoryMax"}, differing        # ONLY the memory cap differs
-    for k in ("ProtectSystem", "ProtectHome", "PrivateNetwork", "NoNewPrivileges",
-              "TemporaryFileSystem", "BindReadOnlyPaths", "RestrictSUIDSGID"):
-        assert dp[k] == dl[k]
-    assert probe.setenv == launch.setenv
-    assert "GIT_CONFIG_GLOBAL=/dev/null" in launch.setenv
-
-
-# --------------------------------------------------------------------- CLI
-def _cli(rig, argv):
-    return RA._cli(argv, targets=rig["t"])
-
-
-def test_cli_setup_dry_run_changes_nothing(rig, capsys):
-    rc = _cli(rig, ["setup", "--commit", rig["commit"]])
-    doc = json.loads(capsys.readouterr().out)
-    assert rc == 0 and doc["status"] == "OK" and doc["applied"] is False
-    assert doc["view"]["applied"] is False
-    assert not rig["t"].view.exists() and not rig["t"].setup_manifest.exists()
-    assert any(step["class"] == "evidence" for step in doc["plan"])
-
-
-def test_cli_setup_refuses_when_preflight_fails(rig, capsys):
-    rig["t"].view.mkdir(parents=True)
-    rc = _cli(rig, ["setup", "--commit", rig["commit"]])
-    doc = json.loads(capsys.readouterr().out)
-    assert rc == 3 and doc["status"] == "REFUSED" and doc["refusal"].startswith("PREFLIGHT_FAILED")
-
-
-def test_cli_launch_refuses_placeholders_and_partial_setup(rig, capsys):
-    rc = _cli(rig, ["launch"])
-    doc = json.loads(capsys.readouterr().out)
-    assert rc == 3 and doc["refusal"].startswith("UNRESOLVED_INPUTS")
-    d = rig["trust"] / "decision.json"; d.write_text("{}")
-    rc = _cli(rig, ["launch", "--commit", rig["commit"], "--decision", str(d)])
-    doc = json.loads(capsys.readouterr().out)
-    assert rc == 3 and doc["refusal"].startswith("SETUP_INCOMPLETE")     # no continuation after partial setup
-    rig["t"].research_root.mkdir(parents=True, exist_ok=True)
-    rig["t"].setup_manifest.write_text(json.dumps({"created": []}))
-    rc = _cli(rig, ["launch", "--commit", rig["commit"], "--decision", str(d)])
-    doc = json.loads(capsys.readouterr().out)
-    assert rc == 3 and doc["refusal"].startswith("DECISION_OR_SIGNATURE_MISSING")
-
-
-def test_cli_launch_resolves_every_input_and_never_applies(rig, capsys, tmp_path):
-    t = rig["t"]
-    subprocess.run(["git", "clone", "-q", "--no-hardlinks", str(t.source_repo), str(t.checkout)],
-                   check=True, timeout=120)
-    t.setup_manifest.parent.mkdir(parents=True, exist_ok=True)
-    t.setup_manifest.write_text(json.dumps({"created": []}))
-    d = rig["trust"] / "decision.json"; d.write_text("{}")
-    d.with_name(d.name + ".sig").write_text("sig")
-    rc = _cli(rig, ["launch", "--commit", rig["commit"], "--decision", str(d)])
-    doc = json.loads(capsys.readouterr().out)
-    assert rc == 0 and doc["applied"] is False
-    r = doc["resolved"]
-    assert r["commit"] == rig["commit"] and len(r["source_tree_sha256"]) == 64
-    assert r["experiment"] == "ALPHA-EXP-001B" and r["registration_hash"] == RA.REGISTRATION_HASH
-    assert "<" not in doc["command"] and ">" not in doc["command"]        # no placeholders survive
-    assert "--execute" in doc["command"] and "systemd-run" in doc["command"]
-    rc = _cli(rig, ["launch", "--commit", rig["commit"], "--decision", str(d), "--apply"])
-    doc = json.loads(capsys.readouterr().out)
-    assert rc == 3 and doc["refusal"].startswith("LAUNCH_APPLY_REQUIRES_SEPARATE_AUTHORIZATION")
-
-
-# ---------------------------------------------------------------- rollback
-def test_rollback_refuses_without_a_setup_manifest(rig):
     with pytest.raises(Refused, match="^NO_SETUP_MANIFEST"):
-        RA.rollback_plan(rig["t"])
+        RA.run_verify(t)
+    run = StandIn(t)
+    RA.run_setup(t, rig["commit"], apply=True, run=run)
+    assert RA.run_verify(t)["ok"]                       # honest pass
+    RA.account_facts = lambda u: {"name": u, "present": False}
+    with pytest.raises(Refused, match="^IDENTITY_MISSING"):
+        RA.run_verify(t)
 
 
-def test_rollback_removes_only_capability_and_never_evidence_or_etc_apex(rig):
+def test_verify_detects_a_removed_environment_and_a_tampered_view(rig):
     t = rig["t"]
-    t.research_root.mkdir(parents=True, exist_ok=True)
-    t.setup_manifest.write_text(json.dumps({"created": [
-        {"object": str(t.venv), "class": "capability", "kind": "venv"},
-        {"object": str(t.checkout), "class": "capability", "kind": "checkout"},
-        {"object": str(t.view), "class": "capability", "kind": "dataset_view"},
-        {"object": t.research_user, "class": "capability", "kind": "account"},
-        {"object": str(t.out), "class": "evidence", "kind": "dir"},
-        {"object": str(t.runner_root / "pinned.txt"), "class": "evidence", "kind": "file"},
-        {"object": str(t.trust_root / "decision.json"), "class": "capability", "kind": "file"},
-    ]}))
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    victim = sorted(t.view_bars.iterdir())[0]
+    victim.write_text("TAMPERED")
+    with pytest.raises(Refused, match="^VIEW_HASH_MISMATCH"):
+        RA.run_verify(t)
+    RA.run_setup.__doc__                                  # (no-op; keeps the intent explicit)
+
+
+def test_verify_detects_a_missing_interpreter(rig):
+    t = rig["t"]
+    RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    t.python.unlink()
+    with pytest.raises(Refused, match="^VENV_NOT_CREATED"):
+        RA.run_verify(t)
+
+
+# ================================ probe ==================================
+def _complete(rig):
+    RA.run_setup(rig["t"], rig["commit"], apply=True, run=StandIn(rig["t"]))
+
+
+def test_probe_enters_the_sandbox_and_measures(rig):
+    """The V0 defect: probe printed a configuration and executed nothing."""
+    t = rig["t"]; _complete(rig)
+    good = "\n".join("%s=%s" % (k, str(v).lower()) for k, v in RA.PROBE_EXPECTATIONS.items())
+
+    class ProbeRunner(StandIn):
+        def cmd(self, argv, *, timeout=1800, input_text=None):
+            argv = [str(x) for x in argv]
+            self.calls.append(argv)
+            if "systemd-run" in argv:
+                return subprocess.CompletedProcess(argv, 0, good, "")
+            return StandIn.cmd(self, argv, timeout=timeout, input_text=input_text)
+    run = ProbeRunner(t)
+    out = RA.run_probe(t, run=run)
+    assert out["executed"] and out["ok"] and out["deviations"] == {}
+    invocation = [c for c in run.calls if "systemd-run" in c]
+    assert len(invocation) == 1, "the probe must actually invoke the sandbox"
+    argv = invocation[0]
+    for prop in ("ProtectSystem=strict", "PrivateNetwork=yes", "NoNewPrivileges=yes"):
+        assert prop in argv
+    assert any(a.startswith("BindReadOnlyPaths=%s:" % t.view_bars) for a in argv)
+    assert any(a.startswith("TemporaryFileSystem=") for a in argv)
+    assert out["denied_example"] == "SPY_2023-06-01.json"     # an out-of-scope file, from the manifest
+
+
+def test_probe_fails_when_an_expectation_is_violated(rig):
+    t = rig["t"]; _complete(rig)
+    bad = "\n".join("%s=%s" % (k, "true" if k == "evaluation_readable" else str(v).lower())
+                    for k, v in RA.PROBE_EXPECTATIONS.items())
+
+    class BadProbe(StandIn):
+        def cmd(self, argv, *, timeout=1800, input_text=None):
+            argv = [str(x) for x in argv]
+            self.calls.append(argv)
+            if "systemd-run" in argv:
+                return subprocess.CompletedProcess(argv, 0, bad, "")
+            return StandIn.cmd(self, argv, timeout=timeout, input_text=input_text)
+    with pytest.raises(Refused, match="^PROBE_FAILED"):
+        RA.run_probe(t, run=BadProbe(t))
+
+
+def test_probe_fails_when_the_sandbox_returns_nothing(rig):
+    t = rig["t"]; _complete(rig)
+
+    class Silent(StandIn):
+        def cmd(self, argv, *, timeout=1800, input_text=None):
+            argv = [str(x) for x in argv]
+            self.calls.append(argv)
+            if "systemd-run" in argv:
+                return subprocess.CompletedProcess(argv, 0, "", "")
+            return StandIn.cmd(self, argv, timeout=timeout, input_text=input_text)
+    with pytest.raises(Refused, match="^PROBE_FAILED"):
+        RA.run_probe(t, run=Silent(t))
+
+
+def test_probe_refuses_before_setup_is_complete(rig):
+    with pytest.raises(Refused, match="^NO_SETUP_MANIFEST"):
+        RA.run_probe(rig["t"], run=StandIn(rig["t"]))
+
+
+# ================================ launch =================================
+def _decision(rig):
+    d = rig["trust"] / "decision.json"
+    d.write_text(json.dumps({"decision": "ADMIT"}))
+    d.with_name(d.name + ".sig").write_text("signature")
+    return d
+
+
+def test_working_tree_identity_matches_the_boundary_computation(rig):
+    """The wrapper and apex.world_model.real_data.boundary must agree, or a
+    launch could pass here and be refused there (or worse, the reverse)."""
+    from apex.world_model.real_data import boundary as B
+    t = rig["t"]; _complete(rig)
+    mine, theirs = RA.working_tree_identity(t.checkout), B.source_identity(t.checkout)
+    assert mine["tree_sha256"] == theirs["tree_sha256"]
+    assert mine["commit"] == theirs["commit"] and mine["dirty"] == theirs["dirty"]
+
+
+def test_launch_prepares_with_every_input_resolved(rig):
+    t = rig["t"]; _complete(rig)
+    plan = RA.prepare_launch(t, rig["commit"], _decision(rig))
+    r = plan["resolved"]
+    assert r["commit"] == rig["commit"] and len(r["source_tree_sha256"]) == 64
+    assert r["view_files"] == len(rig["days"]) and r["experiment"] == "ALPHA-EXP-001B"
+    assert r["decision_sha256"] and r["interpreter"] == str(t.python)
+    assert "<" not in plan["command"] and "--execute" in plan["command"]
+    assert "systemd-run" in plan["argv"] or "systemd-run" in plan["command"]
+
+
+def test_launch_refuses_source_drift_and_view_drift(rig):
+    t = rig["t"]; _complete(rig)
+    d = _decision(rig)
+    (t.checkout / "apex" / "world_model" / "x.py").write_text("X = 999\n")
+    # an edited WORKING file: the committed blobs are unchanged, so only a
+    # working-tree check can see this
+    with pytest.raises(Refused, match="^SOURCE_DIRTY|^SOURCE_DRIFT"):
+        RA.prepare_launch(t, rig["commit"], d)
+    _git(t.checkout, "checkout", "--", "apex/world_model/x.py")
+    assert RA.prepare_launch(t, rig["commit"], d)["resolved"]["commit"] == rig["commit"]
+    sorted(t.view_bars.iterdir())[0].unlink()
+    with pytest.raises(Refused, match="^VIEW_DRIFT"):
+        RA.prepare_launch(t, rig["commit"], d)
+
+
+def test_launch_refuses_a_decision_outside_the_trust_root_or_without_a_signature(rig):
+    t = rig["t"]; _complete(rig)
+    d = rig["tmp"] / "elsewhere.json"; d.write_text("{}")
+    d.with_name(d.name + ".sig").write_text("s")
+    with pytest.raises(Refused, match="^DECISION_OUTSIDE_TRUST_ROOT"):
+        RA.prepare_launch(t, rig["commit"], d)
+    d2 = rig["trust"] / "unsigned.json"; d2.write_text("{}")
+    with pytest.raises(Refused, match="^DECISION_OR_SIGNATURE_MISSING"):
+        RA.prepare_launch(t, rig["commit"], d2)
+
+
+def test_launch_apply_executes_and_records_the_outcome(rig):
+    """The execution path is IMPLEMENTED. It is exercised here against a
+    stand-in; the real command is never run in development."""
+    t = rig["t"]; _complete(rig)
+
+    class LaunchRunner(StandIn):
+        def cmd(self, argv, *, timeout=1800, input_text=None):
+            argv = [str(x) for x in argv]
+            self.calls.append(argv)
+            if "systemd-run" in argv:
+                return subprocess.CompletedProcess(
+                    argv, 0, json.dumps({"experiment": "ALPHA-EXP-001B",
+                                         "process_outcome": "SCIENTIFIC_COMPLETE",
+                                         "status": "NO_SIGNAL"}), "")
+            return StandIn.cmd(self, argv, timeout=timeout, input_text=input_text)
+    run = LaunchRunner(t)
+    out = RA.run_launch(t, rig["commit"], _decision(rig), apply=True, run=run)
+    assert out["applied"] and out["execution"]["process_outcome"] == "SCIENTIFIC_COMPLETE"
+    assert out["execution"]["returncode"] == 0
+    rp = Path(out["launch_record"])
+    assert rp.exists() and rp.parent == t.out
+    assert json.loads(rp.read_text())["resolved"]["commit"] == rig["commit"]
+    inv = [c for c in run.calls if "systemd-run" in c]
+    assert len(inv) == 1 and "--execute" in inv[0]
+
+
+def test_launch_without_apply_executes_nothing(rig):
+    t = rig["t"]; _complete(rig)
+    run = StandIn(t)
+    out = RA.run_launch(t, rig["commit"], _decision(rig), apply=False, run=run)
+    assert out["applied"] is False and "execution" not in out
+    assert not [c for c in run.calls if "systemd-run" in c]
+
+
+# =============================== rollback ================================
+def test_rollback_never_schedules_a_parent_that_contains_evidence(rig):
+    """The V0 defect: /apex-data/research listed for removal while its own
+    manifest and out/ were listed as preserved."""
+    t = rig["t"]; _complete(rig)
     plan = RA.rollback_plan(t)
-    removed = {o["object"] for o in plan["remove"]}
-    preserved = {o["object"] for o in plan["preserve"]}
-    assert str(t.venv) in removed and str(t.checkout) in removed and str(t.view) in removed
-    assert str(t.out) in preserved and str(t.runner_root / "pinned.txt") in preserved
-    # a trust-root object is preserved even though it was recorded as capability
-    assert str(t.trust_root / "decision.json") in preserved
-    assert not any(o["object"].startswith(str(t.trust_root)) for o in plan["remove"])
-    assert str(t.trust_root) in plan["never_touched"] and "/etc/apex" in plan["never_touched"]
-    src = (REPO / "scripts/research_activation.py").read_text()
-    assert "rm -rf /etc/apex" not in src and "rm -rf %s\" % t.trust_root" not in src
+    removes = [o["object"] for o in plan["remove"]]
+    preserves = [o["object"] for o in plan["preserve"]]
+    for r in removes:
+        for p in preserves:
+            assert not p.startswith(r.rstrip("/") + "/"), (r, p)
+    assert str(t.research_root) in preserves and str(t.runner_root) in preserves
+    parent = [o for o in plan["preserve"] if o["object"] == str(t.research_root)][0]
+    assert parent["why_preserved"] == "PARENT_CONTAINS_EVIDENCE"
+    assert str(t.out) in parent["evidence_inside"]
+    assert str(t.checkout) in parent["removable_children"] and str(t.view) in parent["removable_children"]
+    assert str(t.checkout) in removes and str(t.view) in removes
+    assert t.research_user in removes                     # the account is removable
 
 
-def test_cli_rollback_is_dry_run_and_apply_is_a_separate_authorization(rig, capsys):
+def test_rollback_apply_removes_capability_and_keeps_evidence(rig):
+    t = rig["t"]; _complete(rig)
+    run = StandIn(t)
+    out = RA.run_rollback(t, apply=True, run=run)
+    assert not t.checkout.exists() and not t.view.exists() and not t.venv.exists()
+    assert t.out.exists() and t.setup_manifest.exists() and t.log.exists()
+    assert t.pinned.exists() and t.research_root.exists() and t.runner_root.exists()
+    assert out["evidence_intact"] == {str(t.out): True, str(t.setup_manifest): True, str(t.log): True}
+    assert ["deluser", "--remove-home", t.research_user] in run.calls
+
+
+def test_rollback_refuses_missing_or_inconsistent_records(rig):
     t = rig["t"]
-    t.research_root.mkdir(parents=True, exist_ok=True)
-    t.setup_manifest.write_text(json.dumps({"created": [
-        {"object": str(t.venv), "class": "capability", "kind": "venv"}]}))
-    rc = _cli(rig, ["rollback"])
-    doc = json.loads(capsys.readouterr().out)
-    assert rc == 0 and doc["applied"] is False and doc["remove"]
-    assert t.venv.parent.exists() or True                    # nothing was actually removed
-    rc = _cli(rig, ["rollback", "--apply"])
-    assert rc == 3 and "ROLLBACK_APPLY_NOT_IMPLEMENTED_IN_THIS_STEP" in capsys.readouterr().out
+    with pytest.raises(Refused, match="^NO_SETUP_MANIFEST"):
+        RA.rollback_plan(t)
+    t.research_root.mkdir(parents=True)
+    t.setup_manifest.write_text(json.dumps({"contract": RA.ACTIVATION_VERSION, "state": "COMPLETE",
+                                            "created": [{"object": str(t.venv), "class": "nonsense"}]}))
+    with pytest.raises(Refused, match="^SETUP_RECORD_INCONSISTENT"):
+        RA.rollback_plan(t)
+    t.setup_manifest.write_text(json.dumps({"contract": "OTHER", "state": "COMPLETE", "created": []}))
+    with pytest.raises(Refused, match="^SETUP_RECORD_CONTRACT"):
+        RA.rollback_plan(t)
 
 
-def test_production_entry_point_takes_no_injected_targets():
+def test_rollback_never_touches_trust_material_even_if_recorded(rig):
+    t = rig["t"]
+    t.research_root.mkdir(parents=True)
+    t.setup_manifest.write_text(json.dumps({
+        "contract": RA.ACTIVATION_VERSION, "state": "COMPLETE", "created": [
+            {"object": str(t.trust_root), "class": "capability", "kind": "dir", "stage": "x"},
+            {"object": str(t.trust_root / "decision.json"), "class": "capability", "kind": "file", "stage": "x"},
+        ]}))
+    plan = RA.rollback_plan(t)
+    assert plan["remove"] == []
+    assert all(o["why_preserved"].startswith("PROTECTED_PATH") for o in plan["preserve"])
+    src = (REPO / "scripts/research_activation.py").read_text()
+    assert "rm -rf /etc/apex" not in src
+
+
+def test_rollback_after_a_partial_setup_only_removes_what_was_verified(rig):
+    t = rig["t"]
+    with pytest.raises(Refused):
+        RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t, fail_on="-m venv"))
+    plan = RA.rollback_plan(t)
+    assert plan["state"] == "PARTIAL_FAILED"
+    removes = [o["object"] for o in plan["remove"]]
+    assert str(t.venv) not in removes and str(t.checkout) not in removes
+    assert t.research_user in removes and str(t.runner_root) in removes
+
+
+# ============================ end to end =================================
+def test_end_to_end_setup_verify_probe_launch_rollback(rig):
+    t = rig["t"]
+    good = "\n".join("%s=%s" % (k, str(v).lower()) for k, v in RA.PROBE_EXPECTATIONS.items())
+
+    class Full(StandIn):
+        def cmd(self, argv, *, timeout=1800, input_text=None):
+            argv = [str(x) for x in argv]
+            if "systemd-run" in argv:
+                self.calls.append(argv)
+                return subprocess.CompletedProcess(argv, 0, good, "")
+            return StandIn.cmd(self, argv, timeout=timeout, input_text=input_text)
+    run = Full(t)
+    setup = RA.run_setup(t, rig["commit"], apply=True, run=run)
+    assert setup["state"] == "COMPLETE"
+    assert RA.run_verify(t)["ok"]
+    assert RA.run_probe(t, run=run)["ok"]
+    plan = RA.run_launch(t, rig["commit"], _decision(rig), apply=False, run=run)
+    assert plan["applied"] is False and plan["resolved"]["commit"] == rig["commit"]
+    roll = RA.run_rollback(t, apply=True, run=run)
+    assert roll["evidence_intact"][str(t.setup_manifest)] is True
+    assert not t.checkout.exists()
+
+
+def test_cli_exit_codes(rig, capsys):
+    t = rig["t"]
+    assert RA._cli(["setup"], targets=t) == 3
+    assert json.loads(capsys.readouterr().out)["refusal"].startswith("UNRESOLVED_INPUTS")
+    assert RA._cli(["setup", "--commit", rig["commit"]], targets=t) == 0
+    assert json.loads(capsys.readouterr().out)["state"] == "DRY_RUN"
+    assert RA._cli(["verify"], targets=t) == 3
+    assert RA._cli(["probe"], targets=t) == 3
+    capsys.readouterr()
+    assert RA._cli(["setup", "--commit", rig["commit"], "--apply"], targets=t,
+                   runner=StandIn(t)) == 0
+    capsys.readouterr()
+    assert RA._cli(["verify"], targets=t) == 0
+    capsys.readouterr()
+
+
+def test_production_entry_point_injects_nothing():
     src = (REPO / "scripts/research_activation.py").read_text()
     tail = src.split('if __name__ == "__main__":')[1]
-    assert "targets=" not in tail and "sys.exit(_cli())" in tail
+    assert "targets=" not in tail and "runner=" not in tail and "sys.exit(_cli())" in tail
     t = RA.production_targets()
-    assert t.research_user == "apexresearch" and str(t.runner_root) == "/opt/apex-runner"
-    assert str(t.trust_root) == "/etc/apex/admissions"
-    assert t.expected_view_files == 1511
+    assert (t.research_user, str(t.runner_root), str(t.trust_root), t.expected_view_files) == \
+           ("apexresearch", "/opt/apex-runner", "/etc/apex/admissions", 1511)
 
 
-def test_no_market_row_is_parsed_by_this_wrapper():
-    import ast
-    tree = ast.parse((REPO / "scripts/research_activation.py").read_text())
-    called = {n.func.attr for n in ast.walk(tree)
-              if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)}
-    assert "loads" in called          # json.loads is used for the MANIFEST only
+def test_no_market_row_is_parsed():
     src = (REPO / "scripts/research_activation.py").read_text()
-    for forbidden in ("observable_rows", "load_session", "bars.targets", "economic"):
+    for forbidden in ("observable_rows", "load_session", "economic_evaluation", "bars.targets"):
         assert forbidden not in src

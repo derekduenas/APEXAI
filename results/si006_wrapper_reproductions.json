@@ -1,0 +1,92 @@
+{
+ "produced_utc": "2026-09-08T01:03:57Z",
+ "wrapper_under_test": "/apex-data/tmp/si006_base_wt/scripts/research_activation.py",
+ "what_this_is": "reproduction of a DESCRIBE-BUT-DO-NOT-DO defect in the wrapper",
+ "what_this_is_not": "the systemd sandbox probe in results/si004_sandbox_probe.json, which executed real containment checks and remains valid for the launch configuration it tested",
+ "findings": [
+  {
+   "finding": 1,
+   "claim": "setup --apply records planned objects as created without executing their creation",
+   "status": "REPRODUCED",
+   "evidence": {
+    "exit_code": 0,
+    "applied": true,
+    "objects_recorded_as_created": 12,
+    "actually_exists": {
+     "venv": false,
+     "checkout": false,
+     "runner_root": false,
+     "account_recorded": true,
+     "dataset_view": true,
+     "setup_manifest": true
+    },
+    "note": "created is assigned the PLAN verbatim: only the dataset view is built"
+   }
+  },
+  {
+   "finding": 2,
+   "claim": "verify succeeds with an absent account, environment and checkout",
+   "status": "REPRODUCED",
+   "evidence": {
+    "exit_code": 0,
+    "account_present": false,
+    "venv_exists": false,
+    "checkout_exists": false,
+    "note": "verify returns the configuration and the account facts; it asserts nothing"
+   }
+  },
+  {
+   "finding": 3,
+   "claim": "probe does not execute its checks",
+   "status": "REPRODUCED",
+   "evidence": {
+    "exit_code": 0,
+    "subprocess_calls_during_probe": 0,
+    "systemd_run_invocations": 0,
+    "note": "probe prints config_properties; no sandbox is entered and nothing is measured"
+   }
+  },
+  {
+   "finding": 4,
+   "claim": "rollback schedules directories that contain preserved evidence",
+   "status": "REPRODUCED",
+   "evidence": {
+    "remove": [
+     "/tmp/si006_f4_jrwl9r0a/research",
+     "/tmp/si006_f4_jrwl9r0a/runner"
+    ],
+    "preserve": [
+     "/tmp/si006_f4_jrwl9r0a/research/out",
+     "/tmp/si006_f4_jrwl9r0a/research/_ACTIVATION_MANIFEST.json",
+     "/tmp/si006_f4_jrwl9r0a/runner/pinned.txt"
+    ],
+    "parent_child_conflicts": [
+     {
+      "removable_parent": "/tmp/si006_f4_jrwl9r0a/research",
+      "preserved_child": "/tmp/si006_f4_jrwl9r0a/research/out"
+     },
+     {
+      "removable_parent": "/tmp/si006_f4_jrwl9r0a/research",
+      "preserved_child": "/tmp/si006_f4_jrwl9r0a/research/_ACTIVATION_MANIFEST.json"
+     },
+     {
+      "removable_parent": "/tmp/si006_f4_jrwl9r0a/runner",
+      "preserved_child": "/tmp/si006_f4_jrwl9r0a/runner/pinned.txt"
+     }
+    ],
+    "note": "recursive removal of the parent would erase the evidence the plan claims to preserve"
+   }
+  }
+ ],
+ "source_facts": {
+  "setup_assigns_plan_to_created": true,
+  "setup_plan_returns_command_strings": true,
+  "no_subprocess_run_in_setup_path": true,
+  "rollback_apply_unimplemented": true,
+  "launch_checks_manifest_existence_only": true
+ },
+ "summary": {
+  "reproduced": 4,
+  "not_reproduced": 0
+ }
+}

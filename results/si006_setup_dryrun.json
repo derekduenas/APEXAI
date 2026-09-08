@@ -1,0 +1,97 @@
+{
+ "contract": "RESEARCH_ACTIVATION_V1",
+ "status": "OK",
+ "action": "setup",
+ "applied": false,
+ "started_utc": "2026-09-08T01:11:07Z",
+ "state": "DRY_RUN",
+ "commit": "87948c122a7a0e10ef5dd0bfa71e43ffab4df503",
+ "source_tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545",
+ "expected_view_files": 1511,
+ "runner": "system",
+ "targets": {
+  "research_user": "apexresearch",
+  "runner_root": "/opt/apex-runner",
+  "research_root": "/apex-data/research",
+  "checkout": "/apex-data/research/checkout",
+  "view": "/apex-data/research/dataset_view",
+  "out": "/apex-data/research/out"
+ },
+ "planned_stages": [
+  {
+   "stage": "research_root",
+   "object": "/apex-data/research",
+   "class": "capability",
+   "kind": "dir"
+  },
+  {
+   "stage": "out",
+   "object": "/apex-data/research/out",
+   "class": "evidence",
+   "kind": "dir"
+  },
+  {
+   "stage": "account",
+   "object": "apexresearch",
+   "class": "capability",
+   "kind": "account"
+  },
+  {
+   "stage": "own_research_paths",
+   "object": "/apex-data/research",
+   "class": "capability",
+   "kind": "own"
+  },
+  {
+   "stage": "runner_root",
+   "object": "/opt/apex-runner",
+   "class": "capability",
+   "kind": "dir"
+  },
+  {
+   "stage": "venv",
+   "object": "/opt/apex-runner/venv",
+   "class": "capability",
+   "kind": "venv"
+  },
+  {
+   "stage": "requirements",
+   "object": "/opt/apex-runner/requirements.txt",
+   "class": "capability",
+   "kind": "file"
+  },
+  {
+   "stage": "packages",
+   "object": "/opt/apex-runner/venv [packages]",
+   "class": "capability",
+   "kind": "packages"
+  },
+  {
+   "stage": "pinned",
+   "object": "/opt/apex-runner/pinned.txt",
+   "class": "evidence",
+   "kind": "file"
+  },
+  {
+   "stage": "harden_runner",
+   "object": "/opt/apex-runner",
+   "class": "capability",
+   "kind": "own"
+  },
+  {
+   "stage": "checkout",
+   "object": "/apex-data/research/checkout",
+   "class": "capability",
+   "kind": "checkout"
+  },
+  {
+   "stage": "dataset_view",
+   "object": "/apex-data/research/dataset_view",
+   "class": "capability",
+   "kind": "dataset_view"
+  }
+ ],
+ "created": [],
+ "stages": [],
+ "note": "nothing executed; no object created; run with --apply to perform these stages"
+}
