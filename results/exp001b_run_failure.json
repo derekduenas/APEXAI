@@ -1,0 +1,50 @@
+{
+ "cause": "The registered run loop accumulates the whole period in memory: rows_all/sessions collect every admitted row, then f0/f1/sealed collect every forecast object, then g0/g1/g0n/g1n collect every grading. At the 1400M containment cap this exhausts memory partway through validation.",
+ "cause_is_in_bound_source": true,
+ "cause_location": "apex/world_model/exp001b/run.py, lines ~126-190",
+ "cpu_seconds": 618,
+ "decision_owner": "admission authority; not taken here",
+ "event": "EXP001B_RUN_KILLED_BEFORE_RESULT",
+ "finished_utc": "2026-09-08T13:31:52Z",
+ "no_result_file": "_RESULT.json was never written; there is no distributional result",
+ "outcome": "OOM_KILL",
+ "progress_preserved": {
+  "bytes": 566689749,
+  "hash_chain": "intact from GENESIS; 165958 records parsed, 0 truncated",
+  "models_emitting": [
+   "M0",
+   "M1"
+  ],
+  "period": "validation",
+  "sealed_forecasts_written": 165958
+ },
+ "remedies_for_the_authority": [
+  {
+   "cost": "changes the launch configuration, so the sandbox must be re-probed; the probe measured isolation at 1400M",
+   "option": "raise MemoryMax above 1400M"
+  },
+  {
+   "cost": "run.py is a BOUND source path, so this changes source_tree_sha256 and INVALIDATES the signed admission; it needs fresh review and a new signature",
+   "option": "stream instead of accumulating in the run loop"
+  }
+ ],
+ "result_sealed": false,
+ "run_id": "20260908T131351Z-exp001b-2054eaa4",
+ "started_utc": "2026-09-08T13:13:51Z",
+ "systemd": {
+  "memory_max": "1400M",
+  "memory_peak": "1.3G",
+  "result": "oom-kill",
+  "termination": "code=killed/status=KILL"
+ },
+ "wall_seconds": 1081,
+ "what_was_NOT_done": {
+  "data_changed": false,
+  "decision_edited": false,
+  "memory_cap_raised": false,
+  "model_changed": false,
+  "note": "the cap is a containment control and is never raised to make a run pass",
+  "protocol_changed": false,
+  "registration_amended": false
+ }
+}
