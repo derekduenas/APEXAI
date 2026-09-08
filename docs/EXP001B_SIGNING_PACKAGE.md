@@ -24,8 +24,27 @@ The boundary is two facts, neither of them a string:
 
 | | |
 |---|---|
-| **Possession of the private signing key** | held off-host; **must never exist on the research host** |
+| **Possession of the private signing key** | usable only by the authority; **must never exist on the research host** |
 | **Protection of `allowed_signers`** | if a key can be appended there, the boundary is gone regardless of any name |
+
+### "Off-host" is not the boundary — corrected
+
+An earlier version of this document located the key "off-host, on your machine".
+**That framing is insufficient in this deployment and the reviewer is right to
+strike it.** Claude can reach the operator's Mac. A key sitting unlocked on that
+machine is a key Claude can read and use, so machine location establishes
+separation from the research host but not separation from Claude.
+
+What actually establishes it, and all three are required:
+
+1. The key is **passphrase-protected**, and the passphrase is known only to the
+   authority and never entered into a Claude session.
+2. The **authority runs `ssh-keygen -Y sign` themselves.** Signing is not delegated.
+3. No unlocked key, and no agent holding one, is exposed to a Claude session.
+
+Creating the key is part of this. A key generated on the operator's behalf by the
+party that wrote the wrapper and prepared the environment is a key that party can
+use, which is the same boundary failure by a quieter route.
 
 Both must hold. This is why no signing key was created during activation: creating
 one on the research host would put both halves of the authority in the same place
@@ -165,15 +184,11 @@ Give it a passphrase. **Run it yourself rather than delegating it.** A key creat
 by the party that wrote the wrapper and prepared the environment is a key that
 party can use, and possession is the entire authority boundary — see section 1.
 
-If you want the boundary to survive compromise of the machine itself, a
-hardware-backed key makes possession non-extractable:
+Choose a passphrase when prompted, and keep it out of any Claude session. If the
+command asks to overwrite an existing key, **stop** — something is already there
+and overwriting it would destroy it.
 
-```bash
-ssh-keygen -t ed25519-sk -f ~/.ssh/apex_admission_ed25519_sk -C "apex-admission"
-```
-
-`ssh-keygen -Y sign` and `-Y verify` work with either. Substitute the filename
-below if you choose the hardware variant.
+No hardware key is needed for this step.
 
 1. Fetch the unsigned request from the branch and review it:
    `results/exp001b_admission_request.json`
@@ -192,6 +207,20 @@ allowed-signers file:
 ```bash
 echo "<principal> $(cat ~/.ssh/apex_admission_ed25519.pub)" > allowed_signers
 ```
+
+### THE THREE ARTIFACTS TO HAND OVER
+
+Signing produces exactly three public items. All three are needed; none is private.
+
+| artifact | why it is required |
+|---|---|
+| the **public key** line for `allowed_signers` | names the principal whose key must verify |
+| the **decision JSON**, byte-for-byte as signed | `ssh-keygen -Y verify` hashes these exact bytes |
+| the **detached signature** `.sig` | the signature over those bytes |
+
+**The decision JSON is not optional and must not be reformatted in transit.**
+Re-indenting it, reordering keys, or re-serialising it changes the bytes and the
+signature will fail to verify. Transfer the file as produced.
 
 ### ON-HOST (as root, on the research host)
 
