@@ -151,6 +151,30 @@ period. A run started any other way as this account would not be.
 **Never copy the private key to the research host. Never paste it into this
 session.** Only the public key and the signature travel.
 
+**0. Create the signing key. It does not exist yet.**
+
+An earlier version of this section assumed `~/.ssh/apex_admission_ed25519` was
+already present. It was not, and no admission signing key has ever been created in
+this programme. Run this yourself, on the machine that will hold the key:
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/apex_admission_ed25519 -C "apex-admission"
+```
+
+Give it a passphrase. **Run it yourself rather than delegating it.** A key created
+by the party that wrote the wrapper and prepared the environment is a key that
+party can use, and possession is the entire authority boundary — see section 1.
+
+If you want the boundary to survive compromise of the machine itself, a
+hardware-backed key makes possession non-extractable:
+
+```bash
+ssh-keygen -t ed25519-sk -f ~/.ssh/apex_admission_ed25519_sk -C "apex-admission"
+```
+
+`ssh-keygen -Y sign` and `-Y verify` work with either. Substitute the filename
+below if you choose the hardware variant.
+
 1. Fetch the unsigned request from the branch and review it:
    `results/exp001b_admission_request.json`
 2. Author the decision from it: set `"decision": "ADMIT"`, set
