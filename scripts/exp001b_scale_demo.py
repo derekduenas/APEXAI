@@ -3,7 +3,7 @@ UNCHANGED 1400M cap, on synthetic fixtures. Reads no real market data."""
 from __future__ import annotations
 
 import hashlib, json, math, random, resource, sys, time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 
@@ -43,9 +43,22 @@ def sha256_file(p: Path) -> str:
     return h.hexdigest()
 
 
-def doc(day, n, seed):
+def doc(day, n, seed, *, open_utc=None, minutes=None):
+    """Bars aligned to the ACTUAL session window.
+
+    An earlier version started every session at a fixed 14:30 UTC. The real
+    session opens at 13:30 UTC in summer and 14:30 in winter, and the loader
+    clips to [open, close], so those fixtures lost an hour at the front and had
+    everything past the close discarded. Raising the bar count changed nothing
+    because the extra bars fell outside the window. Sessions are now generated
+    from the calendar's own open time for the exact number of regular minutes,
+    which is the structure a real session file has."""
     rng = random.Random(seed)
-    t = datetime.fromisoformat("%sT14:30:00+00:00" % day)
+    if open_utc is not None:
+        t = datetime.fromtimestamp(open_utc, timezone.utc)
+        n = minutes if minutes else n
+    else:
+        t = datetime.fromisoformat("%sT14:30:00+00:00" % day)
     px, bars = 400.0, []
     for i in range(n):
         r = rng.gauss(0, 3e-4)
@@ -58,20 +71,25 @@ def doc(day, n, seed):
 
 def main(n_train, n_val, bars_n, root: Path, out: Path):
     from apex.world_model.exp001b import bars as B, run as R, exchange_calendar as C
-    days, k, d0 = [], 0, datetime.fromisoformat("2016-01-04")
+    days, bounds, k, d0 = [], {}, 0, datetime.fromisoformat("2016-01-04")
     while len(days) < n_train + n_val:
         day = (d0 + timedelta(days=k)).strftime("%Y-%m-%d"); k += 1
         try:
-            C.session_bounds(day, require_verified=True); days.append(day)
+            b = C.session_bounds(day, require_verified=True)
         except Exception:
             continue
+        days.append(day); bounds[day] = b
     root.mkdir(parents=True, exist_ok=True)
     fx = {}
     t_gen = time.time()
     for i, day in enumerate(days):
         p = root / ("SYN_%s.json" % day)
         if not p.exists():
-            p.write_text(json.dumps(doc(day, bars_n, seed=i + 1)))
+            b = bounds[day]
+            p.write_text(json.dumps(doc(day, bars_n, seed=i + 1),
+                                    ) if False else json.dumps(
+                doc(day, bars_n, seed=i + 1, open_utc=b["open_utc"],
+                    minutes=int(b["regular_minutes"]))))
         fx[p.name] = {"source_class": "SYNTHETIC_FIXTURE",
                       "sha256": hashlib.sha256(p.read_bytes()).hexdigest(), "generator": "scale_demo"}
     (root / "_PROVENANCE.json").write_text(json.dumps({"fixtures": fx}))

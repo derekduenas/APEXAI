@@ -915,3 +915,60 @@ def test_a_result_that_does_belong_to_this_run_still_succeeds(rig, tmp_path):
     assert rec["execution"]["result_sealed"] is True
     assert rec["execution"]["sealed_results"][0]["run_id"] == "mine"
     assert rec["execution"]["outcome"] == RA.LAUNCH_COMPLETED and code == 0
+
+
+# ============== exit 4 is EVALUATION_SEALED, not a free pass ==============
+# The experiment's own table gives exit 4 to EVALUATION_SEALED: validation
+# detected signal and evaluation stayed sealed. That is a completed run. But it
+# must be accepted BECAUSE a valid bound result exists, never merely because the
+# child returned 4.
+
+def test_exit_4_without_a_bound_result_is_not_accepted(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+    run = Child(t, script="import sys; print('signal detected'); sys.exit(4)")
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["returncode"] == 4
+    assert rec["execution"]["result_sealed"] is False
+    # exit 4 loses its standing entirely without a bound result: it falls back
+    # to an ordinary failure rather than being read as a completed run
+    assert rec["execution"]["outcome"] == RA.LAUNCH_FAILED
+    assert rec["status"] == "FAILED"
+    assert code == RA.LAUNCH_EXIT_CODES[RA.LAUNCH_FAILED] != 0
+
+
+def test_exit_4_with_a_result_from_another_decision_is_not_accepted(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+    res = t.out / RA.EXPERIMENT_ID / "runs" / "elsewhere" / "_RESULT.json"
+    run = Child(t, script=_seal_script(res, "0" * 64, status="SEALED_EVALUATION_PENDING",
+                                       run_id="elsewhere") +
+                          "import sys; sys.exit(4)\n")
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["returncode"] == 4
+    assert rec["execution"]["result_sealed"] is False
+    assert code != 0
+
+
+def test_exit_4_with_a_valid_bound_result_is_accepted(rig, tmp_path):
+    """A signal-detecting run must not be reported as a failure."""
+    t = rig["t"]; _ready(rig)
+    res = t.out / RA.EXPERIMENT_ID / "runs" / "sealed" / "_RESULT.json"
+    run = Child(t, script=_seal_script(res, _dsha(rig), status="SEALED_EVALUATION_PENDING",
+                                       run_id="sealed") +
+                          "import sys; sys.exit(4)\n")
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["returncode"] == 4
+    assert rec["execution"]["result_sealed"] is True
+    assert rec["execution"]["outcome"] == RA.LAUNCH_COMPLETED
+    assert code == 0
+
+
+def test_no_other_nonzero_exit_is_rescued_by_a_sealed_result(rig, tmp_path):
+    """Only 4 has this standing. A crash that happens to leave a result behind
+    is still a failure."""
+    t = rig["t"]; _ready(rig)
+    res = t.out / RA.EXPERIMENT_ID / "runs" / "crashed" / "_RESULT.json"
+    run = Child(t, script=_seal_script(res, _dsha(rig), run_id="crashed") +
+                          "import sys; sys.exit(5)\n")
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["outcome"] == RA.LAUNCH_FAILED
+    assert code == RA.LAUNCH_EXIT_CODES[RA.LAUNCH_FAILED]
