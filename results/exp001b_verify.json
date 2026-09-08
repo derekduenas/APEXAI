@@ -56,7 +56,7 @@
    "check": "checkout_identity",
    "ok": true,
    "detail": {
-    "commit": "792a2843d18b1baf5db219a17e14fc84fa916e53",
+    "commit": "277e4a023c7f070c7421fb587cba6dfcedcb3be8",
     "tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545",
     "n_files": 48
    }

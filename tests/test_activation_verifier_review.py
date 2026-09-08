@@ -247,9 +247,12 @@ def test_bound_tree_equality_is_not_claimed_to_protect_the_wrapper():
     invariance was measured rather than inferred from the hash."""
     r = _pkg()["repin"]
     assert r["wrapper_in_bound_surface"] is False
-    assert r["launch_argv_identical_measured"] is True
-    assert r["probe_properties_changed"] is True
-    assert r["wrapper_sha256_at_pinned_commit"] == r["wrapper_sha256_at_branch_head"]
+    assert r["bound_tree_equality_protects"] == "the declared bound surface only"
+    assert r["bound_tree_unchanged_throughout"] is True
+    # the second re-pin deliberately carries wrapper behaviour changes, and the
+    # package must say so rather than implying the hash covered them
+    assert "DOES change behaviour" in r["second_repin_note"]
+    assert len(r["history"]) == 2
 
 
 def test_evaluation_exclusion_is_scoped_to_the_sandboxed_process():
