@@ -921,7 +921,11 @@ def classify_launch(child: dict, result_sealed: bool) -> tuple:
         outcome = doc.get("process_outcome") if isinstance(doc, dict) else None
     except ValueError:
         pass
-    if rc not in (0, None):
+    # exit 4 is EVALUATION_SEALED in the experiment's own table: validation
+    # detected signal and evaluation stayed sealed. That is a completed run, not
+    # a failure, and calling it one would misreport the very outcome we want.
+    terminal_ok = rc == 4 and result_sealed
+    if rc not in (0, None) and not terminal_ok:
         if oom:
             return LAUNCH_OOM, "systemd reported the process was killed for memory"
         if outcome and "REFUS" in str(outcome).upper():
@@ -933,7 +937,7 @@ def classify_launch(child: dict, result_sealed: bool) -> tuple:
         # the defect this exists to prevent: a run that dies mid-way, or exits
         # zero having sealed nothing, must never be reported as a success
         return LAUNCH_NO_RESULT, "the child exited %s but sealed no result" % rc
-    return LAUNCH_COMPLETED, "the child exited 0 and sealed a result"
+    return LAUNCH_COMPLETED, "the child exited %s and sealed a result" % rc
 
 
 def _run_dirs(t: Targets) -> set:

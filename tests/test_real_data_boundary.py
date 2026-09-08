@@ -667,3 +667,71 @@ def test_a_run_record_carries_the_environment_it_ran_in(rig):
     # version rather than merely named
     if "numpy" in rec["runtime"]["third_party"]:
         assert rec["runtime"]["third_party"]["numpy"]["version"]
+
+
+# ============ result sealing through the REAL execute path ================
+# Exercised with the disposable test authority and synthetic data. Production
+# trust is not touched and no historical data is admitted. Import provenance is
+# stubbed exactly as the neighbouring outcome test does, because the throwaway
+# checkout is not where the real modules live; provenance has its own tests.
+
+def _stub_imports(monkeypatch):
+    monkeypatch.setattr(boundary, "verify_imports_against_commit",
+                        lambda *a, **k: {"all_imports_match_admitted_commit": True, "n_modules": 0,
+                                         "verified": [], "mismatched": [], "outside_checkout": [],
+                                         "untracked_at_commit": [], "unbound_dependencies": []})
+
+
+def test_execute_seals_a_result_bound_to_its_decision(rig, monkeypatch, capsys):
+    """The direct-function demonstration never reached seal_result. This does."""
+    mod = _cmd(); _stub_imports(monkeypatch)
+    p = _write(rig, _body(rig))
+    rc = mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
+    doc = json.loads(capsys.readouterr().out)
+    d = Path(doc["run_dir"])
+
+    res = json.loads((d / boundary.RESULT_FILE).read_text())
+    runrec = json.loads((d / boundary.RUN_FILE).read_text())
+    assert runrec["decision_sha256"] == boundary.sha256_of(p)       # bound to THIS decision
+    assert runrec["registration_hash"] == registration_hash()
+    assert res["process_outcome"] == doc["process_outcome"]
+    assert rc == mod.EXIT[doc["process_outcome"]]
+    assert (d / boundary.AUTHORITY_FILE).is_file()
+    # exactly one result, and a second is refused
+    with pytest.raises(RealDataRefused) as ei:
+        boundary.seal_result(d, {"status": "SECOND"})
+    assert str(ei.value).startswith("RESULT_EXISTS")
+
+
+def test_the_wrapper_binding_check_accepts_a_genuinely_sealed_result(rig, monkeypatch, capsys):
+    """Closes the loop: the launcher's binding check, run against a result the
+    real execute path actually sealed."""
+    import importlib.util as _il, sys as _sys
+    spec = _il.spec_from_file_location("_ra_bind", REPO / "scripts" / "research_activation.py")
+    RA = _il.module_from_spec(spec); _sys.modules["_ra_bind"] = RA; spec.loader.exec_module(RA)
+
+    mod = _cmd(); _stub_imports(monkeypatch)
+    p = _write(rig, _body(rig))
+    tg = RA.Targets(research_root=rig["out"].parent)
+    (rig["out"]).mkdir(parents=True, exist_ok=True)
+    before = RA._run_dirs(tg)
+    mod.main(["--decision", str(p), "--execute"], trust=rig["trust"])
+    doc = json.loads(capsys.readouterr().out)
+
+    considered = RA._sealed_results_for(tg, boundary.sha256_of(p), before)
+    counted = [c for c in considered if c.get("counted")]
+    assert counted, considered
+    assert counted[0]["run_id"] == Path(doc["run_dir"]).name
+
+    # and the same result is refused under a different decision
+    other = RA._sealed_results_for(tg, "0" * 64, before)
+    assert not [c for c in other if c.get("counted")]
+    assert any("not the one launched" in c.get("why", "") for c in other)
+
+
+def test_production_trust_is_untouched_by_these_tests():
+    """The disposable authority must not have relocated production trust."""
+    pt = boundary.production_trust()
+    assert str(pt.admission_root) == "/etc/apex/admissions"
+    assert str(pt.allowed_signers) == "/etc/apex/admissions/trust/allowed_signers"
+    assert pt.enforce_ownership is True
