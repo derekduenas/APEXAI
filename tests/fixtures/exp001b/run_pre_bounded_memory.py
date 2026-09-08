@@ -135,12 +135,7 @@ def run(sessions_by_period: dict, *, ledger_dir, session_loader, seed: int = 7,
                     elif y is None:
                         refused_rows[why.split(":")[0]] += 1
                 us = _usable(rows, tg)
-                rows_all.extend(us)
-                # one session reference PER ROW pinned every session's bars in
-                # memory for the whole run. Only economics reads them, and only
-                # on the evaluation period.
-                if period == "evaluation":
-                    sessions.extend([s] * len(us))
+                rows_all.extend(us); sessions.extend([s] * len(us))
             data[period], sess_of[period] = rows_all, sessions
             stage("admission:" + period, status="READY", sessions=len(sessions_by_period.get(period, [])),
                   usable_rows=len(rows_all), refused_rows=refused_rows)
@@ -161,57 +156,33 @@ def run(sessions_by_period: dict, *, ledger_dir, session_loader, seed: int = 7,
     except ValueError as e:
         rec.update(status="INVALID_INPUT", why=str(e)); return rec
     stage("fit", status="READY", **{k: params[k] for k in ("n_train", "params_hash")})
-    # train is never read again: the fit consumed it. Holding it through
-    # validation cost hundreds of megabytes for nothing.
-    tr = None
-    data["train"] = None
-    sess_of.pop("train", None)
 
     def evaluate(period: str, rows_y: list, tag: str) -> dict:
         if len(rows_y) < MIN_SAMPLES:
             return {"status": "INSUFFICIENT_EVIDENCE", "n": len(rows_y), "need": MIN_SAMPLES}
         now = time.time()
-
-        def pair(r):
-            """The registered forecast pair for one row.
-
-            M.forecast and M.fit contain no randomness and creation_time is
-            fixed for the period, so this is a pure function of the row: calling
-            it twice returns the same forecasts. That is what lets the null pass
-            recompute instead of retaining every forecast."""
+        f0, f1, sealed = [], [], []
+        for r, y, tk in rows_y:
             iid = "%s|%s|%d" % (tag, r["event_time"], r["i"])
             ih = hashlib.sha256(json.dumps({k: r[k] for k in ("event_time", "features", "close")},
                                            sort_keys=True).encode()).hexdigest()[:16]
-            return (M.forecast(M0["id"], params, r, input_id=iid, input_hash=ih, creation_time=now),
-                    M.forecast(M1["id"], params, r, input_id=iid, input_hash=ih, creation_time=now))
-
-        # economics grade the SAME sealed M1 forecasts, and run only on the
-        # evaluation period; nowhere else needs a forecast after it is graded
-        keep_f1 = period == "evaluation"
-        f1_kept = [] if keep_f1 else None
-        first_sealed = last_sealed = None
+            a = M.forecast(M0["id"], params, r, input_id=iid, input_hash=ih, creation_time=now)
+            b = M.forecast(M1["id"], params, r, input_id=iid, input_hash=ih, creation_time=now)
+            f0.append(a); f1.append(b)
+            sealed.append(chain_append(led / ("forecasts_%s.jsonl" % period),
+                                       {"kind": "sealed_forecast", "period": period,
+                                        "m0": a.sealed(), "m1": b.sealed()})["entry_hash"])
         g0, g1 = [], []
-        for r, y, tk in rows_y:
-            a, b = pair(r)                       # forecast still precedes its grading
-            h = chain_append(led / ("forecasts_%s.jsonl" % period),
-                             {"kind": "sealed_forecast", "period": period,
-                              "m0": a.sealed(), "m1": b.sealed()})["entry_hash"]
-            if first_sealed is None:
-                first_sealed = h
-            last_sealed = h
+        for a, b, (r, y, tk) in zip(f0, f1, rows_y):
             oc = OutcomeRecord(world_id="corpus", world_hash=tag, subject="SPY", step=r["i"],
                                horizon=HORIZON, target_value=y, outcome_known_time=tk)
             g0.append(grader.grade(a, oc, grading_time=tk + 1.0))
             g1.append(grader.grade(b, oc, grading_time=tk + 1.0))
-            if keep_f1:
-                f1_kept.append(b)
         dm = inference.dm_hac_rule(g1, g0)
-        g0 = g1 = None                           # released before the null set is built
         ys = [y for _, y, _ in rows_y]
-        yp = _n0_permute(ys, seed)               # local Random(seed): call order is irrelevant
+        yp = _n0_permute(ys, seed)
         g0n, g1n = [], []
-        for (r, _, tk), y in zip(rows_y, yp):
-            a, b = pair(r)                       # identical to the first pass
+        for a, b, (r, _, tk), y in zip(f0, f1, rows_y, yp):
             oc = OutcomeRecord(world_id="corpus", world_hash=tag + "|N0", subject="SPY", step=r["i"],
                                horizon=HORIZON, target_value=y, outcome_known_time=tk)
             g0n.append(grader.grade(a, oc, grading_time=tk + 1.0))
@@ -219,12 +190,9 @@ def run(sessions_by_period: dict, *, ledger_dir, session_loader, seed: int = 7,
         n0 = inference.dm_hac_rule(g1n, g0n)
         chain_append(led / "outcomes.jsonl", {"kind": "outcomes_attached", "period": period, "n": len(rows_y),
                                               "outcome_clock": "target bar_complete",
-                                              "first_sealed": first_sealed, "last_sealed": last_sealed})
-        out = {"status": "READY", "n": len(rows_y), "dm": dm, "n0": n0,
-               "n0_is_no_signal": n0.get("verdict") == "NO_SIGNAL"}
-        if keep_f1:
-            out["_f1"] = f1_kept
-        return out
+                                              "first_sealed": sealed[0], "last_sealed": sealed[-1]})
+        return {"status": "READY", "n": len(rows_y), "dm": dm, "n0": n0,
+                "n0_is_no_signal": n0.get("verdict") == "NO_SIGNAL", "_f1": f1}
 
     def public(d):
         return {k: v for k, v in d.items() if not k.startswith("_")}
