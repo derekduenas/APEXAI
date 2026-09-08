@@ -1,0 +1,72 @@
+{
+ "contract": "CATALYST_CAPTURE_HEALTH_METRICS_V0",
+ "measured_utc": "2026-09-08T02:32:03Z",
+ "definitions_kept_separate": true,
+ "metrics": {
+  "process_liveness": {
+   "value": "ALIVE",
+   "pid": 737236,
+   "since_utc": "2026-09-02T06:19:35Z",
+   "state": "S (sleeping)",
+   "wchan": "hrtimer_nanosleep",
+   "evidence": "observed"
+  },
+  "successful_source_contact": {
+   "checks": 10871,
+   "succeeded": 10285,
+   "failed": 586,
+   "rate": 0.9461,
+   "last_contact_utc": "2026-09-04T20:02:01Z"
+  },
+  "accepted_observation": {
+   "raw_offered": 223532,
+   "accepted": 5209,
+   "acceptance_rate": 0.0233,
+   "note": "the remainder is deduplication of items re-offered every poll, counted not silent"
+  },
+  "persisted_observation": {
+   "raw_observations": 5209,
+   "events": 5163,
+   "event_updates": 46
+  },
+  "heartbeat_freshness_seconds": {
+   "value": 30,
+   "verdict": "FRESH"
+  },
+  "output_freshness_seconds": {
+   "value": 282601,
+   "human": "3d 6h 30m",
+   "verdict_naive": "STALE",
+   "verdict_calendar_aware": "EXPECTED",
+   "why": "weekend 2026-09-05/06 plus Labor Day 2026-09-07"
+  },
+  "useful_work_count": {
+   "work_completed": 267,
+   "cycles_logged": 640,
+   "trading_days_covered": 7
+  },
+  "error_count": {
+   "sources_failed": 586,
+   "cycles_with_last_error": 633,
+   "heartbeat_last_error": null,
+   "note": "per-source and per-event failures never reach the heartbeat"
+  },
+  "silent_discard_count": {
+   "deduplicated_raw_items": 218323,
+   "cycles_refusing_at_least_one_event": 426,
+   "surfaced_outside_cycle_log": 0,
+   "note": "dedup is counted and legitimate; event refusals are recorded only in cycles.jsonl"
+  }
+ },
+ "thresholds_used": {
+  "freshness_threshold_naive_hours": 24,
+  "calendar_aware_expectation": "no work is due while the ET session calendar says the day is not a trading day"
+ },
+ "verdict": {
+  "root_cause": "CONFIRMED_NOT_A_STALL",
+  "last_useful_capture_utc": "2026-09-04T20:02:02.655137+00:00",
+  "records_lost": "NONE ESTABLISHED - no source was polled and refused during the gap because no poll was scheduled; whether any newsworthy item occurred over the weekend and was never captured is UNKNOWN and unknowable from this host",
+  "doing_useful_work": "YES on trading days; correctly idle otherwise",
+  "output_path_correct": true
+ }
+}
