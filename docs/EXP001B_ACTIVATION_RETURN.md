@@ -128,8 +128,12 @@ authority has to **judge**, not hunt. It carries `decision: REQUESTED_NOT_GRANTE
 and no signature, and a test asserts it would be refused if it were ever presented
 as an admission.
 
-One field is deliberately `PENDING_FINAL_COMMIT`: the decision must commit to the
-exact code that will run, which is the commit the authority approves.
+`code.commit` is pinned to `2b4860b5e53bf9e3286786e28d50c4dd228b0964` — the commit
+actually checked out into the research environment and verified there, working tree
+clean. Later commits on this branch touch only the wrapper and its tests: the bound
+experiment tree is byte-identical at `e3ae7eec` (same `616a1912…`, same 48 files),
+so this pins exactly the code that will run. It was measured rather than left as a
+choice for the authority.
 
 ### The three steps the authority takes
 
