@@ -1,0 +1,171 @@
+{
+ "artifacts": {
+  "probe": {
+   "path": "results/exp001b_probe.json",
+   "sha256": "70ea835637f66f5ec2e0024b24bbba3d1e5ae2817d4569a50e7658cef08b007a"
+  },
+  "request": {
+   "path": "results/exp001b_admission_request.json",
+   "sha256": "b0d32538aeec97097e5aa736f6ed94f1eedbf54d7cf9bacc9a68b3fe3cc9f301"
+  },
+  "setup_record": {
+   "path": "/apex-data/research/_ACTIVATION_MANIFEST.json",
+   "sha256": "d37a44f7c0388bb2aeb68cda9a3274b6d980174b8c22515a9501474d735064e7"
+  },
+  "stage_log": {
+   "path": "/apex-data/research/_ACTIVATION_LOG.jsonl",
+   "sha256": "9b4c7b64069060a98b4e62f84f26d707b88da95a5cf239f18cb370b3c3e4ec2f"
+  },
+  "verify": {
+   "path": "results/exp001b_verify.json",
+   "sha256": "b6dcc71a4474b3380052c5ed65e6c9e547511f95a131f6bfc3d9eaff9d74b65b"
+  }
+ },
+ "authority": {
+  "allowed_signers": "/etc/apex/admissions/trust/allowed_signers",
+  "allowed_signers_present": false,
+  "boundary": "Possession of the private signing key, held OFF-HOST and never present on the research host, together with protection of the allowed_signers file. The decided_by identity string is NOT the boundary: it selects which public key must have signed.",
+  "decision_path_expected": "/etc/apex/admissions/exp001b_admission.json",
+  "private_key_on_research_host": false,
+  "signature_mechanism": "OPENSSH_SSHSIG (ssh-keygen -Y sign/verify, ed25519)",
+  "signature_namespace": "apex-admission",
+  "signature_path_expected": "/etc/apex/admissions/exp001b_admission.json.sig",
+  "trust_root": "/etc/apex/admissions",
+  "trust_root_present": false
+ },
+ "contract": "RESEARCH_ACTIVATION_V1",
+ "evaluation_exclusion": {
+  "does_not_hold_for": "the research account generally",
+  "holds_for": "the process launched through this unit configuration",
+  "measured_outside_sandbox": {
+   "corpus_mode": "-rw-rw-r--",
+   "evaluation_file_readable": true,
+   "note": "the corpus is world-readable; exclusion is produced by TemporaryFileSystem plus a read-only bind of the admitted view alone"
+  }
+ },
+ "generated_utc": "2026-09-08T03:52:25Z",
+ "identifiers": {
+  "admitted_sessions": 1511,
+  "bound_source_paths": [
+   "apex/world_model",
+   "apex/governance/chain_ledger.py",
+   "apex/intraday/sessions.py",
+   "scripts/alpha_exp_real_execute.py"
+  ],
+  "bound_source_tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545",
+  "branch": "exp001b-activation-001",
+  "dataset_manifest_path": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json",
+  "dataset_manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "dataset_view": "/apex-data/research/dataset_view/etf_continuous/bars",
+  "experiment_id": "ALPHA-EXP-001B",
+  "prepared_checkout_commit": "792a2843d18b1baf5db219a17e14fc84fa916e53",
+  "prepared_checkout_path": "/apex-data/research/checkout",
+  "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9",
+  "wrapper_commit": "792a2843d18b1baf5db219a17e14fc84fa916e53"
+ },
+ "launch": {
+  "argv": [
+   "sudo",
+   "-n",
+   "systemd-run",
+   "--pipe",
+   "--wait",
+   "--collect",
+   "--slice=wmresearch.slice",
+   "-p",
+   "User=apexresearch",
+   "-p",
+   "Group=apexresearch",
+   "-p",
+   "MemoryMax=1400M",
+   "-p",
+   "TasksMax=64",
+   "-p",
+   "ProtectSystem=strict",
+   "-p",
+   "ProtectHome=yes",
+   "-p",
+   "PrivateTmp=yes",
+   "-p",
+   "PrivateNetwork=yes",
+   "-p",
+   "NoNewPrivileges=yes",
+   "-p",
+   "RestrictSUIDSGID=yes",
+   "-p",
+   "TemporaryFileSystem=/apex-data/history-b",
+   "-p",
+   "BindReadOnlyPaths=/apex-data/research/dataset_view/etf_continuous/bars:/apex-data/history-b/etf_continuous/bars",
+   "-p",
+   "InaccessiblePaths=/apex-data/core",
+   "-p",
+   "InaccessiblePaths=/apex-data/history-a",
+   "-p",
+   "InaccessiblePaths=/apex-data/runtime",
+   "-p",
+   "ReadOnlyPaths=/apex-data/governance/admissions",
+   "-p",
+   "ReadOnlyPaths=/etc/apex/admissions",
+   "-p",
+   "ReadWritePaths=/apex-data/research/out",
+   "--setenv=GIT_CONFIG_GLOBAL=/dev/null",
+   "--setenv=GIT_CONFIG_NOSYSTEM=1",
+   "--setenv=PYTHONPATH=/apex-data/research/checkout",
+   "--working-directory=/apex-data/research/checkout",
+   "/opt/apex-runner/venv/bin/python",
+   "scripts/alpha_exp_real_execute.py",
+   "--decision",
+   "/etc/apex/admissions/exp001b_admission.json",
+   "--execute"
+  ],
+  "command": "sudo -n systemd-run --pipe --wait --collect --slice=wmresearch.slice -p User=apexresearch -p Group=apexresearch -p MemoryMax=1400M -p TasksMax=64 -p ProtectSystem=strict -p ProtectHome=yes -p PrivateTmp=yes -p PrivateNetwork=yes -p NoNewPrivileges=yes -p RestrictSUIDSGID=yes -p TemporaryFileSystem=/apex-data/history-b -p BindReadOnlyPaths=/apex-data/research/dataset_view/etf_continuous/bars:/apex-data/history-b/etf_continuous/bars -p InaccessiblePaths=/apex-data/core -p InaccessiblePaths=/apex-data/history-a -p InaccessiblePaths=/apex-data/runtime -p ReadOnlyPaths=/apex-data/governance/admissions -p ReadOnlyPaths=/etc/apex/admissions -p ReadWritePaths=/apex-data/research/out --setenv=GIT_CONFIG_GLOBAL=/dev/null --setenv=GIT_CONFIG_NOSYSTEM=1 --setenv=PYTHONPATH=/apex-data/research/checkout --working-directory=/apex-data/research/checkout /opt/apex-runner/venv/bin/python scripts/alpha_exp_real_execute.py --decision /etc/apex/admissions/exp001b_admission.json --execute",
+  "prepare_first": "run the same command without --apply; it resolves inputs and refuses on source drift, view drift, missing signature, or a decision outside the trust root",
+  "probe_used_identical_configuration": true,
+  "unit_properties": [
+   "User=apexresearch",
+   "Group=apexresearch",
+   "MemoryMax=1400M",
+   "TasksMax=64",
+   "ProtectSystem=strict",
+   "ProtectHome=yes",
+   "PrivateTmp=yes",
+   "PrivateNetwork=yes",
+   "NoNewPrivileges=yes",
+   "RestrictSUIDSGID=yes",
+   "TemporaryFileSystem=/apex-data/history-b",
+   "BindReadOnlyPaths=/apex-data/research/dataset_view/etf_continuous/bars:/apex-data/history-b/etf_continuous/bars",
+   "InaccessiblePaths=/apex-data/core",
+   "InaccessiblePaths=/apex-data/history-a",
+   "InaccessiblePaths=/apex-data/runtime",
+   "ReadOnlyPaths=/apex-data/governance/admissions",
+   "ReadOnlyPaths=/etc/apex/admissions",
+   "ReadWritePaths=/apex-data/research/out"
+  ],
+  "working_directory": "/apex-data/research/checkout"
+ },
+ "purpose": "Everything needed to review and sign the bounded EXP-001B train/validation admission. Generated by the wrapper, not transcribed by hand.",
+ "scope": {
+  "economics_permitted_in_this_run": false,
+  "evaluation": [
+   "2022-01-01",
+   "2024-12-31"
+  ],
+  "evaluation_admitted": false,
+  "note": "The admitted window is exactly train plus validation. The registration fixes economics to the evaluation stage only, so an economic number from this run would itself be a contract violation.",
+  "train": [
+   "2016-01-04",
+   "2019-12-31"
+  ],
+  "validation": [
+   "2020-01-01",
+   "2021-12-31"
+  ],
+  "validation_is_distributional_only": true
+ },
+ "state": {
+  "admission_issued": false,
+  "alpha_claimed": false,
+  "experiment_run": false,
+  "independently_reviewed": false
+ }
+}

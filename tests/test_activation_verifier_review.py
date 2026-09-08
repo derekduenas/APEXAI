@@ -147,3 +147,59 @@ def test_the_admission_request_cannot_be_used_as_an_admission():
     assert doc["provenance"]["decided_utc"] is None
     assert doc["provenance"]["decided_by"].upper() not in ("CALLER", "ENGINEERING", "SELF", "")
     assert not (REQUEST.parent / (REQUEST.name + ".sig")).exists()
+
+
+# ===================== the signing package is self-consistent =============
+PKG = Path(__file__).resolve().parents[1] / "results" / "exp001b_signing_package.json"
+
+
+def _pkg():
+    import json
+    return json.loads(PKG.read_text())
+
+
+def test_the_prepared_checkout_matches_the_wrapper_under_review():
+    """An auditor opening the checkout must not find an older tree than the one
+    being reviewed."""
+    p = _pkg()["identifiers"]
+    assert p["prepared_checkout_commit"] == p["wrapper_commit"]
+    assert p["bound_source_tree_sha256"] == (
+        "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545")
+    assert p["registration_hash"] == (
+        "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9")
+    assert p["dataset_manifest_sha256"] == (
+        "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39")
+    assert p["admitted_sessions"] == 1511
+
+
+def test_the_launch_uses_the_configuration_that_was_probed():
+    assert _pkg()["launch"]["probe_used_identical_configuration"] is True
+
+
+def test_the_signed_scope_permits_train_and_validation_only():
+    sc = _pkg()["scope"]
+    assert sc["evaluation_admitted"] is False
+    assert sc["economics_permitted_in_this_run"] is False
+    assert sc["validation_is_distributional_only"] is True
+    assert sc["train"][0] == "2016-01-04" and sc["validation"][1] == "2021-12-31"
+
+
+def test_no_private_signing_key_belongs_on_the_research_host():
+    a = _pkg()["authority"]
+    assert a["private_key_on_research_host"] is False
+    assert a["signature_namespace"] == "apex-admission"
+    assert "OFF-HOST" in a["boundary"]
+
+
+def test_the_package_does_not_overstate_what_has_happened():
+    st = _pkg()["state"]
+    assert st == {"admission_issued": False, "experiment_run": False,
+                  "alpha_claimed": False, "independently_reviewed": False}
+
+
+def test_evaluation_exclusion_is_scoped_to_the_sandboxed_process():
+    """The measured truth, not the comfortable one."""
+    e = _pkg()["evaluation_exclusion"]
+    assert e["holds_for"].startswith("the process")
+    assert e["does_not_hold_for"] == "the research account generally"
+    assert e["measured_outside_sandbox"]["evaluation_file_readable"] is True
