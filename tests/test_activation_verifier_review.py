@@ -137,6 +137,39 @@ def test_the_admission_request_is_complete_as_a_template():
     assert doc["scope"]["temporal_range"]["end"] == "2021-12-31"
 
 
+def test_the_request_declares_the_manifests_own_vocabulary():
+    """The boundary refused the first signed decision with SCOPE_INVALID because
+    this field carried a descriptive label I invented rather than the source
+    family the manifest declares. The scope is checked against the manifest, so
+    only the manifest's own names can appear here."""
+    import json
+    doc = json.loads(REQUEST.read_text())
+    assert doc["scope"]["source_families"] == ["alpaca_sip_raw_1m"]
+    assert doc["scope"]["universe"] == ["SPY"]
+    # availability is a structured contract, not prose
+    for k in ("event_time", "receipt_time", "publication_time", "revision_time"):
+        assert isinstance(doc["availability"][k], dict), k
+        assert doc["availability"][k]["kind"] in {"PER_ROW", "PER_FILE", "BULK", "NOT_AVAILABLE"}
+    assert doc["availability"]["corporate_actions"] == "RAW_UNADJUSTED_EXPLICIT"
+    assert doc["availability"]["restricted_use"].strip()
+    # RESEARCH_HISTORICAL is the only classification the boundary accepts
+    assert doc["output"]["authority_classification"] == "RESEARCH_HISTORICAL"
+
+
+def test_the_first_refusal_is_preserved_unaltered():
+    """The run refused. That is a result, and it stays in the record with its
+    cause attributed."""
+    import json
+    r = json.loads((Path(__file__).resolve().parents[1] / "results" /
+                    "exp001b_first_refusal.json").read_text())
+    assert r["process_outcome"] == "AUTHORIZATION_REFUSED"
+    assert r["exit_code"] == 3
+    assert r["code_changed_to_make_it_pass"] is False
+    assert r["model_changed"] is False and r["protocol_changed"] is False
+    assert r["decision_edited_after_signing"] is False
+    assert r["fault"].startswith("mine")
+
+
 def test_the_admission_request_cannot_be_used_as_an_admission():
     """If this file were ever handed to the boundary it must be refused. The
     decision field is not ADMIT and the provenance names no authority, so the
