@@ -4,7 +4,7 @@
 PROBABILITY_CONTRACT:  CORRECTED — World Model owns the distribution INCLUDING versioned dynamics;
                        Multiverse executes and may use sampling weights with declared proposal,
                        target, correction, effective sample size and validation; stress stays separate
-ENVIRONMENT:           dedicated root-owned /opt/apex-research/venv (numpy==2.4.6) SPECIFIED;
+ENVIRONMENT:           dedicated root-owned /opt/apex-runner/venv (numpy==2.4.6) SPECIFIED;
                        production venv UNTOUCHED; interpreter + third-party provenance now RECORDED per run
 DATASET_ISOLATION:     containment PROBED read-only — evaluation files unreadable at the FILESYSTEM level,
                        10/10 expectations met (results/si004_sandbox_probe.json)
@@ -65,10 +65,18 @@ Measured: the research path loads **exactly one** third-party package,
 called** by EXP-001B (which is pure `math`/`statistics`), plus
 `/etc/python3.12/sitecustomize.py`.
 
-Chosen: a **separate root-owned `/opt/apex-research/venv`** built from the
+Chosen: a **separate root-owned `/opt/apex-runner/venv`** built from the
 system interpreter with `numpy==2.4.6` pinned. `/opt/apex/shared/venv` is
 **not modified** and no package is installed into it. (My earlier draft
 suggested re-owning the production venv; that is withdrawn.)
+
+**A second path defect caught before finalising:** my first draft put the
+environment in `/opt/apex-research` and chowned it to root. That directory
+**already exists**, is `apex`-owned, and holds the World Model shadow
+worktree (`world-model-shadow-v0` @ `d01e961b6`) — the command would have
+re-owned a live research worktree. The environment is now `/opt/apex-runner`,
+which is free. Found by listing the target before writing the step down as
+fact, which is the same habit that caught the numpy classification bug.
 
 Provenance is now **recorded rather than asserted** (`560fdc72`):
 `_RUN.json` carries the interpreter (realpath, version, **sha256 of the
@@ -172,7 +180,7 @@ established.
 | Commit | Content |
 |---|---|
 | `560fdc722` | interpreter + third-party provenance recorded per run; venv path-matching defect fixed; positive-capture test |
-| `50f6664ae` | probability-contract correction, activation package, sandbox probe script + artifact, updated proposal, this return |
+| `__DOCS__` | probability-contract correction, activation package, sandbox probe script + artifact, updated proposal, this return |
 
 Applicable bounded regression on `560fdc72` (24 modules touching
 `world_model`, `chain_ledger` or `exp001`, one contained shard each, as

@@ -44,13 +44,21 @@ Measured: the research run path loads **exactly one** third-party package —
 by `apex/world_model/__init__.py` (the synthetic-lab models) and is **not
 called** by the EXP-001B path, which is pure `math`/`statistics`.
 
+**Path note (caught before this package was finalised):**
+`/opt/apex-research` **already exists**, is `apex`-owned, and holds the
+World Model shadow worktree (`world-model-shadow`, branch
+`world-model-shadow-v0` @ `d01e961b6`). An earlier draft of this step would
+have told the operator to `chown -R root:root` that directory, which would
+have re-owned a live research worktree. The environment therefore goes to
+`/opt/apex-runner`, which is free, under root-owned `/opt`.
+
 ```bash
-sudo install -d -o root -g root -m 0755 /opt/apex-research
-sudo /usr/bin/python3.12 -m venv /opt/apex-research/venv
-echo 'numpy==2.4.6' | sudo tee /opt/apex-research/requirements.txt
-sudo /opt/apex-research/venv/bin/pip install --no-cache-dir -r /opt/apex-research/requirements.txt
-sudo /opt/apex-research/venv/bin/pip freeze | sudo tee /opt/apex-research/pinned.txt
-sudo chown -R root:root /opt/apex-research && sudo chmod -R go-w /opt/apex-research
+sudo install -d -o root -g root -m 0755 /opt/apex-runner
+sudo /usr/bin/python3.12 -m venv /opt/apex-runner/venv
+echo 'numpy==2.4.6' | sudo tee /opt/apex-runner/requirements.txt
+sudo /opt/apex-runner/venv/bin/pip install --no-cache-dir -r /opt/apex-runner/requirements.txt
+sudo /opt/apex-runner/venv/bin/pip freeze | sudo tee /opt/apex-runner/pinned.txt
+sudo chown -R root:root /opt/apex-runner && sudo chmod -R go-w /opt/apex-runner
 ```
 
 Root-owned and not writable by research, so the account cannot inject an
@@ -151,7 +159,7 @@ sudo systemd-run --pipe --wait --collect --slice=wmresearch.slice \
   --setenv=PYTHONPATH=/apex-data/research/checkout \
   --setenv=GIT_CONFIG_GLOBAL=/dev/null --setenv=GIT_CONFIG_NOSYSTEM=1 \
   --working-directory=/apex-data/research/checkout \
-  /opt/apex-research/venv/bin/python scripts/alpha_exp_real_execute.py \
+  /opt/apex-runner/venv/bin/python scripts/alpha_exp_real_execute.py \
   --decision /etc/apex/admissions/<decision>.json --execute
 ```
 
@@ -217,7 +225,7 @@ modifying the production venv.
 | dataset manifest | `etf_continuous_SPY_manifest_v0.json`, sha256 `3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39` |
 | scope | train 2016–2019 + validation 2020–2021 **only**; distributional only; no economic stage |
 | availability restriction | `ASSUMED_BAR_CLOSE`; no publication or revision record; calendar reconciled for 2016–2021 only |
-| environment | `/opt/apex-research/venv`, `numpy==2.4.6`, recorded per run |
+| environment | `/opt/apex-runner/venv`, `numpy==2.4.6`, recorded per run |
 | output | `/apex-data/research/out/ALPHA-EXP-001B/runs/<unique>` |
 | limits | `MemoryMax=1400M`, `TasksMax=64`, no network |
 | expected outcomes | `0 SCIENTIFIC_COMPLETE` (incl. `NO_SIGNAL`) · `4 EVALUATION_SEALED` · `3 AUTHORIZATION_REFUSED` · `5 INVALID_INPUT_OR_FAILURE` |
@@ -227,7 +235,7 @@ modifying the production venv.
 
 ```bash
 sudo rm -rf /apex-data/research/dataset_view /apex-data/research/checkout
-sudo rm -rf /opt/apex-research
+sudo rm -rf /opt/apex-runner
 sudo deluser --remove-home apexresearch
 sudo rm -rf /etc/apex                 # admission then refuses TRUST_PATH_MISSING
 # /apex-data/research/out and its sealed runs are deliberately left in place
