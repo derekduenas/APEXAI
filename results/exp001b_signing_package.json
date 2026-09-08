@@ -2,7 +2,7 @@
  "artifacts": {
   "incident": {
    "path": "results/evaluation_read_incident_001.json",
-   "sha256": "42ac25472d76f74376dfd44b3b7fd363246f024f7d9341b6ff66a32218071bd2"
+   "sha256": "6943dde4ea989ea56bba3a0bcfac40655fb43b23a35f5d8493e32062c8bc60d7"
   },
   "probe": {
    "path": "results/exp001b_probe.json",
@@ -47,6 +47,7 @@
    "id": "EVALUATION_READ_INCIDENT_001",
    "machine_readable": "results/evaluation_read_incident_001.json",
    "record": "docs/EVALUATION_READ_INCIDENT_001.md",
+   "status": "CLOSED - disclosed, evaluation set preserved as registered",
    "values_exposed": false
   },
   "measured_outside_sandbox": {

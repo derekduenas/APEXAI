@@ -239,6 +239,10 @@ def test_the_evaluation_read_incident_stays_disclosed():
     assert inc["exposed_content_classification"]["any_timestamp_value"] is False
     assert inc["disposition"]["holdout_replaced"] is False
     assert inc["disposition"]["registration_amended"] is False
+    # the authority ruled: disclosed, evaluation set preserved as registered
+    assert inc["disposition"]["decided_here"] is True
+    assert "preserve the evaluation set as registered" in inc["disposition"]["ruling"]
+    assert inc["evaluation_set_status"] == "NO LONGER DESCRIBABLE AS COMPLETELY UNTOUCHED"
     assert inc["influence_on_research_decisions"]["model_fit"] is False
 
 

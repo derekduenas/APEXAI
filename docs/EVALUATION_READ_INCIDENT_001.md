@@ -108,18 +108,29 @@ The honest status: the evaluation set can no longer be called completely untouch
 One 60-byte structural prefix of one of its sessions was observed, containing no
 numeric values.
 
-Three options, with a recommendation:
+### RULING (admission authority, 2026-09-08) — CLOSED
 
-1. **Accept as immaterial and proceed (recommended).** No value of any kind was
+**The incident does not justify dropping a session or changing the registration.**
+The recorded exposure was structural metadata, with no price, timestamp value,
+volume, or outcome. The incident stays disclosed and the evaluation set is
+preserved exactly as registered.
+
+Nothing was dropped, re-sealed, or amended. The options below are recorded as
+considered and rejected, not as pending.
+
+Three options were put forward:
+
+1. **Accept as immaterial and proceed — ADOPTED.** No value of any kind was
    exposed, and the exposed bytes were already reconstructible from the repository.
    There is no mechanism by which this could bias a model fit on 2016–2021.
-2. **Drop `SPY_2022-01-03` from the evaluation set.** Cheap and conservative, at the
+2. ~~Drop `SPY_2022-01-03` from the evaluation set.~~ **Rejected.** Cheap and conservative, at the
    cost of one session and a registration amendment.
-3. **Re-seal with a later evaluation start.** Disproportionate to a 60-byte
+3. ~~Re-seal with a later evaluation start.~~ **Rejected.** Disproportionate to a 60-byte
    structural prefix, and it would discard clean data.
 
-This is the authority's decision. It does not block signing the train/validation
-admission, which concerns 2016–2021 only.
+The disclosure obligation survives the ruling: the evaluation set is preserved as
+registered, and it is still not describable as completely untouched. Both facts
+stand together.
 
 ---
 

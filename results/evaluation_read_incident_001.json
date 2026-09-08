@@ -9,16 +9,19 @@
  },
  "bytes_exposed": 60,
  "disposition": {
-  "alternatives": [
+  "alternatives_rejected": [
    "drop SPY_2022-01-03 from the evaluation set",
    "re-seal with a later evaluation start"
   ],
   "blocks_note": "the admission under review concerns 2016-2021 only",
   "blocks_train_validation_admission": false,
-  "decided_here": false,
+  "decided_by": "admission authority (review of 2026-09-08)",
+  "decided_here": true,
   "holdout_replaced": false,
   "recommendation": "accept as immaterial and proceed; no value of any kind was exposed and there is no mechanism by which it could bias a model fit on 2016-2021",
-  "registration_amended": false
+  "registration_amended": false,
+  "ruling": "The incident does not justify dropping a session or changing the registration. The recorded exposure was structural metadata with no price, timestamp value, volume, or outcome. Keep the incident disclosed and preserve the evaluation set as registered.",
+  "status": "CLOSED \u2014 DISCLOSED, EVALUATION SET PRESERVED AS REGISTERED"
  },
  "evaluation_set_status": "NO LONGER DESCRIBABLE AS COMPLETELY UNTOUCHED",
  "exposed_content_classification": {
