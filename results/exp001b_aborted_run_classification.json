@@ -1,0 +1,32 @@
+{
+ "admission_hashes": {
+  "allowed_signers": "ae30f60db42443ad58a573daa31e94ea0b6ca985148303682c7ca6ccfbaf83e0",
+  "decision": "1eafbe1fd972a45bc320acf2da0468a4a601eef7a00b7e6090499cc9cfcd0fa2",
+  "signature": "95ffc101e908eef7424cd26992b210ac6b51329fb597c5c7cc73f7188d66f7de"
+ },
+ "any_rerun": "gets a NEW run directory; this one is closed",
+ "artifact_hashes": {
+  "_AUTHORITY.json": "342374236f4a3fc42b45dd2b86d7e48876ac9484c3158560562226fd88ca28c9",
+  "_RUN.json": "507aff185bd6298184e9c0444276f7ac7aae56fbddf1569dff46c3945a37ce39",
+  "forecasts_validation.jsonl": "7a6cbe36c25c333191fc865e27c7c920bfefb67d008ecad6233a82a8a96a3407"
+ },
+ "classification": "INCOMPLETE_DUE_TO_OOM",
+ "made_read_only_utc": "2026-09-08T13:40Z",
+ "partial_forecasts": {
+  "count": 165958,
+  "hash_chain_intact": true,
+  "parseable": true,
+  "what_this_does_NOT_establish": "forecast correctness, or a completed experiment",
+  "what_this_establishes": "artifact integrity only"
+ },
+ "preserved_unchanged": true,
+ "prohibited_and_not_done": {
+  "graded_the_partial_forecasts": false,
+  "resumed_appending_to_this_run": false,
+  "reused_this_run_directory": false,
+  "tuned_from_them": false
+ },
+ "run_id": "20260908T131351Z-exp001b-2054eaa4",
+ "statistical_verdict": null,
+ "statistical_verdict_note": "There is NO verdict. The run was killed during the validation forecast loop and sealed no _RESULT.json."
+}

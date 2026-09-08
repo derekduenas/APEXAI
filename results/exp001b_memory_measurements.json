@@ -1,0 +1,56 @@
+{
+ "bytes_per_usable_row": {
+  "forecasts_f0_f1_sealed": 3153.3,
+  "gradings_g0_g1": 3634.6,
+  "null_gradings_g0n_g1n": 3654.1,
+  "rows_plus_sessions": 1560.2
+ },
+ "dominant_allocations": [
+  "null gradings",
+  "real gradings",
+  "forecast retention",
+  "input rows"
+ ],
+ "extrapolation_to_admitted_scale": {
+  "cap_mb": 1400,
+  "consistency": "the observed kill came during the forecast loop at a 1.3G peak, which is where this projection crosses the cap",
+  "forecasts_mb": 525,
+  "null_gradings_mb": 609,
+  "real_gradings_mb": 606,
+  "total_mb": 2518,
+  "train_rows_mb": 518,
+  "train_usable_rows_estimate": 332000,
+  "validation_rows_mb": 260,
+  "validation_usable_rows_estimate": 166650
+ },
+ "measurement_caveat": "RSS does not shrink when Python frees objects, so the 'sessions alone' delta measured zero. That is an artifact of the instrument, not evidence the sessions were free; their cost is real and is removed by the repair.",
+ "method": "synthetic sessions at the admitted run's scale, real trading days from the exchange calendar, measured inside the 1400M cap; no real market data read and the aborted run never inspected",
+ "probe": "scripts/exp001b_memory_probe.py",
+ "repairs": [
+  {
+   "removed": "except on evaluation, where economics reads them",
+   "retention": "one session reference per row"
+  },
+  {
+   "removed": "released after the fit",
+   "retention": "train rows held through validation"
+  },
+  {
+   "removed": "first and last kept",
+   "retention": "every sealed entry hash"
+  },
+  {
+   "removed": "null pass recomputes; exact because forecasting is deterministic and creation_time is fixed per period",
+   "retention": "every forecast object"
+  },
+  {
+   "removed": "dm computed and the first set released before the second is built",
+   "retention": "real and null grading sets coexisting"
+  }
+ ],
+ "sample": {
+  "bars_per_session": 390,
+  "sessions": 40,
+  "usable_rows": 13200
+ }
+}

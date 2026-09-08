@@ -1,0 +1,88 @@
+{
+ "baseline": "results/si007_protected_before.json (unchanged, still the pre-repair record)",
+ "checked_files": 57,
+ "current_hashes": {
+  "catalyst_events": {
+   "apex/catalyst/events.py": "3f7fd4ccc639f27d6716146641dc230e9a287d18e1cb3c52fbc797b846f21267",
+   "apex/events/capture.py": "c1b3f28504dc871e3b621c17d5605193fa0e02c5a1c3b045e101f806c6646675",
+   "apex/events/catalyst.py": "2f62d8ea5ac0ce300b2d0348bbf1cf49f8819bcc684d7641562e99ce9bb195cb"
+  },
+  "chain_ledger": {
+   "apex/governance/chain_ledger.py": "c50c8a9059c452de411a64f134521ef347c531efde1317126e7da6e120a087ec"
+  },
+  "real_data_boundary": {
+   "apex/world_model/authority.py": "b33091a22dc612d7f9c98691075500b79b975ac6806d1f29f7a16d7abf75dd8a",
+   "apex/world_model/real_data/boundary.py": "c9ed15b7e277751587e81ce999f07e851593292d45167b3d4d479b3967c0a89d",
+   "apex/world_model/sources.py": "2513130770dfae10bf78fbbae8c620911c728ee60c03108f0cadbd04deeb5673"
+  },
+  "registrations": {
+   "results/exp001_registration.json": "96ea6edc1f89dfc2a6c3188d30e460067c13ad0561b75feebdbe26c0dc803367",
+   "results/exp001b_registration.json": "dddd64fee0a23902c9ce7c5bfcb46b412a00f1e46516554255cc018a0046bfe8"
+  },
+  "risk_book": {
+   "apex/organism/book.py": "dacdd2e98d57f0c4d0aca0d583409a026e35b415cc673834772154de8bbb8ce6",
+   "apex/organism/risk_certificate.py": "3e887ec746cf8c7bfb26881ad0141f52b029d6175139af9c247c7c1702c862a5"
+  },
+  "twin_contracts": {
+   "apex/pulse/sources.py": "ec8f2a3c4142c2b2e745b304edc66ee717dfba4a1e228154f090e6ce332fa985",
+   "apex/pulse/twin.py": "33c2a6d3e9957520450d5241bc948feff91c0174a751214de847c12e7c83ff44",
+   "apex/world/twin2.py": "aa4fe682292f924c2c74d727272afcb9f37954e8ae7d17b1f5ebbda3aed641f1"
+  },
+  "world_model_surface": {
+   "apex/world_model/__init__.py": "f0ea89d6d74db9a2f8024aa53331c6ce02d808b9ebf0a3d7f9214897f449a82f",
+   "apex/world_model/authority.py": "b33091a22dc612d7f9c98691075500b79b975ac6806d1f29f7a16d7abf75dd8a",
+   "apex/world_model/bootstrap.py": "19d3d70e41d1d5ebe3fee1e5483c4e26ba996fa34b812ee6b91791881b763872",
+   "apex/world_model/budget.py": "bcb4cfd6b8af6c575f8e543c41cfe5bc4cd54750c3cf0743148749498ea9f497",
+   "apex/world_model/canonical.py": "26fbb5018d876dec1052e52c07f5b2e33383da43a2990f5a7b1db191b5c28ce5",
+   "apex/world_model/controls.py": "6e92de2d84af9491faf6e902b06df0fa679f5c92803c145f035f688ce4896673",
+   "apex/world_model/controls_r3.py": "cec658d50d0810021d7052c02a2c5c001db8ce7f383eb49694385ac7ca682538",
+   "apex/world_model/controls_r4.py": "2a1cf380d5d897ab169feec82ee7444f63e9c54bde37edb261061bd2a43dc584",
+   "apex/world_model/controls_r5.py": "d0e78d7d0d9e57481959004b0532fa54d54a2db7d129eeee1cfabcf809a9608f",
+   "apex/world_model/controls_r51.py": "c989d70e410dca0f8aafd154425587a3d8b56e233cd6db84863215bf47442c30",
+   "apex/world_model/court.py": "bc9a69c06502b631e46b9492b77bfc716c737639f9065e848192ff9ee03a1b59",
+   "apex/world_model/court_v1.py": "ea878fdf767d5cad97ea1b4990ccc8c00586c4e37c001ab5740904293086cbb9",
+   "apex/world_model/court_v2.py": "0aeb17863079acab48fdec8de71b788a62712f2d11adbda482e7c91a88492f92",
+   "apex/world_model/exp001/__init__.py": "2f2dc2cc35c7f238631fe314a5e1c31fbd35dd5540288075e53e9279e2dd8397",
+   "apex/world_model/exp001/bars.py": "59a277757b916983aa2fe089b9361eb398dc9dfdf3ab500f9732c436f3f36da1",
+   "apex/world_model/exp001/economic_path.py": "57c58a6b84b0b20570c9fcce090fdfff2513f15e7f6dc8684d9c0d1019b36830",
+   "apex/world_model/exp001/models.py": "4cd3aa397fc707366642d52dc92a7cf1c6fb63e16e77b5b9b40f3d25addb3a75",
+   "apex/world_model/exp001/registration.py": "11afb3428d0df660497b6c03e7f677edf6dfe8a23ebf990f07ccc2ce0eace6ea",
+   "apex/world_model/exp001/run.py": "7ed33c7146e2843b6e4a09e7c396f8a2bbcb5ec74b049c4fb59048da4220eec7",
+   "apex/world_model/exp001b/__init__.py": "e4ba5d88438d851746c64fecc40c991cc7dff16add44d30ea97621d2fd48b66b",
+   "apex/world_model/exp001b/bars.py": "68b1125ea7968887ccc0246a5ce43b9d09dcbf7745aa1e75f96160ba4f90d200",
+   "apex/world_model/exp001b/exchange_calendar.py": "23924aa1afc38f312762e140362f532cf9de94df477e045a44d7b14a69a03339",
+   "apex/world_model/exp001b/models.py": "8d33fd07ee40f651d429c9872e16ab23e9ecec18d9e0821a160199e557941817",
+   "apex/world_model/exp001b/registration.py": "6620c604e83fd2a2f12ef6b2f919d591e212e9ddf9602a74e842ef734f2e6216",
+   "apex/world_model/exp001b/run.py": "59cc577260278ddddd301035edbb1385540a82b1b58f48ea0cb781214c6d2430",
+   "apex/world_model/features.py": "0b2e56bbeaf4daf42ee488cbc6e375cb97f722c175441ed0bf18a8429c1eb409",
+   "apex/world_model/forecast.py": "1fbdc1e094a007c65161f9d20db09efc1ea7e993020db64759ed1762a14ce4f1",
+   "apex/world_model/grader.py": "5bfe40011b55bf13c6cc9a0f0519c1b156f2149da84b27db62b3db6b8a671281",
+   "apex/world_model/holdout.py": "af56648f3e5b146e63ff02f642c84b4d65a81378fd9ad33e66eb0f6b01a151c8",
+   "apex/world_model/inference.py": "2731c2a18c808a0659bb4dde01715ca411d369e049673b13e120c64d17dd9d56",
+   "apex/world_model/inputs.py": "e01988f387d02010ccfadd1268c368d3bee5ff95fad09b3780b726e19a14fff5",
+   "apex/world_model/models.py": "8d6354ed918911b81fa467a6c9794e4f3ad6a660dc70c796303029fc082a86b9",
+   "apex/world_model/nulls.py": "3585cce27c15a5d419825c4fa2d395999233f4c01daed0a8a6b33ceff283e645",
+   "apex/world_model/quality.py": "5c48a6bb90a49e8b292b3598adb33a179c4bf595fadd24bde246460c77dc2608",
+   "apex/world_model/real_data/__init__.py": "3a9323136b73e959b176a9e3a08539032d7cfc61da1b27eee5ccf0dab92d6d8d",
+   "apex/world_model/real_data/boundary.py": "c9ed15b7e277751587e81ce999f07e851593292d45167b3d4d479b3967c0a89d",
+   "apex/world_model/real_data/loader.py": "cfdbce716a47f9348c54b7fae15f77834fd6837eefa98b6beb12fd1a490b3731",
+   "apex/world_model/real_data/manifest.py": "b9d2c78d61cc75e9fe13cffcdda88488120eac91a147e64399631944c1e61941",
+   "apex/world_model/runs.py": "0ba881260607729147c5d08489edd76780bc98df9020196d403916e90595f98a",
+   "apex/world_model/sources.py": "2513130770dfae10bf78fbbae8c620911c728ee60c03108f0cadbd04deeb5673",
+   "apex/world_model/targets.py": "b08f5fe7c53b64151a4092bd1689d7d2f873eaeb3712975f5813fbba80fc49b3",
+   "apex/world_model/teststand.py": "8a2c49fe188ae50524e6baab445769ddf87947ffeb2da6fee431462ef30244e6",
+   "apex/world_model/worlds.py": "6a260672dda55f05ce99485a537227d2f9676ab955771d3cdc831038c1dfe4cf"
+  }
+ },
+ "drift": [
+  {
+   "now": "59cc577260278ddddd301035edbb1385540a82b1b58f48ea0cb781214c6d2430",
+   "path": "apex/world_model/exp001b/run.py",
+   "was": "0341a7276040d635ade717eb22cd510c08752dd9d14ce521c9a5766964733398"
+  }
+ ],
+ "drift_is_expected": true,
+ "drifted_files": 1,
+ "everything_else_unchanged": true,
+ "why": "apex/world_model/exp001b/run.py is a BOUND source path and the bounded-memory repair changed it. A protected surface moving is exactly the event that invalidates the previous admission, which is why a fresh signature is required. It is recorded here rather than re-baselined away."
+}

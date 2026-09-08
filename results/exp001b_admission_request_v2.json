@@ -1,0 +1,85 @@
+{
+ "NOTE": "THIS IS A REQUEST, NOT A DECISION. Unsigned; decision is not ADMIT and provenance names no principal. The identity string is not the boundary: it selects which public key in allowed_signers must have signed. The boundary is possession of the private key, held off-host and never present on the research host, together with protection of allowed_signers. Only the admission authority may author and sign.",
+ "REVISION_CLASS": {
+  "aborted_attempt": "20260908T131351Z-exp001b-2054eaa4, INCOMPLETE_DUE_TO_OOM, no statistical verdict, preserved read-only",
+  "equivalence_proved": "sealed forecasts byte-identical and final statistics identical against the pre-repair source on deterministic fixtures; see tests/test_exp001b_bounded_memory.py",
+  "is_a_new_hypothesis": false,
+  "kind": "ENGINEERING_REVISION_AFTER_ABORTED_ATTEMPT",
+  "learning_algorithm_changed": false,
+  "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9",
+  "registration_unchanged": true,
+  "statistical_procedure_changed": false
+ },
+ "SUPERSEDES": {
+  "decision_sha256": "1eafbe1fd972a45bc320acf2da0468a4a601eef7a00b7e6090499cc9cfcd0fa2",
+  "previous_source_tree": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545",
+  "why": "the source it bound was changed by a bounded-memory repair, so its code.source_tree_sha256 no longer matches; the previous admission is spent and cannot authorise the repaired source"
+ },
+ "availability": {
+  "corporate_actions": "RAW_UNADJUSTED_EXPLICIT",
+  "event_time": {
+   "kind": "PER_ROW",
+   "latest": "2026-08-28"
+  },
+  "publication_time": {
+   "kind": "NOT_AVAILABLE"
+  },
+  "receipt_time": {
+   "at": "2026-08-29",
+   "kind": "BULK"
+  },
+  "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record exists for these bars; they may not be used to claim point-in-time availability or to model vendor revisions; receipt was bulk on 2026-08-29, so no row is evidence of what was knowable before that date except by its event time",
+  "revision_time": {
+   "kind": "NOT_AVAILABLE"
+  }
+ },
+ "code": {
+  "commit": "22ea5104c682145cbb6d5c25a336df4605c5c685",
+  "note": "the bound tree MOVED because run.py is a bound path and the bounded-memory repair changed it. That is why a fresh signature is required and the previous one cannot be reused.",
+  "source_tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345"
+ },
+ "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
+ "dataset": {
+  "dataset_id": "history-b/etf_continuous",
+  "manifest_path": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json",
+  "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "root": "/apex-data/history-b/etf_continuous/bars"
+ },
+ "decision": "REQUESTED_NOT_GRANTED",
+ "output": {
+  "authority_classification": "RESEARCH_HISTORICAL",
+  "root": "/apex-data/research/out"
+ },
+ "provenance": {
+  "decided_by": "UNSIGNED_REQUEST_AWAITING_AUTHORITY",
+  "decided_utc": null,
+  "review_reference": "EXP001B-BOUNDED-MEMORY-RECOVERY"
+ },
+ "purpose": {
+  "experiment_id": "ALPHA-EXP-001B",
+  "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9",
+  "research_purpose": "Execute the frozen train/validation protocol of ALPHA-EXP-001B on admitted historical SPY sessions, producing a distributional result only. This is a re-run of an attempt aborted by memory exhaustion, on repaired source proved equivalent."
+ },
+ "scope": {
+  "fields": [
+   "open",
+   "high",
+   "low",
+   "close",
+   "volume",
+   "event_time_utc"
+  ],
+  "source_families": [
+   "alpaca_sip_raw_1m"
+  ],
+  "temporal_range": {
+   "end": "2021-12-31",
+   "evaluation_period_sealed": "2022-01-01 onward is NOT admitted",
+   "sessions": 1511,
+   "start": "2016-01-04"
+  },
+  "universe": [
+   "SPY"
+  ]
+ }
+}
