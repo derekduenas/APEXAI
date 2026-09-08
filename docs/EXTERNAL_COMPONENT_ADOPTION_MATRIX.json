@@ -1,0 +1,333 @@
+{
+ "contract": "EXTERNAL_COMPONENT_ADOPTION_MATRIX_V0",
+ "produced_utc": "2026-09-08",
+ "inspection_method": "public GitHub API at pinned commits from the operator machine; no clone, no install, no dependency",
+ "repositories": {
+  "anthropics/financial-services": {
+   "head": "69cbc81467a5dced793eee03dec4658aa24ef856",
+   "commit_date": "2026-08-25",
+   "license_file": "LICENSE",
+   "license": "Apache-2.0",
+   "license_verified_from_file": true,
+   "permits_code_reuse": true,
+   "language": "Python + Markdown skills",
+   "runtime": "Claude Code plugins/skills; no library",
+   "relevant_modules": [
+    "plugins/vertical-plugins/equity-research/skills/catalyst-calendar",
+    "plugins/agent-plugins/earnings-reviewer/skills/{earnings-analysis,earnings-preview,morning-note}",
+    "plugins/agent-plugins/market-researcher/skills/{sector-overview,idea-generation}",
+    "plugins/vertical-plugins/financial-analysis"
+   ],
+   "tests": 0,
+   "maintenance": "active (pushed 2026-08-25)",
+   "data_assumptions": "human-supplied documents; no timestamps, no source hashes; partner plugins (LSEG, S&P) need vendor credentials",
+   "limitations": "produces PROSE REPORTS for humans (8-12 pages, charts), not machine-readable records; no publication_time, known_from, uncertainty or provenance fields",
+   "security": "partner plugins require third-party credentials; skills instruct web/document access",
+   "suitability": [
+    "interface_inspiration",
+    "research_baseline"
+   ],
+   "not_suitable": [
+    "direct_code_reuse"
+   ]
+  },
+  "AI4Finance-Foundation/FinGPT": {
+   "head": "1c6e2ce3b5e01eb192c57fad01ae719376868afd",
+   "commit_date": "2026-09-07",
+   "license_file": "LICENSE",
+   "license": "MIT",
+   "license_verified_from_file": true,
+   "permits_code_reuse": true,
+   "language": "Jupyter/Python",
+   "runtime": "Llama-2-13B + LoRA, 8-bit, GPU; transformers/peft; trust_remote_code=True",
+   "relevant_modules": [
+    "fingpt/FinGPT_Sentiment_Analysis_v3",
+    "fingpt/FinGPT_Sentiment_Analysis_v1",
+    "fingpt/FinGPT_Benchmark",
+    "fingpt/FinGPT_Forecaster/market_sentiment.py"
+   ],
+   "tests": 23,
+   "maintenance": "active (pushed 2026-09-07)",
+   "data_assumptions": "sentence-level sentiment corpora (PhraseBank/tweets) with NO publication timestamps; market_sentiment.py depends on api.adanos.org (reddit/x/news/polymarket), 90-day lookback",
+   "limitations": "sentiment labels are not returns; no PIT discipline; undocumented third-party API dependency; GPU required",
+   "security": "trust_remote_code=True executes model-repo code; external API of unknown terms",
+   "suitability": [
+    "offline_challenger",
+    "interface_inspiration"
+   ],
+   "not_suitable": [
+    "direct_code_reuse",
+    "signal_source"
+   ]
+  },
+  "StockSharp/StockSharp": {
+   "head": "c049b1f9ee1653b158a9303115779a1f48e5534e",
+   "commit_date": "2026-09-07",
+   "license_file": "LICENSE",
+   "license": "PROPRIETARY (StockSharp Custom License Notice; EULA-gated)",
+   "license_verified_from_file": true,
+   "permits_code_reuse": false,
+   "language": "C#",
+   "runtime": ".NET",
+   "relevant_modules": [
+    "NOT INSPECTED - the license conditions viewing and copying"
+   ],
+   "tests": null,
+   "maintenance": "active (pushed 2026-09-07)",
+   "data_assumptions": "n/a",
+   "limitations": "all rights reserved; terms may change unilaterally on their website",
+   "security": "n/a",
+   "suitability": [],
+   "not_suitable": [
+    "direct_code_reuse",
+    "dependency",
+    "vendoring",
+    "source_inspection"
+   ],
+   "decision": "NO_ADOPTION"
+  },
+  "je-suis-tm/quant-trading": {
+   "head": "611b73f2c3f577ac5b28aaa19ac8c43d3236c7a5",
+   "commit_date": "2024-04-14",
+   "license_file": "LICENSE",
+   "license": "Apache-2.0",
+   "license_verified_from_file": true,
+   "permits_code_reuse": true,
+   "language": "Python",
+   "runtime": "pandas/numpy/matplotlib scripts",
+   "relevant_modules": [
+    "MACD oscillator backtest.py",
+    "Bollinger Bands Pattern Recognition backtest.py",
+    "Dual Thrust backtest.py"
+   ],
+   "tests": 0,
+   "maintenance": "STALE (last push 2024-04-14)",
+   "data_assumptions": "frictionless single-asset backtests; no commissions, spread, slippage, liquidity, latency or capacity",
+   "limitations": "backtest results are NOT economic evidence in any form APEX accepts",
+   "security": "none",
+   "suitability": [
+    "research_baseline",
+    "null_comparator"
+   ],
+   "not_suitable": [
+    "direct_code_reuse",
+    "economic_evidence"
+   ]
+  },
+  "wangzhe3224/awesome-systematic-trading": {
+   "head": "424df5f4acc98dcc3880107188d20f5fa4897653",
+   "commit_date": "2026-08-30",
+   "license_file": "LICENSE",
+   "license": "MIT",
+   "license_verified_from_file": true,
+   "permits_code_reuse": true,
+   "language": "HTML/Markdown catalog",
+   "runtime": "none",
+   "relevant_modules": [
+    "catalog only"
+   ],
+   "tests": null,
+   "maintenance": "active",
+   "data_assumptions": "none",
+   "limitations": "a list; each linked project needs its own license and quality review",
+   "security": "none",
+   "suitability": [
+    "catalog_reference"
+   ],
+   "not_suitable": [
+    "runtime_dependency"
+   ]
+  },
+  "jmfernandes/robin_stocks": {
+   "head": "1b4ef98be36d1df127886889c843256799a1dfea",
+   "commit_date": "2026-02-11",
+   "license_file": "LICENSE.txt",
+   "license": "MIT",
+   "license_verified_from_file": true,
+   "permits_code_reuse": true,
+   "language": "Python",
+   "runtime": "requests-based; no async",
+   "relevant_modules": [
+    "robin_stocks/robinhood/{authentication,account,markets,options,orders,stocks,profiles}.py"
+   ],
+   "tests": 4,
+   "maintenance": "stale-ish (last push 2026-02-11)",
+   "data_assumptions": "unofficial reverse-engineered endpoints; session token persisted to disk; no idempotency keys",
+   "limitations": "endpoints change without notice; no order idempotency; no partial-fill model; auth is interactive/MFA",
+   "security": "stores session tokens; credentials would live on the research host; MUST never bypass Risk/Book/PRIME/execution boundary",
+   "suitability": [
+    "broker_adapter_candidate_readonly"
+   ],
+   "not_suitable": [
+    "execution_now",
+    "dependency_now"
+   ]
+  }
+ },
+ "adoption_matrix": [
+  {
+   "component": "Event taxonomy + beat/miss framing",
+   "source": "anthropics/financial-services",
+   "adds": "a controlled vocabulary for event_type and a structure for surprise (expected vs actual vs prior)",
+   "apex_layer": "DIGITAL MARKET TWIN (records) / CATALYST (extraction)",
+   "simpler_baseline": "the existing 16-value EVENT_TYPES in apex/catalyst/events.py plus keyword_baseline_event_type()",
+   "economic_value_path": "better event typing -> cleaner conditioning sets for a future event study; no direct value",
+   "falsifier": "typed events do not improve out-of-sample log-likelihood over the keyword baseline at the same horizon",
+   "null_control": "event labels permuted across dates; must show no gain",
+   "data_compute": "none beyond existing text; no GPU",
+   "leakage_risk": "HIGH if publication/known_from are not enforced -- addressed by the admissibility gate",
+   "capacity_execution_risk": "none (no execution)",
+   "timing": "NOW (as vocabulary only)",
+   "if_it_fails": "the vocabulary is discarded; nothing downstream depends on it"
+  },
+  {
+   "component": "LLM sentiment / novelty / severity features",
+   "source": "AI4Finance-Foundation/FinGPT",
+   "adds": "a text-derived feature channel APEX does not have (tone, novelty, disagreement, management uncertainty)",
+   "apex_layer": "WORLD MODEL (as a challenger feature), never PRIME",
+   "simpler_baseline": "keyword/lexicon sentiment; event-type dummies",
+   "economic_value_path": "only if it improves a calibrated forecast enough to clear round-trip costs",
+   "falsifier": "DM-HAC log-likelihood gain <= 0 vs the lexicon baseline on a sealed period",
+   "null_control": "text shuffled across events (destroys text-event association); must return NO_SIGNAL",
+   "data_compute": "GPU, 13B model, HuggingFace downloads, trust_remote_code=True",
+   "leakage_risk": "HIGH: sentiment corpora carry no timestamps; features must be computed from text whose publication_time precedes known_from",
+   "capacity_execution_risk": "none directly",
+   "timing": "DOWNSTREAM (after the first real-data experiment)",
+   "if_it_fails": "challenger is recorded as failed in the register; no live surface changes"
+  },
+  {
+   "component": "Execution simulator concepts (order state machine, latency, partial fills, replay)",
+   "source": "StockSharp/StockSharp (NOT USED)",
+   "adds": "nothing that may be taken from this repository",
+   "apex_layer": "EXECUTION SIMULATOR (apex/predators/.../day_trader marketable_fill today)",
+   "simpler_baseline": "the existing modelled-spread fill with SIMULATED labelling",
+   "economic_value_path": "a realistic fill model changes after-cost economics materially",
+   "falsifier": "richer fill model does not change the sign or significance of an after-cost readout",
+   "null_control": "n/a (a model, not a signal)",
+   "data_compute": "tick/L2 data APEX does not have",
+   "leakage_risk": "none",
+   "capacity_execution_risk": "HIGH: an optimistic fill model manufactures edge",
+   "timing": "DOWNSTREAM, and must be built from public microstructure literature + APEX paper evidence",
+   "if_it_fails": "execution realism stays as-is, labelled SIMULATED"
+  },
+  {
+   "component": "Three benchmark strategies as null comparators",
+   "source": "je-suis-tm/quant-trading",
+   "adds": "externally specified rules that a World Model forecast must beat",
+   "apex_layer": "EXPERIENCE / evaluation (comparators), never PRIME",
+   "simpler_baseline": "always-CASH and the zero-mean M0 already registered",
+   "economic_value_path": "none directly; it raises the bar a candidate must clear",
+   "falsifier": "n/a - comparators are not hypotheses",
+   "null_control": "the comparators ARE the null",
+   "data_compute": "admitted bars only",
+   "leakage_risk": "MEDIUM: their code has no PIT discipline; must be reimplemented, never imported",
+   "capacity_execution_risk": "must be costed with the same spread/slippage as the candidate",
+   "timing": "DOWNSTREAM (with the first economic evaluation)",
+   "if_it_fails": "a candidate that cannot beat a 2024 blog strategy is correctly rejected"
+  },
+  {
+   "component": "Read-only broker reconciliation and quote/chain retrieval",
+   "source": "jmfernandes/robin_stocks",
+   "adds": "an account/position/quote/options-chain read path APEX lacks in code",
+   "apex_layer": "EXECUTION BOUNDARY (sealed) - read-only surfaces only",
+   "simpler_baseline": "the existing sealed gateway and paper book; manual reconciliation",
+   "economic_value_path": "operational reliability (position truth), not alpha",
+   "falsifier": "n/a (an adapter, not a hypothesis)",
+   "null_control": "n/a",
+   "data_compute": "network + credentials (NOT created)",
+   "leakage_risk": "none",
+   "capacity_execution_risk": "HIGH if it ever reaches order placement; must never bypass Risk/Book/PRIME",
+   "timing": "DOWNSTREAM, and only after an explicit connection authorization",
+   "if_it_fails": "reconciliation stays manual"
+  },
+  {
+   "component": "EVENT_INTELLIGENCE_ADMISSIBILITY_V0 (IMPLEMENTED)",
+   "source": "APEX (gap found by inspecting APEX itself)",
+   "adds": "a per-record admissibility decision plus the checks APEX lacked: source content hashing and mutation, duplicate content, publication-vs-retrieval, future timestamps, extraction provenance, entity resolution, and a structural ban on probabilities and trade fields",
+   "apex_layer": "CATALYST -> DIGITAL MARKET TWIN boundary",
+   "simpler_baseline": "CatalystEvent alone, which already enforces the four clocks and dedup",
+   "economic_value_path": "NONE claimed. It improves research validity: it makes event research checkable and refuses records that would be silently wrong",
+   "falsifier": "if no realistic record is ever refused by it, it adds nothing (25 tests exercise 12 distinct refusals)",
+   "null_control": "an empty event stream must yield nothing and raise nothing (tested)",
+   "data_compute": "none",
+   "leakage_risk": "this is the leakage control",
+   "capacity_execution_risk": "none - no authority, AST-verified unreachable from decision layers",
+   "timing": "NOW",
+   "if_it_fails": "event research stays blocked, which is the safe state"
+  }
+ ],
+ "economic_evaluation_design": {
+  "comparators": [
+   "A0_event_free_baseline",
+   "options_implied_benchmark",
+   "keyword_event_baseline",
+   "fingpt_challenger",
+   "structured_anthropic_extraction",
+   "combined_model"
+  ],
+  "method": {
+   "splits": "chronological, registered before scoring",
+   "point_in_time": "every feature computed only from rows whose known_from precedes the decision time",
+   "purging_embargo": "targets overlapping the horizon are purged; an embargo of one horizon is applied at every split boundary",
+   "after_cost": "round-trip modelled spread and fees; abstention below one round trip",
+   "calibration": "PIT / coverage reported beside the score, never instead of it",
+   "capacity": "expected gross after impact at declared participation",
+   "search_accounting": "every comparator counted in the search budget before any is scored"
+  },
+  "primary_statistic": "dependence-aware DM-HAC log-likelihood differential vs the declared comparator",
+  "nulls": [
+   "N0 outcome permutation across blocks",
+   "text shuffled across events",
+   "event labels permuted across dates"
+  ],
+  "not_yet_run": true,
+  "prohibition": "no result from this design may be reported as edge until it passes APEX's governed economic court"
+ },
+ "implemented_this_brick": "apex/catalyst/event_admissibility.py (EVENT_INTELLIGENCE_ADMISSIBILITY_V0) + 25 tests",
+ "not_implemented": [
+  "Multiverse",
+  "PRIME changes",
+  "Kelly sizing",
+  "broker connection",
+  "any new event model (APEX already has CatalystEvent)"
+ ],
+ "alpha_claim": "NONE. No component has passed an economic court.",
+ "ranked_followups": [
+  {
+   "rank": 1,
+   "item": "Acquire a scheduled-event calendar with publication provenance (FOMC/CPI/NFP + earnings dates)",
+   "why": "the admissibility gate is built but there is no admitted event stream to gate",
+   "blocks": "any event study"
+  },
+  {
+   "rank": 2,
+   "item": "Wire keyword_baseline_event_type into an offline extraction run over an ADMITTED text corpus",
+   "why": "establishes the comparator before any LLM is involved",
+   "blocks": "FinGPT challenger"
+  },
+  {
+   "rank": 3,
+   "item": "Register ALPHA-EXP-002 (event-conditioned, options-informed) as a separate proposal",
+   "why": "the event contract has no experiment to serve yet",
+   "blocks": "economic evaluation"
+  },
+  {
+   "rank": 4,
+   "item": "Specify the execution simulator from public microstructure literature",
+   "why": "StockSharp cannot be used; the need it confirms is real",
+   "blocks": "option expression economics"
+  },
+  {
+   "rank": 5,
+   "item": "Read-only robin_stocks reconciliation spec behind the sealed boundary",
+   "why": "operational reliability; requires an explicit connection authorization",
+   "blocks": "paper reconciliation"
+  },
+  {
+   "rank": 6,
+   "item": "FinGPT offline scoring harness on GPU with trust_remote_code isolation",
+   "why": "only after 1-3; highest compute and security cost of the set",
+   "blocks": "nothing today"
+  }
+ ]
+}

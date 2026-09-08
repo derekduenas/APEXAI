@@ -1,0 +1,26 @@
+{
+ "jmfernandes_robin_stocks": {
+  "sha": "1b4ef98be36d1df127886889c843256799a1dfea",
+  "date": "2026-02-11T02:42:31Z"
+ },
+ "StockSharp_StockSharp": {
+  "sha": "c049b1f9ee1653b158a9303115779a1f48e5534e",
+  "date": "2026-09-07T22:46:46Z"
+ },
+ "je-suis-tm_quant-trading": {
+  "sha": "611b73f2c3f577ac5b28aaa19ac8c43d3236c7a5",
+  "date": "2024-04-14T13:06:59Z"
+ },
+ "AI4Finance-Foundation_FinGPT": {
+  "sha": "1c6e2ce3b5e01eb192c57fad01ae719376868afd",
+  "date": "2026-09-07T03:16:32Z"
+ },
+ "wangzhe3224_awesome-systematic-trading": {
+  "sha": "424df5f4acc98dcc3880107188d20f5fa4897653",
+  "date": "2026-08-30T20:58:07Z"
+ },
+ "anthropics_financial-services": {
+  "sha": "69cbc81467a5dced793eee03dec4658aa24ef856",
+  "date": "2026-08-25T01:04:28Z"
+ }
+}
