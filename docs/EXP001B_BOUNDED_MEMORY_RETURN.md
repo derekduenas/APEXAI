@@ -155,7 +155,70 @@ accepted values.
 
 ---
 
-## 8. WHAT THIS RETURN DOES NOT CLAIM
+## 8. SCALE DEMONSTRATION — COMPLETED UNDER THE UNCHANGED CAP
+
+1006 train and 505 validation synthetic sessions, 390 bars each, on real trading
+days. No real market data. Nothing was changed while it ran.
+
+| | |
+|---|---|
+| systemd result | **success**, exit 0 |
+| OOM counters (cgroup) | `oom 0`, `oom_kill 0`, `oom_group_kill 0` |
+| **peak memory, whole process group** | **1046 MB** against the 1400 MB cap |
+| headroom | 354 MB, 24% |
+| runtime | 19.7 min wall, 13.0 min CPU |
+
+**Expected versus completed records:**
+
+| | |
+|---|---|
+| validation usable rows expected | 146,190 |
+| validation forecasts written | **146,190** |
+| real grading pass (`dm`) | completed, n = 146,190 |
+| null grading pass (`n0`) | completed, n = 146,190 |
+| outcomes ledger records | 1 |
+| returned status | `NO_SIGNAL` |
+
+**Both grading passes completed.** The verdict is `NO_SIGNAL` on synthetic noise,
+which is the expected outcome and carries no information about markets.
+
+### The measurement covers the process group, and the difference matters
+
+`getrusage` reported 743 MB; the cgroup peak was **1046 MB**. The cgroup figure is
+authoritative: it covers the whole process group and includes page cache for the
+499 MB forecast file, and it is what `MemoryMax` actually enforces. The self-only
+figure would have understated the peak by 303 MB and overstated headroom
+correspondingly. One process ran in the group; no children were spawned.
+
+### Result sealing was NOT demonstrated
+
+The demo calls `run()` directly. `_RESULT.json` is sealed by
+`alpha_exp_real_execute.py` through `boundary.seal_result`, which requires a
+verified admission — and there is no admission for the repaired source. **So
+sealing cannot be exercised at this stage and this demonstration does not cover
+it.** What it does show is that `run()` completed both passes and returned the
+terminal status that `seal_result` would have written.
+
+`attribution.jsonl` is likewise absent: `run()` returns early on `NO_SIGNAL` and
+only writes it past the evaluation branch. That is pre-existing behaviour and the
+repair did not change it.
+
+### Reconciliation with the admission request
+
+| | |
+|---|---|
+| bound tree before repair (`9fcc6fe`) | `616a1912…` |
+| bound tree after repair (`22ea5104`) | `06eee315…` |
+| bound tree at head (`984c5bba`) | `06eee315…` |
+| request `code.source_tree_sha256` | `06eee315…` |
+
+Commits after the repair touched the wrapper, tests, results and docs — none of
+them bound paths — so the bound tree is identical at the repair commit and at head.
+**The implementation that was tested is the implementation the request binds.**
+
+---
+
+## 9. WHAT THIS RETURN DOES NOT CLAIM
 
 No statistical verdict exists. No experiment has completed. Nothing here says
 anything about whether the registered model extracts predictive information from

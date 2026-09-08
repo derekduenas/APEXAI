@@ -1,0 +1,107 @@
+{
+ "comparison_with_the_aborted_real_run": {
+  "aborted_outcome": "oom-kill at 18min, no result",
+  "aborted_peak_mb": 1300,
+  "caveat": "the aborted run was on real data and this is synthetic, so the comparison is indicative of memory behaviour, not a like-for-like runtime measurement",
+  "repaired_outcome": "completed both passes in 19.7min",
+  "repaired_peak_mb": 1046
+ },
+ "data": "SYNTHETIC fixtures on real trading days; no real market data was read",
+ "demonstration": "EXP001B_BOUNDED_MEMORY_SCALE_DEMO",
+ "executed_source": {
+  "bound_tree_after_repair": {
+   "commit": "22ea5104c682145cbb6d5c25a336df4605c5c685",
+   "n_files": 48,
+   "tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345"
+  },
+  "bound_tree_at_head": {
+   "commit": "984c5bba026ee156274eb84dfc304986760f2f72",
+   "n_files": 48,
+   "tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345"
+  },
+  "bound_tree_before_repair": {
+   "commit": "9fcc6fe807e01ca7a01a263bfe876533efec4a2d",
+   "n_files": 48,
+   "tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545"
+  },
+  "note": "commits after the repair touched only the wrapper, tests, results and docs, none of them bound paths, so the bound tree is identical at the repair commit and at head. The executed run.py is therefore the source the admission request pins.",
+  "working_tree_dirty": 0,
+  "worktree_head_at_completion": "984c5bba026ee156274eb84dfc304986760f2f72"
+ },
+ "exit_and_memory": {
+  "cap_bytes": 1468006400,
+  "cap_mb": 1400.0,
+  "exit_code": 0,
+  "headroom_fraction": 0.241,
+  "headroom_mb": 354.1,
+  "oom_counters_cgroup": {
+   "high": 0,
+   "max": 0,
+   "oom": 0,
+   "oom_group_kill": 0,
+   "oom_kill": 0
+  },
+  "peak_memory_cgroup_bytes": 1096716288,
+  "peak_memory_cgroup_mb": 1046.0,
+  "peak_rss_self_only_bytes": 778735616,
+  "peak_rss_self_only_mb": 742.7,
+  "process_group_scope": {
+   "children_spawned": 0,
+   "measurement_covers_process_group": true,
+   "processes_in_cgroup_during_run": 1
+  },
+  "systemd_result": "success",
+  "which_figure_is_authoritative": "the cgroup peak. It covers the whole process group and includes page cache for the 499 MB forecast file, and it is what MemoryMax enforces. The self-only figure from getrusage excludes both and would have understated the peak by 303 MB."
+ },
+ "purpose": "prove the complete workload finishes inside the unchanged 1400M cap",
+ "records_expected_vs_completed": {
+  "both_passes_completed": true,
+  "grading_pass_1_real": {
+   "completed": true,
+   "n": 146190,
+   "statistic": "dm",
+   "verdict": "NO_SIGNAL"
+  },
+  "grading_pass_2_null": {
+   "completed": true,
+   "n": 146190,
+   "statistic": "n0",
+   "verdict": "NO_SIGNAL"
+  },
+  "match": true,
+  "outcomes_ledger_records": 1,
+  "refused_rows_validation": {
+   "EMBARGO": 15150,
+   "MISSING_FEATURE_BARS": 9960,
+   "MISSING_TARGET_BAR": 0,
+   "WARMUP": 5190
+  },
+  "run_status_returned": "NO_SIGNAL",
+  "train_usable_rows": 290520,
+  "validation_forecasts_written": 146190,
+  "validation_usable_rows_expected": 146190
+ },
+ "result_sealing": {
+  "attribution_ledger_absent": "run() returns early on NO_SIGNAL and only writes attribution.jsonl past the evaluation branch. That is pre-existing behaviour and the repair did not change it.",
+  "demonstrated": false,
+  "what_the_demo_does_show": "run() completed both grading passes and returned a terminal status, which is the input seal_result would have written",
+  "why_not": "the demo calls run() directly. _RESULT.json is sealed by scripts/alpha_exp_real_execute.py via boundary.seal_result, which requires a verified admission. There is no admission for the repaired source, so sealing cannot be exercised at this stage."
+ },
+ "runtime": {
+  "cpu_seconds": 781.9,
+  "run_minutes": 19.7,
+  "run_seconds": 1180.8,
+  "wall_including_fixture_generation": 1194.9
+ },
+ "scale": {
+  "bars_per_session": 390,
+  "fixture_generation_seconds": 14.1,
+  "train_sessions": 1006,
+  "validation_sessions": 505
+ },
+ "what_this_does_not_establish": [
+  "any statistical result about real markets: the verdict here is NO_SIGNAL on synthetic noise, which is the expected outcome and carries no information",
+  "that the repaired source has been independently reviewed",
+  "that result sealing works end to end, which needs an admission"
+ ]
+}
