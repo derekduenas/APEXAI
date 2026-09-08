@@ -1036,7 +1036,11 @@ def run_repin(t: Targets, commit: str, *, apply: bool, run: SystemRunner | None 
     the checkout should not find an older tree than the one under review. But
     re-pinning must never become a way to change what runs: the bound source
     tree hash must match exactly, or this refuses and the environment has to be
-    rebuilt under fresh review."""
+    rebuilt under a fresh admission.
+
+    Refusing does NOT mean the hypothesis changed. Changing bound code is an
+    engineering revision of the same registered experiment and requires a fresh
+    admission; it does not require a new registration."""
     rec = load_setup_record(t)
     if rec["state"] != STATE_COMPLETE:
         raise ActivationRefused("SETUP_NOT_COMPLETE: state is %s" % rec["state"])
@@ -1048,8 +1052,10 @@ def run_repin(t: Targets, commit: str, *, apply: bool, run: SystemRunner | None 
             "bound_paths": list(BOUND_SOURCE_PATHS), "applied": bool(apply)}
     if new_ident["tree_sha256"] != rec["source_tree_sha256"]:
         raise ActivationRefused(
-            "REPIN_CHANGES_EXPERIMENT_CODE: bound tree would move %s -> %s. A commit that "
-            "changes what runs is a new experiment, not a re-pin."
+            "REPIN_CHANGES_EXPERIMENT_CODE: bound tree would move %s -> %s. Changing "
+            "bound code needs a FRESH ADMISSION and a fresh checkout, not a re-pin. "
+            "This is an engineering revision of the same registered experiment; the "
+            "registration and hypothesis are untouched."
             % (rec["source_tree_sha256"][:16], new_ident["tree_sha256"][:16]))
     if not apply:
         plan["note"] = "prepared only; nothing moved"
