@@ -619,3 +619,51 @@ def test_run_record_carries_trust_chain_verifier_and_imports(rig):
     assert set(rec["trust_chain"]) == {"admission_root", "allowed_signers", "decision"}
     assert rec["trust_chain"]["decision"][0]["path"] == "/"
     assert rec["imports"] == {"n_modules": 3}
+
+
+# ============ activation prep: environment provenance ============
+def test_interpreter_and_third_party_provenance_is_recorded():
+    """"We used the venv" names nothing. The same source under a different
+    numpy is a different run, so the environment is part of provenance."""
+    ip = boundary.interpreter_provenance()
+    assert ip["realpath"] == str(Path(sys.executable).resolve())
+    assert ip["python"] == sys.version.split()[0]
+    assert ip["executable_sha256"] and len(ip["executable_sha256"]) == 64
+    assert ip["is_virtual_environment"] == (sys.prefix != sys.base_prefix)
+    tp = boundary.third_party_provenance()
+    # stdlib and apex's own modules are excluded; anything left is the environment
+    assert "json" not in tp and "os" not in tp and "pathlib" not in tp
+    assert not any(k.startswith("apex") for k in tp)
+    import sysconfig
+    paths = sysconfig.get_paths()
+    std = paths["stdlib"]
+    for name, rec in tp.items():
+        assert not rec["file"].startswith(str(boundary.checkout_root())), (name, rec)
+        assert rec["origin"] in ("SITE_PACKAGES", "OUTSIDE_STDLIB_AND_SITE"), (name, rec)
+        if rec["origin"] == "SITE_PACKAGES":
+            assert not rec["file"].startswith(std) or "site-packages" in rec["file"], (name, rec)
+    # POSITIVE capture: an installed package MUST appear. The first version of
+    # this function reported nothing under a venv, because platstdlib is the
+    # venv root and site-packages sits underneath it -- a structural assertion
+    # alone did not catch that.
+    import numpy
+    assert "numpy" in tp, sorted(tp)
+    assert tp["numpy"]["version"] == numpy.__version__
+    assert tp["numpy"]["origin"] == "SITE_PACKAGES"
+    rp = boundary.runtime_provenance()
+    assert rp["interpreter"]["realpath"] == ip["realpath"]
+    assert set(rp["third_party"]) == set(tp)
+    assert rp["apex_module_files"] and rp["n_apex_modules"] == len(rp["apex_module_files"])
+
+
+def test_a_run_record_carries_the_environment_it_ran_in(rig):
+    g = _verify(rig, _write(rig, _body(rig)))
+    run = boundary.open_run(g, label="env")
+    rec = boundary.run_records(run)["_RUN.json"]
+    assert rec["runtime"]["interpreter"]["executable_sha256"]
+    assert "third_party" in rec["runtime"]
+    # numpy is the one third-party package the research path loads; when the
+    # suite runs under an environment that has it, it must be recorded with a
+    # version rather than merely named
+    if "numpy" in rec["runtime"]["third_party"]:
+        assert rec["runtime"]["third_party"]["numpy"]["version"]

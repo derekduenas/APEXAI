@@ -281,10 +281,69 @@ def recheck_source_identity(grant: "Grant", trust: TrustConfig | None = None) ->
             "acceptance_qualification": "VALID" if same else "INVALID_SOURCE_CHANGED_DURING_RUN"}
 
 
+def _library_roots() -> dict:
+    """Stdlib roots and site-package roots, kept apart.
+
+    In a virtual environment `platstdlib` IS the venv root, and site-packages
+    lives underneath it -- so a naive "starts with a stdlib root" test hides
+    every installed package. The site roots are therefore matched FIRST."""
+    import sysconfig
+    p = sysconfig.get_paths()
+    return {"stdlib": {str(_resolved(p[k])) for k in ("stdlib", "platstdlib") if p.get(k)},
+            "site": {str(_resolved(p[k])) for k in ("purelib", "platlib") if p.get(k)}}
+
+
+def third_party_provenance() -> dict:
+    """Every loaded top-level module that is neither the standard library nor
+    APEX's own code, with its version and file.
+
+    The environment is part of a result's provenance: the same source under a
+    different numpy is a different run, and "we used the venv" names nothing.
+    apex modules are excluded here because they are verified byte-for-byte
+    against the admitted commit by verify_imports_against_commit."""
+    roots, croot = _library_roots(), str(checkout_root())
+    out = {}
+    for name, m in sorted(sys.modules.items()):
+        if "." in name or name.startswith("_") or name == "apex":
+            continue
+        f = getattr(m, "__file__", None)
+        if not f:
+            continue
+        p = str(_resolved(f))
+        if p.startswith(croot):
+            continue                                   # APEX code: verified against the commit
+        if any(p.startswith(s) for s in roots["site"]):
+            out[name] = {"version": getattr(m, "__version__", None), "file": p,
+                         "origin": "SITE_PACKAGES"}
+            continue
+        if any(p.startswith(s) for s in roots["stdlib"]):
+            continue                                   # standard library: pinned by the interpreter
+        out[name] = {"version": getattr(m, "__version__", None), "file": p,
+                     "origin": "OUTSIDE_STDLIB_AND_SITE"}
+    return out
+
+
+def interpreter_provenance() -> dict:
+    real = _resolved(sys.executable)
+    rec = {"executable": sys.executable, "realpath": str(real),
+           "python": sys.version.split()[0], "implementation": sys.implementation.name,
+           "prefix": sys.prefix, "base_prefix": sys.base_prefix,
+           "is_virtual_environment": sys.prefix != sys.base_prefix,
+           "site_packages_on_path": [p for p in sys.path if "site-packages" in p]}
+    try:
+        rec["executable_sha256"] = sha256_of(real)
+    except OSError as e:                                                # noqa: BLE001
+        rec["executable_sha256"] = None
+        rec["executable_sha256_error"] = str(e)
+    return rec
+
+
 def runtime_provenance() -> dict:
     mods = {n: getattr(m, "__file__", None) for n, m in sorted(sys.modules.items())
             if n.startswith("apex.") and getattr(m, "__file__", None)}
-    return {"executable": sys.executable, "python": sys.version.split()[0],
+    return {"interpreter": interpreter_provenance(),
+            "third_party": third_party_provenance(),
+            "executable": sys.executable, "python": sys.version.split()[0],
             "cwd": os.getcwd(), "pid": os.getpid(), "euid": os.geteuid(),
             "apex_module_files": mods, "n_apex_modules": len(mods)}
 
