@@ -367,15 +367,17 @@ def test_launch_apply_executes_and_records_the_outcome(rig):
     t = rig["t"]; _complete(rig)
 
     class LaunchRunner(StandIn):
-        def cmd(self, argv, *, timeout=1800, input_text=None):
-            argv = [str(x) for x in argv]
-            self.calls.append(argv)
-            if "systemd-run" in argv:
-                return subprocess.CompletedProcess(
-                    argv, 0, json.dumps({"experiment": "ALPHA-EXP-001B",
-                                         "process_outcome": "SCIENTIFIC_COMPLETE",
-                                         "status": "NO_SIGNAL"}), "")
-            return StandIn.cmd(self, argv, timeout=timeout, input_text=input_text)
+        # the child now goes through run_child, so that is what a stand-in
+        # intercepts; cmd never sees the experiment
+        def run_child(self, argv, *, timeout):
+            self.calls.append([str(a) for a in argv])
+            res = t.out / RA.EXPERIMENT_ID / "runs" / "standin" / "_RESULT.json"
+            res.parent.mkdir(parents=True, exist_ok=True)
+            res.write_text(json.dumps({"sealed": True}))
+            return {"returncode": 0, "timed_out": False, "spawn_error": None,
+                    "stdout": json.dumps({"experiment": "ALPHA-EXP-001B",
+                                          "process_outcome": "SCIENTIFIC_COMPLETE",
+                                          "status": "NO_SIGNAL"}), "stderr": ""}
     run = LaunchRunner(t)
     out = RA.run_launch(t, rig["commit"], _decision(rig), apply=True, run=run)
     assert out["applied"] and out["execution"]["process_outcome"] == "SCIENTIFIC_COMPLETE"
@@ -714,3 +716,115 @@ def test_the_real_trust_root_is_still_accepted(rig):
     t = rig["t"]
     RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
     RA.prepare_launch(t, rig["commit"], _decision(rig))
+
+
+# ============ launch outcome reporting, through the real CLI ==============
+# An OOM-killed run exited 0. These tests drive the actual CLI with controlled
+# child processes and require the outcome to survive to the exit code.
+
+class Child(StandIn):
+    """A runner whose experiment child is a REAL process with scripted behaviour."""
+
+    def __init__(self, targets, *, script, **kw):
+        super().__init__(targets, **kw)
+        self.script = script
+        self.child_calls = []
+
+    def run_child(self, argv, *, timeout):
+        self.child_calls.append([str(a) for a in argv])
+        return super().run_child([sys.executable, "-c", self.script], timeout=timeout)
+
+
+def _ready(rig):
+    RA.run_setup(rig["t"], rig["commit"], apply=True, run=StandIn(rig["t"]))
+    return _decision(rig)
+
+
+def _cli_launch(rig, runner, tmp):
+    out = tmp / "launch.json"
+    code = RA._cli(["launch", "--commit", rig["commit"], "--decision", str(_decision(rig)),
+                    "--apply", "--json", str(out)], targets=rig["t"], runner=runner)
+    return code, json.loads(out.read_text())
+
+
+OK_JSON = ('import json,sys,pathlib\n'
+           'p=pathlib.Path(%r)\n'
+           'p.parent.mkdir(parents=True,exist_ok=True)\n'
+           'p.write_text(json.dumps({"sealed":True}))\n'
+           'print(json.dumps({"process_outcome":"COMPLETED"}))\n')
+
+
+def test_a_child_that_seals_a_result_and_exits_zero_is_the_only_success(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+    res = t.out / RA.EXPERIMENT_ID / "runs" / "r1" / "_RESULT.json"
+    run = Child(t, script=OK_JSON % str(res))
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["outcome"] == RA.LAUNCH_COMPLETED
+    assert rec["execution"]["result_sealed"] is True
+    assert rec["status"] == "OK" and code == 0
+
+
+def test_a_child_that_exits_zero_without_sealing_is_not_a_success(rig, tmp_path):
+    """The defect in one line: a missing result must never become success."""
+    t = rig["t"]; _ready(rig)
+    run = Child(t, script="print('did nothing')")
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["outcome"] == RA.LAUNCH_NO_RESULT
+    assert rec["execution"]["result_sealed"] is False
+    assert rec["status"] == "FAILED"
+    assert code == RA.LAUNCH_EXIT_CODES[RA.LAUNCH_NO_RESULT] != 0
+
+
+def test_an_oom_killed_child_is_classified_from_systemd_evidence(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+    run = Child(t, script=("import sys\n"
+                           "sys.stderr.write('Finished with result: oom-kill\\n"
+                           "Main processes terminated with: code=killed/status=KILL\\n')\n"
+                           "sys.exit(1)\n"))
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["outcome"] == RA.LAUNCH_OOM
+    assert "memory" in rec["execution"]["outcome_evidence"]
+    assert code == RA.LAUNCH_EXIT_CODES[RA.LAUNCH_OOM]
+    assert "oom-kill" in rec["execution"]["stderr"]      # evidence preserved
+
+
+def test_a_refusing_child_is_distinguished_from_an_ordinary_failure(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+    run = Child(t, script=("import json,sys\n"
+                           "print(json.dumps({'process_outcome':'AUTHORIZATION_REFUSED',"
+                           "'refusal':'SCOPE_INVALID: made up family'}))\n"
+                           "sys.exit(3)\n"))
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["outcome"] == RA.LAUNCH_REFUSED
+    assert rec["execution"]["process_outcome"] == "AUTHORIZATION_REFUSED"
+    assert code == RA.LAUNCH_EXIT_CODES[RA.LAUNCH_REFUSED]
+    # the refusal text survives; it had to be recovered by hand before
+    assert "SCOPE_INVALID" in rec["execution"]["stdout"]
+
+
+def test_an_ordinary_failure_keeps_its_traceback(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+    run = Child(t, script="raise RuntimeError('boom in the experiment')")
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["outcome"] == RA.LAUNCH_FAILED
+    assert code == RA.LAUNCH_EXIT_CODES[RA.LAUNCH_FAILED]
+    assert "boom in the experiment" in rec["execution"]["stderr"]
+
+
+def test_a_timeout_is_its_own_outcome(rig, tmp_path):
+    t = rig["t"]; _ready(rig)
+
+    class Slow(Child):
+        def run_child(self, argv, *, timeout):
+            return RA.SystemRunner.run_child(self, [sys.executable, "-c",
+                                                     "import time; time.sleep(30)"], timeout=0.5)
+    run = Slow(t, script="")
+    code, rec = _cli_launch(rig, run, tmp_path)
+    assert rec["execution"]["outcome"] == RA.LAUNCH_TIMEOUT
+    assert rec["execution"]["timed_out"] is True
+    assert code == RA.LAUNCH_EXIT_CODES[RA.LAUNCH_TIMEOUT]
+
+
+def test_every_non_completed_outcome_exits_nonzero():
+    for name, code in RA.LAUNCH_EXIT_CODES.items():
+        assert (code == 0) == (name == RA.LAUNCH_COMPLETED), (name, code)

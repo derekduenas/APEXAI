@@ -30,6 +30,7 @@ import pwd
 import shutil
 import stat
 import subprocess
+import time
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -38,6 +39,9 @@ from pathlib import Path
 
 ACTIVATION_VERSION = "RESEARCH_ACTIVATION_V1"
 EXPERIMENT_ID = "ALPHA-EXP-001B"
+# must match apex.world_model.real_data.boundary.RESULT_FILE; a run that has
+# not written this has not produced a result, whatever its exit code says
+RESULT_FILE = "_RESULT.json"
 REGISTRATION_HASH = "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9"
 MANIFEST_SHA256 = "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39"
 SCOPE_SYMBOL, SCOPE_START, SCOPE_END = "SPY", "2016-01-04", "2021-12-31"
@@ -163,6 +167,25 @@ class SystemRunner:
 
     def copy(self, src: Path, dst: Path) -> None:
         shutil.copy2(src, dst)
+
+    def run_child(self, argv, *, timeout) -> dict:
+        """Run the experiment child and return what happened, without raising.
+
+        `cmd` raises on non-zero and keeps 300 characters of stderr, which threw
+        away the refusal that explained the failure. Nothing is discarded here."""
+        argv = [str(x) for x in argv]
+        try:
+            r = subprocess.run(argv, capture_output=True, text=True, timeout=timeout)
+        except subprocess.TimeoutExpired as e:
+            return {"returncode": None, "timed_out": True,
+                    "stdout": (e.stdout or b"").decode("utf-8", "replace") if isinstance(e.stdout, bytes) else (e.stdout or ""),
+                    "stderr": (e.stderr or b"").decode("utf-8", "replace") if isinstance(e.stderr, bytes) else (e.stderr or ""),
+                    "spawn_error": None}
+        except OSError as e:
+            return {"returncode": None, "timed_out": False, "stdout": "", "stderr": "",
+                    "spawn_error": "%s: %s" % (type(e).__name__, e)}
+        return {"returncode": r.returncode, "timed_out": False,
+                "stdout": r.stdout or "", "stderr": r.stderr or "", "spawn_error": None}
 
 
 # ------------------------------------------------------------ inventory
@@ -866,27 +889,99 @@ def operator_commands(t: Targets, commit: str, decision) -> dict:
             "difference": "--apply, on the wrapper invocation"}
 
 
+# Launch outcomes. Only one of them is success, and it requires a sealed result.
+LAUNCH_COMPLETED = "COMPLETED_WITH_RESULT"
+LAUNCH_NO_RESULT = "COMPLETED_WITHOUT_RESULT"
+LAUNCH_REFUSED = "REFUSED"
+LAUNCH_OOM = "OOM_KILLED"
+LAUNCH_TIMEOUT = "TIMED_OUT"
+LAUNCH_FAILED = "FAILED"
+LAUNCH_NOT_STARTED = "NOT_STARTED"
+LAUNCH_EXIT_CODES = {LAUNCH_COMPLETED: 0, LAUNCH_REFUSED: 3, LAUNCH_FAILED: 4,
+                     LAUNCH_OOM: 5, LAUNCH_TIMEOUT: 6, LAUNCH_NO_RESULT: 7,
+                     LAUNCH_NOT_STARTED: 8}
+# systemd reports the kill reason on its own stderr. Classifying on that text is
+# evidence, not inference; without it an OOM is reported as an ordinary failure.
+_OOM_EVIDENCE = ("oom-kill", "oom_kill", "out of memory", "status=KILL")
+
+
+def classify_launch(child: dict, result_sealed: bool) -> tuple:
+    """(outcome, evidence). Never returns success without a sealed result."""
+    if child.get("spawn_error"):
+        return LAUNCH_NOT_STARTED, "the child could not be started: %s" % child["spawn_error"]
+    if child.get("timed_out"):
+        return LAUNCH_TIMEOUT, "the child exceeded its timeout and was terminated"
+    rc = child.get("returncode")
+    blob = "%s\n%s" % (child.get("stderr") or "", child.get("stdout") or "")
+    oom = any(m.lower() in blob.lower() for m in _OOM_EVIDENCE)
+    outcome = None
+    try:
+        doc = json.loads(child.get("stdout") or "")
+        outcome = doc.get("process_outcome") if isinstance(doc, dict) else None
+    except ValueError:
+        pass
+    if rc not in (0, None):
+        if oom:
+            return LAUNCH_OOM, "systemd reported the process was killed for memory"
+        if outcome and "REFUS" in str(outcome).upper():
+            return LAUNCH_REFUSED, "the experiment refused: %s" % outcome
+        return LAUNCH_FAILED, "the child exited %s" % rc
+    if oom:
+        return LAUNCH_OOM, "systemd reported a memory kill despite exit %s" % rc
+    if not result_sealed:
+        # the defect this exists to prevent: a run that dies mid-way, or exits
+        # zero having sealed nothing, must never be reported as a success
+        return LAUNCH_NO_RESULT, "the child exited %s but sealed no result" % rc
+    return LAUNCH_COMPLETED, "the child exited 0 and sealed a result"
+
+
+def _sealed_results_since(t: Targets, since_mtime: float) -> list:
+    """Run directories that sealed a result during this launch."""
+    base = t.out / EXPERIMENT_ID / "runs"
+    if not base.is_dir():
+        return []
+    found = []
+    for d in sorted(base.iterdir()):
+        r = d / RESULT_FILE
+        try:
+            if r.is_file() and r.stat().st_mtime >= since_mtime - 1:
+                found.append(str(r))
+        except OSError:
+            continue
+    return found
+
+
 def run_launch(t: Targets, commit: str, decision: Path, *, apply: bool,
                run: SystemRunner | None = None) -> dict:
     plan = prepare_launch(t, commit, decision)
     plan["applied"] = bool(apply)
     if not apply:
         plan["note"] = "prepared only; authorization C is required to run this command"
+        plan["ok"] = True
         return plan
     run = run or SystemRunner()
-    started = now()
+    started, t0 = now(), time.time()
+    child = run.run_child(plan["argv"], timeout=7200)
+    sealed = _sealed_results_since(t, t0)
+    outcome, why = classify_launch(child, bool(sealed))
+    plan["execution"] = {
+        "started_utc": started, "finished_utc": now(),
+        "returncode": child.get("returncode"),
+        "timed_out": bool(child.get("timed_out")),
+        "spawn_error": child.get("spawn_error"),
+        "outcome": outcome, "outcome_evidence": why,
+        "exit_code": LAUNCH_EXIT_CODES[outcome],
+        "result_sealed": bool(sealed), "sealed_results": sealed,
+        # the whole of both streams: on failure these ARE the evidence
+        "stdout": child.get("stdout") or "",
+        "stderr": child.get("stderr") or "",
+    }
     try:
-        r = run.cmd(plan["argv"], timeout=7200)
-        rc, out, err = 0, r.stdout, r.stderr
-    except ActivationRefused as e:
-        rc, out, err = None, "", str(e)
-    plan["execution"] = {"started_utc": started, "finished_utc": now(),
-                         "returncode": rc, "stdout_tail": (out or "")[-4000:],
-                         "stderr_tail": (err or "")[-2000:]}
-    try:
-        plan["execution"]["process_outcome"] = json.loads(out).get("process_outcome")
-    except (ValueError, AttributeError):
+        doc = json.loads(child.get("stdout") or "")
+        plan["execution"]["process_outcome"] = doc.get("process_outcome") if isinstance(doc, dict) else None
+    except ValueError:
         plan["execution"]["process_outcome"] = None
+    plan["ok"] = outcome == LAUNCH_COMPLETED
     rp = t.out / ("_LAUNCH_%s.json" % started.replace(":", "").replace("-", ""))
     rp.write_text(json.dumps(plan, indent=1, sort_keys=True, default=str))
     plan["launch_record"] = str(rp)
@@ -1114,11 +1209,20 @@ def _cli(argv=None, *, targets: Targets | None = None, runner: SystemRunner | No
         print(json.dumps({"contract": ACTIVATION_VERSION, "action": a.action,
                           "status": "REFUSED", "refusal": str(e)}, indent=1))
         return 3
-    out = json.dumps({"contract": ACTIVATION_VERSION, "status": "OK", **rec}, indent=1, default=str)
+    ok = rec.get("ok")
+    if ok is None:
+        # An action that reports no verdict is not a success. The launch record
+        # defaulting to True is what let an OOM-killed run exit 0.
+        ok = rec.get("state") in (STATE_COMPLETE, "DRY_RUN") or rec.get("action") != "launch"
+    status = "OK" if ok else "FAILED"
+    out = json.dumps({"contract": ACTIVATION_VERSION, "status": status, **rec}, indent=1, default=str)
     if a.json:
         Path(a.json).write_text(out)
     print(out)
-    return 0 if rec.get("ok", True) else 3
+    if ok:
+        return 0
+    ex = (rec.get("execution") or {}).get("exit_code")
+    return int(ex) if isinstance(ex, int) else 3
 
 
 if __name__ == "__main__":
