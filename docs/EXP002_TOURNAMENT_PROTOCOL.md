@@ -1,182 +1,280 @@
-# EXP-002 — BOUNDED CHALLENGER TOURNAMENT, PROTOCOL FOR REVIEW
+# EXP-002 — BOUNDED CHALLENGER TOURNAMENT, PROTOCOL v2
 
-**Nothing has been fitted. No admission is requested by this document.** It is one
-protocol, offered for review before any challenger is fitted.
+**Revision for review. Nothing fitted, no admission requested, no historical data
+touched.** Supersedes v1 at `13f5c9b`.
 
-This tournament tests a **forecasting component**. Option-price comparison and
-executable payoff economics are separate later stages and are not touched here.
+This tests a **forecasting component**. Option-price comparison and executable
+payoff economics are separate later stages. The options-only business objective is
+unchanged and untouched by this document.
 
 ---
 
-## 1. WHAT EXP-001B ACTUALLY TESTED
-
-Stated exactly, because the next step only makes sense against it.
+## 1. WHAT EXP-001B TESTED, AND WHAT IT DID NOT
 
 | | |
 |---|---|
-| information set | `ret_1`, `ret_5`, `rv_30`, built from bars in `[t-30min, t]`; 30-minute warmup |
-| target | `log(close[t+15min] / close[t])`, elapsed time, exact bar required, no imputation |
-| comparator M0 | zero mean; `sigma = rv_30 · k`, `k` fit on train; **Gaussian** |
-| challenger M1 | mean `a + b1·ret_1 + b5·ret_5` by OLS on train; **same sigma**; Gaussian |
-| metric | out-of-sample log-likelihood differential, M1 − M0 |
-| statistic | Diebold-Mariano with HAC, Bartlett, lag 14, threshold `t > 2.0` |
-| negative control | N0 block permutation, 20-row blocks |
-| search budget | 2 model families, 1 feature set, **0 hyperparameters tuned**, 1 horizon |
+| information set | `ret_1`, `ret_5`, `rv_30` from bars in `[t-30min, t]`, 30-minute warmup |
+| target | `log(close[t+15min] / close[t])`, elapsed, exact bar required, no imputation |
+| M0 | zero mean, `sd = rv_30 · k`, Gaussian |
+| M1 | mean `a + b1·ret_1 + b5·ret_5` (OLS on train), same sd, Gaussian |
+| statistic | Diebold-Mariano, Bartlett HAC, lag 14, threshold `t > 2.0` |
 | result | `t = 0.7525`, **NO_SIGNAL**, n = 165,958 |
 
-**So EXP-001B tested exactly one thing: whether a linear conditional mean in two
-features beats a zero mean, holding the variance model and the distribution family
-fixed.** It did not test nonlinearity, distribution shape, conditional variance
-beyond `rv_30` scaling, or any richer state.
-
-The correct reading: **this specification did not demonstrate predictive
-improvement over its comparator on the validation period.** It does not reject the
-World Model idea and it does not test the options engine.
+It tested **only** whether a linear conditional mean beats a zero mean, with the
+variance model and distribution family held fixed. It is preserved as a completed
+NO_SIGNAL result and is not revisited.
 
 ---
 
-## 2. THE TRAP THIS PROTOCOL HAS TO AVOID
+## 2. THE ARMS — FIVE, WITH SCALE AND TAIL SHARED WHERE IT MATTERS
 
-The metric is log-likelihood. **A challenger can win on log-likelihood purely by
-fitting fatter tails, while carrying no conditional information whatsoever.**
-Fifteen-minute equity returns are strongly leptokurtic, so a Student-t will very
-likely beat a Gaussian on density alone. That would look like a discovery and be
-nothing of the kind.
+v1 had four arms and could not isolate nonlinearity: quadratic-t against
+linear-Gaussian differs in **two** ways at once. A matched linear-t arm is added.
 
-The design below separates the two with an explicit ablation. This is the single
-most important feature of the protocol.
+| arm | mean | family | scale / tail parameters |
+|---|---|---|---|
+| **M0** | zero | Gaussian | `k` on fit split |
+| **M1** | linear | Gaussian | `k` on fit split |
+| **S** | **zero** | Student-t | **shared** `(k*, ν*)` |
+| **L** | **linear** | Student-t | **shared** `(k*, ν*)` |
+| **C** | **quadratic** | Student-t | **shared** `(k*, ν*)` |
 
----
+`C`'s mean is `a + b1·ret_1 + b5·ret_5 + b11·ret_1² + b55·ret_5² + b15·ret_1·ret_5`.
 
-## 3. THE ARMS
+### Shared parameters, and why
 
-Information set and forecast target are **held constant** at EXP-001B's, so the only
-thing varying is model flexibility.
+In v1, `S` and `C` each estimated their own `ν` from their own residuals, so `C − S`
+mixed a mean change with a shape change. **`(k*, ν*)` are now estimated once**, on
+the fitting split, from the **linear-mean** residuals, and the identical values are
+used by `S`, `L` and `C`. The only thing that varies across those three arms is the
+mean specification.
 
-| arm | mean | scale | family | purpose |
-|---|---|---|---|---|
-| **M0** | zero | `rv_30 · k` | Gaussian | registered baseline |
-| **M1** | linear in `ret_1, ret_5` | `rv_30 · k` | Gaussian | registered linear challenger |
-| **S** (shape control) | **zero** | `rv_30 · k` | **Student-t**, ν on train | isolates gain from tail shape alone |
-| **C** (challenger) | quadratic basis in `ret_1, ret_5` | `rv_30 · k` | **Student-t**, ν on train | nonlinear conditional mean + flexible shape |
+### Scale versus standard deviation
 
-C's mean is `a + b1·ret_1 + b5·ret_5 + b11·ret_1² + b55·ret_5² + b15·ret_1·ret_5`,
-by ordinary least squares on the fitting split. Nonlinear in the features, linear in
-the parameters, closed form, **no tuned hyperparameters**. ν is estimated once on
-fitting-split residuals by one-dimensional maximum likelihood, identically for S and
-C, and is a fitted parameter rather than a searched one.
+`rv_30 · k` defines the **standard deviation**, as it does for the Gaussian arms.
+The Student-t **scale** is derived as `sd · sqrt((ν − 2) / ν)`, so the second moment
+is matched across every arm. Without this the comparison would confound shape with
+variance.
 
-### The decision rule, fixed before any fit
+### The primary question
 
-C is promoted only if **both** hold on the primary development split:
-
-1. `DM-HAC(C − S) > 2.0` — the gain survives removal of the shape advantage, so it
-   is **conditional information** rather than better tails.
-2. `DM-HAC(C − max(M0, M1)) > 2.0` — it beats the **strongest** registered
-   comparator, not the weaker one.
-
-All four differentials are reported regardless: C−M0, C−M1, C−S, S−M0. **S−M0 is
-expected to be large and is not a finding.**
+**`C − L`: does a quadratic mean improve forecasts when scale, tail and information
+set are held fixed?** That is the experiment. Everything else is context.
 
 ---
 
-## 4. CHRONOLOGICAL SPLITS, AND AN HONEST PROBLEM
+## 3. PROMOTION RULE — NAMED PAIRWISE COMPARISONS
+
+`max(M0, M1)` is withdrawn: it was ambiguous between a per-row winner and a best
+average comparator. Every comparison is now an explicitly named pair.
+
+**Gates. All three must pass on the development split.**
+
+| gate | comparison | what it establishes |
+|---|---|---|
+| G1 **primary** | `C − L` | the quadratic mean adds information, holding scale and tail fixed |
+| G2 | `C − M1` | it also beats the registered linear Gaussian challenger |
+| G3 | `C − M0` | it also beats the registered baseline |
+
+Each at `DM-HAC t > 2.0`, one-sided, in favour of `C`.
+
+**Reported, with no promotion authority:** `L − M1`, `S − M0`, `L − S`, `M1 − M0`.
+**`S − M0` is expected to be large and is not a finding.**
+
+### Multiplicity
+
+The three gates form a **conjunction**, evaluated as an intersection-union test.
+Requiring all three to pass at level α controls the type-I rate at **no more than
+α**; a conjunction cannot inflate it, so no correction is applied and none is
+needed. This is stated because applying one here would be wrong, not merely
+unnecessary.
+
+The four reported comparisons form a separate family and carry **Holm-Bonferroni**
+correction across the four. They are exploratory, they cannot promote anything, and
+their corrected and uncorrected values are both reported.
+
+**No subgroup, regime, session or hour analysis is permitted.** Any such comparison
+would be an unregistered additional test and is outside the budget.
+
+---
+
+## 4. DEPENDENCE — TWO INFERENCES, DECIDED IN ADVANCE
+
+HAC at lag 14 is an **overlap-motivated choice**, not a demonstration that all
+dependence is handled. Overlapping 15-minute targets guarantee dependence out to 14
+lags; they do not bound it there.
+
+- **Primary:** Diebold-Mariano, Bartlett HAC, lag 14.
+- **Robustness, specified before any result:** a **session-block** inference. Blocks
+  are whole trading sessions, since the overlap is within-session and sessions are
+  separated by an overnight gap. Stationary block bootstrap over session blocks,
+  10,000 resamples, seed `20260909`.
+
+**Disagreement rule, fixed now:** if the two inferences disagree on any gate, the
+gate **fails**. The disagreement is reported with both statistics. Selection never
+takes the more favourable of the two.
+
+---
+
+## 5. NULL CONTROL — PER-DIFFERENTIAL, NOT BLANKET
+
+"NO_SIGNAL for every arm" was not a defined test and was wrong. **N0 block
+permutation (20-row blocks) destroys the association between state and outcome. It
+preserves the marginal distribution of outcomes and the state sequence.**
+
+A Student-t arm therefore beats a Gaussian **legitimately** under N0, because the
+outcome's fat tails survive permutation. Requiring NO_SIGNAL there would have
+condemned correct behaviour.
+
+| differential | channel destroyed | required under N0 |
+|---|---|---|
+| `C − L` | conditional mean | **NO_SIGNAL** |
+| `C − M1` | conditional mean and shape | **NO_SIGNAL** on the mean channel; a residual shape gain is permitted and reported |
+| `M1 − M0` | conditional mean | **NO_SIGNAL** |
+| `S − M0` | none — pure shape | **gain PERMITTED**; NO_SIGNAL is not required and not expected |
+| `L − S` | conditional mean | **NO_SIGNAL** |
+
+Failure of a required NO_SIGNAL invalidates the tournament.
+
+---
+
+## 6. POSITIVE CONTROLS — FOUR WORLDS, PRE-REGISTERED
+
+A planted linear signal does not establish sensitivity to the **nonlinear**
+improvement being tested. Four synthetic worlds, run **before** any market-data fit.
+Seeds, effect sizes and expected outcomes are fixed here.
+
+| world | construction | seed | effect | `C − L` expected | other expectations |
+|---|---|---|---|---|---|
+| **W1 linear** | `y = 0.05·ret_1 + ε`, Gaussian ε | 1001 | small | **NO_SIGNAL** | `M1 − M0` SIGNAL |
+| **W2 nonlinear** | `y = 0.08·ret_1·ret_5 + ε`, Gaussian ε | 1002 | small | **SIGNAL** | `M1 − M0` NO_SIGNAL |
+| **W3 heavy tail only** | `y = ε`, Student-t ε with ν = 4, no conditioning | 1003 | none | **NO_SIGNAL** | `S − M0` SIGNAL |
+| **W4 null world** | `y = ε`, Gaussian ε, no conditioning | 1004 | none | **NO_SIGNAL** | nothing significant anywhere |
+
+**W2 is the control that matters.** It is built so the linear mean cannot capture
+it. If `C − L` does not detect W2, the tournament has no demonstrated sensitivity to
+its own hypothesis and **stops there**, reporting that.
+
+W3 is the mirror: shape improves with no conditional-mean discovery, and `C − L`
+must stay silent.
+
+Effect sizes are chosen so W1 and W2 land in a detectable range at n comparable to
+the development split. If an effect proves too small or too large to discriminate,
+that is reported as an inconclusive control, and the sizes are **not** retuned to
+produce a pass.
+
+---
+
+## 7. SPLITS
 
 | span | role |
 |---|---|
 | 2016-01-04 → 2018-12-31 | **fit** |
-| 2019-01-01 → 2019-12-31 | **primary development split** |
-| 2020-01-01 → 2021-12-31 | **OBSERVED** — secondary only |
-| 2022-01-01 → 2024-12-31 | **SEALED** evaluation, untouched |
-| 2025-01-01 → 2026-08-28 | **SEALED** reserve, untouched |
+| 2019-01-01 → 2019-12-31 | **development selection**, previously used in training |
+| 2020-01-01 → 2021-12-31 | **OBSERVED** — secondary reporting only, no authority |
+| 2022-01-01 → 2024-12-31 | **SEALED** evaluation |
+| 2025-01-01 → 2026-08-28 | **SEALED** reserve |
 
-**2020–2021 has now been observed.** EXP-001B's validation result on it is known, so
-it can never again be presented as untouched evidence in model selection. It is
-reported here as a secondary check with that status attached, and it carries no
-promotion authority.
+**2019 is labelled *previously used in training*, not pristine holdout evidence.**
+It sat inside EXP-001B's fitting window, so its outcomes contributed to `k`, `a`,
+`b1`, `b5` of a model whose validation outcome is now known.
 
-**2019 is the cleanest split available, and it is not pristine.** It sat inside
-EXP-001B's fitting window, so its outcomes influenced parameters of a model whose
-validation outcome we now know. The leakage channel is indirect and weak. It is
-declared, not claimed absent.
+**v1 called that influence "weak". That was unsupported and is withdrawn.** The
+magnitude is **unmeasured**. It will be measured as part of the run: refit `M0` and
+`M1` on 2016–2018 alone and report the parameter displacement and the development
+log-likelihood difference against the 2016–2019 fit. Until that number exists the
+influence is **undescribed**, not small.
 
-Everything is chronological. No shuffling, no cross-validation across time.
+**2020–2021 has been observed and can never again be presented as untouched
+evidence.**
 
 ---
 
-## 5. DISCIPLINE
+## 8. ESTIMATION — BOUNDS, RULES, AND FAILURE
 
-**Train-only transformations.** `k`, ν, and every regression coefficient are
-estimated on the fitting split alone. No standardisation, winsorisation or scaling
-uses any statistic computed outside it. Feature construction is per-row and
-backward-looking by construction.
+**Train-only, enumerated.** `k*`, `ν*`, and every regression coefficient come from
+the fitting split alone. No standardisation, winsorisation, clipping or scaling uses
+any statistic from outside it. Features are per-row and backward-looking by
+construction. The quadratic basis uses **raw** features; no scaling is introduced,
+and the conditioning check below guards the consequence.
 
-**Calibration, reported whatever the verdict.** Probability integral transform
-histogram, and empirical coverage at the 5th, 50th and 95th percentiles, for every
-arm on the development split. A challenger that wins on likelihood while
-miscalibrated is reported as such.
+**`k*`**: `mean(|y|) / mean(rv_30)` on the fit split, as registered. Bound `k* > 0`.
 
-**Dependence handling.** Unchanged: Diebold-Mariano with Bartlett HAC at lag 14,
-matching the 15-minute horizon's overlap. Reported alongside the naive standard
-error so the inflation factor stays visible.
+**`ν*`**: one-dimensional maximum likelihood on fit-split residuals of the **linear**
+mean, over `log ν`, by bounded Brent. Bounds `ν ∈ [2.1, 50]`, tolerance `1e-8`, at
+most 200 iterations. The lower bound keeps the variance finite so the
+moment-matching in §2 is defined.
 
-**Negative control.** N0 block permutation, 20-row blocks, state preserved. Must
-return NO_SIGNAL for every arm.
+**OLS**: closed form via normal equations. If the design matrix condition number
+exceeds `1e10`, the arm is **REFUSED**. No ridge or other regularisation is added,
+because a penalty strength would be a tuned hyperparameter and the budget is zero.
 
-**Positive control — blocking, and run first.** On synthetic data with a planted
-AR(1) mean signal, the pipeline must return SIGNAL_DETECTED at the registered
-threshold. **If it does not, the tournament stops and reports that instead.** This
-exists because EXP-001B established no detection power, as recorded in the reporting
-corrections.
+**Numerical failure behaviour.** If the optimiser fails to converge, or `ν*` lands
+on either bound, or a condition-number check trips, the affected arm returns
+`INVALID_INPUT` and the tournament reports it. **Nothing is clamped silently, no
+fallback estimator is substituted, and no arm is quietly dropped.**
 
-**Fixed search budget, declared in advance.**
+---
+
+## 9. FIT BUDGET, DECLARED IN ADVANCE
 
 | | |
 |---|---|
-| model families | 2 new (S, C) plus 2 registered (M0, M1) |
-| feature sets | 1, unchanged from EXP-001B |
-| hyperparameters tuned | **0** |
+| market-data arms | **5** — M0, M1, S, L, C |
+| market-data fits | **5**, one per arm, one pass over the fit split |
+| information sets | 1, unchanged from EXP-001B |
 | horizons | 1, unchanged |
-| total fits | 4, one per arm, one pass |
-| refits permitted after seeing any result | **0** |
+| tuned hyperparameters | **0** |
+| refits after seeing any result | **0** |
+| leakage-measurement refits | **2** — M0 and M1 on 2016–2018, per §7, declared |
+| **synthetic control fits, counted separately** | **20** — 4 worlds × 5 arms |
+
+Control runs are on synthetic data and are **not** market-data fits. They are
+counted here so the two budgets can never be conflated.
 
 ---
 
-## 6. WHAT IS FORBIDDEN
+## 10. WHAT A RESULT WOULD MEAN — NARROWED
 
-- Lowering or renegotiating EXP-001B's threshold.
-- Searching EXP-001B's results for winning subsets, sessions, regimes or hours.
-- Rerunning EXP-001B with tuned parameters.
+**If all three gates pass:** this **selects `C` as a candidate for later
+confirmation** on evidence not yet used. It does **not** establish validated alpha,
+does not establish economic value, does not open the sealed period, and does not
+license anything in options. Development selection on a split previously used in
+training is candidate generation, nothing more.
+
+**If any gate fails:** **this particular quadratic specification, on this
+information set, at this horizon, did not demonstrate improvement.** It does not
+settle nonlinear models in general and says nothing about the value of richer state,
+which is a separate question for a separate experiment.
+
+**Better tail calibration is a legitimate distributional improvement.** It is not
+evidence of directional information and not evidence of tradable mispricing. Any
+gain attributable to `S` is reported as calibration, never as alpha.
+
+---
+
+## 11. FORBIDDEN
+
+- Lowering EXP-001B's threshold, searching its results for winning subsets, or
+  rerunning it with tuned parameters.
 - Opening the sealed evaluation or reserve periods.
 - Presenting 2020–2021 as untouched evidence.
+- Retuning control effect sizes to produce a pass.
+- Any subgroup, regime, session or hour analysis.
 - Computing any economic quantity. This stage is distributional only.
 
-EXP-001B is preserved as a **completed NO_SIGNAL result** and is not revisited.
-
 ---
 
-## 7. WHAT A RESULT WOULD AND WOULD NOT MEAN
+## 12. OPEN FOR REVIEW
 
-If C passes both gates: **a nonlinear conditional mean carries information the linear
-one missed, on this information set at this horizon.** It would not establish
-economic value, would not open the sealed period, and would not license options
-deployment.
-
-If C fails: model flexibility on this information set does not help, which points the
-next step at **richer state** rather than richer models. That is the intended
-sequence — test whether a better model extracts information the first one missed,
-then separately test whether richer state adds more.
-
-The most likely outcome remains no signal, and that stays a real result.
-
----
-
-## 8. WHAT I NEED FROM REVIEW
-
-1. Do you accept 2019 as the primary development split, with its declared imperfection?
-2. Do you accept the shape-control ablation as the guard against a tail-fitting win?
-3. Do you accept the two-gate promotion rule?
-4. Should the positive control be broadened beyond a planted AR(1) mean?
+1. Is the shared `(k*, ν*)` estimated from **linear-mean** residuals the right
+   reference, or should it come from the zero-mean residuals?
+2. Are the W1 and W2 effect sizes the right magnitudes, given they are fixed now and
+   may not be retuned?
+3. Is the session-block bootstrap the robustness check you want, and is
+   "disagreement fails the gate" the right severity?
+4. Should the leakage measurement in §7 gate the tournament, or only be reported
+   alongside it?
 
 On approval this becomes a registered experiment with its own hash, and only then
 does it need an admission and a fitting run.
