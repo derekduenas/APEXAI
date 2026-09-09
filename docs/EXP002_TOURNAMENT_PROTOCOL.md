@@ -1,332 +1,250 @@
-# EXP-002 — BOUNDED CHALLENGER TOURNAMENT, PROTOCOL v3
+# EXP-002 — BOUNDED CHALLENGER TOURNAMENT, EXECUTABLE SPECIFICATION (v4)
 
-**Revision for review. Nothing fitted, no admission requested, no historical data
-touched. EXP-001B is unchanged.** Supersedes v2 at `ea1eb4c`.
+**Implemented for synthetic qualification only.** Historical fitting and admission
+remain closed. EXP-001B is unchanged and preserved as a completed NO_SIGNAL result.
+The registered constants live in `apex/world_model/exp002/registration.py`, whose
+hash is the registration hash; this document describes them and must not drift.
 
-A small nonlinear forecasting experiment. It tests a **forecasting component**;
-option-price comparison and executable payoff economics are separate later stages,
-and the options-only objective is untouched here.
+This tests a **forecasting component**. Option-price comparison and payoff
+economics are separate later stages. The options-only objective is untouched.
 
 ---
 
 ## 1. WHAT EXP-001B TESTED
 
-Information set `ret_1, ret_5, rv_30` from `[t-30min, t]`. Target
-`log(close[t+15min]/close[t])`. **M0**: zero mean, `sd = rv_30 · k`, Gaussian.
-**M1**: mean `a + b1·ret_1 + b5·ret_5` (OLS), same sd, Gaussian. DM-HAC lag 14,
-threshold 2.0. Result `t = 0.7525`, **NO_SIGNAL**, n = 165,958.
-
-It tested only whether a linear conditional mean beats a zero mean, with variance
-model and distribution family fixed. It is preserved and not revisited.
+Information set `ret_1, ret_5, rv_30` from `[t-30min, t]`; target
+`log(close[t+15min]/close[t])`; M0 zero-mean Gaussian with `sd = rv_30·k`; M1
+linear-mean Gaussian, same sd; DM-HAC lag 14, threshold 2.0. Result `t = 0.7525`,
+NO_SIGNAL, n = 165,958. It tested only a linear conditional mean against zero, with
+variance model and family fixed.
 
 ---
 
-## 2. ARMS
+## 2. ARMS — AS IMPLEMENTED
 
-| arm | mean | family | scale / tail |
-|---|---|---|---|
-| **M0** | zero | Gaussian | registered `k` — **unchanged from EXP-001B** |
-| **M1** | linear | Gaussian | registered `k` — **unchanged** |
-| **S** | zero | Student-t | shared `(s*, ν*)` |
-| **L** | linear | Student-t | shared `(s*, ν*)` |
-| **C** | quadratic | Student-t | shared `(s*, ν*)` |
+| arm | mean | family | dispersion | code |
+|---|---|---|---|---|
+| M0 | zero | Gaussian | registered `k` | `exp001b.models`, imported unchanged |
+| M1 | linear | Gaussian | registered `k` | `exp001b.models`, imported unchanged |
+| S | zero | Student-t | shared `(s*, ν*)` | `exp002.models` |
+| L | linear (SVD, centred/scaled basis) | Student-t | shared `(s*, ν*)` | `exp002.models` |
+| C | quadratic (SVD, centred/scaled basis) | Student-t | shared `(s*, ν*)` | `exp002.models` |
 
-`C`'s mean is `a + b1·ret_1 + b5·ret_5 + b11·ret_1² + b55·ret_5² + b15·ret_1·ret_5`.
+**Shared reference, one estimation.** `e = y − μ_L(x)` on the fit split, `z = e/rv_30`,
+`(s*, ν*) = argmax Σ log t_ν(z; scale s)`. S, L and C use `scale = rv_30·s*` with the
+same `ν*`. Within the t-family only the mean varies.
 
-### The `k*` contradiction in v2, resolved
+**Variance is not matched across families.** `k` and `s*` are different estimators
+on different quantities. `C−L` and `L−S` isolate the mean; `C−M1`, `C−M0`, `S−M0` are
+**compound** and are never described as isolating anything.
 
-v2 said the shared reference came from **linear-mean residuals** but then defined
-`k*` as `mean(|y|)/mean(rv_30)`, which uses **raw outcomes**. Those are different
-estimators and the document asserted both. Resolved as follows.
-
-`(s*, ν*)` are obtained by **one two-parameter maximum-likelihood fit** on the
-fit-split **linear-mean residuals**, standardised by `rv_30`:
-
-```
-e = y − μ_L(x)          μ_L from the linear OLS fit on the fit split
-z = e / rv_30
-(s*, ν*) = argmax  Σ log t_ν( z ; scale = s )
-```
-
-`S`, `L` and `C` then use `scale = rv_30 · s*` with the same `ν*`. One estimation,
-one pair of parameters, all three arms identical outside the mean.
-
-**M0 and M1 keep the registered `k` from `mean(|y|)/mean(rv_30)`, untouched.** They
-are the registered baselines and are not re-specified to suit this tournament.
-
-### Variance is NOT matched across families — correction
-
-v2 claimed second moments were "matched across every arm". **That was wrong.**
-Matching a Student-t's implied standard deviation to its own scale says nothing
-about whether it equals the Gaussian arms' standard deviation, and it does not,
-because `k` and `s*` come from different estimators on different quantities.
-
-The honest position:
-
-- **Within the t-family** (`S`, `L`, `C`) scale and tail are **identical**, so
-  `C − L` and `L − S` isolate the mean specification exactly. This is where the
-  experiment's claim lives.
-- **Across families** (`C − M1`, `C − M0`, `S − M0`) the comparison is **compound**:
-  mean, distribution family and fitted dispersion all differ. Those are reported as
-  compound comparisons and are never described as isolating anything.
+**Standard deviation versus scale.** `implied sd = scale · sqrt(ν/(ν−2))`. The
+`total_uncertainty` field carries the implied sd; the scale and ν travel in the
+sealed `calibration_metadata`.
 
 ---
 
-## 3. GATES AND MULTIPLICITY
+## 3. ESTIMATION — COMPLETE
 
-**Primary, matched:** `G1 = C − L`. Does the quadratic mean improve on the linear
-mean with scale, tail and information set held fixed?
-
-**Secondary, compound, also required:** `G2 = C − M1`, `G3 = C − M0`.
-
-Each one-sided in favour of `C`, at the thresholds in §4, and **all three must pass
-under both inference methods**.
-
-**Reported, no promotion authority:** `L − S`, `L − M1`, `S − M0`, `M1 − M0`, with
-Holm correction across those four, uncorrected values shown alongside.
-
-### Multiplicity, stated correctly
-
-v2 said applying a correction to the conjunction "would be wrong". **That
-overstated it.** The intersection-union argument is appropriate for a fixed
-conjunction of valid component tests, and requiring all three to pass controls the
-type-I rate at no more than α. An additional correction would be **conservative,
-not mathematically incorrect**. None is applied.
-
-Two things this does **not** do, stated because they are easy to assume. It does
-not erase the search already conducted across this research programme. And it does
-not make 2019 confirmatory evidence: 2019 is development data with prior exposure,
-and a pass there is candidate selection.
-
----
-
-## 4. INFERENCE — BOTH REQUIRED, DISAGREEMENT IS ITS OWN VERDICT
-
-**Primary:** Diebold-Mariano, Bartlett HAC, lag 14, one-sided `t > 2.0`. The lag is
-**overlap-motivated**, not a demonstration that dependence is bounded there.
-
-**Secondary, specified before any result:** stationary bootstrap (Politis–Romano)
-over whole trading sessions.
-
-| | |
+| item | rule |
 |---|---|
-| block length | geometric, **expected length 5 sessions** (one trading week) |
-| why 5 | volatility dependence persists across days; this is a **declared choice**, not a derivation |
-| sensitivity | also reported at expected lengths 1 and 10; a gate passing only at one length is reported as such |
-| unequal sessions | sessions are resampled whole and their **row-level** differentials concatenated, so a session contributes in proportion to its row count |
-| construction | centred: the bootstrap distribution of `mean* − mean_obs` |
-| threshold | one-sided `p < 0.0228`, the normal-theory equivalent of `t > 2.0` |
-| resamples | 10,000; seed `20260909` |
+| least squares | `numpy.linalg.lstsq` (SVD), `rcond = 1e-12`; rank `< p` → **REFUSED** `RANK_DEFICIENT` |
+| basis conditioning | non-intercept columns centred and scaled by **fit-split** mean and sd; affine, span unchanged, no hyperparameter |
+| zero-variance column | **REFUSED** `ZERO_VARIANCE_FEATURE` |
+| registered baselines | fitted by the registered `_ols2`, **without** centring; their own refusal surfaces as `REGISTERED_BASELINE_REFUSED` |
+| `(s*, ν*)` | two-parameter ML, **Nelder-Mead** on `(log s, log ν)`, coefficients α=1, γ=2, ρ=0.5, σ=0.5 |
+| initialisation | `ν₀ = 6`, `s₀ = std(z)·sqrt((ν₀−2)/ν₀)`, simplex steps 0.1 |
+| stopping | `max|fᵢ − f_best| < 1e-8` and simplex diameter `< 1e-8`; else 500 iterations → **REFUSED** `OPTIMIZER_NO_CONVERGENCE` |
+| ν bounds | `[2.1, 50]`, enforced as infinite walls |
+| ν at **upper** bound | **legitimate** near-Gaussian outcome; `nu_at_upper_bound = true`; run proceeds |
+| ν at **lower** bound | **REFUSED** — a declared model-domain policy. Variance is finite at 2.1; the dispersion comparison is degenerate that close to 2. |
+| zero volatility | rows with `rv_30 < 1e-9` refused **at admission for every arm**, so pairing is preserved; count reported |
+| numerical failure | `INVALID_INPUT` for the tournament; nothing clamped, substituted or dropped |
 
-**v2 claimed the overnight gap separates sessions. Withdrawn — an overnight gap does
-not establish independence between days.** Session blocks are used because
-dependence is *concentrated* within sessions, not because days are independent, and
-the geometric block length exists precisely to carry dependence across session
-boundaries.
-
-**Disagreement rule.** Both must pass. If they disagree the verdict is
-**`NOT_SELECTED — INFERENCE_DISAGREEMENT`**, reported with both statistics. That is
-neither a broken experiment nor evidence that no information exists; it is an
-unresolved inference, and selection does not proceed on it.
+**Train-only, enumerated:** `k`, `s*`, `ν*`, all coefficients, and the centring and
+scaling constants come from the fit split alone.
 
 ---
 
-## 5. NULL CONTROL — MATCHED PAIRS ONLY
+## 4. SCORING
 
-N0 block permutation, 20-row blocks. **What it does, precisely:** it permutes
-outcome blocks against the state sequence. It **preserves** the marginal
-distribution of outcomes and the state sequence including `rv_30`. It **destroys**
-every outcome-to-state association — the conditional mean **and** the conditional
-variance, since the link between an outcome's magnitude and its row's `rv_30` is
-broken.
+Gaussian arms are scored by the **untouched** `apex.world_model.grader`. Student-t
+arms are scored by `exp002.scoring` in the same `Grade` shape, using
+`exp002.studentt`, a self-contained density, CDF (regularised incomplete beta by
+continued fraction, with the complement formed exactly so the CDF is not flat around
+the median) and quantile. Tests anchor it to the closed-form Cauchy and ν=2 CDFs,
+to the normal in the large-ν limit **via the known first-order expansion**
+`(x⁴−2x²−1)/(4ν)`, and to the grader in the Gaussian limit.
 
-Consequently every arm is mis-scaled under N0 in the same way, which is harmless for
-matched pairs and uninterpretable for unmatched ones.
+**A log-likelihood gain is a distributional-score improvement.** Calibration is a
+separate claim: PIT mean, sd and 10-bin histogram, and empirical coverage at 0.05,
+0.50, 0.95, are reported for every arm regardless of any verdict.
 
-| differential | matched? | requirement under N0 |
+---
+
+## 5. INFERENCE — BOTH REQUIRED
+
+**Primary:** Diebold-Mariano, Bartlett HAC, lag 14 (overlap-motivated, not proof of
+bounded dependence), one-sided `t > 2.0`.
+
+**Secondary:** stationary bootstrap over **whole sessions**, geometric block length
+with **expected length 5 sessions** (a declared research choice, not optimality);
+sessions resampled whole and their row-level differentials concatenated, so each
+contributes in proportion to its rows; **centred**, one-sided `p < 0.0228`;
+10,000 resamples; seed 20260909. Sensitivity at expected lengths **1 and 10**,
+reported; a gate passing only at one length is flagged, and selection never
+switches to whichever passes.
+
+**Disagreement** between HAC and the 5-session bootstrap on the primary gate is
+**`NOT_SELECTED_INFERENCE_DISAGREEMENT`** — an unresolved inference, not a broken
+experiment and not evidence of no information.
+
+---
+
+## 6. GATES, VERDICTS, MULTIPLICITY
+
+| gate | pair | role |
 |---|---|---|
-| `C − L` | yes, identical scale and tail | **NO_SIGNAL** |
-| `L − S` | yes | **NO_SIGNAL** |
-| `M1 − M0` | yes, identical `k` and family | **NO_SIGNAL** |
-| `C − M1`, `C − M0`, `S − M0` | **no** — mixes mean, family and dispersion | **no requirement**; reported only |
+| G1 | `C − L` | **matched, primary** |
+| G2 | `C − M1` | compound |
+| G3 | `C − M0` | compound |
 
-v2's "NO_SIGNAL on the mean channel" for `C − M1` is withdrawn: that differential
-mixes mean and distribution changes and the instruction was not executable. Null
-assertions are now made **only** on matched comparisons.
+| verdict | condition | meaning |
+|---|---|---|
+| `MATCHED_IMPROVEMENT` | G1 passes both inferences | the quadratic mean improves this matched forecast on development data |
+| `BASELINE_REPLACEMENT_CANDIDATE` | matched **and** G2 **and** G3 pass both | candidate for later confirmation against the existing alternatives |
+| `MATCHED_IMPROVEMENT_ONLY` | G1 passes, a compound gate fails | the finding is preserved; the baseline is not replaced |
+| `NOT_SELECTED` | G1 fails under both | this specification did not demonstrate improvement |
+| `NOT_SELECTED_INFERENCE_DISAGREEMENT` | HAC and bootstrap disagree on G1 | unresolved |
+| `INVALID_NULL_CONTROL` | a required null assertion fails | the tournament is void |
 
-Failure of a required NO_SIGNAL invalidates the tournament.
+**Reported, no promotion authority:** `L−S`, `L−M1`, `S−M0`, `M1−M0`, with
+Holm-Bonferroni across the four, uncorrected values alongside.
+
+**Multiplicity.** The gate conjunction is an intersection-union test: requiring all
+of a fixed set of valid component tests to pass controls the type-I rate at no more
+than α. An additional correction would be **conservative, not incorrect**; none is
+applied. This does not erase prior search across the programme and does not make
+2019 confirmatory.
+
+No subgroup, regime, session or hour analysis is permitted.
 
 ---
 
-## 6. POSITIVE CONTROLS — STANDARDISED, WITH DECLARED SIGNAL-TO-NOISE
+## 7. NULL CONTROL — A STRESS TRANSFORMATION ON MATCHED PAIRS
 
-v2's coefficients `0.05` and `0.08` did not define signal strength. **On raw
-returns, `ret_1 · ret_5` has magnitude around `1e-8`, so the interaction world would
-have been effectively empty.** Controls are therefore specified in **standardised**
-feature units with a declared signal-to-noise ratio.
+**What is permuted:** the outcome sequence `y`, in blocks of 20 consecutive
+evaluation rows, block order shuffled with the run seed.
+**What is fixed:** every forecast — models are **not** refitted and forecasts are
+**not** recomputed differently; the state sequence including `rv_30`.
+**What is broken:** the row-level pairing of outcome with state, hence the
+conditional-mean **and** conditional-variance structure.
+**What survives:** the marginal outcome distribution and the state sequence.
 
-**Generator.** Standardised features `z1, z5` with `mean 0, sd 1`, carrying declared
-AR(1) serial dependence `φ = 0.3` to mimic overlap. `rv_30` is generated
-independently and positive. Outcome `y = β·g(z) + ε` where `g` is the world's signal
-and `β` is set so that
+Every arm is therefore mis-scaled in the same way, which is why assertions are made
+**only** on matched pairs:
 
-```
-R² = Var(β·g(z)) / Var(y) = declared value
-```
+| pair | required under N0 |
+|---|---|
+| `C − L` | NO_SIGNAL |
+| `L − S` | NO_SIGNAL |
+| `M1 − M0` | NO_SIGNAL |
+| `C−M1`, `C−M0`, `S−M0` | **no assertion** (compound); `S−M0` reported |
 
-**Orthogonality.** In W2 the signal is `g = z1·z5`. With `z1, z5` independent and
-mean-zero, `E[z1²z5] = E[z1z5²] = 0`, so the interaction is **uncorrelated with both
-linear features by construction**, and a linear mean cannot absorb it. This is the
-property that makes W2 a real test of nonlinear sensitivity.
+---
 
-| world | signal `g` | R² | seed | `C − L` expected | other expectations |
+## 8. SYNTHETIC CONTROL WORLDS — COMPLETE GENERATOR
+
+Rows are generated directly in the shape the tournament consumes.
+
+| element | specification |
+|---|---|
+| sessions | 750 fit + 250 development, 330 rows each; state reset per session |
+| features | `z1, z5` independent AR(1), `φ = 0.3`, innovations scaled to unit marginal variance; `ret_1 = 3e-4·z1`, `ret_5 = 6.7e-4·z5` |
+| volatility | `rv_30 = exp(ℓ)`, `ℓ` AR(1) with `φ = 0.9` around `log(3e-4)`, marginal sd 0.3 |
+| noise | `ε_t = (1/√15)·Σ_{j=0..14} u_{t+j}` — an MA(14) of iid shocks with unit variance, mimicking the 15-minute overlap |
+| outcome | `y = rv_30 · (β·g + ε)` |
+| signal-to-noise | `R² = β²/(β²+1)`, so `β = sqrt(R²/(1−R²))` with `Var(g) = 1` |
+| orthogonality | `g = z1·z5` is uncorrelated with `z1` and `z5` by construction |
+
+| world | `g` | R² | seed | noise | role |
 |---|---|---|---|---|---|
-| **W1 linear** | `z1` | 0.0010 | 1001 | **NO_SIGNAL** | `M1 − M0` SIGNAL |
-| **W2 interaction** | `z1·z5` | 0.0010 | 1002 | **SIGNAL** | `M1 − M0` NO_SIGNAL |
-| **W3 heavy tail only** | none; `ε` Student-t, ν = 4 | 0 | 1003 | **NO_SIGNAL** | `S − M0` gain permitted |
-| **W4 null** | none; `ε` Gaussian | 0 | 1004 | **NO_SIGNAL** | nothing significant |
+| W1_LINEAR | `z1` | 0.0010 | 1001 | Gaussian | basic pipeline check |
+| W2_INTERACTION | `z1·z5` | 0.0010 | 1002 | Gaussian | **weak-signal sensitivity diagnostic** — not a power estimate |
+| W2S_INTERACTION | `z1·z5` | 0.0100 | 1005 | Gaussian | **BLOCKING**: the pipeline must detect the intended nonlinear mechanism |
+| W3_HEAVY_TAIL | none | 0 | 1003 | Student-t ν=4, unit variance | shape improves with no conditional-mean discovery |
+| W4_NULL | none | 0 | 1004 | Gaussian | nothing anywhere |
 
-**Expected detectability, established before any market-data run.** For each world
-the analytic expected statistic is computed as
-`E[t] ≈ sqrt(n) · sqrt(R²) / ι`, with `ι` the HAC inflation factor set to **2.46**,
-the value observed in EXP-001B, and `n` the control sample size. `R² = 0.0010` and
-`n = 80,000` give `E[t] ≈ 3.6`. **The registration records this calculation, and if
-the realised control statistic departs from it materially that is reported as an
-inconclusive control.** Effect sizes are **not** retuned to produce a pass.
+**Declared expectations (HAC verdicts):**
 
-Control runs are on synthetic data and are counted separately from market-data fits.
+| world | `C−L` | `M1−M0` | `L−S` |
+|---|---|---|---|
+| W1 | NO_SIGNAL | SIGNAL | SIGNAL |
+| W2 (weak) | *diagnostic, not asserted* | NO_SIGNAL | — |
+| W2S (strong) | **SIGNAL, both inferences — blocking** | NO_SIGNAL | — |
+| W3 | NO_SIGNAL | NO_SIGNAL | NO_SIGNAL |
+| W4 | NO_SIGNAL | NO_SIGNAL | NO_SIGNAL |
+
+Blocking failures stop the tournament from proceeding to any historical fit. **One
+seeded realisation per world establishes behaviour on that fixture, not general
+detection power.** The earlier `E[t] ≈ √(nR²)/2.46` calculation is withdrawn: the
+inflation factor was specific to EXP-001B's loss differential and cannot be
+transferred to a different process.
 
 ---
 
-## 7. SPLITS
+## 9. SPLITS
 
 | span | role |
 |---|---|
-| 2016-01-04 → 2018-12-31 | **fit** |
-| 2019-01-01 → 2019-12-31 | **development data with prior exposure** |
+| 2016-01-04 → 2018-12-31 | fit |
+| 2019-01-01 → 2019-12-31 | **development data with prior exposure** — inside EXP-001B's fitting window; never pristine |
 | 2020-01-01 → 2021-12-31 | **OBSERVED** — secondary reporting only, no authority |
-| 2022-01-01 → 2024-12-31 | **SEALED** evaluation |
-| 2025-01-01 → 2026-08-28 | **SEALED** reserve |
+| 2022-01-01 → 2024-12-31 | SEALED evaluation |
+| 2025-01-01 → 2026-08-28 | SEALED reserve |
 
-2019 sat inside EXP-001B's fitting window. It is **development data with prior
-exposure**, never pristine holdout evidence, and a pass on it is candidate
-selection.
-
-### Training-window sensitivity — renamed, demoted, and no extra fits
-
-v2 proposed measuring "leakage" by refitting `M0`/`M1` without 2019. **That measures
-training-window sensitivity. It cannot quantify how knowledge of EXP-001B's result
-influenced this design**, which is not recoverable by refitting anything.
-
-It is renamed **training-window sensitivity**, it is a **diagnostic with no gate**,
-and it costs **no additional fits**: this tournament already fits `M0` and `M1` on
-2016–2018, so the comparison is against EXP-001B's **recorded** 2016–2019
-parameters. It is reported only if it is informative.
-
-**The influence of prior knowledge on this design is not measured and is not
-claimed to be small.**
+**Training-window sensitivity** (renamed from "leakage"): `M0`/`M1` fitted here on
+2016–2018 are compared with EXP-001B's recorded 2016–2019 parameters. A diagnostic
+with **no gate**, reported only if informative, costing **no extra fits**. It cannot
+quantify how knowledge of EXP-001B's result shaped this design; that influence is
+**not measured and not claimed small**.
 
 ---
 
-## 8. ESTIMATION
-
-**Train-only, enumerated.** `s*`, `ν*`, all regression coefficients, and the basis
-centring and scaling constants come from the fit split alone.
-
-**Least squares.** Predeclared **SVD** solver (`lstsq`) with `rcond = 1e-12`. Normal
-equations are not used. The quadratic basis columns are **centred and scaled by
-fit-split mean and standard deviation** before solving. That is an affine
-reparameterisation: it improves conditioning, does not change the function space
-spanned, and introduces no hyperparameter. **`M0` and `M1` are fitted exactly as
-registered, without centring**, so the baselines remain identical to EXP-001B's.
-
-**Student-t parameters.** Two-parameter ML on standardised linear-mean residuals per
-§2. Bounds `ν ∈ [2.1, 50]`, `s > 0`. Bounded optimisation on `(log s, log ν)`,
-tolerance `1e-8`, at most 500 iterations.
-
-### Boundary outcomes — declared in advance
-
-A Gaussian-like world will legitimately push `ν` to its upper bound. Under v2's
-rules that would have invalidated the controls themselves.
-
-| outcome | treatment |
-|---|---|
-| `ν*` at **upper** bound (50) | **legitimate**, recorded as `nu_at_upper_bound: true`. The t-arm is near-Gaussian by construction and the run proceeds. Expected in W1, W2 and W4. |
-| `ν*` at **lower** bound (2.1) | **refusal.** Variance is near-undefined and the dispersion comparison degenerates. |
-| optimiser non-convergence | **refusal** |
-| SVD rank deficiency at `rcond` | **refusal** |
-
-Reaching a declared bound is not automatically optimiser failure. Refusals return
-`INVALID_INPUT` for the affected arm and are reported; nothing is clamped silently,
-no fallback estimator is substituted, no arm is quietly dropped.
-
----
-
-## 9. SCORING AND CALIBRATION — SEPARATED
-
-**A likelihood gain is a distributional-score improvement.** It is **not**
-automatically better calibration, and v2's language conflated them.
-
-Calibration is a **separate claim requiring separate evidence**: the probability
-integral transform histogram, and empirical coverage at the 5th, 50th and 95th
-percentiles, reported for every arm on the development split **whatever the gates
-do**. No calibration claim is made without those diagnostics, and a distributional
-score gain accompanied by degraded coverage is reported as exactly that.
-
-Neither a score gain nor better calibration is evidence of directional information
-or of tradable mispricing.
-
----
-
-## 10. FIT BUDGET
+## 10. BUDGET
 
 | | |
 |---|---|
-| market-data arms | 5 — M0, M1, S, L, C |
-| market-data fits | **5**, one pass over the fit split |
-| additional leakage fits | **0** — the sensitivity diagnostic reuses these |
-| information sets | 1, unchanged |
-| horizons | 1, unchanged |
-| tuned hyperparameters | **0** |
-| refits after seeing any result | **0** |
-| **synthetic control fits, separate budget** | **20** — 4 worlds × 5 arms |
+| market-data fits | 5, one per arm, one pass |
+| tuned hyperparameters | 0 |
+| refits after seeing results | 0 |
+| information sets / horizons | 1 / 1 |
+| **synthetic control fits, separate budget** | **25** — 5 worlds × 5 arms |
 
 ---
 
-## 11. WHAT A RESULT MEANS
+## 11. MEMORY
 
-**All gates pass, both inferences:** `C` is **selected as a candidate for later
-confirmation** on evidence not yet used. Not validated alpha, not economic value,
-no opening of the sealed period, no options licence.
-
-**Any gate fails:** **this particular quadratic specification, on this information
-set, at this horizon, did not demonstrate improvement.** It settles neither
-nonlinear models in general nor the value of richer state.
-
-**Inference disagreement:** `NOT_SELECTED — INFERENCE_DISAGREEMENT`. An unresolved
-inference, not a finding either way.
+No forecast or grade object is retained. Per-arm log-likelihoods and PIT values
+are float arrays; forecasts are recomputed for the null pass, which is exact
+because every arm is a deterministic function of the row and `creation_time` is
+fixed per run. A test asserts the record contains no forecast or grade objects.
 
 ---
 
-## 12. FORBIDDEN
+## 12. WHAT A RESULT MEANS
 
-Lowering EXP-001B's threshold, searching its results for subsets, or rerunning it
-tuned. Opening the sealed periods. Presenting 2020–2021 as untouched. Retuning
-control effect sizes to produce a pass. Any subgroup, regime, session or hour
-analysis. Computing any economic quantity.
+A pass **selects a candidate for later confirmation** on evidence not yet used. It
+is not validated alpha, not economic value, does not open the sealed period, and
+licenses nothing in options. A failure means **this particular quadratic
+specification did not demonstrate improvement**, settling neither nonlinear models
+in general nor the value of richer state. Better tails are a real distributional
+improvement and are not evidence of directional information or tradable mispricing.
 
 ---
 
-## 13. OPEN FOR REVIEW
+## 13. FORBIDDEN
 
-1. Is `R² = 0.0010` with `φ = 0.3` the right control calibration, given it is fixed
-   now and may not be retuned?
-2. Is expected block length 5 sessions right, and is reporting 1 and 10 as
-   sensitivity sufficient?
-3. Should `G2` and `G3`, being compound rather than matched, be **required** gates
-   at all, or demoted to reported comparisons with `G1` alone promoting?
-
-Question 3 is the one I would most like an answer to. Requiring compound gates makes
-promotion harder, which is safe, but it also means a genuine matched improvement
-could be blocked by a dispersion difference that has nothing to do with the
-hypothesis.
+Lowering EXP-001B's threshold, searching its results, rerunning it tuned. Opening
+the sealed periods. Presenting 2020–2021 as untouched. Retuning control effect sizes
+to produce a pass. Any subgroup analysis. Any economic quantity.
