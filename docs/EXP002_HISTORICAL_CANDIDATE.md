@@ -212,3 +212,38 @@ added. `models`, `studentt`, `scoring`, `bootstrap`, `controls`, `registration`
 are byte-identical to the qualified tree. The reproduction shows
 `tournament()` giving the same `params_hash` and status on both trees. A
 six-world rerun was therefore not performed.
+
+---
+
+## Revision 3 — reconstruction verifier — candidate `2a09d1ed`
+
+Reviewer finding: `reconstruct()` excluded periods without metadata from the
+check, so zero verified periods gave `all([]) == True`, and one present period
+could carry overall success. Repair to the verifier only.
+
+| Item | 538bbc52 | 2a09d1ed (candidate) |
+|---|---|---|
+| Candidate commit | `538bbc52…` | `2a09d1ed329fe0baa1db24afc542b226f4d7855f` |
+| Bound source tree | `b27d847a…` | `c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d` |
+| Registration / launcher / execute script / r2 record | unchanged | `fe15f818…` / `4b9b187a…` / `a45fbb27…` / `884f6f50…` unchanged |
+| Unsigned request | code → 538bbc52 | code → 2a09d1ed, sha256 `d8e359a8…`; dry-validated (grant as EXP-002, `EXPERIMENT_MISMATCH` as EXP-001B), throwaway key destroyed |
+
+**Required periods are derived from the saved execution record:** `development`
+always; `observed` when `execution.observed_requested` is true. Every
+required period must have its metadata (`forecast_creation_time`), its ledger
+artifact and its sessions, be checked, and match before `all_match`;
+`all_match = (verified_periods == required_periods)` with a non-empty
+requirement. Any missing item yields `status = NOT_VERIFIED` with the missing
+items listed; zero verified periods can never produce `all_match = True`. A
+missing `fit.params` is reported as missing and verifies nothing.
+
+**What reconstruction verifies, separately stated** (`verifies` in the record):
+
+- forecast contents — yes: each admitted row's per-arm forecast hash, looked up by `(event_time, i)`;
+- ledger ordering — reported as `ledger_order_matches_admitted` per period and `ledger_ordering_matches` overall; not folded into `all_match`;
+- chain integrity — **not verified** (`chain_integrity_verified = false`; the entry/prev hash chain is not checked by this function).
+
+**Tests** (in `test_forecast_hashes_reconstruct_from_saved_artifacts`, alongside the successful and perturbed-parameter cases): both required periods missing → `NOT_VERIFIED`, no verified periods, both listed missing; one required period missing → `NOT_VERIFIED`, development verified alone does not carry success; observed ledger artifact absent → `NOT_VERIFIED`, `missing = ["observed.ledger"]`; observed not requested in the saved record → required is `["development"]` only and verifies; `fit.params` absent → `NOT_VERIFIED`. Perturbed params now report per-period `MISMATCH`.
+
+Numerical logic, model, registration and qualification records untouched; no
+six-world rerun, no signing, no historical execution.

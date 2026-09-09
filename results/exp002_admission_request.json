@@ -35,8 +35,8 @@
   }
  },
  "code": {
-  "commit": "538bbc52e7a00efbf6aca3a1c1082d5941bf1111",
-  "source_tree_sha256": "b27d847aeb6a3737a6626c4035bd74ffd04ef6ee400bd80c4b5fc867b0da7428",
+  "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+  "source_tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d",
   "bound_paths": [
    "apex/world_model",
    "apex/governance/chain_ledger.py",
@@ -45,9 +45,14 @@
   ],
   "launcher_sha256_not_in_bound_tree": "4b9b187aee53ce8eacd4bcfbacc0439a10818d9a570c9d7501ea6a08f9422191",
   "supersedes": {
-   "commit": "a7b0b2f935115792e090d31e159fb4942929f12b",
-   "source_tree_sha256": "cf28f17315c3adbb195cd79e888571b492272b35fffd71880f20ce0614722a1f",
-   "why": "historical integration repair after independent review: fit admission through the qualified rule, execution completeness separated from the development verdict, forecast-hash reconstruction evidence"
+   "commit": "538bbc52e7a00efbf6aca3a1c1082d5941bf1111",
+   "source_tree_sha256": "b27d847aeb6a3737a6626c4035bd74ffd04ef6ee400bd80c4b5fc867b0da7428",
+   "why": "reconstruction verifier defect: missing periods were excluded from the check; now derived from the saved record, missing -> NOT_VERIFIED",
+   "previous": {
+    "commit": "a7b0b2f935115792e090d31e159fb4942929f12b",
+    "source_tree_sha256": "cf28f17315c3adbb195cd79e888571b492272b35fffd71880f20ce0614722a1f",
+    "why": "historical integration repair after independent review: fit admission through the qualified rule, execution completeness separated from the development verdict, forecast-hash reconstruction evidence"
+   }
   },
   "note": "the bound tree moved from EXP-001B's 06eee315 because exp002 modules and the experiment switch in the execute script are bound paths; that is why this needs its own admission. The launcher is pinned by the commit and by invoking it from the fresh checkout after checking its hash."
  },
