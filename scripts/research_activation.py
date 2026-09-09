@@ -44,6 +44,21 @@ EXPERIMENT_ID = "ALPHA-EXP-001B"
 RESULT_FILE = "_RESULT.json"
 RUN_FILE = "_RUN.json"
 REGISTRATION_HASH = "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9"
+EXPERIMENTS = ("ALPHA-EXP-001B", "ALPHA-EXP-002")
+
+
+def registration_hash_for(experiment: str, checkout: Path) -> str:
+    """EXP-001B keeps its frozen constant. EXP-002's hash is read from the
+    registration module INSIDE THE CHECKOUT being launched, so the plan binds
+    to the code that will run rather than to whatever the launcher imported."""
+    if experiment == "ALPHA-EXP-001B":
+        return REGISTRATION_HASH
+    if experiment == "ALPHA-EXP-002":
+        reg = Path(checkout) / "apex" / "world_model" / "exp002" / "registration.py"
+        if not reg.is_file():
+            raise ActivationRefused("REGISTRATION_MISSING: %s" % reg)
+        return hashlib.sha256(reg.read_bytes()).hexdigest()
+    raise ActivationRefused("UNKNOWN_EXPERIMENT: %s" % experiment)
 MANIFEST_SHA256 = "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39"
 SCOPE_SYMBOL, SCOPE_START, SCOPE_END = "SPY", "2016-01-04", "2021-12-31"
 EXPECTED_VIEW_FILES = 1511
@@ -879,8 +894,10 @@ def run_probe(t: Targets, *, run: SystemRunner | None = None) -> dict:
 
 
 # ---------------------------------------------------------------- launch
-def prepare_launch(t: Targets, commit: str, decision: Path) -> dict:
+def prepare_launch(t: Targets, commit: str, decision: Path, experiment: str = EXPERIMENT_ID) -> dict:
     validate_targets(t)
+    if experiment not in EXPERIMENTS:
+        raise ActivationRefused("UNKNOWN_EXPERIMENT: %s" % experiment)
     rec = load_setup_record(t)
     if rec["state"] != STATE_COMPLETE:
         raise ActivationRefused("SETUP_NOT_COMPLETE: state is %s; launch requires a verified setup"
@@ -911,20 +928,23 @@ def prepare_launch(t: Targets, commit: str, decision: Path) -> dict:
                                 "(a similarly named sibling is not the trust root)"
                                 % (d, t.trust_root))
     cfg = launch_config(t)
+    # the experiment is named on the inner command explicitly; the execute
+    # script defaults to EXP-001B, so an unnamed launch could run the wrong one
     argv = _systemd_run(t, cfg, [t.python, "scripts/alpha_exp_real_execute.py",
-                                 "--decision", d, "--execute"])
+                                 "--experiment", experiment, "--decision", d, "--execute"])
     return {"action": "launch", "resolved": {
                 "commit": got["commit"], "source_tree_sha256": got["tree_sha256"],
                 "interpreter": str(t.python), "decision": str(d),
                 "decision_sha256": sha256_of(d), "view_files": n,
-                "experiment": EXPERIMENT_ID, "registration_hash": REGISTRATION_HASH},
+                "experiment": experiment,
+                "registration_hash": registration_hash_for(experiment, t.checkout)},
             "argv": argv,
             "executable_command": " ".join(argv),
             "EXECUTABLE_COMMAND_WARNING":
                 "This argv RUNS the experiment. It carries --execute and is not a dry "
                 "run in any form. Preparation and execution are distinguished by the "
                 "WRAPPER invocation in operator_commands, not by editing this argv.",
-            "operator_commands": operator_commands(t, commit, d),
+            "operator_commands": operator_commands(t, commit, d, experiment),
             "checks_performed": PREPARE_CHECKS_PERFORMED,
             "checks_not_performed_here": PREPARE_CHECKS_ELSEWHERE}
 
@@ -963,7 +983,7 @@ PREPARE_CHECKS_ELSEWHERE = {
 }
 
 
-def operator_commands(t: Targets, commit: str, decision) -> dict:
+def operator_commands(t: Targets, commit: str, decision, experiment: str = EXPERIMENT_ID) -> dict:
     """The two wrapper invocations, generated rather than described.
 
     Preparation and execution differ by --apply on the WRAPPER, never by editing
@@ -979,7 +999,7 @@ def operator_commands(t: Targets, commit: str, decision) -> dict:
     if t.research_user != d.research_user:
         sel += ["--research-user", t.research_user]
     base = ["sudo", "-n", t.system_python, "scripts/research_activation.py", "launch",
-            *sel, "--commit", str(commit), "--decision", str(decision)]
+            *sel, "--experiment", experiment, "--commit", str(commit), "--decision", str(decision)]
     return {"prepare": " ".join(base),
             "prepare_effect": "resolves and checks inputs, prints the plan, "
                               "and launches NOTHING",
@@ -1038,8 +1058,8 @@ def classify_launch(child: dict, result_sealed: bool) -> tuple:
     return LAUNCH_COMPLETED, "the child exited %s and sealed a result" % rc
 
 
-def _run_dirs(t: Targets) -> set:
-    base = t.out / EXPERIMENT_ID / "runs"
+def _run_dirs(t: Targets, experiment: str = EXPERIMENT_ID) -> set:
+    base = t.out / experiment / "runs"
     return {str(d) for d in base.iterdir()} if base.is_dir() else set()
 
 
@@ -1047,7 +1067,8 @@ def _run_dirs(t: Targets) -> set:
 _NOT_COMPLETED = ("REFUS", "INCOMPLETE", "ERROR", "FAIL", "ABORT", "INVALID")
 
 
-def _sealed_results_for(t: Targets, decision_sha256: str, before: set) -> list:
+def _sealed_results_for(t: Targets, decision_sha256: str, before: set,
+                        experiment: str = EXPERIMENT_ID) -> list:
     """Results that belong to THIS launch and record a completed outcome.
 
     Existence was not enough. A result left by an earlier run, or by a run under
@@ -1056,7 +1077,7 @@ def _sealed_results_for(t: Targets, decision_sha256: str, before: set) -> list:
     only when its directory is new to this launch, its _RUN.json names the
     decision we launched with, and its result records a completed outcome."""
     out = []
-    for d in sorted(Path(x) for x in (_run_dirs(t) - before)):
+    for d in sorted(Path(x) for x in (_run_dirs(t, experiment) - before)):
         rp, runp = d / RESULT_FILE, d / RUN_FILE
         if not (rp.is_file() and runp.is_file()):
             continue
@@ -1085,19 +1106,19 @@ def _sealed_results_for(t: Targets, decision_sha256: str, before: set) -> list:
 
 
 def run_launch(t: Targets, commit: str, decision: Path, *, apply: bool,
-               run: SystemRunner | None = None) -> dict:
-    plan = prepare_launch(t, commit, decision)
+               run: SystemRunner | None = None, experiment: str = EXPERIMENT_ID) -> dict:
+    plan = prepare_launch(t, commit, decision, experiment)
     plan["applied"] = bool(apply)
     if not apply:
         plan["note"] = "prepared only; authorization C is required to run this command"
         plan["ok"] = True
         return plan
     run = run or SystemRunner()
-    before = _run_dirs(t)
+    before = _run_dirs(t, experiment)
     dsha = sha256_of(Path(decision)) if Path(decision).exists() else ""
     started = now()
     child = run.run_child(plan["argv"], timeout=7200)
-    considered = _sealed_results_for(t, dsha, before)
+    considered = _sealed_results_for(t, dsha, before, experiment)
     sealed = [r for r in considered if r.get("counted")]
     outcome, why = classify_launch(child, bool(sealed))
     plan["execution"] = {
@@ -1332,6 +1353,8 @@ def _cli(argv=None, *, targets: Targets | None = None, runner: SystemRunner | No
                     help="activation research root; defaults to the production value")
     ap.add_argument("--runner-root", default=None,
                     help="runner root; defaults to the production value")
+    ap.add_argument("--experiment", default=EXPERIMENT_ID, choices=list(EXPERIMENTS),
+                    help="which registered experiment the launch names on the inner command")
     ap.add_argument("--research-user", default=None,
                     help="unprivileged account for this environment; a revision "
                          "environment must use its own")
@@ -1369,7 +1392,8 @@ def _cli(argv=None, *, targets: Targets | None = None, runner: SystemRunner | No
         elif a.action == "launch":
             if not a.commit or not a.decision:
                 raise ActivationRefused("UNRESOLVED_INPUTS: --commit and --decision are both required")
-            rec = run_launch(t, a.commit, Path(a.decision), apply=a.apply, run=runner)
+            rec = run_launch(t, a.commit, Path(a.decision), apply=a.apply, run=runner,
+                             experiment=a.experiment)
         else:
             rec = run_rollback(t, apply=a.apply, run=runner)
     except ActivationRefused as e:

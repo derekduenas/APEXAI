@@ -61,33 +61,36 @@ def _block_permute(ys: list, seed: int, block: int) -> list:
     return [y for k in idx for y in blocks[k]][:len(ys)]
 
 
-def tournament(fit_rows_y: list, dev_rows_y: list, *, seed: int = 7, tag: str = "DEV",
-               bootstrap_resamples: int = BOOT_RESAMPLES) -> dict:
+def evaluate(params: dict, dev_rows_y: list, *, seed: int = 7, tag: str = "DEV",
+             bootstrap_resamples: int = BOOT_RESAMPLES, ledger_dir=None,
+             authority: str = "SELECTION") -> dict:
+    """Score already-fitted arms on one evaluation period. Performs NO fitting.
+
+    `authority` is recorded, not acted on: the historical adapter evaluates the
+    observed 2020-2021 period with the SAME fitted params and authority NONE.
+    When `ledger_dir` is given, a compact hash-chained record of every arm's
+    forecast hash is sealed per row; forecasts themselves are deterministic
+    from the recorded params and the row."""
     t0 = time.time()
     rec = {"experiment": EXPERIMENT_ID, "registration_hash": registration_hash(), "tag": tag,
-           "stages": []}
-    fit_rows, fit_refused = _admit(fit_rows_y)
+           "authority": authority, "stages": []}
     dev_rows, dev_refused = _admit(dev_rows_y)
-    rec["admission"] = {"fit_rows": len(fit_rows), "fit_refused_rv_floor": fit_refused,
-                        "dev_rows": len(dev_rows), "dev_refused_rv_floor": dev_refused}
-    try:
-        params = A.fit_arms(fit_rows)
-    except (A.ArmRefused, ValueError) as e:
-        rec.update(status="INVALID_INPUT", refusal={"kind": type(e).__name__, "detail": str(e)[:400]})
-        rec["elapsed_s"] = round(time.time() - t0, 2)
+    rec["admission"] = {"dev_rows": len(dev_rows), "dev_refused_rv_floor": dev_refused}
+    if len(dev_rows) < 4 * 15:
+        rec.update(status="INSUFFICIENT_EVIDENCE", why="%d usable rows" % len(dev_rows))
         return rec
-    rec["fit"] = {"params_hash": params["params_hash"], "n_train": params["n_train"],
-                  "fits_performed": params["fits_performed"],
-                  "t": {k: params["t"][k] for k in ("s", "nu", "iterations", "converged",
-                                                    "nu_at_upper_bound", "nu_at_lower_bound")},
-                  "base_k": params["base"]["k"], "L_rank": params["L"]["rank"], "C_rank": params["C"]["rank"]}
+    led = None
+    if ledger_dir is not None:
+        from apex.governance.chain_ledger import chain_append
+        from pathlib import Path as _P
+        led = _P(ledger_dir) / ("forecast_hashes_%s.jsonl" % tag)
 
     now = time.time()
     n = len(dev_rows)
     ll = {a: np.empty(n) for a in ARMS}
     pit = {a: np.empty(n) for a in ARMS}
     cov = {a: {"0.05": 0.0, "0.5": 0.0, "0.95": 0.0} for a in ARMS}
-    sessions, outcome_hashes = [], []
+    sessions, first_sealed, last_sealed = [], None, None
 
     def make_pair(r, y, tk):
         iid = "%s|%s|%d" % (tag, r["event_time"], r["i"])
@@ -100,7 +103,7 @@ def tournament(fit_rows_y: list, dev_rows_y: list, *, seed: int = 7, tag: str = 
     for i, (r, y, tk) in enumerate(dev_rows):
         iid, ih, oc = make_pair(r, y, tk)
         sessions.append(r.get("session_id", "S?"))
-        outcome_hashes.append(oc.outcome_hash)
+        hashes = {}
         for a in ARMS:
             fc = A.forecast(a, params, r, input_id=iid, input_hash=ih, creation_time=now)
             g = SC.grade_any(fc, oc, grading_time=tk + 1.0)
@@ -109,7 +112,16 @@ def tournament(fit_rows_y: list, dev_rows_y: list, *, seed: int = 7, tag: str = 
             pit[a][i] = SC.pit(fc, y)
             for lv, hit in SC.coverage_hits(fc, y).items():
                 cov[a][lv] += hit
-    rec["stages"].append({"stage": "forecast_and_grade", "rows": n, "arms": list(ARMS)})
+            hashes[a] = fc.forecast_hash
+        if led is not None:
+            h = chain_append(led, {"kind": "forecast_hashes", "period": tag, "i": r["i"],
+                                   "event_time": r["event_time"], "session_id": sessions[-1],
+                                   "arms": hashes})["entry_hash"]
+            first_sealed = first_sealed or h
+            last_sealed = h
+    rec["stages"].append({"stage": "forecast_and_grade", "rows": n, "arms": list(ARMS),
+                          "forecast_hashes_sealed": led is not None,
+                          "first_sealed": first_sealed, "last_sealed": last_sealed})
 
     comparisons = {}
     for name, (a, b) in PAIRS.items():
@@ -134,9 +146,8 @@ def tournament(fit_rows_y: list, dev_rows_y: list, *, seed: int = 7, tag: str = 
         comparisons[k]["holm_adjusted_p"] = holm[k]
         comparisons[k]["promotion_authority"] = False
     for k in GATES:
-        comparisons[k]["promotion_authority"] = True
+        comparisons[k]["promotion_authority"] = (authority == "SELECTION")
 
-    # null: outcomes permuted in blocks; forecasts recomputed identically (not refitted)
     yp = _block_permute([y for _, y, _ in dev_rows], seed, N0["block"])
     null_ll = {a: np.empty(n) for a in ("C", "L", "S", "M1", "M0")}
     for i, ((r, _, tk), y) in enumerate(zip(dev_rows, yp)):
@@ -170,10 +181,35 @@ def tournament(fit_rows_y: list, dev_rows_y: list, *, seed: int = 7, tag: str = 
     else:
         verdict = "MATCHED_IMPROVEMENT"
     rec.update(status=verdict, matched_improvement=bool(g1["both_pass"]),
-               selection_authority="G1 (C-L) only; comparisons against the registered Gaussian "
-                                   "models are reported context without selection authority",
+               selection_authority=("G1 (C-L) only; comparisons against the registered Gaussian "
+                                    "models are reported context without selection authority")
+                                   if authority == "SELECTION" else
+                                   "NONE: secondary reporting with the same fitted models",
                comparisons=comparisons, null_control=null, null_control_ok=null_ok,
                calibration=calibration, n_dev=n,
                economics="NONE (distributional only)")
     rec["elapsed_s"] = round(time.time() - t0, 2)
+    return rec
+
+
+def tournament(fit_rows_y: list, dev_rows_y: list, *, seed: int = 7, tag: str = "DEV",
+               bootstrap_resamples: int = BOOT_RESAMPLES) -> dict:
+    """Fit once, evaluate once. The synthetic qualification calls this; the
+    historical adapter calls fit_arms and evaluate directly so the same fitted
+    params can score a second period without a second fit."""
+    fit_rows, fit_refused = _admit(fit_rows_y)
+    try:
+        params = A.fit_arms(fit_rows)
+    except (A.ArmRefused, ValueError) as e:
+        return {"experiment": EXPERIMENT_ID, "registration_hash": registration_hash(), "tag": tag,
+                "stages": [], "status": "INVALID_INPUT",
+                "refusal": {"kind": type(e).__name__, "detail": str(e)[:400]},
+                "admission": {"fit_rows": len(fit_rows), "fit_refused_rv_floor": fit_refused}}
+    rec = evaluate(params, dev_rows_y, seed=seed, tag=tag, bootstrap_resamples=bootstrap_resamples)
+    rec["admission"].update({"fit_rows": len(fit_rows), "fit_refused_rv_floor": fit_refused})
+    rec["fit"] = {"params_hash": params["params_hash"], "n_train": params["n_train"],
+                  "fits_performed": params["fits_performed"],
+                  "t": {k: params["t"][k] for k in ("s", "nu", "iterations", "converged",
+                                                    "nu_at_upper_bound", "nu_at_lower_bound")},
+                  "base_k": params["base"]["k"], "L_rank": params["L"]["rank"], "C_rank": params["C"]["rank"]}
     return rec
