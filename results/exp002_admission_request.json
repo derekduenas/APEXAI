@@ -1,0 +1,113 @@
+{
+ "DECISION_FILENAME": {
+  "distinct_from": [
+   "exp001b_admission.json",
+   "exp001b_admission_rev2.json"
+  ],
+  "expected_path": "/etc/apex/admissions/exp002_admission.json",
+  "signature_path": "/etc/apex/admissions/exp002_admission.json.sig"
+ },
+ "EXPERIMENT_BINDING": {
+  "entry_point_in_bound_tree": true,
+  "executable_entry_point": "scripts/alpha_exp_real_execute.py --experiment ALPHA-EXP-002 --decision <path> --execute",
+  "experiment_id": "ALPHA-EXP-002",
+  "registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2",
+  "registration_unchanged_since_synthetic_qualification_r2": true,
+  "why_an_exp001b_admission_cannot_authorise_this": "the boundary checks purpose.experiment_id and purpose.registration_hash against the values the executing experiment supplies; a mismatch is refused (EXPERIMENT_MISMATCH / REGISTRATION_MISMATCH). Tested both directions in tests/test_exp002_historical_path.py."
+ },
+ "NOTE": "THIS IS A REQUEST, NOT A DECISION. Unsigned; decision is not ADMIT and provenance names no principal. The identity string is not the boundary: it selects which public key in allowed_signers must have signed. The boundary is possession of the private key, held off-host and never on the research host, together with protection of allowed_signers.",
+ "availability": {
+  "corporate_actions": "RAW_UNADJUSTED_EXPLICIT",
+  "event_time": {
+   "kind": "PER_ROW",
+   "latest": "2026-08-28"
+  },
+  "publication_time": {
+   "kind": "NOT_AVAILABLE"
+  },
+  "receipt_time": {
+   "at": "2026-08-29",
+   "kind": "BULK"
+  },
+  "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record exists for these bars; they may not be used to claim point-in-time availability or to model vendor revisions; receipt was bulk on 2026-08-29, so no row is evidence of what was knowable before that date except by its event time",
+  "revision_time": {
+   "kind": "NOT_AVAILABLE"
+  }
+ },
+ "code": {
+  "bound_paths": [
+   "apex/world_model",
+   "apex/governance/chain_ledger.py",
+   "apex/intraday/sessions.py",
+   "scripts/alpha_exp_real_execute.py"
+  ],
+  "commit": "a7b0b2f935115792e090d31e159fb4942929f12b",
+  "launcher_sha256_not_in_bound_tree": "4b9b187aee53ce8eacd4bcfbacc0439a10818d9a570c9d7501ea6a08f9422191",
+  "note": "the bound tree moved from EXP-001B's 06eee315 because exp002 modules and the experiment switch in the execute script are bound paths; that is why this needs its own admission. The launcher is pinned by the commit and by invoking it from the fresh checkout after checking its hash.",
+  "source_tree_sha256": "cf28f17315c3adbb195cd79e888571b492272b35fffd71880f20ce0614722a1f"
+ },
+ "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
+ "dataset": {
+  "dataset_id": "history-b/etf_continuous",
+  "manifest_path": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json",
+  "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "root": "/apex-data/history-b/etf_continuous/bars"
+ },
+ "decision": "REQUESTED_NOT_GRANTED",
+ "environment": {
+  "preflight": "results/exp002_rev3_preflight.json (ok, nothing created)",
+  "research_root": "/apex-data/research-exp002",
+  "research_user": "apexresearch3",
+  "runner_root": "/opt/apex-runner-exp002"
+ },
+ "output": {
+  "authority_classification": "RESEARCH_HISTORICAL",
+  "root": "/apex-data/research-exp002/out"
+ },
+ "provenance": {
+  "decided_by": "UNSIGNED_REQUEST_AWAITING_AUTHORITY",
+  "decided_utc": null,
+  "review_reference": "EXP002-HISTORICAL-CANDIDATE"
+ },
+ "purpose": {
+  "experiment_id": "ALPHA-EXP-002",
+  "registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2",
+  "research_purpose": "EXP-002 bounded challenger tournament on admitted historical SPY sessions: fit five arms once on 2016-2018, select on the matched C-L comparison over 2019 (development data with prior exposure) under both predeclared inferences, report 2020-2021 with the same fitted models and no authority. Distributional only; no economics, subgroup searches or refits."
+ },
+ "scope": {
+  "fields": [
+   "open",
+   "high",
+   "low",
+   "close",
+   "volume",
+   "event_time_utc"
+  ],
+  "source_families": [
+   "alpaca_sip_raw_1m"
+  ],
+  "temporal_range": {
+   "end": "2021-12-31",
+   "evaluation_and_reserve": "SEALED; never requested by this experiment",
+   "roles": {
+    "development_with_prior_exposure": [
+     "2019-01-01",
+     "2019-12-31"
+    ],
+    "fit": [
+     "2016-01-04",
+     "2018-12-31"
+    ],
+    "observed_secondary_no_authority": [
+     "2020-01-01",
+     "2021-12-31"
+    ]
+   },
+   "sessions": 1511,
+   "start": "2016-01-04"
+  },
+  "universe": [
+   "SPY"
+  ]
+ }
+}

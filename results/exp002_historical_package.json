@@ -1,0 +1,235 @@
+{
+ "admission_request": {
+  "decision_filename": "/etc/apex/admissions/exp002_admission.json",
+  "dry_validated_against_real_boundary_with_throwaway_key": true,
+  "file": "results/exp002_admission_request.json",
+  "output_root": "/apex-data/research-exp002/out",
+  "refused_as_exp001b": "EXPERIMENT_MISMATCH",
+  "sha256": "5479f3f00d131d96a3684261208e56fd1aeffafba5c16498afec0d9bd2a5924b"
+ },
+ "candidate": {
+  "bound_files": 57,
+  "bound_source_tree_sha256": "cf28f17315c3adbb195cd79e888571b492272b35fffd71880f20ce0614722a1f",
+  "commit": "a7b0b2f935115792e090d31e159fb4942929f12b",
+  "execute_script_sha256_bound": "a45fbb27d06aae0945fdff31203c98c2c5e68f49e1715bdfc2f7534d62c6f5e9",
+  "exp001b_tree_for_reference": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
+  "exp002_registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2",
+  "launcher_sha256_not_bound": "4b9b187aee53ce8eacd4bcfbacc0439a10818d9a570c9d7501ea6a08f9422191",
+  "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "registration_unchanged_since_qualification_r2": true,
+  "tree_moved": true
+ },
+ "changes_since_qualification": {
+  "all_verdicts_identical": true,
+  "applicability_spot_check": "W2S_INTERACTION rerun at full declared scale under the REFACTORED runner (candidate a7b0b2f9), compared to the revision-2 qualification record produced by the pre-refactor code",
+  "calibration_coverage_identical": true,
+  "candidate_params_hash": "3c5c4792abc260f4",
+  "comparisons": [
+   {
+    "abs_dmean": 0.0,
+    "abs_dt": 0.0,
+    "candidate_k": 0,
+    "candidate_mean": 0.004035251851698238,
+    "candidate_t": 8.543701621498334,
+    "candidate_verdict": "SIGNAL_DETECTED",
+    "dk": 0,
+    "pair": "C-L",
+    "r2_k": 0,
+    "r2_mean": 0.004035251851698238,
+    "r2_t": 8.543701621498334,
+    "r2_verdict": "SIGNAL_DETECTED",
+    "verdict_same": true
+   },
+   {
+    "abs_dmean": 0.0,
+    "abs_dt": 0.0,
+    "candidate_k": 1744,
+    "candidate_mean": 2.2797320038616934e-05,
+    "candidate_t": 1.2751261485606498,
+    "candidate_verdict": "NO_SIGNAL",
+    "dk": 0,
+    "pair": "L-S",
+    "r2_k": 1744,
+    "r2_mean": 2.2797320038616934e-05,
+    "r2_t": 1.2751261485606498,
+    "r2_verdict": "NO_SIGNAL",
+    "verdict_same": true
+   },
+   {
+    "abs_dmean": 0.0,
+    "abs_dt": 0.0,
+    "candidate_k": 0,
+    "candidate_mean": 0.06336226845271671,
+    "candidate_t": 16.50526730546043,
+    "candidate_verdict": "SIGNAL_DETECTED",
+    "dk": 0,
+    "pair": "L-M1",
+    "r2_k": 0,
+    "r2_mean": 0.06336226845271671,
+    "r2_t": 16.50526730546043,
+    "r2_verdict": "SIGNAL_DETECTED",
+    "verdict_same": true
+   },
+   {
+    "abs_dmean": 0.0,
+    "abs_dt": 0.0,
+    "candidate_k": 0,
+    "candidate_mean": 0.0633763865638792,
+    "candidate_t": 16.506492883812545,
+    "candidate_verdict": "SIGNAL_DETECTED",
+    "dk": 0,
+    "pair": "S-M0",
+    "r2_k": 0,
+    "r2_mean": 0.0633763865638792,
+    "r2_t": 16.506492883812545,
+    "r2_verdict": "SIGNAL_DETECTED",
+    "verdict_same": true
+   },
+   {
+    "abs_dmean": 0.0,
+    "abs_dt": 0.0,
+    "candidate_k": 1671,
+    "candidate_mean": 3.6915431201114584e-05,
+    "candidate_t": 1.3168920260936772,
+    "candidate_verdict": "NO_SIGNAL",
+    "dk": 0,
+    "pair": "M1-M0",
+    "r2_k": 1671,
+    "r2_mean": 3.6915431201114584e-05,
+    "r2_t": 1.3168920260936772,
+    "r2_verdict": "NO_SIGNAL",
+    "verdict_same": true
+   },
+   {
+    "abs_dmean": 0.0,
+    "abs_dt": 0.0,
+    "candidate_k": 0,
+    "candidate_mean": 0.06739752030441494,
+    "candidate_t": 17.314391542033256,
+    "candidate_verdict": "SIGNAL_DETECTED",
+    "dk": 0,
+    "pair": "C-M1",
+    "r2_k": 0,
+    "r2_mean": 0.06739752030441494,
+    "r2_t": 17.314391542033256,
+    "r2_verdict": "SIGNAL_DETECTED",
+    "verdict_same": true
+   },
+   {
+    "abs_dmean": 0.0,
+    "abs_dt": 0.0,
+    "candidate_k": 0,
+    "candidate_mean": 0.06743443573561606,
+    "candidate_t": 17.31751523754149,
+    "candidate_verdict": "SIGNAL_DETECTED",
+    "dk": 0,
+    "pair": "C-M0",
+    "r2_k": 0,
+    "r2_mean": 0.06743443573561606,
+    "r2_t": 17.31751523754149,
+    "r2_verdict": "SIGNAL_DETECTED",
+    "verdict_same": true
+   }
+  ],
+  "k": [
+   0.8048539703044207,
+   0.8048539703044207
+  ],
+  "max_abs_difference_in_any_t_or_mean": 0.0,
+  "n_dev_candidate": 82500,
+  "n_dev_r2": 82500,
+  "nu_star": [
+   49.99999999904425,
+   49.99999999904425
+  ],
+  "null_control_t_r2_vs_candidate": {
+   "C-L": [
+    -11.52081913243855,
+    -11.52081913243855
+   ],
+   "L-S": [
+    0.9176646721147411,
+    0.9176646721147411
+   ],
+   "M1-M0": [
+    0.6947584557718008,
+    0.6947584557718008
+   ],
+   "S-M0_reported_only": [
+    18.626227059135037,
+    18.626227059135037
+   ]
+  },
+  "params_hash_identical": true,
+  "peak_rss_self_bytes": 413163520,
+  "r2_params_hash": "3c5c4792abc260f4",
+  "reading": "the refactor is behaviour-preserving on this world: identical fitted parameters (same params_hash), identical statistics to floating-point precision, identical exceedance counts, identical verdicts, identical calibration. One world at full scale, deterministic seeds; a full six-world rerun on the candidate is available on request and was not performed unprompted.",
+  "runtime_s": 510.4,
+  "status_candidate": "MATCHED_IMPROVEMENT",
+  "status_r2": "MATCHED_IMPROVEMENT",
+  "status_same": true
+ },
+ "commands": {
+  "execute": "the same command with --apply appended",
+  "prepare": "sudo -n /usr/bin/python3.12 scripts/research_activation.py launch --research-root /apex-data/research-exp002 --runner-root /opt/apex-runner-exp002 --research-user apexresearch3 --experiment ALPHA-EXP-002 --commit a7b0b2f935115792e090d31e159fb4942929f12b --decision /etc/apex/admissions/exp002_admission.json",
+  "run_from": "/apex-data/research-exp002/checkout (after setup, verify, probe, launcher hash check)"
+ },
+ "environment": {
+  "created": false,
+  "preflight": "results/exp002_rev3_preflight.json",
+  "preflight_ok": true,
+  "research_root": "/apex-data/research-exp002",
+  "research_user": "apexresearch3",
+  "runner_root": "/opt/apex-runner-exp002"
+ },
+ "for": "independent review; nothing signed; no historical fitting",
+ "not_done": [
+  "signing",
+  "environment setup",
+  "historical fitting",
+  "economics",
+  "subgroup search",
+  "refits"
+ ],
+ "package": "EXP002_HISTORICAL_EXECUTION_CANDIDATE",
+ "preservation": {
+  "aborted_run_forecasts_sha256": "7a6cbe36c25c333191fc865e27c7c920bfefb67d008ecad6233a82a8a96a3407 unchanged",
+  "accounts": {
+   "apexresearch": 109,
+   "apexresearch2": 110
+  },
+  "exp001b_registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9",
+  "exp001b_rev2_sealed_result_sha256_prefix": "4b23021d07d8d200",
+  "protected_surface_drift": [
+   "apex/world_model/exp001b/run.py (the bounded-memory repair, already on record)"
+  ],
+  "rev1_checkout": "277e4a02",
+  "rev2_checkout": "a35ab1a2",
+  "signed_decisions_prefix": [
+   "1eafbe1fd972a45b",
+   "28bc28590339b6e9"
+  ],
+  "synthetic_qualification_r1": "unchanged, NOT QUALIFIED",
+  "synthetic_qualification_r2": "unchanged, QUALIFIED"
+ },
+ "temporal_roles": {
+  "development_with_prior_exposure": [
+   "2019-01-01",
+   "2019-12-31"
+  ],
+  "evaluation_and_reserve": "SEALED, never requested",
+  "fit": [
+   "2016-01-04",
+   "2018-12-31"
+  ],
+  "observed_secondary_no_authority_same_models": [
+   "2020-01-01",
+   "2021-12-31"
+  ]
+ },
+ "tests": {
+  "acceptance_real_path_unstubbed": "tests/test_exp002_historical_path.py: 10 passed at a7b0b2f9 (clean bound tree required)",
+  "exp002_unit_suites": "studentt, controls, reference(scipy): pass",
+  "regression_at_candidate": "tournament, revision2, research_activation, verifier review, real_data_boundary: 173 passed"
+ }
+}
