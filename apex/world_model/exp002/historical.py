@@ -3,21 +3,32 @@
 Called by scripts/alpha_exp_real_execute.py with --experiment ALPHA-EXP-002.
 It never decides admission: the route that admitted the files supplies the
 session loader. It opens fit, development and observed only; evaluation and
-reserve are never requested."""
+reserve are never requested.
+
+Two records are kept apart on purpose:
+  scientific_status  the development verdict (selection authority G1 only)
+  status             whether the REQUESTED run completed; observed reporting
+                     that was requested and did not happen makes the run
+                     incomplete even when development produced a verdict."""
 from __future__ import annotations
 
+import json
 import time
+from pathlib import Path
 
 from apex.world_model.exp001b import bars as B
 from apex.world_model.exp001b.run import _usable
 from . import models as A
 from .registration import (DEVELOPMENT_STATUS, EXPERIMENT_ID, FIT_BUDGET, OBSERVED_STATUS,
                            PERIODS, registration_hash)
-from .run import evaluate
+from .run import _admit, evaluate, reconstruct_forecast_hashes
 
 PERIOD_ROLES = {"fit": PERIODS["fit"], "development": PERIODS["development"],
                 "observed": PERIODS["observed"]}
 NEVER_OPENED = ("evaluation", "reserve")
+TAGS = {"development": "DEVELOPMENT_2019", "observed": "OBSERVED_2020_2021"}
+SCIENTIFIC = ("MATCHED_IMPROVEMENT", "NOT_SELECTED", "NOT_SELECTED_INFERENCE_DISAGREEMENT")
+ADMISSION_REFUSALS = ("SourceAdmissionRefused", "RealDataRefused")
 STATUS = {
     "MATCHED_IMPROVEMENT": "SCIENTIFIC_COMPLETE",
     "NOT_SELECTED": "SCIENTIFIC_COMPLETE",
@@ -26,10 +37,18 @@ STATUS = {
     "INVALID_INPUT": "INVALID_INPUT_OR_FAILURE",
     "INSUFFICIENT_EVIDENCE": "INVALID_INPUT_OR_FAILURE",
     "ADMISSION_REFUSED": "AUTHORIZATION_REFUSED",
+    # requested observed reporting did not happen: development evidence is
+    # preserved under scientific_status, but the run did not complete
+    "INCOMPLETE_OBSERVED_ADMISSION_REFUSED": "AUTHORIZATION_REFUSED",
+    "INCOMPLETE_OBSERVED_REPORTING": "INVALID_INPUT_OR_FAILURE",
 }
 
 
 def _rows_for(paths: list, session_loader) -> tuple:
+    """Feature/target-usable rows, per session, with refusal counts. Volatility
+    admission (RV_FLOOR) is applied afterwards by the SAME `_admit` the
+    qualified tournament uses, so a below-floor row is refused for fitting
+    exactly as it is refused for scoring."""
     rows_all, refused = [], {"WARMUP": 0, "MISSING_FEATURE_BARS": 0, "MISSING_TARGET_BAR": 0, "EMBARGO": 0}
     for p in paths:
         s = session_loader(p)
@@ -44,6 +63,13 @@ def _rows_for(paths: list, session_loader) -> tuple:
             r["session_id"] = s["session_date"]           # whole-session blocks for the bootstrap
             rows_all.append((r, y, tk))
     return rows_all, refused
+
+
+def _admitted_rows_for(paths: list, session_loader) -> tuple:
+    usable, refused = _rows_for(paths, session_loader)
+    admitted, rv_refused = _admit(usable)
+    refused = {**refused, "RV_FLOOR": rv_refused}
+    return admitted, refused, len(usable)
 
 
 def run(sessions_by_period: dict, *, ledger_dir, session_loader, seed: int = 7) -> dict:
@@ -65,11 +91,13 @@ def run(sessions_by_period: dict, *, ledger_dir, session_loader, seed: int = 7) 
         rec["stages"].append({"stage": name, **kw})
 
     try:
-        fit_rows, fit_ref = _rows_for(sessions_by_period["fit"], session_loader)
-        stage("admission:fit", sessions=len(sessions_by_period["fit"]), usable_rows=len(fit_rows), refused_rows=fit_ref)
+        fit_rows, fit_ref, fit_usable = _admitted_rows_for(sessions_by_period["fit"], session_loader)
+        stage("admission:fit", sessions=len(sessions_by_period["fit"]), usable_rows=fit_usable,
+              admitted_rows=len(fit_rows), refused_rows=fit_ref,
+              rule="apex.world_model.exp002.run._admit (RV_FLOOR), the qualified tournament's admission")
     except Exception as e:                                                   # noqa: BLE001
         kind = type(e).__name__
-        rec.update(status="ADMISSION_REFUSED" if kind in ("SourceAdmissionRefused", "RealDataRefused") else "INVALID_INPUT",
+        rec.update(status="ADMISSION_REFUSED" if kind in ADMISSION_REFUSALS else "INVALID_INPUT",
                    refusal={"kind": kind, "detail": str(e)[:600]})
         return rec
 
@@ -85,36 +113,90 @@ def run(sessions_by_period: dict, *, ledger_dir, session_loader, seed: int = 7) 
                   "within_budget": params["fits_performed"] <= FIT_BUDGET["market_data_fits"],
                   "t": {k: params["t"][k] for k in ("s", "nu", "iterations", "converged",
                                                     "nu_at_upper_bound", "nu_at_lower_bound")},
-                  "base_k": params["base"]["k"], "L": params["L"], "C": params["C"]}
+                  "base_k": params["base"]["k"], "L": params["L"], "C": params["C"],
+                  # the EXACT fitted object every forecast was built from; a
+                  # recorded forecast hash is reconstructible from this and the row
+                  "params": json.loads(json.dumps(params, default=float))}
     stage("fit", status="READY", fits_performed=params["fits_performed"])
 
     try:
-        dev_rows, dev_ref = _rows_for(sessions_by_period["development"], session_loader)
-        stage("admission:development", sessions=len(sessions_by_period["development"]), usable_rows=len(dev_rows), refused_rows=dev_ref)
+        dev_rows, dev_ref, dev_usable = _admitted_rows_for(sessions_by_period["development"], session_loader)
+        stage("admission:development", sessions=len(sessions_by_period["development"]),
+              usable_rows=dev_usable, admitted_rows=len(dev_rows), refused_rows=dev_ref)
     except Exception as e:                                                   # noqa: BLE001
         rec.update(status="ADMISSION_REFUSED", refusal={"kind": type(e).__name__, "detail": str(e)[:600]})
         return rec
-    dev = evaluate(params, dev_rows, seed=seed, tag="DEVELOPMENT_2019", ledger_dir=ledger_dir,
+    dev = evaluate(params, dev_rows, seed=seed, tag=TAGS["development"], ledger_dir=ledger_dir,
                    authority="SELECTION")
     dev_rows = None
     rec["development"] = dev
+    rec["scientific_status"] = dev["status"]                 # selection follows development only
     stage("development", status=dev["status"], n=dev.get("n_dev"))
 
     obs_paths = sessions_by_period.get("observed") or []
+    execution = {"observed_requested": bool(obs_paths), "observed_outcome": None, "failure": None}
     if obs_paths:
         try:
-            obs_rows, obs_ref = _rows_for(obs_paths, session_loader)
-            stage("admission:observed", sessions=len(obs_paths), usable_rows=len(obs_rows), refused_rows=obs_ref)
-            obs = evaluate(params, obs_rows, seed=seed, tag="OBSERVED_2020_2021", ledger_dir=ledger_dir,
-                           authority="NONE")                  # same fitted params; no fit; no authority
-            obs_rows = None
-            rec["observed"] = obs
-            stage("observed", status=obs["status"], n=obs.get("n_dev"), authority="NONE")
+            obs_rows, obs_ref, obs_usable = _admitted_rows_for(obs_paths, session_loader)
+            stage("admission:observed", sessions=len(obs_paths), usable_rows=obs_usable,
+                  admitted_rows=len(obs_rows), refused_rows=obs_ref)
         except Exception as e:                                               # noqa: BLE001
-            rec["observed"] = {"status": "NOT_EVALUATED", "error": "%s: %s" % (type(e).__name__, str(e)[:300])}
-    rec["status"] = dev["status"]                            # selection follows development only
+            kind = type(e).__name__
+            execution["failure"] = {"class": "ADMISSION_REFUSED" if kind in ADMISSION_REFUSALS else "EXCEPTION",
+                                    "at": "admission:observed", "kind": kind, "detail": str(e)[:600]}
+        else:
+            try:
+                obs = evaluate(params, obs_rows, seed=seed, tag=TAGS["observed"], ledger_dir=ledger_dir,
+                               authority="NONE")              # same fitted params; no fit; no authority
+                obs_rows = None
+                rec["observed"] = obs
+                stage("observed", status=obs["status"], n=obs.get("n_dev"), authority="NONE")
+                if obs["status"] not in SCIENTIFIC:
+                    execution["failure"] = {"class": "INVALID_RESULT", "at": "observed",
+                                            "kind": obs["status"], "detail": obs.get("why", "")}
+            except Exception as e:                                           # noqa: BLE001
+                execution["failure"] = {"class": "EXCEPTION", "at": "observed",
+                                        "kind": type(e).__name__, "detail": str(e)[:600]}
+        if execution["failure"] is None:
+            execution["observed_outcome"] = "REPORTED_WITHOUT_SELECTION_AUTHORITY"
+        else:
+            execution["observed_outcome"] = "NOT_REPORTED"
+            rec.setdefault("observed", {})["status"] = "NOT_EVALUATED"
+            rec["observed"]["failure"] = execution["failure"]
+    execution["complete"] = execution["failure"] is None
+    rec["execution"] = execution
+    if execution["complete"]:
+        rec["status"] = dev["status"]
+    else:
+        f = execution["failure"]
+        rec["status"] = ("INCOMPLETE_OBSERVED_ADMISSION_REFUSED" if f["class"] == "ADMISSION_REFUSED"
+                         else "INCOMPLETE_OBSERVED_REPORTING")
+        rec["why"] = ("requested observed reporting did not happen (%s at %s: %s); the development "
+                      "verdict %s is preserved under scientific_status but the run is not complete"
+                      % (f["class"], f["at"], f["kind"], dev["status"]))
     rec["fits_performed_total"] = params["fits_performed"]
     rec["economics"] = "NONE (distributional only)"
     rec["evaluation"] = "SEALED: never requested by this run"
     rec["elapsed_s"] = round(time.time() - t0, 2)
     return rec
+
+
+def reconstruct(result: dict, sessions_by_period: dict, *, session_loader, ledger_dir,
+                params: dict | None = None) -> dict:
+    """Rebuild every recorded forecast hash from the SAVED artifacts (the sealed
+    result's exact fitted params and per-period forecast creation time) plus
+    freshly admitted rows, and compare against the sealed forecast-hash ledger.
+    `params` overrides the saved object only for negative controls."""
+    params = params if params is not None else result["fit"]["params"]
+    out = {"params_hash": params["params_hash"], "periods": {}}
+    for period, tag in TAGS.items():
+        per = result.get(period) or {}
+        if "forecast_creation_time" not in per:
+            out["periods"][period] = {"status": "NOT_RECORDED"}
+            continue
+        rows, _, _ = _admitted_rows_for(sessions_by_period.get(period) or [], session_loader)
+        out["periods"][period] = reconstruct_forecast_hashes(
+            params, rows, tag=tag, creation_time=per["forecast_creation_time"],
+            ledger_path=Path(ledger_dir) / ("forecast_hashes_%s.jsonl" % tag))
+    out["all_match"] = all(p.get("all_match") for p in out["periods"].values() if p.get("status") != "NOT_RECORDED")
+    return out

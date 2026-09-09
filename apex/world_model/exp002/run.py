@@ -9,6 +9,7 @@ import json
 import math
 import random
 import time
+from pathlib import Path
 
 import numpy as np
 
@@ -22,6 +23,12 @@ from .registration import (ARMS, BOOT_BLOCK_SESSIONS, BOOT_P_THRESHOLD, BOOT_RES
 
 PAIRS = {**GATES, **REPORTED}
 MATCHED_FOR_NULL = (("C", "L"), ("L", "S"), ("M1", "M0"))
+FORECAST_IDENTITY = {
+    "input_id": "<tag>|<row.event_time>|<row.i>",
+    "input_hash": "sha256(json.dumps({event_time, features, close}, sort_keys=True))[:16]",
+    "model_version": "params_hash",
+    "content_hash_excludes_creation_time": True,     # apex.world_model.forecast.WorldModelForecast.content
+}
 
 
 def _phi_sf(t: float) -> float:
@@ -61,6 +68,17 @@ def _block_permute(ys: list, seed: int, block: int) -> list:
     return [y for k in idx for y in blocks[k]][:len(ys)]
 
 
+def pair_identity(tag: str, r: dict, y: float, tk: float) -> tuple:
+    """(input_id, input_hash, outcome) for one row. The forecast content hash
+    is a function of these, the fitted params and the row only."""
+    iid = "%s|%s|%d" % (tag, r["event_time"], r["i"])
+    ih = hashlib.sha256(json.dumps({k: r[k] for k in ("event_time", "features", "close")},
+                                   sort_keys=True).encode()).hexdigest()[:16]
+    oc = OutcomeRecord(world_id="corpus", world_hash=tag, subject="SPY", step=r["i"],
+                       horizon=HORIZON, target_value=y, outcome_known_time=tk)
+    return iid, ih, oc
+
+
 def evaluate(params: dict, dev_rows_y: list, *, seed: int = 7, tag: str = "DEV",
              bootstrap_resamples: int = BOOT_RESAMPLES, ledger_dir=None,
              authority: str = "SELECTION") -> dict:
@@ -73,7 +91,7 @@ def evaluate(params: dict, dev_rows_y: list, *, seed: int = 7, tag: str = "DEV",
     from the recorded params and the row."""
     t0 = time.time()
     rec = {"experiment": EXPERIMENT_ID, "registration_hash": registration_hash(), "tag": tag,
-           "authority": authority, "stages": []}
+           "authority": authority, "params_hash": params["params_hash"], "stages": []}
     dev_rows, dev_refused = _admit(dev_rows_y)
     rec["admission"] = {"dev_rows": len(dev_rows), "dev_refused_rv_floor": dev_refused}
     if len(dev_rows) < 4 * 15:
@@ -82,10 +100,11 @@ def evaluate(params: dict, dev_rows_y: list, *, seed: int = 7, tag: str = "DEV",
     led = None
     if ledger_dir is not None:
         from apex.governance.chain_ledger import chain_append
-        from pathlib import Path as _P
-        led = _P(ledger_dir) / ("forecast_hashes_%s.jsonl" % tag)
+        led = Path(ledger_dir) / ("forecast_hashes_%s.jsonl" % tag)
 
     now = time.time()
+    rec["forecast_creation_time"] = now                      # persisted: instance identity
+    rec["forecast_identity"] = dict(FORECAST_IDENTITY)
     n = len(dev_rows)
     ll = {a: np.empty(n) for a in ARMS}
     pit = {a: np.empty(n) for a in ARMS}
@@ -93,12 +112,7 @@ def evaluate(params: dict, dev_rows_y: list, *, seed: int = 7, tag: str = "DEV",
     sessions, first_sealed, last_sealed = [], None, None
 
     def make_pair(r, y, tk):
-        iid = "%s|%s|%d" % (tag, r["event_time"], r["i"])
-        ih = hashlib.sha256(json.dumps({k: r[k] for k in ("event_time", "features", "close")},
-                                       sort_keys=True).encode()).hexdigest()[:16]
-        oc = OutcomeRecord(world_id="corpus", world_hash=tag, subject="SPY", step=r["i"],
-                           horizon=HORIZON, target_value=y, outcome_known_time=tk)
-        return iid, ih, oc
+        return pair_identity(tag, r, y, tk)
 
     for i, (r, y, tk) in enumerate(dev_rows):
         iid, ih, oc = make_pair(r, y, tk)
@@ -190,6 +204,41 @@ def evaluate(params: dict, dev_rows_y: list, *, seed: int = 7, tag: str = "DEV",
                economics="NONE (distributional only)")
     rec["elapsed_s"] = round(time.time() - t0, 2)
     return rec
+
+
+def reconstruct_forecast_hashes(params: dict, rows_y: list, *, tag: str, creation_time: float,
+                                ledger_path) -> dict:
+    """Recompute every arm's forecast hash for `rows_y` (already through
+    `_admit`) from `params` and compare against the sealed ledger, row by row.
+    No grading, no statistics: this establishes only that the recorded hashes
+    are the hashes of forecasts built from the saved params and these rows."""
+    admitted, _ = _admit(rows_y)
+    ledger = []
+    p = Path(ledger_path)
+    if p.exists():
+        for line in p.read_text().splitlines():
+            if not line.strip():
+                continue
+            obj = json.loads(line)
+            ledger.append(obj["entry"] if isinstance(obj.get("entry"), dict) else obj)
+    out = {"tag": tag, "creation_time_used": creation_time, "rows_admitted": len(admitted),
+           "rows_in_ledger": len(ledger), "matched_rows": 0, "mismatched": [], "unmatched_rows": 0}
+    by_key = {(e["event_time"], e["i"]): e["arms"] for e in ledger}
+    for r, y, tk in admitted:
+        iid, ih, _ = pair_identity(tag, r, y, tk)
+        got = {a: A.forecast(a, params, r, input_id=iid, input_hash=ih, creation_time=creation_time).forecast_hash
+               for a in ARMS}
+        want = by_key.get((r["event_time"], r["i"]))
+        if want is None:
+            out["unmatched_rows"] += 1
+        elif want == got:
+            out["matched_rows"] += 1
+        elif len(out["mismatched"]) < 5:
+            out["mismatched"].append({"event_time": r["event_time"], "i": r["i"],
+                                      "arms_differing": sorted(a for a in ARMS if want.get(a) != got[a])})
+    out["mismatched_rows"] = len(admitted) - out["matched_rows"] - out["unmatched_rows"]
+    out["all_match"] = (out["rows_admitted"] == out["rows_in_ledger"] == out["matched_rows"] > 0)
+    return out
 
 
 def tournament(fit_rows_y: list, dev_rows_y: list, *, seed: int = 7, tag: str = "DEV",

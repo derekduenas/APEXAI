@@ -20,7 +20,8 @@ import pytest
 
 from apex.world_model.exp001b.registration import EXPERIMENT_ID as EXP001B_ID
 from apex.world_model.exp001b.registration import registration_hash as exp001b_hash
-from apex.world_model.exp002.registration import EXPERIMENT_ID as EXP002_ID, registration_hash
+from apex.world_model.exp002.registration import EXPERIMENT_ID as EXP002_ID, RV_FLOOR, registration_hash
+from apex.world_model.real_data import loader
 from apex.world_model.real_data import boundary, manifest
 from apex.world_model.real_data.boundary import RealDataRefused, TrustConfig
 
@@ -54,7 +55,10 @@ def _require_clean():
     return ident
 
 
-def _session(day: str, seed: int, signal: float = 0.0):
+FLAT = {FIT_DAYS[0]: (120, 60)}      # minutes [120,180) identical closes -> rv_30 == 0 rows below RV_FLOOR
+
+
+def _session(day: str, seed: int, signal: float = 0.0, flat: dict = FLAT):
     """Bars aligned to the calendar's open for admitted-window days. The
     evaluation TRAP lies outside the calendar's verified window, which the
     calendar correctly refuses; that file only has to EXIST so the loader could
@@ -67,8 +71,11 @@ def _session(day: str, seed: int, signal: float = 0.0):
         t0, minutes = datetime.fromtimestamp(b["open_utc"], timezone.utc), int(b["regular_minutes"])
     rng = random.Random(seed)
     px, bars, last = 400.0, [], 0.0
+    fl = (flat or {}).get(day)
     for i in range(minutes):
         r = signal * last + rng.gauss(0, 3e-4); last = r
+        if fl and fl[0] <= i < fl[0] + fl[1]:
+            r = 0.0                                       # identical closes: volatility exactly zero
         o = px * math.exp(rng.gauss(0, 5e-5)); px = px * math.exp(r)
         bars.append({"event_time_utc": (t0 + timedelta(minutes=i)).strftime("%Y-%m-%dT%H:%M:%SZ"),
                      "open": o, "high": max(o, px) * 1.0001, "low": min(o, px) * 0.9999,
@@ -173,6 +180,10 @@ def test_execute_uses_the_roles_correctly_and_never_opens_evaluation(rig, capsys
     assert res["observed"]["comparisons"]["G1"]["promotion_authority"] is False
     assert res["evaluation"].startswith("SEALED")
     assert res["economics"].startswith("NONE")
+    assert res["execution"] == {"observed_requested": True, "observed_outcome": "REPORTED_WITHOUT_SELECTION_AUTHORITY",
+                                "failure": None, "complete": True}
+    assert res["scientific_status"] == res["development"]["status"] == res["status"]
+    assert res["observed"]["status"] in ("MATCHED_IMPROVEMENT", "NOT_SELECTED", "NOT_SELECTED_INFERENCE_DISAGREEMENT")
 
 
 def test_exactly_five_fits_even_with_the_secondary_period(rig, capsys):
@@ -321,3 +332,181 @@ def test_the_real_path_from_a_fresh_clone_in_a_child_process(rig, tmp_path):
     r2 = subprocess.run(args, capture_output=True, text=True, env=env, timeout=600)
     res2 = json.loads(r2.stdout.strip().splitlines()[-1])
     assert res2["rc"] == 3 and res2["doc"]["refusal"].startswith("SOURCE_DIRTY"), res2["doc"]
+
+
+# ------------------------------------------------ integration repair (review findings)
+
+def _grant_and_sessions(rig, p):
+    from apex.world_model.exp002 import historical as H2
+    grant = boundary.verify_decision_with(p, rig["trust"], experiment_id=EXP002_ID, registration_hash=registration_hash())
+    return grant, loader.sessions_by_period(grant, H2.PERIOD_ROLES, symbol="SPY"), loader.loader_for(grant)
+
+
+def test_fit_admission_uses_the_qualified_rule_and_reproduces_tournament_params(rig, capsys):
+    """Finding 1. The fixture's first fit day carries rows with rv_30 == 0 (< RV_FLOOR).
+    They are feature/target-usable, so the old adapter fitted on them while
+    scoring refused them. Now the same `_admit` governs both, and the fitted
+    params equal what the qualified `tournament()` produces on the same rows."""
+    from apex.world_model.exp002 import historical as H2
+    from apex.world_model.exp002.run import _admit, tournament
+    p = _write(rig, _body(rig))
+    rc, doc = _run(rig, p, capsys, "--execute")
+    assert rc == 0, doc
+    res = json.loads((Path(doc["run_dir"]) / "_RESULT.json").read_text())
+    adm = next(s for s in res["stages"] if s["stage"] == "admission:fit")
+    assert adm["refused_rows"]["RV_FLOOR"] > 0, adm                     # the mismatch condition exists
+    assert adm["admitted_rows"] == adm["usable_rows"] - adm["refused_rows"]["RV_FLOOR"]
+    assert res["fit"]["n_train"] == adm["admitted_rows"]                # fitted on admitted rows only
+    # independent recomputation on freshly loaded rows: usable rows do contain
+    # below-floor volatility, and the qualified runner's fit is identical
+    _, sbp, ld = _grant_and_sessions(rig, p)
+    fit_usable, _ = H2._rows_for(sbp["fit"], ld)
+    dev_usable, _ = H2._rows_for(sbp["development"], ld)
+    assert any(r["features"]["rv_30"] < RV_FLOOR for r, _, _ in fit_usable)
+    admitted, refused = _admit(fit_usable)
+    assert (len(admitted), refused) == (adm["admitted_rows"], adm["refused_rows"]["RV_FLOOR"])
+    q = tournament(fit_usable, dev_usable, bootstrap_resamples=50)      # fit is independent of resamples
+    assert q["fit"]["params_hash"] == res["fit"]["params_hash"]
+    assert q["fit"]["n_train"] == res["fit"]["n_train"]
+    assert q["admission"]["fit_refused_rv_floor"] == adm["refused_rows"]["RV_FLOOR"]
+    # the persisted params object IS the fitted object (same hash recomputed from its content)
+    saved = res["fit"]["params"]
+    import hashlib
+    rehash = hashlib.sha256(json.dumps({k: v for k, v in saved.items() if k != "params_hash"},
+                                       sort_keys=True, default=float).encode()).hexdigest()[:16]
+    assert rehash == saved["params_hash"] == res["fit"]["params_hash"]
+
+
+def test_fit_budget_by_recording_spy_on_the_real_fitters(rig, capsys, monkeypatch):
+    """Finding 4. Spies delegate to the real fitters and record every call in
+    order: one fit_arms invocation, its four underlying fitter calls (M0+M1 in
+    one baseline fit, L, C, t = five model fits), no fitter after the first
+    forecast, and forecasts in both periods built from the same params."""
+    from apex.world_model.exp002 import models as A, studentt as T
+    from apex.world_model.exp001b import models as M01
+    events = []
+    def spy(mod, name, label):
+        real = getattr(mod, name)
+        def w(*a, **k):
+            out = real(*a, **k)
+            if label == "forecast":
+                events.append(("forecast", k["input_id"].split("|")[0], a[1]["params_hash"], id(a[1])))
+            else:
+                events.append((label, out["params_hash"] if isinstance(out, dict) and "params_hash" in out else None))
+            return out
+        monkeypatch.setattr(mod, name, w)
+    spy(A, "fit_arms", "fit_arms"); spy(M01, "fit", "baseline_fit"); spy(A, "_fit_lstsq", "lstsq")
+    spy(T, "fit_scale_nu", "student_t_fit"); spy(A, "forecast", "forecast")
+    rc, doc = _run(rig, _write(rig, _body(rig)), capsys, "--execute")
+    assert rc == 0, doc
+    res = json.loads((Path(doc["run_dir"]) / "_RESULT.json").read_text())
+    fits = [e for e in events if e[0] != "forecast"]
+    assert [e[0] for e in fits] == ["baseline_fit", "lstsq", "lstsq", "student_t_fit", "fit_arms"]
+    assert fits[-1][1] == res["fit"]["params_hash"]
+    first_fc = next(i for i, e in enumerate(events) if e[0] == "forecast")
+    assert all(e[0] == "forecast" for e in events[first_fc:])              # no refit after scoring began
+    tags = {e[1] for e in events if e[0] == "forecast"}
+    assert tags == {"DEVELOPMENT_2019", "OBSERVED_2020_2021"}
+    assert {e[2] for e in events if e[0] == "forecast"} == {res["fit"]["params_hash"]}
+    assert len({e[3] for e in events if e[0] == "forecast"}) == 1        # the same object, not a copy
+    assert res["development"]["params_hash"] == res["observed"]["params_hash"] == res["fit"]["params_hash"]
+
+
+def _incomplete_common(rig, p, doc, rc_expected, outcome, status, failure_class):
+    assert doc["process_outcome"] == outcome and rc_expected == doc.get("exit", rc_expected)
+    res = json.loads((Path(doc["run_dir"]) / "_RESULT.json").read_text())
+    assert res["status"] == status
+    assert res["execution"]["complete"] is False
+    assert res["execution"]["observed_outcome"] == "NOT_REPORTED"
+    assert res["execution"]["failure"]["class"] == failure_class
+    assert res["observed"]["status"] == "NOT_EVALUATED"
+    # development evidence preserved, verdict distinct from completion
+    assert res["scientific_status"] in ("MATCHED_IMPROVEMENT", "NOT_SELECTED", "NOT_SELECTED_INFERENCE_DISAGREEMENT")
+    assert res["development"]["status"] == res["scientific_status"]
+    assert "G1" in res["development"]["comparisons"] and res["development"]["null_control_ok"] is True
+    assert res["process_outcome"] == outcome
+    # the launcher does not count it as a completed result
+    spec = importlib.util.spec_from_file_location("_ra3", REPO / "scripts" / "research_activation.py")
+    RA = importlib.util.module_from_spec(spec); sys.modules["_ra3"] = RA; spec.loader.exec_module(RA)
+    got = RA._sealed_results_for(RA.Targets(research_root=rig["out"].parent), boundary.sha256_of(p), set(), EXP002_ID)
+    assert got and not any(c.get("counted") for c in got), got
+    return res
+
+
+def test_observed_admission_refusal_is_incomplete_not_success(rig, capsys, monkeypatch):
+    """Finding 2a. A file-integrity refusal on an observed session."""
+    real = boundary.open_file
+    def refusing(grant, path, **kw):
+        if kw["session_date"] >= "2020-01-01":
+            raise RealDataRefused("FILE_INTEGRITY: %s does not match the manifest" % Path(path).name)
+        return real(grant, path, **kw)
+    monkeypatch.setattr(boundary, "open_file", refusing)
+    p = _write(rig, _body(rig))
+    rc, doc = _run(rig, p, capsys, "--execute")
+    assert rc == 3
+    res = _incomplete_common(rig, p, doc, 3, "AUTHORIZATION_REFUSED", "INCOMPLETE_OBSERVED_ADMISSION_REFUSED", "ADMISSION_REFUSED")
+    assert res["execution"]["failure"]["kind"] == "RealDataRefused" and "FILE_INTEGRITY" in res["execution"]["failure"]["detail"]
+    assert "observed" not in [s["stage"] for s in res["stages"]]
+
+
+def test_observed_scoring_exception_is_incomplete_not_success(rig, capsys, monkeypatch):
+    """Finding 2b. An exception inside observed scoring."""
+    from apex.world_model.exp002 import historical as H2
+    real = H2.evaluate
+    def failing(params, rows, **kw):
+        if kw["tag"].startswith("OBSERVED"):
+            raise ZeroDivisionError("scoring blew up on observed")
+        return real(params, rows, **kw)
+    monkeypatch.setattr(H2, "evaluate", failing)
+    p = _write(rig, _body(rig))
+    rc, doc = _run(rig, p, capsys, "--execute")
+    assert rc == 5
+    res = _incomplete_common(rig, p, doc, 5, "INVALID_INPUT_OR_FAILURE", "INCOMPLETE_OBSERVED_REPORTING", "EXCEPTION")
+    assert res["execution"]["failure"]["kind"] == "ZeroDivisionError"
+
+
+def test_observed_invalid_result_is_incomplete_not_success(rig, capsys, monkeypatch):
+    """Finding 2c. Observed evaluation returns an invalid status."""
+    from apex.world_model.exp002 import historical as H2
+    real = H2.evaluate
+    def invalid(params, rows, **kw):
+        out = real(params, rows, **kw)
+        if kw["tag"].startswith("OBSERVED"):
+            out["status"] = "INVALID_NULL_CONTROL"; out["null_control_ok"] = False
+        return out
+    monkeypatch.setattr(H2, "evaluate", invalid)
+    p = _write(rig, _body(rig))
+    rc, doc = _run(rig, p, capsys, "--execute")
+    assert rc == 5
+    res = _incomplete_common(rig, p, doc, 5, "INVALID_INPUT_OR_FAILURE", "INCOMPLETE_OBSERVED_REPORTING", "INVALID_RESULT")
+    assert res["execution"]["failure"]["kind"] == "INVALID_NULL_CONTROL"
+
+
+def test_forecast_hashes_reconstruct_from_saved_artifacts(rig, capsys):
+    """Evidence item. From the sealed result (exact fitted params, per-period
+    creation time) and freshly admitted rows, every recorded forecast hash is
+    rebuilt and matches the sealed ledger; a perturbed params object does not."""
+    from apex.world_model.exp002 import historical as H2
+    p = _write(rig, _body(rig))
+    rc, doc = _run(rig, p, capsys, "--execute")
+    assert rc == 0, doc
+    run_dir = Path(doc["run_dir"])
+    res = json.loads((run_dir / "_RESULT.json").read_text())
+    for period in ("development", "observed"):
+        assert isinstance(res[period]["forecast_creation_time"], float)
+        assert res[period]["forecast_identity"]["content_hash_excludes_creation_time"] is True
+    _, sbp, ld = _grant_and_sessions(rig, p)
+    rep = H2.reconstruct(res, sbp, session_loader=ld, ledger_dir=run_dir)
+    assert rep["all_match"] is True, rep
+    for period in ("development", "observed"):
+        r = rep["periods"][period]
+        assert r["rows_admitted"] == r["rows_in_ledger"] == r["matched_rows"] == res[period]["n_dev"] > 0
+        assert r["mismatched_rows"] == 0 and r["unmatched_rows"] == 0
+        assert r["creation_time_used"] == res[period]["forecast_creation_time"]
+    # negative control: the check has teeth
+    bad = json.loads(json.dumps(res["fit"]["params"]))
+    bad["t"]["s"] *= 1.01
+    rep_bad = H2.reconstruct(res, sbp, session_loader=ld, ledger_dir=run_dir, params=bad)
+    assert rep_bad["all_match"] is False
+    assert all(r["matched_rows"] == 0 for r in rep_bad["periods"].values())
+    assert all(set(m["arms_differing"]) == {"S", "L", "C"} for m in rep_bad["periods"]["development"]["mismatched"])
