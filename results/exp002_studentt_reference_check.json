@@ -98,9 +98,12 @@
  "scale": 0.00021,
  "scipy_version": "1.18.1",
  "versions": {
+  "correction": "an earlier commit message said the committed test ran under 1.18.1; it ran under 1.17.1. Agreement against two independent scipy versions is recorded as such.",
   "numpy": "2.4.6 (pinned in the disposable venv to match the research runner)",
   "python": "3.12",
   "scipy": "1.18.1",
+  "scipy_committed_test": "1.17.1 (shared test venv /opt/apex/shared/venv; the committed test EXECUTED there, 25 cases passed, it did not skip)",
+  "scipy_executed_record": "1.18.1 (disposable venv, this file)",
   "venv": "disposable /tmp/refvenv, created for this check and deleted afterwards; scipy is NOT a production dependency"
  },
  "worst": {
