@@ -1,4 +1,10 @@
 {
+ "REPORTING_CORRECTIONS": {
+  "1": "a null returning NO_SIGNAL does not establish detection power; that needs separate positive-control evidence",
+  "2": "the OOM counters were sampled once at ~2 minutes, not throughout; completion without a kill is established, continuous zero counters are not",
+  "file": "results/exp001b_reporting_corrections.json",
+  "result_unchanged": true
+ },
  "admission_reconciliation": {
   "refusals_validation": {
    "EMBARGO": 15150,
@@ -62,7 +68,8 @@
   "oom_counters_at_that_read": {
    "max": 0,
    "oom": 0,
-   "oom_kill": 0
+   "oom_kill": 0,
+   "scope": "ONE sample at about 2 minutes into a 21-minute run; not the whole run"
   },
   "sigkill_classifier_note": "not exercised; no kill occurred. The recorded finding that status=KILL alone should not imply OOM stands.",
   "wall_seconds": 1272,
@@ -90,7 +97,7 @@
    "t": -0.3349,
    "verdict": "NO_SIGNAL"
   },
-  "reading": "the point estimate is positive but small and the dependence-aware standard error is 2.46x the naive one; t=0.75 against a threshold of 2.0. The null control returned NO_SIGNAL, so the harness discriminates."
+  "reading": "the point estimate is positive but small and the dependence-aware standard error is 2.46x the naive one; t=0.75 against a threshold of 2.0. The N0 negative control returned NO_SIGNAL as required, which is consistent with correct behaviour but does NOT establish that the harness can detect signal. See REPORTING_CORRECTIONS."
  },
  "terminal_status": "NO_SIGNAL",
  "what_this_does_not_establish": [
