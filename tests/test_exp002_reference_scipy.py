@@ -29,16 +29,28 @@ def test_logpdf_matches_scipy_across_the_declared_range_and_tails(nu):
 
 
 @pytest.mark.parametrize("nu", NUS)
-def test_cdf_matches_scipy_including_extreme_tails_relatively(nu):
+def test_lower_tail_matches_scipy_relatively_out_to_50_scale_units(nu):
+    """Tails are compared on the LOWER side, where both implementations return
+    the small probability directly. An upper tail formed as 1 - cdf rounds to
+    exactly zero near |x|=50 and cannot be compared relatively; symmetry (tested
+    separately) makes the lower tail sufficient."""
     ref = scipy_stats.t(df=nu, loc=MU, scale=SCALE)
     for x in XS:
-        y = MU + x * SCALE
+        y = MU - abs(x) * SCALE
         ours, theirs = T.cdf(y, MU, SCALE, nu), float(ref.cdf(y))
-        tail = min(theirs, 1.0 - theirs)
-        if tail < 1e-3:
-            assert abs(ours - theirs) / tail < 1e-8          # relative, so the tail is really tested
+        assert theirs > 0.0
+        if theirs < 1e-3:
+            assert abs(ours - theirs) / theirs < 1e-8
         else:
             assert abs(ours - theirs) < 1e-10
+
+
+@pytest.mark.parametrize("nu", NUS)
+def test_cdf_is_symmetric_about_the_location(nu):
+    for x in (0.0, 1e-3, 0.5, 2.0, 6.0, 20.0):
+        lo = T.cdf(MU - x * SCALE, MU, SCALE, nu)
+        hi = T.cdf(MU + x * SCALE, MU, SCALE, nu)
+        assert abs(lo + hi - 1.0) < 1e-15
 
 
 @pytest.mark.parametrize("nu", NUS)
