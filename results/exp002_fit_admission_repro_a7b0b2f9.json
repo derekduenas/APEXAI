@@ -1,0 +1,36 @@
+{
+ "checkout": "a7b0b2f9",
+ "fit_usable_rows": 1650,
+ "below_rv_floor_in_usable": 31,
+ "qualified_admitted_rows": 1619,
+ "qualified_refused_rv_floor": 31,
+ "tournament": {
+  "status": "NOT_SELECTED",
+  "params_hash": "99e9df2fee7597b7",
+  "n_train": 1619,
+  "refusal": null
+ },
+ "historical": {
+  "status": "INVALID_INPUT",
+  "params_hash": null,
+  "n_train": null,
+  "refusal": {
+   "kind": "ValueError",
+   "detail": "INSUFFICIENT_OR_NONFINITE_RESIDUALS"
+  },
+  "admission_fit_stage": {
+   "stage": "admission:fit",
+   "sessions": 5,
+   "usable_rows": 1650,
+   "refused_rows": {
+    "WARMUP": 150,
+    "MISSING_FEATURE_BARS": 0,
+    "MISSING_TARGET_BAR": 0,
+    "EMBARGO": 150
+   }
+  },
+  "scientific_status": null,
+  "execution": null
+ },
+ "fit_admission_consistent": false
+}

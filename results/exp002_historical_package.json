@@ -1,22 +1,24 @@
 {
  "admission_request": {
+  "code_commit": "538bbc52e7a00efbf6aca3a1c1082d5941bf1111",
   "decision_filename": "/etc/apex/admissions/exp002_admission.json",
   "dry_validated_against_real_boundary_with_throwaway_key": true,
   "file": "results/exp002_admission_request.json",
   "output_root": "/apex-data/research-exp002/out",
   "refused_as_exp001b": "EXPERIMENT_MISMATCH",
-  "sha256": "5479f3f00d131d96a3684261208e56fd1aeffafba5c16498afec0d9bd2a5924b"
+  "sha256": "4f86b88f90b63339de672de5306b53aaf00f5c8e3e090cc9c5866c5f92991f52",
+  "throwaway_key_destroyed": true
  },
  "candidate": {
-  "bound_files": 57,
-  "bound_source_tree_sha256": "cf28f17315c3adbb195cd79e888571b492272b35fffd71880f20ce0614722a1f",
-  "commit": "a7b0b2f935115792e090d31e159fb4942929f12b",
+  "bound_source_tree_sha256": "b27d847aeb6a3737a6626c4035bd74ffd04ef6ee400bd80c4b5fc867b0da7428",
+  "commit": "538bbc52e7a00efbf6aca3a1c1082d5941bf1111",
   "execute_script_sha256_bound": "a45fbb27d06aae0945fdff31203c98c2c5e68f49e1715bdfc2f7534d62c6f5e9",
   "exp001b_tree_for_reference": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
   "exp002_registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2",
   "launcher_sha256_not_bound": "4b9b187aee53ce8eacd4bcfbacc0439a10818d9a570c9d7501ea6a08f9422191",
   "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
   "registration_unchanged_since_qualification_r2": true,
+  "revision": "after independent review of a7b0b2f9",
   "tree_moved": true
  },
  "changes_since_qualification": {
@@ -171,7 +173,7 @@
  },
  "commands": {
   "execute": "the same command with --apply appended",
-  "prepare": "sudo -n /usr/bin/python3.12 scripts/research_activation.py launch --research-root /apex-data/research-exp002 --runner-root /opt/apex-runner-exp002 --research-user apexresearch3 --experiment ALPHA-EXP-002 --commit a7b0b2f935115792e090d31e159fb4942929f12b --decision /etc/apex/admissions/exp002_admission.json",
+  "prepare": "sudo -n /usr/bin/python3.12 scripts/research_activation.py launch --research-root /apex-data/research-exp002 --runner-root /opt/apex-runner-exp002 --research-user apexresearch3 --experiment ALPHA-EXP-002 --commit 538bbc52e7a00efbf6aca3a1c1082d5941bf1111 --decision /etc/apex/admissions/exp002_admission.json",
   "run_from": "/apex-data/research-exp002/checkout (after setup, verify, probe, launcher hash check)"
  },
  "environment": {
@@ -203,6 +205,7 @@
   "protected_surface_drift": [
    "apex/world_model/exp001b/run.py (the bounded-memory repair, already on record)"
   ],
+  "registration_py_sha256_prefix": "fe15f818129acfb0",
   "rev1_checkout": "277e4a02",
   "rev2_checkout": "a35ab1a2",
   "signed_decisions_prefix": [
@@ -210,7 +213,109 @@
    "28bc28590339b6e9"
   ],
   "synthetic_qualification_r1": "unchanged, NOT QUALIFIED",
-  "synthetic_qualification_r2": "unchanged, QUALIFIED"
+  "synthetic_qualification_r1_sha256_prefix": "f4825320397d6f0b",
+  "synthetic_qualification_r2": "unchanged, QUALIFIED",
+  "synthetic_qualification_r2_sha256_prefix": "884f6f50bbe8a9cc"
+ },
+ "review_repair": {
+  "evidence_forecast_hash_reconstruction": {
+   "content_hash_excludes_creation_time": true,
+   "establishes": "each ledger entry is the content hash of the forecast built from the persisted params and that admitted row; not forecast correctness",
+   "function": "apex.world_model.exp002.historical.reconstruct",
+   "negative_control": "t.s x 1.01 -> zero matches, arms S/L/C differ, M0/M1 unchanged (they do not use t)",
+   "persisted": [
+    "fit.params (exact fitted object; recomputed hash == params_hash)",
+    "<period>.forecast_creation_time",
+    "<period>.forecast_identity"
+   ],
+   "provided": true,
+   "test": "test_forecast_hashes_reconstruct_from_saved_artifacts"
+  },
+  "finding_1_fit_admission": {
+   "note": "on this fixture rv_30 == 0 exactly, so the bypass surfaced as a spurious Student-t refusal; a row with 0 < rv_30 < RV_FLOOR would have fitted silently. Fitting now runs through the same _admit as scoring, pairing preserved, refusal counts recorded.",
+   "records": [
+    "results/exp002_fit_admission_repro_a7b0b2f9.json",
+    "results/exp002_fit_admission_repro_538bbc52.json"
+   ],
+   "reproduction_new": {
+    "below_rv_floor_in_usable": 31,
+    "fit_admission_consistent": true,
+    "fit_usable_rows": 1650,
+    "historical_n_train": 1619,
+    "historical_params_hash": "99e9df2fee7597b7",
+    "historical_status": "NOT_SELECTED",
+    "qualified_admitted_rows": 1619,
+    "qualified_refused_rv_floor": 31,
+    "refused_rv_floor_recorded": 31,
+    "tournament": {
+     "n_train": 1619,
+     "params_hash": "99e9df2fee7597b7",
+     "refusal": null,
+     "status": "NOT_SELECTED"
+    }
+   },
+   "reproduction_old": {
+    "below_rv_floor_in_usable": 31,
+    "fit_admission_consistent": false,
+    "fit_usable_rows": 1650,
+    "historical_refusal": {
+     "detail": "INSUFFICIENT_OR_NONFINITE_RESIDUALS",
+     "kind": "ValueError"
+    },
+    "historical_status": "INVALID_INPUT",
+    "qualified_admitted_rows": 1619,
+    "qualified_refused_rv_floor": 31,
+    "tournament": {
+     "n_train": 1619,
+     "params_hash": "99e9df2fee7597b7",
+     "refusal": null,
+     "status": "NOT_SELECTED"
+    }
+   }
+  },
+  "finding_2_execution_completeness": {
+   "fields": [
+    "scientific_status (development verdict, preserved)",
+    "status (run completion)",
+    "execution.{observed_requested, observed_outcome, failure, complete}"
+   ],
+   "incomplete_statuses": {
+    "INCOMPLETE_OBSERVED_ADMISSION_REFUSED": "AUTHORIZATION_REFUSED (3)",
+    "INCOMPLETE_OBSERVED_REPORTING": "INVALID_INPUT_OR_FAILURE (5)"
+   },
+   "launcher_never_counts_them": "matched by _NOT_COMPLETED markers INCOMPLETE/REFUS/INVALID; asserted in each test",
+   "tests": [
+    "test_observed_admission_refusal_is_incomplete_not_success",
+    "test_observed_scoring_exception_is_incomplete_not_success",
+    "test_observed_invalid_result_is_incomplete_not_success"
+   ]
+  },
+  "finding_4_fit_budget_spy": {
+   "established": "one fit_arms call; underlying fitter calls baseline(M0+M1), lstsq(L), lstsq(C), student_t; no fitter after the first forecast; both periods forecast from one params object; development.params_hash == observed.params_hash == fit.params_hash",
+   "test": "test_fit_budget_by_recording_spy_on_the_real_fitters"
+  },
+  "qualified_modules_byte_identical_to_a7b0b2f9": [
+   "registration",
+   "models",
+   "studentt",
+   "scoring",
+   "bootstrap",
+   "controls"
+  ],
+  "run_py_changes": "non-numerical: pair_identity lifted to module level (identical output), params_hash and forecast_creation_time recorded, reconstruct_forecast_hashes added",
+  "six_world_rerun": "not performed: qualified numerical behaviour unchanged; tournament() gives identical params_hash and status on both trees in the reproduction"
+ },
+ "superseded_candidate": {
+  "bound_files": 57,
+  "bound_source_tree_sha256": "cf28f17315c3adbb195cd79e888571b492272b35fffd71880f20ce0614722a1f",
+  "commit": "a7b0b2f935115792e090d31e159fb4942929f12b",
+  "execute_script_sha256_bound": "a45fbb27d06aae0945fdff31203c98c2c5e68f49e1715bdfc2f7534d62c6f5e9",
+  "exp001b_tree_for_reference": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
+  "exp002_registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2",
+  "launcher_sha256_not_bound": "4b9b187aee53ce8eacd4bcfbacc0439a10818d9a570c9d7501ea6a08f9422191",
+  "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "registration_unchanged_since_qualification_r2": true,
+  "tree_moved": true
  },
  "temporal_roles": {
   "development_with_prior_exposure": [
@@ -228,8 +333,21 @@
   ]
  },
  "tests": {
-  "acceptance_real_path_unstubbed": "tests/test_exp002_historical_path.py: 10 passed at a7b0b2f9 (clean bound tree required)",
-  "exp002_unit_suites": "studentt, controls, reference(scipy): pass",
-  "regression_at_candidate": "tournament, revision2, research_activation, verifier review, real_data_boundary: 173 passed"
+  "acceptance_real_path_unstubbed": "tests/test_exp002_historical_path.py: 16 passed at 538bbc52 (311 s, contained MemoryMax=1400M)",
+  "exp002_unit_suites": "included in regression",
+  "regression_at_candidate": {
+   "failed": false,
+   "files": [
+    "tournament",
+    "revision2",
+    "studentt",
+    "controls",
+    "reference_scipy",
+    "research_activation",
+    "real_data_boundary",
+    "activation_verifier_review"
+   ],
+   "passed": 213
+  }
  }
 }

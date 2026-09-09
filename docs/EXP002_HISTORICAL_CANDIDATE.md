@@ -111,3 +111,104 @@ did not demonstrate improvement over the matched linear Student-t on this inform
 set at this horizon. The 2020–2021 report is context with no authority.
 
 **Stop here for independent review before signing or historical execution.**
+
+---
+
+## Revision after independent review — candidate `538bbc52`
+
+The reviewer found two code-level blockers in the historical adapter and one
+evidence gap. The qualified model specification and both synthetic
+qualification records are unchanged; the repair is to the integration only.
+
+| Item | a7b0b2f9 (withdrawn) | 538bbc52 (candidate) |
+|---|---|---|
+| Candidate commit | `a7b0b2f935115792e090d31e159fb4942929f12b` | `538bbc52e7a00efbf6aca3a1c1082d5941bf1111` |
+| Bound source tree | `cf28f17315c3adbb…14722a1f` | `b27d847aeb6a3737a6626c4035bd74ffd04ef6ee400bd80c4b5fc867b0da7428` |
+| EXP-002 registration | `fe15f818…` | `fe15f818…` (unchanged) |
+| Launcher sha256 (not bound) | `4b9b187a…` | `4b9b187a…` (unchanged) |
+| Execute script sha256 (bound) | `a45fbb27…` | `a45fbb27…` (unchanged) |
+| Unsigned request | code → a7b0b2f9 | code → 538bbc52, sha256 `4f86b88f…`; dry-validated with a throwaway key: grant as EXP-002, `EXPERIMENT_MISMATCH` as EXP-001B |
+
+### Finding 1 — fit admission bypassed the qualified volatility rule (fixed)
+
+`historical.run` built fit rows with `_usable` (features + target only) and
+passed them straight to `fit_arms`; `tournament()` applies `_admit` (RV_FLOOR)
+first, and `evaluate()` applies it to scoring rows. Below-floor rows could
+therefore reach historical fitting while being refused at scoring.
+
+Reproduction (`scripts/exp002_fit_admission_repro.py`, disposable fixture with
+a 60-minute flat-price stretch → 31 rows with `rv_30 == 0`), same fixture on
+both trees:
+
+| | old tree a7b0b2f9 | repaired tree 538bbc52 |
+|---|---|---|
+| usable fit rows / below floor | 1650 / 31 | 1650 / 31 |
+| `tournament()` on the same rows | NOT_SELECTED, params `99e9df2fee7597b7`, n_train 1619 | identical |
+| `historical.run` | **INVALID_INPUT** — the 31 rows reached the Student-t fit, `INSUFFICIENT_OR_NONFINITE_RESIDUALS` | NOT_SELECTED, params `99e9df2fee7597b7`, n_train 1619, `refused_rows.RV_FLOOR = 31` |
+
+On this fixture the bypass surfaced as a spurious refusal because `rv_30` was
+exactly zero (residuals divided by zero). A row with `0 < rv_30 < RV_FLOOR`
+would instead have fitted silently on rows the qualified rule excludes; the
+repair covers both because fitting now goes through the same `_admit`.
+
+Repair: `_admitted_rows_for` = `_rows_for` → `_admit`; the fit stage records
+`usable_rows`, `admitted_rows`, `refused_rows` including `RV_FLOOR`, and the
+rule used. Pairing is preserved (a refused row is refused for every arm).
+Test: `test_fit_admission_uses_the_qualified_rule_and_reproduces_tournament_params`
+— refusal count > 0, `n_train == admitted`, and the fitted `params_hash`
+equals `tournament()`'s on independently reloaded rows.
+
+### Finding 2 — observed-period failure could read as overall success (fixed)
+
+The record now carries two distinct fields:
+
+- `scientific_status` — the development verdict (selection authority G1 only), always preserved together with the full `development` block;
+- `status` / `execution` — whether the **requested** run completed. If observed reporting was requested and hit an admission refusal, an exception, or an invalid result, `execution.complete = false`, `observed.status = NOT_EVALUATED` with the failure recorded, and `status` becomes `INCOMPLETE_OBSERVED_ADMISSION_REFUSED` (→ `AUTHORIZATION_REFUSED`, exit 3) or `INCOMPLETE_OBSERVED_REPORTING` (→ `INVALID_INPUT_OR_FAILURE`, exit 5). The launcher's `_NOT_COMPLETED` markers (`INCOMPLETE`, `REFUS`, `INVALID`) mean such a result is never counted.
+
+Valid observed statistics are kept, with `promotion_authority = false` and
+authority `NONE`. Three tests exercise the cases through the real
+execute-and-seal path (file-integrity refusal on an observed session, a
+scoring exception, an invalid observed status); each asserts the development
+evidence is intact, the exit code is non-zero, and the launcher does not count
+the result.
+
+### Evidence — forecast-hash reconstruction (provided)
+
+`forecast_hash` is the content identity and **excludes `creation_time`** by
+design (`apex/world_model/forecast.py`, "CONTENT identity — creation_time
+deliberately excluded"). The sealed result now persists, per period, the exact
+fitted object (`fit.params`, whose recomputed hash equals `params_hash`), the
+`forecast_creation_time` actually used, and the identity construction
+(`forecast_identity`). `historical.reconstruct()` rebuilds every recorded hash
+from those saved artifacts plus freshly admitted rows and compares against
+the sealed ledger row by row.
+
+`test_forecast_hashes_reconstruct_from_saved_artifacts`: development and
+observed both `rows_admitted == rows_in_ledger == matched_rows == n_dev`, zero
+mismatches; negative control (`t.s` × 1.01) → zero matches, arms S/L/C
+differing (M0/M1 do not use `t`, so their hashes correctly stay equal).
+
+What the retained hashes establish: that each ledger entry is the content
+hash of the forecast produced from the persisted params and that admitted row.
+They do not by themselves establish forecast correctness; that is the job of
+the qualification and the reference tests.
+
+### Finding 4 — fit-budget evidence by recording spy (added)
+
+`test_fit_budget_by_recording_spy_on_the_real_fitters` wraps the real
+`fit_arms`, baseline `fit`, `_fit_lstsq`, `fit_scale_nu` and `forecast`,
+delegating to them and recording order. Established: one `fit_arms` call, its
+four underlying fitter calls (baseline M0+M1 in one call, L, C, t — five model
+fits), no fitter call after the first forecast, forecasts in both periods
+built from one and the same params object, and
+`development.params_hash == observed.params_hash == fit.params_hash`.
+
+### Applicability of the qualification
+
+`run.py` changes are non-numerical: the row identity builder was lifted to
+module level (`pair_identity`, identical output), two fields are recorded
+(`params_hash`, `forecast_creation_time`), and a reconstruction function was
+added. `models`, `studentt`, `scoring`, `bootstrap`, `controls`, `registration`
+are byte-identical to the qualified tree. The reproduction shows
+`tournament()` giving the same `params_hash` and status on both trees. A
+six-world rerun was therefore not performed.

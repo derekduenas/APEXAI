@@ -35,16 +35,21 @@
   }
  },
  "code": {
+  "commit": "538bbc52e7a00efbf6aca3a1c1082d5941bf1111",
+  "source_tree_sha256": "b27d847aeb6a3737a6626c4035bd74ffd04ef6ee400bd80c4b5fc867b0da7428",
   "bound_paths": [
    "apex/world_model",
    "apex/governance/chain_ledger.py",
    "apex/intraday/sessions.py",
    "scripts/alpha_exp_real_execute.py"
   ],
-  "commit": "a7b0b2f935115792e090d31e159fb4942929f12b",
   "launcher_sha256_not_in_bound_tree": "4b9b187aee53ce8eacd4bcfbacc0439a10818d9a570c9d7501ea6a08f9422191",
-  "note": "the bound tree moved from EXP-001B's 06eee315 because exp002 modules and the experiment switch in the execute script are bound paths; that is why this needs its own admission. The launcher is pinned by the commit and by invoking it from the fresh checkout after checking its hash.",
-  "source_tree_sha256": "cf28f17315c3adbb195cd79e888571b492272b35fffd71880f20ce0614722a1f"
+  "supersedes": {
+   "commit": "a7b0b2f935115792e090d31e159fb4942929f12b",
+   "source_tree_sha256": "cf28f17315c3adbb195cd79e888571b492272b35fffd71880f20ce0614722a1f",
+   "why": "historical integration repair after independent review: fit admission through the qualified rule, execution completeness separated from the development verdict, forecast-hash reconstruction evidence"
+  },
+  "note": "the bound tree moved from EXP-001B's 06eee315 because exp002 modules and the experiment switch in the execute script are bound paths; that is why this needs its own admission. The launcher is pinned by the commit and by invoking it from the fresh checkout after checking its hash."
  },
  "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
  "dataset": {

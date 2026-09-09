@@ -1,0 +1,41 @@
+{
+ "checkout": "538bbc52e",
+ "fit_usable_rows": 1650,
+ "below_rv_floor_in_usable": 31,
+ "qualified_admitted_rows": 1619,
+ "qualified_refused_rv_floor": 31,
+ "tournament": {
+  "status": "NOT_SELECTED",
+  "params_hash": "99e9df2fee7597b7",
+  "n_train": 1619,
+  "refusal": null
+ },
+ "historical": {
+  "status": "NOT_SELECTED",
+  "params_hash": "99e9df2fee7597b7",
+  "n_train": 1619,
+  "refusal": null,
+  "admission_fit_stage": {
+   "stage": "admission:fit",
+   "sessions": 5,
+   "usable_rows": 1650,
+   "admitted_rows": 1619,
+   "refused_rows": {
+    "WARMUP": 150,
+    "MISSING_FEATURE_BARS": 0,
+    "MISSING_TARGET_BAR": 0,
+    "EMBARGO": 150,
+    "RV_FLOOR": 31
+   },
+   "rule": "apex.world_model.exp002.run._admit (RV_FLOOR), the qualified tournament's admission"
+  },
+  "scientific_status": "NOT_SELECTED",
+  "execution": {
+   "observed_requested": true,
+   "observed_outcome": "REPORTED_WITHOUT_SELECTION_AUTHORITY",
+   "failure": null,
+   "complete": true
+  }
+ },
+ "fit_admission_consistent": true
+}
