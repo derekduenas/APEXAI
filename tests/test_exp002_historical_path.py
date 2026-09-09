@@ -55,12 +55,19 @@ def _require_clean():
 
 
 def _session(day: str, seed: int, signal: float = 0.0):
+    """Bars aligned to the calendar's open for admitted-window days. The
+    evaluation TRAP lies outside the calendar's verified window, which the
+    calendar correctly refuses; that file only has to EXIST so the loader could
+    list it, so it is built at a fixed start without consulting the calendar."""
     from apex.world_model.exp001b import exchange_calendar as C
-    b = C.session_bounds(day, require_verified=True)
+    if day in EVAL_TRAP:
+        t0, minutes = datetime.fromisoformat(day + "T13:30:00+00:00"), 390
+    else:
+        b = C.session_bounds(day, require_verified=True)
+        t0, minutes = datetime.fromtimestamp(b["open_utc"], timezone.utc), int(b["regular_minutes"])
     rng = random.Random(seed)
-    t0 = datetime.fromtimestamp(b["open_utc"], timezone.utc)
     px, bars, last = 400.0, [], 0.0
-    for i in range(int(b["regular_minutes"])):
+    for i in range(minutes):
         r = signal * last + rng.gauss(0, 3e-4); last = r
         o = px * math.exp(rng.gauss(0, 5e-5)); px = px * math.exp(r)
         bars.append({"event_time_utc": (t0 + timedelta(minutes=i)).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -200,7 +207,14 @@ def test_an_exp001b_admission_cannot_authorise_exp002(rig, capsys):
 def test_signature_and_source_refusals(rig, capsys):
     p = _write(rig, _body(rig), sign=False)
     rc, doc = _run(rig, p, capsys, "--execute")
-    assert rc == 3 and "SIGNATURE" in doc["refusal"]
+    assert rc == 3 and doc["refusal"].startswith("UNSIGNED_DECISION")
+    # and a signature by a key NOT in allowed_signers is refused as invalid
+    other = rig["tmp"] / "otherkey"
+    subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(other), "-C", "x"], check=True)
+    p = _write(rig, _body(rig), name="dbad.json", sign=False)
+    subprocess.run(["ssh-keygen", "-Y", "sign", "-f", str(other), "-n", "apex-admission", str(p)], check=True, capture_output=True)
+    rc, doc = _run(rig, p, capsys, "--execute")
+    assert rc == 3 and doc["refusal"].startswith("SIGNATURE_INVALID")
     p = _write(rig, _body(rig, code__commit="0" * 40), name="dc.json")
     rc, doc = _run(rig, p, capsys, "--execute")
     assert rc == 3 and doc["refusal"].startswith("CODE_IDENTITY_MISMATCH")
