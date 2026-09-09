@@ -497,16 +497,50 @@ def test_forecast_hashes_reconstruct_from_saved_artifacts(rig, capsys):
         assert res[period]["forecast_identity"]["content_hash_excludes_creation_time"] is True
     _, sbp, ld = _grant_and_sessions(rig, p)
     rep = H2.reconstruct(res, sbp, session_loader=ld, ledger_dir=run_dir)
-    assert rep["all_match"] is True, rep
+    assert rep["all_match"] is True and rep["status"] == "VERIFIED", rep
+    assert rep["required_periods"] == rep["verified_periods"] == ["development", "observed"]
+    assert rep["missing"] == []
     for period in ("development", "observed"):
         r = rep["periods"][period]
+        assert r["status"] == "VERIFIED"
         assert r["rows_admitted"] == r["rows_in_ledger"] == r["matched_rows"] == res[period]["n_dev"] > 0
         assert r["mismatched_rows"] == 0 and r["unmatched_rows"] == 0
         assert r["creation_time_used"] == res[period]["forecast_creation_time"]
+        assert r["ledger_order_matches_admitted"] is True and r["chain_integrity_verified"] is False
+    assert rep["ledger_ordering_matches"] is True
+    assert "NOT VERIFIED" in rep["verifies"]["chain_integrity"]
+    # negative: BOTH required periods lack reconstruction metadata -> never a false success
+    none = json.loads(json.dumps(res))
+    for period in ("development", "observed"):
+        none[period].pop("forecast_creation_time")
+    rep_none = H2.reconstruct(none, sbp, session_loader=ld, ledger_dir=run_dir)
+    assert rep_none["all_match"] is False and rep_none["status"] == "NOT_VERIFIED"
+    assert rep_none["verified_periods"] == [] and set(rep_none["missing"]) == {
+        "development.forecast_creation_time", "observed.forecast_creation_time"}
+    assert all(rep_none["periods"][p]["status"] == "NOT_VERIFIED" for p in ("development", "observed"))
+    # negative: ONE required period missing -> the other alone cannot carry overall success
+    one = json.loads(json.dumps(res)); one["observed"].pop("forecast_creation_time")
+    rep_one = H2.reconstruct(one, sbp, session_loader=ld, ledger_dir=run_dir)
+    assert rep_one["all_match"] is False and rep_one["status"] == "NOT_VERIFIED"
+    assert rep_one["verified_periods"] == ["development"] and rep_one["missing"] == ["observed.forecast_creation_time"]
+    assert rep_one["periods"]["development"]["status"] == "VERIFIED"
+    # a missing ledger artifact is a missing artifact, not a pass
+    (run_dir / "forecast_hashes_OBSERVED_2020_2021.jsonl").rename(run_dir / "moved.jsonl")
+    rep_led = H2.reconstruct(res, sbp, session_loader=ld, ledger_dir=run_dir)
+    assert rep_led["status"] == "NOT_VERIFIED" and rep_led["missing"] == ["observed.ledger"]
+    (run_dir / "moved.jsonl").rename(run_dir / "forecast_hashes_OBSERVED_2020_2021.jsonl")
+    # requirement is derived from the saved execution record: observed not requested -> not required
+    dev_only = json.loads(json.dumps(res)); dev_only["execution"]["observed_requested"] = False; dev_only.pop("observed")
+    rep_dev = H2.reconstruct(dev_only, sbp, session_loader=ld, ledger_dir=run_dir)
+    assert rep_dev["required_periods"] == ["development"] and rep_dev["status"] == "VERIFIED"
+    # no saved params -> nothing can be verified
+    nop = json.loads(json.dumps(res)); nop["fit"].pop("params")
+    rep_nop = H2.reconstruct(nop, sbp, session_loader=ld, ledger_dir=run_dir)
+    assert rep_nop["status"] == "NOT_VERIFIED" and rep_nop["verified_periods"] == [] and "fit.params" in rep_nop["missing"]
     # negative control: the check has teeth
     bad = json.loads(json.dumps(res["fit"]["params"]))
     bad["t"]["s"] *= 1.01
     rep_bad = H2.reconstruct(res, sbp, session_loader=ld, ledger_dir=run_dir, params=bad)
-    assert rep_bad["all_match"] is False
-    assert all(r["matched_rows"] == 0 for r in rep_bad["periods"].values())
+    assert rep_bad["all_match"] is False and rep_bad["status"] == "NOT_VERIFIED"
+    assert all(r["status"] == "MISMATCH" and r["matched_rows"] == 0 for r in rep_bad["periods"].values())
     assert all(set(m["arms_differing"]) == {"S", "L", "C"} for m in rep_bad["periods"]["development"]["mismatched"])

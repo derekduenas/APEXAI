@@ -238,6 +238,10 @@ def reconstruct_forecast_hashes(params: dict, rows_y: list, *, tag: str, creatio
                                       "arms_differing": sorted(a for a in ARMS if want.get(a) != got[a])})
     out["mismatched_rows"] = len(admitted) - out["matched_rows"] - out["unmatched_rows"]
     out["all_match"] = (out["rows_admitted"] == out["rows_in_ledger"] == out["matched_rows"] > 0)
+    # ordering is reported, not folded into all_match; the entry/prev hash chain is not checked here
+    out["ledger_order_matches_admitted"] = ([(e["event_time"], e["i"]) for e in ledger]
+                                            == [(r["event_time"], r["i"]) for r, _, _ in admitted])
+    out["chain_integrity_verified"] = False
     return out
 
 

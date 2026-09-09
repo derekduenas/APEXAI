@@ -187,16 +187,39 @@ def reconstruct(result: dict, sessions_by_period: dict, *, session_loader, ledge
     result's exact fitted params and per-period forecast creation time) plus
     freshly admitted rows, and compare against the sealed forecast-hash ledger.
     `params` overrides the saved object only for negative controls."""
-    params = params if params is not None else result["fit"]["params"]
-    out = {"params_hash": params["params_hash"], "periods": {}}
-    for period, tag in TAGS.items():
+    params = params if params is not None else (result.get("fit") or {}).get("params")
+    # required periods are derived from the SAVED execution record, never from
+    # what happens to be present: development always; observed if requested
+    required = ["development"]
+    if (result.get("execution") or {}).get("observed_requested"):
+        required.append("observed")
+    out = {"params_hash": params["params_hash"] if params else None, "required_periods": required,
+           "verified_periods": [], "missing": [], "periods": {},
+           "verifies": {"forecast_contents": "each admitted row's per-arm forecast hash, looked up by (event_time, i)",
+                        "ledger_ordering": "reported separately as ledger_ordering_matches; not part of all_match",
+                        "chain_integrity": "NOT VERIFIED here (entry/prev hash chain is not checked)"}}
+    if params is None:
+        out["missing"].append("fit.params")
+    for period in required:
+        tag = TAGS[period]
         per = result.get(period) or {}
-        if "forecast_creation_time" not in per:
-            out["periods"][period] = {"status": "NOT_RECORDED"}
+        ledger = Path(ledger_dir) / ("forecast_hashes_%s.jsonl" % tag)
+        absent = [k for k, ok in (("forecast_creation_time", "forecast_creation_time" in per),
+                                  ("ledger", ledger.exists()), ("sessions", bool(sessions_by_period.get(period))))
+                  if not ok]
+        if params is None or absent:
+            out["periods"][period] = {"status": "NOT_VERIFIED", "missing": absent}
+            out["missing"].extend("%s.%s" % (period, a) for a in absent)
             continue
-        rows, _, _ = _admitted_rows_for(sessions_by_period.get(period) or [], session_loader)
-        out["periods"][period] = reconstruct_forecast_hashes(
-            params, rows, tag=tag, creation_time=per["forecast_creation_time"],
-            ledger_path=Path(ledger_dir) / ("forecast_hashes_%s.jsonl" % tag))
-    out["all_match"] = all(p.get("all_match") for p in out["periods"].values() if p.get("status") != "NOT_RECORDED")
+        rows, _, _ = _admitted_rows_for(sessions_by_period[period], session_loader)
+        rep = reconstruct_forecast_hashes(params, rows, tag=tag, creation_time=per["forecast_creation_time"],
+                                          ledger_path=ledger)
+        rep["status"] = "VERIFIED" if rep["all_match"] else "MISMATCH"
+        out["periods"][period] = rep
+        if rep["all_match"]:
+            out["verified_periods"].append(period)
+    out["all_match"] = bool(required) and out["verified_periods"] == required
+    out["ledger_ordering_matches"] = all(out["periods"][p].get("ledger_order_matches_admitted") is True
+                                         for p in required) if out["all_match"] else False
+    out["status"] = "VERIFIED" if out["all_match"] else "NOT_VERIFIED"
     return out
