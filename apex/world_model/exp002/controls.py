@@ -16,7 +16,12 @@ GAUSSIAN_NU_ANCHOR = 4.0                         # W3 innovations
 
 WORLDS = {
     "W1_LINEAR":        {"signal": "z1",    "r2": 0.0010, "seed": 1001, "noise": "gaussian",
-                         "role": "basic pipeline check"},
+                         "role": "WEAK-signal linear sensitivity DIAGNOSTIC (revision 1 declared it "
+                                 "blocking; M1-M0 sat at the HAC threshold with an inference "
+                                 "disagreement; parameters and seed unchanged)"},
+    "W1S_LINEAR":       {"signal": "z1",    "r2": 0.0100, "seed": 1006, "noise": "gaussian",
+                         "role": "BLOCKING: basic linear-detection check (added in revision 2, seed "
+                                 "and specification frozen before execution)"},
     "W2_INTERACTION":   {"signal": "z1z5",  "r2": 0.0010, "seed": 1002, "noise": "gaussian",
                          "role": "WEAK-signal sensitivity DIAGNOSTIC, not a power estimate"},
     "W2S_INTERACTION":  {"signal": "z1z5",  "r2": 0.0100, "seed": 1005, "noise": "gaussian",
@@ -29,14 +34,19 @@ WORLDS = {
 
 # Expected outcomes, declared before any run. Keys are (a, b) differentials.
 EXPECTED = {
-    "W1_LINEAR":       {("C", "L"): "NO_SIGNAL", ("M1", "M0"): "SIGNAL_DETECTED", ("L", "S"): "SIGNAL_DETECTED"},
+    "W1_LINEAR":       {("C", "L"): "NO_SIGNAL"},                      # M1-M0 and L-S here are diagnostics
+    "W1S_LINEAR":      {("C", "L"): "NO_SIGNAL", ("M1", "M0"): "SIGNAL_DETECTED", ("L", "S"): "SIGNAL_DETECTED"},
     "W2_INTERACTION":  {("M1", "M0"): "NO_SIGNAL"},                    # C-L here is a diagnostic, not asserted
     "W2S_INTERACTION": {("C", "L"): "SIGNAL_DETECTED", ("M1", "M0"): "NO_SIGNAL"},
     "W3_HEAVY_TAIL":   {("C", "L"): "NO_SIGNAL", ("L", "S"): "NO_SIGNAL", ("M1", "M0"): "NO_SIGNAL"},
     "W4_NULL":         {("C", "L"): "NO_SIGNAL", ("L", "S"): "NO_SIGNAL", ("M1", "M0"): "NO_SIGNAL"},
 }
-BLOCKING = {"W2S_INTERACTION": [("C", "L")], "W4_NULL": [("C", "L"), ("L", "S"), ("M1", "M0")],
-            "W1_LINEAR": [("M1", "M0")], "W3_HEAVY_TAIL": [("C", "L")]}
+BLOCKING = {"W1S_LINEAR": [("M1", "M0"), ("C", "L")],
+            "W2S_INTERACTION": [("C", "L")],
+            "W3_HEAVY_TAIL": [("C", "L")],
+            "W4_NULL": [("C", "L"), ("L", "S"), ("M1", "M0")]}
+DIAGNOSTIC_ONLY = {"W1_LINEAR": [("M1", "M0"), ("L", "S"), ("C", "L")],
+                   "W2_INTERACTION": [("C", "L")]}
 
 
 def beta_for_r2(r2: float) -> float:

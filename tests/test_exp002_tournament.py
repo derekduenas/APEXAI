@@ -100,6 +100,7 @@ def test_verdict_structure_and_null_on_a_null_world():
     assert set(rec["null_control"]) >= {"C-L", "L-S", "M1-M0"}
     assert rec["status"] in ("NOT_SELECTED", "NOT_SELECTED_INFERENCE_DISAGREEMENT",
                              "INVALID_NULL_CONTROL")
+    assert rec["selection_authority"].startswith("G1 (C-L) only")
     assert rec["economics"].startswith("NONE")
     for a in ARMS:
         c = rec["calibration"][a]
@@ -122,18 +123,11 @@ def test_the_null_permutes_outcomes_and_leaves_forecasts_fixed():
     assert rec["null_control_ok"] is True
 
 
-def test_matched_improvement_is_preserved_when_a_compound_gate_fails():
-    """Construct the verdict logic directly: G1 passes, G3 fails -> MATCHED_IMPROVEMENT_ONLY."""
-    from apex.world_model.exp002 import run as R
-    fake = {"G1": {"both_pass": True, "inference_disagreement": False},
-            "G2": {"both_pass": True, "inference_disagreement": False},
-            "G3": {"both_pass": False, "inference_disagreement": False}}
-    g1, g2, g3 = fake["G1"], fake["G2"], fake["G3"]
-    verdict = ("NOT_SELECTED_INFERENCE_DISAGREEMENT" if g1["inference_disagreement"]
-               else "NOT_SELECTED" if not g1["both_pass"]
-               else "BASELINE_REPLACEMENT_CANDIDATE" if (g2["both_pass"] and g3["both_pass"])
-               else "MATCHED_IMPROVEMENT_ONLY")
-    assert verdict == "MATCHED_IMPROVEMENT_ONLY"
+def test_compound_comparisons_carry_no_selection_authority():
+    """Revision 2: the verdict depends on the matched gate alone."""
+    from apex.world_model.exp002.registration import GATES, REPORTED
+    assert set(GATES) == {"G1"}
+    assert {"R5", "R6"} <= set(REPORTED)
 
 
 def test_no_forecast_or_grade_objects_are_retained():

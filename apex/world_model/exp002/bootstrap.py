@@ -9,6 +9,10 @@ import random
 
 import numpy as np
 
+from .registration import BOOT_P_ESTIMATOR
+
+P_ESTIMATOR_LABEL = BOOT_P_ESTIMATOR.split(",")[0].strip()
+
 
 def session_stationary_bootstrap(d, session_ids, *, expected_block_sessions: int,
                                  n_resamples: int, seed: int, threshold: float) -> dict:
@@ -36,9 +40,13 @@ def session_stationary_bootstrap(d, session_ids, *, expected_block_sessions: int
             idx = rng.randrange(S) if rng.random() < p else (idx + 1) % S
         means[b] = tot / cnt
     centred = means - m_obs
-    p_one = float(np.mean(centred >= m_obs))
+    k = int(np.sum(centred >= m_obs))                 # exceedances
+    B = int(n_resamples)
+    p_hat = (k + 1.0) / (B + 1.0)                     # declared estimator; never zero
     return {"mean": m_obs, "n_rows": int(n), "n_sessions": int(S),
-            "expected_block_sessions": expected_block_sessions, "resamples": n_resamples,
+            "expected_block_sessions": expected_block_sessions, "resamples": B,
             "seed": seed, "boot_se": float(centred.std(ddof=1)),
-            "p_one_sided": p_one, "threshold": threshold,
-            "pass": bool(m_obs > 0 and p_one < threshold)}
+            "exceedances": k, "p_estimator": P_ESTIMATOR_LABEL, "p_one_sided": p_hat,
+            "raw_fraction_k_over_B": k / B, "smallest_reportable_p": 1.0 / (B + 1.0),
+            "threshold": threshold,
+            "pass": bool(m_obs > 0 and p_hat < threshold)}

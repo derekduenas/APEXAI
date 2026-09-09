@@ -1,4 +1,11 @@
-# EXP-002 — BOUNDED CHALLENGER TOURNAMENT, EXECUTABLE SPECIFICATION (v4)
+# EXP-002 — BOUNDED CHALLENGER TOURNAMENT, EXECUTABLE SPECIFICATION (v5, qualification revision 2)
+
+> **Revision 2 was designed after observing the failed revision-1 battery.** Revision 1
+> (`results/exp002_synthetic_qualification.json`) remains **NOT QUALIFIED**; its failure is
+> not retroactively removed and its 25 fits stay in the cumulative record. Changes: a strong
+> linear world is the blocking linear check and the weak one is kept unchanged as a
+> diagnostic; the baseline-replacement verdict is removed and selection rests on the matched
+> `C − L` comparison alone; the bootstrap p-value estimator is declared as `(k+1)/(B+1)`.
 
 **Implemented for synthetic qualification only.** Historical fitting and admission
 remain closed. EXP-001B is unchanged and preserved as a completed NO_SIGNAL result.
@@ -91,7 +98,7 @@ bounded dependence), one-sided `t > 2.0`.
 with **expected length 5 sessions** (a declared research choice, not optimality);
 sessions resampled whole and their row-level differentials concatenated, so each
 contributes in proportion to its rows; **centred**, one-sided `p < 0.0228`;
-10,000 resamples; seed 20260909. Sensitivity at expected lengths **1 and 10**,
+10,000 resamples; seed 20260909. **p-value estimator, declared before the revision-2 run: `(k+1)/(B+1)`**, with `k` the centred exceedances and `B` the replicates; zero observed exceedances is reported as `k = 0`, `p = 1/(B+1)`, never as zero probability. Sensitivity at expected lengths **1 and 10**,
 reported; a gate passing only at one length is flagged, and selection never
 switches to whichever passes.
 
@@ -101,35 +108,30 @@ experiment and not evidence of no information.
 
 ---
 
-## 6. GATES, VERDICTS, MULTIPLICITY
+## 6. GATE, VERDICTS, MULTIPLICITY — REVISION 2
 
-| gate | pair | role |
-|---|---|---|
-| G1 | `C − L` | **matched, primary** |
-| G2 | `C − M1` | compound |
-| G3 | `C − M0` | compound |
+**One gate carries selection authority: `G1 = C − L`**, matched, with shared dispersion
+and tail parameters unchanged, required under **both** predeclared inferences.
 
 | verdict | condition | meaning |
 |---|---|---|
-| `MATCHED_IMPROVEMENT` | G1 passes both inferences | the quadratic mean improves this matched forecast on development data |
-| `BASELINE_REPLACEMENT_CANDIDATE` | matched **and** G2 **and** G3 pass both | candidate for later confirmation against the existing alternatives |
-| `MATCHED_IMPROVEMENT_ONLY` | G1 passes, a compound gate fails | the finding is preserved; the baseline is not replaced |
-| `NOT_SELECTED` | G1 fails under both | this specification did not demonstrate improvement |
-| `NOT_SELECTED_INFERENCE_DISAGREEMENT` | HAC and bootstrap disagree on G1 | unresolved |
-| `INVALID_NULL_CONTROL` | a required null assertion fails | the tournament is void |
+| `MATCHED_IMPROVEMENT` | G1 passes both inferences | a candidate for later confirmation of incremental predictive information; **not validated alpha** |
+| `NOT_SELECTED` | G1 fails under both | this quadratic specification did not demonstrate improvement over the matched linear Student-t |
+| `NOT_SELECTED_INFERENCE_DISAGREEMENT` | the two inferences disagree on G1 | unresolved |
+| `INVALID_NULL_CONTROL` | a required matched null assertion fails | void |
 
-**Reported, no promotion authority:** `L−S`, `L−M1`, `S−M0`, `M1−M0`, with
-Holm-Bonferroni across the four, uncorrected values alongside.
+**Removed:** `BASELINE_REPLACEMENT_CANDIDATE` and `MATCHED_IMPROVEMENT_ONLY`. Revision 1
+showed the compound comparisons `C−M1` and `C−M0` pass in every world including the null,
+because the registered scale law is a mean-absolute-deviation ratio used as a standard
+deviation (about 0.80 of the truth for Gaussian data), so they added little
+discrimination. They are now **reported context without selection authority**, alongside
+`L−S`, `L−M1`, `S−M0`, `M1−M0`, with Holm correction across the six. No comparator family
+is added now; a later baseline-replacement study can specify stronger dispersion
+comparators explicitly. The registered models and EXP-001B's result are untouched.
 
-**Multiplicity.** The gate conjunction is an intersection-union test: requiring all
-of a fixed set of valid component tests to pass controls the type-I rate at no more
-than α. An additional correction would be **conservative, not incorrect**; none is
-applied. This does not erase prior search across the programme and does not make
-2019 confirmatory.
-
-No subgroup, regime, session or hour analysis is permitted.
-
----
+**Multiplicity.** With a single gate there is no conjunction to control. The six reported
+comparisons form a separate family under Holm. This does not erase prior search and does
+not make 2019 confirmatory.
 
 ## 7. NULL CONTROL — A STRESS TRANSFORMATION ON MATCHED PAIRS
 
@@ -169,21 +171,23 @@ Rows are generated directly in the shape the tournament consumes.
 
 | world | `g` | R² | seed | noise | role |
 |---|---|---|---|---|---|
-| W1_LINEAR | `z1` | 0.0010 | 1001 | Gaussian | basic pipeline check |
-| W2_INTERACTION | `z1·z5` | 0.0010 | 1002 | Gaussian | **weak-signal sensitivity diagnostic** — not a power estimate |
-| W2S_INTERACTION | `z1·z5` | 0.0100 | 1005 | Gaussian | **BLOCKING**: the pipeline must detect the intended nonlinear mechanism |
+| W1_LINEAR | `z1` | 0.0010 | 1001 | Gaussian | weak linear **sensitivity diagnostic**, unchanged from revision 1 |
+| **W1S_LINEAR** | `z1` | **0.0100** | **1006** | Gaussian | **BLOCKING** basic linear-detection check, added in revision 2, frozen before execution |
+| W2_INTERACTION | `z1·z5` | 0.0010 | 1002 | Gaussian | weak interaction **sensitivity diagnostic** |
+| W2S_INTERACTION | `z1·z5` | 0.0100 | 1005 | Gaussian | **BLOCKING**: the intended nonlinear mechanism must be detected |
 | W3_HEAVY_TAIL | none | 0 | 1003 | Student-t ν=4, unit variance | shape improves with no conditional-mean discovery |
 | W4_NULL | none | 0 | 1004 | Gaussian | nothing anywhere |
 
-**Declared expectations (HAC verdicts):**
+**Declared expectations (HAC verdicts; blocking SIGNAL must also pass the bootstrap):**
 
 | world | `C−L` | `M1−M0` | `L−S` |
 |---|---|---|---|
-| W1 | NO_SIGNAL | SIGNAL | SIGNAL |
-| W2 (weak) | *diagnostic, not asserted* | NO_SIGNAL | — |
-| W2S (strong) | **SIGNAL, both inferences — blocking** | NO_SIGNAL | — |
-| W3 | NO_SIGNAL | NO_SIGNAL | NO_SIGNAL |
-| W4 | NO_SIGNAL | NO_SIGNAL | NO_SIGNAL |
+| W1 (weak) | NO_SIGNAL | *diagnostic* | *diagnostic* |
+| **W1S (strong)** | **NO_SIGNAL, blocking** | **SIGNAL, blocking** | SIGNAL |
+| W2 (weak) | *diagnostic* | NO_SIGNAL | — |
+| W2S (strong) | **SIGNAL, blocking** | NO_SIGNAL | — |
+| W3 | **NO_SIGNAL, blocking** | NO_SIGNAL | NO_SIGNAL |
+| W4 | **NO_SIGNAL, blocking** | **NO_SIGNAL, blocking** | **NO_SIGNAL, blocking** |
 
 Blocking failures stop the tournament from proceeding to any historical fit. **One
 seeded realisation per world establishes behaviour on that fixture, not general
@@ -219,11 +223,20 @@ quantify how knowledge of EXP-001B's result shaped this design; that influence i
 | tuned hyperparameters | 0 |
 | refits after seeing results | 0 |
 | information sets / horizons | 1 / 1 |
-| **synthetic control fits, separate budget** | **25** — 5 worlds × 5 arms |
+| **synthetic control fits, separate budget** | **30** — 6 worlds × 5 arms (revision 2); revision 1's 25 retained; cumulative 55 |
 
 ---
 
-## 11. MEMORY
+## 11. ATTRIBUTABILITY OF THE SYNTHETIC RUN
+
+The qualification script captures, **by the process itself**, the file path and sha256 of
+every `apex.*` module it imported, the git head and dirty count of the tree they came
+from, interpreter and numpy versions, working directory and `PYTHONPATH`, the
+registration hash, and every world's generator parameters and seed; it re-hashes the same
+modules at completion and records whether they were unchanged. Outputs are written with a
+sidecar hash. Revision 1's provenance limitation stands as recorded.
+
+## 12. MEMORY
 
 No forecast or grade object is retained. Per-arm log-likelihoods and PIT values
 are float arrays; forecasts are recomputed for the null pass, which is exact
@@ -232,7 +245,7 @@ fixed per run. A test asserts the record contains no forecast or grade objects.
 
 ---
 
-## 12. WHAT A RESULT MEANS
+## 13. WHAT A RESULT MEANS
 
 A pass **selects a candidate for later confirmation** on evidence not yet used. It
 is not validated alpha, not economic value, does not open the sealed period, and
@@ -243,7 +256,7 @@ improvement and are not evidence of directional information or tradable misprici
 
 ---
 
-## 13. FORBIDDEN
+## 14. FORBIDDEN
 
 Lowering EXP-001B's threshold, searching its results, rerunning it tuned. Opening
 the sealed periods. Presenting 2020–2021 as untouched. Retuning control effect sizes

@@ -160,19 +160,18 @@ def tournament(fit_rows_y: list, dev_rows_y: list, *, seed: int = 7, tag: str = 
                        "coverage_nominal": {"0.05": 0.05, "0.5": 0.5, "0.95": 0.95}}
                    for a in ARMS}
 
-    g1, g2, g3 = comparisons["G1"], comparisons["G2"], comparisons["G3"]
+    g1 = comparisons["G1"]
     if not null_ok:
         verdict = "INVALID_NULL_CONTROL"
     elif g1["inference_disagreement"]:
         verdict = "NOT_SELECTED_INFERENCE_DISAGREEMENT"
     elif not g1["both_pass"]:
         verdict = "NOT_SELECTED"
-    elif g2["both_pass"] and g3["both_pass"]:
-        verdict = "BASELINE_REPLACEMENT_CANDIDATE"
     else:
-        verdict = "MATCHED_IMPROVEMENT_ONLY"
+        verdict = "MATCHED_IMPROVEMENT"
     rec.update(status=verdict, matched_improvement=bool(g1["both_pass"]),
-               baseline_replacement_candidate=(verdict == "BASELINE_REPLACEMENT_CANDIDATE"),
+               selection_authority="G1 (C-L) only; comparisons against the registered Gaussian "
+                                   "models are reported context without selection authority",
                comparisons=comparisons, null_control=null, null_control_ok=null_ok,
                calibration=calibration, n_dev=n,
                economics="NONE (distributional only)")

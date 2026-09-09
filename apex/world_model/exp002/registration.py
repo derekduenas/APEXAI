@@ -5,6 +5,16 @@ import hashlib
 from pathlib import Path
 
 EXPERIMENT_ID = "ALPHA-EXP-002"
+QUALIFICATION_REVISION = 2
+QUALIFICATION_REVISION_NOTE = (
+    "Revision 2 of the synthetic qualification was DESIGNED AFTER OBSERVING the failed "
+    "revision-1 battery (results/exp002_synthetic_qualification.json, NOT QUALIFIED: the "
+    "weak linear world was declared blocking and M1-M0 sat at the HAC threshold with an "
+    "inference disagreement). Revision 1 is preserved as failed; its failure is not "
+    "retroactively removed. Changes: a strong linear world is added as the blocking "
+    "linear-detection check with the weak one kept unchanged as a diagnostic; the "
+    "baseline-replacement verdict is removed and selection concerns the matched C-L "
+    "comparison only; the bootstrap p-value estimator is declared as (k+1)/(B+1).")
 PARENT = "ALPHA-EXP-001B"
 PARENT_REGISTRATION_HASH = "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9"
 PARENT_RESULT = "NO_SIGNAL, t=0.7525, n=165958, run 20260909T003427Z-exp001b-914a30d3"
@@ -51,19 +61,34 @@ BOOT_SENSITIVITY_SESSIONS = (1, 10)
 BOOT_RESAMPLES = 10000
 BOOT_SEED = 20260909
 BOOT_P_THRESHOLD = 0.0228          # one-sided normal-theory equivalent of t > 2.0
+BOOT_P_ESTIMATOR = "(k + 1) / (B + 1), k = centred exceedances of the observed mean, B = replicates"
+BOOT_P_ESTIMATOR_NOTE = ("declared BEFORE the revision-2 run. Zero observed exceedances is not zero "
+                         "probability: with B=10000 the smallest reportable p is 1/10001 ~ 1e-4. "
+                         "Revision 1 reported the raw fraction k/B, which printed 0.0000; its records "
+                         "are kept as they were and re-read under this estimator where cited.")
 INFERENCE_RULE = ("HAC and the 5-session bootstrap must BOTH pass; disagreement is "
                   "NOT_SELECTED_INFERENCE_DISAGREEMENT, never a switch to the friendlier one")
 
 # ---- gates
-GATES = {"G1": ("C", "L"), "G2": ("C", "M1"), "G3": ("C", "M0")}
-REPORTED = {"R1": ("L", "S"), "R2": ("L", "M1"), "R3": ("S", "M0"), "R4": ("M1", "M0")}
+# Selection authority rests on ONE matched comparison. Comparisons against the
+# registered Gaussian models are reported context: revision 1 showed they pass
+# in every world, including the null, because the registered scale law is a
+# mean-absolute-deviation ratio used as a standard deviation, so they add little
+# discrimination here. A later baseline-replacement study may specify stronger
+# dispersion comparators explicitly. No comparator family is added now.
+GATES = {"G1": ("C", "L")}
+REPORTED = {"R1": ("L", "S"), "R2": ("L", "M1"), "R3": ("S", "M0"), "R4": ("M1", "M0"),
+            "R5": ("C", "M1"), "R6": ("C", "M0")}
 OUTCOMES = {
-    "MATCHED_IMPROVEMENT": "G1 passes both inferences",
-    "BASELINE_REPLACEMENT_CANDIDATE": "MATCHED_IMPROVEMENT and G2 and G3 pass both inferences",
-    "MATCHED_IMPROVEMENT_ONLY": "G1 passes; a compound gate does not. The finding is preserved; the baseline is not replaced.",
-    "NOT_SELECTED": "G1 fails under both inferences",
-    "NOT_SELECTED_INFERENCE_DISAGREEMENT": "the two inferences disagree on G1",
+    "MATCHED_IMPROVEMENT": "G1 (C-L) passes BOTH predeclared inferences: a candidate for later "
+                           "confirmation of incremental predictive information. Not validated alpha.",
+    "NOT_SELECTED": "G1 fails under both inferences: this quadratic specification did not "
+                    "demonstrate improvement over the matched linear Student-t",
+    "NOT_SELECTED_INFERENCE_DISAGREEMENT": "the two inferences disagree on G1; unresolved",
+    "INVALID_NULL_CONTROL": "a required matched null assertion failed; the tournament is void",
 }
+REMOVED_IN_REVISION_2 = ("BASELINE_REPLACEMENT_CANDIDATE and MATCHED_IMPROVEMENT_ONLY: the compound "
+                         "gates carried no selection authority worth having in this battery")
 
 # ---- null control, stated precisely
 N0 = {"name": "N0_BLOCK_PERMUTATION",
@@ -87,7 +112,10 @@ OBSERVED_STATUS = "2020-2021 has been observed; secondary reporting only; no aut
 
 # ---- budget
 FIT_BUDGET = {"market_data_fits": 5, "tuned_hyperparameters": 0, "refits_after_results": 0,
-              "information_sets": 1, "horizons": 1, "synthetic_control_fits": 25}
+              "information_sets": 1, "horizons": 1,
+              "synthetic_control_fits": 30,            # revision 2: 6 worlds x 5 arms
+              "synthetic_control_fits_revision_1": 25, # retained in the cumulative record
+              "synthetic_control_fits_cumulative": 55}
 
 CALIBRATION_LAW = ("a log-likelihood gain is a DISTRIBUTIONAL-SCORE improvement. Calibration is a "
                    "separate claim requiring PIT and coverage at 0.05/0.50/0.95, reported for every arm.")
