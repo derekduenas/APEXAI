@@ -1,0 +1,1644 @@
+{
+ "QUALIFIED": false,
+ "blocking_failures": [
+  "W1_LINEAR M1-M0 expected SIGNAL_DETECTED got NO_SIGNAL",
+  "W1_LINEAR M1-M0 SIGNAL not confirmed by both inferences"
+ ],
+ "budget": {
+  "horizons": 1,
+  "information_sets": 1,
+  "market_data_fits": 5,
+  "refits_after_results": 0,
+  "synthetic_control_fits": 25,
+  "tuned_hyperparameters": 0
+ },
+ "elapsed_s": 2872.3,
+ "market_data_fits": 0,
+ "note": "one seeded realisation per world establishes behaviour on that fixture, not general detection power",
+ "peak_rss_self_bytes": 626577408,
+ "qualification": "EXP002_SYNTHETIC_QUALIFICATION",
+ "registration_hash": "b6336c35b8658902d0456e67d63333ee396a272fde2d1cf278144ff2c091e658",
+ "synthetic_control_fits": 25,
+ "within_budget": true,
+ "worlds": {
+  "W1_LINEAR": {
+   "admission": {
+    "dev_refused_rv_floor": 0,
+    "dev_rows": 82500,
+    "fit_refused_rv_floor": 0,
+    "fit_rows": 247500
+   },
+   "calibration": {
+    "C": {
+     "coverage": {
+      "0.05": 0.051393939393939395,
+      "0.5": 0.4956848484848485,
+      "0.95": 0.9498787878787879
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8339,
+      8001,
+      8135,
+      8198,
+      8221,
+      8174,
+      8237,
+      8276,
+      8433,
+      8486
+     ],
+     "pit_mean": 0.5030627446167129,
+     "pit_sd": 0.28962460740172447
+    },
+    "L": {
+     "coverage": {
+      "0.05": 0.051333333333333335,
+      "0.5": 0.49564848484848484,
+      "0.95": 0.9499030303030302
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8345,
+      8003,
+      8121,
+      8194,
+      8228,
+      8177,
+      8239,
+      8269,
+      8439,
+      8485
+     ],
+     "pit_mean": 0.5030672267664034,
+     "pit_sd": 0.2896226504049662
+    },
+    "M0": {
+     "coverage": {
+      "0.05": 0.09483636363636364,
+      "0.5": 0.49696969696969695,
+      "0.95": 0.9046545454545455
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      12475,
+      7914,
+      7094,
+      6806,
+      6711,
+      6640,
+      6831,
+      7190,
+      8123,
+      12716
+     ],
+     "pit_mean": 0.5024961040161391,
+     "pit_sd": 0.3230423798095592
+    },
+    "M1": {
+     "coverage": {
+      "0.05": 0.09438787878787878,
+      "0.5": 0.49564848484848484,
+      "0.95": 0.9037575757575758
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      12365,
+      7918,
+      7101,
+      6795,
+      6712,
+      6645,
+      6790,
+      7238,
+      8181,
+      12755
+     ],
+     "pit_mean": 0.5035494875773793,
+     "pit_sd": 0.3229396627857447
+    },
+    "S": {
+     "coverage": {
+      "0.05": 0.05178181818181818,
+      "0.5": 0.49696969696969695,
+      "0.95": 0.950169696969697
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8365,
+      8084,
+      8117,
+      8212,
+      8222,
+      8162,
+      8251,
+      8197,
+      8449,
+      8441
+     ],
+     "pit_mean": 0.502106849357511,
+     "pit_sd": 0.28971884785109514
+    }
+   },
+   "checks": [
+    {
+     "blocking": false,
+     "expected": "NO_SIGNAL",
+     "ok": true,
+     "pair": "C-L",
+     "realised": "NO_SIGNAL"
+    },
+    {
+     "blocking": true,
+     "expected": "SIGNAL_DETECTED",
+     "ok": false,
+     "pair": "M1-M0",
+     "realised": "NO_SIGNAL"
+    },
+    {
+     "blocking": false,
+     "expected": "SIGNAL_DETECTED",
+     "ok": false,
+     "pair": "L-S",
+     "realised": "NO_SIGNAL"
+    }
+   ],
+   "comparisons": {
+    "G1": {
+     "boot10_p": 0.9113,
+     "boot1_p": 0.8754,
+     "boot5_p": 0.8885,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": -1.79591335059382e-05,
+     "pair": [
+      "C",
+      "L"
+     ],
+     "sensitivity_disagreement": false,
+     "t": -1.181517390056274
+    },
+    "G2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06130476728648053,
+     "pair": [
+      "C",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 15.556199774594495
+    },
+    "G3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06185480113383046,
+     "pair": [
+      "C",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 15.690498130555044
+    },
+    "R1": {
+     "boot10_p": 0.0037,
+     "boot1_p": 0.023,
+     "boot5_p": 0.0065,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": true,
+     "mean": 0.0003576149230364572,
+     "pair": [
+      "L",
+      "S"
+     ],
+     "sensitivity_disagreement": true,
+     "t": 1.9643447816196944
+    },
+    "R2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06132272641998647,
+     "pair": [
+      "L",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 15.560607185367234
+    },
+    "R3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06151514534429994,
+     "pair": [
+      "S",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 15.616715563401586
+    },
+    "R4": {
+     "boot10_p": 0.0038,
+     "boot1_p": 0.0259,
+     "boot5_p": 0.0068,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": true,
+     "mean": 0.0005500338473499287,
+     "pair": [
+      "M1",
+      "M0"
+     ],
+     "sensitivity_disagreement": true,
+     "t": 1.9256340520677904
+    }
+   },
+   "elapsed_s": 634.5,
+   "fit": {
+    "C_rank": 6,
+    "L_rank": 3,
+    "base_k": 0.8018033209278795,
+    "fits_performed": 5,
+    "n_train": 247500,
+    "params_hash": "39c8aa37cc835ef5",
+    "t": {
+     "converged": true,
+     "iterations": 124,
+     "nu": 49.999999998268315,
+     "nu_at_lower_bound": false,
+     "nu_at_upper_bound": true,
+     "s": 0.9851448763786196
+    }
+   },
+   "generator": {
+    "beta": 0.03163859985841663,
+    "features": "AR(1) phi=0.30 per session, N(0,1) marginal",
+    "noise": "gaussian; MA(14) of iid shocks, unit variance, mimicking 15-minute overlap",
+    "orthogonality": "z1*z5 is uncorrelated with z1 and z5 by construction (independent, mean zero)",
+    "r2": 0.001,
+    "rv_30": "lognormal, AR(1) phi=0.90 on log, mean log -8.1117 sd 0.30",
+    "sessions": {
+     "dev": 250,
+     "fit": 750,
+     "rows_each": 330
+    },
+    "signal": "z1"
+   },
+   "n_dev": 82500,
+   "null_control": {
+    "C-L": {
+     "mean": 8.52860741628058e-06,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": 0.4217313556797434,
+     "verdict": "NO_SIGNAL"
+    },
+    "L-S": {
+     "mean": -0.0009450879991306458,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -4.044382699551584,
+     "verdict": "NO_SIGNAL"
+    },
+    "M1-M0": {
+     "mean": -0.0015874528695358256,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -3.7937960685093115,
+     "verdict": "NO_SIGNAL"
+    },
+    "S-M0_reported_only": 21.19784822965195
+   },
+   "role": "basic pipeline check",
+   "status": "NOT_SELECTED"
+  },
+  "W2S_INTERACTION": {
+   "admission": {
+    "dev_refused_rv_floor": 0,
+    "dev_rows": 82500,
+    "fit_refused_rv_floor": 0,
+    "fit_rows": 247500
+   },
+   "calibration": {
+    "C": {
+     "coverage": {
+      "0.05": 0.04692121212121212,
+      "0.5": 0.4897818181818182,
+      "0.95": 0.9472848484848485
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8127,
+      8168,
+      8076,
+      8015,
+      8021,
+      7915,
+      8192,
+      8503,
+      8644,
+      8839
+     ],
+     "pit_mean": 0.5076593011038781,
+     "pit_sd": 0.29088730046242656
+    },
+    "L": {
+     "coverage": {
+      "0.05": 0.04772121212121212,
+      "0.5": 0.48936969696969695,
+      "0.95": 0.9469454545454545
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8107,
+      8234,
+      8136,
+      7956,
+      7940,
+      7980,
+      8164,
+      8389,
+      8721,
+      8873
+     ],
+     "pit_mean": 0.5075830539984098,
+     "pit_sd": 0.29154166009856886
+    },
+    "M0": {
+     "coverage": {
+      "0.05": 0.09136969696969698,
+      "0.5": 0.48875151515151516,
+      "0.95": 0.8994545454545455
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      12385,
+      7832,
+      7059,
+      6593,
+      6453,
+      6486,
+      6664,
+      7354,
+      8349,
+      13325
+     ],
+     "pit_mean": 0.5087329719172634,
+     "pit_sd": 0.32511636186504683
+    },
+    "M1": {
+     "coverage": {
+      "0.05": 0.09151515151515152,
+      "0.5": 0.48936969696969695,
+      "0.95": 0.8996121212121212
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      12416,
+      7831,
+      7068,
+      6597,
+      6461,
+      6478,
+      6643,
+      7357,
+      8353,
+      13296
+     ],
+     "pit_mean": 0.5083509177253364,
+     "pit_sd": 0.32512186400491083
+    },
+    "S": {
+     "coverage": {
+      "0.05": 0.04761212121212121,
+      "0.5": 0.48875151515151516,
+      "0.95": 0.9468606060606061
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8077,
+      8235,
+      8138,
+      7940,
+      7932,
+      7983,
+      8174,
+      8404,
+      8741,
+      8876
+     ],
+     "pit_mean": 0.5079307796347607,
+     "pit_sd": 0.2915365200319025
+    }
+   },
+   "checks": [
+    {
+     "blocking": true,
+     "expected": "SIGNAL_DETECTED",
+     "ok": true,
+     "pair": "C-L",
+     "realised": "SIGNAL_DETECTED"
+    },
+    {
+     "blocking": false,
+     "expected": "NO_SIGNAL",
+     "ok": true,
+     "pair": "M1-M0",
+     "realised": "NO_SIGNAL"
+    }
+   ],
+   "comparisons": {
+    "G1": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.004035251851698238,
+     "pair": [
+      "C",
+      "L"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 8.543701621498334
+    },
+    "G2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06739752030441494,
+     "pair": [
+      "C",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 17.314391542033256
+    },
+    "G3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06743443573561606,
+     "pair": [
+      "C",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 17.31751523754149
+    },
+    "R1": {
+     "boot10_p": 0.1736,
+     "boot1_p": 0.1412,
+     "boot5_p": 0.1744,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": 2.2797320038616934e-05,
+     "pair": [
+      "L",
+      "S"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 1.2751261485606498
+    },
+    "R2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06336226845271671,
+     "pair": [
+      "L",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 16.50526730546043
+    },
+    "R3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.0633763865638792,
+     "pair": [
+      "S",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 16.506492883812545
+    },
+    "R4": {
+     "boot10_p": 0.1658,
+     "boot1_p": 0.1343,
+     "boot5_p": 0.1671,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": 3.6915431201114584e-05,
+     "pair": [
+      "M1",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 1.3168920260936772
+    }
+   },
+   "elapsed_s": 548.84,
+   "fit": {
+    "C_rank": 6,
+    "L_rank": 3,
+    "base_k": 0.8048539703044207,
+    "fits_performed": 5,
+    "n_train": 247500,
+    "params_hash": "3c5c4792abc260f4",
+    "t": {
+     "converged": true,
+     "iterations": 166,
+     "nu": 49.99999999904425,
+     "nu_at_lower_bound": false,
+     "nu_at_upper_bound": true,
+     "s": 0.9887381281701566
+    }
+   },
+   "generator": {
+    "beta": 0.10050378152592121,
+    "features": "AR(1) phi=0.30 per session, N(0,1) marginal",
+    "noise": "gaussian; MA(14) of iid shocks, unit variance, mimicking 15-minute overlap",
+    "orthogonality": "z1*z5 is uncorrelated with z1 and z5 by construction (independent, mean zero)",
+    "r2": 0.01,
+    "rv_30": "lognormal, AR(1) phi=0.90 on log, mean log -8.1117 sd 0.30",
+    "sessions": {
+     "dev": 250,
+     "fit": 750,
+     "rows_each": 330
+    },
+    "signal": "z1z5"
+   },
+   "n_dev": 82500,
+   "null_control": {
+    "C-L": {
+     "mean": -0.006785635656154387,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -11.52081913243855,
+     "verdict": "NO_SIGNAL"
+    },
+    "L-S": {
+     "mean": 1.9092852773548336e-05,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": 0.9176646721147411,
+     "verdict": "NO_SIGNAL"
+    },
+    "M1-M0": {
+     "mean": 2.572031295091373e-05,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": 0.6947584557718008,
+     "verdict": "NO_SIGNAL"
+    },
+    "S-M0_reported_only": 18.626227059135037
+   },
+   "role": "BLOCKING: the pipeline must detect the intended nonlinear mechanism",
+   "status": "BASELINE_REPLACEMENT_CANDIDATE"
+  },
+  "W2_INTERACTION": {
+   "admission": {
+    "dev_refused_rv_floor": 0,
+    "dev_rows": 82500,
+    "fit_refused_rv_floor": 0,
+    "fit_rows": 247500
+   },
+   "calibration": {
+    "C": {
+     "coverage": {
+      "0.05": 0.050606060606060606,
+      "0.5": 0.5096484848484848,
+      "0.95": 0.9540121212121212
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8406,
+      8550,
+      8615,
+      8145,
+      8330,
+      8137,
+      8056,
+      8316,
+      8154,
+      7791
+     ],
+     "pit_mean": 0.49387573912319943,
+     "pit_sd": 0.28810515629926825
+    },
+    "L": {
+     "coverage": {
+      "0.05": 0.050727272727272725,
+      "0.5": 0.5100606060606061,
+      "0.95": 0.9539757575757576
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8414,
+      8571,
+      8573,
+      8196,
+      8326,
+      8067,
+      8109,
+      8297,
+      8157,
+      7790
+     ],
+     "pit_mean": 0.49379736544510955,
+     "pit_sd": 0.288156398612432
+    },
+    "M0": {
+     "coverage": {
+      "0.05": 0.09429090909090909,
+      "0.5": 0.5075757575757576,
+      "0.95": 0.910860606060606
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      12649,
+      8354,
+      7282,
+      6797,
+      6793,
+      6543,
+      6647,
+      7264,
+      8093,
+      12078
+     ],
+     "pit_mean": 0.495016166766161,
+     "pit_sd": 0.3219438304260633
+    },
+    "M1": {
+     "coverage": {
+      "0.05": 0.09527272727272727,
+      "0.5": 0.5100606060606061,
+      "0.95": 0.9118787878787878
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      12768,
+      8414,
+      7295,
+      6794,
+      6809,
+      6554,
+      6622,
+      7237,
+      8049,
+      11958
+     ],
+     "pit_mean": 0.4931597321040225,
+     "pit_sd": 0.3219224978434454
+    },
+    "S": {
+     "coverage": {
+      "0.05": 0.049842424242424244,
+      "0.5": 0.5075757575757576,
+      "0.95": 0.9534181818181818
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8325,
+      8509,
+      8543,
+      8169,
+      8329,
+      8074,
+      8128,
+      8341,
+      8189,
+      7893
+     ],
+     "pit_mean": 0.4954803351518041,
+     "pit_sd": 0.2881734167035389
+    }
+   },
+   "checks": [
+    {
+     "blocking": false,
+     "expected": "NO_SIGNAL",
+     "ok": true,
+     "pair": "M1-M0",
+     "realised": "NO_SIGNAL"
+    }
+   ],
+   "comparisons": {
+    "G1": {
+     "boot10_p": 0.0027,
+     "boot1_p": 0.0034,
+     "boot5_p": 0.004,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.00035967879143323155,
+     "pair": [
+      "C",
+      "L"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 2.447323502422953
+    },
+    "G2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.05598836896297943,
+     "pair": [
+      "C",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 14.450168459120738
+    },
+    "G3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.055813174940241066,
+     "pair": [
+      "C",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 14.416037581407917
+    },
+    "R1": {
+     "boot10_p": 0.9285,
+     "boot1_p": 0.9229,
+     "boot5_p": 0.919,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": -0.0001102497561197185,
+     "pair": [
+      "L",
+      "S"
+     ],
+     "sensitivity_disagreement": false,
+     "t": -1.6196193285795744
+    },
+    "R2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.0556286901715462,
+     "pair": [
+      "L",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 14.383032512342941
+    },
+    "R3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.05556374590492755,
+     "pair": [
+      "S",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 14.372177245571416
+    },
+    "R4": {
+     "boot10_p": 0.9311,
+     "boot1_p": 0.9253,
+     "boot5_p": 0.9213,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": -0.0001751940227383638,
+     "pair": [
+      "M1",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": -1.6407300714980961
+    }
+   },
+   "elapsed_s": 543.03,
+   "fit": {
+    "C_rank": 6,
+    "L_rank": 3,
+    "base_k": 0.8002478208170678,
+    "fits_performed": 5,
+    "n_train": 247500,
+    "params_hash": "60d304e0f7d08516",
+    "t": {
+     "converged": true,
+     "iterations": 122,
+     "nu": 49.99999999909572,
+     "nu_at_lower_bound": false,
+     "nu_at_upper_bound": true,
+     "s": 0.9841569258403583
+    }
+   },
+   "generator": {
+    "beta": 0.03163859985841663,
+    "features": "AR(1) phi=0.30 per session, N(0,1) marginal",
+    "noise": "gaussian; MA(14) of iid shocks, unit variance, mimicking 15-minute overlap",
+    "orthogonality": "z1*z5 is uncorrelated with z1 and z5 by construction (independent, mean zero)",
+    "r2": 0.001,
+    "rv_30": "lognormal, AR(1) phi=0.90 on log, mean log -8.1117 sd 0.30",
+    "sessions": {
+     "dev": 250,
+     "fit": 750,
+     "rows_each": 330
+    },
+    "signal": "z1z5"
+   },
+   "n_dev": 82500,
+   "null_control": {
+    "C-L": {
+     "mean": -0.0009122817269573936,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -4.791429765648514,
+     "verdict": "NO_SIGNAL"
+    },
+    "L-S": {
+     "mean": -4.809712227885302e-05,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -0.6277598574057757,
+     "verdict": "NO_SIGNAL"
+    },
+    "M1-M0": {
+     "mean": -6.962827886327727e-05,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -0.5301852350720007,
+     "verdict": "NO_SIGNAL"
+    },
+    "S-M0_reported_only": 21.74805890935291
+   },
+   "role": "WEAK-signal sensitivity DIAGNOSTIC, not a power estimate",
+   "status": "BASELINE_REPLACEMENT_CANDIDATE"
+  },
+  "W3_HEAVY_TAIL": {
+   "admission": {
+    "dev_refused_rv_floor": 0,
+    "dev_rows": 82500,
+    "fit_refused_rv_floor": 0,
+    "fit_rows": 247500
+   },
+   "calibration": {
+    "C": {
+     "coverage": {
+      "0.05": 0.05096969696969697,
+      "0.5": 0.498169696969697,
+      "0.95": 0.9486060606060606
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8461,
+      8265,
+      8251,
+      8029,
+      8093,
+      8127,
+      8046,
+      8375,
+      8308,
+      8545
+     ],
+     "pit_mean": 0.5010162217119937,
+     "pit_sd": 0.29087591829643694
+    },
+    "L": {
+     "coverage": {
+      "0.05": 0.050945454545454544,
+      "0.5": 0.4981090909090909,
+      "0.95": 0.9486666666666667
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8456,
+      8265,
+      8274,
+      8005,
+      8094,
+      8138,
+      8039,
+      8369,
+      8315,
+      8545
+     ],
+     "pit_mean": 0.5010141761442779,
+     "pit_sd": 0.2908773710803168
+    },
+    "M0": {
+     "coverage": {
+      "0.05": 0.09530909090909091,
+      "0.5": 0.4995030303030303,
+      "0.95": 0.9050060606060606
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      12411,
+      8002,
+      7222,
+      6771,
+      6803,
+      6757,
+      6907,
+      7248,
+      7999,
+      12380
+     ],
+     "pit_mean": 0.5000383757459017,
+     "pit_sd": 0.3220011361224774
+    },
+    "M1": {
+     "coverage": {
+      "0.05": 0.09473939393939394,
+      "0.5": 0.4981090909090909,
+      "0.95": 0.9045454545454545
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      12352,
+      7967,
+      7202,
+      6774,
+      6799,
+      6734,
+      6932,
+      7269,
+      8028,
+      12443
+     ],
+     "pit_mean": 0.5011288364926219,
+     "pit_sd": 0.3219984962427741
+    },
+    "S": {
+     "coverage": {
+      "0.05": 0.05122424242424242,
+      "0.5": 0.4995030303030303,
+      "0.95": 0.9490545454545455
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8490,
+      8309,
+      8296,
+      8039,
+      8075,
+      8138,
+      8013,
+      8373,
+      8271,
+      8496
+     ],
+     "pit_mean": 0.500022812586505,
+     "pit_sd": 0.29087966100839524
+    }
+   },
+   "checks": [
+    {
+     "blocking": true,
+     "expected": "NO_SIGNAL",
+     "ok": true,
+     "pair": "C-L",
+     "realised": "NO_SIGNAL"
+    },
+    {
+     "blocking": false,
+     "expected": "NO_SIGNAL",
+     "ok": true,
+     "pair": "L-S",
+     "realised": "NO_SIGNAL"
+    },
+    {
+     "blocking": false,
+     "expected": "NO_SIGNAL",
+     "ok": true,
+     "pair": "M1-M0",
+     "realised": "NO_SIGNAL"
+    }
+   ],
+   "comparisons": {
+    "G1": {
+     "boot10_p": 0.0477,
+     "boot1_p": 0.0705,
+     "boot5_p": 0.0476,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": 1.3944783901756438e-05,
+     "pair": [
+      "C",
+      "L"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 1.3727355064657814
+    },
+    "G2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.08358309087057608,
+     "pair": [
+      "C",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 13.521043245405862
+    },
+    "G3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.08360255504357168,
+     "pair": [
+      "C",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 13.518001832421476
+    },
+    "R1": {
+     "boot10_p": 0.4498,
+     "boot1_p": 0.4387,
+     "boot5_p": 0.4472,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": 6.548066013852029e-06,
+     "pair": [
+      "L",
+      "S"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 0.160751663138624
+    },
+    "R2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.08356914608667433,
+     "pair": [
+      "L",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 13.519676219493903
+    },
+    "R3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.08358206219365608,
+     "pair": [
+      "S",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 13.51749093375469
+    },
+    "R4": {
+     "boot10_p": 0.401,
+     "boot1_p": 0.3958,
+     "boot5_p": 0.402,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": 1.9464172995598067e-05,
+     "pair": [
+      "M1",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 0.294825023279935
+    }
+   },
+   "elapsed_s": 560.1,
+   "fit": {
+    "C_rank": 6,
+    "L_rank": 3,
+    "base_k": 0.7873221283896535,
+    "fits_performed": 5,
+    "n_train": 247500,
+    "params_hash": "526fa7901e77e362",
+    "t": {
+     "converged": true,
+     "iterations": 61,
+     "nu": 12.917454422828255,
+     "nu_at_lower_bound": false,
+     "nu_at_upper_bound": false,
+     "s": 0.9242374647729104
+    }
+   },
+   "generator": {
+    "beta": 0.0,
+    "features": "AR(1) phi=0.30 per session, N(0,1) marginal",
+    "noise": "student_t_nu4; MA(14) of iid shocks, unit variance, mimicking 15-minute overlap",
+    "orthogonality": "z1*z5 is uncorrelated with z1 and z5 by construction (independent, mean zero)",
+    "r2": 0.0,
+    "rv_30": "lognormal, AR(1) phi=0.90 on log, mean log -8.1117 sd 0.30",
+    "sessions": {
+     "dev": 250,
+     "fit": 750,
+     "rows_each": 330
+    },
+    "signal": null
+   },
+   "n_dev": 82500,
+   "null_control": {
+    "C-L": {
+     "mean": 1.779051870882018e-05,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": 1.5542919932011272,
+     "verdict": "NO_SIGNAL"
+    },
+    "L-S": {
+     "mean": -7.5673195540584605e-06,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -0.18449920698243444,
+     "verdict": "NO_SIGNAL"
+    },
+    "M1-M0": {
+     "mean": -1.2993563003737071e-05,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -0.16141631086710673,
+     "verdict": "NO_SIGNAL"
+    },
+    "S-M0_reported_only": 18.433250132411462
+   },
+   "role": "shape can improve with no conditional-mean discovery",
+   "status": "NOT_SELECTED"
+  },
+  "W4_NULL": {
+   "admission": {
+    "dev_refused_rv_floor": 0,
+    "dev_rows": 82500,
+    "fit_refused_rv_floor": 0,
+    "fit_rows": 247500
+   },
+   "calibration": {
+    "C": {
+     "coverage": {
+      "0.05": 0.05179393939393939,
+      "0.5": 0.5092606060606061,
+      "0.95": 0.9497333333333333
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8748,
+      8592,
+      8274,
+      8235,
+      8165,
+      8098,
+      7943,
+      8061,
+      8125,
+      8259
+     ],
+     "pit_mean": 0.49429069149528665,
+     "pit_sd": 0.2909095548766213
+    },
+    "L": {
+     "coverage": {
+      "0.05": 0.05179393939393939,
+      "0.5": 0.5092969696969697,
+      "0.95": 0.9497696969696969
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8750,
+      8589,
+      8271,
+      8228,
+      8179,
+      8104,
+      7951,
+      8043,
+      8129,
+      8256
+     ],
+     "pit_mean": 0.4942897994192385,
+     "pit_sd": 0.29090745666666584
+    },
+    "M0": {
+     "coverage": {
+      "0.05": 0.0954060606060606,
+      "0.5": 0.5018181818181818,
+      "0.95": 0.9033575757575758
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      12685,
+      8064,
+      7249,
+      6739,
+      6663,
+      6583,
+      6640,
+      7117,
+      8025,
+      12735
+     ],
+     "pit_mean": 0.4996313732799264,
+     "pit_sd": 0.3241816349493325
+    },
+    "M1": {
+     "coverage": {
+      "0.05": 0.09873939393939395,
+      "0.5": 0.5092969696969697,
+      "0.95": 0.9066424242424242
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      13113,
+      8159,
+      7317,
+      6792,
+      6636,
+      6617,
+      6606,
+      6999,
+      7894,
+      12367
+     ],
+     "pit_mean": 0.4935167158201928,
+     "pit_sd": 0.3241765824831674
+    },
+    "S": {
+     "coverage": {
+      "0.05": 0.04970909090909091,
+      "0.5": 0.5018181818181818,
+      "0.95": 0.9477696969696969
+     },
+     "coverage_nominal": {
+      "0.05": 0.05,
+      "0.5": 0.5,
+      "0.95": 0.95
+     },
+     "pit_hist10": [
+      8438,
+      8432,
+      8198,
+      8137,
+      8195,
+      8084,
+      7991,
+      8181,
+      8292,
+      8552
+     ],
+     "pit_mean": 0.4998452160335942,
+     "pit_sd": 0.2909023705520984
+    }
+   },
+   "checks": [
+    {
+     "blocking": true,
+     "expected": "NO_SIGNAL",
+     "ok": true,
+     "pair": "C-L",
+     "realised": "NO_SIGNAL"
+    },
+    {
+     "blocking": true,
+     "expected": "NO_SIGNAL",
+     "ok": true,
+     "pair": "L-S",
+     "realised": "NO_SIGNAL"
+    },
+    {
+     "blocking": true,
+     "expected": "NO_SIGNAL",
+     "ok": true,
+     "pair": "M1-M0",
+     "realised": "NO_SIGNAL"
+    }
+   ],
+   "comparisons": {
+    "G1": {
+     "boot10_p": 0.984,
+     "boot1_p": 0.9619,
+     "boot5_p": 0.975,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": -1.759813019814521e-05,
+     "pair": [
+      "C",
+      "L"
+     ],
+     "sensitivity_disagreement": false,
+     "t": -1.7636852768524847
+    },
+    "G2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06319240291090263,
+     "pair": [
+      "C",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 16.359043162477523
+    },
+    "G3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06292378872760282,
+     "pair": [
+      "C",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 16.17251190283134
+    },
+    "R1": {
+     "boot10_p": 0.7877,
+     "boot1_p": 0.7489,
+     "boot5_p": 0.7758,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": -0.0001922300918146338,
+     "pair": [
+      "L",
+      "S"
+     ],
+     "sensitivity_disagreement": false,
+     "t": -0.8575330311052735
+    },
+    "R2": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.06321000104110076,
+     "pair": [
+      "L",
+      "M1"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 16.363102207188014
+    },
+    "R3": {
+     "boot10_p": 0.0,
+     "boot1_p": 0.0,
+     "boot5_p": 0.0,
+     "both_pass": true,
+     "hac": "SIGNAL_DETECTED",
+     "inference_disagreement": false,
+     "mean": 0.0631336169496156,
+     "pair": [
+      "S",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": 16.31187660282826
+    },
+    "R4": {
+     "boot10_p": 0.7642,
+     "boot1_p": 0.7245,
+     "boot5_p": 0.75,
+     "both_pass": false,
+     "hac": "NO_SIGNAL",
+     "inference_disagreement": false,
+     "mean": -0.00026861418329979887,
+     "pair": [
+      "M1",
+      "M0"
+     ],
+     "sensitivity_disagreement": false,
+     "t": -0.7648750180394448
+    }
+   },
+   "elapsed_s": 555.1,
+   "fit": {
+    "C_rank": 6,
+    "L_rank": 3,
+    "base_k": 0.803640101310831,
+    "fits_performed": 5,
+    "n_train": 247500,
+    "params_hash": "8f416e3e5999cccf",
+    "t": {
+     "converged": true,
+     "iterations": 127,
+     "nu": 49.99999999955042,
+     "nu_at_lower_bound": false,
+     "nu_at_upper_bound": true,
+     "s": 0.986629585887827
+    }
+   },
+   "generator": {
+    "beta": 0.0,
+    "features": "AR(1) phi=0.30 per session, N(0,1) marginal",
+    "noise": "gaussian; MA(14) of iid shocks, unit variance, mimicking 15-minute overlap",
+    "orthogonality": "z1*z5 is uncorrelated with z1 and z5 by construction (independent, mean zero)",
+    "r2": 0.0,
+    "rv_30": "lognormal, AR(1) phi=0.90 on log, mean log -8.1117 sd 0.30",
+    "sessions": {
+     "dev": 250,
+     "fit": 750,
+     "rows_each": 330
+    },
+    "signal": null
+   },
+   "n_dev": 82500,
+   "null_control": {
+    "C-L": {
+     "mean": 1.1360325678569287e-06,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": 0.08815216467047735,
+     "verdict": "NO_SIGNAL"
+    },
+    "L-S": {
+     "mean": -0.0002067301230556143,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -0.8133885576192855,
+     "verdict": "NO_SIGNAL"
+    },
+    "M1-M0": {
+     "mean": -9.098421573608225e-05,
+     "ok": true,
+     "required": "NO_SIGNAL",
+     "t": -0.20140796824197818,
+     "verdict": "NO_SIGNAL"
+    },
+    "S-M0_reported_only": 15.962258451352431
+   },
+   "role": "no predictability anywhere",
+   "status": "NOT_SELECTED"
+  }
+ }
+}

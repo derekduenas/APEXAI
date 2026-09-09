@@ -1,0 +1,57 @@
+{
+ "findings": "EXP002_SYNTHETIC_QUALIFICATION_FINDINGS",
+ "verdict": "NOT QUALIFIED",
+ "source": "results/exp002_synthetic_qualification.json (unit exp002-qual.service, Result=success, exit 0)",
+ "fits": {"synthetic": 25, "budget": 25, "market_data": 0},
+ "runtime": {"elapsed_s": 2872.3, "cpu": "46min 46.6s"},
+ "memory": {"cgroup_memory_peak_bytes": 609431552, "cgroup_source": "systemd MemoryPeak read during the run and its closing summary 581.1M",
+            "self_ru_maxrss_bytes": 626657280, "events_last_read": {"max": 0, "oom": 0, "oom_kill": 0},
+            "note": "counters were read at intervals, not continuously; completion with exit 0 is what establishes no kill"},
+
+ "worlds": {
+  "W1_LINEAR":       {"status": "NOT_SELECTED", "C-L": "NO_SIGNAL (expected)", "M1-M0": "HAC t=1.926 NO_SIGNAL, bootstrap p=0.0068 pass -> INFERENCE DISAGREEMENT; expected SIGNAL under both -> BLOCKING FAILURE", "L-S": "t=1.964 NO_SIGNAL, boot p=0.0065 -> disagreement"},
+  "W2_INTERACTION":  {"status": "BASELINE_REPLACEMENT_CANDIDATE", "C-L": "t=2.447, boot p=0.0040, both pass -> weak interaction DETECTED (sensitivity evidence, not blocking)", "M1-M0": "NO_SIGNAL (expected: linear cannot see it)"},
+  "W2S_INTERACTION": {"status": "BASELINE_REPLACEMENT_CANDIDATE", "C-L": "t=8.544, boot p=0.0000, both pass -> BLOCKING CHECK PASSED", "M1-M0": "NO_SIGNAL (expected)"},
+  "W3_HEAVY_TAIL":   {"status": "NOT_SELECTED", "C-L": "NO_SIGNAL (expected, blocking, passed)", "L-S": "NO_SIGNAL", "M1-M0": "NO_SIGNAL", "nu_star": 12.92, "note": "the MA(14) overlap averaging of t(4) shocks pushes the outcome toward Gaussian; the realised tail is milder than the generator's label suggests"},
+  "W4_NULL":         {"status": "NOT_SELECTED", "all_matched_pairs": "NO_SIGNAL (expected, blocking, passed)"}
+ },
+ "null_control": "matched pairs C-L, L-S, M1-M0 returned NO_SIGNAL in every world; S-M0 retained a large gain under permutation in every world (t 16-22), as the protocol predicted",
+ "nu_at_upper_bound": "in all four Gaussian-noise worlds nu*=50, recorded as legitimate and the runs proceeded, as declared",
+ "numerical_refusals": "none",
+
+ "blocking_failure": {
+  "check": "W1_LINEAR M1-M0 expected SIGNAL_DETECTED under both inferences",
+  "realised": "HAC t=1.926 < 2.0; bootstrap p=0.0068 < 0.0228",
+  "reading": "at R2=0.0010 and n=82,500 the linear signal sits at the HAC threshold, and the two inferences disagree at that margin. The protocol's own rule classifies this as NOT_SELECTED_INFERENCE_DISAGREEMENT. As a BLOCKING basic-pipeline check it fails.",
+  "what_it_does_not_mean": "not evidence the pipeline cannot detect linear signal: the bootstrap detected it and the compound gates did. It means the weak effect size is marginal for HAC, which is precisely what a sensitivity diagnostic is for",
+  "design_inconsistency_i_introduced": "the interaction check has a weak diagnostic (W2) and a strong blocking world (W2S); the linear check has only the weak world and I declared it blocking. That asymmetry is mine.",
+  "proposal_for_review_NOT_applied": "add W1S_LINEAR at R2=0.0100 as the blocking basic-pipeline check, matching the W2/W2S structure, and keep W1 as a sensitivity diagnostic with its realised result on record. This adds a world, not a retuning of W1, and raises the synthetic budget to 30."
+ },
+
+ "design_finding_1_compound_gates_are_non_discriminating": {
+  "observation": "G2 (C-M1) and G3 (C-M0) passed at t between 13.5 and 17.3 in EVERY world, including the null world and the heavy-tail world where C-L was silent",
+  "cause": "the registered baselines' scale law k = mean(|y|)/mean(rv_30) is a mean-absolute-deviation ratio used as a standard deviation. For Gaussian data it equals sqrt(2/pi) ~ 0.80 of the true sd: k came out 0.79-0.80 in every world. Every ML-scaled arm therefore beats M0 and M1 by a large margin on log-likelihood purely through dispersion, regardless of any conditional information.",
+  "evidence": "S-M0 and L-M1 at t 13-17 in every world with nu*=50 (no tail advantage available); M0/M1 coverage at the 5th/95th percentiles 0.091-0.099 / 0.899-0.912 against nominal 0.05/0.95, while S/L/C sit at 0.047-0.052 / 0.947-0.954",
+  "consequence": "BASELINE_REPLACEMENT_CANDIDATE is granted to any Student-t arm in any world. The compound gates as constituted test the registered scale law, not the challenger. The reviewer's concern about compound gates being dominated by dispersion is confirmed and quantified.",
+  "what_this_says_about_EXP001B": "its M0/M1 intervals were narrower than nominal by construction. This does NOT change its verdict: the paired M1-M0 comparison shared the same k, so the comparison was fair. It does mean 'beating the EXP-001B baseline' on log-likelihood is a low bar that any correctly scaled model clears.",
+  "proposal_for_review_NOT_applied": "either (a) redefine G2/G3 against SCALE-MATCHED versions of M0/M1 (same mean laws, Gaussian, with sd from ML on fit-split residuals), so the compound gates test mean and shape rather than an estimator artifact, or (b) drop the replacement verdict and report the registered comparisons as compound context only. Registered M0 and M1 themselves stay untouched either way."
+ },
+
+ "design_finding_2_inference_disagreement_at_the_margin": {
+  "observation": "HAC and the session bootstrap disagreed on M1-M0 and L-S in W1 and on C-L in W3 (bootstrap p=0.0476 vs threshold 0.0228 borderline); sensitivity block lengths 1 and 10 also disagreed with 5 on the W1 pairs",
+  "reading": "on this synthetic process the session bootstrap is the more permissive of the two near t~2. The disagreement rule held and produced the declared verdict. Whether the bootstrap is anti-conservative here or HAC conservative is not established by one realisation."
+ },
+
+ "what_passed_as_declared": ["strong interaction detected by the matched gate under both inferences",
+                             "linear world: matched gate silent",
+                             "heavy-tail world: matched gate silent",
+                             "null world: every matched pair silent",
+                             "null control on matched pairs in every world",
+                             "shape gain survives permutation, as predicted",
+                             "weak interaction detected (sensitivity evidence)",
+                             "t-arms calibrated at nominal coverage; Gaussian baselines under-cover as their scale law implies",
+                             "25 fits, within budget; no refusals; completed in 48 minutes at 581 MiB"],
+ "decision_needed_from_review": ["accept W1S_LINEAR as the blocking linear check and W1 as diagnostic?",
+                                 "redefine or drop the compound gates?",
+                                 "only then rerun the synthetic battery; historical admission stays closed"]
+}
