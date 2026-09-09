@@ -1,0 +1,118 @@
+{
+ "admission_installed": false,
+ "commands": {
+  "difference": "--apply, on the wrapper invocation",
+  "execute": "the same command with --apply appended",
+  "prepare": "sudo -n /usr/bin/python3.12 scripts/research_activation.py launch --research-root /apex-data/research-rev2 --runner-root /opt/apex-runner-rev2 --research-user apexresearch2 --commit a35ab1a24ebbd8942713234a97551aaf6256057b --decision /etc/apex/admissions/exp001b_admission_rev2.json",
+  "run_from": "/apex-data/research-rev2/checkout"
+ },
+ "historical_execution": false,
+ "open_finding_recorded_not_fixed": {
+  "consequence": "a non-OOM kill could be reported as OOM_KILLED",
+  "correct_behaviour": "classify as OOM only on explicit OOM evidence such as 'oom-kill', 'oom_kill' or a non-zero cgroup oom_kill counter; otherwise leave it an unspecified kill",
+  "id": "OOM_CLASSIFIER_TOO_BROAD",
+  "severity": "reporting accuracy; it cannot turn a failure into a success, because success still requires a bound completed result",
+  "what": "the launcher's OOM evidence list includes 'status=KILL'. SIGKILL alone does not establish an out-of-memory condition: a manual kill, a watchdog or an operator stop produce the same text.",
+  "why_not_fixed_here": "changing the launcher would move its sha256 and invalidate the candidate now set up and under review. It is recorded for the next revision."
+ },
+ "preservation": {
+  "aborted_run": {
+   "bytes": 566689749,
+   "mode": "-r--r--r--",
+   "sha256": "7a6cbe36c25c333191fc865e27c7c920bfefb67d008ecad6233a82a8a96a3407",
+   "unchanged": true
+  },
+  "rev1_account": "apexresearch uid 109, unchanged",
+  "rev1_checkout_commit": "277e4a023c7f070c7421fb587cba6dfcedcb3be8",
+  "rev1_runner_root": "/opt/apex-runner, root-owned, unchanged",
+  "rev2_account": "apexresearch2 uid 110, distinct",
+  "rev2_output_root_empty": true,
+  "signature_sha256": "95ffc101e908eef7424cd26992b210ac6b51329fb597c5c7cc73f7188d66f7de",
+  "signed_decision_sha256": "1eafbe1fd972a45bc320acf2da0468a4a601eef7a00b7e6090499cc9cfcd0fa2"
+ },
+ "probe": {
+  "admitted_example": "SPY_2016-01-04.json",
+  "bound_to_revision_2_only": {
+   "user": "apexresearch2",
+   "view": "/apex-data/research-rev2/dataset_view/etf_continuous/bars",
+   "writable": "/apex-data/research-rev2/out"
+  },
+  "cap": "MemoryMax=1400M (unchanged)",
+  "denied_example": "SPY_2022-01-03.json",
+  "deviations": {},
+  "executed": true,
+  "observations": {
+   "admitted_readable": true,
+   "core_readable": false,
+   "corpus_writable": false,
+   "evaluation_readable": false,
+   "history_a_readable": false,
+   "manifest_readable": true,
+   "network_reachable": false,
+   "other_corpus_files_visible": false,
+   "secrets_readable": false
+  },
+  "ok": true,
+  "probe_config_identical_to_launch_config": true
+ },
+ "reconfirmed_immediately_before_setup": {
+  "account_absent": "apexresearch2",
+  "bound_tree": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
+  "bound_tree_unchanged_from_qualified": true,
+  "candidate_commit": "a35ab1a24ebbd8942713234a97551aaf6256057b",
+  "destinations_absent": [
+   "/apex-data/research-rev2",
+   "/opt/apex-runner-rev2"
+  ],
+  "launcher_matches_candidate_blob": true,
+  "launcher_sha256_invoked": "efa9d3e84ccc09a2b0dd2c963a6a10d469bc9f1e38a876d0c66e9c23875d6184"
+ },
+ "setup": {
+  "all_three_selections_explicit": true,
+  "stages_verified": 12,
+  "state": "COMPLETE",
+  "targets": {
+   "checkout": "/apex-data/research-rev2/checkout",
+   "out": "/apex-data/research-rev2/out",
+   "research_root": "/apex-data/research-rev2",
+   "research_user": "apexresearch2",
+   "runner_root": "/opt/apex-runner-rev2",
+   "view": "/apex-data/research-rev2/dataset_view"
+  }
+ },
+ "signed": false,
+ "step": "EXP001B_REVISION_2_SETUP_AND_VERIFICATION",
+ "verification_from_the_new_pinned_checkout": {
+  "account_privileges": {
+   "groups": [
+    "apexresearch2"
+   ],
+   "privileged_groups": [],
+   "uid": 110
+  },
+  "checkout_identity": {
+   "commit": "a35ab1a24ebbd8942713234a97551aaf6256057b",
+   "tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345"
+  },
+  "dataset_inventory": {
+   "files": 1511,
+   "first": "SPY_2016-01-04.json",
+   "hashes_rechecked": true,
+   "last": "SPY_2021-12-31.json",
+   "note": "the dataset_inventory check re-hashes every admitted file and refuses on VIEW_HASH_MISMATCH"
+  },
+  "launcher_in_checkout_sha256": "efa9d3e84ccc09a2b0dd2c963a6a10d469bc9f1e38a876d0c66e9c23875d6184",
+  "ok": true,
+  "permissions": {
+   "out_owner_uid": 110,
+   "research_uid": 110,
+   "view_mode": "755"
+  },
+  "runner_ownership": {
+   "entries_checked": 2628,
+   "group_or_other_writable": 0,
+   "runner_root_uid": 0,
+   "uid_separation_checked": true
+  }
+ }
+}
