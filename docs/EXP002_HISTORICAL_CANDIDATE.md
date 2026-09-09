@@ -247,3 +247,29 @@ missing `fit.params` is reported as missing and verifies nothing.
 
 Numerical logic, model, registration and qualification records untouched; no
 six-world rerun, no signing, no historical execution.
+
+---
+
+## Environment setup and verification — 2026-09-09 (candidate `2a09d1ed`)
+
+Sequence as it happened: **preflight passed → setup passed (12 stages VERIFIED, 22 s) → verify did not run** (my ad hoc `git rev-parse` in the same shell chain failed with `dubious ownership` and short-circuited it; no ownership or `safe.directory` change was made) **→ probe passed → verify rerun from the pinned checkout, passed → probe rerun, passed.** Records: `results/exp002_environment_setup.json`.
+
+| Check | Result |
+|---|---|
+| Candidate / bound tree / launcher vs package | `2a09d1ed…` / `c855b15d…` (57 files) / `4b9b187a…` — all match; launcher hash identical in the pinned checkout |
+| Targets | `/apex-data/research-exp002`, `/opt/apex-runner-exp002`, `apexresearch3` — all free before setup, disjoint from production |
+| Account | uid 111, gid 114, groups `[apexresearch3]`, no privileged groups, `nologin`, no sudo |
+| Ownership | research root/checkout/out owned by uid 111; runner root and venv root-owned 755, 2628 entries checked not writable by the research user |
+| Runner | numpy==2.4.6 only, pinned, python 3.12.3 |
+| Dataset view | 1511 files == exactly the in-range SPY manifest entries; 22/22 sampled sha256 match the manifest; bound read-only into the sandbox |
+| Sandbox probe (launch config) | `MemoryMax=1400M`, `PrivateNetwork=yes`, `ProtectSystem=strict`, `NoNewPrivileges`, corpus visible only via the view: admitted readable, **evaluation not readable** (`SPY_2022-01-03.json` denied), other corpus files not visible, core/history-a/secrets not readable, corpus not writable, network not reachable — zero deviations |
+| Preservation | `apexresearch` 109 / `apexresearch2` 110 intact; rev2 sealed result `4b23021d…`; signed decisions `1eafbe1f…`, `28bc2859…`; `allowed_signers` `ae30f60d…` unchanged; synthetic records r1 `f4825320…`, r2 `884f6f50…` unchanged |
+| Unsigned request | already names commit `2a09d1ed`, tree `c855b15d…`, output root `/apex-data/research-exp002/out`, the three targets — matches the prepared checkout; unchanged (sha `d8e359a8…`) |
+
+Not done: signing, installing `/etc/apex/admissions/exp002_admission.json`, historical fitting.
+
+**Preparation (no fitting; refuses without a signed decision):**
+```
+sudo -n /usr/bin/python3.12 /apex-data/research-exp002/checkout/scripts/research_activation.py launch --research-root /apex-data/research-exp002 --runner-root /opt/apex-runner-exp002 --research-user apexresearch3 --experiment ALPHA-EXP-002 --commit 2a09d1ed329fe0baa1db24afc542b226f4d7855f --decision /etc/apex/admissions/exp002_admission.json
+```
+**Execution (historical fitting; only after review and the operator's off-host signature):** the same command with `--apply` appended.

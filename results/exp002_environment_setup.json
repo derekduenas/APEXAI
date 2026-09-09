@@ -1,0 +1,727 @@
+{
+ "account": {
+  "gid": 114,
+  "groups": [
+   "apexresearch3"
+  ],
+  "shell": "/usr/sbin/nologin",
+  "sudo": "not allowed, no sudoers entry",
+  "uid": 111
+ },
+ "brick": "EXP002 environment setup and verification",
+ "candidate": {
+  "bound_source_tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d",
+  "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+  "launcher_hash_identical_in_pinned_checkout": true,
+  "launcher_sha256": "4b9b187aee53ce8eacd4bcfbacc0439a10818d9a570c9d7501ea6a08f9422191",
+  "matches_committed_package": true
+ },
+ "dataset_view_hash_check": {
+  "entries": "root-owned regular files, mode 664, bound read-only into the sandbox; probe confirms corpus not writable",
+  "equals_in_range_manifest_set": true,
+  "matched": 22,
+  "sampled": 22,
+  "view_files": 1511
+ },
+ "not_done": [
+  "signing",
+  "admission installation",
+  "historical fitting"
+ ],
+ "preservation": {
+  "accounts": {
+   "apexresearch": 109,
+   "apexresearch2": 110
+  },
+  "allowed_signers_sha256_prefix": "ae30f60db42443ad",
+  "exp001b_rev2_result_sha256_prefix": "4b23021d07d8d200",
+  "note": "aborted-run forecasts path check omitted this time (path typo in my command); its hash 7a6cbe36... was verified in the previous brick",
+  "signed_decisions_prefix": [
+   "1eafbe1fd972a45b",
+   "28bc28590339b6e9"
+  ],
+  "synthetic_r1_prefix": "f4825320397d6f0b",
+  "synthetic_r2_prefix": "884f6f50bbe8a9cc"
+ },
+ "records": {
+  "preflight": {
+   "action": "preflight",
+   "blocking": [],
+   "checks": [
+    {
+     "check": "identity_absent",
+     "detail": "apexresearch3 does not exist yet",
+     "ok": true
+    },
+    {
+     "check": "destination_free:runner_root",
+     "detail": "free",
+     "ok": true
+    },
+    {
+     "check": "destination_free:research_root",
+     "detail": "free",
+     "ok": true
+    },
+    {
+     "check": "destination_free:checkout",
+     "detail": "free",
+     "ok": true
+    },
+    {
+     "check": "destination_free:view",
+     "detail": "free",
+     "ok": true
+    },
+    {
+     "check": "source_repo",
+     "detail": "/opt/apex-repo",
+     "ok": true
+    },
+    {
+     "check": "system_python",
+     "detail": "/usr/bin/python3.12",
+     "ok": true
+    },
+    {
+     "check": "corpus_readable",
+     "detail": "/apex-data/history-b/etf_continuous/bars",
+     "ok": true
+    },
+    {
+     "check": "manifest_present",
+     "detail": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json",
+     "ok": true
+    },
+    {
+     "check": "manifest_hash",
+     "detail": "3ac8b250eefb47c5",
+     "ok": true
+    },
+    {
+     "check": "inventory_count",
+     "detail": "1511 selected, expected 1511",
+     "ok": true
+    },
+    {
+     "check": "trust_root_present",
+     "detail": "/etc/apex/admissions (authority creates)",
+     "ok": true
+    },
+    {
+     "check": "allowed_signers_present",
+     "detail": "/etc/apex/admissions/trust/allowed_signers (authority installs)",
+     "ok": true
+    },
+    {
+     "check": "commit_resolves",
+     "detail": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+     "ok": true
+    }
+   ],
+   "contract": "RESEARCH_ACTIVATION_V1",
+   "inventory": {
+    "expected": 1511,
+    "first": "2016-01-04",
+    "last": "2021-12-31",
+    "range": [
+     "2016-01-04",
+     "2021-12-31"
+    ],
+    "selected_from_manifest": 1511,
+    "symbol": "SPY"
+   },
+   "ok": true,
+   "requirements": [
+    "numpy==2.4.6"
+   ],
+   "resolved_commit": {
+    "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+    "n_files": 57,
+    "tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d"
+   },
+   "resuming": false,
+   "status": "OK",
+   "targets": {
+    "allowed_signers": "/etc/apex/admissions/trust/allowed_signers",
+    "checkout": "/apex-data/research-exp002/checkout",
+    "out": "/apex-data/research-exp002/out",
+    "research_user": "apexresearch3",
+    "runner_root": "/opt/apex-runner-exp002",
+    "trust_root": "/etc/apex/admissions",
+    "venv": "/opt/apex-runner-exp002/venv",
+    "view": "/apex-data/research-exp002/dataset_view"
+   },
+   "targets_validated": {
+    "disjoint_from_default": true,
+    "environment": "REVISION (disjoint from the production default)",
+    "research_root": "/apex-data/research-exp002",
+    "research_user": "apexresearch3",
+    "runner_root": "/opt/apex-runner-exp002"
+   },
+   "utc": "2026-09-09T14:48:00Z"
+  },
+  "probe": {
+   "action": "probe",
+   "admitted_example": "SPY_2016-01-04.json",
+   "contract": "RESEARCH_ACTIVATION_V1",
+   "denied_example": "SPY_2022-01-03.json",
+   "deviations": {},
+   "executed": true,
+   "expected": {
+    "admitted_readable": true,
+    "core_readable": false,
+    "corpus_writable": false,
+    "evaluation_readable": false,
+    "history_a_readable": false,
+    "manifest_readable": true,
+    "network_reachable": false,
+    "other_corpus_files_visible": false,
+    "secrets_readable": false
+   },
+   "observations": {
+    "admitted_readable": true,
+    "core_readable": false,
+    "corpus_writable": false,
+    "evaluation_readable": false,
+    "history_a_readable": false,
+    "manifest_readable": true,
+    "network_reachable": false,
+    "other_corpus_files_visible": false,
+    "secrets_readable": false
+   },
+   "ok": true,
+   "properties": [
+    "User=apexresearch",
+    "Group=apexresearch",
+    "MemoryMax=1400M",
+    "TasksMax=64",
+    "ProtectSystem=strict",
+    "ProtectHome=yes",
+    "PrivateTmp=yes",
+    "PrivateNetwork=yes",
+    "NoNewPrivileges=yes",
+    "RestrictSUIDSGID=yes",
+    "TemporaryFileSystem=/apex-data/history-b",
+    "BindReadOnlyPaths=/apex-data/research/dataset_view/etf_continuous/bars:/apex-data/history-b/etf_continuous/bars",
+    "InaccessiblePaths=/apex-data/core",
+    "InaccessiblePaths=/apex-data/history-a",
+    "InaccessiblePaths=/apex-data/runtime",
+    "ReadOnlyPaths=/apex-data/governance/admissions",
+    "ReadOnlyPaths=/etc/apex/admissions",
+    "ReadWritePaths=/apex-data/research/out"
+   ],
+   "status": "OK"
+  },
+  "probe2": {
+   "action": "probe",
+   "admitted_example": "SPY_2016-01-04.json",
+   "contract": "RESEARCH_ACTIVATION_V1",
+   "denied_example": "SPY_2022-01-03.json",
+   "deviations": {},
+   "executed": true,
+   "expected": {
+    "admitted_readable": true,
+    "core_readable": false,
+    "corpus_writable": false,
+    "evaluation_readable": false,
+    "history_a_readable": false,
+    "manifest_readable": true,
+    "network_reachable": false,
+    "other_corpus_files_visible": false,
+    "secrets_readable": false
+   },
+   "observations": {
+    "admitted_readable": true,
+    "core_readable": false,
+    "corpus_writable": false,
+    "evaluation_readable": false,
+    "history_a_readable": false,
+    "manifest_readable": true,
+    "network_reachable": false,
+    "other_corpus_files_visible": false,
+    "secrets_readable": false
+   },
+   "ok": true,
+   "properties": [
+    "User=apexresearch3",
+    "Group=apexresearch3",
+    "MemoryMax=1400M",
+    "TasksMax=64",
+    "ProtectSystem=strict",
+    "ProtectHome=yes",
+    "PrivateTmp=yes",
+    "PrivateNetwork=yes",
+    "NoNewPrivileges=yes",
+    "RestrictSUIDSGID=yes",
+    "TemporaryFileSystem=/apex-data/history-b",
+    "BindReadOnlyPaths=/apex-data/research-exp002/dataset_view/etf_continuous/bars:/apex-data/history-b/etf_continuous/bars",
+    "InaccessiblePaths=/apex-data/core",
+    "InaccessiblePaths=/apex-data/history-a",
+    "InaccessiblePaths=/apex-data/runtime",
+    "ReadOnlyPaths=/apex-data/governance/admissions",
+    "ReadOnlyPaths=/etc/apex/admissions",
+    "ReadWritePaths=/apex-data/research-exp002/out"
+   ],
+   "status": "OK"
+  },
+  "setup": {
+   "action": "setup",
+   "applied": true,
+   "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+   "contract": "RESEARCH_ACTIVATION_V1",
+   "created": [
+    {
+     "class": "capability",
+     "evidence": {
+      "exists": true,
+      "mode": "755"
+     },
+     "kind": "dir",
+     "object": "/apex-data/research-exp002",
+     "stage": "research_root",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "class": "evidence",
+     "evidence": {
+      "exists": true,
+      "mode": "755"
+     },
+     "kind": "dir",
+     "object": "/apex-data/research-exp002/out",
+     "stage": "out",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "class": "capability",
+     "evidence": {
+      "groups": [
+       "apexresearch3"
+      ],
+      "privileged_groups": [],
+      "uid": 111
+     },
+     "kind": "account",
+     "object": "apexresearch3",
+     "stage": "account",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "class": "capability",
+     "evidence": {
+      "entries_checked": 4,
+      "research_root_uid": 111
+     },
+     "kind": "own",
+     "object": "/apex-data/research-exp002",
+     "stage": "own_research_paths",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "class": "capability",
+     "evidence": {
+      "exists": true,
+      "mode": "755"
+     },
+     "kind": "dir",
+     "object": "/opt/apex-runner-exp002",
+     "stage": "runner_root",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "class": "capability",
+     "evidence": {
+      "python": "/opt/apex-runner-exp002/venv/bin/python"
+     },
+     "kind": "venv",
+     "object": "/opt/apex-runner-exp002/venv",
+     "stage": "venv",
+     "utc": "2026-09-09T14:48:25Z"
+    },
+    {
+     "class": "capability",
+     "evidence": {
+      "pins": [
+       "numpy==2.4.6"
+      ]
+     },
+     "kind": "file",
+     "object": "/opt/apex-runner-exp002/requirements.txt",
+     "stage": "requirements",
+     "utc": "2026-09-09T14:48:25Z"
+    },
+    {
+     "class": "capability",
+     "evidence": {
+      "numpy": "2.4.6"
+     },
+     "kind": "packages",
+     "object": "/opt/apex-runner-exp002/venv [packages]",
+     "stage": "packages",
+     "utc": "2026-09-09T14:48:31Z"
+    },
+    {
+     "class": "evidence",
+     "evidence": {
+      "lines": 1
+     },
+     "kind": "file",
+     "object": "/opt/apex-runner-exp002/pinned.txt",
+     "stage": "pinned",
+     "utc": "2026-09-09T14:48:31Z"
+    },
+    {
+     "class": "capability",
+     "evidence": {
+      "entries_checked": 2628,
+      "runner_root_mode": "755",
+      "runner_root_uid": 0,
+      "symlinks_skipped": 4,
+      "uid_separation_checked": true
+     },
+     "kind": "own",
+     "object": "/opt/apex-runner-exp002",
+     "stage": "harden_runner",
+     "utc": "2026-09-09T14:48:32Z"
+    },
+    {
+     "class": "capability",
+     "evidence": {
+      "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+      "n_files": 57,
+      "tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d"
+     },
+     "kind": "checkout",
+     "object": "/apex-data/research-exp002/checkout",
+     "stage": "checkout",
+     "utc": "2026-09-09T14:48:33Z"
+    },
+    {
+     "class": "capability",
+     "evidence": {
+      "files": 1511,
+      "first": "SPY_2016-01-04.json",
+      "last": "SPY_2021-12-31.json"
+     },
+     "kind": "dataset_view",
+     "object": "/apex-data/research-exp002/dataset_view",
+     "stage": "dataset_view",
+     "utc": "2026-09-09T14:48:39Z"
+    }
+   ],
+   "expected_view_files": 1511,
+   "finished_utc": "2026-09-09T14:48:39Z",
+   "planned_stages": [
+    {
+     "class": "capability",
+     "kind": "dir",
+     "object": "/apex-data/research-exp002",
+     "stage": "research_root"
+    },
+    {
+     "class": "evidence",
+     "kind": "dir",
+     "object": "/apex-data/research-exp002/out",
+     "stage": "out"
+    },
+    {
+     "class": "capability",
+     "kind": "account",
+     "object": "apexresearch3",
+     "stage": "account"
+    },
+    {
+     "class": "capability",
+     "kind": "own",
+     "object": "/apex-data/research-exp002",
+     "stage": "own_research_paths"
+    },
+    {
+     "class": "capability",
+     "kind": "dir",
+     "object": "/opt/apex-runner-exp002",
+     "stage": "runner_root"
+    },
+    {
+     "class": "capability",
+     "kind": "venv",
+     "object": "/opt/apex-runner-exp002/venv",
+     "stage": "venv"
+    },
+    {
+     "class": "capability",
+     "kind": "file",
+     "object": "/opt/apex-runner-exp002/requirements.txt",
+     "stage": "requirements"
+    },
+    {
+     "class": "capability",
+     "kind": "packages",
+     "object": "/opt/apex-runner-exp002/venv [packages]",
+     "stage": "packages"
+    },
+    {
+     "class": "evidence",
+     "kind": "file",
+     "object": "/opt/apex-runner-exp002/pinned.txt",
+     "stage": "pinned"
+    },
+    {
+     "class": "capability",
+     "kind": "own",
+     "object": "/opt/apex-runner-exp002",
+     "stage": "harden_runner"
+    },
+    {
+     "class": "capability",
+     "kind": "checkout",
+     "object": "/apex-data/research-exp002/checkout",
+     "stage": "checkout"
+    },
+    {
+     "class": "capability",
+     "kind": "dataset_view",
+     "object": "/apex-data/research-exp002/dataset_view",
+     "stage": "dataset_view"
+    }
+   ],
+   "resumed_from": null,
+   "runner": "system",
+   "source_tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d",
+   "stages": [
+    {
+     "evidence": {
+      "exists": true,
+      "mode": "755"
+     },
+     "stage": "research_root",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "evidence": {
+      "exists": true,
+      "mode": "755"
+     },
+     "stage": "out",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "evidence": {
+      "groups": [
+       "apexresearch3"
+      ],
+      "privileged_groups": [],
+      "uid": 111
+     },
+     "stage": "account",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "evidence": {
+      "entries_checked": 4,
+      "research_root_uid": 111
+     },
+     "stage": "own_research_paths",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "evidence": {
+      "exists": true,
+      "mode": "755"
+     },
+     "stage": "runner_root",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:18Z"
+    },
+    {
+     "evidence": {
+      "python": "/opt/apex-runner-exp002/venv/bin/python"
+     },
+     "stage": "venv",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:25Z"
+    },
+    {
+     "evidence": {
+      "pins": [
+       "numpy==2.4.6"
+      ]
+     },
+     "stage": "requirements",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:25Z"
+    },
+    {
+     "evidence": {
+      "numpy": "2.4.6"
+     },
+     "stage": "packages",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:31Z"
+    },
+    {
+     "evidence": {
+      "lines": 1
+     },
+     "stage": "pinned",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:31Z"
+    },
+    {
+     "evidence": {
+      "entries_checked": 2628,
+      "runner_root_mode": "755",
+      "runner_root_uid": 0,
+      "symlinks_skipped": 4,
+      "uid_separation_checked": true
+     },
+     "stage": "harden_runner",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:32Z"
+    },
+    {
+     "evidence": {
+      "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+      "n_files": 57,
+      "tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d"
+     },
+     "stage": "checkout",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:33Z"
+    },
+    {
+     "evidence": {
+      "files": 1511,
+      "first": "SPY_2016-01-04.json",
+      "last": "SPY_2021-12-31.json"
+     },
+     "stage": "dataset_view",
+     "status": "VERIFIED",
+     "utc": "2026-09-09T14:48:39Z"
+    }
+   ],
+   "started_utc": "2026-09-09T14:48:18Z",
+   "state": "COMPLETE",
+   "status": "OK",
+   "targets": {
+    "checkout": "/apex-data/research-exp002/checkout",
+    "out": "/apex-data/research-exp002/out",
+    "research_root": "/apex-data/research-exp002",
+    "research_user": "apexresearch3",
+    "runner_root": "/opt/apex-runner-exp002",
+    "view": "/apex-data/research-exp002/dataset_view"
+   },
+   "view": {
+    "files": 1511,
+    "first": "SPY_2016-01-04.json",
+    "last": "SPY_2021-12-31.json"
+   }
+  },
+  "verify": {
+   "action": "verify",
+   "checks": [
+    {
+     "check": "identity",
+     "detail": {
+      "gid": 114,
+      "groups": [
+       "apexresearch3"
+      ],
+      "home": "/home/apexresearch3",
+      "name": "apexresearch3",
+      "present": true,
+      "privileged_groups": [],
+      "shell": "/usr/sbin/nologin",
+      "uid": 111
+     },
+     "ok": true
+    },
+    {
+     "check": "environment",
+     "detail": {
+      "python": "/opt/apex-runner-exp002/venv/bin/python"
+     },
+     "ok": true
+    },
+    {
+     "check": "packages",
+     "detail": {
+      "numpy": "2.4.6"
+     },
+     "ok": true
+    },
+    {
+     "check": "pinned",
+     "detail": {
+      "lines": 1
+     },
+     "ok": true
+    },
+    {
+     "check": "runner_not_writable_by_research",
+     "detail": {
+      "entries_checked": 2628,
+      "runner_root_mode": "755",
+      "runner_root_uid": 0,
+      "symlinks_skipped": 4,
+      "uid_separation_checked": true
+     },
+     "ok": true
+    },
+    {
+     "check": "checkout_identity",
+     "detail": {
+      "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+      "n_files": 57,
+      "tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d"
+     },
+     "ok": true
+    },
+    {
+     "check": "dataset_inventory",
+     "detail": {
+      "files": 1511,
+      "first": "SPY_2016-01-04.json",
+      "last": "SPY_2021-12-31.json"
+     },
+     "ok": true
+    },
+    {
+     "check": "permissions",
+     "detail": {
+      "out_owner_uid": 111,
+      "research_uid": 111,
+      "view_mode": "755"
+     },
+     "ok": true
+    }
+   ],
+   "contract": "RESEARCH_ACTIVATION_V1",
+   "ok": true,
+   "state": "COMPLETE",
+   "status": "OK"
+  }
+ },
+ "request_reconciliation": {
+  "changed": false,
+  "commit_matches_checkout": true,
+  "output_root_matches": true,
+  "request_sha256": "d8e359a8b06afbe89d9895cd1dd0d79bab0fce727a4ff3a2e47b840957c5b316",
+  "targets_match": true,
+  "tree_matches_checkout": true
+ },
+ "sequence": [
+  "preflight: passed",
+  "setup --apply: passed (12 stages VERIFIED)",
+  "verify: DID NOT RUN (my ad hoc git rev-parse failed on dubious ownership and short-circuited the chain; no ownership or safe.directory change made)",
+  "probe: passed",
+  "verify (fresh, from pinned checkout): passed rc=0",
+  "probe (fresh, from pinned checkout): passed rc=0"
+ ],
+ "utc_setup": "2026-09-09T14:48Z"
+}
