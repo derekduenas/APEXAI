@@ -320,7 +320,7 @@ def _load(name):
 def test_the_v3_request_pins_one_revision_carrying_both_halves():
     plan = _load("exp001b_revision_plan.json")
     req = _load("exp001b_admission_request_v3.json")
-    rev = plan["one_reviewed_revision"]
+    rev = plan["one_candidate_revision"]
     assert req["code"]["commit"] == rev["commit"]
     assert req["code"]["source_tree_sha256"] == rev["experiment"]["bound_source_tree_sha256"]
     # the launcher is identified separately because the bound tree cannot cover it
@@ -328,6 +328,33 @@ def test_the_v3_request_pins_one_revision_carrying_both_halves():
     assert req["code"]["launcher_sha256_not_covered_by_the_bound_tree"] == \
         rev["launcher"]["sha256"]
     assert rev["experiment"]["identical_to_the_qualified_tree"] is True
+    # the bound tree must not have moved: that is what makes requalification
+    # unnecessary and keeps the memory demonstration applicable
+    assert req["code"]["source_tree_sha256"] == (
+        "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345")
+
+
+def test_the_candidate_is_not_described_as_accepted():
+    req = _load("exp001b_admission_request_v3.json")
+    st = req["REVIEW_STATUS"]
+    assert st["state"] == "REVIEW_CANDIDATE"
+    assert "NOT independently accepted" in st["not_accepted"]
+    assert st["requalification_needed"] is False
+    assert st["qualified_experiment_tree_unchanged"] is True
+
+
+def test_revision_two_writes_to_its_own_output_root_and_decision_file():
+    """Nothing revision 2 does may land where revision 1's evidence lives."""
+    req = _load("exp001b_admission_request_v3.json")
+    plan = _load("exp001b_revision_plan.json")
+    assert req["output"]["root"] == "/apex-data/research-rev2/out"
+    assert req["output"]["root"] != "/apex-data/research/out"
+    dec = req["DECISION_FILENAME"]["expected_path"]
+    assert dec == "/etc/apex/admissions/exp001b_admission_rev2.json"
+    assert dec != "/etc/apex/admissions/exp001b_admission.json"
+    rec = plan["output_root_reconciliation"]
+    assert rec["revision_2_output_root"] == req["output"]["root"]
+    assert rec["matches_request"] is True
 
 
 def test_the_revision_is_not_described_as_a_new_experiment():

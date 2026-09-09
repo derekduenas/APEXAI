@@ -1,5 +1,17 @@
 {
+ "DECISION_FILENAME": {
+  "expected_path": "/etc/apex/admissions/exp001b_admission_rev2.json",
+  "signature_path": "/etc/apex/admissions/exp001b_admission_rev2.json.sig",
+  "why_distinct": "the existing signed decision at /etc/apex/admissions/exp001b_admission.json is PRESERVED. A distinct filename means installing this one cannot overwrite it, and both remain independently verifiable."
+ },
  "NOTE": "THIS IS A REQUEST, NOT A DECISION. Unsigned; decision is not ADMIT and provenance names no principal. The identity string is not the boundary: it selects which public key in allowed_signers must have signed. The boundary is possession of the private key, held off-host and never present on the research host, together with protection of allowed_signers. Only the admission authority may author and sign.",
+ "REVIEW_STATUS": {
+  "not_accepted": "this commit is a candidate. It is NOT independently accepted merely because a package calls it reviewed. Acceptance requires the remaining source review and setup verification.",
+  "qualified_experiment_tree_unchanged": true,
+  "requalification_needed": false,
+  "state": "REVIEW_CANDIDATE",
+  "why_no_requalification": "the bound experiment tree is byte-identical to the qualified one, so the memory demonstration carries over. Only the launcher changed."
+ },
  "REVISION_CLASS": {
   "aborted_attempt": "20260908T131351Z-exp001b-2054eaa4, INCOMPLETE_DUE_TO_OOM, no statistical verdict, preserved read-only",
   "is_a_new_experiment": false,
@@ -35,9 +47,9 @@
   }
  },
  "code": {
-  "commit": "ed4825684cd00ce5c70ef12bf12e3f08b684b212",
-  "launcher_sha256_not_covered_by_the_bound_tree": "5aeb8288647d55342278b7eff22d9875e42f280015302ea038bfe4ba91edc712",
-  "note": "the bound tree covers the experiment. scripts/research_activation.py is NOT a bound path, so this decision cannot pin it. It is pinned by the COMMIT: invoking the launcher from the fresh checkout at this commit is what makes the reviewed launcher the one that runs. The operator verifies its sha256 before use.",
+  "commit": "a35ab1a24ebbd8942713234a97551aaf6256057b",
+  "launcher_sha256_not_covered_by_the_bound_tree": "efa9d3e84ccc09a2b0dd2c963a6a10d469bc9f1e38a876d0c66e9c23875d6184",
+  "note": "the bound tree covers the experiment and is UNCHANGED from the qualified tree. scripts/research_activation.py is NOT a bound path, so this decision cannot pin it; it is pinned by the COMMIT. The operator invokes the launcher from the fresh checkout at this commit and verifies its sha256 first.",
   "source_tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345"
  },
  "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
@@ -50,7 +62,8 @@
  "decision": "REQUESTED_NOT_GRANTED",
  "output": {
   "authority_classification": "RESEARCH_HISTORICAL",
-  "root": "/apex-data/research/out"
+  "note": "revision 2 writes to its own output root. The preserved environment's output at /apex-data/research/out is untouched, and the aborted run directory beneath it stays closed.",
+  "root": "/apex-data/research-rev2/out"
  },
  "provenance": {
   "decided_by": "UNSIGNED_REQUEST_AWAITING_AUTHORITY",

@@ -1,5 +1,9 @@
 # EXP-001B — REVISION SETUP AND SIGNING PACKAGE
 
+> **This commit is a REVIEW CANDIDATE.** It is not accepted merely
+> because this package describes it. Acceptance requires the remaining
+> source review and setup verification.
+
 A **bounded-memory engineering revision of the same registered experiment**, after
 an aborted attempt. The registration, the hypothesis and the statistical procedure
 are unchanged. Changing bound code requires a fresh admission and a fresh checkout;
@@ -9,15 +13,15 @@ Read-only. Nothing here has been signed or executed.
 
 ---
 
-## 1. ONE REVIEWED REVISION, CONTAINING BOTH
+## 1. ONE CANDIDATE REVISION, CONTAINING BOTH
 
-`ed4825684cd00ce5c70ef12bf12e3f08b684b212`
+`a35ab1a24ebbd8942713234a97551aaf6256057b`
 
 | | |
 |---|---|
 | bound experiment tree | `06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345`, 48 files |
 | identical to the qualified tree | **yes** |
-| launcher `scripts/research_activation.py` | sha256 `5aeb8288647d55342278b7eff22d9875e42f280015302ea038bfe4ba91edc712` |
+| launcher `scripts/research_activation.py` | sha256 `efa9d3e84ccc09a2b0dd2c963a6a10d469bc9f1e38a876d0c66e9c23875d6184` |
 
 **The launcher is not a bound path, so the admission cannot pin it.** Matching the
 bound experiment hash establishes the experiment and nothing else. That gap is
@@ -44,6 +48,8 @@ but not the later launcher repairs, so it is superseded.
 | dataset view | `/apex-data/research-rev2/dataset_view` |
 | output | `/apex-data/research-rev2/out` |
 | runner root | `/opt/apex-runner-rev2` |
+| account | `apexresearch2` |
+| decision | `/etc/apex/admissions/exp001b_admission_rev2.json` |
 
 A second runner root is needed because preflight requires every destination to be
 free and the existing one must stay intact.
@@ -52,20 +58,21 @@ free and the existing one must stay intact.
 the trust root with the signed v2 decision, and the aborted run directory, which
 stays read-only.
 
-### One thing blocks this, and it is not implemented here
+### The blocker is now resolved
 
-The CLI has **no flags for the roots** — target injection is a testing interface
-only — so a second environment cannot be built through the wrapper as it stands.
+Two things blocked it, not one. The CLI had no flags for the roots, **and fresh
+setup requires the research account to be absent**, so the existing `apexresearch`
+would have blocked a second environment. Both are now handled.
 
-Three options, with a recommendation:
+`--research-root`, `--runner-root` and `--research-user` are implemented. Absent
+flags leave production behaviour identical. `validate_targets` runs **before any
+mutation** in every action and refuses overlapping roots, protected locations, and
+any target that could reach the preserved environment. An environment is either
+exactly the production default triple or disjoint from it in all three — including
+the account, because rollback removes an account by name and a shared account would
+let one teardown delete the other's identity.
 
-1. **Add `--research-root` and `--runner-root` (recommended).** Small, changes no
-   check, guard or default, and production behaviour is identical when the flags
-   are absent.
-2. Roll back the existing environment and reuse the paths. **Rejected:** rollback
-   preserves evidence by refusing to remove parents that contain it, and reusing
-   the paths would put a new run where the old evidence lives.
-3. Build the tree by hand. **Rejected:** nothing would be verified.
+Revision 2 uses the dedicated account **`apexresearch2`**.
 
 The re-pin guard is **not bypassed and not weakened.** It correctly refuses to
 move the existing checkout across a bound-tree change, which is exactly why a
@@ -79,7 +86,7 @@ which wrongly called this a new experiment.
 | property | check |
 |---|---|
 | checkout identity | commit equals the admitted commit, bound tree equals `06eee315…`, working tree clean |
-| **launcher identity** | sha256 of the launcher in the fresh checkout equals `5aeb8288…`, checked **before** invoking it |
+| **launcher identity** | sha256 of the launcher in the fresh checkout equals `efa9d3e8…`, checked **before** invoking it |
 | dataset view | `verify` **re-hashes every admitted file** and refuses on a mismatch; count must be 1511 |
 | environment | unprivileged uid with no privileged groups, venv interpreter present, numpy pinned at 2.4.6, runner tree root-owned and not group- or other-writable across every entry |
 | activation record | state COMPLETE, every stage VERIFIED with its evidence, plus the append-only stage log |
@@ -97,7 +104,7 @@ sha256sum /apex-data/research-rev2/checkout/scripts/research_activation.py
 
 Unchanged from the established process, and the key stays where it is. Start from
 `results/exp001b_admission_request_v3.json`, set `decision` to ADMIT, fill
-`provenance`, confirm `code.commit` is `ed482568…`, then:
+`provenance`, confirm `code.commit` is `a35ab1a2…`, then:
 
 ```bash
 ssh-keygen -Y sign -f ~/.ssh/apex_admission_ed25519 -n apex-admission exp001b_admission.json
@@ -145,7 +152,7 @@ still fail.
 1. Targeted source review of this one revision.
 2. Add the two root flags so the second environment can be built through the wrapper.
 3. Setup, verify, probe.
-4. Authority signs the v3 request bound to `ed482568…`.
+4. Authority signs the v3 request bound to `a35ab1a2…`.
 5. Install decision and signature; verify on host.
 6. Verify, prepare, then execute into a new run directory.
 

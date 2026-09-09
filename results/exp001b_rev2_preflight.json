@@ -1,0 +1,117 @@
+{
+ "contract": "RESEARCH_ACTIVATION_V1",
+ "status": "OK",
+ "utc": "2026-09-09T00:07:13Z",
+ "action": "preflight",
+ "targets_validated": {
+  "research_root": "/apex-data/research-rev2",
+  "runner_root": "/opt/apex-runner-rev2",
+  "research_user": "apexresearch2",
+  "environment": "REVISION (disjoint from the production default)",
+  "disjoint_from_default": true
+ },
+ "targets": {
+  "research_user": "apexresearch2",
+  "runner_root": "/opt/apex-runner-rev2",
+  "venv": "/opt/apex-runner-rev2/venv",
+  "checkout": "/apex-data/research-rev2/checkout",
+  "view": "/apex-data/research-rev2/dataset_view",
+  "out": "/apex-data/research-rev2/out",
+  "trust_root": "/etc/apex/admissions",
+  "allowed_signers": "/etc/apex/admissions/trust/allowed_signers"
+ },
+ "requirements": [
+  "numpy==2.4.6"
+ ],
+ "checks": [
+  {
+   "check": "identity_absent",
+   "ok": true,
+   "detail": "apexresearch2 does not exist yet"
+  },
+  {
+   "check": "destination_free:runner_root",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:research_root",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:checkout",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:view",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "source_repo",
+   "ok": true,
+   "detail": "/opt/apex-repo"
+  },
+  {
+   "check": "system_python",
+   "ok": true,
+   "detail": "/usr/bin/python3.12"
+  },
+  {
+   "check": "corpus_readable",
+   "ok": true,
+   "detail": "/apex-data/history-b/etf_continuous/bars"
+  },
+  {
+   "check": "manifest_present",
+   "ok": true,
+   "detail": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json"
+  },
+  {
+   "check": "manifest_hash",
+   "ok": true,
+   "detail": "3ac8b250eefb47c5"
+  },
+  {
+   "check": "inventory_count",
+   "ok": true,
+   "detail": "1511 selected, expected 1511"
+  },
+  {
+   "check": "trust_root_present",
+   "ok": true,
+   "detail": "/etc/apex/admissions (authority creates)"
+  },
+  {
+   "check": "allowed_signers_present",
+   "ok": true,
+   "detail": "/etc/apex/admissions/trust/allowed_signers (authority installs)"
+  },
+  {
+   "check": "commit_resolves",
+   "ok": true,
+   "detail": "a35ab1a24ebbd8942713234a97551aaf6256057b"
+  }
+ ],
+ "blocking": [],
+ "resuming": false,
+ "inventory": {
+  "selected_from_manifest": 1511,
+  "expected": 1511,
+  "first": "2016-01-04",
+  "last": "2021-12-31",
+  "symbol": "SPY",
+  "range": [
+   "2016-01-04",
+   "2021-12-31"
+  ]
+ },
+ "resolved_commit": {
+  "commit": "a35ab1a24ebbd8942713234a97551aaf6256057b",
+  "tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
+  "n_files": 48
+ },
+ "ok": true
+}

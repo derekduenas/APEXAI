@@ -1,27 +1,16 @@
 {
  "fresh_environment": {
   "blocking_gap": {
-   "consequence": "a second environment cannot be set up through the CLI as it stands",
-   "not_implemented_in_this_step": true,
-   "options": [
-    {
-     "note": "production defaults stay exactly as they are when the flags are absent",
-     "option": "add --research-root and --runner-root flags",
-     "recommended": true,
-     "size": "small; no change to any check, guard or default"
-    },
-    {
-     "note": "REJECTED: rollback preserves evidence by refusing to remove parents that contain it, and reusing the paths would put the new run where the old evidence lives",
-     "option": "roll back the existing environment and reuse the paths",
-     "recommended": false
-    },
-    {
-     "note": "REJECTED: nothing would be verified",
-     "option": "create the tree by hand outside the wrapper",
-     "recommended": false
-    }
+   "defaults_preserved": "absent flags leave production behaviour identical",
+   "implemented": [
+    "--research-root",
+    "--runner-root",
+    "--research-user"
    ],
-   "what": "the CLI has no flags for research_root or runner_root; target injection is a testing interface only"
+   "research_user_rev2": "apexresearch2",
+   "resolved": true,
+   "validation": "validate_targets runs before any mutation in every action",
+   "what_it_was": "the CLI had no flags for the roots, AND fresh setup requires the research account to be absent, so the existing apexresearch would have blocked a second environment"
   },
   "derived": {
    "activation_record": "/apex-data/research-rev2/_ACTIVATION_MANIFEST.json",
@@ -37,6 +26,7 @@
    "the aborted run directory, read-only"
   ],
   "research_root": "/apex-data/research-rev2",
+  "research_user": "apexresearch2",
   "runner_root": "/opt/apex-runner-rev2",
   "why_a_second_runner_root": "preflight requires every destination to be free, and the existing /opt/apex-runner must be preserved intact"
  },
@@ -53,8 +43,8 @@
   "sandbox_configuration": "probe ENTERS the sandbox and measures nine properties with zero deviations; a test asserts the probed property list is identical to the launch property list, so what is measured is what will run"
  },
  "nothing_executed_or_signed": true,
- "one_reviewed_revision": {
-  "commit": "ed4825684cd00ce5c70ef12bf12e3f08b684b212",
+ "one_candidate_revision": {
+  "commit": "a35ab1a24ebbd8942713234a97551aaf6256057b",
   "contains_both": true,
   "experiment": {
    "bound_source_tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
@@ -71,14 +61,23 @@
    "established_by": [
     "tests/test_research_activation.py \u2014 outcome classification through the real CLI with controlled child processes (7), result-to-run binding (5), exit-4 contract (4), resumption (6)",
     "tests/test_activation_verifier_review.py \u2014 verifier repairs and package self-consistency",
-    "tests/test_real_data_boundary.py \u2014 sealing through the real execute path with disposable authority (3)"
+    "tests/test_real_data_boundary.py \u2014 sealing through the real execute path with disposable authority (3)",
+    "tests/test_research_activation.py \u2014 two environments side by side: independent stand-up, rollback of the second leaving the first and its account intact, resume isolation, and target validation refusing shared accounts, preserved-environment reach, protected locations and overlapping roots (12)"
    ],
    "how_it_is_pinned_instead": "by the commit. The operator invokes it FROM the fresh checkout and verifies its sha256 first.",
    "in_bound_tree": false,
    "path": "scripts/research_activation.py",
-   "sha256": "5aeb8288647d55342278b7eff22d9875e42f280015302ea038bfe4ba91edc712",
+   "sha256": "efa9d3e84ccc09a2b0dd2c963a6a10d469bc9f1e38a876d0c66e9c23875d6184",
    "why_that_matters": "the admission cannot pin it. Matching the bound experiment hash establishes the experiment only."
-  }
+  },
+  "review_status": "REVIEW_CANDIDATE, not accepted"
+ },
+ "output_root_reconciliation": {
+  "decision_filename": "/etc/apex/admissions/exp001b_admission_rev2.json",
+  "existing_signed_decision_preserved": "/etc/apex/admissions/exp001b_admission.json",
+  "matches_request": true,
+  "preserved": "/apex-data/research/out and the aborted run beneath it are untouched",
+  "revision_2_output_root": "/apex-data/research-rev2/out"
  },
  "plan": "EXP001B_REVISION_PLAN",
  "qualification_carried_forward": {
