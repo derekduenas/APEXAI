@@ -305,3 +305,45 @@ public halves on the Mac, exactly one matches the package's trusted fingerprint:
 
 So the private half to sign with is `~/.ssh/apex_admission_ed25519`. Only public
 halves were read; no key was created and `allowed_signers` was not touched.
+
+---
+
+## Historical execution — 2026-09-09 — INVALID_NULL_CONTROL
+
+Run `20260909T193814Z-exp002-ca450243`, 46 min 17 s, memory peak 432 K,
+decision `dd968c31…`, source unchanged at completion, acceptance VALID.
+**The development pass failed its own pre-registered null control, so it is not
+evidence about the research question.** Exit 5; the launcher did not count it.
+
+Admission (RV_FLOOR refused nothing on real data): fit 754 sessions / 247,692
+rows; development 252 / 82,605; observed 505 / 165,958. Five fits, once:
+ν\*=6.384, s\*=3.288, base k=2.932, params `ca04fc6e713e1a5c`.
+Evaluation and reserve never requested; economics NONE.
+
+**The invalidation.** On block-permuted targets, the matched pair L−S must show
+no signal. It showed t = **2.823** (threshold 2.0), so the development record is
+`INVALID_NULL_CONTROL`. The other matched nulls passed (C−L t = −4.118,
+M1−M0 t = 0.893). The reported-only S−M0 null was t = 12.231.
+
+**No finding is claimed from the invalidated pass.** For completeness the
+development G1 (C−L) was t = −2.312, negative and failing both inferences — but
+a pass whose null control failed cannot support a conclusion in either
+direction, including a negative one.
+
+Observed 2020–2021 (no authority, same fitted models) passed all three matched
+nulls and returned NOT_SELECTED, with G1 C−L t = −3.512. Calibration behaved as
+designed: the t-family arms covered 0.059 / 0.955 against nominal 0.05 / 0.95,
+while the registered Gaussian arms over-covered the lower tail at 0.106.
+
+**What this does and does not establish.** The machinery worked: an invalid null
+control produced an unsuccessful execution outcome rather than a result, and the
+evaluation set stayed closed. It does not answer whether the quadratic component
+improves historical forecasts. The null-control failure is a property of the
+null construction or of the L/S pair under permutation; diagnosing it is a
+separate question and was not attempted here. Nothing was tuned, re-fitted or
+re-run from these numbers.
+
+Artifacts preserved read-only in the run directory: `_AUTHORITY.json`,
+`_RUN.json`, `_RESULT.json`, and the two forecast-hash ledgers (53 MB
+development, 106 MB observed). Copy of the sealed result in
+`results/exp002_historical_run_20260909T193814Z_RESULT.json` (`0c397d70…`).

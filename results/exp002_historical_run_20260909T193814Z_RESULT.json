@@ -1,0 +1,2080 @@
+{
+ "acceptance_qualification": "VALID",
+ "development": {
+  "admission": {
+   "dev_refused_rv_floor": 0,
+   "dev_rows": 82605
+  },
+  "authority": "SELECTION",
+  "calibration": {
+   "C": {
+    "coverage": {
+     "0.05": 0.052478663519157434,
+     "0.5": 0.47514072998002543,
+     "0.95": 0.9517704739422553
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     8356,
+     7986,
+     7803,
+     7581,
+     7523,
+     7975,
+     8476,
+     9158,
+     9439,
+     8308
+    ],
+    "pit_mean": 0.5116890592075739,
+    "pit_sd": 0.2917052920086387
+   },
+   "L": {
+    "coverage": {
+     "0.05": 0.05281762605169179,
+     "0.5": 0.47860299013376917,
+     "0.95": 0.9523273409599903
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     8438,
+     8026,
+     7809,
+     7618,
+     7644,
+     7832,
+     8485,
+     9168,
+     9373,
+     8212
+    ],
+    "pit_mean": 0.5101920647007402,
+    "pit_sd": 0.2917025990935204
+   },
+   "M0": {
+    "coverage": {
+     "0.05": 0.09614430119242176,
+     "0.5": 0.48102415108044305,
+     "0.95": 0.9045215180679136
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     12062,
+     7291,
+     6841,
+     6581,
+     6031,
+     7200,
+     7202,
+     7914,
+     8759,
+     12724
+    ],
+    "pit_mean": 0.5140782724681295,
+    "pit_sd": 0.3226008404717849
+   },
+   "M1": {
+    "coverage": {
+     "0.05": 0.09722171781369167,
+     "0.5": 0.47860299013376917,
+     "0.95": 0.9056836753223171
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     12170,
+     7342,
+     6895,
+     6559,
+     6569,
+     6689,
+     7202,
+     7903,
+     8706,
+     12570
+    ],
+    "pit_mean": 0.5119536605313239,
+    "pit_sd": 0.32255409710734717
+   },
+   "S": {
+    "coverage": {
+     "0.05": 0.05224865322922341,
+     "0.5": 0.4697778584831427,
+     "0.95": 0.9515404636523213
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     8372,
+     7934,
+     7791,
+     7583,
+     7126,
+     8359,
+     8450,
+     9234,
+     9392,
+     8364
+    ],
+    "pit_mean": 0.5121319231813487,
+    "pit_sd": 0.2917561013896826
+   }
+  },
+  "comparisons": {
+   "G1": {
+    "boot5_pass": false,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.00012136706566679292,
+      "exceedances": 9849,
+      "expected_block_sessions": 1,
+      "mean": -0.00026603337641054015,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.9849015098490151,
+      "pass": false,
+      "raw_fraction_k_over_B": 0.9849,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 9.999435051444943e-05,
+      "exceedances": 9973,
+      "expected_block_sessions": 10,
+      "mean": -0.00026603337641054015,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.9973002699730027,
+      "pass": false,
+      "raw_fraction_k_over_B": 0.9973,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.00010802692931678237,
+      "exceedances": 9930,
+      "expected_block_sessions": 5,
+      "mean": -0.00026603337641054015,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.993000699930007,
+      "pass": false,
+      "raw_fraction_k_over_B": 0.993,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": false,
+    "hac": {
+     "hac_lrv": 0.0010940805589156298,
+     "hac_se": 0.00011508573156046993,
+     "iid_se": 4.4231815799280076e-05,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": -0.00026603337641054015,
+     "n": 82605,
+     "p_one_sided": 0.9896004190865522,
+     "se_inflation_vs_iid": 2.6018767143252366,
+     "t": -2.311610421234167,
+     "verdict": "NO_SIGNAL"
+    },
+    "hac_pass": false,
+    "inference_disagreement": false,
+    "pair": [
+     "C",
+     "L"
+    ],
+    "promotion_authority": true,
+    "sensitivity_disagreement": false
+   },
+   "R1": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.00013618986597263466,
+      "exceedances": 0,
+      "expected_block_sessions": 1,
+      "mean": 0.0005992718766504405,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.00011458797456867877,
+      "exceedances": 0,
+      "expected_block_sessions": 10,
+      "mean": 0.0005992718766504405,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.00012227321427131366,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.0005992718766504405,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 0.0014306056024902894,
+     "hac_se": 0.0001316002738379069,
+     "iid_se": 5.945142534746258e-05,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.0005992718766504405,
+     "n": 82605,
+     "p_one_sided": 2.6351722398287827e-06,
+     "se_inflation_vs_iid": 2.213576429307993,
+     "t": 4.553728188959305,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 5.2703444796575655e-06,
+    "inference_disagreement": false,
+    "pair": [
+     "L",
+     "S"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R2": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.03914134534715776,
+      "exceedances": 0,
+      "expected_block_sessions": 1,
+      "mean": 0.23569455603093936,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.03726635438090318,
+      "exceedances": 0,
+      "expected_block_sessions": 10,
+      "mean": 0.23569455603093936,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.03984141213160039,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.23569455603093936,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 102.19445895999867,
+     "hac_se": 0.03517308864746033,
+     "iid_se": 0.012654720728921256,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.23569455603093936,
+     "n": 82605,
+     "p_one_sided": 1.0350528435509573e-11,
+     "se_inflation_vs_iid": 2.779444082639873,
+     "t": 6.700991158135261,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 5.340403159805567e-11,
+    "inference_disagreement": false,
+    "pair": [
+     "L",
+     "M1"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R3": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.039077225981911164,
+      "exceedances": 0,
+      "expected_block_sessions": 1,
+      "mean": 0.23569834328633754,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.037188475987495355,
+      "exceedances": 0,
+      "expected_block_sessions": 10,
+      "mean": 0.23569834328633754,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.03976215632500484,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.23569834328633754,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 101.92222210358874,
+     "hac_se": 0.03512620843155687,
+     "iid_se": 0.012648114303191429,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.2356983432863376,
+     "n": 82605,
+     "p_one_sided": 9.728402322404596e-12,
+     "se_inflation_vs_iid": 2.777189357206684,
+     "t": 6.710042267886495,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 5.340403159805567e-11,
+    "inference_disagreement": false,
+    "pair": [
+     "S",
+     "M0"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R4": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.00027864455146699076,
+      "exceedances": 142,
+      "expected_block_sessions": 1,
+      "mean": 0.0006030591320486563,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.014298570142985701,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0142,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.00021240229361888516,
+      "exceedances": 21,
+      "expected_block_sessions": 10,
+      "mean": 0.0006030591320486563,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.0021997800219978004,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0021,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.0002282375147183385,
+      "exceedances": 39,
+      "expected_block_sessions": 5,
+      "mean": 0.0006030591320486563,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.003999600039996,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0039,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 0.005528792762883461,
+     "hac_se": 0.00025870926848246947,
+     "iid_se": 0.00011231729558918605,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.0006030591320486564,
+     "n": 82605,
+     "p_one_sided": 0.009875882200325767,
+     "se_inflation_vs_iid": 2.3033787194158375,
+     "t": 2.3310302548728385,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 0.009875882200325767,
+    "inference_disagreement": false,
+    "pair": [
+     "M1",
+     "M0"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R5": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.03913678142137791,
+      "exceedances": 0,
+      "expected_block_sessions": 1,
+      "mean": 0.23542852265452885,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.03725277528889906,
+      "exceedances": 0,
+      "expected_block_sessions": 10,
+      "mean": 0.23542852265452885,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.039838319667596205,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.23542852265452885,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 102.1679274051932,
+     "hac_se": 0.03516852256180738,
+     "iid_se": 0.012655279610906973,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.2354285226545288,
+     "n": 82605,
+     "p_one_sided": 1.0835570472857227e-11,
+     "se_inflation_vs_iid": 2.778960532132165,
+     "t": 6.694296646689432,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 5.340403159805567e-11,
+    "inference_disagreement": false,
+    "pair": [
+     "C",
+     "M1"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R6": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.03904764214236933,
+      "exceedances": 0,
+      "expected_block_sessions": 1,
+      "mean": 0.2360315817865775,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.03714396111119467,
+      "exceedances": 0,
+      "expected_block_sessions": 10,
+      "mean": 0.2360315817865775,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.03972906594398051,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.2360315817865775,
+      "n_rows": 82605,
+      "n_sessions": 252,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 101.81683469318213,
+     "hac_se": 0.035108043513779566,
+     "iid_se": 0.012648120028772943,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.2360315817865775,
+     "n": 82605,
+     "p_one_sided": 8.900671933009279e-12,
+     "se_inflation_vs_iid": 2.7757519247060443,
+     "t": 6.7230058460517,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 5.340403159805567e-11,
+    "inference_disagreement": false,
+    "pair": [
+     "C",
+     "M0"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   }
+  },
+  "economics": "NONE (distributional only)",
+  "elapsed_s": 887.38,
+  "experiment": "ALPHA-EXP-002",
+  "forecast_creation_time": 1788982729.3278825,
+  "forecast_identity": {
+   "content_hash_excludes_creation_time": true,
+   "input_hash": "sha256(json.dumps({event_time, features, close}, sort_keys=True))[:16]",
+   "input_id": "<tag>|<row.event_time>|<row.i>",
+   "model_version": "params_hash"
+  },
+  "matched_improvement": false,
+  "n_dev": 82605,
+  "null_control": {
+   "C-L": {
+    "mean": -0.0004217277560674519,
+    "ok": true,
+    "required": "NO_SIGNAL",
+    "t": -4.11829682178344,
+    "verdict": "NO_SIGNAL"
+   },
+   "L-S": {
+    "mean": 0.0003503603036105753,
+    "ok": false,
+    "required": "NO_SIGNAL",
+    "t": 2.8225828669431157,
+    "verdict": "SIGNAL_DETECTED"
+   },
+   "M1-M0": {
+    "mean": 0.0004134339841312684,
+    "ok": true,
+    "required": "NO_SIGNAL",
+    "t": 0.8926329557446238,
+    "verdict": "NO_SIGNAL"
+   },
+   "S-M0_reported_only": 12.230958966078232
+  },
+  "null_control_ok": false,
+  "params_hash": "ca04fc6e713e1a5c",
+  "registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2",
+  "selection_authority": "G1 (C-L) only; comparisons against the registered Gaussian models are reported context without selection authority",
+  "stages": [
+   {
+    "arms": [
+     "M0",
+     "M1",
+     "S",
+     "L",
+     "C"
+    ],
+    "first_sealed": "9d7180ebe16a1a6706f1d4f95e577709030b662c0d2669be2bb1c6ab61106269",
+    "forecast_hashes_sealed": true,
+    "last_sealed": "3b5a8a8dcc47164adcafaedb5855738266a91b87ed2ed81f8b161a94e6b6722c",
+    "rows": 82605,
+    "stage": "forecast_and_grade"
+   }
+  ],
+  "status": "INVALID_NULL_CONTROL",
+  "tag": "DEVELOPMENT_2019"
+ },
+ "development_status": "development data with prior exposure (inside EXP-001B's fitting window); never pristine",
+ "economics": "NONE (distributional only)",
+ "elapsed_s": 2775.88,
+ "evaluation": "SEALED: never requested by this run",
+ "execution": {
+  "complete": true,
+  "failure": null,
+  "observed_outcome": "REPORTED_WITHOUT_SELECTION_AUTHORITY",
+  "observed_requested": true
+ },
+ "experiment": "ALPHA-EXP-002",
+ "fit": {
+  "C": {
+   "beta": [
+    4.921237507430839e-06,
+    -3.861016120588038e-06,
+    -1.4938059391608568e-05,
+    -2.3647073254412455e-06,
+    2.663719199753575e-05,
+    8.57566012223421e-07
+   ],
+   "mean": [
+    2.9589793014807476e-07,
+    1.78067379766927e-06,
+    1.0434887551489636e-07,
+    4.962897900672546e-07,
+    1.0009659565603722e-07
+   ],
+   "quadratic": true,
+   "rank": 6,
+   "rcond": 1e-12,
+   "sd": [
+    0.00032303063006360017,
+    0.0007044761310846813,
+    4.986216498687218e-07,
+    1.9542454578560787e-06,
+    6.37773461934837e-07
+   ],
+   "solver": "numpy.linalg.lstsq(SVD)"
+  },
+  "L": {
+   "beta": [
+    4.9212375074308384e-06,
+    -4.385065701348263e-06,
+    -1.4744925314289624e-05
+   ],
+   "mean": [
+    2.9589793014807476e-07,
+    1.78067379766927e-06
+   ],
+   "quadratic": false,
+   "rank": 3,
+   "rcond": 1e-12,
+   "sd": [
+    0.00032303063006360017,
+    0.0007044761310846813
+   ],
+   "solver": "numpy.linalg.lstsq(SVD)"
+  },
+  "base_k": 2.932453397662227,
+  "budget": 5,
+  "fits_performed": 5,
+  "n_train": 247692,
+  "params": {
+   "C": {
+    "beta": [
+     4.921237507430839e-06,
+     -3.861016120588038e-06,
+     -1.4938059391608568e-05,
+     -2.3647073254412455e-06,
+     2.663719199753575e-05,
+     8.57566012223421e-07
+    ],
+    "mean": [
+     2.9589793014807476e-07,
+     1.78067379766927e-06,
+     1.0434887551489636e-07,
+     4.962897900672546e-07,
+     1.0009659565603722e-07
+    ],
+    "quadratic": true,
+    "rank": 6,
+    "rcond": 1e-12,
+    "sd": [
+     0.00032303063006360017,
+     0.0007044761310846813,
+     4.986216498687218e-07,
+     1.9542454578560787e-06,
+     6.37773461934837e-07
+    ],
+    "solver": "numpy.linalg.lstsq(SVD)"
+   },
+   "L": {
+    "beta": [
+     4.9212375074308384e-06,
+     -4.385065701348263e-06,
+     -1.4744925314289624e-05
+    ],
+    "mean": [
+     2.9589793014807476e-07,
+     1.78067379766927e-06
+    ],
+    "quadratic": false,
+    "rank": 3,
+    "rcond": 1e-12,
+    "sd": [
+     0.00032303063006360017,
+     0.0007044761310846813
+    ],
+    "solver": "numpy.linalg.lstsq(SVD)"
+   },
+   "base": {
+    "a": 4.962524361985471e-06,
+    "b1": -0.013574767508842438,
+    "b5": -0.020930340523513388,
+    "k": 2.932453397662227,
+    "n_train": 247692,
+    "params_hash": "eb1ac599b503496b"
+   },
+   "fits_performed": 5,
+   "n_train": 247692,
+   "params_hash": "ca04fc6e713e1a5c",
+   "t": {
+    "converged": true,
+    "init": {
+     "nu0": 6.0,
+     "s0": 3.266879810350951
+    },
+    "iterations": 55,
+    "n": 247692,
+    "nll": 686423.9230567191,
+    "nu": 6.384478029123821,
+    "nu_at_lower_bound": false,
+    "nu_at_upper_bound": false,
+    "s": 3.287952250006828
+   }
+  },
+  "params_hash": "ca04fc6e713e1a5c",
+  "t": {
+   "converged": true,
+   "iterations": 55,
+   "nu": 6.384478029123821,
+   "nu_at_lower_bound": false,
+   "nu_at_upper_bound": false,
+   "s": 3.287952250006828
+  },
+  "within_budget": true
+ },
+ "fits_performed_total": 5,
+ "imports_at_start": {
+  "all_imports_match_admitted_commit": true,
+  "checkout_root": "/apex-data/research-exp002/checkout",
+  "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+  "mismatched": [],
+  "n_modules": 50,
+  "outside_checkout": [],
+  "unbound_dependencies": [
+   "apex/__init__.py",
+   "apex/governance/__init__.py"
+  ],
+  "untracked_at_commit": [],
+  "verified": [
+   {
+    "module": "apex",
+    "path": "apex/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   {
+    "module": "apex.governance",
+    "path": "apex/governance/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   {
+    "module": "apex.governance.chain_ledger",
+    "path": "apex/governance/chain_ledger.py",
+    "sha256": "c50c8a9059c452de411a64f134521ef347c531efde1317126e7da6e120a087ec"
+   },
+   {
+    "module": "apex.world_model",
+    "path": "apex/world_model/__init__.py",
+    "sha256": "f0ea89d6d74db9a2f8024aa53331c6ce02d808b9ebf0a3d7f9214897f449a82f"
+   },
+   {
+    "module": "apex.world_model.authority",
+    "path": "apex/world_model/authority.py",
+    "sha256": "b33091a22dc612d7f9c98691075500b79b975ac6806d1f29f7a16d7abf75dd8a"
+   },
+   {
+    "module": "apex.world_model.bootstrap",
+    "path": "apex/world_model/bootstrap.py",
+    "sha256": "19d3d70e41d1d5ebe3fee1e5483c4e26ba996fa34b812ee6b91791881b763872"
+   },
+   {
+    "module": "apex.world_model.budget",
+    "path": "apex/world_model/budget.py",
+    "sha256": "bcb4cfd6b8af6c575f8e543c41cfe5bc4cd54750c3cf0743148749498ea9f497"
+   },
+   {
+    "module": "apex.world_model.canonical",
+    "path": "apex/world_model/canonical.py",
+    "sha256": "26fbb5018d876dec1052e52c07f5b2e33383da43a2990f5a7b1db191b5c28ce5"
+   },
+   {
+    "module": "apex.world_model.controls",
+    "path": "apex/world_model/controls.py",
+    "sha256": "6e92de2d84af9491faf6e902b06df0fa679f5c92803c145f035f688ce4896673"
+   },
+   {
+    "module": "apex.world_model.controls_r3",
+    "path": "apex/world_model/controls_r3.py",
+    "sha256": "cec658d50d0810021d7052c02a2c5c001db8ce7f383eb49694385ac7ca682538"
+   },
+   {
+    "module": "apex.world_model.controls_r4",
+    "path": "apex/world_model/controls_r4.py",
+    "sha256": "2a1cf380d5d897ab169feec82ee7444f63e9c54bde37edb261061bd2a43dc584"
+   },
+   {
+    "module": "apex.world_model.controls_r5",
+    "path": "apex/world_model/controls_r5.py",
+    "sha256": "d0e78d7d0d9e57481959004b0532fa54d54a2db7d129eeee1cfabcf809a9608f"
+   },
+   {
+    "module": "apex.world_model.controls_r51",
+    "path": "apex/world_model/controls_r51.py",
+    "sha256": "c989d70e410dca0f8aafd154425587a3d8b56e233cd6db84863215bf47442c30"
+   },
+   {
+    "module": "apex.world_model.court",
+    "path": "apex/world_model/court.py",
+    "sha256": "bc9a69c06502b631e46b9492b77bfc716c737639f9065e848192ff9ee03a1b59"
+   },
+   {
+    "module": "apex.world_model.court_v1",
+    "path": "apex/world_model/court_v1.py",
+    "sha256": "ea878fdf767d5cad97ea1b4990ccc8c00586c4e37c001ab5740904293086cbb9"
+   },
+   {
+    "module": "apex.world_model.court_v2",
+    "path": "apex/world_model/court_v2.py",
+    "sha256": "0aeb17863079acab48fdec8de71b788a62712f2d11adbda482e7c91a88492f92"
+   },
+   {
+    "module": "apex.world_model.exp001",
+    "path": "apex/world_model/exp001/__init__.py",
+    "sha256": "2f2dc2cc35c7f238631fe314a5e1c31fbd35dd5540288075e53e9279e2dd8397"
+   },
+   {
+    "module": "apex.world_model.exp001.models",
+    "path": "apex/world_model/exp001/models.py",
+    "sha256": "4cd3aa397fc707366642d52dc92a7cf1c6fb63e16e77b5b9b40f3d25addb3a75"
+   },
+   {
+    "module": "apex.world_model.exp001.registration",
+    "path": "apex/world_model/exp001/registration.py",
+    "sha256": "11afb3428d0df660497b6c03e7f677edf6dfe8a23ebf990f07ccc2ce0eace6ea"
+   },
+   {
+    "module": "apex.world_model.exp001b",
+    "path": "apex/world_model/exp001b/__init__.py",
+    "sha256": "e4ba5d88438d851746c64fecc40c991cc7dff16add44d30ea97621d2fd48b66b"
+   },
+   {
+    "module": "apex.world_model.exp001b.bars",
+    "path": "apex/world_model/exp001b/bars.py",
+    "sha256": "68b1125ea7968887ccc0246a5ce43b9d09dcbf7745aa1e75f96160ba4f90d200"
+   },
+   {
+    "module": "apex.world_model.exp001b.exchange_calendar",
+    "path": "apex/world_model/exp001b/exchange_calendar.py",
+    "sha256": "23924aa1afc38f312762e140362f532cf9de94df477e045a44d7b14a69a03339"
+   },
+   {
+    "module": "apex.world_model.exp001b.models",
+    "path": "apex/world_model/exp001b/models.py",
+    "sha256": "8d33fd07ee40f651d429c9872e16ab23e9ecec18d9e0821a160199e557941817"
+   },
+   {
+    "module": "apex.world_model.exp001b.registration",
+    "path": "apex/world_model/exp001b/registration.py",
+    "sha256": "6620c604e83fd2a2f12ef6b2f919d591e212e9ddf9602a74e842ef734f2e6216"
+   },
+   {
+    "module": "apex.world_model.exp001b.run",
+    "path": "apex/world_model/exp001b/run.py",
+    "sha256": "59cc577260278ddddd301035edbb1385540a82b1b58f48ea0cb781214c6d2430"
+   },
+   {
+    "module": "apex.world_model.exp002",
+    "path": "apex/world_model/exp002/__init__.py",
+    "sha256": "1ca259b71d6513ffccd522cf2d59861d9ea8d529408a58d773b741ecc2b75323"
+   },
+   {
+    "module": "apex.world_model.exp002.bootstrap",
+    "path": "apex/world_model/exp002/bootstrap.py",
+    "sha256": "fa8978af4eb6df1637e69717b40a6145ea3c751a7db546feaa40c326de4a2b50"
+   },
+   {
+    "module": "apex.world_model.exp002.historical",
+    "path": "apex/world_model/exp002/historical.py",
+    "sha256": "2deda851c1d89af98163fcdf0e82a91e4ed93a5d952f9466a42c826e5179cb14"
+   },
+   {
+    "module": "apex.world_model.exp002.models",
+    "path": "apex/world_model/exp002/models.py",
+    "sha256": "37a8351b728e25a0a5760a49d3d1f1b603e8646b864caa3b160080451fef7c31"
+   },
+   {
+    "module": "apex.world_model.exp002.registration",
+    "path": "apex/world_model/exp002/registration.py",
+    "sha256": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2"
+   },
+   {
+    "module": "apex.world_model.exp002.run",
+    "path": "apex/world_model/exp002/run.py",
+    "sha256": "7f19ebf73a247b78d38ea0945bb1494f21d47af116c3a939d640b722a5c76b13"
+   },
+   {
+    "module": "apex.world_model.exp002.scoring",
+    "path": "apex/world_model/exp002/scoring.py",
+    "sha256": "3243ea4c2085753555d79b846a97282ec38ba62e8631ac4dbbf3e09a50a513d2"
+   },
+   {
+    "module": "apex.world_model.exp002.studentt",
+    "path": "apex/world_model/exp002/studentt.py",
+    "sha256": "d211424f438c26df8a65dabe013414d74489ca14909cb1da6a3334325aac35d8"
+   },
+   {
+    "module": "apex.world_model.features",
+    "path": "apex/world_model/features.py",
+    "sha256": "0b2e56bbeaf4daf42ee488cbc6e375cb97f722c175441ed0bf18a8429c1eb409"
+   },
+   {
+    "module": "apex.world_model.forecast",
+    "path": "apex/world_model/forecast.py",
+    "sha256": "1fbdc1e094a007c65161f9d20db09efc1ea7e993020db64759ed1762a14ce4f1"
+   },
+   {
+    "module": "apex.world_model.grader",
+    "path": "apex/world_model/grader.py",
+    "sha256": "5bfe40011b55bf13c6cc9a0f0519c1b156f2149da84b27db62b3db6b8a671281"
+   },
+   {
+    "module": "apex.world_model.holdout",
+    "path": "apex/world_model/holdout.py",
+    "sha256": "af56648f3e5b146e63ff02f642c84b4d65a81378fd9ad33e66eb0f6b01a151c8"
+   },
+   {
+    "module": "apex.world_model.inference",
+    "path": "apex/world_model/inference.py",
+    "sha256": "2731c2a18c808a0659bb4dde01715ca411d369e049673b13e120c64d17dd9d56"
+   },
+   {
+    "module": "apex.world_model.inputs",
+    "path": "apex/world_model/inputs.py",
+    "sha256": "e01988f387d02010ccfadd1268c368d3bee5ff95fad09b3780b726e19a14fff5"
+   },
+   {
+    "module": "apex.world_model.models",
+    "path": "apex/world_model/models.py",
+    "sha256": "8d6354ed918911b81fa467a6c9794e4f3ad6a660dc70c796303029fc082a86b9"
+   },
+   {
+    "module": "apex.world_model.nulls",
+    "path": "apex/world_model/nulls.py",
+    "sha256": "3585cce27c15a5d419825c4fa2d395999233f4c01daed0a8a6b33ceff283e645"
+   },
+   {
+    "module": "apex.world_model.quality",
+    "path": "apex/world_model/quality.py",
+    "sha256": "5c48a6bb90a49e8b292b3598adb33a179c4bf595fadd24bde246460c77dc2608"
+   },
+   {
+    "module": "apex.world_model.real_data",
+    "path": "apex/world_model/real_data/__init__.py",
+    "sha256": "3a9323136b73e959b176a9e3a08539032d7cfc61da1b27eee5ccf0dab92d6d8d"
+   },
+   {
+    "module": "apex.world_model.real_data.boundary",
+    "path": "apex/world_model/real_data/boundary.py",
+    "sha256": "c9ed15b7e277751587e81ce999f07e851593292d45167b3d4d479b3967c0a89d"
+   },
+   {
+    "module": "apex.world_model.real_data.loader",
+    "path": "apex/world_model/real_data/loader.py",
+    "sha256": "cfdbce716a47f9348c54b7fae15f77834fd6837eefa98b6beb12fd1a490b3731"
+   },
+   {
+    "module": "apex.world_model.runs",
+    "path": "apex/world_model/runs.py",
+    "sha256": "0ba881260607729147c5d08489edd76780bc98df9020196d403916e90595f98a"
+   },
+   {
+    "module": "apex.world_model.sources",
+    "path": "apex/world_model/sources.py",
+    "sha256": "2513130770dfae10bf78fbbae8c620911c728ee60c03108f0cadbd04deeb5673"
+   },
+   {
+    "module": "apex.world_model.targets",
+    "path": "apex/world_model/targets.py",
+    "sha256": "b08f5fe7c53b64151a4092bd1689d7d2f873eaeb3712975f5813fbba80fc49b3"
+   },
+   {
+    "module": "apex.world_model.teststand",
+    "path": "apex/world_model/teststand.py",
+    "sha256": "8a2c49fe188ae50524e6baab445769ddf87947ffeb2da6fee431462ef30244e6"
+   },
+   {
+    "module": "apex.world_model.worlds",
+    "path": "apex/world_model/worlds.py",
+    "sha256": "6a260672dda55f05ce99485a537227d2f9676ab955771d3cdc831038c1dfe4cf"
+   }
+  ]
+ },
+ "never_opened": [
+  "evaluation",
+  "reserve"
+ ],
+ "observed": {
+  "admission": {
+   "dev_refused_rv_floor": 0,
+   "dev_rows": 165958
+  },
+  "authority": "NONE",
+  "calibration": {
+   "C": {
+    "coverage": {
+     "0.05": 0.059020957109630144,
+     "0.5": 0.4732823967509852,
+     "0.95": 0.9550187396811242
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     18479,
+     15665,
+     14905,
+     14621,
+     14875,
+     15697,
+     16944,
+     18697,
+     19249,
+     16826
+    ],
+    "pit_mean": 0.5106077111758582,
+    "pit_sd": 0.2948586577904382
+   },
+   "L": {
+    "coverage": {
+     "0.05": 0.0590450595933911,
+     "0.5": 0.4741259836826185,
+     "0.95": 0.955241687655913
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     18499,
+     15642,
+     14958,
+     14648,
+     14938,
+     15603,
+     16972,
+     18711,
+     19173,
+     16814
+    ],
+    "pit_mean": 0.5103672440421164,
+    "pit_sd": 0.2948022933949587
+   },
+   "M0": {
+    "coverage": {
+     "0.05": 0.10546041769604357,
+     "0.5": 0.4749575193723713,
+     "0.95": 0.903469552537389
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     25792,
+     14178,
+     12869,
+     12672,
+     12302,
+     13871,
+     14461,
+     15777,
+     18037,
+     25999
+    ],
+    "pit_mean": 0.5142218984854039,
+    "pit_sd": 0.32581932475210207
+   },
+   "M1": {
+    "coverage": {
+     "0.05": 0.1063702864580195,
+     "0.5": 0.4741259836826185,
+     "0.95": 0.9045903180322732
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     26004,
+     14201,
+     12897,
+     12709,
+     12874,
+     13315,
+     14434,
+     15748,
+     18035,
+     25741
+    ],
+    "pit_mean": 0.5126532888998062,
+    "pit_sd": 0.32578952968853037
+   },
+   "S": {
+    "coverage": {
+     "0.05": 0.05858711240193302,
+     "0.5": 0.46887164222273103,
+     "0.95": 0.9544704081755625
+    },
+    "coverage_nominal": {
+     "0.05": 0.05,
+     "0.5": 0.5,
+     "0.95": 0.95
+    },
+    "pit_hist10": [
+     18340,
+     15603,
+     14889,
+     14569,
+     14412,
+     16161,
+     16998,
+     18669,
+     19340,
+     16977
+    ],
+    "pit_mean": 0.5118093140817952,
+    "pit_sd": 0.2948402600086303
+   }
+  },
+  "comparisons": {
+   "G1": {
+    "boot5_pass": false,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.00010665048774277426,
+      "exceedances": 9979,
+      "expected_block_sessions": 1,
+      "mean": -0.00033165622948182915,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.9979002099790021,
+      "pass": false,
+      "raw_fraction_k_over_B": 0.9979,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.00013126283785775902,
+      "exceedances": 9877,
+      "expected_block_sessions": 10,
+      "mean": -0.00033165622948182915,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.9877012298770123,
+      "pass": false,
+      "raw_fraction_k_over_B": 0.9877,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.00012002042816707985,
+      "exceedances": 9937,
+      "expected_block_sessions": 5,
+      "mean": -0.00033165622948182915,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.9937006299370063,
+      "pass": false,
+      "raw_fraction_k_over_B": 0.9937,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": false,
+    "hac": {
+     "hac_lrv": 0.0014800798133377318,
+     "hac_se": 9.443728033182248e-05,
+     "iid_se": 4.377783432117136e-05,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": -0.00033165622948182915,
+     "n": 165958,
+     "p_one_sided": 0.9997775595485469,
+     "se_inflation_vs_iid": 2.157193972616223,
+     "t": -3.511920592339116,
+     "verdict": "NO_SIGNAL"
+    },
+    "hac_pass": false,
+    "inference_disagreement": false,
+    "pair": [
+     "C",
+     "L"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R1": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 8.848494102691464e-05,
+      "exceedances": 1,
+      "expected_block_sessions": 1,
+      "mean": 0.00038827399099734036,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.00019998000199980003,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0001,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 9.659829108471623e-05,
+      "exceedances": 2,
+      "expected_block_sessions": 10,
+      "mean": 0.00038827399099734036,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.00029997000299970003,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0002,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 9.47765444366649e-05,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.00038827399099734036,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 0.0012319319192846316,
+     "hac_se": 8.615773192110464e-05,
+     "iid_se": 4.067668405763091e-05,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.00038827399099734036,
+     "n": 165958,
+     "p_one_sided": 3.294532684667371e-06,
+     "se_inflation_vs_iid": 2.11811099938815,
+     "t": 4.506548423917265,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 6.589065369334742e-06,
+    "inference_disagreement": false,
+    "pair": [
+     "L",
+     "S"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R2": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.025972850754362613,
+      "exceedances": 0,
+      "expected_block_sessions": 1,
+      "mean": 0.20175192706495934,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.026940867288276212,
+      "exceedances": 0,
+      "expected_block_sessions": 10,
+      "mean": 0.20175192706495934,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.02693495859402519,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.20175192706495934,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 86.0414104538526,
+     "hac_se": 0.02276956136069243,
+     "iid_se": 0.008252721692722759,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.20175192706495929,
+     "n": 165958,
+     "p_one_sided": 3.979322605706938e-19,
+     "se_inflation_vs_iid": 2.7590366194913134,
+     "t": 8.860597877535218,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 2.1509371812426113e-18,
+    "inference_disagreement": false,
+    "pair": [
+     "L",
+     "M1"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R3": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.025941601077235598,
+      "exceedances": 0,
+      "expected_block_sessions": 1,
+      "mean": 0.20159617528123713,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.02692559290736809,
+      "exceedances": 0,
+      "expected_block_sessions": 10,
+      "mean": 0.20159617528123713,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.02691688489487579,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.20159617528123713,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 85.82560954806206,
+     "hac_se": 0.022740989206749204,
+     "iid_se": 0.008244392347856198,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.20159617528123708,
+     "n": 165958,
+     "p_one_sided": 3.829272854900511e-19,
+     "se_inflation_vs_iid": 2.7583584389530635,
+     "t": 8.86488153388711,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 2.1509371812426113e-18,
+    "inference_disagreement": false,
+    "pair": [
+     "S",
+     "M0"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R4": {
+    "boot5_pass": false,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.00018189634723588205,
+      "exceedances": 1022,
+      "expected_block_sessions": 1,
+      "mean": 0.00023252220727510285,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.10228977102289771,
+      "pass": false,
+      "raw_fraction_k_over_B": 0.1022,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.0001738970555842194,
+      "exceedances": 898,
+      "expected_block_sessions": 10,
+      "mean": 0.00023252220727510285,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.0898910108989101,
+      "pass": false,
+      "raw_fraction_k_over_B": 0.0898,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.00017988931076298907,
+      "exceedances": 930,
+      "expected_block_sessions": 5,
+      "mean": 0.00023252220727510285,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 0.09309069093090691,
+      "pass": false,
+      "raw_fraction_k_over_B": 0.093,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": false,
+    "hac": {
+     "hac_lrv": 0.0046746749341422455,
+     "hac_se": 0.0001678327118650375,
+     "iid_se": 7.595632953501263e-05,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.0002325222072751029,
+     "n": 165958,
+     "p_one_sided": 0.08295893352546503,
+     "se_inflation_vs_iid": 2.2095948144476067,
+     "t": 1.385440327402237,
+     "verdict": "NO_SIGNAL"
+    },
+    "hac_pass": false,
+    "holm_adjusted_p": 0.08295893352546503,
+    "inference_disagreement": false,
+    "pair": [
+     "M1",
+     "M0"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R5": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.025964539945141363,
+      "exceedances": 0,
+      "expected_block_sessions": 1,
+      "mean": 0.20142027083547748,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.02693782247133443,
+      "exceedances": 0,
+      "expected_block_sessions": 10,
+      "mean": 0.20142027083547748,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.026925257502643418,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.20142027083547748,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 86.01985102768857,
+     "hac_se": 0.022766708493512717,
+     "iid_se": 0.00825314263041545,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.20142027083547748,
+     "n": 165958,
+     "p_one_sided": 4.489512316663225e-19,
+     "se_inflation_vs_iid": 2.75855022904974,
+     "t": 8.847140590958565,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 2.1509371812426113e-18,
+    "inference_disagreement": false,
+    "pair": [
+     "C",
+     "M1"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   },
+   "R6": {
+    "boot5_pass": true,
+    "bootstrap": {
+     "1": {
+      "boot_se": 0.025924977083659668,
+      "exceedances": 0,
+      "expected_block_sessions": 1,
+      "mean": 0.20165279304275258,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "10": {
+      "boot_se": 0.02692533579994862,
+      "exceedances": 0,
+      "expected_block_sessions": 10,
+      "mean": 0.20165279304275258,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     },
+     "5": {
+      "boot_se": 0.02691163714235187,
+      "exceedances": 0,
+      "expected_block_sessions": 5,
+      "mean": 0.20165279304275258,
+      "n_rows": 165958,
+      "n_sessions": 505,
+      "p_estimator": "(k + 1) / (B + 1)",
+      "p_one_sided": 9.999000099990002e-05,
+      "pass": true,
+      "raw_fraction_k_over_B": 0.0,
+      "resamples": 10000,
+      "seed": 20260909,
+      "smallest_reportable_p": 9.999000099990002e-05,
+      "threshold": 0.0228
+     }
+    },
+    "both_pass": true,
+    "hac": {
+     "hac_lrv": 85.73170403947962,
+     "hac_se": 0.02272854485229017,
+     "iid_se": 0.008244383831415297,
+     "kernel": "BARTLETT",
+     "lag": 14,
+     "mean": 0.20165279304275258,
+     "n": 165958,
+     "p_one_sided": 3.584895302071019e-19,
+     "se_inflation_vs_iid": 2.756851854189861,
+     "t": 8.87222628431638,
+     "verdict": "SIGNAL_DETECTED"
+    },
+    "hac_pass": true,
+    "holm_adjusted_p": 2.1509371812426113e-18,
+    "inference_disagreement": false,
+    "pair": [
+     "C",
+     "M0"
+    ],
+    "promotion_authority": false,
+    "sensitivity_disagreement": false
+   }
+  },
+  "economics": "NONE (distributional only)",
+  "elapsed_s": 1842.18,
+  "experiment": "ALPHA-EXP-002",
+  "forecast_creation_time": 1788983628.969365,
+  "forecast_identity": {
+   "content_hash_excludes_creation_time": true,
+   "input_hash": "sha256(json.dumps({event_time, features, close}, sort_keys=True))[:16]",
+   "input_id": "<tag>|<row.event_time>|<row.i>",
+   "model_version": "params_hash"
+  },
+  "matched_improvement": false,
+  "n_dev": 165958,
+  "null_control": {
+   "C-L": {
+    "mean": -0.0002793513660104635,
+    "ok": true,
+    "required": "NO_SIGNAL",
+    "t": -4.22394545939053,
+    "verdict": "NO_SIGNAL"
+   },
+   "L-S": {
+    "mean": 0.00015128898639847602,
+    "ok": true,
+    "required": "NO_SIGNAL",
+    "t": 1.9114063417128357,
+    "verdict": "NO_SIGNAL"
+   },
+   "M1-M0": {
+    "mean": -5.21723881089051e-05,
+    "ok": true,
+    "required": "NO_SIGNAL",
+    "t": -0.11647824561316426,
+    "verdict": "NO_SIGNAL"
+   },
+   "S-M0_reported_only": 6.326564799347842
+  },
+  "null_control_ok": true,
+  "params_hash": "ca04fc6e713e1a5c",
+  "registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2",
+  "selection_authority": "NONE: secondary reporting with the same fitted models",
+  "stages": [
+   {
+    "arms": [
+     "M0",
+     "M1",
+     "S",
+     "L",
+     "C"
+    ],
+    "first_sealed": "efca791d96157ae4170b6c9441fcaf6c8321f582b2f99471b2cb153cfe10861b",
+    "forecast_hashes_sealed": true,
+    "last_sealed": "536e54beb84f142da1f919bdc70bd835c36b78f27f0eced00a5f50c9be309c1d",
+    "rows": 165958,
+    "stage": "forecast_and_grade"
+   }
+  ],
+  "status": "NOT_SELECTED",
+  "tag": "OBSERVED_2020_2021"
+ },
+ "observed_status": "2020-2021 has been observed; secondary reporting only; no authority",
+ "period_roles": {
+  "development": [
+   "2019-01-01",
+   "2019-12-31"
+  ],
+  "fit": [
+   "2016-01-04",
+   "2018-12-31"
+  ],
+  "observed": [
+   "2020-01-01",
+   "2021-12-31"
+  ]
+ },
+ "plan": {
+  "code_commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+  "dataset_id": "history-b/etf_continuous",
+  "decision_sha256": "dd968c314283a83a4dfeca0c73bec32a1445b9b3a20790fd40af8e7afde289b6",
+  "evaluation": "SEALED (not unsealed by this command)",
+  "experiment": "ALPHA-EXP-002",
+  "output_root": "/apex-data/research-exp002/out",
+  "registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2",
+  "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record exists for these bars; they may not be used to claim point-in-time availability or to model vendor revisions; receipt was bulk on 2026-08-29, so no row is evidence of what was knowable before that date except by its event time",
+  "sealed_periods_never_requested": [
+   "evaluation",
+   "reserve"
+  ],
+  "sessions": {
+   "development": 252,
+   "fit": 754,
+   "observed": 505
+  },
+  "signer": "apex-admission",
+  "source_tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d",
+  "temporal_range": [
+   "2016-01-04",
+   "2021-12-31"
+  ]
+ },
+ "process_outcome": "INVALID_INPUT_OR_FAILURE",
+ "registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2",
+ "runtime_at_end": {
+  "apex_module_files": {
+   "apex.governance": "/apex-data/research-exp002/checkout/apex/governance/__init__.py",
+   "apex.governance.chain_ledger": "/apex-data/research-exp002/checkout/apex/governance/chain_ledger.py",
+   "apex.world_model": "/apex-data/research-exp002/checkout/apex/world_model/__init__.py",
+   "apex.world_model.authority": "/apex-data/research-exp002/checkout/apex/world_model/authority.py",
+   "apex.world_model.bootstrap": "/apex-data/research-exp002/checkout/apex/world_model/bootstrap.py",
+   "apex.world_model.budget": "/apex-data/research-exp002/checkout/apex/world_model/budget.py",
+   "apex.world_model.canonical": "/apex-data/research-exp002/checkout/apex/world_model/canonical.py",
+   "apex.world_model.controls": "/apex-data/research-exp002/checkout/apex/world_model/controls.py",
+   "apex.world_model.controls_r3": "/apex-data/research-exp002/checkout/apex/world_model/controls_r3.py",
+   "apex.world_model.controls_r4": "/apex-data/research-exp002/checkout/apex/world_model/controls_r4.py",
+   "apex.world_model.controls_r5": "/apex-data/research-exp002/checkout/apex/world_model/controls_r5.py",
+   "apex.world_model.controls_r51": "/apex-data/research-exp002/checkout/apex/world_model/controls_r51.py",
+   "apex.world_model.court": "/apex-data/research-exp002/checkout/apex/world_model/court.py",
+   "apex.world_model.court_v1": "/apex-data/research-exp002/checkout/apex/world_model/court_v1.py",
+   "apex.world_model.court_v2": "/apex-data/research-exp002/checkout/apex/world_model/court_v2.py",
+   "apex.world_model.exp001": "/apex-data/research-exp002/checkout/apex/world_model/exp001/__init__.py",
+   "apex.world_model.exp001.models": "/apex-data/research-exp002/checkout/apex/world_model/exp001/models.py",
+   "apex.world_model.exp001.registration": "/apex-data/research-exp002/checkout/apex/world_model/exp001/registration.py",
+   "apex.world_model.exp001b": "/apex-data/research-exp002/checkout/apex/world_model/exp001b/__init__.py",
+   "apex.world_model.exp001b.bars": "/apex-data/research-exp002/checkout/apex/world_model/exp001b/bars.py",
+   "apex.world_model.exp001b.exchange_calendar": "/apex-data/research-exp002/checkout/apex/world_model/exp001b/exchange_calendar.py",
+   "apex.world_model.exp001b.models": "/apex-data/research-exp002/checkout/apex/world_model/exp001b/models.py",
+   "apex.world_model.exp001b.registration": "/apex-data/research-exp002/checkout/apex/world_model/exp001b/registration.py",
+   "apex.world_model.exp001b.run": "/apex-data/research-exp002/checkout/apex/world_model/exp001b/run.py",
+   "apex.world_model.exp002": "/apex-data/research-exp002/checkout/apex/world_model/exp002/__init__.py",
+   "apex.world_model.exp002.bootstrap": "/apex-data/research-exp002/checkout/apex/world_model/exp002/bootstrap.py",
+   "apex.world_model.exp002.historical": "/apex-data/research-exp002/checkout/apex/world_model/exp002/historical.py",
+   "apex.world_model.exp002.models": "/apex-data/research-exp002/checkout/apex/world_model/exp002/models.py",
+   "apex.world_model.exp002.registration": "/apex-data/research-exp002/checkout/apex/world_model/exp002/registration.py",
+   "apex.world_model.exp002.run": "/apex-data/research-exp002/checkout/apex/world_model/exp002/run.py",
+   "apex.world_model.exp002.scoring": "/apex-data/research-exp002/checkout/apex/world_model/exp002/scoring.py",
+   "apex.world_model.exp002.studentt": "/apex-data/research-exp002/checkout/apex/world_model/exp002/studentt.py",
+   "apex.world_model.features": "/apex-data/research-exp002/checkout/apex/world_model/features.py",
+   "apex.world_model.forecast": "/apex-data/research-exp002/checkout/apex/world_model/forecast.py",
+   "apex.world_model.grader": "/apex-data/research-exp002/checkout/apex/world_model/grader.py",
+   "apex.world_model.holdout": "/apex-data/research-exp002/checkout/apex/world_model/holdout.py",
+   "apex.world_model.inference": "/apex-data/research-exp002/checkout/apex/world_model/inference.py",
+   "apex.world_model.inputs": "/apex-data/research-exp002/checkout/apex/world_model/inputs.py",
+   "apex.world_model.models": "/apex-data/research-exp002/checkout/apex/world_model/models.py",
+   "apex.world_model.nulls": "/apex-data/research-exp002/checkout/apex/world_model/nulls.py",
+   "apex.world_model.quality": "/apex-data/research-exp002/checkout/apex/world_model/quality.py",
+   "apex.world_model.real_data": "/apex-data/research-exp002/checkout/apex/world_model/real_data/__init__.py",
+   "apex.world_model.real_data.boundary": "/apex-data/research-exp002/checkout/apex/world_model/real_data/boundary.py",
+   "apex.world_model.real_data.loader": "/apex-data/research-exp002/checkout/apex/world_model/real_data/loader.py",
+   "apex.world_model.runs": "/apex-data/research-exp002/checkout/apex/world_model/runs.py",
+   "apex.world_model.sources": "/apex-data/research-exp002/checkout/apex/world_model/sources.py",
+   "apex.world_model.targets": "/apex-data/research-exp002/checkout/apex/world_model/targets.py",
+   "apex.world_model.teststand": "/apex-data/research-exp002/checkout/apex/world_model/teststand.py",
+   "apex.world_model.worlds": "/apex-data/research-exp002/checkout/apex/world_model/worlds.py"
+  },
+  "cwd": "/apex-data/research-exp002/checkout",
+  "euid": 111,
+  "executable": "/opt/apex-runner-exp002/venv/bin/python",
+  "interpreter": {
+   "base_prefix": "/usr",
+   "executable": "/opt/apex-runner-exp002/venv/bin/python",
+   "executable_sha256": "1643dacd9feaedc58f3cc581e4d22577dfe25c09b10282936186ccf0f2e61118",
+   "implementation": "cpython",
+   "is_virtual_environment": true,
+   "prefix": "/opt/apex-runner-exp002/venv",
+   "python": "3.12.3",
+   "realpath": "/usr/bin/python3.12",
+   "site_packages_on_path": [
+    "/opt/apex-runner-exp002/venv/lib/python3.12/site-packages"
+   ]
+  },
+  "n_apex_modules": 49,
+  "pid": 2147304,
+  "python": "3.12.3",
+  "third_party": {
+   "numpy": {
+    "file": "/opt/apex-runner-exp002/venv/lib/python3.12/site-packages/numpy/__init__.py",
+    "origin": "SITE_PACKAGES",
+    "version": "2.4.6"
+   },
+   "sitecustomize": {
+    "file": "/etc/python3.12/sitecustomize.py",
+    "origin": "OUTSIDE_STDLIB_AND_SITE",
+    "version": null
+   }
+  }
+ },
+ "scientific_status": "INVALID_NULL_CONTROL",
+ "source_identity_at_completion": {
+  "acceptance_qualification": "VALID",
+  "admitted": {
+   "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+   "tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d"
+  },
+  "at_completion": {
+   "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+   "dirty": [],
+   "tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d"
+  },
+  "unchanged": true
+ },
+ "stages": [
+  {
+   "admitted_rows": 247692,
+   "refused_rows": {
+    "EMBARGO": 22620,
+    "MISSING_FEATURE_BARS": 30,
+    "MISSING_TARGET_BAR": 9,
+    "RV_FLOOR": 0,
+    "WARMUP": 22620
+   },
+   "rule": "apex.world_model.exp002.run._admit (RV_FLOOR), the qualified tournament's admission",
+   "sessions": 754,
+   "stage": "admission:fit",
+   "usable_rows": 247692
+  },
+  {
+   "fits_performed": 5,
+   "stage": "fit",
+   "status": "READY"
+  },
+  {
+   "admitted_rows": 82605,
+   "refused_rows": {
+    "EMBARGO": 7530,
+    "MISSING_FEATURE_BARS": 1,
+    "MISSING_TARGET_BAR": 14,
+    "RV_FLOOR": 0,
+    "WARMUP": 7560
+   },
+   "sessions": 252,
+   "stage": "admission:development",
+   "usable_rows": 82605
+  },
+  {
+   "n": 82605,
+   "stage": "development",
+   "status": "INVALID_NULL_CONTROL"
+  },
+  {
+   "admitted_rows": 165958,
+   "refused_rows": {
+    "EMBARGO": 15150,
+    "MISSING_FEATURE_BARS": 114,
+    "MISSING_TARGET_BAR": 19,
+    "RV_FLOOR": 0,
+    "WARMUP": 15108
+   },
+   "sessions": 505,
+   "stage": "admission:observed",
+   "usable_rows": 165958
+  },
+  {
+   "authority": "NONE",
+   "n": 165958,
+   "stage": "observed",
+   "status": "NOT_SELECTED"
+  }
+ ],
+ "status": "INVALID_NULL_CONTROL"
+}
