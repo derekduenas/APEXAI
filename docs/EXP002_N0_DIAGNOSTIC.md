@@ -94,3 +94,55 @@ is a fixed intercept plus a fixed slope on a synthetic predictor. The real
 - **D.** The effect grows with the permuted-sample fraction of `|z| > √ν`, and `E[ψ′(z)]` turns negative as that fraction grows.
 
 If A fails, the hypothesis is wrong and will be reported as wrong.
+
+---
+
+## 5. Result — prediction A is REFUTED by this test
+
+Run in the contained slice, 6 s. Vectorised log-density agrees with the shipped
+scalar `studentt.logpdf` to `0.0` max absolute difference over the sampled rows.
+Means below in units of 1e-6.
+
+| τ | L−S intact | L−S **permuted** | Gaussian intact | Gaussian **permuted** | frac \|z\|>√ν | E[ψ′] |
+|---|---|---|---|---|---|---|
+| 0.0 | −1241.6 (t=−8.21) | −1101.4 (**t=−7.25**) | −1942.9 (t=−7.51) | −1776.7 (t=−6.85) | 0.043 | 0.787 |
+| 0.3 | −1592.9 (t=−9.26) | −1039.0 (**t=−5.61**) | −2570.1 (t=−8.76) | −1876.9 (t=−4.43) | 0.074 | 0.770 |
+| 0.6 | −2777.2 (t=−10.67) | −1631.6 (**t=−5.54**) | −4566.8 (t=−10.21) | −3978.9 (t=−2.35) | 0.135 | 0.739 |
+| 0.9 | −12361.7 (t=−23.59) | −4075.2 (**t=−7.51**) | −21134.1 (t=−21.68) | −7982.5 (t=−0.49) | 0.190 | 0.710 |
+
+**Scored against the frozen predictions:**
+
+- **A — FAILED.** Permuted `L−S` was negative at every τ, including 0.9. The asserted `NO_SIGNAL` held in all four worlds with a wide margin. My proposed mechanism does not produce a positive `L−S` at these heterogeneity levels.
+- **B — held.** τ=0 permuted `L−S` mean < 0.
+- **C — held.** The Gaussian analogue was negative at every τ.
+- **D — FAILED.** The tail fraction did rise as predicted (0.043 → 0.190), but `E[ψ′(z)]` stayed **positive** throughout (0.787 → 0.710). The bulk of the distribution continues to dominate the average; the sign never flips.
+
+**What is therefore demonstrated:**
+
+1. The score-differential derivation in §2 and the family contrast in §3 are correct and confirmed numerically: with `ψ′ ≡ 1` the Gaussian pair cannot go positive under an independent outcome, while the Student-t's `ψ′` is only *locally* negative. A differing null statistic between L−S and M1−M0 is a family property and is **not** evidence of a bug.
+2. Scale heterogeneity **erodes** the negative margin — visibly so for the Gaussian pair, whose permuted `t` moves −6.85 → −0.49 as τ grows — but in a **well-specified** world it does not flip the Student-t pair's sign. So volatility mismatch alone is *not* a sufficient explanation of the observed `+2.823`.
+3. In a correctly specified world the expected permuted `L−S` is *strongly* negative (t ≈ −5 to −7.5). The observed real-data value is a large departure from that expectation, which makes a pure chance rejection less comfortable as an explanation than the raw p-value alone suggests.
+
+**Remaining candidate explanations, all UNMEASURED hypotheses:**
+
+- **marginal misspecification** — real outcomes may have heavier tails, given `σ_i`, than the fitted `t_ν` law, putting far more mass past `√ν` than any world tested here (my worlds drew outcomes from exactly the fitted law, the best case for the null);
+- **the first-order term** `E[a·ψ(z)]` — L keeps its fitted intercept, and real standardised outcomes are skewed; this channel was not isolated here;
+- **inference** — the HAC standard error may be understated under a block permutation that preserves within-block dependence and creates block-boundary discontinuities;
+- **chance** — one-sided `t = 2.823` alone is not extraordinary.
+
+Distinguishing these requires either rescoring the sealed run or a further synthetic
+design with deliberately misspecified tails. Neither was performed; both are
+outside this brick.
+
+## 6. Proposed disposition (for review; nothing acted on)
+
+The verdict stands and no model is selected. The diagnostic did **not** identify
+the cause. My recommendation is to treat N0's `L−S` assertion as *not yet shown
+to be justified* rather than as either sound or broken, and to decide between:
+
+- **(a)** a further bounded synthetic study with misspecified tails and an isolated intercept term, frozen in advance, to separate the two leading hypotheses; or
+- **(b)** a permitted re-analysis of the *existing* sealed forecasts — no refit, no new fit budget — to measure the real permuted `z` distribution and the two terms directly; this reads the development period only and would need explicit authorisation because it re-touches admitted data; or
+- **(c)** leaving the question open and revisiting the null's construction at the next registration, on the record that the current assertion rests on assumptions that have not been established.
+
+I do not recommend changing N0, the threshold, or the model on the strength of
+what is known now.

@@ -347,3 +347,29 @@ Artifacts preserved read-only in the run directory: `_AUTHORITY.json`,
 `_RUN.json`, `_RESULT.json`, and the two forecast-hash ledgers (53 MB
 development, 106 MB observed). Copy of the sealed result in
 `results/exp002_historical_run_20260909T193814Z_RESULT.json` (`0c397d70…`).
+
+### Corrections to my execution report (additive)
+
+1. **A result WAS sealed.** `_RESULT.json` exists in the run directory and records
+   scientific invalidity; it was correctly refused as a *completed* launch. The
+   wrapper field `result_sealed=false` conflates "a sealed artifact exists" with
+   "an acceptable completed result exists", and my report repeated that
+   conflation. Registered as a naming defect in `research_activation.py`
+   (`sealed_results` / `result_sealed`); **the admitted launcher was not changed
+   during this diagnostic**, since it is pinned by the admission.
+2. **Peak memory is UNKNOWN.** The `Memory peak: 432.0K` line appears verbatim in
+   systemd's captured output, but cannot credibly represent a NumPy workload
+   holding five per-arm float arrays over 165,958 rows plus 10,000 bootstrap
+   resamples. The unit was `--collect`ed, so `systemctl show -p MemoryPeak`
+   returns `[not set]`, and the only other counter,
+   `/sys/fs/cgroup/wmresearch.slice/memory.peak = 1,610,612,736 B`, is the
+   slice-level maximum across every unit ever run there and is not attributable
+   to this run. I withdraw the "memory peak 432 K" statement and any implication
+   of established headroom; the experiment's peak memory is **not established**.
+3. **Calibration, corrected and separated by period.** ~10.6% of observed
+   outcomes fell below the Gaussian arms' predicted 5th percentile: that is an
+   *excess* of lower-tail exceedances — the predicted lower tail was too thin —
+   not "over-covering". Development Student-t 5th-percentile frequencies were
+   ~5.2–5.3% (C 5.25, L 5.28, S 5.22), not 5.9%; the 5.9% figure belongs to the
+   observed period. Numerical proximity to nominal at three quantiles does not
+   establish calibration, and no calibration claim is made here.
