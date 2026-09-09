@@ -1,0 +1,20 @@
+{
+ "authority": {
+  "ADMISSION_ISSUANCE": "NONE (no signing key on the research path)",
+  "BOOK_OUTCOME_ACCESS": "FORBIDDEN",
+  "CAPITAL_AUTHORITY": "NONE",
+  "LIVE_DECISION_AUTHORITY": "NONE",
+  "MODEL_PROMOTION_AUTHORITY": "NONE",
+  "ORDER_AUTHORITY": "NONE",
+  "PRODUCTION_DEPLOYMENT": "FORBIDDEN",
+  "PROSPECTIVE_OUTCOME_ACCESS": "FORBIDDEN",
+  "P_AND_L_ACCESS": "FORBIDDEN",
+  "REAL_HISTORICAL_READ": "BY_SIGNED_ADMISSION_DECISION_ONLY",
+  "ROBINHOOD_ACCESS": "FORBIDDEN",
+  "TRADING_AUTHORITY": "NONE",
+  "contract": "REAL_DATA_RESEARCH_AUTHORITY_V0"
+ },
+ "authority_classification": "RESEARCH_HISTORICAL",
+ "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
+ "law": "outputs here are RESEARCH_HISTORICAL; nothing downstream may treat them as a live decision, a broker instruction or a promotion"
+}

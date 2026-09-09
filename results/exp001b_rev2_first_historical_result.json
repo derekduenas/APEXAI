@@ -1,0 +1,102 @@
+{
+ "admission_reconciliation": {
+  "refusals_validation": {
+   "EMBARGO": 15150,
+   "MISSING_FEATURE_BARS": 114,
+   "MISSING_TARGET_BAR": 19,
+   "WARMUP": 15108
+  },
+  "sessions_train": 1006,
+  "sessions_validation": 505,
+  "usable_rows_train": 330297,
+  "usable_rows_validation": 165958,
+  "versus_synthetic_qualification": {
+   "cause": "real bars have small gaps: 114 missing feature bars and 19 missing target bars, plus 42 fewer warmup refusals. Synthetic sessions were contiguous by construction, so the qualification workload was an upper bound on the real one, as intended.",
+   "difference": 152,
+   "real_validation_rows": 165958,
+   "synthetic_validation_rows": 166110
+  }
+ },
+ "artifacts": {
+  "forecasts_validation.jsonl": {
+   "bytes": 566357833,
+   "sha256": "5e6dbc23fbda8bc84ede78da576a81e85cbbc9698615436eec0407f10d30af67"
+  },
+  "outcomes.jsonl": {
+   "sha256": "c2ac3c7fddf21c89b45ac8614703251ccaf63891538d115afc5a8fb5df7cee51"
+  },
+  "run_dir": "/apex-data/research-rev2/out/ALPHA-EXP-001B/runs/20260909T003427Z-exp001b-914a30d3"
+ },
+ "binding": {
+  "all_imports_match_admitted_commit": true,
+  "code_commit": "a35ab1a24ebbd8942713234a97551aaf6256057b",
+  "code_tree": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
+  "decision_sha256": "28bc28590339b6e92a95e800542a8ed0e16c7834646480c66045952ef96a9d11",
+  "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9",
+  "result_counted_because": "the run directory was new to this launch, its _RUN.json names this launch's decision, and its status is a completed outcome",
+  "signer": "apex-admission",
+  "wrapper_outcome": "COMPLETED_WITH_RESULT"
+ },
+ "correction_to_an_earlier_inference": {
+  "actually": "165,958 IS the full validation count. The aborted run had FINISHED the forecast loop and was killed while building the grading lists.",
+  "i_said": "the aborted run wrote 165,958 and was 152 rows short of finishing validation forecasting",
+  "why_it_matters": "it confirms the memory attribution: gradings were the largest allocation, and that is where the process died."
+ },
+ "plain_statement": "On real SPY history 2016-2021, the registered model did NOT demonstrate useful predictive information at the 15-minute horizon on validation. This is a result, not a failure of the run.",
+ "preservation_after_the_run": {
+  "aborted_run_forecasts": "7a6cbe36c25c333191fc865e27c7c920bfefb67d008ecad6233a82a8a96a3407, unchanged and read-only",
+  "rev1_account": "apexresearch uid 109, unchanged",
+  "rev1_checkout": "277e4a023c7f070c7421fb587cba6dfcedcb3be8, unchanged",
+  "rev1_signed_decision": "1eafbe1fd972a45bc320acf2da0468a4a601eef7a00b7e6090499cc9cfcd0fa2, unchanged"
+ },
+ "process_outcome": "SCIENTIFIC_COMPLETE",
+ "result": "EXP001B_FIRST_GOVERNED_HISTORICAL_RESULT",
+ "run_id": "20260909T003427Z-exp001b-914a30d3",
+ "runtime_and_memory": {
+  "cgroup_peak_live_read_at_2_minutes": 667181056,
+  "cpu": "14min 10.9s",
+  "elapsed_s_in_result": 1270.83,
+  "final_cgroup_peak": "NOT CAPTURED",
+  "no_kill_occurred": true,
+  "oom_counters_at_that_read": {
+   "max": 0,
+   "oom": 0,
+   "oom_kill": 0
+  },
+  "sigkill_classifier_note": "not exercised; no kill occurred. The recorded finding that status=KILL alone should not imply OOM stands.",
+  "wall_seconds": 1272,
+  "what_is_established": "the process completed and was never killed: it exited 0 and sealed a result, and the counters were zero throughout the sampled period.",
+  "why_not": "the transient unit ran with --collect, so its cgroup was removed at exit before a final read. The '260.0K memory peak' in systemd's closing line is the wrapper scope's own accounting, not the experiment's, and is the same class of discrepancy recorded in the qualification."
+ },
+ "statistics_validation": {
+  "dm": {
+   "hac_se": 0.0002633,
+   "iid_se": 0.0001071,
+   "kernel": "BARTLETT",
+   "lag": 14,
+   "mean_loglik_gain": 0.0001981,
+   "se_inflation_vs_iid": 2.459,
+   "t": 0.7525,
+   "threshold": 2.0,
+   "verdict": "NO_SIGNAL"
+  },
+  "economics": "NONE. The registration fixes validation as distributional only and economics to the evaluation stage.",
+  "evaluation": "SEALED and absent from the result. Validation did not detect signal, so it was never approached.",
+  "n": 165958,
+  "n0_null_control": {
+   "mean_loglik_gain": -0.0002678,
+   "returned_no_signal_as_required": true,
+   "t": -0.3349,
+   "verdict": "NO_SIGNAL"
+  },
+  "reading": "the point estimate is positive but small and the dependence-aware standard error is 2.46x the naive one; t=0.75 against a threshold of 2.0. The null control returned NO_SIGNAL, so the harness discriminates."
+ },
+ "terminal_status": "NO_SIGNAL",
+ "what_this_does_not_establish": [
+  "that the model is worthless: one horizon, one instrument, one specification, one validation window",
+  "anything about the evaluation period, which remains sealed and unopened",
+  "any economic quantity: none was computed, by registration"
+ ],
+ "why": "DM-HAC on validation did not exceed 2.0; evaluation stays sealed"
+}

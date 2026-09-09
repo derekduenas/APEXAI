@@ -1,0 +1,485 @@
+{
+ "created_utc": "2026-09-09T00:34:27Z",
+ "dataset_id": "history-b/etf_continuous",
+ "decision_path": "/etc/apex/admissions/exp001b_admission_rev2.json",
+ "decision_sha256": "28bc28590339b6e92a95e800542a8ed0e16c7834646480c66045952ef96a9d11",
+ "experiment_id": "ALPHA-EXP-001B",
+ "imports": {
+  "all_imports_match_admitted_commit": true,
+  "checkout_root": "/apex-data/research-rev2/checkout",
+  "commit": "a35ab1a24ebbd8942713234a97551aaf6256057b",
+  "mismatched": [],
+  "n_modules": 42,
+  "outside_checkout": [],
+  "unbound_dependencies": [
+   "apex/__init__.py",
+   "apex/governance/__init__.py"
+  ],
+  "untracked_at_commit": [],
+  "verified": [
+   {
+    "module": "apex",
+    "path": "apex/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   {
+    "module": "apex.governance",
+    "path": "apex/governance/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   {
+    "module": "apex.governance.chain_ledger",
+    "path": "apex/governance/chain_ledger.py",
+    "sha256": "c50c8a9059c452de411a64f134521ef347c531efde1317126e7da6e120a087ec"
+   },
+   {
+    "module": "apex.world_model",
+    "path": "apex/world_model/__init__.py",
+    "sha256": "f0ea89d6d74db9a2f8024aa53331c6ce02d808b9ebf0a3d7f9214897f449a82f"
+   },
+   {
+    "module": "apex.world_model.authority",
+    "path": "apex/world_model/authority.py",
+    "sha256": "b33091a22dc612d7f9c98691075500b79b975ac6806d1f29f7a16d7abf75dd8a"
+   },
+   {
+    "module": "apex.world_model.bootstrap",
+    "path": "apex/world_model/bootstrap.py",
+    "sha256": "19d3d70e41d1d5ebe3fee1e5483c4e26ba996fa34b812ee6b91791881b763872"
+   },
+   {
+    "module": "apex.world_model.budget",
+    "path": "apex/world_model/budget.py",
+    "sha256": "bcb4cfd6b8af6c575f8e543c41cfe5bc4cd54750c3cf0743148749498ea9f497"
+   },
+   {
+    "module": "apex.world_model.canonical",
+    "path": "apex/world_model/canonical.py",
+    "sha256": "26fbb5018d876dec1052e52c07f5b2e33383da43a2990f5a7b1db191b5c28ce5"
+   },
+   {
+    "module": "apex.world_model.controls",
+    "path": "apex/world_model/controls.py",
+    "sha256": "6e92de2d84af9491faf6e902b06df0fa679f5c92803c145f035f688ce4896673"
+   },
+   {
+    "module": "apex.world_model.controls_r3",
+    "path": "apex/world_model/controls_r3.py",
+    "sha256": "cec658d50d0810021d7052c02a2c5c001db8ce7f383eb49694385ac7ca682538"
+   },
+   {
+    "module": "apex.world_model.controls_r4",
+    "path": "apex/world_model/controls_r4.py",
+    "sha256": "2a1cf380d5d897ab169feec82ee7444f63e9c54bde37edb261061bd2a43dc584"
+   },
+   {
+    "module": "apex.world_model.controls_r5",
+    "path": "apex/world_model/controls_r5.py",
+    "sha256": "d0e78d7d0d9e57481959004b0532fa54d54a2db7d129eeee1cfabcf809a9608f"
+   },
+   {
+    "module": "apex.world_model.controls_r51",
+    "path": "apex/world_model/controls_r51.py",
+    "sha256": "c989d70e410dca0f8aafd154425587a3d8b56e233cd6db84863215bf47442c30"
+   },
+   {
+    "module": "apex.world_model.court",
+    "path": "apex/world_model/court.py",
+    "sha256": "bc9a69c06502b631e46b9492b77bfc716c737639f9065e848192ff9ee03a1b59"
+   },
+   {
+    "module": "apex.world_model.court_v1",
+    "path": "apex/world_model/court_v1.py",
+    "sha256": "ea878fdf767d5cad97ea1b4990ccc8c00586c4e37c001ab5740904293086cbb9"
+   },
+   {
+    "module": "apex.world_model.court_v2",
+    "path": "apex/world_model/court_v2.py",
+    "sha256": "0aeb17863079acab48fdec8de71b788a62712f2d11adbda482e7c91a88492f92"
+   },
+   {
+    "module": "apex.world_model.exp001",
+    "path": "apex/world_model/exp001/__init__.py",
+    "sha256": "2f2dc2cc35c7f238631fe314a5e1c31fbd35dd5540288075e53e9279e2dd8397"
+   },
+   {
+    "module": "apex.world_model.exp001.models",
+    "path": "apex/world_model/exp001/models.py",
+    "sha256": "4cd3aa397fc707366642d52dc92a7cf1c6fb63e16e77b5b9b40f3d25addb3a75"
+   },
+   {
+    "module": "apex.world_model.exp001.registration",
+    "path": "apex/world_model/exp001/registration.py",
+    "sha256": "11afb3428d0df660497b6c03e7f677edf6dfe8a23ebf990f07ccc2ce0eace6ea"
+   },
+   {
+    "module": "apex.world_model.exp001b",
+    "path": "apex/world_model/exp001b/__init__.py",
+    "sha256": "e4ba5d88438d851746c64fecc40c991cc7dff16add44d30ea97621d2fd48b66b"
+   },
+   {
+    "module": "apex.world_model.exp001b.bars",
+    "path": "apex/world_model/exp001b/bars.py",
+    "sha256": "68b1125ea7968887ccc0246a5ce43b9d09dcbf7745aa1e75f96160ba4f90d200"
+   },
+   {
+    "module": "apex.world_model.exp001b.exchange_calendar",
+    "path": "apex/world_model/exp001b/exchange_calendar.py",
+    "sha256": "23924aa1afc38f312762e140362f532cf9de94df477e045a44d7b14a69a03339"
+   },
+   {
+    "module": "apex.world_model.exp001b.models",
+    "path": "apex/world_model/exp001b/models.py",
+    "sha256": "8d33fd07ee40f651d429c9872e16ab23e9ecec18d9e0821a160199e557941817"
+   },
+   {
+    "module": "apex.world_model.exp001b.registration",
+    "path": "apex/world_model/exp001b/registration.py",
+    "sha256": "6620c604e83fd2a2f12ef6b2f919d591e212e9ddf9602a74e842ef734f2e6216"
+   },
+   {
+    "module": "apex.world_model.exp001b.run",
+    "path": "apex/world_model/exp001b/run.py",
+    "sha256": "59cc577260278ddddd301035edbb1385540a82b1b58f48ea0cb781214c6d2430"
+   },
+   {
+    "module": "apex.world_model.features",
+    "path": "apex/world_model/features.py",
+    "sha256": "0b2e56bbeaf4daf42ee488cbc6e375cb97f722c175441ed0bf18a8429c1eb409"
+   },
+   {
+    "module": "apex.world_model.forecast",
+    "path": "apex/world_model/forecast.py",
+    "sha256": "1fbdc1e094a007c65161f9d20db09efc1ea7e993020db64759ed1762a14ce4f1"
+   },
+   {
+    "module": "apex.world_model.grader",
+    "path": "apex/world_model/grader.py",
+    "sha256": "5bfe40011b55bf13c6cc9a0f0519c1b156f2149da84b27db62b3db6b8a671281"
+   },
+   {
+    "module": "apex.world_model.holdout",
+    "path": "apex/world_model/holdout.py",
+    "sha256": "af56648f3e5b146e63ff02f642c84b4d65a81378fd9ad33e66eb0f6b01a151c8"
+   },
+   {
+    "module": "apex.world_model.inference",
+    "path": "apex/world_model/inference.py",
+    "sha256": "2731c2a18c808a0659bb4dde01715ca411d369e049673b13e120c64d17dd9d56"
+   },
+   {
+    "module": "apex.world_model.inputs",
+    "path": "apex/world_model/inputs.py",
+    "sha256": "e01988f387d02010ccfadd1268c368d3bee5ff95fad09b3780b726e19a14fff5"
+   },
+   {
+    "module": "apex.world_model.models",
+    "path": "apex/world_model/models.py",
+    "sha256": "8d6354ed918911b81fa467a6c9794e4f3ad6a660dc70c796303029fc082a86b9"
+   },
+   {
+    "module": "apex.world_model.nulls",
+    "path": "apex/world_model/nulls.py",
+    "sha256": "3585cce27c15a5d419825c4fa2d395999233f4c01daed0a8a6b33ceff283e645"
+   },
+   {
+    "module": "apex.world_model.quality",
+    "path": "apex/world_model/quality.py",
+    "sha256": "5c48a6bb90a49e8b292b3598adb33a179c4bf595fadd24bde246460c77dc2608"
+   },
+   {
+    "module": "apex.world_model.real_data",
+    "path": "apex/world_model/real_data/__init__.py",
+    "sha256": "3a9323136b73e959b176a9e3a08539032d7cfc61da1b27eee5ccf0dab92d6d8d"
+   },
+   {
+    "module": "apex.world_model.real_data.boundary",
+    "path": "apex/world_model/real_data/boundary.py",
+    "sha256": "c9ed15b7e277751587e81ce999f07e851593292d45167b3d4d479b3967c0a89d"
+   },
+   {
+    "module": "apex.world_model.real_data.loader",
+    "path": "apex/world_model/real_data/loader.py",
+    "sha256": "cfdbce716a47f9348c54b7fae15f77834fd6837eefa98b6beb12fd1a490b3731"
+   },
+   {
+    "module": "apex.world_model.runs",
+    "path": "apex/world_model/runs.py",
+    "sha256": "0ba881260607729147c5d08489edd76780bc98df9020196d403916e90595f98a"
+   },
+   {
+    "module": "apex.world_model.sources",
+    "path": "apex/world_model/sources.py",
+    "sha256": "2513130770dfae10bf78fbbae8c620911c728ee60c03108f0cadbd04deeb5673"
+   },
+   {
+    "module": "apex.world_model.targets",
+    "path": "apex/world_model/targets.py",
+    "sha256": "b08f5fe7c53b64151a4092bd1689d7d2f873eaeb3712975f5813fbba80fc49b3"
+   },
+   {
+    "module": "apex.world_model.teststand",
+    "path": "apex/world_model/teststand.py",
+    "sha256": "8a2c49fe188ae50524e6baab445769ddf87947ffeb2da6fee431462ef30244e6"
+   },
+   {
+    "module": "apex.world_model.worlds",
+    "path": "apex/world_model/worlds.py",
+    "sha256": "6a260672dda55f05ce99485a537227d2f9676ab955771d3cdc831038c1dfe4cf"
+   }
+  ]
+ },
+ "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+ "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9",
+ "run_id": "20260909T003427Z-exp001b-914a30d3",
+ "runtime": {
+  "apex_module_files": {
+   "apex.governance": "/apex-data/research-rev2/checkout/apex/governance/__init__.py",
+   "apex.governance.chain_ledger": "/apex-data/research-rev2/checkout/apex/governance/chain_ledger.py",
+   "apex.world_model": "/apex-data/research-rev2/checkout/apex/world_model/__init__.py",
+   "apex.world_model.authority": "/apex-data/research-rev2/checkout/apex/world_model/authority.py",
+   "apex.world_model.bootstrap": "/apex-data/research-rev2/checkout/apex/world_model/bootstrap.py",
+   "apex.world_model.budget": "/apex-data/research-rev2/checkout/apex/world_model/budget.py",
+   "apex.world_model.canonical": "/apex-data/research-rev2/checkout/apex/world_model/canonical.py",
+   "apex.world_model.controls": "/apex-data/research-rev2/checkout/apex/world_model/controls.py",
+   "apex.world_model.controls_r3": "/apex-data/research-rev2/checkout/apex/world_model/controls_r3.py",
+   "apex.world_model.controls_r4": "/apex-data/research-rev2/checkout/apex/world_model/controls_r4.py",
+   "apex.world_model.controls_r5": "/apex-data/research-rev2/checkout/apex/world_model/controls_r5.py",
+   "apex.world_model.controls_r51": "/apex-data/research-rev2/checkout/apex/world_model/controls_r51.py",
+   "apex.world_model.court": "/apex-data/research-rev2/checkout/apex/world_model/court.py",
+   "apex.world_model.court_v1": "/apex-data/research-rev2/checkout/apex/world_model/court_v1.py",
+   "apex.world_model.court_v2": "/apex-data/research-rev2/checkout/apex/world_model/court_v2.py",
+   "apex.world_model.exp001": "/apex-data/research-rev2/checkout/apex/world_model/exp001/__init__.py",
+   "apex.world_model.exp001.models": "/apex-data/research-rev2/checkout/apex/world_model/exp001/models.py",
+   "apex.world_model.exp001.registration": "/apex-data/research-rev2/checkout/apex/world_model/exp001/registration.py",
+   "apex.world_model.exp001b": "/apex-data/research-rev2/checkout/apex/world_model/exp001b/__init__.py",
+   "apex.world_model.exp001b.bars": "/apex-data/research-rev2/checkout/apex/world_model/exp001b/bars.py",
+   "apex.world_model.exp001b.exchange_calendar": "/apex-data/research-rev2/checkout/apex/world_model/exp001b/exchange_calendar.py",
+   "apex.world_model.exp001b.models": "/apex-data/research-rev2/checkout/apex/world_model/exp001b/models.py",
+   "apex.world_model.exp001b.registration": "/apex-data/research-rev2/checkout/apex/world_model/exp001b/registration.py",
+   "apex.world_model.exp001b.run": "/apex-data/research-rev2/checkout/apex/world_model/exp001b/run.py",
+   "apex.world_model.features": "/apex-data/research-rev2/checkout/apex/world_model/features.py",
+   "apex.world_model.forecast": "/apex-data/research-rev2/checkout/apex/world_model/forecast.py",
+   "apex.world_model.grader": "/apex-data/research-rev2/checkout/apex/world_model/grader.py",
+   "apex.world_model.holdout": "/apex-data/research-rev2/checkout/apex/world_model/holdout.py",
+   "apex.world_model.inference": "/apex-data/research-rev2/checkout/apex/world_model/inference.py",
+   "apex.world_model.inputs": "/apex-data/research-rev2/checkout/apex/world_model/inputs.py",
+   "apex.world_model.models": "/apex-data/research-rev2/checkout/apex/world_model/models.py",
+   "apex.world_model.nulls": "/apex-data/research-rev2/checkout/apex/world_model/nulls.py",
+   "apex.world_model.quality": "/apex-data/research-rev2/checkout/apex/world_model/quality.py",
+   "apex.world_model.real_data": "/apex-data/research-rev2/checkout/apex/world_model/real_data/__init__.py",
+   "apex.world_model.real_data.boundary": "/apex-data/research-rev2/checkout/apex/world_model/real_data/boundary.py",
+   "apex.world_model.real_data.loader": "/apex-data/research-rev2/checkout/apex/world_model/real_data/loader.py",
+   "apex.world_model.runs": "/apex-data/research-rev2/checkout/apex/world_model/runs.py",
+   "apex.world_model.sources": "/apex-data/research-rev2/checkout/apex/world_model/sources.py",
+   "apex.world_model.targets": "/apex-data/research-rev2/checkout/apex/world_model/targets.py",
+   "apex.world_model.teststand": "/apex-data/research-rev2/checkout/apex/world_model/teststand.py",
+   "apex.world_model.worlds": "/apex-data/research-rev2/checkout/apex/world_model/worlds.py"
+  },
+  "cwd": "/apex-data/research-rev2/checkout",
+  "euid": 110,
+  "executable": "/opt/apex-runner-rev2/venv/bin/python",
+  "interpreter": {
+   "base_prefix": "/usr",
+   "executable": "/opt/apex-runner-rev2/venv/bin/python",
+   "executable_sha256": "1643dacd9feaedc58f3cc581e4d22577dfe25c09b10282936186ccf0f2e61118",
+   "implementation": "cpython",
+   "is_virtual_environment": true,
+   "prefix": "/opt/apex-runner-rev2/venv",
+   "python": "3.12.3",
+   "realpath": "/usr/bin/python3.12",
+   "site_packages_on_path": [
+    "/opt/apex-runner-rev2/venv/lib/python3.12/site-packages"
+   ]
+  },
+  "n_apex_modules": 41,
+  "pid": 2003267,
+  "python": "3.12.3",
+  "third_party": {
+   "numpy": {
+    "file": "/opt/apex-runner-rev2/venv/lib/python3.12/site-packages/numpy/__init__.py",
+    "origin": "SITE_PACKAGES",
+    "version": "2.4.6"
+   },
+   "sitecustomize": {
+    "file": "/etc/python3.12/sitecustomize.py",
+    "origin": "OUTSIDE_STDLIB_AND_SITE",
+    "version": null
+   }
+  }
+ },
+ "signature_mechanism": "OPENSSH_SSHSIG (ssh-keygen -Y sign/verify, ed25519)",
+ "signer": "apex-admission",
+ "source_identity": {
+  "checkout_root": "/apex-data/research-rev2/checkout",
+  "commit": "a35ab1a24ebbd8942713234a97551aaf6256057b",
+  "dirty": [],
+  "n_files": 48,
+  "paths": [
+   "apex/world_model",
+   "apex/governance/chain_ledger.py",
+   "apex/intraday/sessions.py",
+   "scripts/alpha_exp_real_execute.py"
+  ],
+  "tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345"
+ },
+ "trust_chain": {
+  "admission_root": [
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc/apex",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc/apex/admissions",
+    "sticky": false,
+    "uid": 0
+   }
+  ],
+  "allowed_signers": [
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc/apex",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc/apex/admissions",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc/apex/admissions/trust",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": false,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "644",
+    "owned_by_euid": false,
+    "path": "/etc/apex/admissions/trust/allowed_signers",
+    "sticky": false,
+    "uid": 0
+   }
+  ],
+  "decision": [
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc/apex",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "path": "/etc/apex/admissions",
+    "sticky": false,
+    "uid": 0
+   },
+   {
+    "dir": false,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "644",
+    "owned_by_euid": false,
+    "path": "/etc/apex/admissions/exp001b_admission_rev2.json",
+    "sticky": false,
+    "uid": 0
+   }
+  ]
+ },
+ "verifier": "/usr/bin/ssh-keygen"
+}
