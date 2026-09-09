@@ -60,12 +60,24 @@
  "package": "EXP002_SIGNING_PACKAGE",
  "signing": {
   "claude_holds_no_key": true,
+  "digest_note": "the signed admission necessarily has a different sha256 than the request, because decision and provenance change. The boundary authenticates it by signature over the installed bytes, not by matching the request digest; the run record seals the decision's own sha256.",
+  "key": {
+   "comment_in_public_key": "apex-admission (ED25519)",
+   "correction": "an earlier instruction of mine named ~/.ssh/apex_admission; that filename was an assumption and is wrong",
+   "fingerprint": "SHA256:A9uPHHPKZSzeWcRkOGyAa6M1gHVJhj4fFKAAgrIgumI",
+   "identified_by": "public fingerprint match against the package's trusted fingerprint; no private-key contents were read",
+   "no_key_created_or_allowed_signers_changed": true,
+   "private_key_path": "~/.ssh/apex_admission_ed25519",
+   "public_key_path": "~/.ssh/apex_admission_ed25519.pub"
+  },
   "namespace": "apex-admission",
   "principal": "apex-admission",
   "steps": [
+   "extract the request from commit 8daa4f05 (not from a branch) and verify sha256 == d8e359a8b06afbe89d9895cd1dd0d79bab0fce727a4ff3a2e47b840957c5b316",
    "set decision=ADMIT and provenance {decided_by: apex-admission, decided_utc: <now>, review_reference: EXP002-HISTORICAL-EXECUTION}; change nothing else",
-   "ssh-keygen -Y sign -f <private key> -n apex-admission <decision file>",
-   "install the decision and its .sig on the host as root, mode 644"
+   "ssh-keygen -Y sign -f ~/.ssh/apex_admission_ed25519 -n apex-admission <decision file>",
+   "install the decision and its .sig on the host as root, mode 644",
+   "verify the installed pair on the host: ssh-keygen -Y verify with the trusted allowed_signers"
   ],
   "trusted_public_key": {
    "file": "/etc/apex/admissions/trust/allowed_signers",
@@ -77,6 +89,12 @@
  },
  "unsigned_request": {
   "decision_field": "REQUESTED_NOT_GRANTED",
+  "immutable_source": {
+   "commit": "8daa4f05038f68398d691af89ff2e3edfbd642c7",
+   "extract": "git show 8daa4f05038f68398d691af89ff2e3edfbd642c7:results/exp002_admission_request.json",
+   "verified_extraction_matches_digest": true,
+   "why": "a branch name moves; the commit does not. Extract from the commit and verify the digest before editing."
+  },
   "path": "results/exp002_admission_request.json",
   "provenance_principal": null,
   "sha256": "d8e359a8b06afbe89d9895cd1dd0d79bab0fce727a4ff3a2e47b840957c5b316"

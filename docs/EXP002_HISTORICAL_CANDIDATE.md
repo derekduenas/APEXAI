@@ -273,3 +273,35 @@ Not done: signing, installing `/etc/apex/admissions/exp002_admission.json`, hist
 sudo -n /usr/bin/python3.12 /apex-data/research-exp002/checkout/scripts/research_activation.py launch --research-root /apex-data/research-exp002 --runner-root /opt/apex-runner-exp002 --research-user apexresearch3 --experiment ALPHA-EXP-002 --commit 2a09d1ed329fe0baa1db24afc542b226f4d7855f --decision /etc/apex/admissions/exp002_admission.json
 ```
 **Execution (historical fitting; only after review and the operator's off-host signature):** the same command with `--apply` appended.
+
+### Signing instructions — corrected
+
+Two fixes to my previous instructions.
+
+**Use the immutable request, not a branch.** `git checkout && git pull` follows a
+moving ref. Extract from the commit and verify the digest before editing:
+
+```
+git show 8daa4f05038f68398d691af89ff2e3edfbd642c7:results/exp002_admission_request.json > /tmp/exp002_request.json
+shasum -a 256 /tmp/exp002_request.json
+# must be d8e359a8b06afbe89d9895cd1dd0d79bab0fce727a4ff3a2e47b840957c5b316
+```
+
+Verified: extracting from that commit reproduces exactly that digest. The signed
+admission will have a *different* digest, because `decision` and `provenance`
+change. That is expected: the boundary authenticates the installed decision by
+signature over its bytes, not by matching the request digest, and the run record
+seals the decision's own sha256.
+
+**Signing key, identified by public fingerprint.** My earlier
+`~/.ssh/apex_admission` was an assumption and is wrong. Fingerprinting the
+public halves on the Mac, exactly one matches the package's trusted fingerprint:
+
+| File | Fingerprint |
+|---|---|
+| `~/.ssh/apex_admission_ed25519.pub` | `SHA256:A9uPHHPKZSzeWcRkOGyAa6M1gHVJhj4fFKAAgrIgumI` — **match**, comment `apex-admission` |
+| `~/.ssh/id_ed25519.pub` | `SHA256:vSKI57cA9uCFS7zJFGvBCELzajw+rzg/HSKZVHlBxXM` |
+| `~/.ssh/id_rsa.pub` | `SHA256:GoO5TG2mjDmmeCVeDbmEfbL1HbONaZd/QgEjOFn7MDk` |
+
+So the private half to sign with is `~/.ssh/apex_admission_ed25519`. Only public
+halves were read; no key was created and `allowed_signers` was not touched.
