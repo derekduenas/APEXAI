@@ -16,6 +16,16 @@
   "launcher_sha256": "4b9b187aee53ce8eacd4bcfbacc0439a10818d9a570c9d7501ea6a08f9422191",
   "matches_committed_package": true
  },
+ "corrections": {
+  "dataset_verification": "COMPLETE, not sampled: the pinned wrapper's dataset_inventory check hashes every file in the view against the manifest and refuses on mismatch, so the passing verify covers all 1511 files; the 22-file spot check was an additional redundant check",
+  "first_probe_attribution": {
+   "acceptance_rests_on": "probe2.json, which names apexresearch3 and the EXP-002 paths, zero deviations",
+   "actually_tested": "the EXP-001B environment (apexresearch, /apex-data/research/dataset_view, /apex-data/research/out)",
+   "cause": "the shell chain broke on my failed ad hoc git rev-parse before T=... was assigned, so the invocation ran with no target flags and fell back to the production defaults",
+   "record": "probe.json",
+   "status": "preserved as evidence of what it tested; NOT evidence for this environment"
+  }
+ },
  "dataset_view_hash_check": {
   "entries": "root-owned regular files, mode 664, bound read-only into the sandbox; probe confirms corpus not writable",
   "equals_in_range_manifest_set": true,
@@ -29,13 +39,22 @@
   "historical fitting"
  ],
  "preservation": {
+  "aborted_run": {
+   "bytes": 566689749,
+   "method": "hashed as bytes; not parsed, graded or read",
+   "mode": "444",
+   "note": "lives under the rev1 environment; my earlier command used a rev2 path that does not exist, which is why the check was omitted",
+   "path": "/apex-data/research/out/ALPHA-EXP-001B/runs/20260908T131351Z-exp001b-2054eaa4/forecasts_validation.jsonl",
+   "sha256": "7a6cbe36c25c333191fc865e27c7c920bfefb67d008ecad6233a82a8a96a3407",
+   "uid": 109,
+   "unchanged": true
+  },
   "accounts": {
    "apexresearch": 109,
    "apexresearch2": 110
   },
   "allowed_signers_sha256_prefix": "ae30f60db42443ad",
   "exp001b_rev2_result_sha256_prefix": "4b23021d07d8d200",
-  "note": "aborted-run forecasts path check omitted this time (path typo in my command); its hash 7a6cbe36... was verified in the previous brick",
   "signed_decisions_prefix": [
    "1eafbe1fd972a45b",
    "28bc28590339b6e9"

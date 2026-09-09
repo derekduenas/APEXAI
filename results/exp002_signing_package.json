@@ -1,0 +1,84 @@
+{
+ "authorized_scope": {
+  "development": {
+   "authority": "matched C-L gate (G1) only, both predeclared inferences",
+   "exposure": "prior exposure acknowledged",
+   "range": [
+    "2019-01-01",
+    "2019-12-31"
+   ]
+  },
+  "evaluation_and_reserve": "SEALED; never requested",
+  "excluded": [
+   "economics",
+   "trading",
+   "subgroup searches",
+   "refits"
+  ],
+  "fit": {
+   "model_fits": 5,
+   "performed": "once",
+   "range": [
+    "2016-01-04",
+    "2018-12-31"
+   ]
+  },
+  "observed": {
+   "authority": "NONE, secondary reporting",
+   "models": "the same fitted models, no refit",
+   "range": [
+    "2020-01-01",
+    "2021-12-31"
+   ]
+  }
+ },
+ "candidate": {
+  "bound_source_tree_sha256": "c855b15d9c97fd76c5b340b042a12f719141b8818b65f808d52ebe2fd2fc2f6d",
+  "commit": "2a09d1ed329fe0baa1db24afc542b226f4d7855f",
+  "launcher_sha256": "4b9b187aee53ce8eacd4bcfbacc0439a10818d9a570c9d7501ea6a08f9422191",
+  "registration_hash": "fe15f818129acfb09702cad70401b80f2bdd35af625c44a64800ffa197a3d3f2"
+ },
+ "commands": {
+  "execution_historical_fitting": "the same command with --apply appended",
+  "preparation_no_fitting": "sudo -n /usr/bin/python3.12 /apex-data/research-exp002/checkout/scripts/research_activation.py launch --research-root /apex-data/research-exp002 --runner-root /opt/apex-runner-exp002 --research-user apexresearch3 --experiment ALPHA-EXP-002 --commit 2a09d1ed329fe0baa1db24afc542b226f4d7855f --decision /etc/apex/admissions/exp002_admission.json"
+ },
+ "decision_filename": {
+  "distinct_from": [
+   "exp001b_admission.json",
+   "exp001b_admission_rev2.json"
+  ],
+  "earlier_admissions_untouched": true,
+  "path": "/etc/apex/admissions/exp002_admission.json",
+  "signature": "/etc/apex/admissions/exp002_admission.json.sig"
+ },
+ "for": "the operator's off-host signature; Claude does not sign, install or execute",
+ "not_done": [
+  "signing",
+  "admission installation",
+  "historical fitting"
+ ],
+ "package": "EXP002_SIGNING_PACKAGE",
+ "signing": {
+  "claude_holds_no_key": true,
+  "namespace": "apex-admission",
+  "principal": "apex-admission",
+  "steps": [
+   "set decision=ADMIT and provenance {decided_by: apex-admission, decided_utc: <now>, review_reference: EXP002-HISTORICAL-EXECUTION}; change nothing else",
+   "ssh-keygen -Y sign -f <private key> -n apex-admission <decision file>",
+   "install the decision and its .sig on the host as root, mode 644"
+  ],
+  "trusted_public_key": {
+   "file": "/etc/apex/admissions/trust/allowed_signers",
+   "fingerprint": "SHA256:A9uPHHPKZSzeWcRkOGyAa6M1gHVJhj4fFKAAgrIgumI",
+   "sha256_prefix": "ae30f60db42443ad",
+   "unchanged": true
+  },
+  "where": "off-host, on the Mac; the private key is never transmitted to or placed on the research host"
+ },
+ "unsigned_request": {
+  "decision_field": "REQUESTED_NOT_GRANTED",
+  "path": "results/exp002_admission_request.json",
+  "provenance_principal": null,
+  "sha256": "d8e359a8b06afbe89d9895cd1dd0d79bab0fce727a4ff3a2e47b840957c5b316"
+ }
+}
