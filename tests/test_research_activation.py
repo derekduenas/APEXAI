@@ -972,3 +972,168 @@ def test_no_other_nonzero_exit_is_rescued_by_a_sealed_result(rig, tmp_path):
     code, rec = _cli_launch(rig, run, tmp_path)
     assert rec["execution"]["outcome"] == RA.LAUNCH_FAILED
     assert code == RA.LAUNCH_EXIT_CODES[RA.LAUNCH_FAILED]
+
+
+# ================= two environments, side by side =========================
+# Revision 2 must be unable to reach revision 1: not through setup, not through
+# resume, and above all not through rollback, which removes an account by name.
+
+from dataclasses import replace as _replace
+
+
+class Multi(StandIn):
+    """A stand-in with a SHARED account registry, so two environments can hold
+    two accounts at once and one teardown can be seen not to touch the other."""
+
+    def __init__(self, targets, users, **kw):
+        super().__init__(targets, **kw)
+        self.users = users
+
+    def cmd(self, argv, *, timeout=1800, input_text=None):
+        argv = [str(x) for x in argv]
+        if argv[0] == "adduser":
+            self.calls.append(argv); self.users.add(argv[-1])
+            return subprocess.CompletedProcess(argv, 0, "", "")
+        if argv[0] == "deluser":
+            self.calls.append(argv); self.users.discard(argv[-1])
+            return subprocess.CompletedProcess(argv, 0, "", "")
+        return super().cmd(argv, timeout=timeout, input_text=input_text)
+
+
+@pytest.fixture
+def two(rig, monkeypatch):
+    users = set()
+
+    def facts(u, _u=users):
+        if u in _u:
+            return {"name": u, "present": True, "uid": os.getuid(), "gid": os.getgid(),
+                    "shell": "/usr/sbin/nologin", "home": "/home/%s" % u,
+                    "groups": [u], "privileged_groups": []}
+        return {"name": u, "present": False}
+    monkeypatch.setattr(RA, "account_facts", facts)
+    tmp = rig["tmp"]
+    e1 = _replace(rig["t"], research_user="rev1_research")
+    e2 = _replace(rig["t"], research_root=tmp / "research2", runner_root=tmp / "runner2",
+                  research_user="rev2_research")
+    return {"users": users, "e1": e1, "e2": e2, "commit": rig["commit"], "rig": rig}
+
+
+def _setup(env, users, commit, **kw):
+    run = Multi(env, users, **kw)
+    return RA.run_setup(env, commit, apply=True, run=run), run
+
+
+def test_two_environments_stand_up_independently(two):
+    e1, e2, users = two["e1"], two["e2"], two["users"]
+    r1, _ = _setup(e1, users, two["commit"])
+    r2, _ = _setup(e2, users, two["commit"])
+    assert r1["state"] == "COMPLETE" and r2["state"] == "COMPLETE"
+    assert users == {"rev1_research", "rev2_research"}
+    for e in (e1, e2):
+        for p in (e.checkout, e.venv, e.view_bars, e.out):
+            assert p.exists(), (e.research_user, p)
+    assert e1.research_root != e2.research_root
+    assert e1.setup_manifest != e2.setup_manifest
+
+
+def test_rolling_back_the_second_leaves_the_first_and_its_account_intact(two):
+    e1, e2, users = two["e1"], two["e2"], two["users"]
+    _setup(e1, users, two["commit"])
+    _setup(e2, users, two["commit"])
+    before = {p: p.exists() for p in (e1.checkout, e1.venv, e1.view_bars, e1.out,
+                                      e1.setup_manifest)}
+    run = Multi(e2, users)
+    RA.run_rollback(e2, apply=True, run=run)
+
+    # the first environment is untouched, including its account
+    assert "rev1_research" in users
+    assert {p: p.exists() for p in before} == before
+    # and nothing the rollback ran named the first environment
+    for c in run.calls:
+        joined = " ".join(c)
+        assert "rev1_research" not in joined, c
+        assert str(e1.research_root) not in joined, c
+        assert str(e1.runner_root) not in joined, c
+
+
+def test_resuming_the_second_cannot_disturb_the_first(two):
+    e1, e2, users = two["e1"], two["e2"], two["users"]
+    _setup(e1, users, two["commit"])
+    with pytest.raises(Refused):
+        RA.run_setup(e2, two["commit"], apply=True, run=Multi(e2, users, fail_on="git"))
+    m1_before = e1.setup_manifest.read_text()
+    rec = RA.run_setup(e2, two["commit"], apply=True, run=Multi(e2, users), resume=True)
+    assert rec["state"] == "COMPLETE"
+    assert e1.setup_manifest.read_text() == m1_before
+    assert "rev1_research" in users
+
+
+# ---------------- target validation, before any mutation ------------------
+
+def test_a_revision_may_not_share_the_production_account(rig):
+    d = RA.production_targets()
+    t = _replace(rig["t"], research_user=d.research_user)
+    with pytest.raises(Refused, match="SHARED_RESEARCH_ACCOUNT"):
+        RA.validate_targets(t)
+
+
+def test_a_revision_may_not_reach_the_preserved_environment(rig):
+    d = RA.production_targets()
+    for field, val in (("research_root", Path(str(d.research_root)) / "rev2"),
+                       ("runner_root", Path(str(d.runner_root)) / "rev2")):
+        t = _replace(rig["t"], research_user="rev2", **{field: val})
+        with pytest.raises(Refused, match="TARGET_WOULD_REACH_PRESERVED_ENVIRONMENT"):
+            RA.validate_targets(t)
+
+
+@pytest.mark.parametrize("bad", ["/", "/etc", "/etc/apex", "/opt", "/apex-data",
+                                 "/apex-data/history-b", "/usr", "/root"])
+def test_protected_locations_are_refused(rig, bad):
+    t = _replace(rig["t"], research_root=Path(bad), research_user="rev2")
+    with pytest.raises(Refused, match="TARGET_IS_OR_CONTAINS_PROTECTED|TARGET_INSIDE_PROTECTED"):
+        RA.validate_targets(t)
+
+
+def test_overlapping_roots_are_refused(rig):
+    t = _replace(rig["t"], runner_root=rig["t"].research_root / "runner",
+                 research_user="rev2")
+    with pytest.raises(Refused, match="TARGETS_OVERLAP"):
+        RA.validate_targets(t)
+
+
+def test_the_production_default_triple_still_validates():
+    facts = RA.validate_targets(RA.production_targets())
+    assert facts["environment"] == "PRODUCTION DEFAULT"
+    assert facts["disjoint_from_default"] is False
+
+
+def test_validation_runs_before_anything_is_created(rig, tmp_path):
+    """Refusal must happen with the ground untouched."""
+    t = _replace(rig["t"], research_root=Path("/etc/apex/rev2"), research_user="rev2")
+    with pytest.raises(Refused):
+        RA.run_setup(t, rig["commit"], apply=True, run=StandIn(t))
+    assert not Path("/etc/apex/rev2").exists()
+
+
+# ------------- generated commands must carry the selections ---------------
+
+def test_operator_commands_name_the_environment_they_act_on(two):
+    e2, users = two["e2"], two["users"]
+    _setup(e2, users, two["commit"])
+    d = _decision(two["rig"])
+    oc = RA.prepare_launch(e2, two["commit"], d)["operator_commands"]
+    for flag, val in (("--research-root", str(e2.research_root)),
+                      ("--runner-root", str(e2.runner_root)),
+                      ("--research-user", e2.research_user)):
+        assert "%s %s" % (flag, val) in oc["prepare"], (flag, oc["prepare"])
+        assert "%s %s" % (flag, val) in oc["execute"]
+    assert oc["execute"] == oc["prepare"] + " --apply"
+
+
+def test_default_environment_commands_carry_no_flags(rig):
+    """Production must not grow noise it does not need."""
+    d = RA.production_targets()
+    oc = RA.operator_commands(d, "abc123", Path("/etc/apex/admissions/x.json"))
+    assert "--research-root" not in oc["prepare"]
+    assert "--runner-root" not in oc["prepare"]
+    assert "--research-user" not in oc["prepare"]

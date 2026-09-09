@@ -33,7 +33,7 @@ import subprocess
 import time
 import sys
 import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -125,6 +125,90 @@ class Targets:
 
 def production_targets() -> Targets:
     return Targets()
+
+
+# An environment may never BE one of these, nor CONTAIN one. "/" is here because
+# a root of "/" would put the environment over the whole filesystem; being *under*
+# "/" is true of every absolute path and is not what this forbids.
+NEVER_BE_OR_CONTAIN = ("/", "/etc", "/etc/apex", "/opt", "/opt/apex", "/opt/apex-repo",
+                       "/opt/apex/current", "/apex-data", "/apex-data/core",
+                       "/apex-data/runtime", "/apex-data/governance",
+                       "/apex-data/history-a", "/apex-data/history-b",
+                       "/home", "/usr", "/var", "/boot", "/root", "/bin", "/sbin")
+
+# An environment may never sit INSIDE one of these. /opt and /apex-data are
+# deliberately absent: the production roots live under them.
+NEVER_INSIDE = ("/etc", "/usr", "/var", "/boot", "/bin", "/sbin", "/root", "/home",
+                "/opt/apex-repo", "/opt/apex/current", "/opt/apex",
+                "/apex-data/core", "/apex-data/runtime", "/apex-data/governance",
+                "/apex-data/history-a", "/apex-data/history-b")
+
+
+def _within(a: Path, b: Path) -> bool:
+    """a is b, or a lies under b."""
+    a, b = Path(a), Path(b)
+    return a == b or b in a.parents
+
+
+def _overlaps(a: Path, b: Path) -> bool:
+    return _within(a, b) or _within(b, a)
+
+
+def validate_targets(t: Targets) -> dict:
+    """Check the resolved targets BEFORE anything is created or removed.
+
+    A second environment must be unable to reach the first. It is therefore
+    either exactly the production default triple, or disjoint from it in all
+    three of research root, runner root and account -- because rollback removes
+    an account by name, and a shared account would let one environment's
+    teardown delete the other's identity."""
+    d = production_targets()
+    rr, ru = Path(t.research_root), Path(t.runner_root)
+    facts = {"research_root": str(rr), "runner_root": str(ru),
+             "research_user": t.research_user}
+
+    for label, p in (("research_root", rr), ("runner_root", ru)):
+        if not p.is_absolute():
+            raise ActivationRefused("TARGET_NOT_ABSOLUTE: %s=%s" % (label, p))
+        for prot in NEVER_BE_OR_CONTAIN:
+            if p == Path(prot) or _within(Path(prot), p):
+                raise ActivationRefused(
+                    "TARGET_IS_OR_CONTAINS_PROTECTED: %s=%s and %s" % (label, p, prot))
+        for prot in NEVER_INSIDE:
+            if _within(p, Path(prot)):
+                raise ActivationRefused(
+                    "TARGET_INSIDE_PROTECTED: %s=%s is under %s" % (label, p, prot))
+        if _overlaps(p, Path(t.trust_root)):
+            raise ActivationRefused(
+                "TARGET_OVERLAPS_TRUST_ROOT: %s=%s and %s" % (label, p, t.trust_root))
+    if _overlaps(rr, ru):
+        raise ActivationRefused(
+            "TARGETS_OVERLAP: research_root %s and runner_root %s are not disjoint" % (rr, ru))
+
+    is_default = (rr == Path(d.research_root) and ru == Path(d.runner_root)
+                  and t.research_user == d.research_user)
+    if not is_default:
+        # a revision environment: it must not be able to touch the production one
+        if _overlaps(rr, Path(d.research_root)):
+            raise ActivationRefused(
+                "TARGET_WOULD_REACH_PRESERVED_ENVIRONMENT: research_root %s overlaps the "
+                "preserved %s, whose checkout, evidence and aborted run must stay intact"
+                % (rr, d.research_root))
+        if _overlaps(ru, Path(d.runner_root)):
+            raise ActivationRefused(
+                "TARGET_WOULD_REACH_PRESERVED_ENVIRONMENT: runner_root %s overlaps the "
+                "preserved %s" % (ru, d.runner_root))
+        if t.research_user == d.research_user:
+            raise ActivationRefused(
+                "SHARED_RESEARCH_ACCOUNT: %r already belongs to the environment at %s. "
+                "Rollback removes an account by name, so sharing it would let this "
+                "environment's teardown delete that one's identity. Use a dedicated "
+                "account." % (t.research_user, d.research_root))
+        facts["environment"] = "REVISION (disjoint from the production default)"
+    else:
+        facts["environment"] = "PRODUCTION DEFAULT"
+    facts["disjoint_from_default"] = not is_default
+    return facts
 
 
 # ---------------------------------------------------------------- runner
@@ -590,6 +674,7 @@ def load_setup_record(t: Targets) -> dict:
 def run_setup(t: Targets, commit: str, *, apply: bool, run: SystemRunner | None = None,
               resume: bool = False) -> dict:
     run = run or SystemRunner()
+    validate_targets(t)
     prior = None
     if resume:
         try:
@@ -667,6 +752,7 @@ def run_setup(t: Targets, commit: str, *, apply: bool, run: SystemRunner | None 
 # ---------------------------------------------------------------- verify
 def run_verify(t: Targets) -> dict:
     """Check what actually exists. Raises on the first thing that does not."""
+    validate_targets(t)
     rec = load_setup_record(t)
     if rec["state"] != STATE_COMPLETE:
         raise ActivationRefused("SETUP_NOT_COMPLETE: state is %s" % rec["state"])
@@ -751,6 +837,7 @@ PROBE_EXPECTATIONS = {"admitted_readable": True, "evaluation_readable": False,
 
 def run_probe(t: Targets, *, run: SystemRunner | None = None) -> dict:
     """ENTER the sandbox and measure. Not a description of one."""
+    validate_targets(t)
     run = run or SystemRunner()
     rec = load_setup_record(t)
     if rec["state"] != STATE_COMPLETE:
@@ -793,6 +880,7 @@ def run_probe(t: Targets, *, run: SystemRunner | None = None) -> dict:
 
 # ---------------------------------------------------------------- launch
 def prepare_launch(t: Targets, commit: str, decision: Path) -> dict:
+    validate_targets(t)
     rec = load_setup_record(t)
     if rec["state"] != STATE_COMPLETE:
         raise ActivationRefused("SETUP_NOT_COMPLETE: state is %s; launch requires a verified setup"
@@ -880,8 +968,18 @@ def operator_commands(t: Targets, commit: str, decision) -> dict:
 
     Preparation and execution differ by --apply on the WRAPPER, never by editing
     the inner argv."""
+    d = production_targets()
+    sel = []
+    # without these the operator's command would silently fall back to the
+    # production defaults and act on the preserved environment
+    if str(t.research_root) != str(d.research_root):
+        sel += ["--research-root", str(t.research_root)]
+    if str(t.runner_root) != str(d.runner_root):
+        sel += ["--runner-root", str(t.runner_root)]
+    if t.research_user != d.research_user:
+        sel += ["--research-user", t.research_user]
     base = ["sudo", "-n", t.system_python, "scripts/research_activation.py", "launch",
-            "--commit", str(commit), "--decision", str(decision)]
+            *sel, "--commit", str(commit), "--decision", str(decision)]
     return {"prepare": " ".join(base),
             "prepare_effect": "resolves and checks inputs, prints the plan, "
                               "and launches NOTHING",
@@ -1083,6 +1181,7 @@ def rollback_plan(t: Targets) -> dict:
     evidence: recursive removal of such a parent would erase the evidence the
     plan claims to keep. Such a parent is preserved and only its recorded
     capability CHILDREN are removed."""
+    validate_targets(t)
     rec = load_setup_record(t)
     created = rec.get("created") or []
     always_preserve = {t.out, t.setup_manifest, t.log}
@@ -1156,6 +1255,7 @@ def run_rollback(t: Targets, *, apply: bool, run: SystemRunner | None = None) ->
 def preflight(t: Targets, commit: str | None, decision: Path | None,
               *, resuming: bool = False) -> dict:
     rec = {"contract": ACTIVATION_VERSION, "utc": now(), "action": "preflight",
+           "targets_validated": validate_targets(t),
            "targets": {k: str(v) for k, v in (("research_user", t.research_user),
                                               ("runner_root", t.runner_root), ("venv", t.venv),
                                               ("checkout", t.checkout), ("view", t.view),
@@ -1228,8 +1328,29 @@ def _cli(argv=None, *, targets: Targets | None = None, runner: SystemRunner | No
                     help="finish a PARTIAL setup: re-verify each stage and perform only "
                          "the ones reality does not already satisfy")
     ap.add_argument("--json", default=None)
+    ap.add_argument("--research-root", default=None,
+                    help="activation research root; defaults to the production value")
+    ap.add_argument("--runner-root", default=None,
+                    help="runner root; defaults to the production value")
+    ap.add_argument("--research-user", default=None,
+                    help="unprivileged account for this environment; a revision "
+                         "environment must use its own")
     a = ap.parse_args(argv)
-    t = targets or production_targets()
+    if targets is None:
+        base = production_targets()
+        over = {}
+        if a.research_root:
+            over["research_root"] = Path(a.research_root)
+        if a.runner_root:
+            over["runner_root"] = Path(a.runner_root)
+        if a.research_user:
+            over["research_user"] = a.research_user
+        # absent flags leave the production defaults exactly as they were
+        t = replace(base, **over) if over else base
+    else:
+        if a.research_root or a.runner_root or a.research_user:
+            raise ActivationRefused("TARGETS_INJECTED_AND_FLAGGED: pass one or the other")
+        t = targets
     try:
         if a.action == "preflight":
             rec = preflight(t, a.commit, Path(a.decision) if a.decision else None)
