@@ -130,7 +130,10 @@ def fit_d1(z, p, *, nu0: float, s0: float, max_iter: int = 500, tol: float = 1e-
         raise DispersionRefused("D1_ARITHMETIC: %s: %s" % (type(e).__name__, e)) from e
     if not converged:
         raise DispersionRefused("OPTIMIZER_NO_CONVERGENCE after %d iterations (D1)" % iters)
-    s1, lam = math.exp(best[0]), float(best[1])
+    try:                                               # an extreme optimiser result must not escape the fitter
+        s1, lam = math.exp(best[0]), float(best[1])
+    except (ArithmeticError, ValueError) as e:
+        raise DispersionRefused("D1_ARITHMETIC: %s converting the optimiser result: %s" % (type(e).__name__, e)) from e
     if abs(lam - lo) <= BOUND_TOL or abs(lam - hi) <= BOUND_TOL:
         raise DispersionRefused("LAMBDA_AT_BOUND: lambda=%.4f within %g of %s; a constrained estimate, refused by "
                                 "declared model-domain policy" % (lam, BOUND_TOL, LAMBDA_BOUNDS))

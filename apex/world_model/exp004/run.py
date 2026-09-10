@@ -77,6 +77,27 @@ class FitAccounting:
 
 # ---------------------------------------------------------------- helpers
 
+def resolve_inference_parameters(bootstrap_resamples=None, seed=None, *, override: bool = False) -> dict:
+    """The registration FIXES B = 10,000 and seed = 20260909. The production
+    path uses those and nothing else: any other value is refused unless the
+    caller explicitly declares a NON-HISTORICAL synthetic run, and the values
+    actually used are recorded either way. B and the seed change p-value
+    resolution, intervals and therefore SELECTED/NOT_SELECTED."""
+    reg_B, reg_seed = int(BOOT["resamples"]), int(BOOT["seed"])
+    B = reg_B if bootstrap_resamples is None else int(bootstrap_resamples)
+    sd = reg_seed if seed is None else int(seed)
+    registered = (B == reg_B and sd == reg_seed)
+    if not registered and not override:
+        raise F.FeatureRefused(
+            "UNREGISTERED_INFERENCE_PARAMETERS: B=%d seed=%d; the registration fixes B=%d seed=%d. "
+            "These change p-value resolution, intervals and the selection outcome. A synthetic run may pass "
+            "unregistered_inference_override=True; the historical path may not." % (B, sd, reg_B, reg_seed))
+    return {"resamples": B, "seed": sd, "registered_values": registered,
+            "registered_resamples": reg_B, "registered_seed": reg_seed,
+            "override_declared": bool(override), "override_used": bool(override and not registered),
+            "historical_path_valid": registered}
+
+
 def _refusal(kind: str, detail: str, stage: str, rec: dict) -> dict:
     rec.update(status="INTEGRITY_FAILURE", refusal={"kind": kind, "detail": detail[:600], "stage": stage},
                classification=I.classify({}, integrity_ok=False, integrity_reason="%s at %s" % (kind, stage)))
@@ -217,8 +238,10 @@ def _year_cell(year, rows_idx, ll, sess_all, keys_all, ref_by_year, *, B, seed):
     return cell
 
 
-def score(prep: dict, dev_sessions: list, *, bootstrap_resamples: int = BOOT["resamples"],
-          seed: int = BOOT["seed"]) -> dict:
+def score(prep: dict, dev_sessions: list, *, bootstrap_resamples=None, seed=None,
+          unregistered_inference_override: bool = False) -> dict:
+    params = resolve_inference_parameters(bootstrap_resamples, seed, override=unregistered_inference_override)
+    bootstrap_resamples, seed = params["resamples"], params["seed"]
     ident = F.validate_sessions(dev_sessions, role="development")
     rows, ref, per_sess = F.eligible_rows_many(dev_sessions, prep["vbar"], role="development")
     if len(rows) < MIN_DEV_ROWS:
@@ -267,7 +290,7 @@ def score(prep: dict, dev_sessions: list, *, bootstrap_resamples: int = BOOT["re
         per_year[yr] = _year_cell(yr, idx, ll, sess, keys, ref_by_year, B=bootstrap_resamples, seed=seed)
     unregistered = sorted({k[0][:4] for k in keys} - set(REPORT_YEARS))
     theta = prep["location"]["specs"]["C"]["beta"][-1]
-    out = {"sessions": ident, "development_refusals": ref, "development_refusals_by_session": per_sess,
+    out = {"sessions": ident, "inference_parameters": params, "development_refusals": ref, "development_refusals_by_session": per_sess,
            "clipping_applied": clip, "n_rows": len(rows),
            "row_key_population": {"n_keys": len(keys), "identical_across_all_comparisons": identical,
                                   "computed_from": "sha256 of each comparison cell's row keys", "key_sets": len(shas),
@@ -281,12 +304,17 @@ def score(prep: dict, dev_sessions: list, *, bootstrap_resamples: int = BOOT["re
     return out
 
 
-def tournament(fit_sessions: list, dev_sessions: list, *, bootstrap_resamples: int = BOOT["resamples"],
-               seed: int = BOOT["seed"]) -> dict:
+def tournament(fit_sessions: list, dev_sessions: list, *, bootstrap_resamples=None, seed=None,
+               unregistered_inference_override: bool = False) -> dict:
     t0 = time.time()
     rec = {"experiment": EXPERIMENT_ID, "registration_hash": registration_hash(),
            "development_status": DEVELOPMENT_STATUS, "preprocessing_order": list(PREPROCESSING_ORDER),
            "budget_declared": BUDGET, "economics": "NONE (distributional only)"}
+    try:                                    # BEFORE any preprocessing, fitting or session work
+        params = resolve_inference_parameters(bootstrap_resamples, seed, override=unregistered_inference_override)
+        rec["inference_parameters"] = params
+    except REFUSALS as e:
+        return _refusal(type(e).__name__, str(e), "inference_parameters", rec)
     try:
         F.validate_sessions(fit_sessions, role="fit")                     # registered fit range
         F.validate_sessions(dev_sessions, role="development")             # registered development range
@@ -299,7 +327,8 @@ def tournament(fit_sessions: list, dev_sessions: list, *, bootstrap_resamples: i
         return _refusal(type(e).__name__, str(e), "fit", rec)
     rec["fit"] = {k: v for k, v in prep.items() if k != "vbar"}
     try:
-        dev = score(prep, dev_sessions, bootstrap_resamples=bootstrap_resamples, seed=seed)
+        dev = score(prep, dev_sessions, bootstrap_resamples=params["resamples"], seed=params["seed"],
+                    unregistered_inference_override=unregistered_inference_override)
     except REFUSALS as e:
         return _refusal(type(e).__name__, str(e), "development", rec)
     rec["development"] = dev

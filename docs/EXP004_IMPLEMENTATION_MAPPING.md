@@ -93,3 +93,17 @@ Registration unchanged. Focused suite **27 passed**.
 | Arithmetic/overflow failures from dispersion fitting uncaught | `fit_d0` catches `(ValueError, ArithmeticError)` → `D0_FITTER: <type>: <msg>`; the D1 optimiser call is wrapped → `D1_ARITHMETIC: <type>: <msg>`; `ArithmeticError` (covering `OverflowError`, `FloatingPointError`, `ZeroDivisionError`) is in `REFUSALS` | `test_arithmetic_failures_in_dispersion_are_named_refusals`: injected `OverflowError`, `ZeroDivisionError` and `FloatingPointError` each become named refusals, the last through the full runner |
 | Finiteness checked only after `M.fit_all` | targets **and every feature column** (`ret_1, ret_5, rv_30, B̄̃, P̃, F̃`) are validated **before** the location fits | `test_nonfinite_inputs_are_caught_before_the_location_fits` spies on `M.fit_all` and asserts it **never ran**: `NONFINITE_VALUES: fit feature F_c` |
 | Per-year row-key identity not independently verified | `_year_cell` now computes its own `cell_sha`/`cell_n` and requires every comparison **and** the dispersion record in that year to match, else `YEAR_ROW_POPULATION_MISMATCH: <year>`; the cell records its hash. Top level likewise verifies the dispersion record shares the population | `test_per_year_row_key_identity_is_verified_inside_each_cell` tampers a comparison **only inside the 2020 cell** — invisible to the top-level check — and gets `YEAR_ROW_POPULATION_MISMATCH: 2020`; the clean run shows three distinct, individually verified year hashes |
+
+---
+
+## Inference-contract patch — supersedes `22d807b4`
+
+Registration unchanged. Focused suite **28 passed**.
+
+| Reviewer finding | Repair | Test |
+|---|---|---|
+| `tournament()`/`score()` accepted arbitrary `B` and seed, so the production path could alter p-value resolution, intervals and the selection outcome | `run.resolve_inference_parameters`: both entry points now default to **`None`**, which resolves to the registered `B = 10,000`, seed `20260909`. Any other value is **refused** (`UNREGISTERED_INFERENCE_PARAMETERS`) unless the caller declares `unregistered_inference_override=True`, which is only legitimate for a **non-historical synthetic run**. The check runs at the very top of `tournament()`, at a new `inference_parameters` stage, before session validation, baselines or fitting. The values actually used are recorded on every run as `inference_parameters` (top level and inside `development`), including `registered_values`, `override_used` and `historical_path_valid` | `test_registered_bootstrap_parameters_are_enforced_before_any_fitting`: defaults resolve to the registered pair with no override; `(50, …)`, `(…, seed 1)` and `(200, 7)` are each refused; through the runner, spies on `validate_sessions`, `fit_baselines` and `fit_all` prove **none of them ran**, and the record has no `fit`, `development` or `periods` block; an overridden run records `historical_path_valid: False` and the bootstrap cells carry the actual `resamples`/`seed` |
+| `math.exp(best[0])` sat outside the arithmetic wrapper in `fit_d1` | the conversion of the optimiser result is now inside its own `try` → `D1_ARITHMETIC: <type> converting the optimiser result` | an optimiser result of `log s₁ = 1e9` is refused by the **fitter**, not merely caught generically by the tournament |
+
+All 19 test call sites and both record-script calls now declare the override
+explicitly, so every synthetic run is marked as such in its own record.
