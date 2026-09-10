@@ -45,7 +45,9 @@ behaviour, not changing it):
 | `RV_FLOOR` | `exp002.registration.RV_FLOOR` | `1e-9`; below-floor rows refused for all arms |
 | HAC | `apex.world_model.inference` | Bartlett, lag `14 = H−1` |
 | bootstrap constants | `exp002.registration.BOOT_*` | block 5 (sens. 1, 10), `B = 10,000`, seed `20260909`, `p̂ < 0.0228`, `(k+1)/(B+1)` |
-| DM threshold | `exp002.registration.DM_THRESHOLD` | 2.0 | **EXP-004 requires its own signed admission**;
+| DM threshold | `exp002.registration.DM_THRESHOLD` | 2.0 |
+
+**EXP-004 requires its own signed admission**;
 no prior admission extends to it. A development result is a candidate screen and
 grants no sealed access.
 
