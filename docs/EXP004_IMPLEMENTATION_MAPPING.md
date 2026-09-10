@@ -129,3 +129,29 @@ All 20 synthetic call sites in the tests and both record-script calls now go
 through `synthetic.synthetic_tournament`; the only remaining references to
 `run.tournament` with parameters are the two assertions that they raise
 `TypeError`.
+
+---
+
+## Brick status: PASS at `762d6259` — and one requirement carried forward
+
+Accepted as an **implementation** pass on independent review: 30 focused tests,
+188 regression tests, registration hash `9155024f…45bf9` unchanged, historical
+admission and execution stopped. It is not evidence of alpha, options
+profitability, GARCH value, or a "time machine".
+
+**Carried forward to the historical-adapter brick (required, not optional).**
+When the adapter that wires EXP-004 into the governed execution path is built,
+it must be tested that it:
+
+1. imports and invokes **only** `apex.world_model.exp004.run.tournament`;
+2. **cannot route through** `apex.world_model.exp004.synthetic` — neither directly nor transitively — so reduced inference parameters are unreachable from an admitted run;
+3. produces records carrying `run_mode: "HISTORICAL"` and `historical_path_valid: true`, and never `NOT_FOR_HISTORICAL_USE`.
+
+Suggested form, by analogy with the EXP-002 acceptance tests: a static import
+check on the adapter module plus a runtime guard test that fails if
+`synthetic` appears anywhere in the admitted call path (for example, a spy on
+`synthetic.synthetic_tournament` asserting it is never called during a full
+governed run).
+
+Until that brick is registered and reviewed, EXP-004 has **no** historical
+admission and no execution authority.
