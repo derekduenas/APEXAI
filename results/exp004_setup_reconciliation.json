@@ -1,0 +1,194 @@
+{
+ "account": {
+  "gid": 115,
+  "groups": [
+   "apexresearch4"
+  ],
+  "home": "/home/apexresearch4",
+  "login_disabled": true,
+  "privileged_groups": [],
+  "shell": "/usr/sbin/nologin",
+  "sudo_permitted": false,
+  "sudo_report": "User apexresearch4 is not allowed to run sudo on APEX.",
+  "uid": 112,
+  "user": "apexresearch4"
+ },
+ "checkout_identity": {
+  "checkout_root": "/apex-data/research-exp004/checkout",
+  "commit": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
+  "dirty": [],
+  "execute_script_sha256": "73aca971ce8fd16658bcd0b0c1e7c13b877cbb2981a3f9e40be499a79300f2c0",
+  "launcher_sha256": "823b0125b58b86ba653f0dfedf3c495dfe05cc7df79e4671c8717e4a57776b9e",
+  "matches_pin": true,
+  "n_files": 67,
+  "paths": [
+   "apex/world_model",
+   "apex/governance/chain_ledger.py",
+   "apex/intraday/sessions.py",
+   "scripts/alpha_exp_real_execute.py"
+  ],
+  "registration_sha256": "9155024f51825d13487cdc035432d85b357d22e39a40f967477873a7a6145bf9",
+  "tree_sha256": "8fbe6ed6155df0e4b8fb09f6dd8ce54c7e1cf064cea29592e08fa44a41996991"
+ },
+ "dataset_view": {
+  "admitted_in_range": 1511,
+  "all_admitted_files_match": true,
+  "entry_type": "regular/hardlink",
+  "hash_mismatches": [],
+  "hashes_recomputed": 1511,
+  "manifest_total_entries": 2679,
+  "missing_from_view": [],
+  "note": "the manifest's full inventory is larger than the admitted view; the extra entries are dates outside 2016-2021 and are NOT present in the view",
+  "out_of_range_present": [],
+  "sample_mode": "664",
+  "sample_uid": 0,
+  "view_files": 1511
+ },
+ "output_directory": {
+  "EMPTY": true,
+  "entries": [],
+  "path": "/apex-data/research-exp004/out"
+ },
+ "ownership": [
+  {
+   "gid": 115,
+   "mode": "755",
+   "owner": "apexresearch4",
+   "path": "/apex-data/research-exp004",
+   "uid": 112
+  },
+  {
+   "gid": 115,
+   "mode": "755",
+   "owner": "apexresearch4",
+   "path": "/apex-data/research-exp004/checkout",
+   "uid": 112
+  },
+  {
+   "gid": 115,
+   "mode": "755",
+   "owner": "apexresearch4",
+   "path": "/apex-data/research-exp004/out",
+   "uid": 112
+  },
+  {
+   "gid": 0,
+   "mode": "755",
+   "owner": "root",
+   "path": "/apex-data/research-exp004/dataset_view",
+   "uid": 0
+  },
+  {
+   "gid": 0,
+   "mode": "755",
+   "owner": "root",
+   "path": "/opt/apex-runner-exp004",
+   "uid": 0
+  },
+  {
+   "gid": 0,
+   "mode": "755",
+   "owner": "root",
+   "path": "/opt/apex-runner-exp004/venv",
+   "uid": 0
+  }
+ ],
+ "pin": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
+ "preservation": {
+  "accounts": {
+   "apexresearch": 109,
+   "apexresearch2": 110,
+   "apexresearch3": 111,
+   "apexresearch4": 112
+  },
+  "allowed_signers": "ae30f60db42443ad58a573daa31e94ea0b6ca985148303682c7ca6ccfbaf83e0",
+  "environments": [
+   "/apex-data/research",
+   "/apex-data/research-exp002",
+   "/apex-data/research-exp004",
+   "/apex-data/research-rev2"
+  ],
+  "exp001b_aborted_forecasts": "7a6cbe36c25c333191fc865e27c7c920bfefb67d008ecad6233a82a8a96a3407",
+  "exp001b_rev2_result": "4b23021d07d8d200c2ac40c3f4c8a807f72af7dc51d7fc2efddaf1cc5378c909",
+  "exp002_result": "0c397d703a83fcb915fef47b96fd6a75c1822ab21dd80bcbe27d90f1cdf9ad3f",
+  "other_env_outputs_untouched": {
+   "/apex-data/research": [
+    "ALPHA-EXP-001B",
+    "_LAUNCH_20260908T130557Z.json",
+    "_LAUNCH_20260908T131351Z.json"
+   ],
+   "/apex-data/research-exp002": [
+    "ALPHA-EXP-002",
+    "_LAUNCH_20260909T193813Z.json"
+   ],
+   "/apex-data/research-rev2": [
+    "ALPHA-EXP-001B",
+    "_LAUNCH_20260909T003427Z.json"
+   ]
+  },
+  "runner_roots": [
+   "/opt/apex-runner",
+   "/opt/apex-runner-exp002",
+   "/opt/apex-runner-exp004",
+   "/opt/apex-runner-rev2"
+  ],
+  "signed_decisions": {
+   "exp001b_admission.json": "1eafbe1fd972a45bc320acf2da0468a4a601eef7a00b7e6090499cc9cfcd0fa2",
+   "exp001b_admission_rev2.json": "28bc28590339b6e92a95e800542a8ed0e16c7834646480c66045952ef96a9d11",
+   "exp002_admission.json": "dd968c314283a83a4dfeca0c73bec32a1445b9b3a20790fd40af8e7afde289b6",
+   "exp004_admission.json": "ABSENT"
+  }
+ },
+ "probe": {
+  "admitted_example": "SPY_2016-01-04.json",
+  "denied_example": "SPY_2022-01-03.json",
+  "deviations": {},
+  "executed": true,
+  "expected": {
+   "admitted_readable": true,
+   "core_readable": false,
+   "corpus_writable": false,
+   "evaluation_readable": false,
+   "history_a_readable": false,
+   "manifest_readable": true,
+   "network_reachable": false,
+   "other_corpus_files_visible": false,
+   "secrets_readable": false
+  },
+  "memory_max_is_1400M": true,
+  "memory_max_property": [
+   "MemoryMax=1400M"
+  ],
+  "no_other_environment_named": true,
+  "observations": {
+   "admitted_readable": true,
+   "core_readable": false,
+   "corpus_writable": false,
+   "evaluation_readable": false,
+   "history_a_readable": false,
+   "manifest_readable": true,
+   "network_reachable": false,
+   "other_corpus_files_visible": false,
+   "secrets_readable": false
+  },
+  "ok": true,
+  "paths_are_exp004": true,
+  "paths_named": {
+   "bind_read_only": [
+    "BindReadOnlyPaths=/apex-data/research-exp004/dataset_view/etf_continuous/bars:/apex-data/history-b/etf_continuous/bars"
+   ],
+   "inaccessible": [
+    "InaccessiblePaths=/apex-data/core",
+    "InaccessiblePaths=/apex-data/history-a",
+    "InaccessiblePaths=/apex-data/runtime"
+   ],
+   "read_write": [
+    "ReadWritePaths=/apex-data/research-exp004/out"
+   ]
+  },
+  "user_property": [
+   "User=apexresearch4"
+  ]
+ },
+ "reconciliation": "EXP004_SETUP"
+}

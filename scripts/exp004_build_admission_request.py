@@ -9,8 +9,9 @@ production signing key is never on this host.
 This creates a REQUEST, not a decision. It is unsigned, its decision field is
 REQUESTED_NOT_GRANTED, and its provenance names no principal. The throwaway key
 exists only to prove the document parses and binds correctly; it is generated
-in a temporary directory and destroyed before this script exits. The real
-signing key is never on this host.
+in a temporary directory, and the record reports the OBSERVED post-cleanup
+state of that directory rather than asserting the key was destroyed. The
+production signing key is never on this host.
 
 Run: python3 scripts/exp004_build_admission_request.py <out_request.json> <out_checks.json>
 """

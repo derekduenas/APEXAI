@@ -1,0 +1,84 @@
+{
+ "contract": "RESEARCH_ACTIVATION_V1",
+ "status": "OK",
+ "action": "verify",
+ "state": "COMPLETE",
+ "checks": [
+  {
+   "check": "identity",
+   "ok": true,
+   "detail": {
+    "name": "apexresearch4",
+    "present": true,
+    "uid": 112,
+    "gid": 115,
+    "shell": "/usr/sbin/nologin",
+    "home": "/home/apexresearch4",
+    "groups": [
+     "apexresearch4"
+    ],
+    "privileged_groups": []
+   }
+  },
+  {
+   "check": "environment",
+   "ok": true,
+   "detail": {
+    "python": "/opt/apex-runner-exp004/venv/bin/python"
+   }
+  },
+  {
+   "check": "packages",
+   "ok": true,
+   "detail": {
+    "numpy": "2.4.6"
+   }
+  },
+  {
+   "check": "pinned",
+   "ok": true,
+   "detail": {
+    "lines": 1
+   }
+  },
+  {
+   "check": "runner_not_writable_by_research",
+   "ok": true,
+   "detail": {
+    "runner_root_mode": "755",
+    "runner_root_uid": 0,
+    "uid_separation_checked": true,
+    "entries_checked": 2628,
+    "symlinks_skipped": 4
+   }
+  },
+  {
+   "check": "checkout_identity",
+   "ok": true,
+   "detail": {
+    "commit": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
+    "tree_sha256": "8fbe6ed6155df0e4b8fb09f6dd8ce54c7e1cf064cea29592e08fa44a41996991",
+    "n_files": 67
+   }
+  },
+  {
+   "check": "dataset_inventory",
+   "ok": true,
+   "detail": {
+    "files": 1511,
+    "first": "SPY_2016-01-04.json",
+    "last": "SPY_2021-12-31.json"
+   }
+  },
+  {
+   "check": "permissions",
+   "ok": true,
+   "detail": {
+    "out_owner_uid": 112,
+    "view_mode": "755",
+    "research_uid": 112
+   }
+  }
+ ],
+ "ok": true
+}

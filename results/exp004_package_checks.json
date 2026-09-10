@@ -1,5 +1,6 @@
 {
  "dry_validation": {
+  "cleanup_note": "shutil.rmtree(ignore_errors=True) can fail silently; these two fields are post-cleanup existence checks, not an assertion that removal succeeded. The key was generated in a temp directory on this host and never left it; the production signing key was never present.",
   "granted_as_exp004": {
    "code_commit": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
    "experiment": "ALPHA-EXP-004",
@@ -10,9 +11,11 @@
     "2021-12-31"
    ]
   },
+  "private_key_absent_observed": true,
   "refused_as_ALPHA-EXP-001B": "EXPERIMENT_MISMATCH: decision serves 'ALPHA-EXP-004', caller is 'ALPHA-EXP-001B'",
   "refused_as_ALPHA-EXP-002": "EXPERIMENT_MISMATCH: decision serves 'ALPHA-EXP-004', caller is 'ALPHA-EXP-002'",
-  "throwaway_key_destroyed": true,
+  "temp_dir": "/tmp/tmph9nzc7fv",
+  "temp_dir_removed_observed": true,
   "wrong_registration": "REGISTRATION_MISMATCH: decision was made for registration 9155024f51825d13, caller runs fe"
  },
  "pin": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
