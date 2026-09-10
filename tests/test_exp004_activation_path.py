@@ -260,6 +260,9 @@ def test_governed_execute_runs_the_adapter_seals_a_historical_result(rig, capsys
     rc, doc = _run(rig, _write(rig, _body(rig), name="d4_exec.json"), capsys, "--execute")
     assert doc["experiment"] == EXP004_ID
     res = json.loads((Path(doc["run_dir"]) / "_RESULT.json").read_text())
+    print("\nGOVERNED EXECUTE OUTCOME: rc=%s process_outcome=%s status=%s run_mode=%s refusal=%s"
+          % (rc, doc["process_outcome"], res.get("status"), res.get("run_mode"),
+             (res.get("refusal") or {}).get("detail", "")[:120]))
     assert res["experiment"] == EXP004_ID and res["registration_hash"] == registration_hash()
     assert res["adapter"]["entry_point"] == "apex.world_model.exp004.run.tournament"
     assert calls["synthetic"] == 0, "the governed path reached the synthetic entry point"
