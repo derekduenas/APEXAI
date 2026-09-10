@@ -2,6 +2,10 @@
 dry-validate it against the REAL boundary with a disposable key, and collect
 preservation checks.
 
+Wording note: this DOES sign — with a disposable key, to prove the document
+parses and binds. What is never signed here is a PRODUCTION admission; the
+production signing key is never on this host.
+
 This creates a REQUEST, not a decision. It is unsigned, its decision field is
 REQUESTED_NOT_GRANTED, and its provenance names no principal. The throwaway key
 exists only to prove the document parses and binds correctly; it is generated
@@ -121,6 +125,7 @@ def build_request(checkout: Path) -> dict:
 
 def dry_validate(req: dict, checkout: Path) -> dict:
     tmp = Path(tempfile.mkdtemp()); os.chmod(tmp, 0o755)
+    result: dict = {}
     try:
         key = tmp / "key"
         subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(key), "-C", "dry"], check=True)
@@ -140,7 +145,7 @@ def dry_validate(req: dict, checkout: Path) -> dict:
         os.chmod(d.with_name(d.name + ".sig"), 0o644)
         trust = TrustConfig(admission_root=aroot, allowed_signers=signers, checkout_root=checkout,
                             permitted_roots=("/apex-data/history-b",), enforce_ownership=False)
-        out = {}
+        out = result
         g = boundary.verify_decision_with(d, trust, experiment_id=EXPERIMENT_ID,
                                           registration_hash=registration_hash())
         out["granted_as_exp004"] = {"experiment": g.experiment_id, "code_commit": g.code_commit,
@@ -157,10 +162,18 @@ def dry_validate(req: dict, checkout: Path) -> dict:
             out["wrong_registration"] = "NOT REFUSED - INVESTIGATE"
         except RealDataRefused as e:
             out["wrong_registration"] = str(e)[:90]
-        out["throwaway_key_destroyed"] = True
         return out
     finally:
+        key_paths = [tmp / "key", tmp / "key.pub"]
         shutil.rmtree(tmp, ignore_errors=True)
+        # report what is OBSERVED after cleanup, not that cleanup was attempted
+        result.update({"temp_dir": str(tmp),
+                       "temp_dir_removed_observed": not tmp.exists(),
+                       "private_key_absent_observed": not key_paths[0].exists(),
+                       "cleanup_note": ("shutil.rmtree(ignore_errors=True) can fail silently; these two fields are "
+                                        "post-cleanup existence checks, not an assertion that removal succeeded. "
+                                        "The key was generated in a temp directory on this host and never left it; "
+                                        "the production signing key was never present.")})
 
 
 def preservation() -> dict:
