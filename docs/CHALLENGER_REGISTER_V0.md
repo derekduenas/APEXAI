@@ -71,13 +71,17 @@ Availability of reference code confers no forecasting or trading authority.
 
 | Row | Candidate | Reference files (pinned) | Contribution | Required evidence before adoption | Status |
 |---|---|---|---|---|---|
-| C15 | GARCH volatility challenger | none suitable in the reference — `agent/src/quantlib/volatility.py` is Heston | recursively evolving variance vs `rv_30` scale law and an EWMA baseline | separate frozen comparison; intraday clocks, units, horizon aggregation declared | CANDIDATE_NOT_ADOPTED; own future brick |
+| C15 | GARCH volatility challenger | `agent/src/quantlib/timeseries.py::fit_garch` — a wrapper around `arch`: GARCH(1,1), constant mean, Gaussian innovations (**correction 2026-09-09**: my earlier note that no GARCH existed because `volatility.py` is Heston was wrong; Heston's presence did not establish GARCH's absence) | recursively evolving variance vs `rv_30` scale law and an EWMA baseline | separate frozen comparison; intraday clocks, units, horizon aggregation declared | CANDIDATE_NOT_ADOPTED; own future brick |
 | C16 | Options analytics references | `agent/src/quantlib/options.py`; `agent/backtest/engines/options_portfolio.py`; `agent/backtest/options_payoff.py`; tests `agent/tests/quantlib/test_options.py` | Greeks, IV inversion, pricing benchmarks | independent numerical checks; explicit exercise-style assumptions (BS European; American only via heuristic) — insufficient alone for American-style SPY contracts | CANDIDATE_NOT_ADOPTED |
-| C17 | Live research dashboard | `frontend/src/components/charts/RegimeTimeline.tsx`, `MonteCarloPathsChart.tsx` (UI only; displays foreign objects) | freshness, runs, forecast distributions, comparisons, refusals, evidence maturity | every value source- and timestamp-bound; unavailable stays unavailable | CANDIDATE_NOT_ADOPTED |
+| C17 | Live research dashboard | `frontend/src/pages/Runtime.tsx` (the page), with `frontend/src/components/charts/RegimeTimeline.tsx`, `MonteCarloPathsChart.tsx` (UI only; displays foreign objects) | freshness, runs, forecast distributions, comparisons, refusals, evidence maturity | every value source- and timestamp-bound; unavailable stays unavailable | CANDIDATE_NOT_ADOPTED |
 | C18 | Selected factor references | `agent/src/factors/zoo/{academic,alpha101,gtja191,qlib158,fundamental}`; registry `agent/src/factors/registry.py` | documented candidates and simpler comparators | one named hypothesis at a time; duplication check; APEX admission | CANDIDATE_NOT_ADOPTED |
 
-Boundaries: theoretical option prices ≠ executable-quote evidence; the
-reference's causal trailing-smoothed hysteresis regime labels and trade-order
-PnL permutation (`agent/backtest/validation.py::monte_carlo_test`) are
-different objects from APEX's time-*t* state estimates and conditional
-future-path simulations.
+Boundaries: theoretical option prices ≠ executable-quote evidence. The
+reference has **two distinct regime implementations**, both different objects
+from APEX's time-*t* state estimates: `agent/backtest/regime.py` computes a
+causal trailing-smoothed correlation/hysteresis **label**; `agent/src/quantlib/
+timeseries.py::fit_markov_regime` returns **full-sample smoothed historical
+regime probabilities** (`smoothed_marginal_probabilities`), which are **unsuitable
+as historical forecast-time inputs** because each value uses data after its own
+timestamp. Its Monte Carlo (`agent/backtest/validation.py::monte_carlo_test`)
+permutes trade-PnL order and is not a conditional future-path simulation.
