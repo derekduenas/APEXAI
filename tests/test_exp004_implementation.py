@@ -430,6 +430,99 @@ def test_dispersion_comparison_reports_hac_and_bootstrap_everywhere(world):
             complete(ycell["dispersion_improvement"], "year %s" % yr)
 
 
+# ------------------------------------------------------------------ fail-closed: no escape paths
+
+def test_bars_refused_cannot_escape_the_runner(world, monkeypatch):
+    """BarsRefused subclasses Exception, not ValueError. A valid-but-extreme
+    finite price sequence raises NONFINITE_FEATURE inside observable_rows; that
+    must become a sealed INTEGRITY_FAILURE, never an uncaught exception."""
+    from apex.world_model.exp001b.bars import BarsRefused
+    assert not issubclass(BarsRefused, ValueError) and BarsRefused in R.REFUSALS
+    fit, dev = world["fit"], world["dev"]
+    # A real, VALID-but-extreme finite price sequence: flat at 1e-300, one upward
+    # jump to 1e300, flat after. Every bar is finite and positive and no ratio is
+    # zero or negative, so the bars pass validation; but that one jump makes
+    # c[t]/c[t-1] overflow to inf, so rv_30 becomes non-finite inside
+    # observable_rows and it raises BarsRefused("NONFINITE_FEATURE").
+    day = dev[0]["session_date"]
+    bars = X.build_bars(day, X.SEEDS["n"] + 60)
+    for i, b in enumerate(bars):
+        c = 1e-300 if i < 200 else 1e300
+        b.update(open=c, high=c, low=c, close=c)
+    extreme = X.session_from_bars(day, bars)
+    with pytest.raises(BarsRefused, match="NONFINITE_FEATURE"):
+        B.observable_rows(extreme)
+    with pytest.raises(F.FeatureRefused, match="BARS_REFUSED"):                 # converted at the boundary
+        F.eligible_rows(extreme, world["prep"]["vbar"])
+    rec = R.tournament(fit, [extreme] + dev[1:], bootstrap_resamples=50)         # and through the runner
+    assert rec["status"] == "INTEGRITY_FAILURE" and "BARS_REFUSED" in rec["refusal"]["detail"]
+    assert "NONFINITE_FEATURE" in rec["refusal"]["detail"] and "development" not in rec
+    assert rec["classification"]["outcome"] == "INTEGRITY_FAILURE"
+    R.strict_json(rec)
+
+
+def test_arithmetic_failures_in_dispersion_are_named_refusals(world, monkeypatch):
+    assert ArithmeticError in R.REFUSALS
+    rng = np.random.default_rng(X.SEEDS["n"] + 61)
+    z = rng.standard_t(6.0, 400) * 1.2; p = rng.uniform(0, 1, 400)
+    monkeypatch.setattr(D, "_nelder_mead", lambda *a, **k: (_ for _ in ()).throw(OverflowError("exp overflow")))
+    d0 = {"nu0": 6.0, "s0": 1.0}
+    with pytest.raises(D.DispersionRefused, match="D1_ARITHMETIC: OverflowError"):
+        D.fit_d1(z, p, nu0=d0["nu0"], s0=d0["s0"])
+    monkeypatch.undo()
+    monkeypatch.setattr(T, "fit_scale_nu", lambda zz: (_ for _ in ()).throw(ZeroDivisionError("degenerate")))
+    with pytest.raises(D.DispersionRefused, match="D0_FITTER: ZeroDivisionError"):
+        D.fit_d0(z)
+    monkeypatch.undo()
+    real = D.fit_d0
+    monkeypatch.setattr(D, "fit_d0", lambda zz: (_ for _ in ()).throw(FloatingPointError("underflow")))
+    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE" and rec["refusal"]["stage"] == "fit"
+    assert "FloatingPointError" in rec["refusal"]["detail"] or "underflow" in rec["refusal"]["detail"]
+
+
+def test_nonfinite_inputs_are_caught_before_the_location_fits(world, monkeypatch):
+    """The guard must fire BEFORE M.fit_all, not only on its output."""
+    seen = {"fit_all": False}
+    real_fit_all = M.fit_all
+    def spy(rows_y):
+        seen["fit_all"] = True
+        return real_fit_all(rows_y)
+    monkeypatch.setattr(M, "fit_all", spy)
+    real_clip = F.apply_clipping
+    def poison(rows_y, consts):
+        out = real_clip(rows_y, consts)
+        rows_y[len(rows_y) // 2][0]["features"]["F_c"] = float("nan")     # a feature column, not a target
+        return out
+    monkeypatch.setattr(F, "apply_clipping", poison)
+    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE"
+    assert "NONFINITE_VALUES: fit feature F_c" in rec["refusal"]["detail"]
+    assert seen["fit_all"] is False, "the location fits ran despite a non-finite feature"
+
+
+def test_per_year_row_key_identity_is_verified_inside_each_cell(world, monkeypatch):
+    """The top-level check cannot catch a mismatch confined to one year cell."""
+    real = R._compare
+    def tamper_2020_only(ll, sess, a, b, sp, keys, **kw):
+        out = real(ll, sess, a, b, sp, keys, **kw)
+        if keys and all(k[0].startswith("2020") for k in keys) and (a, b) == ("A", "L") and sp == "D1":
+            out["row_keys_sha"] = "f" * 16
+        return out
+    monkeypatch.setattr(R, "_compare", tamper_2020_only)
+    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE"
+    assert "YEAR_ROW_POPULATION_MISMATCH: 2020" in rec["refusal"]["detail"], rec["refusal"]["detail"]
+    assert "development" not in rec
+    monkeypatch.undo()
+    # and the untampered run records each year's own key hash
+    clean = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50)
+    per_year = clean["development"]["per_year"]
+    shas = {y: c["row_keys_sha"] for y, c in per_year.items() if c["status"] == "REPORTED"}
+    assert len(shas) == 3 and len(set(shas.values())) == 3          # distinct populations, each verified
+    assert clean["development"]["row_key_population"]["identical_across_all_comparisons"] is True
+
+
 # ------------------------------------------------------------------ N8: replicate SEQUENCE preserved
 
 class _TracingRandom(random.Random):

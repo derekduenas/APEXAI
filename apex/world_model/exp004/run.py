@@ -12,6 +12,7 @@ import time
 
 import numpy as np
 
+from apex.world_model.exp001b.bars import BarsRefused
 from . import bootstrap_adapter as BA, dispersion as D, features as F, inference as I, models as M
 from .registration import (ARMS, BUDGET, CONTEXTUAL, DEVELOPMENT_STATUS, EXPERIMENT_ID, INHERITED,
                            PREPROCESSING_ORDER, PRIMARY, SECONDARY, registration_hash)
@@ -22,7 +23,11 @@ COMPARISONS = {"P1": tuple(PRIMARY["comparison"]), **{k: tuple(v) for k, v in SE
 REPORT_YEARS = tuple(str(y) for y in CONTEXTUAL["per_year"])          # fixed cells: 2019, 2020, 2021
 YEAR_MIN_ROWS = 60                                                     # below this a year cell is NOT_AVAILABLE
 MIN_DEV_ROWS = 60
-REFUSALS = (F.FeatureRefused, M.ArmRefused, D.DispersionRefused, I.InferenceRefused, ValueError)
+# BarsRefused subclasses Exception (not ValueError) and ArithmeticError covers
+# OverflowError/FloatingPointError/ZeroDivisionError: both are named here so no
+# numerical or input failure can terminate the runner without a sealed record.
+REFUSALS = (F.FeatureRefused, M.ArmRefused, D.DispersionRefused, I.InferenceRefused,
+            BarsRefused, ArithmeticError, ValueError)
 
 
 class BudgetExceeded(ValueError):
@@ -125,10 +130,14 @@ def prepare_fit(fit_sessions: list) -> dict:
         _check_row_order(_keys(rows), "fit")
         consts = F.clipping_constants(rows)                                         # 4 (3 counted calls)
         clip = F.apply_clipping(rows, consts)                                       # 5
-        fits = M.fit_all(rows)                                                      # 6 (4 counted calls)
-        ys = D.require_finite([y for _, y, _ in rows], "fit targets"); rr = [r for r, _, _ in rows]
+        # every input to the fits is checked BEFORE fitting, not only afterward
+        rr = [r for r, _, _ in rows]
+        ys = D.require_finite([y for _, y, _ in rows], "fit targets")
+        for col in ("ret_1", "ret_5", "rv_30", "Bbar_c", "P_c", "F_c"):
+            D.require_finite([r["features"][col] for r in rr], "fit feature %s" % col)
         rv = D.require_finite([r["features"]["rv_30"] for r in rr], "fit rv_30")
         pc = D.require_finite([r["features"]["P_c"] for r in rr], "fit P~")
+        fits = M.fit_all(rows)                                                      # 6 (4 counted calls)
         mu_ax = D.require_finite(M.means_of(fits["specs"]["AX"], rr), "fit AX means")
         z = D.require_finite((ys - mu_ax) / rv, "fit reference residuals")            # 7
         d0 = D.fit_d0(z)
@@ -190,12 +199,21 @@ def _year_cell(year, rows_idx, ll, sess_all, keys_all, ref_by_year, *, B, seed):
     idx = np.array(rows_idx)
     sub_ll = {sp: {arm: ll[sp][arm][idx] for arm in ARMS} for sp in ll}
     sub_sess = [sess_all[i] for i in rows_idx]; sub_keys = [keys_all[i] for i in rows_idx]
-    comps = {name: {sp: _compare(sub_ll, sub_sess, a, b, sp, sub_keys, B=B, seed=seed,
-                                 blocks=(BOOT["expected_block_sessions"], *BOOT["sensitivities"]))
+    blocks = (BOOT["expected_block_sessions"], *BOOT["sensitivities"])
+    comps = {name: {sp: _compare(sub_ll, sub_sess, a, b, sp, sub_keys, B=B, seed=seed, blocks=blocks)
                     for sp in ("D0", "D1")} for name, (a, b) in COMPARISONS.items()}
-    cell.update(status="REPORTED", comparisons=comps,
-                dispersion_improvement=_dispersion_record(sub_ll, sub_sess, sub_keys, B=B, seed=seed,
-                                                          blocks=(BOOT["expected_block_sessions"], *BOOT["sensitivities"])))
+    # row-key identity is verified INSIDE this year cell, against this cell's own keys
+    cell_sha, cell_n = _keys_sha(sub_keys), len(sub_keys)
+    shas = {c[sp]["row_keys_sha"] for c in comps.values() for sp in ("D0", "D1")}
+    ns = {c[sp]["n_rows"] for c in comps.values() for sp in ("D0", "D1")}
+    if shas != {cell_sha} or ns != {cell_n}:
+        raise F.FeatureRefused("YEAR_ROW_POPULATION_MISMATCH: %s expected sha %s n %d, saw %d key set(s), sizes %s"
+                               % (year, cell_sha, cell_n, len(shas), sorted(ns)))
+    cell["row_keys_sha"] = cell_sha
+    disp = _dispersion_record(sub_ll, sub_sess, sub_keys, B=B, seed=seed, blocks=blocks)
+    if disp["row_keys_sha"] != cell_sha or disp["n_rows"] != cell_n:
+        raise F.FeatureRefused("YEAR_ROW_POPULATION_MISMATCH: %s dispersion cell" % year)
+    cell.update(status="REPORTED", comparisons=comps, dispersion_improvement=disp)
     return cell
 
 
@@ -236,6 +254,8 @@ def score(prep: dict, dev_sessions: list, *, bootstrap_resamples: int = BOOT["re
     fam = I.secondary_family({"%s_%s" % (s, sp): comps[s][sp]["hac"]["p_one_sided"] for s in SECONDARY for sp in ("D0", "D1")},
                              {"%s_%s" % (s, sp): comps[s][sp]["bootstrap"]["p_one_sided"] for s in SECONDARY for sp in ("D0", "D1")})
     disp_rec = _dispersion_record(ll, sess, keys, B=bootstrap_resamples, seed=seed, blocks=blocks)
+    if disp_rec["row_keys_sha"] != _keys_sha(keys) or disp_rec["n_rows"] != len(keys):
+        raise F.FeatureRefused("ROW_POPULATION_MISMATCH: dispersion comparison")
     # fixed per-year cells: every registered year is present, with refusals, or NOT_AVAILABLE
     ref_by_year = {}
     for sdate, r in per_sess.items():

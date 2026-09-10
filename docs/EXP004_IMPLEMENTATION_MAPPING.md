@@ -80,3 +80,16 @@ constructed at all — the exchange calendar's independently verified window end
 `2021-12-31`, so `session_bounds(require_verified=True)` refuses 2022+ dates
 (`CALENDAR_NOT_VERIFIED`). The scope test asserts that refusal and then
 exercises the scope check itself with identity-only stubs.
+
+---
+
+## Fail-closed patch — candidate `PENDING2` (supersedes `84c00bc0`)
+
+Registration unchanged. Focused suite **27 passed**.
+
+| Reviewer finding | Repair | Test |
+|---|---|---|
+| `BarsRefused` could escape the tournament | Confirmed: `BarsRefused(Exception)` is **not** a `ValueError`, so the old `REFUSALS` tuple missed it. Two layers: `features.eligible_rows` converts it at the module boundary to `FeatureRefused("BARS_REFUSED: …")` (and converts numeric `ValueError`/`ArithmeticError` from the same path to `BARS_NUMERIC`/`BARS_ARITHMETIC`), **and** `run.REFUSALS` now names `BarsRefused` and `ArithmeticError` directly | `test_bars_refused_cannot_escape_the_runner` uses a **real valid-but-extreme** session — every bar finite and positive, flat at 1e-300, one upward jump to 1e300 — so no ratio is zero or negative but `c[t]/c[t−1]` overflows to `inf`, making `rv_30` non-finite. Asserts the raw `BarsRefused("NONFINITE_FEATURE")`, the converted `FeatureRefused`, and a sealed `INTEGRITY_FAILURE` with no `development` block |
+| Arithmetic/overflow failures from dispersion fitting uncaught | `fit_d0` catches `(ValueError, ArithmeticError)` → `D0_FITTER: <type>: <msg>`; the D1 optimiser call is wrapped → `D1_ARITHMETIC: <type>: <msg>`; `ArithmeticError` (covering `OverflowError`, `FloatingPointError`, `ZeroDivisionError`) is in `REFUSALS` | `test_arithmetic_failures_in_dispersion_are_named_refusals`: injected `OverflowError`, `ZeroDivisionError` and `FloatingPointError` each become named refusals, the last through the full runner |
+| Finiteness checked only after `M.fit_all` | targets **and every feature column** (`ret_1, ret_5, rv_30, B̄̃, P̃, F̃`) are validated **before** the location fits | `test_nonfinite_inputs_are_caught_before_the_location_fits` spies on `M.fit_all` and asserts it **never ran**: `NONFINITE_VALUES: fit feature F_c` |
+| Per-year row-key identity not independently verified | `_year_cell` now computes its own `cell_sha`/`cell_n` and requires every comparison **and** the dispersion record in that year to match, else `YEAR_ROW_POPULATION_MISMATCH: <year>`; the cell records its hash. Top level likewise verifies the dispersion record shares the population | `test_per_year_row_key_identity_is_verified_inside_each_cell` tampers a comparison **only inside the 2020 cell** — invisible to the top-level check — and gets `YEAR_ROW_POPULATION_MISMATCH: 2020`; the clean run shows three distinct, individually verified year hashes |

@@ -116,6 +116,8 @@ def validate_fit_bars(fit_sessions: list) -> dict:
     REFUSED by name (session and minute); it is never excluded silently."""
     n = 0
     for s in fit_sessions:
+        if not s.get("rows"):
+            raise FeatureRefused("NO_BARS: %s" % s.get("session_date"))
         for bar in s["rows"]:
             why = bar_invalid(bar)
             if why:
@@ -203,8 +205,18 @@ def eligible_rows(session: dict, vbar: dict, *, W: int = WINDOW_BARS) -> tuple:
     """Rows satisfying EVERY arm's requirements (legacy warm-up, target,
     embargo, RV_FLOOR, pressure window). Returns ([(row, y, tk)], refusals)."""
     refused = {k: 0 for k in REFUSAL_KEYS}
-    rows = B.observable_rows(session)
-    tg = B.targets(session, rows)
+    try:
+        rows = B.observable_rows(session)
+        tg = B.targets(session, rows)
+    except B.BarsRefused as e:
+        # BarsRefused subclasses Exception, not ValueError: convert it here so it
+        # can never escape the runner's named-refusal path (e.g. NONFINITE_FEATURE
+        # from a valid-but-extreme finite price sequence)
+        raise FeatureRefused("BARS_REFUSED: %s: %s" % (session.get("session_date"), e)) from e
+    except ArithmeticError as e:
+        raise FeatureRefused("BARS_ARITHMETIC: %s: %s: %s" % (session.get("session_date"), type(e).__name__, e)) from e
+    except ValueError as e:                       # e.g. math domain error on a zero/negative ratio
+        raise FeatureRefused("BARS_NUMERIC: %s: %s" % (session.get("session_date"), e)) from e
     for r, (y, tk, why) in zip(rows, tg):
         if r["features"] is None:
             refused[r["why"].split(":")[0]] += 1

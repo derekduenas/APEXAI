@@ -93,8 +93,10 @@ def fit_d0(z) -> dict:
     _validate_residuals(z, "D0")
     try:
         t = T.fit_scale_nu(z)
-    except ValueError as e:
-        raise DispersionRefused("D0_FITTER: %s" % e) from e
+    except DispersionRefused:
+        raise
+    except (ValueError, ArithmeticError) as e:
+        raise DispersionRefused("D0_FITTER: %s: %s" % (type(e).__name__, e)) from e
     if t["nu_at_lower_bound"]:
         raise DispersionRefused("NU_AT_LOWER_BOUND: nu=%.4f at %.1f; refused by declared model-domain policy"
                                 % (t["nu"], NU_BOUNDS[0]))
@@ -122,7 +124,10 @@ def fit_d1(z, p, *, nu0: float, s0: float, max_iter: int = 500, tol: float = 1e-
         v = J1(z, p, log_s1, lam, nu0)
         return v if math.isfinite(v) else float("inf")
 
-    best, nll, converged, iters = _nelder_mead(obj, np.array([math.log(s0), 0.0]), max_iter=max_iter, tol=tol)
+    try:
+        best, nll, converged, iters = _nelder_mead(obj, np.array([math.log(s0), 0.0]), max_iter=max_iter, tol=tol)
+    except ArithmeticError as e:                       # overflow/underflow/zero-division inside the search
+        raise DispersionRefused("D1_ARITHMETIC: %s: %s" % (type(e).__name__, e)) from e
     if not converged:
         raise DispersionRefused("OPTIMIZER_NO_CONVERGENCE after %d iterations (D1)" % iters)
     s1, lam = math.exp(best[0]), float(best[1])
