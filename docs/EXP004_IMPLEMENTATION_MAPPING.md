@@ -34,3 +34,30 @@ host after the candidate commit). Synthetic only; no historical data was read.
 
 These tests establish implementation behaviour. They do not establish market
 signal, statistical size, or power.
+
+---
+
+## Contract repair — candidate `6061f3ba` (supersedes `32c82b2c`)
+
+Registration unchanged; hash `9155024f…45bf9` re-verified after the commit.
+Focused suite **19 passed** (50 s); regression on untouched suites **188 passed**.
+
+| Reviewer finding | Repair | Test |
+|---|---|---|
+| 1. Non-finite scores became an ordinary `NOT_SELECTED` | `dispersion.require_finite` applied to targets, `rv_30`, `P̃`, every arm's means, reference residuals, every log-density (`logpdf` now refuses its own non-finite output), every pairwise differential, HAC inputs and statistics (`inference.InferenceRefused`), bootstrap replicates and summary values; `run.strict_json` uses `allow_nan=False` and runs before any record is returned | `test_nonfinite_values_are_integrity_refusals_never_not_selected`: the exact probes (`logpdf([1e308,…])`, `hac_decision([nan]*60)`) now raise; a poisoned mean for arm C ends as `INTEGRITY_FAILURE` with no `development` block; `strict_json` refuses NaN and Infinity |
+| 2. Duplicate session objects fabricated baseline support | `features.validate_sessions`: refuses `NO_SESSIONS`, `SESSION_WITHOUT_IDENTITY`, `SYMBOL_MISMATCH`, `DUPLICATE_SESSION`, `NON_CHRONOLOGICAL_SESSIONS`; `fit_baselines` calls it and counts **unique** dates | 100 copies now refused by name; five unique sessions give no baseline; a duplicated fit session ends the run as `INTEGRITY_FAILURE` |
+| 3. Session order assumed, never validated | `validate_sessions` (strictly increasing dates) at both fit and development; `run._check_row_order` refuses `ROWS_OUT_OF_ORDER` / `INTERLEAVED_SESSIONS` on the row keys before any statistic | reversed development list refused before inference; out-of-order and interleaved key sequences refused |
+| 4. Reporting did not satisfy the frozen contract | `run._year_cell`: fixed cells `2019, 2020, 2021` always present; each carries `n_rows`, per-year refusal counts, every comparison (P1, S1–S3, C-vs-L) under both specs with HAC (interval) and bootstrap (percentile interval + sensitivities 1/10), and dispersion improvement; a year below 60 rows or with no sessions is an explicit `NOT_AVAILABLE` cell; years outside the registered set are listed separately | three-year fixture asserts all cells `REPORTED` with full contents and per-year refusals (INVALID_OHLC = 10 in 2019, 0 in 2020); two-year fixture asserts a `NOT_AVAILABLE` 2021 cell |
+| 5. Malformed fit bars excluded rather than refused | `features.validate_fit_bars` (step 1) refuses `INVALID_FIT_BAR: <date> minute <m>: <why>`; `fit_baselines` re-checks; the `invalid_bars_excluded` counter is gone | one impossible bar among ~43,000 refuses the fit by name; run ends `INTEGRITY_FAILURE` with no `fit` block |
+| N8 compared aggregates, not the replicate sequence | tracing `random.Random` injected into both modules: the **full RNG draw sequence** (method, value) is identical, length > 1,000; the exposed replicate means reproduce the original's `boot_se` and exceedances | `test_n8_adapter_preserves_the_exact_rng_draw_sequence` |
+| `identical_across_all_comparisons` hard-coded | computed from a sha256 of each comparison cell's row keys and the cell sizes; a mismatch is a refusal (`ROW_POPULATION_MISMATCH`) | end-to-end asserts `key_sets == 1` |
+| Budget reported, not enforced | `run.FitAccounting`: counting wrappers around the **real** `fit_baselines`, `order_statistic`, `fit_arm`, `fit_d0`, `fit_d1` for the duration of `prepare_fit`; a call beyond the registered count raises `BUDGET_EXCEEDED`; the final tally must equal the registered budget or the fit is refused; the call log is recorded | tally `{1,3,4,2}` = 10 with the ordered log; an injected fifth location fit ends as `INTEGRITY_FAILURE: BUDGET_EXCEEDED: location_fits call 5 > 4` |
+| False comment about `ceil(0.025*40)` | corrected in `bootstrap_adapter.order_stat`: `0.025*40 == 1.0` in Python; the integer form is kept because it is exact for every `B` and tail, not because of that example | — |
+
+Representative records regenerated on the three-year fixture:
+`NOT_SELECTED` with all flags false over 3,950 rows, `θ ≈ −1.9e-5`; refused
+`INTEGRITY_FAILURE` / `INSUFFICIENT_DEVELOPMENT_ROWS: 0 eligible`.
+
+This brick remains implementation evidence. It does not establish market
+alpha, options profitability, GARCH value, regime skill, or a working time
+machine.
