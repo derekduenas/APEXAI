@@ -45,6 +45,7 @@ Ordered by how much each blocks an *honest* pilot, not by effort.
 |---|---|---|---|
 | **G0** | **The loop has no forecast input.** The session attacks on *geometry*; `forecast_pedigree="NOT_ESTIMABLE"` is hard-coded (`options_paper_session.py:166`), and `expression.compare` returns `NOT_ESTIMABLE` — "no option may be declared superior to STOCK without a forecast" — so the expected-move normalisation is never exercised live | `options_paper_session.py:166`; `expression.py:444-487`; every retained card lacks a forecast field | A **timestamped forecast record** (`known_from`, sealed hash) exists **before** any quote is consulted, supplies `expected_move_pct` (and direction) to `compare/normalize`, and its hash is carried on the card and the outcome. Test: an attack without a sealed forecast is refused |
 | **G1** | **Live cards and outcomes are mislabelled as replay.** Every `options_live_card` and `options_outcome` carries `evidence_class: HISTORICAL_DEVELOPMENT_REPLAY`, `decision_power: NONE_REPLAY`, law "never prospective evidence" — while the same session's friction and scoreboard records say `PROSPECTIVE_PAPER` | ledger records; cause: `options_paper_session.py:39` imports `seal_before_card` from `apex/predators/options/replay.py`, which stamps `EVIDENCE_CLASS` (replay) | A prospective sealer in a live module stamps `PROSPECTIVE_PAPER` / `NONE_PAPER` and `live_promotion_eligible` truthfully; a test asserts no live record ever carries the replay class; the 9 historical sessions are annotated as mislabelled, **not rewritten** |
+| **G2a** | **Freshness is checked for the newest quote anywhere in the chain, not for the selected contract and side.** `live_world.observe` computes `q_age` from `newest` across all fetched expirations (`live_world.py:31`); one fresh contract can mask a stale selected one | `live_world.py:26-48` | Freshness is evaluated **per selected contract and per side crossed** at execution time; a stale selected side refuses regardless of the chain's newest quote. Implemented and tested in the recording boundary (`apex/options_pilot/boundary.py::_quote_ok`, `test_freshness_is_checked_for_the_selected_contract_and_side`) |
 | **G2** | **Stale-quote threshold is 120 s** and the code says so: `STALE_QUOTE_S = 120.0  # far too lax for live` (`attack_geometry.py:69`); timestamps are handled ET-naive with a documented history of a 4-hour offset bug (`live_world.py:3-5`, `resolve` docstring) | code comments; Day-1 defect B record | A declared **live** quote-age limit (proposal: **≤ 15 s** for option quotes, ≤ 90 s for bars — to be set from measured ThetaData snapshot cadence, §5), tz-aware timestamps end-to-end, and tests that a 16 s quote refuses and a naive timestamp is rejected |
 | **G3** | **Risk certification and the risk kernel are not invoked by the options session.** `risk_kernel.check` callers: `hunt.py, allocator.py, baselines.py, flight_sim.py, first_dollar_readiness.py` — not `options_paper_session.py`; `certify` likewise. The session's only limit is "one open paper position per symbol" (`:387`) | `grep` in this audit; `options_paper_session.py:385-388` | `certify()` and `risk_kernel.check()` run **before** `simulate_entry`; their records are chained; a refusal by either is sealed as a refusal; a test forces an aggregate-limit breach and asserts no fill |
 | **G4** | **No commissions or fees.** Friction is the half-spread only: retained `entry_friction 0.0`, `exit_friction 1.0` per contract; no per-contract commission, OCC/ORF/exchange fees | `paper_execution.py` (no fee term); friction records | Declared paper fee schedule as constants (per contract, per leg, entry and exit), added as a **fourth term** of the identity `pnl = mid_change − entry_friction − exit_friction − fees`; identity test updated; attribution reports fees separately |
@@ -97,6 +98,30 @@ Tests establish the code computes what it claims on fixtures. They do not
 establish feed behaviour, cadence, or anything about edge.
 
 ---
+
+## 4b. Corrections to this audit after review (before any implementation)
+
+- **G0 as first written included modelling choices.** `rv_30·s₀` is a Student-t
+  *scale* for the registered 15-minute return, not an expected directional move
+  and not a hold-to-close forecast; combining it with a trend label and stretching
+  the horizon would have manufactured a new forecasting specification. Corrected:
+  the pilot keeps the **native 15-minute horizon** and identifies the **exact
+  frozen parameter artifact** (EXP-002 sealed result, `params_hash
+  ca04fc6e713e1a5c`, registered L arm with shared `s* = 3.288, ν* = 6.384`, from a
+  NOT_SELECTED experiment — a well-specified forecast, explicitly not a validated
+  one). No `expected_move_pct` is manufactured.
+- **Expression comparison by expiration breakeven is withdrawn for the pilot.**
+  Breakevens at expiry cannot say which 21+ DTE option best monetises a move
+  before today's close. The pilot uses **one deterministic rule** with no
+  "best option" or mispricing claim (`apex/options_pilot/expression_rule.py`).
+  Horizon-consistent option valuation is a separate capability.
+- **The seal check is weaker than §1 reported.** `simulate_entry` accepts any
+  string of ≥ 32 characters; it does not establish that the hash belongs to a
+  persisted, matching card. The session does append the card first, but the
+  fill function proves nothing. The recording boundary therefore verifies the
+  intent by **re-reading the ledger and recomputing its hash** and does not rely
+  on `simulate_entry`'s check.
+- **G2a (above):** freshness must be per selected contract and side.
 
 ## 5. Smallest proposed pilot specification
 
