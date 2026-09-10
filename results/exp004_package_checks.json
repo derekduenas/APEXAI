@@ -1,0 +1,48 @@
+{
+ "dry_validation": {
+  "granted_as_exp004": {
+   "code_commit": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
+   "experiment": "ALPHA-EXP-004",
+   "manifest_files": 2679,
+   "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+   "temporal_range": [
+    "2016-01-04",
+    "2021-12-31"
+   ]
+  },
+  "refused_as_ALPHA-EXP-001B": "EXPERIMENT_MISMATCH: decision serves 'ALPHA-EXP-004', caller is 'ALPHA-EXP-001B'",
+  "refused_as_ALPHA-EXP-002": "EXPERIMENT_MISMATCH: decision serves 'ALPHA-EXP-004', caller is 'ALPHA-EXP-002'",
+  "throwaway_key_destroyed": true,
+  "wrong_registration": "REGISTRATION_MISMATCH: decision was made for registration 9155024f51825d13, caller runs fe"
+ },
+ "pin": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
+ "preservation": {
+  "accounts": {
+   "apexresearch": "109",
+   "apexresearch2": "110",
+   "apexresearch3": "111",
+   "apexresearch4": "DOES_NOT_EXIST"
+  },
+  "allowed_signers_sha256": "ae30f60db42443ad58a573daa31e94ea0b6ca985148303682c7ca6ccfbaf83e0",
+  "environments_present": [
+   "/apex-data/research",
+   "/apex-data/research-exp002",
+   "/apex-data/research-rev2"
+  ],
+  "exp001b_aborted_forecasts": "7a6cbe36c25c333191fc865e27c7c920bfefb67d008ecad6233a82a8a96a3407",
+  "exp001b_rev2_sealed_result": "4b23021d07d8d200c2ac40c3f4c8a807f72af7dc51d7fc2efddaf1cc5378c909",
+  "exp002_sealed_result": "0c397d703a83fcb915fef47b96fd6a75c1822ab21dd80bcbe27d90f1cdf9ad3f",
+  "runner_roots_present": [
+   "/opt/apex-runner",
+   "/opt/apex-runner-exp002",
+   "/opt/apex-runner-rev2"
+  ],
+  "signed_decisions_on_host": {
+   "exp001b_admission.json": "1eafbe1fd972a45bc320acf2da0468a4a601eef7a00b7e6090499cc9cfcd0fa2",
+   "exp001b_admission_rev2.json": "28bc28590339b6e92a95e800542a8ed0e16c7834646480c66045952ef96a9d11",
+   "exp002_admission.json": "dd968c314283a83a4dfeca0c73bec32a1445b9b3a20790fd40af8e7afde289b6",
+   "exp004_admission.json": "ABSENT"
+  }
+ },
+ "request_sha256": "290e4cce9e443a4aa9fb3b654e119083869e1e98f4340e851168ab658c1cdaeb"
+}

@@ -1,0 +1,127 @@
+{
+ "DECISION_FILENAME": {
+  "distinct_from": [
+   "exp001b_admission.json",
+   "exp001b_admission_rev2.json",
+   "exp002_admission.json"
+  ],
+  "expected_path": "/etc/apex/admissions/exp004_admission.json",
+  "signature_path": "/etc/apex/admissions/exp004_admission.json.sig"
+ },
+ "EXPERIMENT_BINDING": {
+  "adapter": "apex.world_model.exp004.historical.run -> apex.world_model.exp004.run.tournament",
+  "executable_entry_point": "scripts/alpha_exp_real_execute.py --experiment ALPHA-EXP-004 --decision <path> --execute",
+  "experiment_id": "ALPHA-EXP-004",
+  "inference_parameters": "NONE accepted: the entry point takes no inference parameters; B=10000 seed=20260909 come from the registration",
+  "registration_frozen": true,
+  "registration_hash": "9155024f51825d13487cdc035432d85b357d22e39a40f967477873a7a6145bf9",
+  "why_another_admission_cannot_authorise_this": "the boundary checks purpose.experiment_id and purpose.registration_hash against the values the executing experiment supplies; a mismatch is refused (EXPERIMENT_MISMATCH / REGISTRATION_MISMATCH). Tested both directions in tests/test_exp004_activation_path.py"
+ },
+ "MEMORY_QUALIFICATION": {
+  "measured": "737.2 MiB peak of a 1400 MiB cap, 662.8 MiB headroom, zero limit/OOM events, 12 min 4 s",
+  "record": "docs/EXP004_MEMORY_QUALIFICATION.md; results/exp004_memory_adapter_registeredB.json",
+  "scope": "synthetic bars, governed_path_exercised: false (ledger_dir None, on-demand loading). The governed path at registered scale - admitted loader, import provenance and sealing over 1511 sessions - has NEVER been run and its memory and runtime are NOT established"
+ },
+ "NOTE": "THIS IS A REQUEST, NOT A DECISION. Unsigned; the decision field is not ADMIT and provenance names no principal. The identity string is not the boundary: it selects which public key in allowed_signers must have signed. The boundary is possession of the private key, held off-host and never on the research host, together with protection of allowed_signers.",
+ "WHAT_A_RESULT_WOULD_BE": "an EXPOSED-DATA CANDIDATE SCREEN on 2019-2021 development data. It grants no sealed access, is not confirmation, and is not evidence of alpha, options profitability or tradability. Evaluation and reserve stay closed.",
+ "availability": {
+  "corporate_actions": "RAW_UNADJUSTED_EXPLICIT",
+  "event_time": {
+   "kind": "PER_ROW",
+   "latest": "2026-08-28"
+  },
+  "publication_time": {
+   "kind": "NOT_AVAILABLE"
+  },
+  "receipt_time": {
+   "at": "2026-08-29",
+   "kind": "BULK"
+  },
+  "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record exists for these bars; they may not be used to claim point-in-time availability or to model vendor revisions; receipt was bulk on 2026-08-29, so no row is evidence of what was knowable before that date except by its event time",
+  "revision_time": {
+   "kind": "NOT_AVAILABLE"
+  }
+ },
+ "code": {
+  "bound_files": 67,
+  "bound_paths": [
+   "apex/world_model",
+   "apex/governance/chain_ledger.py",
+   "apex/intraday/sessions.py",
+   "scripts/alpha_exp_real_execute.py"
+  ],
+  "commit": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
+  "execute_script_sha256_bound": "73aca971ce8fd16658bcd0b0c1e7c13b877cbb2981a3f9e40be499a79300f2c0",
+  "launcher_sha256_not_in_bound_tree": "823b0125b58b86ba653f0dfedf3c495dfe05cc7df79e4671c8717e4a57776b9e",
+  "note": "the launcher is not a bound path; it is pinned by this hash and by invoking it from the fresh checkout after checking that hash",
+  "source_tree_sha256": "8fbe6ed6155df0e4b8fb09f6dd8ce54c7e1cf064cea29592e08fa44a41996991"
+ },
+ "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
+ "dataset": {
+  "dataset_id": "history-b/etf_continuous",
+  "manifest_path": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json",
+  "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "root": "/apex-data/history-b/etf_continuous/bars"
+ },
+ "decision": "REQUESTED_NOT_GRANTED",
+ "environment": {
+  "disjoint_from": [
+   "/apex-data/research + apexresearch (EXP-001B rev1)",
+   "/apex-data/research-rev2 + apexresearch2 (EXP-001B rev2)",
+   "/apex-data/research-exp002 + apexresearch3 (EXP-002)"
+  ],
+  "research_root": "/apex-data/research-exp004",
+  "research_user": "apexresearch4",
+  "runner_root": "/opt/apex-runner-exp004"
+ },
+ "output": {
+  "authority_classification": "RESEARCH_HISTORICAL",
+  "root": "/apex-data/research-exp004/out"
+ },
+ "provenance": {
+  "decided_by": "UNSIGNED_REQUEST_AWAITING_AUTHORITY",
+  "decided_utc": null,
+  "review_reference": "EXP004-ACTIVATION-CANDIDATE"
+ },
+ "purpose": {
+  "experiment_id": "ALPHA-EXP-004",
+  "registration_hash": "9155024f51825d13487cdc035432d85b357d22e39a40f967477873a7a6145bf9",
+  "research_purpose": "EXP-004: does the clipped signed body-volume feature F~ improve the distributional score of a 15-minute-ahead SPY log-return forecast after the legacy price features, both ingredients and their product are already in the location forecast, holding scale and tail shape fixed? Fit once on 2016-2018; score the EXPOSED 2019-2021 development pool under two declared dispersion specifications. Distributional only; no economics, no subgroup search, no refits."
+ },
+ "scope": {
+  "fields": [
+   "open",
+   "high",
+   "low",
+   "close",
+   "volume",
+   "event_time_utc"
+  ],
+  "source_families": [
+   "alpaca_sip_raw_1m"
+  ],
+  "temporal_range": {
+   "end": "2021-12-31",
+   "evaluation_and_reserve": "SEALED; never requested by this experiment",
+   "roles": {
+    "development_EXPOSED": [
+     "2019-01-01",
+     "2021-12-31"
+    ],
+    "fit": [
+     "2016-01-04",
+     "2018-12-31"
+    ]
+   },
+   "sessions": 1511,
+   "sessions_by_role": {
+    "development": 757,
+    "fit": 754
+   },
+   "start": "2016-01-04"
+  },
+  "universe": [
+   "SPY"
+  ]
+ }
+}
