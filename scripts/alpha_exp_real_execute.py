@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""ALPHA-EXP-001B on REAL historical data -- executable only under a verified,
-SIGNED admission decision. Without one, the only output is a named refusal.
+"""Registered experiments on REAL historical data -- executable only under a
+verified, SIGNED admission decision. Without one, the only output is a named
+refusal.
 
     alpha_exp_real_execute.py --decision PATH --plan      # list what WOULD run; opens no rows
     alpha_exp_real_execute.py --decision PATH --execute   # train + validation; evaluation stays SEALED
@@ -28,6 +29,9 @@ from apex.world_model.exp001b.registration import EXPERIMENT_ID as EXP001B_ID, I
 from apex.world_model.exp002 import historical as H2
 from apex.world_model.exp002.registration import EXPERIMENT_ID as EXP002_ID
 from apex.world_model.exp002.registration import registration_hash as exp002_registration_hash
+from apex.world_model.exp004 import historical as H4
+from apex.world_model.exp004.registration import EXPERIMENT_ID as EXP004_ID
+from apex.world_model.exp004.registration import registration_hash as exp004_registration_hash
 from apex.world_model.real_data import boundary, loader
 from apex.world_model.real_data.boundary import RealDataRefused
 
@@ -46,6 +50,16 @@ EXPERIMENTS = {
                 "status": H2.STATUS,
                 "run": lambda sbp, run_dir, grant: H2.run(
                     {"fit": sbp["fit"], "development": sbp["development"], "observed": sbp.get("observed", [])},
+                    ledger_dir=run_dir, session_loader=loader.loader_for(grant))},
+    # EXP-004 binds to apex.world_model.exp004.historical, whose ONLY execution
+    # entry point is exp004.run.tournament. That function takes no inference
+    # parameters, so an admitted run cannot use anything but the registered
+    # B = 10,000 / seed = 20260909, and exp004.synthetic is unreachable from here.
+    EXP004_ID: {"registration_hash": exp004_registration_hash,
+                "periods": lambda: dict(H4.PERIOD_ROLES),          # fit, development; never evaluation or reserve
+                "status": H4.STATUS,
+                "run": lambda sbp, run_dir, grant: H4.run(
+                    {"fit": sbp["fit"], "development": sbp["development"]},
                     ledger_dir=run_dir, session_loader=loader.loader_for(grant))},
 }
 EXPERIMENT_ID = EXP001B_ID                                    # default; overridden per invocation
