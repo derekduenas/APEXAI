@@ -76,7 +76,9 @@ def test_order_is_proven_by_ledger_sequence_and_receipts_are_reread(tmp_path):
     assert fill["status"] == "FILLED" and fill["side_crossed"] == "ASK" and fill["price"] == 2.50 and fill["net_debit"] == 250.0
     assert intent["expression"] == "LONG_CALL" and intent["contract"] == {"symbol": SYM, "expiration": "2026-10-09", "strike": 645.0, "right": "CALL"}
     assert intent["expression_rule"] == RULE_ID and intent["no_best_option_claim"] is True
-    o = S.resolve(led, fill_receipt=fl, exit_quote_fn=lambda c: _quote(c, bid=2.70, ask=2.80), clock_fn=lambda: T0 + 60)
+    # the exit quote must itself be fresh at the resolve clock: stamp it there
+    o = S.resolve(led, fill_receipt=fl, exit_quote_fn=lambda c: _quote(c, bid=2.70, ask=2.80, timestamp_epoch=T0 + 59),
+                  clock_fn=lambda: T0 + 60)
     assert o["status"] == "RESOLVED" and o["seq"] > fl["seq"]
     outc = L.read_all(led)[o["seq"] - 1]
     assert outc["exit_side"] == "BID" and outc["pnl"] == 20.0 and outc["fees"] == "NOT_MODELLED_IN_THIS_BRICK"
@@ -281,6 +283,16 @@ def test_one_contract_is_filled_or_unfilled_explicitly(tmp_path):
     assert o["status"] == "NO_POSITION"
     out2 = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=lambda c: _quote(c, ask=None)))
     assert L.read_all(led)[out2["fill_receipt"]["seq"] - 1]["why"].startswith("QUOTE_SIDE_MISSING")
+
+
+def test_stale_exit_quote_is_not_estimable(tmp_path):
+    """The exit side is freshness-checked too: a 61 s-old bid at resolve time is NOT_ESTIMABLE."""
+    led = tmp_path / "p.jsonl"
+    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources())
+    o = S.resolve(led, fill_receipt=out["fill_receipt"], exit_quote_fn=lambda c: _quote(c, bid=2.70, ask=2.80),
+                  clock_fn=lambda: T0 + 60)                                      # quote stamped T0-1 -> 61 s old
+    rec = L.read_all(led)[o["seq"] - 1]
+    assert rec["status"] == "NOT_ESTIMABLE" and rec["why"].startswith("STALE_SELECTED_CONTRACT: BID side 61.0s")
 
 
 def test_missing_exit_quote_is_not_estimable_never_imputed(tmp_path):
