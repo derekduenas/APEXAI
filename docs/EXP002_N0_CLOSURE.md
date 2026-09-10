@@ -157,3 +157,58 @@ For decision, not for action now. EXP-002's verdict and records are unchanged.
 I am not recommending one of these over the others; that is a registration
 decision. My only recommendation is that whichever is chosen be declared before
 any further historical access.
+
+---
+
+## 9. Corrections to this closure (applied; investigation closed after these)
+
+**9.1 Permutation does not establish independence.** §3 said N0 establishes
+assumption (1) "up to the within-block dependence the block permutation
+deliberately retains". That is still an overclaim. Block permutation **disrupts
+the original row-level pairing**; it does not establish independence between the
+permuted outcome and the state. Retained time structure, block positions,
+nonstationarity across 2016–2021, and accidental alignment of a permuted block
+with a similar state stretch can all leave dependence. Corrected statement:
+
+> N0 establishes that the original pairing was disrupted. It does **not**
+> establish assumption (1), (2) or (3). All three remain assumptions.
+
+**9.2 Independence gives factorization, not substitution.** Under independence of
+the *standardized* variables, `E[a²ψ′(z)] = E[a²]·E[ψ′(z)]` — the non-negative
+multiplier `E[a²]` remains, so independence licenses reading the **sign** from
+`E[ψ′(z)]`, never the magnitude. Independence is sufficient for that
+factorization, not necessary. And my claim that `a` and `z` "remain dependent"
+in the experiment because both contain `σ` was too strong: a shared denominator
+is a potential dependence channel, not a proof of dependence in every
+construction. The same care applies to the Gaussian step: `E[az] = E[a]E[z]`
+requires independence of the standardized `a` and `z`, not merely of raw
+outcomes and predictors, once the scale varies across rows.
+
+**9.3 Repetition does not manufacture a reference distribution.** Disposition
+item 3 said computing the statistic over many permutations "gives a valid
+reference". It does not. It gives the distribution induced by the chosen
+randomization scheme. Treating that as the null distribution requires an
+exchangeability or invariance argument appropriate to the hypothesis and to the
+time dependence present; more repetitions cannot supply it. Corrected to: *a
+permutation reference distribution is a candidate design that requires an
+explicit invariance argument, not a default remedy.*
+
+**9.4 Neither centering fix is automatically sufficient.** A common intercept
+across a matched pair does not guarantee that the differing conditional
+components carry no marginal score advantage after permutation. Arithmetic
+centering of the outcome does not generally produce the Student-t pseudo-true
+location, especially across varying scales. Both are **candidate designs
+requiring justification**, not fixes.
+
+**9.5 Transcription.** §5's precision correction quoted the wrong series. The
+Gaussian **permuted** realized sample means accompanying `t` = −6.85 → −0.49 were
+approximately **−1777 → −7983** (1e-6 units); the −1943 → −21134 figures are the
+**intact** series. All of these are realized sample means from one seeded
+fixture, not established expectations. The observation stands in that narrower
+form: in this fixture the permuted mean grew more negative while the realized
+`t` moved toward zero, consistent with a HAC standard error growing faster than
+the mean.
+
+**Status: this investigation is closed.** Established: N0's required `NO_SIGNAL`
+is not justified by permutation alone. Unresolved and not further pursued: the
+cause of the specific `L−S t = +2.823` failure on the development period.
