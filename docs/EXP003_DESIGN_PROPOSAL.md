@@ -1,4 +1,19 @@
-# EXP-003 — prospective research-design proposal
+# EXP-003 — prospective research-design proposal — **WITHDRAWN IN PART**
+
+> **Superseded by `EXP003_EQUIVALENCE_FINDING.md`.** The proposed
+> orthogonalised increment is algebraically the SAME predictor as EXP-002's
+> C arm (Frisch-Waugh-Lovell; verified against the shipped code path to
+> 4.3e-16 relative out of sample). Orthogonalisation is withdrawn as a
+> forecasting capability; what remains here is a proposed testing-protocol
+> revision, not a model advance, and the same historical comparison must not
+> be re-run because its invalidation rule changed. Three further corrections
+> apply: the known-absence 'size check' claim is withdrawn; implementation
+> checks CAN invalidate the scientific use of an artifact if a defect is
+> found later; and the automatic confirmation opening is withdrawn - sealed
+> access requires a separately reviewed admission. The successor modelling
+> proposal is `EXP004_METAORDER_STATE_PROPOSAL.md`.
+
+---
 
 For independent review. **Nothing here is implemented, fitted, scored or
 registered.** No historical access. EXP-002's verdict
