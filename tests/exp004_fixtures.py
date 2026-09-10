@@ -74,3 +74,12 @@ def fit_sessions(n: int = N_FIT_SESSIONS) -> list:
 
 def dev_sessions(n: int = N_DEV_SESSIONS) -> list:
     return [make_session(d, SEEDS["dev"] + i) for i, d in enumerate(trading_days("2019-06-03", n))]
+
+
+def dev_sessions_years(years=("2019", "2020", "2021"), per_year: int = 4) -> list:
+    """Chronological development sessions across the registered report years."""
+    out, k = [], 0
+    for y in years:
+        for d in trading_days("%s-06-01" % y, per_year):
+            out.append(make_session(d, SEEDS["dev"] + 100 + k)); k += 1
+    return out

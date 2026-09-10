@@ -22,7 +22,10 @@ COVERAGE = 0.95          # tails 25/1000 and 975/1000, exact
 
 def order_stat(sorted_vals: np.ndarray, num: int, den: int) -> tuple:
     """The ceil(num/den * B)-th order statistic, 1-indexed, computed with EXACT
-    integer arithmetic (floating ceil(0.025*40) rounds to 2)."""
+    integer arithmetic. (Correction: in Python 0.025*40 == 1.0 exactly; my
+    earlier claim that it rounds to 2 was false. The integer form is kept
+    because it is exact for every B and every declared tail, not because of
+    that example.)"""
     B = len(sorted_vals)
     k = max(1, min(B, (num * B + den - 1) // den))
     return float(sorted_vals[k - 1]), k
@@ -53,6 +56,8 @@ def session_stationary_bootstrap_ext(d, session_ids, *, expected_block_sessions:
             tot += sums[idx]; cnt += counts[idx]
             idx = rng.randrange(S) if rng.random() < p else (idx + 1) % S
         means[b] = tot / cnt
+    if not np.all(np.isfinite(means)):
+        raise ValueError("NONFINITE_BOOTSTRAP_REPLICATES: %d of %d" % (int(n_resamples - np.isfinite(means).sum()), n_resamples))
     centred = means - m_obs
     k = int(np.sum(centred >= m_obs))
     B = int(n_resamples)

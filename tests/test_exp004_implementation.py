@@ -27,7 +27,7 @@ REG_HASH = "9155024f51825d13487cdc035432d85b357d22e39a40f967477873a7a6145bf9"
 @pytest.fixture(scope="module")
 def world():
     fit = X.fit_sessions()
-    dev = X.dev_sessions()
+    dev = X.dev_sessions_years()                 # 2019, 2020, 2021 x 4 sessions, chronological
     prep = R.prepare_fit(fit)
     return {"fit": fit, "dev": dev, "prep": prep}
 
@@ -104,12 +104,12 @@ def test_n4_features_use_only_prior_completed_bars():
 
 def test_n5_c_is_distinct_from_ax_out_of_sample_and_degenerate_columns_refused(world):
     prep, dev = world["prep"], world["dev"]
-    rows, _ = F.eligible_rows_many(dev, prep["vbar"]); F.apply_clipping(rows, prep["clipping"])
+    rows, _, _ = F.eligible_rows_many(dev, prep["vbar"]); F.apply_clipping(rows, prep["clipping"])
     rr = [r for r, _, _ in rows]
     diff = np.abs(M.means_of(prep["location"]["specs"]["C"], rr) - M.means_of(prep["location"]["specs"]["AX"], rr))
     assert diff.max() > 0 and np.isfinite(diff).all()
     assert prep["location"]["specs"]["C"]["rank"] == 7 and prep["location"]["specs"]["AX"]["rank"] == 6
-    fit_rows, _ = F.eligible_rows_many(world["fit"][:5], prep["vbar"]); F.apply_clipping(fit_rows, prep["clipping"])
+    fit_rows, _, _ = F.eligible_rows_many(world["fit"][:5], prep["vbar"], role="fit"); F.apply_clipping(fit_rows, prep["clipping"])
     zero = copy.deepcopy(fit_rows)
     for r, _, _ in zero:
         r["features"]["F_c"] = 0.3
@@ -182,7 +182,10 @@ def test_feature_refusals_and_valid_cases():
     f0, why0 = F.pressure_for_row(row, zv, vbar_ok); assert why0 is None and f0["P"] < f["P"]
     zr = dict(by_t); zr[row["event_time"]] = dict(row, high=row["close"], low=row["close"], open=row["close"])
     fz, whyz = F.pressure_for_row(row, zr, vbar_ok); assert whyz is None and fz["zero_range_bars"] == 1
-    assert F.fit_baselines([s] * 5)["minutes_with_baseline"] == 0             # support below 100 -> no baseline
+    with pytest.raises(F.FeatureRefused, match="DUPLICATE_SESSION"):           # copies cannot fabricate support
+        F.fit_baselines([s] * 5)
+    five = [X.make_session(d, X.SEEDS["n"] + 20 + i) for i, d in enumerate(X.trading_days("2018-04-02", 5))]
+    assert F.fit_baselines(five)["minutes_with_baseline"] == 0                # 5 unique sessions < 100 -> no baseline
     assert F.order_statistic(list(range(1, 101)), 99, 100) == 99 and F.order_statistic(list(range(1, 11)), 99, 100) == 10
 
 
@@ -258,47 +261,165 @@ def test_bootstrap_interval_indexing_and_unequal_session_counts():
     tot = sum(d[i] for i in range(len(d))); assert math.isclose(tot / len(d), b["mean"])
 
 
-# ------------------------------------------------------------------ N7 + end to end
+# ------------------------------------------------------------------ session validation, fit bars, guards, budget
 
-def test_n7_and_end_to_end_tournament(world, tmp_path):
+def test_session_identity_and_chronology_are_validated_not_trusted(world):
     fit, dev, prep = world["fit"], world["dev"], world["prep"]
-    # induce PRESSURE-ONLY refusals: lower `high` below close on one bar; closes untouched so legacy passes
+    for bad, kind in ((dev + [dev[0]], "DUPLICATE_SESSION"), (list(reversed(dev)), "NON_CHRONOLOGICAL_SESSIONS"),
+                      ([dev[0], dev[2], dev[1]], "NON_CHRONOLOGICAL_SESSIONS"), ([], "NO_SESSIONS")):
+        with pytest.raises(F.FeatureRefused, match=kind):
+            F.validate_sessions(bad, role="development")
+    other = copy.deepcopy(dev); other[1]["symbol"] = "QQQ"
+    with pytest.raises(F.FeatureRefused, match="SYMBOL_MISMATCH"):
+        F.validate_sessions(other, role="development")
+    # through the runner: a reversed development list is refused BEFORE any statistic is computed
+    rec = R.tournament(fit, list(reversed(dev)), bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE" and "NON_CHRONOLOGICAL_SESSIONS" in rec["refusal"]["detail"]
+    assert "development" not in rec
+    dup_fit = fit[:99] + [fit[50]] + fit[99:]
+    rec = R.tournament(dup_fit, dev, bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE" and "DUPLICATE_SESSION" in rec["refusal"]["detail"]
+    # row order is checked independently of session validation; a session revisited later in the
+    # list necessarily breaks (date, time) monotonicity, so it is caught as ROWS_OUT_OF_ORDER
+    with pytest.raises(F.FeatureRefused, match="ROWS_OUT_OF_ORDER"):
+        R._check_row_order([("2019-06-03", 1), ("2019-06-04", 2), ("2019-06-03", 3)], "x")
+    with pytest.raises(F.FeatureRefused, match="ROWS_OUT_OF_ORDER"):
+        R._check_row_order([("2019-06-03", 5), ("2019-06-03", 4)], "x")
+
+
+def test_invalid_fit_bar_is_refused_by_name_not_excluded(world):
+    fit = copy.deepcopy(world["fit"])
+    day = fit[7]["session_date"]; bars = X.build_bars(day, X.SEEDS["fit"] + 7)
+    bars[123]["high"] = bars[123]["low"] - 1.0                  # one impossible bar among ~43,000
+    fit[7] = X.session_from_bars(day, bars)
+    with pytest.raises(F.FeatureRefused, match="INVALID_FIT_BAR: %s minute 123" % day):
+        F.validate_fit_bars(fit)
+    rec = R.tournament(fit, world["dev"], bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE" and "INVALID_FIT_BAR" in rec["refusal"]["detail"]
+    assert "fit" not in rec and "development" not in rec
+
+
+def test_nonfinite_values_are_integrity_refusals_never_not_selected(world, monkeypatch):
+    with pytest.raises(D.DispersionRefused, match="NONFINITE_VALUES"):
+        D.logpdf(np.array([1e308, 1e308]), np.zeros(2), np.array([1e-300, 1e-300]), 6.0)
+    with pytest.raises(I.InferenceRefused, match="NONFINITE_DIFFERENTIALS"):
+        I.hac_decision([float("nan")] * 60)
+    with pytest.raises(I.InferenceRefused, match="NONFINITE_DIFFERENTIALS"):
+        I.hac_decision([1.0] * 30 + [float("inf")])
+    with pytest.raises(ValueError):
+        R.strict_json({"x": float("nan")})
+    with pytest.raises(ValueError):
+        R.strict_json({"x": float("inf")})
+    real = M.means_of
+    def poisoned(spec, rows):
+        out = real(spec, rows)
+        if spec["arm"] == "C":
+            out = out.copy(); out[len(out) // 2] = float("nan")
+        return out
+    monkeypatch.setattr(M, "means_of", poisoned)
+    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE"
+    assert rec["refusal"]["kind"] == "DispersionRefused" and "NONFINITE_VALUES: means C" in rec["refusal"]["detail"]
+    assert "development" not in rec and rec["classification"]["outcome"] == "INTEGRITY_FAILURE"
+
+
+def test_fit_budget_is_counted_on_the_real_fitters_and_enforced(world, monkeypatch):
+    est = world["prep"]["estimations"]
+    assert {k: est[k] for k in ("baselines", "clipping_constants", "location_fits", "dispersion_fits", "total")} == \
+        {"baselines": 1, "clipping_constants": 3, "location_fits": 4, "dispersion_fits": 2, "total": 10}
+    assert est["total"] == BUDGET["total_fit_split_estimations"]
+    assert [k for k, _ in est["call_log"]].count("location_fits") == 4 and len(est["call_log"]) == 10
+    assert est["call_log"][-2:] == [("dispersion_fits", "fit_d0"), ("dispersion_fits", "fit_d1")]
+    real = M.fit_all
+    def one_extra(rows_y):
+        out = real(rows_y); M.fit_arm(rows_y, "L"); return out          # a fifth location fit
+    monkeypatch.setattr(M, "fit_all", one_extra)
+    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE" and "BUDGET_EXCEEDED: location_fits call 5 > 4" in rec["refusal"]["detail"]
+
+
+# ------------------------------------------------------------------ N8: replicate SEQUENCE preserved
+
+class _TracingRandom(random.Random):
+    trace = []
+    def random(self):
+        v = super().random(); _TracingRandom.trace.append(("random", v)); return v
+    def randrange(self, *a, **k):
+        v = super().randrange(*a, **k); _TracingRandom.trace.append(("randrange", v)); return v
+
+
+def test_n8_adapter_preserves_the_exact_rng_draw_sequence(monkeypatch):
+    import apex.world_model.exp002.bootstrap as ORIG
+    d, sids, _ = _unequal()
+    traces = {}
+    for name, mod, fn in (("orig", ORIG, boot_orig), ("ext", BA, BA.session_stationary_bootstrap_ext)):
+        _TracingRandom.trace = []
+        monkeypatch.setattr(mod.random, "Random", _TracingRandom)
+        out = fn(d, sids, expected_block_sessions=5, n_resamples=200, seed=20260909, threshold=0.0228)
+        traces[name] = (list(_TracingRandom.trace), out)
+        monkeypatch.undo()
+    t_orig, o = traces["orig"]; t_ext, e = traces["ext"]
+    assert len(t_orig) == len(t_ext) > 1000
+    assert t_orig == t_ext                                                  # identical draws, identical order
+    assert o["boot_se"] == e["boot_se"] and o["exceedances"] == e["exceedances"] and o["p_one_sided"] == e["p_one_sided"]
+    # the exposed replicate means reproduce the aggregate the original computed from its own (unexposed) replicates
+    rm = e["replicate_means"]
+    assert math.isclose(float((rm - e["mean"]).std(ddof=1)), o["boot_se"], rel_tol=1e-12)
+    assert int(np.sum((rm - e["mean"]) >= e["mean"])) == o["exceedances"]
+
+
+# ------------------------------------------------------------------ N7 + end to end, fixed three-year reporting
+
+def test_n7_and_end_to_end_tournament_with_fixed_year_cells(world, tmp_path):
+    fit, dev, prep = world["fit"], world["dev"], world["prep"]
     dev2 = copy.deepcopy(dev)
-    day = dev2[3]["session_date"]; bars = X.build_bars(day, X.SEEDS["dev"] + 3)
-    bars[200]["high"] = bars[200]["close"] - 0.01
+    day = dev2[3]["session_date"]; bars = X.build_bars(day, X.SEEDS["dev"] + 100 + 3)
+    bars[200]["high"] = bars[200]["close"] - 0.01                # pressure-only refusals on ten rows (2019)
     dev2[3] = X.session_from_bars(day, bars)
     rows, ref = F.eligible_rows(dev2[3], prep["vbar"])
     assert ref["INVALID_OHLC"] == WINDOW_BARS
-    legacy = B.observable_rows(dev2[3]); tg = B.targets(dev2[3], legacy)
-    t_bad = dev2[3]["rows"][200]["event_time"]
-    assert all(r["features"] is not None for r, (y, _, _) in zip(legacy, tg) if t_bad <= r["event_time"] < t_bad + WINDOW_BARS * 60)
+    legacy = B.observable_rows(dev2[3]); tg = B.targets(dev2[3], legacy); t_bad = dev2[3]["rows"][200]["event_time"]
+    assert all(r["features"] is not None for r, _ in zip(legacy, tg) if t_bad <= r["event_time"] < t_bad + WINDOW_BARS * 60)
     assert not any(t_bad <= r["event_time"] < t_bad + WINDOW_BARS * 60 for r, _, _ in rows)
-    rec = R.tournament(fit, dev2, bootstrap_resamples=2000)
+    rec = R.tournament(fit, dev2, bootstrap_resamples=1000)
     assert rec["status"] in ("SELECTED", "NOT_SELECTED"), rec.get("refusal")
     assert rec["registration_hash"] == registration_hash() == REG_HASH
     dv = rec["development"]
-    ns = {c[sp]["n_rows"] for c in dv["comparisons"].values() for sp in ("D0", "D1")}
-    assert ns == {dv["n_rows"]} == {dv["row_key_population"]["n_keys"]}       # identical row keys everywhere
+    assert dv["row_key_population"]["identical_across_all_comparisons"] is True and dv["row_key_population"]["key_sets"] == 1
+    assert {c[sp]["n_rows"] for c in dv["comparisons"].values() for sp in ("D0", "D1")} == {dv["n_rows"]}
     assert dv["development_refusals"]["INVALID_OHLC"] == WINDOW_BARS
-    est = rec["fit"]["estimations"]
-    assert est == {"baselines": 1, "clipping_constants": 3, "location_fits": 4, "dispersion_fits": 2, "total": 10}
-    assert est["total"] == BUDGET["total_fit_split_estimations"]
-    assert rec["fit"]["location"]["fits_performed"] == 4 and set(rec["fit"]["location"]["specs"]) == set(ARMS)
+    assert set(dv["development_refusals_by_session"]) == {s["session_date"] for s in dev2}
+    assert rec["fit"]["estimations"]["total"] == 10 and rec["fit"]["fit_bars"]["bars_validated"] > 40000
     assert rec["fit"]["dispersion"]["D1"]["nu0"] == rec["fit"]["dispersion"]["D0"]["nu0"]
-    assert set(dv["comparisons"]) == {"P1", "S1", "S2", "S3", "C_vs_L"}
-    assert dv["comparisons"]["P1"]["D0"]["pair"] == ["C", "AX"]
-    assert set(dv["secondary_family"]["holm_hac"]) == set(dv["secondary_family"]["holm_bootstrap"]) and dv["secondary_family"]["m"] == 6
-    assert set(dv["per_year"]) == {"2019"} and set(dv["primary_decisions"]) == {"HAC_D0", "BOOT_D0", "HAC_D1", "BOOT_D1"}
+    assert set(dv["comparisons"]) == {"P1", "S1", "S2", "S3", "C_vs_L"} and dv["comparisons"]["P1"]["D0"]["pair"] == ["C", "AX"]
+    assert dv["secondary_family"]["m"] == 6
+    # fixed report cells: every registered year present, refusals attached, every comparison and both specs
+    assert list(dv["per_year"]) == ["2019", "2020", "2021"] and dv["years_outside_registered_report"] == []
+    for yr, cell in dv["per_year"].items():
+        assert cell["status"] == "REPORTED" and cell["refusals"]["eligible"] == cell["n_rows"] > 0
+        assert set(cell["comparisons"]) == {"P1", "S1", "S2", "S3", "C_vs_L"}
+        for c in cell["comparisons"].values():
+            for sp in ("D0", "D1"):
+                assert "percentile_interval" in c[sp]["bootstrap"] and "interval_95" in c[sp]["hac"]
+                assert set(c[sp]["bootstrap_sensitivities"]) == {"1", "10"}
+        assert cell["dispersion_improvement"]["pair"] == "AX@D1 - AX@D0"
+    assert dv["per_year"]["2019"]["refusals"]["INVALID_OHLC"] == WINDOW_BARS and dv["per_year"]["2020"]["refusals"]["INVALID_OHLC"] == 0
     for c in dv["comparisons"].values():
         for sp in ("D0", "D1"):
-            assert "percentile_interval" in c[sp]["bootstrap"] and "interval_95" in c[sp]["hac"]
             assert "replicate_means" not in c[sp]["bootstrap"]
-    json.dumps(rec, default=float)                                            # sealed-record serialisable
-    # refused record: development pool that yields no eligible rows -> INTEGRITY_FAILURE, no statistics
-    broken = [X.session_from_bars(s["session_date"], [dict(b, high=b["low"] - 1) for b in X.build_bars(s["session_date"], 1)])
+    json.loads(R.strict_json(rec))                                       # standard JSON, no NaN/Infinity
+    (tmp_path / "ok.json").write_text(R.strict_json(rec))
+    # a registered year with no sessions -> explicit NOT_AVAILABLE cell, never omitted
+    two = X.dev_sessions_years(years=("2019", "2020"))
+    rec2 = R.tournament(fit, two, bootstrap_resamples=200)
+    assert rec2["status"] in ("SELECTED", "NOT_SELECTED")
+    cell = rec2["development"]["per_year"]["2021"]
+    assert cell["status"] == "NOT_AVAILABLE" and cell["n_rows"] == 0 and cell["refusals"] is None and cell["comparisons"] is None
+    assert list(rec2["development"]["per_year"]) == ["2019", "2020", "2021"]
+    # refused record: no eligible development rows -> INTEGRITY_FAILURE, no statistics
+    broken = [X.session_from_bars(s["session_date"], [dict(b, open=b["high"] + 1) for b in X.build_bars(s["session_date"], 1)])
               for s in dev[:2]]
     bad = R.tournament(fit, broken, bootstrap_resamples=50)
     assert bad["status"] == "INTEGRITY_FAILURE" and "development" not in bad
-    assert bad["refusal"]["kind"] == "FeatureRefused" and "INSUFFICIENT_DEVELOPMENT_ROWS" in bad["refusal"]["detail"]
-    assert bad["classification"]["outcome"] == "INTEGRITY_FAILURE"
-    (tmp_path / "ok.json").write_text(json.dumps(rec, default=float)); (tmp_path / "refused.json").write_text(json.dumps(bad, default=float))
+    assert "INSUFFICIENT_DEVELOPMENT_ROWS" in bad["refusal"]["detail"] and bad["classification"]["outcome"] == "INTEGRITY_FAILURE"
+    (tmp_path / "refused.json").write_text(R.strict_json(bad))

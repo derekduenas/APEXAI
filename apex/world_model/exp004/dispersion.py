@@ -151,7 +151,19 @@ def check_scales(spec: dict, rv30, p_c, label: str) -> None:
         raise DispersionRefused("NONFINITE_SCALE: %s under %s" % (label, spec["spec"]))
 
 
-def logpdf(y: np.ndarray, mu: np.ndarray, scale: np.ndarray, nu: float) -> np.ndarray:
-    """Vectorised Student-t log-density with the complete scale (includes -log scale)."""
-    w = (np.asarray(y) - np.asarray(mu)) / scale
-    return _log_t_unit(w, nu) - np.log(scale)
+def require_finite(arr, label: str) -> np.ndarray:
+    """Numerical invalidity is an INTEGRITY refusal, never a statistical negative (R6/R9)."""
+    a = np.asarray(arr, dtype=float)
+    if a.size == 0 or not np.all(np.isfinite(a)):
+        bad = int(a.size - np.isfinite(a).sum()) if a.size else 0
+        raise DispersionRefused("NONFINITE_VALUES: %s (%d non-finite of %d)" % (label, bad, a.size))
+    return a
+
+
+def logpdf(y: np.ndarray, mu: np.ndarray, scale: np.ndarray, nu: float, *, label: str = "log_density") -> np.ndarray:
+    """Vectorised Student-t log-density with the complete scale (includes -log scale).
+    Refuses non-finite output rather than returning it."""
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        w = (np.asarray(y, dtype=float) - np.asarray(mu, dtype=float)) / scale
+        out = _log_t_unit(w, nu) - np.log(scale)
+    return require_finite(out, label)

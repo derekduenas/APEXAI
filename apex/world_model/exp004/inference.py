@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
+
 from apex.world_model import inference as INF
 from apex.world_model.exp002.run import _holm
 from .registration import DECISION_RULE, INHERITED, PRIMARY, SECONDARY
@@ -19,8 +21,18 @@ SPECS = ("D0", "D1")
 Z95 = 1.96
 
 
+class InferenceRefused(ValueError):
+    """Numerical invalidity inside inference: an integrity refusal, not a NOT_SELECTED."""
+
+
 def hac_decision(d: list) -> dict:
-    s = INF.dm_hac_statistic(list(d))
+    arr = np.asarray(list(d), dtype=float)
+    if arr.size == 0 or not np.all(np.isfinite(arr)):
+        raise InferenceRefused("NONFINITE_DIFFERENTIALS: %d non-finite of %d" % (int(arr.size - np.isfinite(arr).sum()), arr.size))
+    s = INF.dm_hac_statistic(arr.tolist())
+    for k in ("mean", "t", "hac_se"):
+        if not math.isfinite(s[k]):
+            raise InferenceRefused("NONFINITE_HAC_STATISTIC: %s" % k)
     passed = bool(s["mean"] > 0 and s["t"] > DM_THRESHOLD)
     return {"mean": s["mean"], "t": s["t"], "hac_se": s["hac_se"], "n": s["n"], "lag": s.get("lag"),
             "kernel": s.get("kernel"), "p_one_sided": 0.5 * math.erfc(s["t"] / math.sqrt(2.0)),

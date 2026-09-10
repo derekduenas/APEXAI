@@ -46,22 +46,60 @@ def body(bar: dict) -> tuple:
     return 0.0, True
 
 
-# ---------------------------------------------------------------- step 1-2: baselines
+# ---------------------------------------------------------------- session identity and order
+
+def validate_sessions(sessions: list, *, role: str, symbol: str = "SPY") -> dict:
+    """The runner never trusts the caller's list. Refuses, by name: an empty
+    list, a session without an identity, a symbol other than the registered
+    one, a DUPLICATE session_date (the same session offered twice can fabricate
+    baseline support), and any non-strictly-increasing date order (the
+    session-order bootstrap depends on chronology)."""
+    if not sessions:
+        raise FeatureRefused("NO_SESSIONS: %s" % role)
+    dates = []
+    for i, s in enumerate(sessions):
+        d, sym = s.get("session_date"), s.get("symbol")
+        if not d or not sym:
+            raise FeatureRefused("SESSION_WITHOUT_IDENTITY: %s index %d" % (role, i))
+        if sym != symbol:
+            raise FeatureRefused("SYMBOL_MISMATCH: %s index %d is %r, registered %r" % (role, i, sym, symbol))
+        if d in dates:
+            raise FeatureRefused("DUPLICATE_SESSION: %s %s offered more than once" % (role, d))
+        if dates and d <= dates[-1]:
+            raise FeatureRefused("NON_CHRONOLOGICAL_SESSIONS: %s %s after %s" % (role, d, dates[-1]))
+        dates.append(d)
+    return {"role": role, "n_sessions": len(dates), "first": dates[0], "last": dates[-1],
+            "unique": True, "strictly_increasing": True, "symbol": symbol}
+
+
+def validate_fit_bars(fit_sessions: list) -> dict:
+    """Step 1: every fit bar must be valid. A malformed or impossible bar is
+    REFUSED by name (session and minute); it is never excluded silently."""
+    n = 0
+    for s in fit_sessions:
+        for bar in s["rows"]:
+            why = bar_invalid(bar)
+            if why:
+                raise FeatureRefused("INVALID_FIT_BAR: %s minute %s: %s" % (s["session_date"], bar.get("minute"), why))
+            n += 1
+    return {"bars_validated": n, "sessions": len(fit_sessions)}
+
+
+# ---------------------------------------------------------------- step 2: baselines
 
 def fit_baselines(fit_sessions: list, *, min_support: int = BASELINE["min_support_sessions"]) -> dict:
-    """Per session-minute MEDIAN volume over valid present bars of the fit
-    sessions. A minute below `min_support` sessions has NO baseline."""
+    """Per session-minute MEDIAN volume over the fit sessions. Support counts
+    UNIQUE sessions (validate_sessions and validate_fit_bars must have run;
+    this function re-checks uniqueness and validity and refuses otherwise)."""
+    ident = validate_sessions(fit_sessions, role="fit")
+    validate_fit_bars(fit_sessions)
     by_minute: dict = {}
-    invalid = 0
     for s in fit_sessions:
         seen = set()
         for bar in s["rows"]:
-            if bar_invalid(bar):
-                invalid += 1
-                continue
             m = bar["minute"]
             if m in seen:
-                continue
+                raise FeatureRefused("DUPLICATE_MINUTE: %s minute %s" % (s["session_date"], m))
             seen.add(m)
             by_minute.setdefault(m, []).append(float(bar["volume"]))
     vbar, support = {}, {}
@@ -72,7 +110,7 @@ def fit_baselines(fit_sessions: list, *, min_support: int = BASELINE["min_suppor
             n = len(vols)
             vbar[m] = vols[n // 2] if n % 2 else 0.5 * (vols[n // 2 - 1] + vols[n // 2])
     return {"vbar": vbar, "support": support, "min_support": min_support,
-            "sessions": len(fit_sessions), "invalid_bars_excluded": invalid,
+            "sessions": ident["n_sessions"], "unique_session_dates": ident["n_sessions"],
             "minutes_with_baseline": len(vbar)}
 
 
@@ -151,13 +189,18 @@ def eligible_rows(session: dict, vbar: dict, *, W: int = WINDOW_BARS) -> tuple:
     return out, {**refused, "eligible": len(out), "zero_range_bars_in_windows": zero_range_total}
 
 
-def eligible_rows_many(sessions: list, vbar: dict, *, W: int = WINDOW_BARS) -> tuple:
-    rows_all, agg = [], None
+def eligible_rows_many(sessions: list, vbar: dict, *, W: int = WINDOW_BARS, role: str = "development") -> tuple:
+    """Rows in strict session order. Returns (rows, aggregate refusals,
+    per-session refusals) after validating identity and chronology."""
+    validate_sessions(sessions, role=role)
+    rows_all, agg, per_session = [], None, {}
     for s in sessions:
         rows, ref = eligible_rows(s, vbar, W=W)
         rows_all.extend(rows)
+        per_session[s["session_date"]] = ref
         agg = ref if agg is None else {k: agg[k] + ref[k] for k in ref}
-    return rows_all, (agg or {k: 0 for k in (*REFUSAL_KEYS, "eligible", "zero_range_bars_in_windows")})
+    empty = {k: 0 for k in (*REFUSAL_KEYS, "eligible", "zero_range_bars_in_windows")}
+    return rows_all, (agg or empty), per_session
 
 
 # ---------------------------------------------------------------- step 4: clipping
