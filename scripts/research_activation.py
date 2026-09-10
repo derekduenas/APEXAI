@@ -44,21 +44,26 @@ EXPERIMENT_ID = "ALPHA-EXP-001B"
 RESULT_FILE = "_RESULT.json"
 RUN_FILE = "_RUN.json"
 REGISTRATION_HASH = "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9"
-EXPERIMENTS = ("ALPHA-EXP-001B", "ALPHA-EXP-002")
+EXPERIMENTS = ("ALPHA-EXP-001B", "ALPHA-EXP-002", "ALPHA-EXP-004")
+# registration modules read from the checkout being launched, per experiment
+REGISTRATION_MODULE = {"ALPHA-EXP-002": ("apex", "world_model", "exp002", "registration.py"),
+                       "ALPHA-EXP-004": ("apex", "world_model", "exp004", "registration.py")}
 
 
 def registration_hash_for(experiment: str, checkout: Path) -> str:
-    """EXP-001B keeps its frozen constant. EXP-002's hash is read from the
-    registration module INSIDE THE CHECKOUT being launched, so the plan binds
-    to the code that will run rather than to whatever the launcher imported."""
+    """EXP-001B keeps its frozen constant. Every later experiment's hash is read
+    from the registration module INSIDE THE CHECKOUT being launched, so the plan
+    binds to the code that will run rather than to whatever the launcher
+    imported."""
     if experiment == "ALPHA-EXP-001B":
         return REGISTRATION_HASH
-    if experiment == "ALPHA-EXP-002":
-        reg = Path(checkout) / "apex" / "world_model" / "exp002" / "registration.py"
-        if not reg.is_file():
-            raise ActivationRefused("REGISTRATION_MISSING: %s" % reg)
-        return hashlib.sha256(reg.read_bytes()).hexdigest()
-    raise ActivationRefused("UNKNOWN_EXPERIMENT: %s" % experiment)
+    parts = REGISTRATION_MODULE.get(experiment)
+    if parts is None:
+        raise ActivationRefused("UNKNOWN_EXPERIMENT: %s" % experiment)
+    reg = Path(checkout).joinpath(*parts)
+    if not reg.is_file():
+        raise ActivationRefused("REGISTRATION_MISSING: %s" % reg)
+    return hashlib.sha256(reg.read_bytes()).hexdigest()
 MANIFEST_SHA256 = "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39"
 SCOPE_SYMBOL, SCOPE_START, SCOPE_END = "SPY", "2016-01-04", "2021-12-31"
 EXPECTED_VIEW_FILES = 1511
