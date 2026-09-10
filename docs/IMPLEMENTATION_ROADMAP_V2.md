@@ -107,6 +107,13 @@ Forecasting models are **built here**, not adopted from outside.
 - **Consequence already in force:** no external models are installed. The
   external-component work concluded with adoption of the smallest justified
   artifact and nothing else, and that stands.
+- **Reconciliation (2026-09-09):** the blanket wording above is narrowed, not
+  reversed. **External mathematical implementations and reference code may be
+  considered through review; their availability confers no forecasting or
+  trading authority.** Forecasting *claims* and economic *evidence* remain
+  APEX's own, produced through registered experiments. Candidate references
+  are recorded in `CHALLENGER_REGISTER_V0.md` under `CANDIDATE_NOT_ADOPTED`
+  with pinned revisions; none is installed or wired in by that listing.
 - **Not yet specified:** which model families, and what evidence would justify
   building each. The challenger register is the place that gets decided, one
   registered experiment at a time.
@@ -123,3 +130,21 @@ interpretable historical result is still: review the bounded-memory repair →
 fresh signed admission → EXP-001B train+validation in a new run directory →
 evidence.
 
+
+
+### P5 — Reference-assisted enhancements (recorded 2026-09-09; none scheduled)
+
+Each row is a candidate, not a plan. Reference: HKUDS/Vibe-Trading at
+`a44ed6e807e6e7d0faeeff5b8f43df8c4694e2d1` (MIT), `CANDIDATE_NOT_ADOPTED`.
+
+| Enhancement | Intended contribution | Required evidence before adoption |
+|---|---|---|
+| GARCH volatility challenger | test recursively evolving variance against the existing `rv_30` scale law **and a simple EWMA baseline** | a separate frozen comparison with correct intraday clocks, units and horizon aggregation. The reference's `agent/src/quantlib/volatility.py` is a **Heston** implementation, not GARCH/EWMA; no GARCH reference code is adopted from it |
+| Options analytics references | Greeks, implied-volatility inversion, pricing benchmarks | independent numerical checks and **explicit exercise-style assumptions**; European pricing alone is insufficient for American-style SPY contracts. Reference: `agent/src/quantlib/options.py` (Black-Scholes-Merton `bs_price`, `bs_greeks`, `implied_volatility` via Newton with bisection fallback, `brentq`), `agent/backtest/engines/options_portfolio.py` (European; American via an early-exercise heuristic, BS-based) |
+| Live research dashboard | data freshness, active runs, forecast distributions, comparisons, refusals, evidence maturity | every displayed value tied to an actual source and timestamp; unavailable values remain unavailable. Reference UI components exist (`frontend/src/components/charts/*`) but display objects that are not APEX's |
+| Selected factor references | documented candidates and simpler comparators | one named hypothesis at a time, checked for duplication, admitted through APEX's research process. Reference zoo: `agent/src/factors/zoo/{academic,alpha101,gtja191,qlib158,fundamental}` (473 files); listing confers nothing |
+
+Boundaries that travel with these entries:
+
+- The inspected options engine generates **theoretical** option prices. Its simulated returns cannot substitute for evidence from executable historical quotes.
+- Its regime labels (`agent/backtest/regime.py`: a causal trailing-smoothed hysteresis state machine on cross-asset correlation edge density) and its Monte Carlo (`agent/backtest/validation.py::monte_carlo_test`: **trade-PnL order permutation**) are different objects from APEX's information-at-time-*t* state estimates and conditional future-path simulations, and are not comparable to them.

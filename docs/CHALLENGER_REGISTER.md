@@ -21,6 +21,8 @@ Exposure is cumulative and never reset.
 | **A×** | EXP-004 v2 (proposed) | A + `B̄̃·P̃` | shared | none yet | **primary comparator** | none |
 | **C₄** | EXP-004 v2 (proposed) | **A× + `F̃`** | shared | none yet | **challenger; P1 = C₄ vs A×** | none |
 
+EXP-004 registration **FROZEN 2026-09-09**, hash `9155024f51825d13487cdc035432d85b357d22e39a40f967477873a7a6145bf9` (`apex/world_model/exp004/registration.py`). Implementation and admission are subsequent reviewed bricks.
+
 Sealed: evaluation 2022-01-01 → 2024-12-31 and reserve 2025-01-01 → 2026-08-28,
 never opened by any arm; the one disclosed 60-byte metadata read of
 `SPY_2022-01-03.json` (`EVALUATION_READ_INCIDENT_001`) is on record.

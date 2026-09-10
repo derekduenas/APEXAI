@@ -1,8 +1,10 @@
-# EXP-004 REGISTRATION — OHLCV pressure proxy (draft for review, to be frozen)
+# EXP-004 REGISTRATION — OHLCV pressure proxy — FROZEN
 
-**Status: DRAFT.** Frozen only when review accepts it and its hash is recorded in
-`apex/world_model/exp004/registration.py`. Implementation and historical
-admission are subsequent bricks. Nothing here has been fitted, scored, or read
+**Status: FROZEN 2026-09-09.** Machine-readable form:
+`apex/world_model/exp004/registration.py`, **registration hash
+`9155024f51825d13487cdc035432d85b357d22e39a40f967477873a7a6145bf9`** (sha256 of the module bytes; the module is
+authoritative where prose and module could differ). Implementation and
+historical admission are subsequent bricks. Nothing here has been fitted, scored, or read
 from historical data. The design rationale is in
 `EXP004_OHLCV_PRESSURE_PROXY.md`; this document is the executable contract.
 
@@ -25,7 +27,25 @@ the location forecast, with scale and tail shape held fixed?
 | reserve | 2025-01-01 → 2026-08-28 | sealed |
 
 Instrument SPY; source family `alpaca_sip_raw_1m`; fields `open, high, low,
-close, volume, event_time_utc`. **EXP-004 requires its own signed admission**;
+close, volume, event_time_utc`.
+
+**Inherited definitions, pinned by source and value** (recording chosen
+behaviour, not changing it):
+
+| Definition | Source | Value |
+|---|---|---|
+| target | `exp001b.registration.TARGET` | `log(close[bar at t+15min] / close[bar at t])`; the t+15min bar must exist; nothing forward-filled |
+| horizon | `exp001b.registration.HORIZON_MINUTES` | 15 |
+| bar length | `exp001b.registration.BAR_SECONDS` | 60 s |
+| availability clock | `exp001b.registration.AVAILABILITY_BASIS`; `bars.session_from_doc` | `ASSUMED_BAR_CLOSE`: `bar_complete = assumed_available = event_time + 60 s`; `known_from` = the feature bar's `assumed_available`; no publication timestamp in the corpus |
+| warm-up | `exp001b.registration.WARMUP_MINUTES` | 30 min |
+| embargo | `exp001b.registration.EMBARGO_MINUTES` | 15 min — rows whose `t+15+15 min` reaches the close are excluded |
+| calendar | `exp001b.registration.CALENDAR_VERSION`; `exchange_calendar.session_bounds(require_verified=True)` | `NYSE_REGULAR_SESSION_CALENDAR_V0_2016_2026` |
+| legacy features | `exp001b.bars.observable_rows`, `EXP001B_OBSERVABLE_FEATURES_V0` | `ret_1, ret_5, rv_30` |
+| `RV_FLOOR` | `exp002.registration.RV_FLOOR` | `1e-9`; below-floor rows refused for all arms |
+| HAC | `apex.world_model.inference` | Bartlett, lag `14 = H−1` |
+| bootstrap constants | `exp002.registration.BOOT_*` | block 5 (sens. 1, 10), `B = 10,000`, seed `20260909`, `p̂ < 0.0228`, `(k+1)/(B+1)` |
+| DM threshold | `exp002.registration.DM_THRESHOLD` | 2.0 | **EXP-004 requires its own signed admission**;
 no prior admission extends to it. A development result is a candidate screen and
 grants no sealed access.
 
@@ -128,6 +148,23 @@ C-vs-L — is scored on the identical key set `(session_date, event_time)`. A
 pressure refusal removes the row from L as well. Eligible counts and refusal
 counts by category are reported per year.
 
+**The same rule governs training.** All four location fits, the clipping
+constants and both dispersion fits use **one identical eligible fit-row
+population** under the same requirements; there is no arm-specific filtering at
+any stage. Preprocessing order, fixed:
+
+1. valid fit bars (calendar-verified sessions; malformed or impossible bars refused by name)
+2. minute-of-session volume baselines `V̄(m)` from those bars (median; support ≥ 100 sessions)
+3. eligible raw feature rows on the fit split under this rule (legacy + pressure requirements)
+4. clipping constants `q_B, q_P, q_F` from the step-3 rows
+5. standardised design matrices per arm (fit-split column mean/sd) from the step-3 rows with step-4 clipping
+6. location fits L, A, A×, C on the identical step-3 rows
+7. dispersion fits D0, then D1, on A× residuals over the identical step-3 rows
+
+For development, steps 2, 4 and the step-5 standardisation statistics are frozen
+from the fit; development rows pass this rule once; features use only completed
+bars available by each forecast time.
+
 Fit-split rows are training material; baselines and clipping constants derived
 from the whole fit window are not forecasts available at earlier fit timestamps.
 
@@ -165,6 +202,14 @@ authority.
 into a normal interval and called a bootstrap interval. The percentile
 interval is descriptive; `p̂` decides. Both intervals are reported for every
 comparison.
+
+**Reporting interface.** The existing `session_stationary_bootstrap` returns
+`mean`, `boot_se`, `exceedances`, `p_one_sided` and `pass` — **not the replicate
+means** the percentile interval needs. EXP-004 therefore requires a reporting
+extension or adapter exposing the replicate means. Its acceptance check (N8)
+must show that, for the same seed, the extension reproduces the existing
+resampling sequence, `p̂` and pass decision **exactly**. "Unchanged" above
+describes the statistical calculation, not the current return object.
 
 ## R9. Result classification (deterministic)
 
@@ -226,7 +271,8 @@ N1 identical close paths ⇒ identical legacy inputs, different `F`; N2 identica
 bars; N4 availability recomputation from prior completed bars only; N5 FWL
 distinctness of C from A× out of sample; **N6 the R5 identity check**; **N7
 common-row-key identity across all comparisons on a synthetic fixture with
-induced pressure refusals**. Fixtures establish representation and computation
+induced pressure refusals**; **N8 bootstrap adapter equivalence** (same seed ⇒
+same replicate sequence, `p̂`, pass). Fixtures establish representation and computation
 only — not predictive value, size, or power.
 
 ## R13. What a pass means
