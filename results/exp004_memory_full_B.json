@@ -1,0 +1,109 @@
+{
+ "admission": null,
+ "admitted_data_used": false,
+ "bootstrap_resamples_used": 10000,
+ "elapsed_seconds": 702.3,
+ "full_registered_inference": true,
+ "headroom": {
+  "cap_bytes": 1468006400,
+  "headroom_bytes": 701300736,
+  "peak_bytes": 766705664,
+  "peak_fraction_of_cap": 0.5223
+ },
+ "memory": {
+  "cgroup": "/sys/fs/cgroup/wmresearch.slice/exp004-mem-full.service",
+  "cgroup_memory_peak_bytes": 766705664,
+  "marks": [
+   {
+    "label": "start",
+    "memory_current": 18284544,
+    "t": 1789017265.042,
+    "vmhwm": 35053568
+   },
+   {
+    "label": "calendar_enumerated",
+    "memory_current": 18808832,
+    "t": 1789017265.114,
+    "vmhwm": 35577856
+   },
+   {
+    "label": "loaded_200_sessions",
+    "memory_current": 62717952,
+    "t": 1789017267.923,
+    "vmhwm": 79441920
+   },
+   {
+    "label": "loaded_400_sessions",
+    "memory_current": 105799680,
+    "t": 1789017271.041,
+    "vmhwm": 122527744
+   },
+   {
+    "label": "loaded_600_sessions",
+    "memory_current": 149323776,
+    "t": 1789017274.096,
+    "vmhwm": 165765120
+   },
+   {
+    "label": "loaded_800_sessions",
+    "memory_current": 192319488,
+    "t": 1789017276.885,
+    "vmhwm": 208805888
+   },
+   {
+    "label": "loaded_1000_sessions",
+    "memory_current": 235646976,
+    "t": 1789017279.718,
+    "vmhwm": 251944960
+   },
+   {
+    "label": "loaded_1200_sessions",
+    "memory_current": 278839296,
+    "t": 1789017282.622,
+    "vmhwm": 295194624
+   },
+   {
+    "label": "loaded_1400_sessions",
+    "memory_current": 322101248,
+    "t": 1789017285.203,
+    "vmhwm": 338341888
+   },
+   {
+    "label": "run_complete",
+    "memory_current": 717877248,
+    "t": 1789017967.462,
+    "vmhwm": 784642048
+   }
+  ],
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+  "memory_max_bytes": "1468006400",
+  "note": "sampled throughout from the running process's own cgroup, not once at exit",
+  "peak_rss_vmhwm_bytes": 784642048,
+  "readable": true,
+  "sampled_max_memory_current_bytes": 759746560,
+  "samples": 2448
+ },
+ "n_dev_rows": 248730,
+ "n_fit_rows": 247740,
+ "qualification": "EXP004_MEMORY_AT_REGISTERED_SCALE",
+ "refusal": null,
+ "registered_bootstrap_resamples": 10000,
+ "registration_hash": "9155024f51825d13487cdc035432d85b357d22e39a40f967477873a7a6145bf9",
+ "run_mode": "HISTORICAL",
+ "scale": {
+  "development_range": [
+   "2019-01-01",
+   "2021-12-31"
+  ],
+  "development_sessions": 757,
+  "fit_range": [
+   "2016-01-04",
+   "2018-12-31"
+  ],
+  "fit_sessions": 754,
+  "sessions_built": 1511,
+  "total_sessions": 1511
+ },
+ "status": "NOT_SELECTED",
+ "synthetic_only": true
+}
