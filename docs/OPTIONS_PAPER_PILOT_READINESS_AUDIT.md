@@ -107,9 +107,13 @@ establish feed behaviour, cadence, or anything about edge.
   the horizon would have manufactured a new forecasting specification. Corrected:
   the pilot keeps the **native 15-minute horizon** and identifies the **exact
   frozen parameter artifact** (EXP-002 sealed result, `params_hash
-  ca04fc6e713e1a5c`, registered L arm with shared `s* = 3.288, ν* = 6.384`, from a
-  NOT_SELECTED experiment — a well-specified forecast, explicitly not a validated
-  one). No `expected_move_pct` is manufactured.
+  ca04fc6e713e1a5c`, registered L arm with shared `s* = 3.288, ν* = 6.384`, from
+  an experiment whose DEVELOPMENT result was **INVALID_NULL_CONTROL** — its
+  observed-period report line reads NOT_SELECTED, but the experiment's status is
+  INVALID_NULL_CONTROL — a well-specified forecast, explicitly not a validated
+  one; see `docs/OPTIONS_PILOT_ARTIFACT_INVENTORY.md`). No `expected_move_pct` is
+  manufactured. *(Wording corrected in OPTIONS-PILOT-001 r2; the earlier text said
+  "a NOT_SELECTED experiment".)*
 - **Expression comparison by expiration breakeven is withdrawn for the pilot.**
   Breakevens at expiry cannot say which 21+ DTE option best monetises a move
   before today's close. The pilot uses **one deterministic rule** with no

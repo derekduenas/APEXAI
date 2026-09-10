@@ -1,74 +1,196 @@
-# OPTIONS-PILOT-001 — the forecast-and-intent recording boundary
+# OPTIONS-PILOT-001 r2 — the recording boundary, repaired and integrated
 
-**Synthetic fixtures only.** No feed, no broker, no orders, no capital, no
-service change. The maintenance block on `apex-options-paper.service` stays in
-place. The existing options stack is untouched: this brick is one new package,
-`apex/options_pilot/`, plus its tests.
+**Prospective paper only. No feed adapter, no broker, no orders, no capital,
+no service change.** The maintenance block on `apex-options-paper.service`
+stays in place; the deployed release is untouched. This is the review
+candidate for the brick "REPAIR THE RECORDING BOUNDARY AND PROVE THE REAL
+SESSION INTEGRATION". Branch `options-pilot-001`, built on `6022a187`.
 
-## The three findings, accepted and built in
+## 0. Reproduced failures (before the repair)
 
-1. **No manufactured forecast.** The forecast record is a *distribution* for
-   the registered 15-minute log return at its native horizon, with explicit
-   meaning fields. The identified frozen artifact is EXP-002's sealed result,
-   `params_hash ca04fc6e713e1a5c` (registered L arm, shared `s* = 3.288`,
-   `ν* = 6.384`) — a **well-specified** forecast from a **NOT_SELECTED**
-   experiment, carried as `validation_status: NOT_VALIDATED …; no edge claim`.
-   A trend label is stored as `direction_signal` with
-   `direction_signal_meaning: HEURISTIC …; not part of the forecast distribution`.
-   The recorded meaning says in words: *NOT an expected directional move, NOT a
-   hold-to-close forecast.* A 30-minute horizon, a "move to close" target, an
-   unknown family, or a missing parameter hash is a **recorded refusal**.
-2. **One deterministic rule, no "best option".** `expression_rule.py`:
-   signal LONG → BUY one CALL, SHORT → BUY one PUT; nearest expiry with
-   DTE ≥ 21; nearest-ATM strike; quantity 1, **filled or unfilled**. The intent
-   carries `no_best_option_claim: true`. Breakeven ranking is not used.
-3. **The seal check is not trusted.** `simulate_entry` accepts any 32+
-   character string. The boundary verifies the persisted intent by **re-reading
-   the ledger and recomputing its `entry_hash`** from the bytes on disk
-   (`ledger.recompute_entry_hash`), comparing seq, kind, hash and contract
-   identity. Every fill record says so:
-   `seal_verification: "… simulate_entry's own 32-char check is NOT relied upon"`.
+`repro_old_boundary.py` was run against the **old** package at `6022a187`
+(2eaab8f6 boundary) in the pilot worktree before any new file was shipped.
+Output, verbatim (`docs/evidence/repro_old_boundary_OUTPUT_6022a187.json`):
 
-## Acceptance contract, item by item
+| # | Finding | Old behaviour |
+|---|---|---|
+| F1 | NaN provider timestamp | **FILLED**, and the literal `NaN` reached the ledger line |
+| F2 | caller-supplied `risk={"approved": True}` | **FILLED** (self-attestation was authorization) |
+| F3 | malformed instant `"2026-09-10 25:99:00Z"` (ends with Z) | **FILLED** (string check) |
+| F4 | provider stamps at request, takes 20 s to deliver | **FILLED**, `why: null` (clock read before the quote) |
+| F5 | six workers past the duplicate check on a barrier | **6 fills on disk, 0 refused** |
+| F6 | `ask_size=True` | **FILLED** (`True < 1` is False) |
+| F7 | seq 1 altered and re-hashed, seq 2 verified | **verified** (one record, not its history) |
 
-| # | Contract | Implementation | Test(s) |
-|---|---|---|---|
-| 1 | Explicit forecast meaning: target, units, horizon, family, location, scale, ν, model/param hashes, input cutoff, creation time, persistence receipt; trend label a heuristic; missing/incompatible → recorded refusal | `records.validate_forecast` (12 required fields, family-specific ν, UTC checks, `created ≥ cutoff`); receipt from `ledger.append_with_receipt` | `test_forecast_meaning_is_explicit…`, 11 parametrised refusal cases, `test_missing_forecast_fields_refuse` |
-| 2 | Enforced order: forecast → decision + risk-approved intent → **later** quote → fill → outcome; proven by append receipts and record identity, not caller timestamps or hash-shaped strings | `boundary.record_forecast → record_intent → execute_intent → record_outcome`; order proven by **ledger seq assigned on append and re-read**; `quote_fn` is called only after `verify_receipt` of the intent succeeds | `test_order_is_proven_by_ledger_sequence…` (seq strictly increasing, receipts re-read and re-hashed), `test_quote_is_requested_only_after_the_intent_is_on_disk` (the quote callback observes the intent already on disk and exactly `seq(intent)` records) |
-| 3 | Failed persistence prevents entry; unknown/altered/mismatched references refuse; restart and duplicate delivery cannot fill twice | `PERSISTENCE_FAILED` / `PERSISTENCE_UNPROVEN` (append reported success but bytes absent); `RECEIPT_MALFORMED / SEQ_UNKNOWN / FOREIGN_LEDGER / RECORD_HASH_MISMATCH / RECORD_ALTERED / KIND_MISMATCH`; `FORECAST_HASH_MISMATCH`, `FORECAST_ALREADY_CONSUMED`; `DUPLICATE_DELIVERY` scans the ledger for an existing fill of that intent **before** anything happens; `session.resume` rebuilds receipts **from disk** and fills exactly once | `test_failed_persistence_prevents_entry` (OSError on append → nothing lands; read-only directory → no file), `test_persistence_is_proven_by_reread_not_by_return_value`, `test_a_hash_shaped_string_is_not_a_receipt` (4 forgeries), `test_an_altered_forecast_on_disk_refuses_the_intent` (tampered field, kept hash → `RECORD_ALTERED`), `test_forecast_hash_mismatch_and_wrong_kind_refuse`, `test_crash_after_intent_then_restart_fills_exactly_once`, `test_duplicate_delivery_of_an_intent_cannot_fill_twice`, `test_a_forecast_cannot_back_two_intents` |
-| 4 | Prospective labels on every new record; old mislabelled records preserved and annotated separately | every record carries `PROSPECTIVE_PAPER / NONE_PAPER / live_capital LOCKED / live_promotion_eligible false`; `records.assert_prospective` refuses any replay string in `evidence_class`, `decision_power` or `law` | `test_every_record_is_prospective_paper_and_never_replay` walks every record including refusals |
-| 5 | Real session-path tests: write failure, wrong contract, wrong horizon, crash/restart | all of the above run through `session.scan` / `session.resume`; `CONTRACT_MISMATCH` on strike and on expiration → `UNFILLED`, recorded | `test_wrong_contract_at_execution_is_unfilled_and_recorded`, `test_rule_refusals_are_recorded_after_the_forecast` |
-| — | **Audit correction: freshness per selected contract and side** | `boundary._quote_ok` checks the *selected* contract's identity and the *side to be crossed* (ASK on entry, BID on exit) against `MAX_SELECTED_QUOTE_AGE_S = 15`; a fresh quote elsewhere cannot mask it; future-dated quotes refuse | `test_freshness_is_checked_for_the_selected_contract_and_side` (16.0 s refuses, 14.9 s fills, −2 s refuses), `test_stale_exit_quote_is_not_estimable` |
-| — | One-contract explicit filled/unfilled | `UNFILLED` with a named `why` (`NO_SIZE_AT_ASK`, `QUOTE_SIDE_MISSING`, stale, mismatch); outcome `NO_POSITION` for an unfilled intent; missing/stale exit → `NOT_ESTIMABLE`, never imputed; a second outcome for one fill → `DUPLICATE_OUTCOME` | `test_one_contract_is_filled_or_unfilled_explicitly`, `test_missing_exit_quote_is_not_estimable_never_imputed` |
+Each is now an acceptance test (`test_reproduced_old_defects_are_now_refused`
+plus the parametrised quote/forecast cases); all refuse.
 
-**Tests:** `tests/test_options_pilot_boundary.py` — **31 passed** (0.6 s). The
-existing options stack the pilot will reuse (`paper_execution`,
-`live_session`, `live_book`) — **51 passed** at `/opt/apex-repo`, unchanged.
+## 1. Exact changes and contract mapping
 
-## The old mislabelled records — annotated, not rewritten
+New/rewritten in `apex/options_pilot/` (additive package; nothing outside it
+changed except the one seam in the script):
+
+| File | Role |
+|---|---|
+| `clock.py` (new) | causal clock contract: `parse_utc` (tz-aware only), `to_utc_string`, `check_reading`, `Clock(now_fn)`; field meanings documented |
+| `records.py` (rewritten) | strict contracts: finite/bool rejection (`is_real`, `is_exact_int`), causal forecast fields, `validate_quote` (QUOTE_CONTRACT_V1), `validate_intent` with `signal_used`, session identity, `HORIZON_RELATIONSHIP`, `labels_for(provenance)`, `canonical_json` with `allow_nan=False` |
+| `ledger.py` (rewritten) | `verify_chain`, `verify_receipt(chain=True)`, `transaction()` on `<path>.txn.lock`, `commit_once(txn_id)` idempotent transition with lost-ack reconciliation; recipe and threat boundary in the module docstring |
+| `risk_gate.py` (new) | `RiskAuthority`, intent-bound `binding_hash`, `verify_approval`, `ProductionRiskAuthority` (refuses: integration is the next brick), `SyntheticRiskAuthority` (harness token only) |
+| `boundary.py` (rewritten) | `Boundary` class: forecast → risk-bound intent → history re-verification → quote → atomic fill → outcome; freshness after receipt; expiry; TRADE/WAIT/REFUSE; refusal persistence reported |
+| `session.py` (rewritten) | stable `scan_id`, `next_seq`, duplicate-scan detection, one `pilot_decision` per scan, `resume` policy, `close_session` |
+| `synthetic_harness.py` (new) | controlled clock, synthetic-parameter forecast provider (`forecast_from_params`), quote knobs (age/size/fail/slow/override), synthetic risk authority |
+| `entrypoint.py` (new) | `route(args)`, `ProductionSources` (refusing), `run_pilot`, `run_from_args` |
+| `scripts/options_paper_session.py` | `build_parser()` split out; `--pilot-boundary` (default off), `--pilot-synthetic-fixture`, `--pilot-session-id`, `--pilot-release`; `main(argv=None, *, pilot_sources=None)` routes to the pilot before pedigree/heartbeat/legacy loop. `_scan_symbol`, `resolve_open` and everything below the seam are byte-identical. |
+
+Contract → implementation → test:
+
+| Item | Implementation | Tests |
+|---|---|---|
+| 1 forecast/artifact claims | inventory in `docs/OPTIONS_PILOT_ARTIFACT_INVENTORY.md`; EXP-002 wording corrected there and in the audit; provider contract proven with `SYNTHETIC:`-digested params; `drives_expression_selection: false`; `signal_used` persisted and checked against the forecast label; hold-horizon extrapolation refused | `test_forecast_meaning_is_explicit_and_does_not_drive_selection`, `test_hold_horizon_extrapolation_is_refused` |
+| 2 causal clock | every instant parsed (`ClockRefused` on naive/malformed/non-string/non-finite); reference, target_end (= reference + 900 s exactly), input_event ≤ reference, event ≤ available ≤ cutoff ≤ created ≤ clock; persisted, expiry, quote_request/receipt, provider ts (meaning recorded); one timeline (T0 = 2026-09-10T00:26:40Z for fixture clock and forecast); freshness from the reading **after** receipt; slow provider test; `order_proof` on every fill; `QUOTE_ELIGIBILITY_V2` declared | 21 parametrised forecast refusals, `test_the_fixture_clock_and_the_forecast_share_one_timeline`, `test_clock_readings_and_timestamps_reject_bool_nan_inf`, `test_quote_timestamp_semantics…`, `test_freshness_is_measured_after_receipt…`, `test_reproduced…` (d) |
+| 3 finite values / strict JSON | `_real`/`_int` refuse bool, NaN, ±inf, strings; `canonical_json(allow_nan=False)`; `append_with_receipt` refuses non-strict entries before `chain_append`; quote contract documented; single snapshot timestamp semantics | 14 parametrised malformed-quote cases through the session path, `test_boolean_quote_size_is_not_a_size`, `test_strict_serialization_refuses_nan_before_anything_lands`, `test_non_dict_and_failing_providers_fail_closed` |
+| 4 verify history | `verify_chain` (prev_hash links + per-record hash); `verify_receipt` verifies 1..N; execute re-verifies intent **and** its forecast (hash, id, symbol, session, scan, horizon, signal/right/action/qty, risk binding); recipe documented; threat boundary stated and **tested as a limit** | `test_an_altered_predecessor_breaks_the_chain…`, `test_intent_history_is_reverified_at_execution`, `test_state_canonicalization_recipe…`, `test_threat_boundary_a_consistent_rewrite_is_not_detected` |
+| 5 atomic idempotency | `transaction()` (thread lock + flock on `.txn.lock`) spans read-check-append; `commit_once(txn_id)`; ids: `scan_id = session:seq:sym`, `forecast_id`/`intent_id`/`fill_id` sha-derived; duplicate scan → REFUSE; duplicate delivery → the **same receipt back** (reconciled, no quote, no append); crash before commit → resume fills once; crash after fsync/before ack → reconciled; resume retires expired/closed/other-release/other-session/stale-risk with terminal records; fsync retained via `chain_append` | `test_concurrent_workers_cannot_fill_the_same_intent_twice` (6 threads, barrier: 1 fill, 5 reconciled), `test_concurrent_intents_cannot_consume_one_forecast_twice` (5 threads, distinct contracts: 1 intent, 4 refused), `test_crash_before_durable_commit…`, `test_crash_after_durable_commit_reconciles_the_lost_ack`, `test_resume_policy_retires_stale_intents…`, `test_duplicate_delivery_and_duplicate_scan…`, `test_fsync_durability_is_retained`, `test_next_seq_survives_restart` |
+| 6 risk | `ProductionRiskAuthority.approve` raises `RiskIntegrationMissing`; any approval must carry `risk_provenance`, `authority_id`, a recomputed `binding_hash` and a finite `certified_max_loss`; a bare `approved: True` is refused as self-attestation; approval re-verified from disk at execution and on resume | `test_risk_self_attestation_is_refused_and_production_authority_refuses` (5 sub-cases), entry-point `test_production_risk_authority_refuses_even_if_a_forecast_is_supplied` |
+| 7 real session path | seam + `entrypoint.py`; `fenced` fixture makes `_scan_symbol`, `seal_before_card`, `simulate_entry`, `build_pedigree`, `Heartbeat`, `observe` raise if touched; provenance vs execution mode on every record and in the report; provider failures fail closed; refusal-persistence reported in decisions | `tests/test_options_pilot_entrypoint.py` (8 tests) |
+| 8 tests run | see §6 | |
+
+## 2. Concurrency and restart evidence
+
+- **Six workers, one intent**, all released by a barrier *inside* the quote
+  provider (so all six passed the pre-quote check): one `pilot_fill` on disk,
+  six receipts pointing at the same seq, five marked `reconciled`, zero
+  refusals, chain verifies.
+- **Five workers, one forecast, five different contracts**, barrier inside
+  the risk authority: one `pilot_intent`, four `FORECAST_ALREADY_CONSUMED`
+  refusals persisted.
+- **Crash before commit** (provider raises `KeyboardInterrupt`): ledger ends
+  at `pilot_intent`; resume executes once; second resume does nothing.
+- **Crash after fsync, before ack** (`append_with_receipt` raises after the
+  write on the fill): one fill on disk; redelivery returns the reconciled
+  receipt, no second quote; resume has nothing to do.
+- **Resume policy** over five unfinished intents on one ledger: this session
+  unexpired → EXECUTED; closed session → CANCELLED (SESSION_CLOSED); other
+  release → CANCELLED (WRONG_RELEASE); other open session → CANCELLED
+  (STALE_AUTHORIZATION); this session past TTL → EXPIRED. One quote call in
+  total; nothing left unfinished; a second resume is a no-op.
+- **Restart through the entry point**: first run dies in the provider; the
+  second run with the same session id reconciles the session-open record,
+  resumes the intent (FILLED), and continues at seq 0002; a new session id
+  starts at 0001.
+
+## 3. Artifact inventory and limits
+
+`docs/OPTIONS_PILOT_ARTIFACT_INVENTORY.md`. In one line: complete for
+inference (all constants and the feature recipe are saved), **not** complete
+for a live adapter (live-bar equivalence unproven, no reviewed adapter, model
+specification not statistically established). The distribution is recorded
+and does not choose the expression; the 15-minute horizon is not stretched to
+the close.
+
+## 4. Synthetic record examples
+
+Produced by the CLI seam itself:
+
+```
+scripts/options_paper_session.py --ledger …/synthetic_ledger.jsonl --out …/report.json \
+  --symbols SPY --dry-run --pilot-boundary --pilot-synthetic-fixture \
+  --pilot-session-id SYN-EXAMPLE-1 --pilot-release example
+```
+
+gives seven records — `pilot_session_open`, `pilot_forecast`, `pilot_intent`,
+`pilot_fill`, `pilot_decision`, `pilot_outcome`, `pilot_session_close` — every
+one carrying `evidence_class: PROSPECTIVE_PAPER`, `decision_power: NONE_PAPER`,
+`data_provenance: SYNTHETIC_FIXTURE`, `synthetic: true`,
+`execution_mode: PROSPECTIVE_ORCHESTRATION`. Abridged:
+
+```json
+{"kind":"pilot_forecast","scan_id":"SYN-EXAMPLE-1:0001:SPY","forecast_id":"4f6b781695b9088a5b773337",
+ "family":"STUDENT_T","location":2.5238e-05,"scale":3.0e-04,"nu":6.0,
+ "model_id":"SYNTHETIC_FIXTURE_MODEL","artifact_digest":"SYNTHETIC:0bcead7c…","params_hash":"SYNTHETIC:0bcead7c4ced138d",
+ "reference_time_utc":"2026-09-10T00:25:00.000000Z","target_end_utc":"2026-09-10T00:40:00.000000Z",
+ "input_event_time_utc":"2026-09-10T00:25:00.000000Z","input_available_utc":"2026-09-10T00:26:00.000000Z",
+ "input_cutoff_utc":"2026-09-10T00:26:00.000000Z","created_utc":"2026-09-10T00:26:40.000000Z",
+ "drives_expression_selection":false,"direction_signal":"LONG","inputs":{"ret_1":1e-4,"ret_5":-2e-4,"rv_30":1e-4},
+ "validation_status":"SYNTHETIC_FIXTURE: no validation claim","txn_id":"forecast:4f6b781695b9088a5b773337"}
+{"kind":"pilot_intent","intent_id":"90651498f8a1cfa33fff6a49","expression":"LONG_CALL","signal_used":"LONG",
+ "contract_id":"SPY|2026-10-09|645.0|CALL","quantity":1,"expiry_utc":"2026-09-10T00:28:40.000000Z",
+ "forecast_ref":{"seq":2,"entry_hash":"1557…","forecast_hash":"16ad…","forecast_id":"4f6b781695b9088a5b773337"},
+ "risk":{"approved":true,"authority_id":"SYNTHETIC_FIXTURE_AUTHORITY","binding_hash":"bb4e…",
+         "certified_max_loss":250.0,"risk_provenance":"SYNTHETIC_FIXTURE"},"txn_id":"intent:90651498f8a1cfa33fff6a49"}
+{"kind":"pilot_fill","fill_id":"347d45cc997b282c46a435de","decision":"TRADE","status":"FILLED","price":2.5,"net_debit":250.0,
+ "quote_request_utc":"2026-09-10T00:26:40.000000Z","quote_receipt_utc":"2026-09-10T00:26:40.000000Z",
+ "quote_age_at_receipt_s":1.0,"quote_ts_minus_intent_persisted_s":-1.0,"provider_latency_s":0.0,
+ "quote_observed":{"ask":2.5,"ask_size":12,"bid":2.4,"bid_size":9,"timestamp_epoch":1788999999.0,
+                   "timestamp_meaning":"PROVIDER_SNAPSHOT: one asserted timestamp for both sides; …"},
+ "eligibility_policy":"QUOTE_ELIGIBILITY_V2: …","order_proof":"ledger seq proves intent persisted BEFORE the quote was requested; it does NOT prove …"}
+{"kind":"pilot_decision","scan_id":"SYN-EXAMPLE-1:0001:SPY","decision":"TRADE","forecast_id":"4f6b…","intent_id":"9065…","fill_id":"347d…"}
+```
+
+The same command **without** `--pilot-synthetic-fixture` (production route,
+`data_provenance: LIVE_FEED`, `ProductionRiskAuthority`) produces
+`pilot_session_open` → `pilot_refusal` (`FORECAST_PROVIDER_FAILED:
+ProviderNotIntegrated: NO_REVIEWED_INFERENCE_ADAPTER …`) → `pilot_decision`
+(REFUSE, `refusal_persisted: true`) → `pilot_session_close`. No forecast, no
+intent, no fill. That is the honest state of the production pilot.
+
+## 5. Protected-surface changes
+
+- Governed source set for the alpha-research path (`RELEVANT_SOURCE_PATHS`:
+  `apex/world_model`, `apex/governance/chain_ledger.py`,
+  `apex/intraday/sessions.py`, `scripts/alpha_exp_real_execute.py`): **no file
+  changed**.
+- `apex/governance/chain_ledger.py`: untouched; the pilot layers its
+  `.txn.lock` transaction *around* `chain_append` and keeps its fsync.
+- `scripts/options_paper_session.py`: **one seam** — argparse moved into
+  `build_parser()`, four new flags (all default off), and a routing block at
+  the top of `main()`; `main` gained `argv`/`pilot_sources` parameters. The
+  legacy loop, `_scan_symbol`, `resolve_open`, outbox emission and the replay
+  import are unchanged. With the flag off the legacy path runs exactly as
+  before (`test_the_seam_is_off_by_default…`).
+- `apex/predators/options/*`, `apex/organism/*`, `apex/ops/*`: untouched.
+- Signing keys, installed admissions, frozen registrations, prior results,
+  the deployed release `/opt/apex/current`, the maintenance block: untouched.
+
+## 6. What works through the entry point, and test runs
+
+Through `scripts/options_paper_session.main --pilot-boundary`: session open
+(idempotent), resume, per-symbol scan through the boundary, TRADE/WAIT/REFUSE
+decisions with stable ids, outcome resolution for TRADE fills, session close,
+a strict-JSON report naming route, provenance, execution mode and risk
+authority. The legacy geometry path is unreachable on this route (fenced in
+tests). Provider failures fail closed as persisted refusals.
+
+Runs, all contained (`systemd-run … MemoryMax=1400M`, worktree
+`/apex-data/tmp/pilot_wt`):
+
+| Set | Result |
+|---|---|
+| `tests/test_options_pilot_boundary.py` + `tests/test_options_pilot_entrypoint.py` | **80 passed** (72 + 8) |
+| `tests/test_options_*.py` (which the glob makes include the two pilot files), `test_ledger_concurrency.py`, `test_live_book.py`, outbox users (`test_catalyst_commissioning.py`, `test_runtime_autonomy.py`) | **449 passed** = 80 pilot + 369 pre-existing options/ledger/outbox tests, 0 failed |
+
+## 7. The old mislabelled records — annotated, not rewritten
 
 All 19 `options_live_card` and 19 `options_outcome` records in
 `/apex-data/core/options_live_ledger.jsonl` (sessions 2026-08-24 → 2026-09-04)
-carry `evidence_class: HISTORICAL_DEVELOPMENT_REPLAY`, `decision_power:
-NONE_REPLAY` and the replay law text, because `scripts/options_paper_session.py`
-imported `seal_before_card` from the replay module. Those sessions were
-prospective paper in fact; the labels are wrong. They are **preserved as
-written** — hash-chained records are not edited — and this note is the
-annotation. Nothing produced by `apex/options_pilot` can carry those labels.
+carry `evidence_class: HISTORICAL_DEVELOPMENT_REPLAY` / `decision_power:
+NONE_REPLAY` because the script imports `seal_before_card` from the replay
+module. Those sessions were prospective paper in fact; the labels are wrong.
+They are **preserved as written** — hash-chained records are not edited — and
+this section is the annotation. Nothing produced by `apex/options_pilot` can
+carry those labels (`assert_prospective`), and the legacy import is left in
+place so the annotation stays true of the old path.
 
-## What one honest fixture run proves, and what it does not
+## 8. What is NOT in this brick (the next execution-accounting brick)
 
-A fixture run shows the loop records a forecast, a risk-approved intent, a
-later quote, a single fill and an outcome, in that order, each provable from
-disk, with every refusal recorded. It does not show anything about feed
-behaviour, quote cadence, fees, re-quoting, risk reservations, exits or
-reconciliation — those are the **next execution brick**, as directed — and
-nothing about edge.
-
-## What is NOT in this brick
-
-- Fees, re-quoting at T+Δ, risk reservations against the kernel's aggregate
-  limits, exit-quote capture windows, reconciliation — **next brick**.
-- Any live feed, any real forecast computation, any change to
-  `scripts/options_paper_session.py` or to `simulate_entry`.
-- Lifting the maintenance block.
+- Risk integration: `risk_certificate.certify()` + `risk_kernel.check()`
+  (per-trade $500, aggregate $1,500, same-underlying $600, family $1,000,
+  session drawdown halt $1,000), reservations against open intents, release
+  on expiry/cancel. Until then the production route cannot approve an intent.
+- A reviewed live-bar inference adapter for the retained artifact, with a
+  demonstration that live features equal the historical recipe.
+- A reviewed live quote adapter for the pilot path (`NO_QUOTE_ADAPTER`).
+- Fees, re-quoting at T+Δ, exit-quote capture windows, position accounting,
+  reconciliation against an external record.
+- GARCH, regime models, Multiverse, a dashboard.
+- Lifting the maintenance block; any service start; any broker order.

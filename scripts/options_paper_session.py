@@ -313,7 +313,7 @@ def resolve_open(open_positions: list, sb: SessionScoreboard,
     return out
 
 
-def main() -> int:
+def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", required=True)
     ap.add_argument("--out", required=True)
@@ -327,7 +327,30 @@ def main() -> int:
                          "this UTC instant, to prove the machinery on "
                          "a closed market. Output is stamped REHEARSAL "
                          "and is NOT prospective evidence.")
-    a = ap.parse_args()
+    # OPTIONS-PILOT-001 SEAM (disabled by default). When set, the scan
+    # loop is the forecast-and-intent recording boundary and the legacy
+    # geometry loop below is unreachable. See apex/options_pilot/entrypoint.
+    ap.add_argument("--pilot-boundary", action="store_true", default=False,
+                    help="route every scan through the OPTIONS-PILOT-001 "
+                         "recording boundary instead of the legacy loop")
+    ap.add_argument("--pilot-synthetic-fixture", action="store_true",
+                    default=False,
+                    help="with --pilot-boundary: drive the boundary from "
+                         "the EXPLICIT synthetic harness; records are "
+                         "labelled SYNTHETIC_FIXTURE and are not evidence")
+    ap.add_argument("--pilot-session-id", default=None)
+    ap.add_argument("--pilot-release", default=None)
+    return ap
+
+
+def main(argv=None, *, pilot_sources=None) -> int:
+    a = build_parser().parse_args(argv)
+
+    from apex.options_pilot import entrypoint as _pilot          # noqa: E402
+    if _pilot.route(a) == _pilot.ROUTE_PILOT:
+        # Nothing below this line runs on the pilot path: no pedigree
+        # heartbeat, no legacy _scan_symbol, no simulate_entry.
+        return _pilot.run_from_args(a, pilot_sources=pilot_sources)
 
     ledger = Path(a.ledger)
     syms = [s.strip().upper() for s in a.symbols.split(",") if s.strip()]

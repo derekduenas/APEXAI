@@ -1,363 +1,816 @@
-"""OPTIONS-PILOT-001 recording boundary, proven through the SESSION
-orchestration on synthetic fixtures. No feed, no broker, no capital.
+"""OPTIONS-PILOT-001 recording boundary (repaired), proven through the SESSION
+orchestration on the EXPLICIT synthetic harness. No feed, no broker, no capital.
 
-What these establish: event order by ledger sequence, receipts re-read from
-disk, refusal on missing/incompatible forecasts, on unknown/altered/mismatched
-references, on write failure, on the wrong contract, on a stale SELECTED
-contract; restart and duplicate delivery cannot fill twice; every record is
-labelled prospective paper. They do not establish edge or feed behaviour."""
+What these establish: event order by ledger sequence; receipts re-read from
+disk with the referenced HISTORY chain-verified; a causal clock contract on
+every recorded instant (parsed, one timeline, freshness measured after quote
+receipt); finite values and strict serialization; risk approval bound to the
+intent (self-attestation refused); atomic session-scoped idempotency under
+concurrent workers and crash/restart; a resume policy that retires stale
+intents instead of executing them forever; every record labelled prospective
+paper with explicit SYNTHETIC provenance. They do not establish edge, feed
+behaviour or risk certification."""
 import json
+import math
 import os
+import threading
 from pathlib import Path
 
 import pytest
 
-from apex.options_pilot import boundary as B, ledger as L, records as R, session as S
+from apex.options_pilot import boundary as B, ledger as L, records as R, risk_gate as RG, session as S
+from apex.options_pilot import clock as C
 from apex.options_pilot.expression_rule import DTE_MIN_DAYS, RULE_ID
+from apex.options_pilot.synthetic_harness import SYNTHETIC_PARAMS, SyntheticHarness, T0, forecast_from_params
 
 SYM = "SPY"
-AS_OF = "2026-09-10T14:00:00Z"
-T0 = 1_789_000_000.0                                     # synthetic epoch for the clock
 
 
-def _forecast(**over):
-    f = {"symbol": SYM, "target": R.FORECAST_TARGET, "units": R.FORECAST_UNITS, "horizon_minutes": 15,
-         "family": "STUDENT_T", "location": 1.2e-5, "scale": 3.1e-4, "nu": 6.384478029123821,
-         "model_id": "EXP002_L", "model_hash": "9155024f51825d13487cdc035432d85b357d22e3",
-         "params_hash": "ca04fc6e713e1a5c" * 2, "input_cutoff_utc": "2026-09-10T13:59:00Z",
-         "created_utc": "2026-09-10T13:59:30Z", "direction_signal": "LONG",
-         "validation_status": "NOT_VALIDATED: parameters from a NOT_SELECTED experiment; no edge claim"}
-    f.update(over)
-    return f
+def _h(tmp_path, **kw) -> SyntheticHarness:
+    return SyntheticHarness(tmp_path / "pilot.jsonl", **kw)
 
 
-CHAIN = [{"expiration": "2026-10-09", "strike": k, "right": r} for k in (640.0, 645.0, 650.0, 655.0) for r in ("CALL", "PUT")] + \
-        [{"expiration": "2026-09-18", "strike": 645.0, "right": "CALL"}]          # 8 DTE: ineligible
+def _scan(h: SyntheticHarness, seq=None, **over):
+    src = h.sources(); src.pop("exit_quote_fn"); src.update(over)
+    seq = S.next_seq(h.ledger, session_id=h.session_id) if seq is None else seq
+    return S.scan(h.bd, symbol=SYM, seq=seq, **src)
 
 
-def _quote(contract, *, ask=2.50, bid=2.40, ask_size=12, bid_size=9, age=1.0, **over):
-    q = {"symbol": contract["symbol"], "expiration": contract["expiration"], "strike": contract["strike"],
-         "right": contract["right"], "bid": bid, "ask": ask, "bid_size": bid_size, "ask_size": ask_size,
-         "timestamp_epoch": T0 - age}
-    q.update(over)
-    return q
+def _rows(h):
+    return L.read_all(h.ledger)
 
 
-def _sources(**over):
-    src = {"forecast_fn": lambda s, t: _forecast(), "signal_fn": lambda s, t: "LONG",
-           "chain_fn": lambda s, t: CHAIN, "spot_fn": lambda s, t: 646.3,
-           "quote_fn": lambda c: _quote(c), "risk_fn": lambda p: {"approved": True, "certified_max_loss": 250.0},
-           "clock_fn": lambda: T0}
-    src.update(over)
-    return src
+def _kinds(h):
+    return [r.get("kind") for r in _rows(h)]
 
 
-def _kinds(ledger):
-    return [r.get("kind") for r in L.read_all(ledger)]
+def _rec(h, receipt):
+    return _rows(h)[receipt["seq"] - 1]
 
 
-# ------------------------------------------------------------------ order, receipts, labels
+# ================================================================== reproduced failures (the old boundary)
 
-def test_order_is_proven_by_ledger_sequence_and_receipts_are_reread(tmp_path):
-    led = tmp_path / "pilot.jsonl"
-    S.open_session(led, session="S1", symbol=SYM, release="test")
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources())
-    f, i, fl = out["forecast_receipt"], out["intent_receipt"], out["fill_receipt"]
-    assert f["seq"] < i["seq"] < fl["seq"]                                   # order by append, not by timestamps
-    assert _kinds(led) == ["pilot_session_open", "pilot_forecast", "pilot_intent", "pilot_fill"]
+def test_reproduced_old_defects_are_now_refused(tmp_path):
+    """Each of these passed the 2eaab8f6 boundary (reproduced against that
+    code before the repair; see the brick record). They are refused now."""
+    # (a) a NaN provider TIMESTAMP passed `_quote_ok`: age = now - nan = nan, and both `nan < 0` and
+    #     `nan > 15` are False, so a NaN-stamped quote FILLED.
+    nan_age = T0 - float("nan")
+    assert not (nan_age < 0) and not (nan_age > 15.0)
+    contract = {"symbol": SYM, "expiration": "2026-10-09", "strike": 645.0, "right": "CALL"}
+    q = {**contract, "bid": 2.4, "ask": 2.5, "bid_size": 9, "ask_size": 12, "timestamp_epoch": float("nan")}
+    with pytest.raises(R.RecordRefused, match="timestamp_epoch: must be a finite real"):
+        R.validate_quote(q, contract=contract)
+    # (b) `risk={"approved": True}` supplied by the caller was authorization.
+    with pytest.raises(RG.RiskRefused, match="self-attestation"):
+        RG.verify_approval({"intent_id": "x"}, {"approved": True})
+    # (c) time was checked with `endswith("Z")`: a naive or malformed instant with a Z pasted on passed.
+    assert "2026-09-10 25:99:00Z".endswith("Z")
+    with pytest.raises(C.ClockRefused, match="unparseable"):
+        C.parse_utc("2026-09-10 25:99:00Z", field="t")
+    with pytest.raises(C.ClockRefused, match="naive"):
+        C.parse_utc("2026-09-10T14:00:00", field="t")
+    # (d) freshness used a clock reading taken BEFORE quote_fn ran: a provider that stamped its quote at request
+    #     time and then took 20 s to deliver looked 1 s old. Now the reading is taken AFTER receipt: 21 s -> WAIT.
+    h = _h(tmp_path)
+    def slow_then_stale(c):
+        q = {**c, "bid": 2.4, "ask": 2.5, "bid_size": 9, "ask_size": 12, "timestamp_epoch": h.now() - 1.0}
+        h.advance(20.0)
+        return q
+    h.quotes.override = slow_then_stale
+    d = _scan(h)
+    assert d["decision"] == "WAIT" and d["why"].startswith("STALE_SELECTED_CONTRACT: ASK side 21.000s")
+    fill = _rec(h, d["receipts"]["fill"])
+    assert fill["quote_receipt_epoch"] - fill["quote_request_epoch"] == pytest.approx(20.0)
+    assert fill["provider_latency_s"] == pytest.approx(20.0) and fill["quote_age_at_receipt_s"] == pytest.approx(21.0)
+
+
+# ================================================================== order, receipts, labels, ids
+
+def test_order_is_proven_by_ledger_sequence_and_history_is_chain_verified(tmp_path):
+    h = _h(tmp_path)
+    S.open_session(h.bd, symbols=[SYM])
+    d = _scan(h)
+    assert d["decision"] == "TRADE" and d["scan_id"] == "SYN-SESSION-1:0001:SPY"
+    f, i, fl = d["receipts"]["forecast"], d["receipts"]["intent"], d["receipts"]["fill"]
+    assert f["seq"] < i["seq"] < fl["seq"]
+    assert _kinds(h) == ["pilot_session_open", "pilot_forecast", "pilot_intent", "pilot_fill", "pilot_decision"]
     for rc, kind in ((f, "pilot_forecast"), (i, "pilot_intent"), (fl, "pilot_fill")):
-        rec = L.verify_receipt(led, rc, expected_kind=kind)                 # re-read and hash-verified
+        rec = L.verify_receipt(h.ledger, rc, expected_kind=kind)
         assert rec["entry_hash"] == rc["entry_hash"] and L.recompute_entry_hash(rec) == rec["entry_hash"]
-        assert "RE-READ" in rc["receipt"]
-    rows = L.read_all(led)
-    intent, fill = rows[i["seq"] - 1], rows[fl["seq"] - 1]
-    assert intent["forecast_ref"] == {"seq": f["seq"], "entry_hash": f["entry_hash"], "forecast_hash": f["forecast_hash"]}
-    assert fill["intent_ref"] == {"seq": i["seq"], "entry_hash": i["entry_hash"]}
-    assert fill["status"] == "FILLED" and fill["side_crossed"] == "ASK" and fill["price"] == 2.50 and fill["net_debit"] == 250.0
+        assert "link to predecessor verified" in rc["receipt"]
+    L.verify_chain(h.ledger)
+    intent, fill = _rec(h, i), _rec(h, fl)
+    assert intent["forecast_ref"] == {"seq": f["seq"], "entry_hash": f["entry_hash"], "forecast_hash": f["forecast_hash"],
+                                      "forecast_id": f["forecast_id"]}
+    assert fill["intent_ref"]["seq"] == i["seq"] and fill["intent_ref"]["intent_id"] == intent["intent_id"]
+    assert fill["status"] == "FILLED" and fill["decision"] == "TRADE" and fill["side_crossed"] == "ASK"
+    assert fill["price"] == 2.50 and fill["net_debit"] == 250.0
     assert intent["expression"] == "LONG_CALL" and intent["contract"] == {"symbol": SYM, "expiration": "2026-10-09", "strike": 645.0, "right": "CALL"}
     assert intent["expression_rule"] == RULE_ID and intent["no_best_option_claim"] is True
-    # the exit quote must itself be fresh at the resolve clock: stamp it there
-    o = S.resolve(led, fill_receipt=fl, exit_quote_fn=lambda c: _quote(c, bid=2.70, ask=2.80, timestamp_epoch=T0 + 59),
-                  clock_fn=lambda: T0 + 60)
+    assert intent["signal_used"] == "LONG" and intent["risk"]["risk_provenance"] == "SYNTHETIC_FIXTURE"
+    # stable ids: recomputable from content, and the decision record carries them
+    assert intent["intent_id"] == R.canonical_hash({"forecast_id": f["forecast_id"], "contract_id": intent["contract_id"],
+                                                    "signal_used": "LONG", "session_id": h.session_id})[:24]
+    dec = _rec(h, d["decision_receipt"])
+    assert (dec["forecast_id"], dec["intent_id"], dec["fill_id"]) == (f["forecast_id"], i["intent_id"], fl["fill_id"])
+    # resolve at a later clock with a fresh exit quote
+    h.advance(60.0)
+    o = S.resolve(h.bd, fill_receipt=fl, exit_quote_fn=h.exit_quotes)
     assert o["status"] == "RESOLVED" and o["seq"] > fl["seq"]
-    outc = L.read_all(led)[o["seq"] - 1]
+    outc = _rec(h, o)
     assert outc["exit_side"] == "BID" and outc["pnl"] == 20.0 and outc["fees"] == "NOT_MODELLED_IN_THIS_BRICK"
-    close = S.close_session(led, session="S1")
-    assert L.read_all(led)[close["seq"] - 1]["unfilled_intents_at_close"] == 0
+    close = S.close_session(h.bd)
+    assert _rec(h, close)["unfinished_intent_seqs_at_close"] == []
 
 
-def test_every_record_is_prospective_paper_and_never_replay(tmp_path):
-    led = tmp_path / "p.jsonl"
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources())
-    S.resolve(led, fill_receipt=out["fill_receipt"], exit_quote_fn=lambda c: _quote(c), clock_fn=lambda: T0 + 1)
-    with pytest.raises(B.BoundaryRefused):                                    # a refusal record too
-        S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(forecast_fn=lambda s, t: _forecast(horizon_minutes=30)))
-    rows = L.read_all(led)
-    assert len(rows) >= 5
+def test_every_record_is_prospective_paper_synthetic_and_never_replay(tmp_path):
+    h = _h(tmp_path)
+    d = _scan(h)
+    S.resolve(h.bd, fill_receipt=d["receipts"]["fill"], exit_quote_fn=h.exit_quotes)
+    h.forecast_override = lambda s, t: {**h.base_forecast(s, t), "horizon_minutes": 30}
+    d2 = _scan(h)
+    assert d2["decision"] == "REFUSE" and d2["refusal_persisted"] is True
+    rows = _rows(h)
+    assert len(rows) >= 6
     for r in rows:
         assert r["evidence_class"] == "PROSPECTIVE_PAPER" and r["decision_power"] == "NONE_PAPER"
         assert r["live_capital"] == "LOCKED" and r["live_promotion_eligible"] is False
+        assert r["data_provenance"] == "SYNTHETIC_FIXTURE" and r["synthetic"] is True
+        assert r["execution_mode"] == "PROSPECTIVE_ORCHESTRATION"
         assert not any(bad in json.dumps(r) for bad in R.FORBIDDEN_CLASSES)
     with pytest.raises(R.RecordRefused, match="REPLAY_LABEL"):
-        R.assert_prospective({**R.LABELS, "law": "HISTORICAL_DEVELOPMENT_REPLAY -- never prospective"})
+        R.assert_prospective({**R.LABELS, "data_provenance": "SYNTHETIC_FIXTURE", "law": "HISTORICAL_DEVELOPMENT_REPLAY"})
+    with pytest.raises(R.RecordRefused, match="PROVENANCE_MISSING"):
+        R.assert_prospective({**R.LABELS})
 
 
-def test_forecast_meaning_is_explicit_and_the_trend_label_is_only_a_signal(tmp_path):
-    led = tmp_path / "p.jsonl"
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources())
-    f = L.read_all(led)[out["forecast_receipt"]["seq"] - 1]
-    for k in R.FORECAST_REQUIRED + ("nu", "forecast_hash", "forecast_meaning", "direction_signal_meaning"):
+def test_forecast_meaning_is_explicit_and_does_not_drive_selection(tmp_path):
+    h = _h(tmp_path)
+    d = _scan(h)
+    f = _rec(h, d["receipts"]["forecast"])
+    for k in R.FORECAST_REQUIRED + ("nu", "forecast_hash", "forecast_id", "forecast_meaning", "direction_signal_meaning",
+                                    "horizon_relationship", "epoch", "persisted_epoch"):
         assert k in f, k
-    assert f["horizon_minutes"] == 15 and f["family"] == "STUDENT_T" and f["nu"] > 2
-    assert "NOT an expected directional move" in f["forecast_meaning"]
+    assert f["drives_expression_selection"] is False
+    assert "NOT a hold-to-close forecast" in f["forecast_meaning"] and "DIFFERENT horizons" in f["horizon_relationship"]
     assert f["direction_signal"] == "LONG" and "HEURISTIC" in f["direction_signal_meaning"]
-    assert f["validation_status"].startswith("NOT_VALIDATED")
+    assert f["artifact_digest"].startswith("SYNTHETIC:") and f["model_id"] == "SYNTHETIC_FIXTURE_MODEL"
+    loc, scale = forecast_from_params(SYNTHETIC_PARAMS, **h.inputs)
+    assert f["location"] == loc and f["scale"] == scale and f["inputs"] == h.inputs
+    # the signal ACTUALLY used by the rule is persisted on the intent, and must agree with the forecast's label
+    i = _rec(h, d["receipts"]["intent"])
+    assert i["signal_used"] == "LONG"
+    h.signal = "SHORT"
+    h.forecast_override = lambda s, t: {**h.base_forecast(s, t), "direction_signal": "LONG"}
+    d2 = _scan(h)
+    assert d2["decision"] == "REFUSE" and "SIGNAL_DISAGREES_WITH_FORECAST_RECORD" in d2["why"]
 
 
-# ------------------------------------------------------------------ forecast refusals
+def test_hold_horizon_extrapolation_is_refused(tmp_path):
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id="SYN-SESSION-1:0001:SPY")
+    prop = {"expression": "LONG_CALL", "action": "BUY", "quantity": 1, "expression_rule": RULE_ID,
+            "contract": {"symbol": SYM, "expiration": "2026-10-09", "strike": 645.0, "right": "CALL"},
+            "use_forecast_as_hold_expectation": True}
+    with pytest.raises(B.BoundaryRefused, match="HORIZON_EXTRAPOLATION_REFUSED"):
+        h.bd.record_intent(forecast_receipt=fr, intent=prop, signal_used="LONG", scan_id="SYN-SESSION-1:0001:SPY")
+
+
+# ================================================================== causal clock contract
 
 @pytest.mark.parametrize("bad, reason", [
     (dict(horizon_minutes=30), "FORECAST_HORIZON_INCOMPATIBLE"),
-    (dict(horizon_minutes=15.0001), "FORECAST_HORIZON_INCOMPATIBLE"),
+    (dict(horizon_minutes=15.0), "FORECAST_HORIZON_INCOMPATIBLE"),
     (dict(target="expected move to close"), "FORECAST_TARGET_INCOMPATIBLE"),
     (dict(family="LOGNORMAL"), "FORECAST_FAMILY_UNKNOWN"),
-    (dict(scale=0.0), "FORECAST_PARAMETERS_INVALID"),
-    (dict(location=float("nan")), "FORECAST_PARAMETERS_INVALID"),
+    (dict(scale=0.0), "scale: must be > 0"),
+    (dict(scale=True), "scale: must be a finite real"),
+    (dict(location=float("nan")), "location: must be a finite real"),
+    (dict(location=float("inf")), "location: must be a finite real"),
     (dict(nu=1.5), "FORECAST_NU_INVALID"),
+    (dict(nu=float("nan")), "FORECAST_NU_INVALID"),
     (dict(params_hash="short"), "FORECAST_PARAMS_HASH_INVALID"),
-    (dict(created_utc="2026-09-10T13:58:00Z"), "FORECAST_CREATED_BEFORE_INPUT_CUTOFF"),
-    (dict(input_cutoff_utc="2026-09-10 13:59:00"), "FORECAST_INPUT_CUTOFF_UTC_NOT_UTC"),
     (dict(direction_signal="UP"), "DIRECTION_SIGNAL_INVALID"),
+    (dict(created_utc="2026-09-10T00:25:00Z"), "FORECAST_CREATED_BEFORE_INPUT_CUTOFF"),
+    (dict(input_cutoff_utc="2026-09-10 00:25:00"), "input_cutoff_utc: naive timestamp"),
+    (dict(input_cutoff_utc="not a time"), "input_cutoff_utc: unparseable"),
+    (dict(created_utc=1789000000.0), "created_utc: not a timestamp string"),
+    (dict(target_end_utc="2026-09-10T00:41:00Z"), "FORECAST_TARGET_END_INCOMPATIBLE"),
+    (dict(input_event_time_utc="2026-09-10T00:26:00Z"), "FORECAST_INPUT_AFTER_REFERENCE"),
+    (dict(input_available_utc="2026-09-10T00:24:00Z"), "FORECAST_AVAILABLE_BEFORE_EVENT"),
+    (dict(input_cutoff_utc="2026-09-10T00:24:30Z"), "FORECAST_INPUT_NOT_AVAILABLE_BY_CUTOFF"),
+    (dict(created_utc="2026-09-10T00:27:00Z"), "FORECAST_FROM_THE_FUTURE"),
 ])
 def test_missing_or_incompatible_forecasts_are_recorded_refusals(tmp_path, bad, reason):
-    led = tmp_path / "p.jsonl"
-    with pytest.raises(B.BoundaryRefused, match=reason):
-        S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(forecast_fn=lambda s, t: _forecast(**bad)))
-    rows = L.read_all(led)
-    assert rows and rows[-1]["kind"] == "pilot_refusal" and rows[-1]["stage"] == "forecast" and reason in rows[-1]["reason"]
+    h = _h(tmp_path)
+    base = h.forecast_fn(SYM, h.now())
+    # reference 00:25:00Z, available/cutoff 00:26:00Z, created 00:26:40Z on the one synthetic timeline (T0 = 2026-09-10T00:26:40Z)
+    assert base["reference_time_utc"].startswith("2026-09-10T00:25:00") and base["created_utc"].startswith("2026-09-10T00:26:40")
+    h.forecast_override = {**base, **bad}
+    d = _scan(h)
+    assert d["decision"] == "REFUSE" and reason in d["why"], d["why"]
+    rows = _rows(h)
+    ref = [r for r in rows if r["kind"] == "pilot_refusal"]
+    assert ref and ref[-1]["stage"] == "forecast" and reason in ref[-1]["reason"]
     assert not any(r["kind"] in ("pilot_intent", "pilot_fill") for r in rows)
 
 
-def test_missing_forecast_fields_refuse(tmp_path):
-    led = tmp_path / "p.jsonl"
-    f = _forecast(); f.pop("params_hash"); f.pop("scale")
-    with pytest.raises(B.BoundaryRefused, match="FORECAST_MISSING_FIELDS"):
-        S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(forecast_fn=lambda s, t: f))
-    assert _kinds(led) == ["pilot_refusal"]
+def test_the_fixture_clock_and_the_forecast_share_one_timeline(tmp_path):
+    h = _h(tmp_path)
+    assert C.parse_utc(C.to_utc_string(T0), field="t0") == T0
+    f = h.forecast_fn(SYM, h.now())
+    body = R.validate_forecast(f, now_epoch=h.now(), provenance="SYNTHETIC_FIXTURE", session_id="s", scan_id="s:0001:SPY")
+    e = body["epoch"]
+    assert e["reference"] <= e["input_event"] <= e["input_available"] <= e["input_cutoff"] <= e["created"] <= h.now()
+    assert e["target_end"] - e["reference"] == 900.0
+    assert C.parse_utc(body["created_utc"], field="c") == e["created"]
 
 
-# ------------------------------------------------------------------ persistence failure
+def test_clock_readings_and_timestamps_reject_bool_nan_inf(tmp_path):
+    for bad in (True, float("nan"), float("inf"), "1789000000", None):
+        with pytest.raises(C.ClockRefused):
+            C.check_reading(bad)
+    with pytest.raises(C.ClockRefused):
+        C.Clock(lambda: float("nan")).now()
+    with pytest.raises(C.ClockRefused):
+        C.to_utc_string(True)
+    assert C.is_exact_int(1) and not C.is_exact_int(True) and not C.is_exact_int(1.0)
+    assert C.is_real(1) and C.is_real(1.5) and not C.is_real(True) and not C.is_real(float("nan"))
 
-def test_failed_persistence_prevents_entry(tmp_path, monkeypatch):
-    led = tmp_path / "p.jsonl"
-    f_ok = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources())["forecast_receipt"]      # a healthy ledger first
-    n_before = len(L.read_all(led))
+
+def test_quote_timestamp_semantics_are_declared_and_request_order_is_not_generation_order(tmp_path):
+    h = _h(tmp_path)
+    d = _scan(h)
+    fill = _rec(h, d["receipts"]["fill"])
+    assert fill["quote_observed"]["timestamp_meaning"].startswith("PROVIDER_SNAPSHOT")
+    assert "does NOT prove the provider generated the quote after the intent" in fill["order_proof"]
+    assert fill["eligibility_policy"].startswith("QUOTE_ELIGIBILITY_V2")
+    assert fill["quote_request_epoch"] <= fill["quote_receipt_epoch"]
+    intent = _rec(h, d["receipts"]["intent"])
+    assert intent["persisted_epoch"] <= fill["quote_request_epoch"]
+    assert fill["quote_ts_minus_intent_persisted_s"] == pytest.approx(-1.0)
+    # a provider timestamp 20 s BEFORE the intent was persisted cannot be 'fresh': receipt >= persisted, so age >= 20
+    h.quotes.override = lambda c: {**c, "bid": 2.4, "ask": 2.5, "bid_size": 9, "ask_size": 12,
+                                   "timestamp_epoch": h.now() - 20.0}
+    d2 = _scan(h)
+    fill2 = _rec(h, d2["receipts"]["fill"])
+    assert d2["decision"] == "WAIT" and fill2["quote_ts_minus_intent_persisted_s"] <= -20.0
+
+
+# ================================================================== finite values, strict serialization, quote contract
+
+@pytest.mark.parametrize("over, reason", [
+    (dict(ask=float("nan")), "ask: must be a finite real"),
+    (dict(ask=float("inf")), "ask: must be a finite real"),
+    (dict(bid=float("-inf")), "bid: must be a finite real"),
+    (dict(ask=True), "ask: must be a finite real"),
+    (dict(ask=None), "ask: must be a finite real"),
+    (dict(ask=0.0), "ask: must be > 0"),
+    (dict(bid=2.6), "QUOTE_CROSSED"),
+    (dict(ask_size=12.0), "ask_size: must be an exact int"),
+    (dict(ask_size=True), "ask_size: must be an exact int"),
+    (dict(ask_size=-1), "ask_size: must be >= 0"),
+    (dict(timestamp_epoch="1789000000"), "timestamp_epoch: must be a finite real"),
+    (dict(timestamp_epoch=float("nan")), "timestamp_epoch: must be a finite real"),
+    (dict(right="C"), "QUOTE_CONTRACT_RIGHT_INVALID"),
+    (dict(expiration="2026-13-40"), "QUOTE_CONTRACT_EXPIRATION_INVALID"),
+])
+def test_malformed_provider_quotes_refuse_through_the_session_path(tmp_path, over, reason):
+    h = _h(tmp_path)
+    h.quotes.override = lambda c: {**c, "bid": 2.4, "ask": 2.5, "bid_size": 9, "ask_size": 12,
+                                   "timestamp_epoch": h.now() - 1.0, **over}
+    d = _scan(h)
+    assert d["decision"] == "REFUSE" and reason in d["why"], d["why"]
+    fill = _rec(h, d["receipts"]["fill"])
+    assert fill["status"] == "UNFILLED" and fill["quantity_filled"] == 0 and fill["net_debit"] == 0.0
+    for line in h.ledger.read_text().splitlines():                       # no NaN/Infinity TOKENS reached disk
+        json.loads(line, parse_constant=lambda c: pytest.fail("non-finite token on disk: %s" % c))
+
+
+def test_non_dict_and_failing_providers_fail_closed(tmp_path):
+    h = _h(tmp_path)
+    h.quotes.override = lambda c: [1, 2, 3]
+    d = _scan(h)
+    assert d["decision"] == "REFUSE" and "QUOTE_NOT_A_RECORD: 'list'" in d["why"]
+    h.quotes.override = None
+    h.quotes.fail_with = ConnectionError("provider down")
+    d2 = _scan(h)
+    assert d2["decision"] == "REFUSE" and "QUOTE_PROVIDER_FAILED: ConnectionError: provider down" in d2["why"]
+    h.quotes.fail_with = None
+    h.forecast_override = lambda s, t: (_ for _ in ()).throw(TimeoutError("forecast provider hung"))
+    d3 = _scan(h)
+    assert d3["decision"] == "REFUSE" and "FORECAST_PROVIDER_FAILED: TimeoutError" in d3["why"] and d3["refusal_persisted"]
+    h.forecast_override = None
+    h.chain = None
+    d4 = _scan(h)
+    assert d4["decision"] == "REFUSE" and "INPUT_PROVIDER_FAILED" in d4["why"]
+    assert _kinds(h).count("pilot_fill") == 2 and not any(r.get("status") == "FILLED" for r in _rows(h))
+
+
+def test_strict_serialization_refuses_nan_before_anything_lands(tmp_path):
+    h = _h(tmp_path)
+    with pytest.raises(L.LedgerRefused, match="NOT_STRICT_JSON"):
+        L.append_with_receipt(h.ledger, {"kind": "x", "v": float("nan")})
+    with pytest.raises(L.LedgerRefused, match="NOT_STRICT_JSON"):
+        L.append_with_receipt(h.ledger, {"kind": "x", "v": float("inf")})
+    with pytest.raises(L.LedgerRefused, match="ENTRY_CARRIES_CHAIN_FIELDS"):
+        L.append_with_receipt(h.ledger, {"kind": "x", "entry_hash": "a" * 64})
+    assert not h.ledger.exists()
+    assert R.canonical_json({"b": 1, "a": [1.5, "x"]}) == '{"a":[1.5,"x"],"b":1}'
+
+
+def test_boolean_quote_size_is_not_a_size(tmp_path):
+    """`True < 1` is False in Python: the old `size < 1` check would have FILLED on size=True."""
+    assert not (True < 1)
+    h = _h(tmp_path)
+    h.quotes.ask_size = True
+    d = _scan(h)
+    assert d["decision"] == "REFUSE" and "ask_size: must be an exact int" in d["why"]
+
+
+# ================================================================== references, history, canonicalization, threat boundary
+
+def _proposal(**over):
+    p = {"expression": "LONG_CALL", "action": "BUY", "quantity": 1, "expression_rule": RULE_ID,
+         "contract": {"symbol": SYM, "expiration": "2026-10-09", "strike": 645.0, "right": "CALL"}}
+    p.update(over)
+    return p
+
+
+SID = "SYN-SESSION-1:0001:SPY"
+
+
+def test_a_hash_shaped_string_is_not_a_receipt(tmp_path):
+    h = _h(tmp_path)
+    h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    fake = {"path": str(h.ledger), "seq": 1, "entry_hash": "a" * 64, "forecast_hash": "b" * 64}
+    with pytest.raises(B.BoundaryRefused, match="RECORD_HASH_MISMATCH"):
+        h.bd.record_intent(forecast_receipt=fake, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    with pytest.raises(B.BoundaryRefused, match="RECEIPT_SEQ_UNKNOWN"):
+        h.bd.record_intent(forecast_receipt={**fake, "seq": 99}, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    with pytest.raises(B.BoundaryRefused, match="RECEIPT_SEQ_UNKNOWN"):
+        h.bd.record_intent(forecast_receipt={**fake, "seq": True}, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    with pytest.raises(B.BoundaryRefused, match="RECEIPT_MALFORMED"):
+        h.bd.record_intent(forecast_receipt={"entry_hash": "a" * 64}, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    with pytest.raises(B.BoundaryRefused, match="RECEIPT_FOREIGN_LEDGER"):
+        h.bd.record_intent(forecast_receipt={**fake, "path": str(tmp_path / "other.jsonl")}, intent=_proposal(),
+                           signal_used="LONG", scan_id=SID)
+    assert _kinds(h)[1:] == ["pilot_refusal"] * 5
+
+
+def test_an_altered_predecessor_breaks_the_chain_not_just_the_record(tmp_path):
+    """verify_receipt on record N verifies 1..N: tampering with an EARLIER record refuses N."""
+    h = _h(tmp_path)
+    S.open_session(h.bd, symbols=[SYM])
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    lines = h.ledger.read_text().splitlines()
+    rec = json.loads(lines[0]); rec["symbols"] = ["QQQ"]                                # tamper seq 1, keep its hash
+    lines[0] = json.dumps(rec, sort_keys=True); h.ledger.write_text("\n".join(lines) + "\n")
+    with pytest.raises(B.BoundaryRefused, match="CHAIN_RECORD_ALTERED at seq 1"):
+        h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    # re-hash the tampered record consistently: the record verifies alone, but the LINK from seq 2 breaks
+    rec["entry_hash"] = L.recompute_entry_hash(rec)
+    lines = h.ledger.read_text().splitlines(); lines[0] = json.dumps(rec, sort_keys=True)
+    h.ledger.write_text("\n".join(lines) + "\n")
+    assert L.recompute_entry_hash(json.loads(lines[0])) == rec["entry_hash"]
+    with pytest.raises(L.ChainBroken, match="CHAIN_LINK_BROKEN at seq 2"):
+        L.verify_chain(h.ledger)
+    with pytest.raises(L.LedgerRefused):
+        L.verify_receipt(h.ledger, fr, expected_kind="pilot_forecast")
+    assert L.verify_receipt(h.ledger, fr, expected_kind="pilot_forecast", chain=False)["kind"] == "pilot_forecast"
+
+
+def test_state_canonicalization_recipe_is_the_documented_one(tmp_path):
+    h = _h(tmp_path)
+    rc = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    raw = h.ledger.read_text().splitlines()[0]
+    rec = json.loads(raw)
+    body = {k: v for k, v in rec.items() if k != "entry_hash"}
+    import hashlib
+    assert hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest() == rec["entry_hash"] == rc["entry_hash"]
+    assert rec["prev_hash"] == "GENESIS" and "default separators" in L.ENTRY_HASH_RECIPE
+    # the recipe hashes the canonical re-serialization, NOT the raw line: re-serializing with other whitespace
+    # yields a different line but the same entry_hash
+    assert json.dumps(rec, sort_keys=True, indent=1) != raw and L.recompute_entry_hash(rec) == rec["entry_hash"]
+
+
+def test_threat_boundary_a_consistent_rewrite_is_not_detected(tmp_path):
+    """HONEST LIMIT: a writer with the file and the recipe can rewrite the chain consistently."""
+    h = _h(tmp_path)
+    _scan(h)
+    rows = _rows(h)
+    rows[1]["scale"] = 9.9e-4                                            # alter the forecast...
+    prev, out = "GENESIS", []
+    for r in rows:                                                       # ...and re-chain everything after it
+        body = {k: v for k, v in r.items() if k not in ("entry_hash", "prev_hash")}
+        body["prev_hash"] = prev
+        body["entry_hash"] = L.recompute_entry_hash(body)
+        prev = body["entry_hash"]
+        out.append(json.dumps(body, sort_keys=True))
+    h.ledger.write_text("\n".join(out) + "\n")
+    L.verify_chain(h.ledger)                                             # verifies: the hashes detect INCONSISTENCY only
+    assert "NOT tamper-proof" in L.__doc__
+
+
+def test_intent_history_is_reverified_at_execution(tmp_path):
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    ir = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    lines = h.ledger.read_text().splitlines()
+    rec = json.loads(lines[fr["seq"] - 1]); rec["symbol"] = "QQQ"; rec["entry_hash"] = L.recompute_entry_hash(rec)
+    lines[fr["seq"] - 1] = json.dumps(rec, sort_keys=True); h.ledger.write_text("\n".join(lines) + "\n")
+    with pytest.raises(B.BoundaryRefused, match="CHAIN_LINK_BROKEN"):
+        h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    assert not h.quotes.calls                                            # no quote was requested
+
+
+def test_forecast_hash_mismatch_wrong_kind_and_other_session_refuse(tmp_path):
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    with pytest.raises(B.BoundaryRefused, match="FORECAST_HASH_MISMATCH"):
+        h.bd.record_intent(forecast_receipt={**fr, "forecast_hash": "f" * 64}, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    ir = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    with pytest.raises(B.BoundaryRefused, match="RECORD_KIND_MISMATCH"):
+        h.bd.record_intent(forecast_receipt={**ir, "forecast_hash": fr["forecast_hash"]}, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    other = SyntheticHarness(h.ledger, session_id="SYN-SESSION-2")
+    with pytest.raises(B.BoundaryRefused, match="FORECAST_FROM_OTHER_SESSION"):
+        other.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id="SYN-SESSION-2:0001:SPY")
+    with pytest.raises(B.BoundaryRefused, match="INTENT_FROM_OTHER_SESSION"):
+        other.bd.execute_intent(intent_receipt=ir, quote_fn=other.quotes)
+    wrong_release = SyntheticHarness(h.ledger, session_id=h.session_id, release="other-release")
+    with pytest.raises(B.BoundaryRefused, match="INTENT_FROM_OTHER_RELEASE"):
+        wrong_release.bd.execute_intent(intent_receipt=ir, quote_fn=wrong_release.quotes)
+
+
+def test_intent_content_refusals(tmp_path):
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    k = dict(forecast_receipt=fr, signal_used="LONG", scan_id=SID)
+    with pytest.raises(B.BoundaryRefused, match="INTENT_SYMBOL_MISMATCH"):
+        h.bd.record_intent(intent=_proposal(contract={"symbol": "QQQ", "expiration": "2026-10-09", "strike": 645.0, "right": "CALL"}), **k)
+    with pytest.raises(B.BoundaryRefused, match="INTENT_QUANTITY_NOT_ONE"):
+        h.bd.record_intent(intent=_proposal(quantity=2), **k)
+    with pytest.raises(B.BoundaryRefused, match="INTENT_QUANTITY_NOT_ONE"):
+        h.bd.record_intent(intent=_proposal(quantity=True), **k)
+    with pytest.raises(B.BoundaryRefused, match="INTENT_EXPRESSION_NOT_IN_PILOT_RULE"):
+        h.bd.record_intent(intent=_proposal(expression="CALL_VERTICAL"), **k)
+    with pytest.raises(B.BoundaryRefused, match="INTENT_SIGNAL_CONTRACT_DISAGREE"):
+        h.bd.record_intent(intent=_proposal(), forecast_receipt=fr, signal_used="SHORT", scan_id=SID)
+    with pytest.raises(B.BoundaryRefused, match="INTENT_SESSION_MISMATCH"):
+        h.bd.record_intent(intent=_proposal(), forecast_receipt=fr, signal_used="LONG", scan_id="SYN-SESSION-1:0002:SPY")
+
+
+# ================================================================== risk: self-attestation is not authorization
+
+def test_risk_self_attestation_is_refused_and_production_authority_refuses(tmp_path):
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    # (1) a caller-supplied risk dict on the proposal is ignored; approval comes from the authority only
+    prod = SyntheticHarness(tmp_path / "prod.jsonl")
+    prod.bd.risk = RG.ProductionRiskAuthority()
+    pfr = prod.bd.record_forecast(prod.forecast_fn(SYM, prod.now()), scan_id=SID)
+    with pytest.raises(B.BoundaryRefused, match="RISK_INTEGRATION_MISSING"):
+        prod.bd.record_intent(forecast_receipt=pfr, intent=_proposal(risk={"approved": True}), signal_used="LONG", scan_id=SID)
+    assert not any(r["kind"] == "pilot_intent" for r in _rows(prod))
+    assert "next brick" in _rows(prod)[-1]["reason"]
+    # (2) the synthetic authority can refuse, and its refusal is a persisted intent-stage refusal
+    h.risk.refuse_with = "SYNTHETIC_LIMIT"
+    with pytest.raises(B.BoundaryRefused, match="RISK_NOT_APPROVED: 'SYNTHETIC_LIMIT'"):
+        h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    h.risk.refuse_with = None
+    # (3) an approval copied from another intent does not bind
+    ir = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    it = _rec(h, ir)
+    foreign = {**it, "contract_id": "SPY|2026-10-09|650.0|CALL"}
+    with pytest.raises(RG.RiskRefused, match="NOT_BOUND_TO_THIS_INTENT"):
+        RG.verify_approval(foreign, it["risk"])
+    with pytest.raises(RG.RiskRefused, match="RISK_PROVENANCE_UNKNOWN"):
+        RG.verify_approval(it, {**it["risk"], "risk_provenance": "I_SAID_SO"})
+    with pytest.raises(RG.RiskRefused, match="RISK_MAX_LOSS_INVALID"):
+        RG.verify_approval(it, {**it["risk"], "certified_max_loss": float("nan")})
+    # (4) the synthetic authority cannot be constructed outside the explicit harness
+    with pytest.raises(RG.RiskRefused, match="OUTSIDE_HARNESS"):
+        RG.SyntheticRiskAuthority(harness_token="production")
+    # (5) an intent whose on-disk approval was edited refuses at execution
+    lines = h.ledger.read_text().splitlines()
+    rec = json.loads(lines[ir["seq"] - 1]); rec["risk"]["binding_hash"] = "0" * 64
+    rec["entry_hash"] = L.recompute_entry_hash(rec); lines[ir["seq"] - 1] = json.dumps(rec, sort_keys=True)
+    h.ledger.write_text("\n".join(lines) + "\n")
+    with pytest.raises(B.BoundaryRefused, match="INTENT_RISK_ON_DISK_RISK_APPROVAL_NOT_BOUND"):
+        h.bd.execute_intent(intent_receipt={**ir, "entry_hash": rec["entry_hash"]}, quote_fn=h.quotes)
+
+
+# ================================================================== fill: wrong contract, staleness, size, expiry
+
+def test_wrong_contract_at_execution_is_unfilled_and_recorded(tmp_path):
+    h = _h(tmp_path)
+    base = lambda c: {**c, "bid": 2.4, "ask": 2.5, "bid_size": 9, "ask_size": 12, "timestamp_epoch": h.now() - 1.0}
+    h.quotes.override = lambda c: base({**c, "strike": 650.0})
+    d = _scan(h)
+    fill = _rec(h, d["receipts"]["fill"])
+    assert d["decision"] == "REFUSE" and fill["status"] == "UNFILLED" and fill["why"].startswith("CONTRACT_MISMATCH")
+    h.quotes.override = lambda c: base({**c, "expiration": "2026-11-20"})
+    d2 = _scan(h)
+    assert d2["why"].startswith("CONTRACT_MISMATCH")
+
+
+def test_freshness_is_measured_after_receipt_for_the_selected_side(tmp_path):
+    h = _h(tmp_path)
+    h.quotes.age = 16.0
+    d = _scan(h)
+    assert d["decision"] == "WAIT" and d["why"].startswith("STALE_SELECTED_CONTRACT: ASK side 16.000s")
+    h.quotes.age = 14.9
+    d2 = _scan(h)
+    assert d2["decision"] == "TRADE"
+    h.quotes.age = -2.0
+    d3 = _scan(h)
+    assert d3["decision"] == "REFUSE" and d3["why"].startswith("QUOTE_FROM_THE_FUTURE")
+
+
+def test_no_size_is_wait_and_resolves_to_no_position(tmp_path):
+    h = _h(tmp_path)
+    h.quotes.ask_size = 0
+    d = _scan(h)
+    fill = _rec(h, d["receipts"]["fill"])
+    assert d["decision"] == "WAIT" and fill["why"] == "NO_SIZE_AT_ASK" and fill["net_debit"] == 0.0
+    o = S.resolve(h.bd, fill_receipt=d["receipts"]["fill"], exit_quote_fn=h.exit_quotes)
+    assert o["status"] == "NO_POSITION"
+
+
+def test_intent_expiry_is_enforced_before_and_during_the_quote(tmp_path):
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    ir = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    assert _rec(h, ir)["expiry_epoch"] == _rec(h, ir)["created_epoch"] + R.INTENT_TTL_S
+    h.advance(R.INTENT_TTL_S + 1)
+    with pytest.raises(B.BoundaryRefused, match="INTENT_EXPIRED before quote"):
+        h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    assert not h.quotes.calls and _kinds(h)[-2:] == ["pilot_intent_expired", "pilot_refusal"]
+    with pytest.raises(B.BoundaryRefused, match="INTENT_TERMINAL: pilot_intent_expired"):
+        h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    # expiry crossed while the provider was slow: refused, recorded on the fill
+    h2 = _h(tmp_path / "s")
+    fr2 = h2.bd.record_forecast(h2.forecast_fn(SYM, h2.now()), scan_id=SID)
+    ir2 = h2.bd.record_intent(forecast_receipt=fr2, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    h2.advance(R.INTENT_TTL_S - 1)
+    h2.quotes.slow_s = 5.0
+    r = h2.bd.execute_intent(intent_receipt=ir2, quote_fn=h2.quotes)
+    assert r["status"] == "UNFILLED" and r["why"].startswith("INTENT_EXPIRED_DURING_QUOTE")
+
+
+def test_stale_and_missing_exit_quotes_are_not_estimable_never_imputed(tmp_path):
+    h = _h(tmp_path)
+    d = _scan(h)
+    h.advance(60.0)
+    h.exit_quotes.age = 61.0
+    o = S.resolve(h.bd, fill_receipt=d["receipts"]["fill"], exit_quote_fn=h.exit_quotes)
+    rec = _rec(h, o)
+    assert rec["status"] == "NOT_ESTIMABLE" and rec["why"].startswith("STALE_SELECTED_CONTRACT: BID side 61.000s")
+    d2 = _scan(h)
+    o2 = S.resolve(h.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=lambda c: None)
+    rec2 = _rec(h, o2)
+    assert rec2["status"] == "NOT_ESTIMABLE" and rec2["pnl"] is None and "never imputed" in rec2["exit_law"]
+    again = S.resolve(h.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=h.exit_quotes)   # redelivery: reconciled
+    assert again["reconciled"] is True and again["seq"] == o2["seq"] and _kinds(h).count("pilot_outcome") == 2
+    d3 = _scan(h)
+    h.exit_quotes.age = 1.0; h.exit_quotes.fail_with = OSError("feed gone")
+    o3 = S.resolve(h.bd, fill_receipt=d3["receipts"]["fill"], exit_quote_fn=h.exit_quotes)
+    assert _rec(h, o3)["why"].startswith("EXIT_QUOTE_PROVIDER_FAILED: OSError")
+
+
+# ================================================================== persistence failure and refusal persistence
+
+def test_failed_persistence_prevents_entry_and_is_reported_honestly(tmp_path, monkeypatch):
+    h = _h(tmp_path)
+    _scan(h)
+    n_before = len(_rows(h))
     real = L.chain_append
     calls = {"n": 0}
     def dying(path, entry):
         calls["n"] += 1
         raise OSError("disk full")
     monkeypatch.setattr(L, "chain_append", dying)
-    with pytest.raises(B.BoundaryRefused, match="PERSISTENCE_FAILED"):
-        S.scan(led, symbol=SYM, as_of=AS_OF, **_sources())
+    d = _scan(h)
     monkeypatch.setattr(L, "chain_append", real)
-    assert len(L.read_all(led)) == n_before                          # nothing landed, not even the refusal
-    assert calls["n"] >= 1
-    # an unwritable ledger directory refuses too, before any fill
+    assert d["decision"] == "REFUSE" and "PERSISTENCE_FAILED" in d["why"]
+    assert d["refusal_persisted"] is False and "REFUSAL_NOT_PERSISTED" in d["why"]
+    assert d["decision_persisted"] is False and "PERSISTENCE_FAILED" in d["decision_persist_error"]
+    assert len(_rows(h)) == n_before and calls["n"] >= 1
     ro = tmp_path / "ro"; ro.mkdir(); os.chmod(ro, 0o500)
     try:
-        with pytest.raises(B.BoundaryRefused):
-            S.scan(ro / "p.jsonl", symbol=SYM, as_of=AS_OF, **_sources())
+        h2 = SyntheticHarness(ro / "p.jsonl")
+        d2 = _scan(h2)
+        assert d2["decision"] == "REFUSE" and d2["refusal_persisted"] is False
         assert not (ro / "p.jsonl").exists()
     finally:
         os.chmod(ro, 0o700)
 
 
 def test_persistence_is_proven_by_reread_not_by_return_value(tmp_path, monkeypatch):
-    """If the append reports success but the bytes are not on disk, refuse."""
-    led = tmp_path / "p.jsonl"
+    h = _h(tmp_path)
     real = L.chain_append
     def lying(path, entry):
         body = real(path, entry)
-        Path(path).write_text("")                                        # wipe what was written
+        Path(path).write_text("")
         return body
     monkeypatch.setattr(L, "chain_append", lying)
     with pytest.raises(B.BoundaryRefused, match="PERSISTENCE_UNPROVEN"):
-        B.record_forecast(led, _forecast())
+        h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
 
 
-# ------------------------------------------------------------------ references: unknown, altered, mismatched
+# ================================================================== atomic, session-scoped idempotency
 
-def test_a_hash_shaped_string_is_not_a_receipt(tmp_path):
-    led = tmp_path / "p.jsonl"
-    B.record_forecast(led, _forecast())
-    fake = {"path": str(led), "seq": 1, "entry_hash": "a" * 64, "forecast_hash": "b" * 64}
-    with pytest.raises(B.BoundaryRefused, match="RECORD_HASH_MISMATCH"):
-        B.record_intent(led, forecast_receipt=fake, intent=_proposal())
-    with pytest.raises(B.BoundaryRefused, match="RECEIPT_SEQ_UNKNOWN"):
-        B.record_intent(led, forecast_receipt={**fake, "seq": 99}, intent=_proposal())
-    with pytest.raises(B.BoundaryRefused, match="RECEIPT_MALFORMED"):
-        B.record_intent(led, forecast_receipt={"entry_hash": "a" * 64}, intent=_proposal())
-    with pytest.raises(B.BoundaryRefused, match="RECEIPT_FOREIGN_LEDGER"):
-        B.record_intent(led, forecast_receipt={**fake, "path": str(tmp_path / "other.jsonl")}, intent=_proposal())
-    assert [r["kind"] for r in L.read_all(led)][1:] == ["pilot_refusal"] * 4
-
-
-def _proposal(**over):
-    p = {"expression": "LONG_CALL", "action": "BUY", "quantity": 1, "expression_rule": RULE_ID,
-         "contract": {"symbol": SYM, "expiration": "2026-10-09", "strike": 645.0, "right": "CALL"},
-         "risk": {"approved": True}}
-    p.update(over)
-    return p
-
-
-def test_an_altered_forecast_on_disk_refuses_the_intent(tmp_path):
-    led = tmp_path / "p.jsonl"
-    fr = B.record_forecast(led, _forecast())
-    lines = led.read_text().splitlines()
-    rec = json.loads(lines[fr["seq"] - 1]); rec["scale"] = 9.9e-4                  # tamper, keep the hash
-    lines[fr["seq"] - 1] = json.dumps(rec, sort_keys=True); led.write_text("\n".join(lines) + "\n")
-    with pytest.raises(B.BoundaryRefused, match="RECORD_ALTERED"):
-        B.record_intent(led, forecast_receipt=fr, intent=_proposal())
-
-
-def test_forecast_hash_mismatch_and_wrong_kind_refuse(tmp_path):
-    led = tmp_path / "p.jsonl"
-    fr = B.record_forecast(led, _forecast())
-    with pytest.raises(B.BoundaryRefused, match="FORECAST_HASH_MISMATCH"):
-        B.record_intent(led, forecast_receipt={**fr, "forecast_hash": "f" * 64}, intent=_proposal())
-    ir = B.record_intent(led, forecast_receipt=fr, intent=_proposal())
-    with pytest.raises(B.BoundaryRefused, match="RECORD_KIND_MISMATCH"):          # an intent receipt is not a forecast
-        B.record_intent(led, forecast_receipt={**ir, "forecast_hash": fr["forecast_hash"]}, intent=_proposal())
-
-
-def test_an_unapproved_or_wrong_symbol_intent_refuses(tmp_path):
-    led = tmp_path / "p.jsonl"
-    fr = B.record_forecast(led, _forecast())
-    with pytest.raises(B.BoundaryRefused, match="INTENT_NOT_RISK_APPROVED"):
-        B.record_intent(led, forecast_receipt=fr, intent=_proposal(risk={"approved": False, "why": "limit"}))
-    with pytest.raises(B.BoundaryRefused, match="INTENT_NOT_RISK_APPROVED"):
-        B.record_intent(led, forecast_receipt=fr, intent=_proposal(risk="yes"))
-    with pytest.raises(B.BoundaryRefused, match="INTENT_SYMBOL_MISMATCH"):
-        B.record_intent(led, forecast_receipt=fr, intent=_proposal(contract={"symbol": "QQQ", "expiration": "2026-10-09", "strike": 645.0, "right": "CALL"}))
-    with pytest.raises(B.BoundaryRefused, match="INTENT_QUANTITY_NOT_ONE"):
-        B.record_intent(led, forecast_receipt=fr, intent=_proposal(quantity=2))
-    with pytest.raises(B.BoundaryRefused, match="INTENT_EXPRESSION_NOT_IN_PILOT_RULE"):
-        B.record_intent(led, forecast_receipt=fr, intent=_proposal(expression="CALL_VERTICAL"))
-
-
-# ------------------------------------------------------------------ fill: wrong contract, staleness, size
-
-def test_wrong_contract_at_execution_is_unfilled_and_recorded(tmp_path):
-    led = tmp_path / "p.jsonl"
-    wrong = lambda c: _quote({**c, "strike": 650.0})                   # quote for a neighbouring strike
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=wrong))
-    fill = L.read_all(led)[out["fill_receipt"]["seq"] - 1]
-    assert fill["status"] == "UNFILLED" and fill["why"].startswith("CONTRACT_MISMATCH") and fill["quantity_filled"] == 0
-    wrong_exp = lambda c: _quote({**c, "expiration": "2026-11-20"})
-    out2 = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=wrong_exp))
-    assert L.read_all(led)[out2["fill_receipt"]["seq"] - 1]["why"].startswith("CONTRACT_MISMATCH")
-
-
-def test_freshness_is_checked_for_the_selected_contract_and_side(tmp_path):
-    """A fresh quote elsewhere in the chain must not mask a stale selected contract."""
-    led = tmp_path / "p.jsonl"
-    stale_selected = lambda c: _quote(c, age=16.0)                     # 16 s > 15 s limit on the ASK side
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=stale_selected))
-    fill = L.read_all(led)[out["fill_receipt"]["seq"] - 1]
-    assert fill["status"] == "UNFILLED" and fill["why"].startswith("STALE_SELECTED_CONTRACT: ASK side 16.0s")
-    fresh_enough = lambda c: _quote(c, age=14.9)
-    out2 = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=fresh_enough))
-    assert L.read_all(led)[out2["fill_receipt"]["seq"] - 1]["status"] == "FILLED"
-    future = lambda c: _quote(c, age=-2.0)
-    out3 = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=future))
-    assert L.read_all(led)[out3["fill_receipt"]["seq"] - 1]["why"].startswith("QUOTE_FROM_THE_FUTURE")
-
-
-def test_one_contract_is_filled_or_unfilled_explicitly(tmp_path):
-    led = tmp_path / "p.jsonl"
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=lambda c: _quote(c, ask_size=0)))
-    fill = L.read_all(led)[out["fill_receipt"]["seq"] - 1]
-    assert fill["status"] == "UNFILLED" and fill["why"] == "NO_SIZE_AT_ASK" and fill["net_debit"] == 0.0
-    o = S.resolve(led, fill_receipt=out["fill_receipt"], exit_quote_fn=lambda c: _quote(c), clock_fn=lambda: T0 + 1)
-    assert o["status"] == "NO_POSITION"
-    out2 = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=lambda c: _quote(c, ask=None)))
-    assert L.read_all(led)[out2["fill_receipt"]["seq"] - 1]["why"].startswith("QUOTE_SIDE_MISSING")
-
-
-def test_stale_exit_quote_is_not_estimable(tmp_path):
-    """The exit side is freshness-checked too: a 61 s-old bid at resolve time is NOT_ESTIMABLE."""
-    led = tmp_path / "p.jsonl"
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources())
-    o = S.resolve(led, fill_receipt=out["fill_receipt"], exit_quote_fn=lambda c: _quote(c, bid=2.70, ask=2.80),
-                  clock_fn=lambda: T0 + 60)                                      # quote stamped T0-1 -> 61 s old
-    rec = L.read_all(led)[o["seq"] - 1]
-    assert rec["status"] == "NOT_ESTIMABLE" and rec["why"].startswith("STALE_SELECTED_CONTRACT: BID side 61.0s")
-
-
-def test_missing_exit_quote_is_not_estimable_never_imputed(tmp_path):
-    led = tmp_path / "p.jsonl"
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources())
-    o = S.resolve(led, fill_receipt=out["fill_receipt"], exit_quote_fn=lambda c: None, clock_fn=lambda: T0 + 1)
-    rec = L.read_all(led)[o["seq"] - 1]
-    assert rec["status"] == "NOT_ESTIMABLE" and rec["pnl"] is None and "never imputed" in rec["exit_law"]
-    with pytest.raises(B.BoundaryRefused, match="DUPLICATE_OUTCOME"):
-        S.resolve(led, fill_receipt=out["fill_receipt"], exit_quote_fn=lambda c: _quote(c), clock_fn=lambda: T0 + 2)
-
-
-# ------------------------------------------------------------------ crash / restart / duplicate delivery
-
-def test_crash_after_intent_then_restart_fills_exactly_once(tmp_path):
-    led = tmp_path / "p.jsonl"
-    boom = lambda c: (_ for _ in ()).throw(RuntimeError("process died before the quote"))
-    with pytest.raises(RuntimeError):
-        S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=boom))
-    assert _kinds(led) == ["pilot_forecast", "pilot_intent"]                     # intent on disk, no fill
-    assert len(S.unfilled_intents(led)) == 1
-    done = S.resume(led, quote_fn=lambda c: _quote(c), clock_fn=lambda: T0 + 5)  # restart: rebuilt from disk
-    assert len(done) == 1 and done[0]["status"] == "FILLED"
-    assert S.unfilled_intents(led) == []
-    again = S.resume(led, quote_fn=lambda c: _quote(c), clock_fn=lambda: T0 + 6)  # second restart: nothing to do
-    assert again == []
-    assert _kinds(led).count("pilot_fill") == 1
-
-
-def test_duplicate_delivery_of_an_intent_cannot_fill_twice(tmp_path):
-    led = tmp_path / "p.jsonl"
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources())
-    with pytest.raises(B.BoundaryRefused, match="DUPLICATE_DELIVERY"):
-        B.execute_intent(led, intent_receipt=out["intent_receipt"], quote_fn=lambda c: _quote(c), now_epoch=T0 + 1)
-    assert _kinds(led).count("pilot_fill") == 1 and _kinds(led)[-1] == "pilot_refusal"
+def test_duplicate_delivery_and_duplicate_scan_are_refused(tmp_path):
+    h = _h(tmp_path)
+    d = _scan(h)
+    n_quotes = len(h.quotes.calls)
+    again = h.bd.execute_intent(intent_receipt=d["receipts"]["intent"], quote_fn=h.quotes)
+    assert again["reconciled"] is True and again["seq"] == d["receipts"]["fill"]["seq"] and again["status"] == "FILLED"
+    assert _kinds(h).count("pilot_fill") == 1 and len(h.quotes.calls) == n_quotes     # no second quote, no second fill
+    d2 = _scan(h, seq=1)
+    assert d2["decision"] == "REFUSE" and d2["why"].startswith("DUPLICATE_SCAN")
+    assert _kinds(h).count("pilot_forecast") == 1
 
 
 def test_a_forecast_cannot_back_two_intents(tmp_path):
-    led = tmp_path / "p.jsonl"
-    fr = B.record_forecast(led, _forecast())
-    B.record_intent(led, forecast_receipt=fr, intent=_proposal())
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    ir = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    same = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)   # identical: reconciled
+    assert same["seq"] == ir["seq"] and "RECONCILED" in same["receipt"]
+    other = _proposal(contract={"symbol": SYM, "expiration": "2026-10-09", "strike": 650.0, "right": "CALL"})
     with pytest.raises(B.BoundaryRefused, match="FORECAST_ALREADY_CONSUMED"):
-        B.record_intent(led, forecast_receipt=fr, intent=_proposal())
+        h.bd.record_intent(forecast_receipt=fr, intent=other, signal_used="LONG", scan_id=SID)
+    assert _kinds(h).count("pilot_intent") == 1
+
+
+def test_concurrent_workers_cannot_fill_the_same_intent_twice(tmp_path):
+    """Deterministic: N workers block on a barrier INSIDE the quote provider, so all have passed
+    the pre-quote duplicate check before any can commit. Exactly one fill lands."""
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    ir = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    n = 6
+    barrier = threading.Barrier(n)
+    results, errors = [], []
+    def quote_fn(c):
+        barrier.wait(timeout=10)
+        return {**c, "bid": 2.4, "ask": 2.5, "bid_size": 9, "ask_size": 12, "timestamp_epoch": h.now() - 1.0}
+    def worker():
+        try:
+            results.append(h.bd.execute_intent(intent_receipt=ir, quote_fn=quote_fn))
+        except B.BoundaryRefused as e:
+            errors.append(str(e))
+    ts = [threading.Thread(target=worker) for _ in range(n)]
+    [t.start() for t in ts]; [t.join(timeout=30) for t in ts]
+    assert len(results) == n and errors == []
+    assert len({r["seq"] for r in results}) == 1 and sum(1 for r in results if r.get("reconciled")) == n - 1
+    assert _kinds(h).count("pilot_fill") == 1 and _kinds(h).count("pilot_refusal") == 0
+    L.verify_chain(h.ledger)
+
+
+def test_concurrent_intents_cannot_consume_one_forecast_twice(tmp_path):
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    n = 5
+    barrier = threading.Barrier(n)
+    ok, bad = [], []
+    class GatedRisk(RG.SyntheticRiskAuthority):
+        def approve(self, intent):
+            barrier.wait(timeout=10)
+            return super().approve(intent)
+    h.bd.risk = GatedRisk(harness_token="I_AM_A_SYNTHETIC_HARNESS")
+    def worker(i):
+        prop = _proposal(contract={"symbol": SYM, "expiration": "2026-10-09", "strike": 640.0 + 5.0 * i, "right": "CALL"})
+        try:
+            ok.append(h.bd.record_intent(forecast_receipt=fr, intent=prop, signal_used="LONG", scan_id=SID))
+        except B.BoundaryRefused as e:
+            bad.append(str(e))
+    ts = [threading.Thread(target=worker, args=(i,)) for i in range(n)]
+    [t.start() for t in ts]; [t.join(timeout=30) for t in ts]
+    assert len(ok) == 1 and len(bad) == n - 1 and all("FORECAST_ALREADY_CONSUMED" in e for e in bad)
+    L.verify_chain(h.ledger)
+
+
+def test_crash_before_durable_commit_leaves_no_fill_and_resume_fills_once(tmp_path):
+    h = _h(tmp_path)
+    h.quotes.fail_with = KeyboardInterrupt()          # process dies inside the provider, before any commit
+    with pytest.raises(KeyboardInterrupt):
+        _scan(h)
+    assert _kinds(h) == ["pilot_forecast", "pilot_intent"]
+    assert len(S.unfilled_intents(h.ledger)) == 1
+    h.quotes.fail_with = None
+    h.advance(5.0)
+    acts = S.resume(h.bd, quote_fn=h.quotes)
+    assert len(acts) == 1 and acts[0]["action"] == "EXECUTED" and acts[0]["status"] == "FILLED" and not acts[0]["reconciled"]
+    assert S.unfilled_intents(h.ledger) == []
+    assert S.resume(h.bd, quote_fn=h.quotes) == []
+    assert _kinds(h).count("pilot_fill") == 1
+
+
+def test_crash_after_durable_commit_reconciles_the_lost_ack(tmp_path, monkeypatch):
+    """The fill was appended and fsync'd but the process died before it stored the receipt."""
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    ir = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    real = L.append_with_receipt
+    def crash_after_write(path, entry):
+        r = real(path, entry)
+        if entry.get("kind") == "pilot_fill":
+            raise KeyboardInterrupt("died after fsync, before ack")
+        return r
+    monkeypatch.setattr(L, "append_with_receipt", crash_after_write)
+    with pytest.raises(KeyboardInterrupt):
+        h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    monkeypatch.setattr(L, "append_with_receipt", real)
+    assert _kinds(h).count("pilot_fill") == 1
+    r = h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)     # redelivery with the same txn_id
+    assert r["reconciled"] is True and r["status"] == "FILLED" and "RECONCILED" in r["receipt"]
+    assert _kinds(h).count("pilot_fill") == 1 and len(h.quotes.calls) == 1   # no second quote, no second fill
+    acts = S.resume(h.bd, quote_fn=h.quotes)
+    assert acts == []
+
+
+def test_resume_policy_retires_stale_intents_instead_of_executing_forever(tmp_path):
+    led = tmp_path / "p.jsonl"
+    # A: this session, unexpired -> executed once
+    a = SyntheticHarness(led, session_id="S-A", release="r1")
+    fa = a.bd.record_forecast(a.forecast_fn(SYM, a.now()), scan_id="S-A:0001:SPY")
+    a.bd.record_intent(forecast_receipt=fa, intent=_proposal(), signal_used="LONG", scan_id="S-A:0001:SPY")
+    # B: a closed session's unfinished intent
+    b = SyntheticHarness(led, session_id="S-B", release="r1")
+    fb = b.bd.record_forecast(b.forecast_fn(SYM, b.now()), scan_id="S-B:0001:SPY")
+    b.bd.record_intent(forecast_receipt=fb, intent=_proposal(), signal_used="LONG", scan_id="S-B:0001:SPY")
+    S.close_session(b.bd)
+    # C: another release
+    c = SyntheticHarness(led, session_id="S-A", release="r0")
+    fc = c.bd.record_forecast(c.forecast_fn(SYM, c.now()), scan_id="S-A:0002:SPY")
+    c.bd.record_intent(forecast_receipt=fc, intent=_proposal(), signal_used="LONG", scan_id="S-A:0002:SPY")
+    # D: another (open) session
+    d = SyntheticHarness(led, session_id="S-D", release="r1")
+    fd = d.bd.record_forecast(d.forecast_fn(SYM, d.now()), scan_id="S-D:0001:SPY")
+    d.bd.record_intent(forecast_receipt=fd, intent=_proposal(), signal_used="LONG", scan_id="S-D:0001:SPY")
+    # E: this session, created on the same timeline 200 s earlier, so its TTL (120 s) has lapsed
+    e = SyntheticHarness(led, session_id="S-A", release="r1", t0=T0 - 200.0)
+    fe = e.bd.record_forecast(e.forecast_fn(SYM, e.now()), scan_id="S-A:0003:SPY")
+    e.bd.record_intent(forecast_receipt=fe, intent=_proposal(), signal_used="LONG", scan_id="S-A:0003:SPY")
+    assert len(S.unfilled_intents(led)) == 5
+    a.t = T0 + 10.0                                  # restart A ten seconds after its intent was persisted
+    acts = S.resume(a.bd, quote_fn=a.quotes)
+    by = {x["intent_id"]: x for x in acts}
+    kinds = {r["scan_id"]: r for r in L.read_all(led) if r["kind"] == "pilot_intent"}
+    assert by[kinds["S-A:0001:SPY"]["intent_id"]]["action"] == "EXECUTED"
+    assert by[kinds["S-B:0001:SPY"]["intent_id"]]["action"] == "CANCELLED" and "SESSION_CLOSED" in by[kinds["S-B:0001:SPY"]["intent_id"]]["why"]
+    assert by[kinds["S-A:0002:SPY"]["intent_id"]]["action"] == "CANCELLED" and "WRONG_RELEASE" in by[kinds["S-A:0002:SPY"]["intent_id"]]["why"]
+    assert by[kinds["S-D:0001:SPY"]["intent_id"]]["action"] == "CANCELLED" and "STALE_AUTHORIZATION" in by[kinds["S-D:0001:SPY"]["intent_id"]]["why"]
+    assert by[kinds["S-A:0003:SPY"]["intent_id"]]["action"] == "EXPIRED"
+    assert S.unfilled_intents(led) == []
+    assert S.resume(a.bd, quote_fn=a.quotes) == []                       # terminal: nothing re-executes
+    assert len(a.quotes.calls) == 1
+    L.verify_chain(led)
 
 
 def test_quote_is_requested_only_after_the_intent_is_on_disk(tmp_path):
-    led = tmp_path / "p.jsonl"
+    h = _h(tmp_path)
     seen = {}
     def quote_fn(c):
-        seen["intent_present"] = any(r.get("kind") == "pilot_intent" for r in L.read_all(led))
-        seen["records_before_quote"] = len(L.read_all(led))
-        return _quote(c)
-    out = S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(quote_fn=quote_fn))
-    assert seen["intent_present"] is True
-    assert seen["records_before_quote"] == out["intent_receipt"]["seq"]         # quote came strictly after seq(intent)
+        rows = L.read_all(h.ledger)
+        seen["intent_present"] = any(r.get("kind") == "pilot_intent" for r in rows)
+        seen["records_before_quote"] = len(rows)
+        return {**c, "bid": 2.4, "ask": 2.5, "bid_size": 9, "ask_size": 12, "timestamp_epoch": h.now() - 1.0}
+    d = _scan(h, quote_fn=quote_fn)
+    assert seen["intent_present"] is True and seen["records_before_quote"] == d["receipts"]["intent"]["seq"]
 
 
-# ------------------------------------------------------------------ rule refusals through the session
+def test_fsync_durability_is_retained(tmp_path, monkeypatch):
+    import apex.governance.chain_ledger as CL
+    calls = []
+    real = os.fsync
+    monkeypatch.setattr(CL.os, "fsync", lambda fd: (calls.append(fd), real(fd)))
+    h = _h(tmp_path)
+    _scan(h)
+    assert len(calls) == len(_rows(h))
+
+
+# ================================================================== rule refusals through the session
 
 def test_rule_refusals_are_recorded_after_the_forecast(tmp_path):
-    led = tmp_path / "p.jsonl"
-    with pytest.raises(B.BoundaryRefused, match="NO_DIRECTION_SIGNAL"):
-        S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(signal_fn=lambda s, t: None))
-    assert _kinds(led) == ["pilot_forecast", "pilot_refusal"]
-    short_chain = [{"expiration": "2026-09-18", "strike": 645.0, "right": "CALL"}]   # only 8 DTE
-    with pytest.raises(B.BoundaryRefused, match="NO_ELIGIBLE_EXPIRY"):
-        S.scan(led, symbol=SYM, as_of=AS_OF, **_sources(chain_fn=lambda s, t: short_chain))
-    assert DTE_MIN_DAYS == 21
+    h = _h(tmp_path)
+    h.signal = None
+    d = _scan(h)
+    assert d["decision"] == "REFUSE" and "NO_DIRECTION_SIGNAL" in d["why"]
+    assert _kinds(h) == ["pilot_forecast", "pilot_refusal", "pilot_decision"]
+    h.signal = "LONG"; h.chain = [{"expiration": "2026-09-18", "strike": 645.0, "right": "CALL"}]
+    d2 = _scan(h)
+    assert "NO_ELIGIBLE_EXPIRY" in d2["why"] and DTE_MIN_DAYS == 21
+
+
+def test_next_seq_survives_restart(tmp_path):
+    h = _h(tmp_path)
+    assert S.next_seq(h.ledger, session_id=h.session_id) == 1
+    _scan(h); _scan(h)
+    assert S.next_seq(h.ledger, session_id=h.session_id) == 3
+    h2 = SyntheticHarness(h.ledger)                    # same session id, new process
+    assert S.next_seq(h2.ledger, session_id=h2.session_id) == 3
+    assert S.next_seq(h2.ledger, session_id="OTHER") == 1
