@@ -146,3 +146,29 @@ to be justified* rather than as either sound or broken, and to decide between:
 
 I do not recommend changing N0, the threshold, or the model on the strength of
 what is known now.
+
+---
+
+## SUPERSEDED IN PART — see `EXP002_N0_CLOSURE.md`
+
+The frozen predictions above and their outcomes (A and D failed, B and C held)
+stand as recorded. Four claims in this document are corrected there:
+
+1. §3's "the Gaussian pair cannot go positive under an independent outcome" is
+   **false**; a fixed-mean counterexample gives `E[d] = m²/(2σ²) > 0` with no
+   conditional information. The L−S / M1−M0 contrast is not a structural family
+   guarantee.
+2. The curvature framing is local and not decisive; the exact per-row condition
+   is `a(2z − a) > 0`, identical for both families. `E[ψ′(z)]` was substituted
+   for `E[a²ψ′(z)]`, valid only under `a ⟂ z` — true in the fixture, false in
+   the experiment, where both share `σ`.
+3. The claim that the simulated statistics make chance "less comfortable" is
+   **withdrawn**: realised statistics from one seeded generator are not a
+   reference distribution for the historical statistic.
+4. "Heterogeneity erodes the negative margin" conflated the expected disadvantage
+   (whose mean grew *more* negative) with statistical precision (whose HAC
+   standard error grew faster). Only the latter is shown.
+
+The refutation is narrowed to: the proposed scale-heterogeneity mechanism did not
+produce a positive Student-t differential in the four tested configurations, in
+which outcomes were drawn from exactly the assumed law.
