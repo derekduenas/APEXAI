@@ -95,6 +95,7 @@
  ],
  "pin": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
  "preservation": {
+  "PRESERVATION_SCOPE": "preservation is claimed ONLY for the named artifacts above, each by sha256. The listing below is a truncated directory sample for orientation and is NOT evidence that those output directories are unchanged.",
   "accounts": {
    "apexresearch": 109,
    "apexresearch2": 110,
@@ -111,7 +112,7 @@
   "exp001b_aborted_forecasts": "7a6cbe36c25c333191fc865e27c7c920bfefb67d008ecad6233a82a8a96a3407",
   "exp001b_rev2_result": "4b23021d07d8d200c2ac40c3f4c8a807f72af7dc51d7fc2efddaf1cc5378c909",
   "exp002_result": "0c397d703a83fcb915fef47b96fd6a75c1822ab21dd80bcbe27d90f1cdf9ad3f",
-  "other_env_outputs_untouched": {
+  "other_env_output_listing_sample_first3": {
    "/apex-data/research": [
     "ALPHA-EXP-001B",
     "_LAUNCH_20260908T130557Z.json",

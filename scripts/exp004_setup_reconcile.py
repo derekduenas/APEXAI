@@ -117,7 +117,10 @@ def preservation() -> dict:
                          ("apexresearch", "apexresearch2", "apexresearch3", "apexresearch4")},
             "environments": sorted(str(p) for p in Path("/apex-data").glob("research*")),
             "runner_roots": sorted(str(p) for p in Path("/opt").glob("apex-runner*")),
-            "other_env_outputs_untouched": {
+            "PRESERVATION_SCOPE": ("preservation is claimed ONLY for the named artifacts above, each by sha256. "
+                                   "The listing below is a truncated directory sample for orientation and is NOT "
+                                   "evidence that those output directories are unchanged."),
+            "other_env_output_listing_sample_first3": {
                 p: sorted(os.listdir(p + "/out"))[:3] if os.path.isdir(p + "/out") else "NO_OUT"
                 for p in ("/apex-data/research", "/apex-data/research-rev2", "/apex-data/research-exp002")}}
 
