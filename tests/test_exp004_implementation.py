@@ -338,6 +338,98 @@ def test_fit_budget_is_counted_on_the_real_fitters_and_enforced(world, monkeypat
     assert rec["status"] == "INTEGRITY_FAILURE" and "BUDGET_EXCEEDED: location_fits call 5 > 4" in rec["refusal"]["detail"]
 
 
+# ------------------------------------------------------------------ registered date scope
+
+def test_registered_date_scope_is_enforced_not_merely_reported(world):
+    fit, dev = world["fit"], world["dev"]
+    out_of_range = X.make_session(X.trading_days("2018-05-02", 1)[0], X.SEEDS["n"] + 40)   # fit era
+    dev_era = X.make_session(X.trading_days("2019-03-01", 1)[0], X.SEEDS["n"] + 43)
+    # sealed-period sessions cannot be BUILT: the calendar's independently verified window ends
+    # 2021-12-31, so session_bounds(require_verified=True) refuses them. That is a second, earlier
+    # protection; the scope check itself is exercised with identity-only stubs.
+    from apex.world_model.exp001b import exchange_calendar as C
+    for sealed_day in ("2022-03-01", "2025-03-03"):
+        with pytest.raises(C.NotASession, match="CALENDAR_NOT_VERIFIED"):
+            C.session_bounds(sealed_day, require_verified=True)
+    sealed_eval = {"session_date": "2022-03-01", "symbol": "SPY", "rows": []}
+    sealed_res = {"session_date": "2025-03-03", "symbol": "SPY", "rows": []}
+    with pytest.raises(F.FeatureRefused, match="SESSION_OUT_OF_REGISTERED_RANGE"):
+        F.validate_sessions([out_of_range] + dev, role="development")
+    with pytest.raises(F.FeatureRefused, match="SEALED_PERIOD_SESSION.*evaluation"):
+        F.validate_sessions(dev + [sealed_eval], role="development")
+    with pytest.raises(F.FeatureRefused, match="SEALED_PERIOD_SESSION.*reserve"):
+        F.validate_sessions(dev + [sealed_res], role="development")
+    with pytest.raises(F.FeatureRefused, match="SESSION_OUT_OF_REGISTERED_RANGE"):
+        F.validate_sessions(fit[:3] + [dev_era], role="fit")
+    # through the runner: refused at period_scope, before ANY preprocessing or statistic
+    for bad_dev, kind in ((dev + [sealed_eval], "SEALED_PERIOD_SESSION"),
+                          ([out_of_range] + dev, "SESSION_OUT_OF_REGISTERED_RANGE")):
+        rec = R.tournament(fit, bad_dev, bootstrap_resamples=50)
+        assert rec["status"] == "INTEGRITY_FAILURE" and rec["refusal"]["stage"] == "period_scope"
+        assert kind in rec["refusal"]["detail"] and "fit" not in rec and "development" not in rec
+    rec = R.tournament(fit[:3] + [dev_era], dev, bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE" and "SESSION_OUT_OF_REGISTERED_RANGE" in rec["refusal"]["detail"]
+    assert world["prep"]["sessions"]["registered_range"] == ["2016-01-04", "2018-12-31"]
+    assert world["prep"]["sessions"]["period_enforced"] is True
+
+
+def test_fit_development_overlap_is_refused(world):
+    fit, dev = world["fit"], world["dev"]
+    # a shared session is impossible inside the registered ranges, so the check is exercised directly
+    with pytest.raises(F.FeatureRefused, match="FIT_DEVELOPMENT_OVERLAP"):
+        F.validate_disjoint(fit, fit[:2])
+    with pytest.raises(F.FeatureRefused, match="FIT_DEVELOPMENT_NOT_SEPARATED"):
+        F.validate_disjoint(dev[2:], dev[:2])
+    ok = F.validate_disjoint(fit, dev)
+    assert ok["shared_sessions"] == 0 and ok["fit_last"] < ok["development_first"]
+    rec = R.tournament(fit, dev, bootstrap_resamples=50)
+    assert rec["periods"]["shared_sessions"] == 0
+
+
+def test_row_key_tampering_is_an_integrity_failure(world, monkeypatch):
+    fit, dev = world["fit"], world["dev"]
+    real = R._compare
+    def tamper_sha(ll, sess, a, b, sp, keys, **kw):
+        out = real(ll, sess, a, b, sp, keys, **kw)
+        if (a, b) == ("A", "L") and sp == "D0":
+            out["row_keys_sha"] = "0" * 16                 # one comparison scored on a different key set
+        return out
+    monkeypatch.setattr(R, "_compare", tamper_sha)
+    rec = R.tournament(fit, dev, bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE" and "ROW_POPULATION_MISMATCH" in rec["refusal"]["detail"]
+    assert "2 key sets" in rec["refusal"]["detail"]
+    monkeypatch.undo()
+    def tamper_n(ll, sess, a, b, sp, keys, **kw):
+        out = real(ll, sess, a, b, sp, keys, **kw)
+        if (a, b) == ("C", "AX") and sp == "D1":
+            out["n_rows"] = out["n_rows"] - 1              # one comparison on a different row population
+        return out
+    monkeypatch.setattr(R, "_compare", tamper_n)
+    rec = R.tournament(fit, dev, bootstrap_resamples=50)
+    assert rec["status"] == "INTEGRITY_FAILURE" and "ROW_POPULATION_MISMATCH" in rec["refusal"]["detail"]
+    assert rec["classification"]["outcome"] == "INTEGRITY_FAILURE" and "development" not in rec
+
+
+def test_dispersion_comparison_reports_hac_and_bootstrap_everywhere(world):
+    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=500)
+    assert rec["status"] in ("SELECTED", "NOT_SELECTED"), rec.get("refusal")
+    dv = rec["development"]
+    def complete(cell, where):
+        assert cell["pair"] == "AX@D1 - AX@D0" and cell["authority"] == "NONE (contextual)", where
+        assert "interval_95" in cell["hac"] and math.isfinite(cell["hac"]["t"]), where
+        b = cell["bootstrap"]
+        assert "percentile_interval" in b and b["percentile_interval"]["lower"] <= b["percentile_interval"]["upper"], where
+        assert "p_one_sided" in b and "boot_se" in b and "pass" in b, where
+        assert set(cell["bootstrap_sensitivities"]) == {"1", "10"}, where
+        for L, sens in cell["bootstrap_sensitivities"].items():
+            assert "percentile_interval" in sens, (where, L)
+        assert cell["n_rows"] > 0 and "row_keys_sha" in cell, where
+    complete(dv["dispersion_improvement"], "top-level")
+    for yr, ycell in dv["per_year"].items():
+        if ycell["status"] == "REPORTED":
+            complete(ycell["dispersion_improvement"], "year %s" % yr)
+
+
 # ------------------------------------------------------------------ N8: replicate SEQUENCE preserved
 
 class _TracingRandom(random.Random):
@@ -403,6 +495,7 @@ def test_n7_and_end_to_end_tournament_with_fixed_year_cells(world, tmp_path):
                 assert "percentile_interval" in c[sp]["bootstrap"] and "interval_95" in c[sp]["hac"]
                 assert set(c[sp]["bootstrap_sensitivities"]) == {"1", "10"}
         assert cell["dispersion_improvement"]["pair"] == "AX@D1 - AX@D0"
+        assert "percentile_interval" in cell["dispersion_improvement"]["bootstrap"]
     assert dv["per_year"]["2019"]["refusals"]["INVALID_OHLC"] == WINDOW_BARS and dv["per_year"]["2020"]["refusals"]["INVALID_OHLC"] == 0
     for c in dv["comparisons"].values():
         for sp in ("D0", "D1"):

@@ -61,3 +61,22 @@ Representative records regenerated on the three-year fixture:
 This brick remains implementation evidence. It does not establish market
 alpha, options profitability, GARCH value, regime skill, or a working time
 machine.
+
+---
+
+## Second contract patch — candidate `PENDING` (supersedes `6061f3ba`)
+
+Registration unchanged. Focused suite **23 passed** (70 s).
+
+| Reviewer finding | Repair | Test |
+|---|---|---|
+| Dispersion improvement reported only a HAC statistic | `_stat_record` extracted and used for **every** comparison cell, pairwise or not; `_dispersion_record` (`AX@D1 − AX@D0`, authority NONE) now carries HAC with interval, the primary bootstrap with percentile interval, and both sensitivities (1, 10) — **top-level and in every per-year cell** | `test_dispersion_comparison_reports_hac_and_bootstrap_everywhere` checks the full contents at top level and in each `REPORTED` year cell; the end-to-end test also asserts the per-year percentile interval |
+| Registered date scope accepted out-of-period sessions | `features._period_refusal` + `validate_sessions(enforce_period=True)`: a date outside the role's registered range is refused `SESSION_OUT_OF_REGISTERED_RANGE`, and a date inside `evaluation` or `reserve` is named `SEALED_PERIOD_SESSION` so the record says exactly what was offered. `tournament` validates **both** lists at a new `period_scope` stage **before any preprocessing** | `test_registered_date_scope_is_enforced_not_merely_reported`: 2018 offered as development, 2019 offered as fit, and evaluation/reserve stubs are all refused; through the runner the record has `stage: period_scope` with no `fit` and no `development` block |
+| Fit/development leakage | `features.validate_disjoint`: refuses `FIT_DEVELOPMENT_OVERLAP` (shared session dates) and `FIT_DEVELOPMENT_NOT_SEPARATED` (fit not entirely before development); result recorded as `periods` | `test_fit_development_overlap_is_refused` |
+| Row-key hash trusted by construction | tampering tests | `test_row_key_tampering_is_an_integrity_failure`: altering one comparison's `row_keys_sha`, and separately its `n_rows`, each yields `INTEGRITY_FAILURE: ROW_POPULATION_MISMATCH` with no `development` block |
+
+**Second protection found while testing:** sealed-period sessions cannot be
+constructed at all — the exchange calendar's independently verified window ends
+`2021-12-31`, so `session_bounds(require_verified=True)` refuses 2022+ dates
+(`CALENDAR_NOT_VERIFIED`). The scope test asserts that refusal and then
+exercises the scope check itself with identity-only stubs.

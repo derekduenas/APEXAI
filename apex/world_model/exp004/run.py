@@ -144,19 +144,33 @@ def prepare_fit(fit_sessions: list) -> dict:
 
 # ---------------------------------------------------------------- development scoring
 
-def _compare(ll, sess, a, b, sp, keys, *, B, seed, blocks):
-    d = D.require_finite(ll[sp][a] - ll[sp][b], "differential %s-%s %s" % (a, b, sp))
+def _stat_record(diff, sess, keys, label, *, B, seed, blocks):
+    """One comparison cell: HAC (with interval) and bootstrap (with percentile
+    interval) plus sensitivities. Used for EVERY comparison, pairwise or not,
+    so the contextual dispersion comparison reports the same contents."""
+    d = D.require_finite(diff, "differential %s" % label)
     hac = I.hac_decision(d.tolist())
     boots = {}
     for L in blocks:
         r = BA.session_stationary_bootstrap_ext(d.tolist(), sess, expected_block_sessions=L, n_resamples=B,
                                                 seed=seed, threshold=BOOT["p_threshold"])
         D.require_finite([r["mean"], r["boot_se"], r["p_one_sided"], r["percentile_interval"]["lower"],
-                          r["percentile_interval"]["upper"]], "bootstrap %s-%s %s L=%d" % (a, b, sp, L))
+                          r["percentile_interval"]["upper"]], "bootstrap %s L=%d" % (label, L))
         boots[str(L)] = BA.strip_arrays(r)
     prim = str(BOOT["expected_block_sessions"])
-    return {"pair": [a, b], "spec": sp, "n_rows": int(len(d)), "row_keys_sha": _keys_sha(keys), "hac": hac,
+    return {"label": label, "n_rows": int(len(d)), "row_keys_sha": _keys_sha(keys), "hac": hac,
             "bootstrap": boots[prim], "bootstrap_sensitivities": {L: boots[L] for L in boots if L != prim}}
+
+
+def _compare(ll, sess, a, b, sp, keys, *, B, seed, blocks):
+    rec = _stat_record(ll[sp][a] - ll[sp][b], sess, keys, "%s-%s %s" % (a, b, sp), B=B, seed=seed, blocks=blocks)
+    return {"pair": [a, b], "spec": sp, **rec}
+
+
+def _dispersion_record(ll, sess, keys, *, B, seed, blocks):
+    """Contextual: AX under D1 vs AX under D0 — same location, same nu."""
+    rec = _stat_record(ll["D1"]["AX"] - ll["D0"]["AX"], sess, keys, "AX@D1 - AX@D0", B=B, seed=seed, blocks=blocks)
+    return {"pair": "AX@D1 - AX@D0", "authority": "NONE (contextual)", **rec}
 
 
 def _keys_sha(keys) -> str:
@@ -179,9 +193,9 @@ def _year_cell(year, rows_idx, ll, sess_all, keys_all, ref_by_year, *, B, seed):
     comps = {name: {sp: _compare(sub_ll, sub_sess, a, b, sp, sub_keys, B=B, seed=seed,
                                  blocks=(BOOT["expected_block_sessions"], *BOOT["sensitivities"]))
                     for sp in ("D0", "D1")} for name, (a, b) in COMPARISONS.items()}
-    disp = D.require_finite(sub_ll["D1"]["AX"] - sub_ll["D0"]["AX"], "year %s dispersion" % year)
     cell.update(status="REPORTED", comparisons=comps,
-                dispersion_improvement={"pair": "AX@D1 - AX@D0", "hac": I.hac_decision(disp.tolist())})
+                dispersion_improvement=_dispersion_record(sub_ll, sub_sess, sub_keys, B=B, seed=seed,
+                                                          blocks=(BOOT["expected_block_sessions"], *BOOT["sensitivities"])))
     return cell
 
 
@@ -221,8 +235,7 @@ def score(prep: dict, dev_sessions: list, *, bootstrap_resamples: int = BOOT["re
     cls = I.classify(decisions)
     fam = I.secondary_family({"%s_%s" % (s, sp): comps[s][sp]["hac"]["p_one_sided"] for s in SECONDARY for sp in ("D0", "D1")},
                              {"%s_%s" % (s, sp): comps[s][sp]["bootstrap"]["p_one_sided"] for s in SECONDARY for sp in ("D0", "D1")})
-    disp = D.require_finite(ll["D1"]["AX"] - ll["D0"]["AX"], "dispersion improvement")
-    disp_rec = {"pair": "AX@D1 - AX@D0", "hac": I.hac_decision(disp.tolist())}
+    disp_rec = _dispersion_record(ll, sess, keys, B=bootstrap_resamples, seed=seed, blocks=blocks)
     # fixed per-year cells: every registered year is present, with refusals, or NOT_AVAILABLE
     ref_by_year = {}
     for sdate, r in per_sess.items():
@@ -254,6 +267,12 @@ def tournament(fit_sessions: list, dev_sessions: list, *, bootstrap_resamples: i
     rec = {"experiment": EXPERIMENT_ID, "registration_hash": registration_hash(),
            "development_status": DEVELOPMENT_STATUS, "preprocessing_order": list(PREPROCESSING_ORDER),
            "budget_declared": BUDGET, "economics": "NONE (distributional only)"}
+    try:
+        F.validate_sessions(fit_sessions, role="fit")                     # registered fit range
+        F.validate_sessions(dev_sessions, role="development")             # registered development range
+        rec["periods"] = F.validate_disjoint(fit_sessions, dev_sessions)  # no shared or overlapping sessions
+    except REFUSALS as e:
+        return _refusal(type(e).__name__, str(e), "period_scope", rec)
     try:
         prep = prepare_fit(fit_sessions)
     except REFUSALS as e:

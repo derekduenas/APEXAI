@@ -10,7 +10,7 @@ import math
 from apex.world_model.exp001b import bars as B
 from apex.world_model.exp001b.run import _usable
 from apex.world_model.exp002.registration import RV_FLOOR
-from .registration import BASELINE, WINDOW_BARS
+from .registration import BASELINE, PERIODS, WINDOW_BARS
 
 BAR_SECONDS = 60
 REFUSAL_KEYS = ("WARMUP", "MISSING_FEATURE_BARS", "MISSING_TARGET_BAR", "EMBARGO", "RV_FLOOR",
@@ -48,12 +48,32 @@ def body(bar: dict) -> tuple:
 
 # ---------------------------------------------------------------- session identity and order
 
-def validate_sessions(sessions: list, *, role: str, symbol: str = "SPY") -> dict:
+SEALED_ROLES = ("evaluation", "reserve")
+
+
+def _period_refusal(date: str, role: str) -> str | None:
+    """None if `date` is inside the role's REGISTERED range; otherwise the named
+    refusal. A date inside a sealed period is named as such, not merely 'out of
+    range', so the record says exactly what was offered."""
+    lo, hi = PERIODS[role]
+    if lo <= date <= hi:
+        return None
+    for sealed in SEALED_ROLES:
+        slo, shi = PERIODS[sealed]
+        if slo <= date <= shi:
+            return ("SEALED_PERIOD_SESSION: %s offered as %s lies in the sealed %s period (%s..%s)"
+                    % (date, role, sealed, slo, shi))
+    return ("SESSION_OUT_OF_REGISTERED_RANGE: %s offered as %s, registered %s is %s..%s"
+            % (date, role, role, lo, hi))
+
+
+def validate_sessions(sessions: list, *, role: str, symbol: str = "SPY", enforce_period: bool = True) -> dict:
     """The runner never trusts the caller's list. Refuses, by name: an empty
     list, a session without an identity, a symbol other than the registered
     one, a DUPLICATE session_date (the same session offered twice can fabricate
-    baseline support), and any non-strictly-increasing date order (the
-    session-order bootstrap depends on chronology)."""
+    baseline support), any non-strictly-increasing date order (the
+    session-order bootstrap depends on chronology), and any session outside the
+    role's REGISTERED date range (sealed periods named explicitly)."""
     if not sessions:
         raise FeatureRefused("NO_SESSIONS: %s" % role)
     dates = []
@@ -67,9 +87,28 @@ def validate_sessions(sessions: list, *, role: str, symbol: str = "SPY") -> dict
             raise FeatureRefused("DUPLICATE_SESSION: %s %s offered more than once" % (role, d))
         if dates and d <= dates[-1]:
             raise FeatureRefused("NON_CHRONOLOGICAL_SESSIONS: %s %s after %s" % (role, d, dates[-1]))
+        if enforce_period and role in PERIODS:
+            why = _period_refusal(d, role)
+            if why:
+                raise FeatureRefused(why)
         dates.append(d)
+    lo, hi = PERIODS[role] if role in PERIODS else (None, None)
     return {"role": role, "n_sessions": len(dates), "first": dates[0], "last": dates[-1],
-            "unique": True, "strictly_increasing": True, "symbol": symbol}
+            "unique": True, "strictly_increasing": True, "symbol": symbol,
+            "registered_range": [lo, hi], "period_enforced": bool(enforce_period and role in PERIODS)}
+
+
+def validate_disjoint(fit_sessions: list, dev_sessions: list) -> dict:
+    """Fit and development must share no session. The registered ranges are
+    disjoint, but the runner checks the actual lists rather than assuming it."""
+    f = [s.get("session_date") for s in fit_sessions]
+    d = [s.get("session_date") for s in dev_sessions]
+    both = sorted(set(f) & set(d))
+    if both:
+        raise FeatureRefused("FIT_DEVELOPMENT_OVERLAP: %d shared session(s), e.g. %s" % (len(both), both[:3]))
+    if f and d and max(f) >= min(d):
+        raise FeatureRefused("FIT_DEVELOPMENT_NOT_SEPARATED: fit ends %s, development starts %s" % (max(f), min(d)))
+    return {"shared_sessions": 0, "fit_last": max(f) if f else None, "development_first": min(d) if d else None}
 
 
 def validate_fit_bars(fit_sessions: list) -> dict:
