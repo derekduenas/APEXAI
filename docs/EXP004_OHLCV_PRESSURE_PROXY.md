@@ -135,7 +135,9 @@ arm has them.
 | **A×** (product comparator — **primary**) | A + `B̄̃·P̃` |
 | **C** (challenger) | **A× + `F̃`** |
 
-The arms are strictly nested: `L ⊂ A ⊂ A× ⊂ C`. The earlier version had
+The design spaces are nested `L ⊆ A ⊆ A× ⊆ C`; strict enlargement depends on
+non-redundant columns on the actual fit data and is not guaranteed — a
+rank-deficient design is refused (`RANK_DEFICIENT`), never repaired. The earlier version had
 `C = A + F̃`, which **replaced** the product with `F` rather than adding `F` while
 retaining it; `A×` could fit a coefficient on `U` while `C` tied `U` and `K` to
 one coefficient — different restrictions, not a matched removal. Corrected.
@@ -237,7 +239,7 @@ are reported separately and are never allowed to stand in for one another:
 | Output | What it is | What it is not |
 |---|---|---|
 | **Score differential** (P1) | which forecast performed better, as a distributional score | evidence about direction or mechanism |
-| **Fitted coefficient** `θ` on `F̃` in C | the model's signed association: positive `θ` associates positive signed activity with a **higher forecast location**, negative `θ` with a lower one | a causal mechanism; a "reversion" or "continuation" finding |
+| **Fitted coefficient** `θ` on `F̃` in C | a **partial association holding the other regressors fixed**: positive `θ` associates positive signed activity with a **higher forecast location**, negative `θ` with a lower one. Because C re-estimates every coefficient, `μ_C − μ_A×` is **not** `θ·F̃` in general | a causal mechanism; a "reversion" or "continuation" finding; the whole forecast difference |
 | **Mechanism interpretation** | what, if anything, the sign of `θ` is *consistent with* | identification of temporary impact, informed trading, or anything else |
 
 **Decision table for P1** (see §8 for the executable rule):
@@ -334,7 +336,7 @@ declared limitation of the inference, not a solved problem.
 | Session-minute volume baselines `V̄(·)` | 1 estimation (≈390 medians) |
 | Winsorisation constants | 3 (`B̄`, `P`, `F`) |
 | Mean fits | 4 (L, A, A×, C) — OLS, fit split, once each |
-| Scale/tail estimates | 2 (D0: `s, ν`; D1: `s, λ, ν`) |
+| Scale/tail estimates | 2 (D0: `s₀, ν₀`; **D1: `s₁, λ` with ν fixed at ν₀**) |
 | **Total fit-split estimations** | **10** |
 | Refits | 0 |
 | Development evaluations | 1 primary + 3 fixed per-year summaries (descriptive, no decisions) |
@@ -368,17 +370,20 @@ causal; that the result generalises past 2021; or that anything is tradable.
 **Unresolved assumptions, listed rather than argued away:**
 
 1. The Student-t scale/tail family is assumed, not tested; D1 probes one alternative, not the family.
-2. Stationarity and block-exchangeability required by both inference methods are not established across 2019–2021.
+2. The stationarity of the per-row differential (HAC) and of the joint sequence of per-session (sum, count) pairs with dependence covered by the geometric run lengths (bootstrap) are not established across 2019–2021.
 3. `B` and relative volume are crude proxies for order flow; the missing evidence is trade-and-quote data, which the corpus does not contain.
 4. The development pool is exposed; there is no clean out-of-sample period below 2022.
 5. 15 minutes is inherited from the registered horizon and is not matched to any execution timescale.
 
 ### Contribution to the options objective, without tradability claims
 
-A positive result would contribute **evidence about the conditional direction
-and magnitude of short-horizon SPY returns in a defined observable state**, and
-— via the D1 comparison — separate evidence about conditional **dispersion**.
-Both are inputs a later options decision would need.
+A pass would contribute, narrowly, **evidence that a defined OHLCV state
+changes the distributional score of the location forecast** for 15-minute SPY
+returns, and — via D1 vs D0 — separate evidence on whether a
+pressure-conditioned scale improves the score. It would **not** by itself be
+evidence about the direction or magnitude of returns in that state; the
+accepted claim is the log-score claim, and the fitted coefficient is a partial
+association, not a directional finding.
 
 **Missing economic evidence, none of which this brick provides:** contemporaneous
 option prices and quotes, implied-volatility changes in the same state, bid-ask
