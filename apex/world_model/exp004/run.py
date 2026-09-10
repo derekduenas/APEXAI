@@ -77,25 +77,47 @@ class FitAccounting:
 
 # ---------------------------------------------------------------- helpers
 
-def resolve_inference_parameters(bootstrap_resamples=None, seed=None, *, override: bool = False) -> dict:
-    """The registration FIXES B = 10,000 and seed = 20260909. The production
-    path uses those and nothing else: any other value is refused unless the
-    caller explicitly declares a NON-HISTORICAL synthetic run, and the values
-    actually used are recorded either way. B and the seed change p-value
-    resolution, intervals and therefore SELECTED/NOT_SELECTED."""
+HISTORICAL, SYNTHETIC_TEST = "HISTORICAL", "SYNTHETIC_TEST"
+RUN_MODES = (HISTORICAL, SYNTHETIC_TEST)
+
+
+def _exact_int(value, name: str) -> int:
+    """Exact type check, NO coercion. bool is an int subclass and is rejected;
+    10000.9 must not silently become 10000, nor may "10000"."""
+    if isinstance(value, bool) or type(value) is not int:
+        raise F.FeatureRefused("INVALID_INFERENCE_PARAMETER_TYPE: %s must be an exact int, got %r (%s)"
+                               % (name, value, type(value).__name__))
+    return value
+
+
+def resolve_inference_parameters(bootstrap_resamples=None, seed=None, *, run_mode: str = HISTORICAL) -> dict:
+    """The registration FIXES B = 10,000 and seed = 20260909.
+
+    `run_mode` is NOT a caller-supplied attestation on the production path: the
+    bound entry points `tournament`/`score` take no inference parameters at all
+    and always resolve to the registered values. Reduced parameters exist only
+    through `apex.world_model.exp004.synthetic`, which is not the admitted
+    entry point and stamps run_mode=SYNTHETIC_TEST on the record."""
+    if run_mode not in RUN_MODES:
+        raise F.FeatureRefused("INVALID_RUN_MODE: %r, expected one of %s" % (run_mode, list(RUN_MODES)))
     reg_B, reg_seed = int(BOOT["resamples"]), int(BOOT["seed"])
-    B = reg_B if bootstrap_resamples is None else int(bootstrap_resamples)
-    sd = reg_seed if seed is None else int(seed)
+    if run_mode == HISTORICAL:
+        if bootstrap_resamples is not None or seed is not None:
+            raise F.FeatureRefused("INFERENCE_PARAMETERS_NOT_ACCEPTED: the historical path uses the registered "
+                                   "B=%d seed=%d and takes no overrides" % (reg_B, reg_seed))
+        B, sd = reg_B, reg_seed
+    else:
+        B = reg_B if bootstrap_resamples is None else _exact_int(bootstrap_resamples, "bootstrap_resamples")
+        sd = reg_seed if seed is None else _exact_int(seed, "seed")
+        if not (1 <= B <= reg_B):
+            raise F.FeatureRefused("INFERENCE_PARAMETER_OUT_OF_RANGE: bootstrap_resamples=%d, expected 1..%d" % (B, reg_B))
+        if not (0 <= sd < 2 ** 32):
+            raise F.FeatureRefused("INFERENCE_PARAMETER_OUT_OF_RANGE: seed=%d, expected 0..2**32-1" % sd)
     registered = (B == reg_B and sd == reg_seed)
-    if not registered and not override:
-        raise F.FeatureRefused(
-            "UNREGISTERED_INFERENCE_PARAMETERS: B=%d seed=%d; the registration fixes B=%d seed=%d. "
-            "These change p-value resolution, intervals and the selection outcome. A synthetic run may pass "
-            "unregistered_inference_override=True; the historical path may not." % (B, sd, reg_B, reg_seed))
-    return {"resamples": B, "seed": sd, "registered_values": registered,
+    return {"run_mode": run_mode, "resamples": B, "seed": sd, "registered_values": registered,
             "registered_resamples": reg_B, "registered_seed": reg_seed,
-            "override_declared": bool(override), "override_used": bool(override and not registered),
-            "historical_path_valid": registered}
+            "historical_path_valid": run_mode == HISTORICAL and registered,
+            "NOT_FOR_HISTORICAL_USE": run_mode == SYNTHETIC_TEST}
 
 
 def _refusal(kind: str, detail: str, stage: str, rec: dict) -> dict:
@@ -238,9 +260,13 @@ def _year_cell(year, rows_idx, ll, sess_all, keys_all, ref_by_year, *, B, seed):
     return cell
 
 
-def score(prep: dict, dev_sessions: list, *, bootstrap_resamples=None, seed=None,
-          unregistered_inference_override: bool = False) -> dict:
-    params = resolve_inference_parameters(bootstrap_resamples, seed, override=unregistered_inference_override)
+def score(prep: dict, dev_sessions: list) -> dict:
+    """Production scoring. Takes NO inference parameters: the registered
+    B and seed are used and nothing else."""
+    return _score(prep, dev_sessions, params=resolve_inference_parameters(run_mode=HISTORICAL))
+
+
+def _score(prep: dict, dev_sessions: list, *, params: dict) -> dict:
     bootstrap_resamples, seed = params["resamples"], params["seed"]
     ident = F.validate_sessions(dev_sessions, role="development")
     rows, ref, per_sess = F.eligible_rows_many(dev_sessions, prep["vbar"], role="development")
@@ -304,17 +330,23 @@ def score(prep: dict, dev_sessions: list, *, bootstrap_resamples=None, seed=None
     return out
 
 
-def tournament(fit_sessions: list, dev_sessions: list, *, bootstrap_resamples=None, seed=None,
-               unregistered_inference_override: bool = False) -> dict:
+def tournament(fit_sessions: list, dev_sessions: list) -> dict:
+    """THE production entry point, and the one an admission binds to. It takes
+    NO inference parameters: B and the seed are the registered values, always.
+    Reduced-parameter runs are not reachable from here at all — they live in
+    `apex.world_model.exp004.synthetic`, which is not an admitted entry point."""
+    return _core(fit_sessions, dev_sessions, params=resolve_inference_parameters(run_mode=HISTORICAL))
+
+
+def _core(fit_sessions: list, dev_sessions: list, *, params: dict) -> dict:
     t0 = time.time()
     rec = {"experiment": EXPERIMENT_ID, "registration_hash": registration_hash(),
+           "run_mode": params["run_mode"], "inference_parameters": params,
            "development_status": DEVELOPMENT_STATUS, "preprocessing_order": list(PREPROCESSING_ORDER),
            "budget_declared": BUDGET, "economics": "NONE (distributional only)"}
-    try:                                    # BEFORE any preprocessing, fitting or session work
-        params = resolve_inference_parameters(bootstrap_resamples, seed, override=unregistered_inference_override)
-        rec["inference_parameters"] = params
-    except REFUSALS as e:
-        return _refusal(type(e).__name__, str(e), "inference_parameters", rec)
+    if params["run_mode"] == SYNTHETIC_TEST:
+        rec["NOT_FOR_HISTORICAL_USE"] = ("run_mode=SYNTHETIC_TEST: reduced inference parameters; this record is "
+                                         "implementation evidence and is not a historical result")
     try:
         F.validate_sessions(fit_sessions, role="fit")                     # registered fit range
         F.validate_sessions(dev_sessions, role="development")             # registered development range
@@ -327,8 +359,7 @@ def tournament(fit_sessions: list, dev_sessions: list, *, bootstrap_resamples=No
         return _refusal(type(e).__name__, str(e), "fit", rec)
     rec["fit"] = {k: v for k, v in prep.items() if k != "vbar"}
     try:
-        dev = score(prep, dev_sessions, bootstrap_resamples=params["resamples"], seed=params["seed"],
-                    unregistered_inference_override=unregistered_inference_override)
+        dev = _score(prep, dev_sessions, params=params)
     except REFUSALS as e:
         return _refusal(type(e).__name__, str(e), "development", rec)
     rec["development"] = dev

@@ -17,7 +17,7 @@ from apex.world_model.exp001b import bars as B
 from apex.world_model.exp002.bootstrap import session_stationary_bootstrap as boot_orig
 from apex.world_model.exp002 import studentt as T
 from apex.world_model.exp004 import (bootstrap_adapter as BA, dispersion as D, features as F,
-                                     inference as I, models as M, run as R)
+                                     inference as I, models as M, run as R, synthetic as SY)
 from apex.world_model.exp004.registration import ARMS, BUDGET, WINDOW_BARS, registration_hash
 from tests import exp004_fixtures as X
 
@@ -273,11 +273,11 @@ def test_session_identity_and_chronology_are_validated_not_trusted(world):
     with pytest.raises(F.FeatureRefused, match="SYMBOL_MISMATCH"):
         F.validate_sessions(other, role="development")
     # through the runner: a reversed development list is refused BEFORE any statistic is computed
-    rec = R.tournament(fit, list(reversed(dev)), bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(fit, list(reversed(dev)), bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE" and "NON_CHRONOLOGICAL_SESSIONS" in rec["refusal"]["detail"]
     assert "development" not in rec
     dup_fit = fit[:99] + [fit[50]] + fit[99:]
-    rec = R.tournament(dup_fit, dev, bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(dup_fit, dev, bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE" and "DUPLICATE_SESSION" in rec["refusal"]["detail"]
     # row order is checked independently of session validation; a session revisited later in the
     # list necessarily breaks (date, time) monotonicity, so it is caught as ROWS_OUT_OF_ORDER
@@ -294,7 +294,7 @@ def test_invalid_fit_bar_is_refused_by_name_not_excluded(world):
     fit[7] = X.session_from_bars(day, bars)
     with pytest.raises(F.FeatureRefused, match="INVALID_FIT_BAR: %s minute 123" % day):
         F.validate_fit_bars(fit)
-    rec = R.tournament(fit, world["dev"], bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(fit, world["dev"], bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE" and "INVALID_FIT_BAR" in rec["refusal"]["detail"]
     assert "fit" not in rec and "development" not in rec
 
@@ -317,7 +317,7 @@ def test_nonfinite_values_are_integrity_refusals_never_not_selected(world, monke
             out = out.copy(); out[len(out) // 2] = float("nan")
         return out
     monkeypatch.setattr(M, "means_of", poisoned)
-    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(world["fit"], world["dev"], bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE"
     assert rec["refusal"]["kind"] == "DispersionRefused" and "NONFINITE_VALUES: means C" in rec["refusal"]["detail"]
     assert "development" not in rec and rec["classification"]["outcome"] == "INTEGRITY_FAILURE"
@@ -334,7 +334,7 @@ def test_fit_budget_is_counted_on_the_real_fitters_and_enforced(world, monkeypat
     def one_extra(rows_y):
         out = real(rows_y); M.fit_arm(rows_y, "L"); return out          # a fifth location fit
     monkeypatch.setattr(M, "fit_all", one_extra)
-    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(world["fit"], world["dev"], bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE" and "BUDGET_EXCEEDED: location_fits call 5 > 4" in rec["refusal"]["detail"]
 
 
@@ -364,10 +364,10 @@ def test_registered_date_scope_is_enforced_not_merely_reported(world):
     # through the runner: refused at period_scope, before ANY preprocessing or statistic
     for bad_dev, kind in ((dev + [sealed_eval], "SEALED_PERIOD_SESSION"),
                           ([out_of_range] + dev, "SESSION_OUT_OF_REGISTERED_RANGE")):
-        rec = R.tournament(fit, bad_dev, bootstrap_resamples=50, unregistered_inference_override=True)
+        rec = SY.synthetic_tournament(fit, bad_dev, bootstrap_resamples=50)
         assert rec["status"] == "INTEGRITY_FAILURE" and rec["refusal"]["stage"] == "period_scope"
         assert kind in rec["refusal"]["detail"] and "fit" not in rec and "development" not in rec
-    rec = R.tournament(fit[:3] + [dev_era], dev, bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(fit[:3] + [dev_era], dev, bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE" and "SESSION_OUT_OF_REGISTERED_RANGE" in rec["refusal"]["detail"]
     assert world["prep"]["sessions"]["registered_range"] == ["2016-01-04", "2018-12-31"]
     assert world["prep"]["sessions"]["period_enforced"] is True
@@ -382,7 +382,7 @@ def test_fit_development_overlap_is_refused(world):
         F.validate_disjoint(dev[2:], dev[:2])
     ok = F.validate_disjoint(fit, dev)
     assert ok["shared_sessions"] == 0 and ok["fit_last"] < ok["development_first"]
-    rec = R.tournament(fit, dev, bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(fit, dev, bootstrap_resamples=50)
     assert rec["periods"]["shared_sessions"] == 0
 
 
@@ -395,7 +395,7 @@ def test_row_key_tampering_is_an_integrity_failure(world, monkeypatch):
             out["row_keys_sha"] = "0" * 16                 # one comparison scored on a different key set
         return out
     monkeypatch.setattr(R, "_compare", tamper_sha)
-    rec = R.tournament(fit, dev, bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(fit, dev, bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE" and "ROW_POPULATION_MISMATCH" in rec["refusal"]["detail"]
     assert "2 key sets" in rec["refusal"]["detail"]
     monkeypatch.undo()
@@ -405,13 +405,13 @@ def test_row_key_tampering_is_an_integrity_failure(world, monkeypatch):
             out["n_rows"] = out["n_rows"] - 1              # one comparison on a different row population
         return out
     monkeypatch.setattr(R, "_compare", tamper_n)
-    rec = R.tournament(fit, dev, bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(fit, dev, bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE" and "ROW_POPULATION_MISMATCH" in rec["refusal"]["detail"]
     assert rec["classification"]["outcome"] == "INTEGRITY_FAILURE" and "development" not in rec
 
 
 def test_dispersion_comparison_reports_hac_and_bootstrap_everywhere(world):
-    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=500, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(world["fit"], world["dev"], bootstrap_resamples=500)
     assert rec["status"] in ("SELECTED", "NOT_SELECTED"), rec.get("refusal")
     dv = rec["development"]
     def complete(cell, where):
@@ -454,7 +454,7 @@ def test_bars_refused_cannot_escape_the_runner(world, monkeypatch):
         B.observable_rows(extreme)
     with pytest.raises(F.FeatureRefused, match="BARS_REFUSED"):                 # converted at the boundary
         F.eligible_rows(extreme, world["prep"]["vbar"])
-    rec = R.tournament(fit, [extreme] + dev[1:], bootstrap_resamples=50, unregistered_inference_override=True)         # and through the runner
+    rec = SY.synthetic_tournament(fit, [extreme] + dev[1:], bootstrap_resamples=50)         # and through the runner
     assert rec["status"] == "INTEGRITY_FAILURE" and "BARS_REFUSED" in rec["refusal"]["detail"]
     assert "NONFINITE_FEATURE" in rec["refusal"]["detail"] and "development" not in rec
     assert rec["classification"]["outcome"] == "INTEGRITY_FAILURE"
@@ -480,7 +480,7 @@ def test_arithmetic_failures_in_dispersion_are_named_refusals(world, monkeypatch
         D.fit_d1(z, p, nu0=6.0, s0=1.0)
     monkeypatch.undo()
     monkeypatch.setattr(D, "fit_d0", lambda zz: (_ for _ in ()).throw(FloatingPointError("underflow")))
-    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(world["fit"], world["dev"], bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE" and rec["refusal"]["stage"] == "fit"
     assert "FloatingPointError" in rec["refusal"]["detail"] or "underflow" in rec["refusal"]["detail"]
 
@@ -499,7 +499,7 @@ def test_nonfinite_inputs_are_caught_before_the_location_fits(world, monkeypatch
         rows_y[len(rows_y) // 2][0]["features"]["F_c"] = float("nan")     # a feature column, not a target
         return out
     monkeypatch.setattr(F, "apply_clipping", poison)
-    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(world["fit"], world["dev"], bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE"
     assert "NONFINITE_VALUES: fit feature F_c" in rec["refusal"]["detail"]
     assert seen["fit_all"] is False, "the location fits ran despite a non-finite feature"
@@ -514,13 +514,13 @@ def test_per_year_row_key_identity_is_verified_inside_each_cell(world, monkeypat
             out["row_keys_sha"] = "f" * 16
         return out
     monkeypatch.setattr(R, "_compare", tamper_2020_only)
-    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(world["fit"], world["dev"], bootstrap_resamples=50)
     assert rec["status"] == "INTEGRITY_FAILURE"
     assert "YEAR_ROW_POPULATION_MISMATCH: 2020" in rec["refusal"]["detail"], rec["refusal"]["detail"]
     assert "development" not in rec
     monkeypatch.undo()
     # and the untampered run records each year's own key hash
-    clean = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50, unregistered_inference_override=True)
+    clean = SY.synthetic_tournament(world["fit"], world["dev"], bootstrap_resamples=50)
     per_year = clean["development"]["per_year"]
     shas = {y: c["row_keys_sha"] for y, c in per_year.items() if c["status"] == "REPORTED"}
     assert len(shas) == 3 and len(set(shas.values())) == 3          # distinct populations, each verified
@@ -529,23 +529,67 @@ def test_per_year_row_key_identity_is_verified_inside_each_cell(world, monkeypat
 
 # ------------------------------------------------------------------ registered inference contract
 
-def test_registered_bootstrap_parameters_are_enforced_before_any_fitting(world, monkeypatch):
-    """B and the seed are FROZEN in the registration. The production path uses
-    those and nothing else; anything different is refused before preprocessing."""
+def test_production_entry_points_accept_no_inference_parameters(world):
+    """A record field is self-attestation; the boundary is that the bound entry
+    point has no such parameter to pass."""
+    import inspect
     from apex.world_model.exp004.registration import INHERITED
     reg = INHERITED["bootstrap"]["value"]
     assert (reg["resamples"], reg["seed"]) == (10000, 20260909)
-    # defaults resolve to the registered values, with no override needed
-    d = R.resolve_inference_parameters()
-    assert (d["resamples"], d["seed"]) == (10000, 20260909)
-    assert d["registered_values"] and d["historical_path_valid"] and not d["override_used"]
-    assert R.resolve_inference_parameters(10000, 20260909)["historical_path_valid"] is True
-    for B, sd in ((50, 20260909), (10000, 1), (200, 7)):
-        with pytest.raises(F.FeatureRefused, match="UNREGISTERED_INFERENCE_PARAMETERS"):
-            R.resolve_inference_parameters(B, sd)
-        ok = R.resolve_inference_parameters(B, sd, override=True)
-        assert ok["override_used"] and not ok["registered_values"] and ok["historical_path_valid"] is False
-    # through the runner: refused BEFORE any session, baseline or fit work happens
+    for fn in (R.tournament, R.score):
+        names = set(inspect.signature(fn).parameters)
+        assert not (names & {"bootstrap_resamples", "seed", "unregistered_inference_override", "params", "run_mode"}), names
+    with pytest.raises(TypeError):
+        R.tournament(world["fit"], world["dev"], bootstrap_resamples=50)
+    with pytest.raises(TypeError):
+        R.tournament(world["fit"], world["dev"], unregistered_inference_override=True)
+    with pytest.raises(TypeError):
+        R.score(world["prep"], world["dev"], bootstrap_resamples=50)
+    # the historical resolution takes nothing and yields the registered pair
+    hp = R.resolve_inference_parameters(run_mode=R.HISTORICAL)
+    assert (hp["resamples"], hp["seed"]) == (10000, 20260909)
+    assert hp["historical_path_valid"] is True and hp["NOT_FOR_HISTORICAL_USE"] is False
+    for bad in ((50, None), (None, 7), (50, 7)):
+        with pytest.raises(F.FeatureRefused, match="INFERENCE_PARAMETERS_NOT_ACCEPTED"):
+            R.resolve_inference_parameters(*bad, run_mode=R.HISTORICAL)
+    with pytest.raises(F.FeatureRefused, match="INVALID_RUN_MODE"):
+        R.resolve_inference_parameters(run_mode="HISTORICAL_BUT_NOT_REALLY")
+
+
+def test_reduced_parameters_only_through_the_synthetic_entry_point(world):
+    sp = R.resolve_inference_parameters(50, 7, run_mode=R.SYNTHETIC_TEST)
+    assert sp["run_mode"] == "SYNTHETIC_TEST" and sp["historical_path_valid"] is False
+    assert sp["NOT_FOR_HISTORICAL_USE"] is True and (sp["resamples"], sp["seed"]) == (50, 7)
+    assert SY.NOT_AN_ADMITTED_ENTRY_POINT is True
+    rec = SY.synthetic_tournament(world["fit"], world["dev"], bootstrap_resamples=50)
+    assert rec["run_mode"] == "SYNTHETIC_TEST" and "NOT_FOR_HISTORICAL_USE" in rec
+    assert rec["inference_parameters"]["historical_path_valid"] is False
+    assert rec["development"]["inference_parameters"]["resamples"] == 50
+    for c in rec["development"]["comparisons"].values():
+        assert c["D0"]["bootstrap"]["resamples"] == 50 and c["D0"]["bootstrap"]["seed"] == 20260909
+    # the synthetic entry with no parameters still marks itself as not historical
+    sp2 = R.resolve_inference_parameters(run_mode=R.SYNTHETIC_TEST)
+    assert sp2["registered_values"] is True and sp2["historical_path_valid"] is False
+
+
+def test_malformed_inference_parameter_types_refuse_cleanly(world, monkeypatch):
+    """No coercion: 10000.9 must not become 10000, "10000" must not parse,
+    and True must not pass as 1."""
+    for bad, name in ((10000.9, "bootstrap_resamples"), (10000.0, "bootstrap_resamples"), ("10000", "bootstrap_resamples"),
+                      (True, "bootstrap_resamples"), (None if False else float("nan"), "bootstrap_resamples"),
+                      ([10000], "bootstrap_resamples")):
+        with pytest.raises(F.FeatureRefused, match="INVALID_INFERENCE_PARAMETER_TYPE: %s" % name):
+            R.resolve_inference_parameters(bad, run_mode=R.SYNTHETIC_TEST)
+    for bad in (20260909.9, "20260909", False, 3.0):
+        with pytest.raises(F.FeatureRefused, match="INVALID_INFERENCE_PARAMETER_TYPE: seed"):
+            R.resolve_inference_parameters(50, bad, run_mode=R.SYNTHETIC_TEST)
+    for bad in (0, -5, 10001):
+        with pytest.raises(F.FeatureRefused, match="INFERENCE_PARAMETER_OUT_OF_RANGE: bootstrap_resamples"):
+            R.resolve_inference_parameters(bad, run_mode=R.SYNTHETIC_TEST)
+    for bad in (-1, 2 ** 32):
+        with pytest.raises(F.FeatureRefused, match="INFERENCE_PARAMETER_OUT_OF_RANGE: seed"):
+            R.resolve_inference_parameters(50, bad, run_mode=R.SYNTHETIC_TEST)
+    # refused before ANY session, baseline or fit work
     touched = {"baselines": False, "fits": False, "sessions": False}
     for mod, name, key in ((F, "fit_baselines", "baselines"), (M, "fit_all", "fits"), (F, "validate_sessions", "sessions")):
         real = getattr(mod, name)
@@ -553,20 +597,9 @@ def test_registered_bootstrap_parameters_are_enforced_before_any_fitting(world, 
             touched[_k] = True
             return _r(*a, **kw)
         monkeypatch.setattr(mod, name, spy)
-    rec = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50)          # no override declared
-    assert rec["status"] == "INTEGRITY_FAILURE" and rec["refusal"]["stage"] == "inference_parameters"
-    assert "UNREGISTERED_INFERENCE_PARAMETERS" in rec["refusal"]["detail"]
+    with pytest.raises(F.FeatureRefused, match="INVALID_INFERENCE_PARAMETER_TYPE"):
+        SY.synthetic_tournament(world["fit"], world["dev"], bootstrap_resamples=50.0)
     assert touched == {"baselines": False, "fits": False, "sessions": False}, touched
-    assert "fit" not in rec and "development" not in rec and "periods" not in rec
-    monkeypatch.undo()
-    # the values actually used are recorded on every run, override or not
-    rec2 = R.tournament(world["fit"], world["dev"], bootstrap_resamples=50, unregistered_inference_override=True)
-    p = rec2["inference_parameters"]
-    assert (p["resamples"], p["seed"]) == (50, 20260909) and p["override_used"] is True
-    assert p["historical_path_valid"] is False and p["registered_resamples"] == 10000
-    assert rec2["development"]["inference_parameters"] == p
-    for c in rec2["development"]["comparisons"].values():
-        assert c["D0"]["bootstrap"]["resamples"] == 50 and c["D0"]["bootstrap"]["seed"] == 20260909
 
 
 # ------------------------------------------------------------------ N8: replicate SEQUENCE preserved
@@ -612,7 +645,7 @@ def test_n7_and_end_to_end_tournament_with_fixed_year_cells(world, tmp_path):
     legacy = B.observable_rows(dev2[3]); tg = B.targets(dev2[3], legacy); t_bad = dev2[3]["rows"][200]["event_time"]
     assert all(r["features"] is not None for r, _ in zip(legacy, tg) if t_bad <= r["event_time"] < t_bad + WINDOW_BARS * 60)
     assert not any(t_bad <= r["event_time"] < t_bad + WINDOW_BARS * 60 for r, _, _ in rows)
-    rec = R.tournament(fit, dev2, bootstrap_resamples=1000, unregistered_inference_override=True)
+    rec = SY.synthetic_tournament(fit, dev2, bootstrap_resamples=1000)
     assert rec["status"] in ("SELECTED", "NOT_SELECTED"), rec.get("refusal")
     assert rec["registration_hash"] == registration_hash() == REG_HASH
     dv = rec["development"]
@@ -643,7 +676,7 @@ def test_n7_and_end_to_end_tournament_with_fixed_year_cells(world, tmp_path):
     (tmp_path / "ok.json").write_text(R.strict_json(rec))
     # a registered year with no sessions -> explicit NOT_AVAILABLE cell, never omitted
     two = X.dev_sessions_years(years=("2019", "2020"))
-    rec2 = R.tournament(fit, two, bootstrap_resamples=200, unregistered_inference_override=True)
+    rec2 = SY.synthetic_tournament(fit, two, bootstrap_resamples=200)
     assert rec2["status"] in ("SELECTED", "NOT_SELECTED")
     cell = rec2["development"]["per_year"]["2021"]
     assert cell["status"] == "NOT_AVAILABLE" and cell["n_rows"] == 0 and cell["refusals"] is None and cell["comparisons"] is None
@@ -651,7 +684,7 @@ def test_n7_and_end_to_end_tournament_with_fixed_year_cells(world, tmp_path):
     # refused record: no eligible development rows -> INTEGRITY_FAILURE, no statistics
     broken = [X.session_from_bars(s["session_date"], [dict(b, open=b["high"] + 1) for b in X.build_bars(s["session_date"], 1)])
               for s in dev[:2]]
-    bad = R.tournament(fit, broken, bootstrap_resamples=50, unregistered_inference_override=True)
+    bad = SY.synthetic_tournament(fit, broken, bootstrap_resamples=50)
     assert bad["status"] == "INTEGRITY_FAILURE" and "development" not in bad
     assert "INSUFFICIENT_DEVELOPMENT_ROWS" in bad["refusal"]["detail"] and bad["classification"]["outcome"] == "INTEGRITY_FAILURE"
     (tmp_path / "refused.json").write_text(R.strict_json(bad))

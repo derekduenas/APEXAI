@@ -107,3 +107,25 @@ Registration unchanged. Focused suite **28 passed**.
 
 All 19 test call sites and both record-script calls now declare the override
 explicitly, so every synthetic run is marked as such in its own record.
+
+---
+
+## Inference boundary patch — supersedes `e5293ad2`
+
+Registration unchanged. Focused suite **30 passed**; regression **188 passed**.
+
+The previous attempt was wrong in kind, not degree: an `unregistered_inference_override`
+argument on the production function is **self-attestation, not an authorization
+boundary** — the same call was available to a historical caller, and a record
+field cannot constrain who may set it. Corrected.
+
+| Requirement | Implementation | Test |
+|---|---|---|
+| Production `tournament()`/`score()` always enforce `B=10000`, seed `20260909`, **no override argument** | both signatures now take **only** the session lists; they call `resolve_inference_parameters(run_mode=HISTORICAL)`, which refuses `INFERENCE_PARAMETERS_NOT_ACCEPTED` if any inference parameter is supplied. There is no parameter to pass | `test_production_entry_points_accept_no_inference_parameters` inspects both signatures for the absence of `bootstrap_resamples`, `seed`, `unregistered_inference_override`, `params`, `run_mode`, and asserts `TypeError` on each attempted call |
+| Reduced parameters behind a separate synthetic-only entry point recording `run_mode="SYNTHETIC_TEST"` | new module `apex/world_model/exp004/synthetic.py` (`synthetic_tournament`, `synthetic_score`, `NOT_AN_ADMITTED_ENTRY_POINT = True`). It is the only route to reduced parameters. Every record it produces carries `run_mode: "SYNTHETIC_TEST"`, `NOT_FOR_HISTORICAL_USE`, and `historical_path_valid: false` — top level and inside `development`. An admission binds to `run.tournament`, which cannot reach it | `test_reduced_parameters_only_through_the_synthetic_entry_point`; the regenerated records show `run_mode: SYNTHETIC_TEST` with `resamples: 2000` |
+| Exact integer types, no coercion; reject floats, strings, booleans, bad ranges, conversion errors, **before** validation or fitting | `_exact_int` rejects anything whose `type(...) is not int`, `bool` included; ranges `1 ≤ B ≤ 10000` and `0 ≤ seed < 2³²`; an invalid `run_mode` is refused. All of it runs before session validation, baselines or fits | `test_malformed_inference_parameter_types_refuse_cleanly`: `10000.9`, `10000.0`, `"10000"`, `True`, `nan`, `[10000]`, and seed variants each refuse by name; out-of-range `0, −5, 10001` and `−1, 2**32` refuse; spies prove `validate_sessions`, `fit_baselines` and `fit_all` never ran |
+
+All 20 synthetic call sites in the tests and both record-script calls now go
+through `synthetic.synthetic_tournament`; the only remaining references to
+`run.tournament` with parameters are the two assertions that they raise
+`TypeError`.
