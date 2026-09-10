@@ -12,13 +12,14 @@ are different things and the confusion was mine. Corrected and separated:
 
 | | |
 |---|---|
-| **THE PIN — tested code revision, to be named in any request** | **`1f008f37022f07812637d710427b909553b3025b`** |
-| package/record commits | documentation-only commits that follow it add no bound bytes and are **not** the pin |
+| **THE PIN — tested code revision, to be named in any request** | **`ea87faa42537a14678bb6fc5cb1e9aacc83cf40f`** |
+| package/record commits | documentation-only commits that follow it add no bound bytes and are **not** the pin. THIS document is such a commit |
+| withdrawn pin | an earlier draft named `1f008f37…`, a **dangling pre-amend object** created when I amended a commit that contained its own hash. It is reachable in the object store but on no branch, and is not a valid pin |
 | earlier revisions | `f1452b47` (wrapper + first tests) and `a3bdd1f1` (added this document) are superseded; the acceptance assertions at those revisions were too weak — see §3 |
 
 | | |
 |---|---|
-| candidate commit | `1f008f37022f07812637d710427b909553b3025b` |
+| candidate commit | `ea87faa42537a14678bb6fc5cb1e9aacc83cf40f` |
 | bound source tree | `8fbe6ed6155df0e4b8fb09f6dd8ce54c7e1cf064cea29592e08fa44a41996991`, 67 files, `dirty: []` |
 | EXP-004 registration | `9155024f51825d13487cdc035432d85b357d22e39a40f967477873a7a6145bf9` — **unchanged** |
 | execute script (bound) | `73aca971ce8fd16658bcd0b0c1e7c13b877cbb2981a3f9e40be499a79300f2c0` |
