@@ -6,6 +6,21 @@ incremental-value criterion and activation gate. Listing here is not
 permission to implement. Each row is activated only by a registered
 experiment that names it, after its dependency row is at least "tested".
 
+> **SUPERSESSION NOTE — 2026-09-09 (applies to the common rule below and to every
+> per-row "N0" / "must return NO_SIGNAL" entry).** The general assertion that a
+> permutation control "must return NO_SIGNAL" is **withdrawn as a universal
+> correctness requirement**. `docs/EXP002_N0_CLOSURE.md` established that
+> permutation alone does not justify a required NO_SIGNAL for a matched
+> location comparison: the expected score differential depends on centering and
+> scale assumptions the transformation does not enforce, and repetition does not
+> supply an invariance argument. Going forward, any randomisation control given
+> invalidation authority must state its null hypothesis, why the transformation
+> represents it, and the assumptions required, and must be reviewed on that basis
+> before registration. **Historical registrations that used this rule
+> (EXP-001B, EXP-002) are not rewritten**; their records stand as executed, and
+> EXP-002's `INVALID_NULL_CONTROL` verdict stands. The per-arm descriptive
+> register is `docs/CHALLENGER_REGISTER.md`.
+
 Common rules: fit on permitted training information only; dependence-aware
 statistics; incremental value is measured against the simpler comparator
 on the *same* sealed data with the *same* costs; a negative control (N0
