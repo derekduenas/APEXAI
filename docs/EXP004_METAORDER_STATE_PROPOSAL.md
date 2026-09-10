@@ -1,4 +1,14 @@
-# EXP-004 proposal — execution-pressure regime state
+# EXP-004 proposal (v1) — **SUPERSEDED** by `EXP004_OHLCV_PRESSURE_PROXY.md`
+
+> Withdrawn on review: the state `pressure·|flow|` simplifies to `|ΣBᵢVᵢ|/ΣV̄ᵢ`,
+> so it is one aggregate and supports no conjunction or persistence claim;
+> `(close−open)/(high−low)` is a signed body-to-range measure, not close
+> location or observed order flow; comparing the combined feature only
+> against L cannot show the combination matters; the fixed-sign A4 arm was
+> not a clean volatility test; and the mechanism language overstated what
+> minute bars can identify. Kept for the record.
+
+---
 
 **Design only.** Nothing implemented, fitted, scored, registered or admitted. No
 sealed-data opening is proposed or implied. One preferred design, as requested.
