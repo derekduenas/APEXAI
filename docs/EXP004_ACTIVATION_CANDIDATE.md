@@ -5,11 +5,20 @@ is signed by the real authority, no admitted historical data was touched. The
 "admitted" files in every test below are synthetic bars in a temporary
 directory, admitted under a **disposable** throwaway key.
 
-## 1. Reconciled source commitment
+## 1. Reconciled source commitment — ONE pin
+
+My earlier report named `a3bdd1f1` while this document named `f1452b47`. Those
+are different things and the confusion was mine. Corrected and separated:
 
 | | |
 |---|---|
-| candidate commit | `f1452b47084329cf733295b6d468cafce049bdc1` |
+| **THE PIN — tested code revision, to be named in any request** | **`1f008f37022f07812637d710427b909553b3025b`** |
+| package/record commits | documentation-only commits that follow it add no bound bytes and are **not** the pin |
+| earlier revisions | `f1452b47` (wrapper + first tests) and `a3bdd1f1` (added this document) are superseded; the acceptance assertions at those revisions were too weak — see §3 |
+
+| | |
+|---|---|
+| candidate commit | `1f008f37022f07812637d710427b909553b3025b` |
 | bound source tree | `8fbe6ed6155df0e4b8fb09f6dd8ce54c7e1cf064cea29592e08fa44a41996991`, 67 files, `dirty: []` |
 | EXP-004 registration | `9155024f51825d13487cdc035432d85b357d22e39a40f967477873a7a6145bf9` — **unchanged** |
 | execute script (bound) | `73aca971ce8fd16658bcd0b0c1e7c13b877cbb2981a3f9e40be499a79300f2c0` |
@@ -45,6 +54,20 @@ Everything else already dispatched on the `experiment` argument
 - `--plan` lists exactly `{fit: 112, development: 6}`, names neither sealed period, and opens no row (spy on `boundary.open_file` raises if it does).
 - An EXP-002 admission cannot authorise EXP-004 → `EXPERIMENT_MISMATCH`; the reverse likewise; the right experiment with EXP-002's registration hash → `REGISTRATION_MISMATCH`.
 - `UNSIGNED_DECISION`, `SIGNATURE_INVALID` (foreign key), `CODE_IDENTITY_MISMATCH`, `SOURCE_IDENTITY_MISMATCH` all refused with exit 3.
+
+**Acceptance tightened after review** (the assertions at `f1452b47` were too weak):
+
+- the successful-execution test previously accepted *either* completion or `INTEGRITY_FAILURE`, so a regression that always refused would have passed. Completion is now **required unconditionally** on this fixed fixture.
+- the counting test previously asserted only that `_sealed_results_for` returned something. It returns **rejected candidates too**, marked `counted: false`, so that proved discovery, not counting. It now asserts **exactly one counted result** for the launched decision and experiment, then forces an `INTEGRITY_FAILURE` under the **same decision** and asserts both runs are discovered while only the completed one is counted.
+- named refusals are exercised **separately**, including a new test where the decision's **own admitted scope** starves the fit (start moved to 2016-03-01, leaving fewer than the registered 100 baseline sessions): exit 5, `INTEGRITY_FAILURE`, `INSUFFICIENT_FIT_ROWS` at stage `fit`, no development statistics, and the result discovered but never counted.
+
+**Record-shape observation, not changed here:** a refusal raised *inside*
+`run.tournament` surfaces as the adapter's `status` while its detail stays in
+the preserved inner `result.refusal`; a refusal raised by the adapter itself
+sits at the top level. Both are sealed and both are correctly not counted. The
+tests accept either shape and require one. Whether the adapter should also
+surface the inner detail at top level for legibility is left for review — the
+repair was bounded to the tests.
 
 **Full governed execution on synthetic admitted files**
 
@@ -83,7 +106,7 @@ never been run for EXP-004 and its memory and runtime are not established.
 
 | Suite | Result |
 |---|---|
-| `test_exp004_activation_path.py` + `test_exp004_historical_adapter.py` + `test_exp004_implementation.py` | **45 passed** (170 s) |
+| `test_exp004_activation_path.py` (**9**, tightened) + `test_exp004_historical_adapter.py` (7) + `test_exp004_implementation.py` (30) | **46 passed** |
 | `test_research_activation.py`, `test_activation_verifier_review.py`, `test_real_data_boundary.py`, `test_exp002_{tournament,revision2,studentt,controls,historical_path}.py` | **204 passed** (580 s) |
 
 The regression includes the activation-wrapper suite and the EXP-002 acceptance

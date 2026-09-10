@@ -220,7 +220,7 @@ def test_sealed_results_are_counted_per_experiment(rig, capsys, monkeypatch):
     rejected = [c for c in found2 if not c.get("counted")]
     assert len(found2) == 2, found2                      # both discovered
     assert len(counted2) == 1 and counted2[0]["run_id"] == Path(doc["run_dir"]).name
-    assert len(rejected) == 1 and rejected[0]["run_id"] == Path(doc2["run_dir"]).name
+    assert len(rejected) == 1 and Path(doc2["run_dir"]).name in rejected[0]["path"]
     assert "INTEGRITY_FAILURE" in rejected[0]["why"] or "not a completed outcome" in rejected[0]["why"]
 
 
@@ -323,9 +323,14 @@ def test_governed_execute_refuses_when_the_admitted_scope_starves_the_fit(rig, c
     assert rc == 5 and doc["process_outcome"] == "INVALID_INPUT_OR_FAILURE"
     res = json.loads((Path(doc["run_dir"]) / "_RESULT.json").read_text())
     assert res["status"] == "INTEGRITY_FAILURE"
-    detail = res["refusal"]["detail"]
-    assert "INSUFFICIENT_FIT_ROWS" in detail or "NO_BASELINE_SUPPORT" in detail, detail
-    assert "result" not in res                                   # no statistics were produced
+    # a refusal raised INSIDE run.tournament is surfaced as the adapter's status
+    # while its detail stays in the preserved inner record; a refusal raised by
+    # the adapter itself sits at the top level. Accept either, require one.
+    inner = (res.get("result") or {}).get("refusal") or {}
+    detail = json.dumps(res.get("refusal") or inner)
+    assert "INSUFFICIENT_FIT_ROWS" in detail or "NO_BASELINE_SUPPORT" in detail, (detail, sorted(res))
+    assert inner.get("stage") == "fit"
+    assert "development" not in (res.get("result") or {})        # no statistics were produced
     RA = _RA()
     tg = RA.Targets(research_root=rig["out"].parent)
     got = RA._sealed_results_for(tg, boundary.sha256_of(p), set(), EXP004_ID)
