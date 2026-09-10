@@ -1,4 +1,4 @@
-# EXP-004 historical result — NOT_SELECTED
+# EXP-004 historical result — NOT_SELECTED (did not demonstrate improvement)
 
 One authorised run. **The registered comparison was not adjusted, and nothing
 was re-run.** Evaluation and reserve were never requested.
@@ -109,17 +109,46 @@ The unit's own summary line again read `Memory peak: 23.3M`, irreconcilable
 with the live cgroup observation of 778,956,800 B. Excluded from evidence, as
 before; no general claim is made about it.
 
-## What this establishes
+## What this establishes — corrected on review
 
-On the **exposed** 2019–2021 development pool, adding the clipped signed
-body-volume feature `F̃` to a location forecast that already contains the legacy
-price features, both ingredients and their product **did not improve** the
-predictive density — under either registered dispersion specification, by
-either inference method. The answer to the registered question is **no**, on
-this pool, by this measure.
+**Scientific conclusion: the challenger did not demonstrate improvement.** On
+the exposed 2019–2021 development pool, adding `F̃` to a location forecast
+already containing the legacy price features, both ingredients and their
+product scored *slightly worse* in this sample and **failed selection** under
+both registered dispersion specifications and both inference methods.
 
-It does not establish that the feature is worthless in other constructions, at
-other horizons, or with genuine order-flow data rather than OHLCV proxies; nor
-does it say anything about alpha, options profitability, or tradability.
-Evaluation and reserve remain closed. No confirmation was sought and none is
-warranted: there is nothing to confirm.
+That is the operational closure of the registered screen. It is **not** a
+demonstration of zero incremental predictive value: both primary 95% intervals
+**cross zero** (HAC D0 [−1.145e-04, 3.559e-05]; D1 [−1.162e-04, 3.523e-05]; the
+bootstrap percentile intervals likewise). The underlying hypothesis is not
+disproved — it was tested at this horizon, with these OHLCV proxies, on this
+pool, and did not clear the registered gate. My earlier phrasing "did not
+improve … the answer is no" overstated this and is withdrawn.
+
+Nothing here speaks to other constructions, horizons, genuine order-flow data,
+alpha, options profitability, or tradability. Evaluation and reserve remain
+closed; no confirmation is warranted because nothing passed to confirm.
+
+## Dispersion result — corrected reading
+
+The contextual comparison is between two **entire fitted scale
+specifications**, not a single coefficient. Under D1, `λ = −0.00922` means the
+predicted scale **decreases with clipped relative volume holding `rv_30` fixed
+within that specification**. It does **not** mean high-volume periods have
+lower absolute volatility (`rv_30` itself rises with activity and is held
+fixed in that statement), and it does **not** mean D1 is everywhere narrower
+than D0 — `s₁ = 3.3397` also changed from `s₀ = 3.2918`. The comparison is
+preserved as contextual evidence for a **future, separately registered
+volatility comparison**. It promotes neither D1 nor GARCH.
+
+## Telemetry — terminal gap stated
+
+The last readable counters are at **15:08:34**; at 15:08:35 the cgroup was
+already gone (`--collect`). What is established: **last observed
+`memory.peak` = 778,956,800 B (742.9 MiB)**, with `memory.events` all zero in
+**every one of the 704 readable samples**. **Final counters are unavailable**
+and are not reconstructed. The watcher accumulated samples in memory and wrote
+them at completion; it did **not** durably persist each observation as it
+arrived, so had the watcher itself died the retained record would have been
+lost. The observations that exist are genuine and useful; the capture design
+should write incrementally next time.
