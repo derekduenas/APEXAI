@@ -185,17 +185,43 @@ def test_wrapper_cli_accepts_exp004_and_refuses_an_unregistered_experiment():
     assert bad.returncode != 0 and "invalid choice" in (bad.stderr + bad.stdout)
 
 
-def test_sealed_results_are_counted_per_experiment(rig, capsys):
-    """A sealed EXP-004 result must not be counted for another experiment."""
-    p = _write(rig, _body(rig))
+def test_sealed_results_are_counted_per_experiment(rig, capsys, monkeypatch):
+    """`_sealed_results_for` returns REJECTED candidates too, marked
+    counted: false. Discovery is not counting, so assert counting."""
+    p = _write(rig, _body(rig), name="d4_count.json")
     rc, doc = _run(rig, p, capsys, "--execute")
-    assert doc["process_outcome"] in ("SCIENTIFIC_COMPLETE", "INVALID_INPUT_OR_FAILURE"), doc
+    assert rc == 0 and doc["process_outcome"] == "SCIENTIFIC_COMPLETE", doc
     RA = _RA()
     tg = RA.Targets(research_root=rig["out"].parent)
     sha = boundary.sha256_of(p)
-    mine = RA._sealed_results_for(tg, sha, set(), EXP004_ID)
-    assert mine, "the EXP-004 run directory was not found"
-    assert not RA._sealed_results_for(tg, sha, set(), EXP002_ID)
+
+    found = RA._sealed_results_for(tg, sha, set(), EXP004_ID)
+    counted = [c for c in found if c.get("counted")]
+    assert len(counted) == 1, found
+    assert counted[0]["run_id"] == Path(doc["run_dir"]).name
+    # the same sealed result is not counted for another experiment
+    assert not [c for c in RA._sealed_results_for(tg, sha, set(), EXP002_ID) if c.get("counted")]
+
+    # now force an INTEGRITY_FAILURE under the SAME decision: it must be
+    # discovered as a candidate but must NOT be counted
+    import apex.world_model.exp004.historical as H
+    mod = _cmd()
+    monkeypatch.setattr(mod.H4, "run", lambda *a, **k: {
+        "experiment": EXP004_ID, "registration_hash": registration_hash(),
+        "status": "INTEGRITY_FAILURE",
+        "refusal": {"kind": "AdapterRefused", "stage": "test", "detail": "forced for the counting assertion"}})
+    rc2 = mod.main(["--experiment", EXP004_ID, "--decision", str(p), "--execute"], trust=rig["trust"])
+    doc2 = json.loads(capsys.readouterr().out)
+    assert rc2 == 5 and doc2["process_outcome"] == "INVALID_INPUT_OR_FAILURE"
+    monkeypatch.undo()
+
+    found2 = RA._sealed_results_for(tg, sha, set(), EXP004_ID)
+    counted2 = [c for c in found2 if c.get("counted")]
+    rejected = [c for c in found2 if not c.get("counted")]
+    assert len(found2) == 2, found2                      # both discovered
+    assert len(counted2) == 1 and counted2[0]["run_id"] == Path(doc["run_dir"]).name
+    assert len(rejected) == 1 and rejected[0]["run_id"] == Path(doc2["run_dir"]).name
+    assert "INTEGRITY_FAILURE" in rejected[0]["why"] or "not a completed outcome" in rejected[0]["why"]
 
 
 # ------------------------------------------------------------------ dispatch and refusals through the real path
@@ -272,17 +298,35 @@ def test_governed_execute_runs_the_adapter_seals_a_historical_result(rig, capsys
     assert res["imports_at_start"]["all_imports_match_admitted_commit"] is True
     assert res["acceptance_qualification"] == "VALID"
     assert res["source_identity_at_completion"]["unchanged"] is True
-    if res["status"] in ("SELECTED", "NOT_SELECTED"):
-        assert rc == 0 and doc["process_outcome"] == "SCIENTIFIC_COMPLETE"
-        assert res["run_mode"] == "HISTORICAL"
-        ip = res["inference_parameters"]
-        assert (ip["resamples"], ip["seed"]) == (10000, 20260909)
-        assert ip["historical_path_valid"] is True and ip["NOT_FOR_HISTORICAL_USE"] is False
-        assert res["result"]["development"]["inference_parameters"]["registered_values"] is True
-    else:
-        # a named refusal is an acceptable outcome for a small fixture; it must
-        # NOT be a completed one, and it must carry its reason
-        assert rc == 5 and res["status"] == "INTEGRITY_FAILURE" and res["refusal"]["detail"]
-        assert doc["process_outcome"] == "INVALID_INPUT_OR_FAILURE"
+    # completion is REQUIRED on this fixed fixture: a regression that always
+    # refused would otherwise pass. Named refusals are exercised separately.
+    assert rc == 0 and doc["process_outcome"] == "SCIENTIFIC_COMPLETE", res.get("refusal")
+    assert res["status"] in ("SELECTED", "NOT_SELECTED")
+    assert res["run_mode"] == "HISTORICAL"
+    ip = res["inference_parameters"]
+    assert (ip["resamples"], ip["seed"]) == (10000, 20260909)
+    assert ip["historical_path_valid"] is True and ip["NOT_FOR_HISTORICAL_USE"] is False
+    assert res["result"]["development"]["inference_parameters"]["registered_values"] is True
+    assert res["result"]["development"]["n_rows"] > 0 and res["result"]["fit"]["n_fit_rows"] > 0
     with pytest.raises(RealDataRefused, match="RESULT_EXISTS"):
         boundary.seal_result(Path(doc["run_dir"]), {"status": "again"})
+
+
+def test_governed_execute_refuses_when_the_admitted_scope_starves_the_fit(rig, capsys):
+    """A named refusal through the FULL path, driven by the decision itself:
+    narrowing the admitted range leaves fewer than the registered 100 baseline
+    sessions, so the adapter refuses and the run is sealed as a failure."""
+    body = _body(rig)
+    body["scope"]["temporal_range"] = {"start": "2016-03-01", "end": "2021-12-31"}
+    p = _write(rig, body, name="d4_starved.json")
+    rc, doc = _run(rig, p, capsys, "--execute")
+    assert rc == 5 and doc["process_outcome"] == "INVALID_INPUT_OR_FAILURE"
+    res = json.loads((Path(doc["run_dir"]) / "_RESULT.json").read_text())
+    assert res["status"] == "INTEGRITY_FAILURE"
+    detail = res["refusal"]["detail"]
+    assert "INSUFFICIENT_FIT_ROWS" in detail or "NO_BASELINE_SUPPORT" in detail, detail
+    assert "result" not in res                                   # no statistics were produced
+    RA = _RA()
+    tg = RA.Targets(research_root=rig["out"].parent)
+    got = RA._sealed_results_for(tg, boundary.sha256_of(p), set(), EXP004_ID)
+    assert got and not any(c.get("counted") for c in got)        # discovered, never counted
