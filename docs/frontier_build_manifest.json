@@ -93,7 +93,7 @@
   },
   "M4": {
    "state": "SYNTHETIC_VERIFIED",
-   "commit": null,
+   "commit": "80ea8de",
    "modules": [
     "apex/multiverse_wb/simulator.py",
     "apex/multiverse_wb/pricing.py",
@@ -106,7 +106,18 @@
    "independent_acceptance": "PENDING"
   },
   "M5": {
-   "state": "NOT_STARTED"
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": null,
+   "modules": [
+    "apex/decision_wb/fusion.py",
+    "apex/decision_wb/supervision.py",
+    "apex/decision_wb/experience.py",
+    "apex/decision_wb/enrichment.py"
+   ],
+   "tests": [
+    "tests/test_decision_wb.py"
+   ],
+   "independent_acceptance": "PENDING"
   },
   "M6": {
    "state": "NOT_STARTED"

@@ -24,8 +24,8 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 | M1 — execution accounting + operational paper loop | `SYNTHETIC_VERIFIED` | `78931c0` | `apex/options_pilot/{fees,book,risk_authority,exit_policy}.py`; boundary/session/entrypoint integration; `tests/test_options_pilot_accounting.py` (14) + the 92 r4 tests updated for fees/exit policy; local run 106 passed |
 | M2 — PULSE / Twin / inference adapters | `SYNTHETIC_VERIFIED` | `d026b87` | `apex/pulse_options/{ingest,snapshot,features,inference,providers,sources}.py` + `exp002_artifact.json`; `tests/test_pulse_options_twin.py` (22); smoke script + collection request prepared, not executed |
 | M3 — World Model workbench | `SYNTHETIC_VERIFIED` (foundation benchmarks `BLOCKED_RESOURCE` / `BLOCKED_LICENSE`) | `e277e4c` | `apex/worldmodel_wb/*`; `tests/test_worldmodel_wb.py` (14); `docs/evidence/garch_reference_vs_arch_OUTPUT.json` |
-| M4 — Multiverse + market-implied | `SYNTHETIC_VERIFIED` | see manifest (`M4.commit`) | `apex/multiverse_wb/{simulator,pricing,surface,expression_war}.py`; `tests/test_multiverse_wb.py` (8) |
-| M5 — fusion, supervision, learning | `NOT_STARTED` | — | — |
+| M4 — Multiverse + market-implied | `SYNTHETIC_VERIFIED` | `80ea8de` | `apex/multiverse_wb/{simulator,pricing,surface,expression_war}.py`; `tests/test_multiverse_wb.py` (8) |
+| M5 — fusion, supervision, learning | `SYNTHETIC_VERIFIED` | see manifest (`M5.commit`) | `apex/decision_wb/{fusion,supervision,experience,enrichment}.py`; `tests/test_decision_wb.py` (4) |
 | M6 — operator view + commissioning package | `NOT_STARTED` | — | — |
 
 ## M0 — closed at `360536cb` (reconciled against the mandate's four items)
@@ -188,3 +188,22 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
   arbitrage label exists.
 - **Not done, by mandate**: no fitted future-IV process (so no established expected value); no jump component;
   no spread/multi-leg certification; no change to the pilot's selection.
+
+## M5 — what was built
+
+- **Fusion** (`decision_wb/fusion.py`): components must share horizon and cutoff and carry lineage; a component
+  without a density is refused (nothing synthesized). Weights are estimated on OUT-OF-FOLD component forecasts
+  by maximizing the mixture log score on the simplex, then FROZEN with a digest that `fuse` re-verifies; the
+  comparison baseline is the strongest single component on the same OOF rows; leave-one-out ablations per
+  component. The fused object carries `p_return_gt_zero` with its definition and a model-disagreement ratio.
+- **Supervision** (`supervision.py`, `PRIME_SUPERVISION_V0_SYNTHETIC`): ACT / ABSTAIN with named reasons
+  (STALE_DATA, UNSUPPORTED_STATE, MODEL_DISAGREEMENT, QUOTE_UNCERTAINTY, VALUE_UNESTABLISHED,
+  INSUFFICIENT_MARGIN, RISK_LIMIT, PREREQUISITE_MISSING); every prerequisite (forecast density, snapshot,
+  expression comparison, risk decision, Book) must be present; "confidence" is P(return > 0) under the
+  density, never a universal percentage; authority NONE (a proposal record).
+- **Experience** (`experience.py`): read-only joins of persisted pilot records to a later realized target and
+  IV, producing one primary attribution class or AMBIGUOUS (never forced); challenger PROPOSALS carry a digest
+  and register nothing. The ledger bytes are unchanged by a join (tested).
+- **Enrichment** (`enrichment.py`): source-linked event records with event/publication/receipt clocks,
+  dedup keys, extraction uncertainty and prompt/model versions; a schedule is a known covariate, a release is
+  usable only from its publication time; `NoLLMClient` refuses — this build makes no model calls.
