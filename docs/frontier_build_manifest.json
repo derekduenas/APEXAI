@@ -137,6 +137,40 @@
    "commissioning_package": "docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md",
    "activation": "NOT_AUTHORIZED",
    "independent_acceptance": "PENDING"
+  },
+  "M7": {
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": "PENDING (this commit)",
+   "name": "the funnel: every layer in one decision path (FULL_FUNNEL_V1)",
+   "modules": [
+    "apex/decision_wb/engine.py",
+    "apex/pulse_options/sources.py (funnel_fn, selection_policy)",
+    "apex/options_pilot/session.py (funnel step, FUNNEL_TRACE_V2)",
+    "apex/options_pilot/entrypoint.py (TwinProvider, funnel_fn)",
+    "scripts/options_paper_session.py (--pilot-selection-policy)",
+    "apex/backtest_wb/{funnel,contract2}.py",
+    "scripts/pilot_replay_002.py",
+    "apex/multiverse_wb/simulator.py (drift_per_bar)",
+    "apex/multiverse_wb/pricing.py (bsm_price_vec)"
+   ],
+   "tests": [
+    "tests/test_funnel_engine.py",
+    "tests/test_backtest_wb.py::test_full_funnel_on_planted_drift"
+   ],
+   "evidence": [
+    "docs/FUNNEL_INTEGRATION.md",
+    "docs/PILOT_REPLAY_001_RESULT.md",
+    "docs/evidence/pilot_replay_001_summary.json"
+   ],
+   "default_selection_policy": "PILOT_RULE_V1",
+   "activation": "NOT_AUTHORIZED",
+   "independent_acceptance": "PENDING",
+   "blockers": [
+    "kernel cap 5 USD vs SPY near-ATM asks 13-19 USD (591/1886 replay scans RISK_ENVELOPE_INFEASIBLE)",
+    "fee schedule UNVERIFIED",
+    "live chain/quote adapters not commissioned",
+    "expected values model-conditional (IV_FIXED)"
+   ]
   }
  },
  "preserved": [
@@ -188,5 +222,23 @@
    "lseg",
    "sp-global"
   ]
+ },
+ "studies": {
+  "PILOT-REPLAY-001": {
+   "status": "COMPLETED",
+   "evidence": "docs/evidence/pilot_replay_001_summary.json",
+   "result": "docs/PILOT_REPLAY_001_RESULT.md",
+   "conclusion": "DID_NOT_DEMONSTRATE_IMPROVEMENT_OVER_WAIT; direction label no skill"
+  },
+  "PILOT-REPLAY-002": {
+   "status": "DECLARED_NOT_RUN",
+   "contract": "apex/backtest_wb/contract2.py",
+   "runner": "scripts/pilot_replay_002.py",
+   "hold": "operator: no backtests until the funnel is complete"
+  },
+  "SHARADAR-DAILYVOL-001": {
+   "status": "COMPLETED",
+   "result": "docs/SHARADAR_DAILYVOL_001_RESULT.md"
+  }
  }
 }

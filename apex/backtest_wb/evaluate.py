@@ -32,7 +32,8 @@ def summarize(records: list, *, seed: int = 11, draws: int = 2000) -> dict:
     out["policy_non_trade_reasons"] = dict(sorted(whys.items(), key=lambda x: -x[1])[:12])
     # trades: per variant
     per = {}
-    for name in ("POLICY", "RANDOM_DIRECTION", "REVERSED_DIRECTION"):
+    names = ["POLICY", "RANDOM_DIRECTION", "REVERSED_DIRECTION"] + sorted({n for r in scans for n in (r.get("variants") or {}) if n not in ("POLICY", "RANDOM_DIRECTION", "REVERSED_DIRECTION")})
+    for name in names:
         nets = {r["day"] + ":%d" % r["scan"]: _net(r["variants"].get(name)) for r in scans if r.get("variants")}
         nets = {k: v for k, v in nets.items() if v is not None}
         gross = [r["variants"][name]["pnl"]["gross"] for r in scans if r.get("variants") and _net(r["variants"].get(name)) is not None]
@@ -70,6 +71,40 @@ def summarize(records: list, *, seed: int = 11, draws: int = 2000) -> dict:
     # 2/3. paired comparisons on common rows
     for ctrl in ("RANDOM_DIRECTION", "REVERSED_DIRECTION"):
         out["policy_vs_" + ctrl.lower()] = paired_comparison(pol, per[ctrl]["nets"])
+    if "FULL_FUNNEL" in per:
+        ff = per["FULL_FUNNEL"]["nets"]
+        out["full_funnel_vs_policy"] = paired_comparison(ff, pol)
+        by_day_ff = {}
+        for k, v in ff.items():
+            by_day_ff.setdefault(k.split(":")[0], []).append(v)
+        d2 = sorted(by_day_ff); mm = []
+        for _ in range(draws):
+            pick = [rng.choice(d2) for _ in d2] if d2 else []
+            vals = [x for d in pick for x in by_day_ff[d]]
+            if vals:
+                mm.append(sum(vals) / len(vals))
+        mm.sort()
+        out["full_funnel_vs_wait"] = {"mean_net_per_trade": per["FULL_FUNNEL"]["mean_net"], "n_trades": len(ff), "n_sessions_with_trades": len(d2),
+                                      "bootstrap_ci95": ([round(mm[int(0.025 * len(mm))], 4), round(mm[int(0.975 * len(mm)) - 1], 4)] if len(mm) > 40 else None)}
+        ci2 = out["full_funnel_vs_wait"]["bootstrap_ci95"]
+        out["full_funnel_vs_wait"]["conclusion"] = (None if ci2 is None else ("DID_NOT_DEMONSTRATE_IMPROVEMENT_OVER_WAIT" if ci2[0] <= 0 else "ABOVE_WAIT_ON_THIS_SAMPLE"))
+        reasons = {}
+        rights = {}
+        for r in scans:
+            v = (r.get("variants") or {}).get("FULL_FUNNEL")
+            if not v:
+                continue
+            if v.get("decision") != "TRADE":
+                w = (v.get("why") or "").split(":")[0]; reasons[w] = reasons.get(w, 0) + 1
+            else:
+                rt = (v.get("contract") or {}).get("right"); rights[rt] = rights.get(rt, 0) + 1
+        out["full_funnel_non_trade_reasons"] = dict(sorted(reasons.items(), key=lambda x: -x[1])[:12])
+        out["full_funnel_rights"] = rights
+        # coverage on the common population: both systems had a forecast
+        both = [r for r in scans if r.get("forecast") and (r.get("variants") or {}).get("FULL_FUNNEL")]
+        out["full_funnel_coverage"] = {"scans_with_forecast": len(both), "policy_trades": sum(1 for r in both if r["variants"]["POLICY"].get("decision") == "TRADE"),
+                                       "funnel_trades": sum(1 for r in both if r["variants"]["FULL_FUNNEL"].get("decision") == "TRADE"),
+                                       "both_trade": sum(1 for r in both if r["variants"]["POLICY"].get("decision") == "TRADE" and r["variants"]["FULL_FUNNEL"].get("decision") == "TRADE")}
     # 4. friction share
     g, f, s = per["POLICY"]["sum_gross"], per["POLICY"]["sum_fees"], per["POLICY"]["sum_spread_crossing"]
     out["friction"] = {"sum_gross": g, "sum_fees": f, "sum_spread_crossing": s, "friction_total": round(f + s, 2),

@@ -94,3 +94,47 @@ def test_no_drift_gives_no_edge_and_costs_dominate(tmp_path):
         assert nets and sum(nets) < 0                                          # no drift: spread crossing + fees dominate every variant
     s = EV.summarize(recs)
     assert s["policy_vs_wait"]["mean_net_per_trade"] < 0
+
+
+# ------------------------------------------------------------------ PILOT-REPLAY-002: the FULL_FUNNEL variant inside the replay
+class _PlantedArtifact:
+    """The frozen artifact with its LOCATION replaced by a planted value (a fixture, labelled): tests the funnel's plumbing, not the artifact."""
+
+    def __init__(self, location: float):
+        self._a = default_artifact(); self.location_value = location
+
+    def forecast(self, snapshot, *, created_epoch, direction_signal=None):
+        f = self._a.forecast(snapshot, created_epoch=created_epoch, direction_signal=direction_signal)
+        return {**f, "location": self.location_value, "model_id": "PLANTED_LOCATION_FIXTURE", "params_hash": "PLANTED", "direction_signal": direction_signal}
+
+
+def test_full_funnel_on_planted_drift(tmp_path):
+    from apex.backtest_wb import contract2 as C2, funnel as FN
+    assert C2.validated()["contract_digest"]
+    days = ["2019-06-03", "2019-06-04", "2019-06-05", "2019-06-06"]
+    for d in days:
+        _corpus(tmp_path, d, drift_per_min=0.02, wiggle=0.03)                     # upward drift + variance; the call tracks the drift
+    runner = FN.FunnelRunner(window_sessions=20, n_paths=300, seed=5)
+    art = _PlantedArtifact(+0.004)                                               # planted +40 bps location per 15 minutes
+    recs = []
+    for d in days:
+        recs.extend(R.replay_session(tmp_path, "SPY", d, artifact=art, out_path=tmp_path / "scans.jsonl", funnel=runner))
+    scans = [r for r in recs if r.get("variants")]
+    ff = [r["variants"]["FULL_FUNNEL"] for r in scans]
+    assert all("trace" in v and v["decision"] in ("TRADE", "WAIT", "TRADE_UNRESOLVED") for v in ff)
+    first_day = [r["variants"]["FULL_FUNNEL"] for r in scans if r["day"] == days[0]]
+    assert all(v["decision"] == "WAIT" and "INSUFFICIENT_HISTORY" in v["why"] for v in first_day)   # no prior session to fit on
+    later = [r["variants"]["FULL_FUNNEL"] for r in scans if r["day"] in days[2:]]
+    trades = [v for v in later if v["decision"] == "TRADE"]
+    assert trades, [v["why"] for v in later][:5]
+    assert all(v["contract"]["right"] == "CALL" and v["direction"] == "LONG" for v in trades)     # planted upward location -> calls
+    assert all(v["pnl"]["net"] > 0 for v in trades)                                               # the corpus call tracks the drift
+    assert all(v["rule_id"].startswith("FULL_FUNNEL_V1") and v["trace"]["expression_war"]["table"][0]["label"] == "WAIT" for v in trades)
+    assert runner.fits >= 2 and all(f.get("status") == "READY" or f.get("status").startswith("INSUFFICIENT_HISTORY") for f in runner.fit_log)
+    s = EV.summarize(recs)
+    assert s["variants"]["FULL_FUNNEL"]["trades"] == len(trades)
+    assert s["full_funnel_vs_policy"]["n_common"] >= 1 and s["full_funnel_vs_wait"]["mean_net_per_trade"] > 0
+    assert "INSUFFICIENT_HISTORY" not in s["full_funnel_non_trade_reasons"] or s["full_funnel_non_trade_reasons"]["PRIME_ABSTAIN"] >= 1
+    assert s["full_funnel_rights"] == {"CALL": len(trades)} and s["full_funnel_coverage"]["funnel_trades"] == len(trades)
+    rows = [json.loads(l) for l in (tmp_path / "scans.jsonl").read_text().splitlines()]
+    assert all("entry_hash" in r for r in rows) and len(rows) == len(recs)

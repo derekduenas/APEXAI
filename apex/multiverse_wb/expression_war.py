@@ -15,7 +15,7 @@ import math
 
 import numpy as np
 
-from .pricing import bsm_price, sanitize_quote, PricingRefused
+from .pricing import bsm_price, bsm_price_vec, sanitize_quote, PricingRefused
 
 SELECTION_AUTHORITY = "NONE: the pilot's deterministic rule selects; this comparison is recorded, not applied"
 
@@ -26,8 +26,7 @@ def _pnl_paths(*, paths: dict, inst: dict, entry_ask: float, T_years: float, hor
     IV_H = paths["iv"][:, -1] if iv_override is None else np.full(len(S_H), iv_override)
     sp = paths["spread_bps"][:, -1] if spread_bps_exit is None else np.full(len(S_H), spread_bps_exit)
     T_exit = max(T_years - horizon_years, 1e-6)
-    model_mid = np.array([bsm_price(S=s, K=inst["strike"], T=T_exit, sigma=iv, r=r, q=inst.get("dividend_yield", 0.0), right=inst["right"])
-                          for s, iv in zip(S_H, IV_H)])
+    model_mid = bsm_price_vec(S_H, inst["strike"], T_exit, IV_H, r=r, q=inst.get("dividend_yield", 0.0), right=inst["right"])
     exit_bid = np.maximum(model_mid * (1 - sp / 2e4), 0.0)
     return 100.0 * (exit_bid - entry_ask) - fees_entry - fees_exit
 

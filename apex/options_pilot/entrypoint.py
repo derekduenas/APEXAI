@@ -50,9 +50,11 @@ class ProductionSources:
     approved even with data. Both are named refusals, not fallbacks."""
     provenance = "LIVE_FEED"
 
-    def __init__(self):
+    def __init__(self, selection_policy: str = "PILOT_RULE_V1"):
         from apex.pulse_options.sources import live_twin_sources
-        self._twin = live_twin_sources()
+        self._twin = live_twin_sources(selection_policy=selection_policy)
+        self.selection_policy = selection_policy
+        self.funnel_engine = self._twin.funnel_engine
         self.clock = self._twin.clock
         self.risk_authority = self._twin.risk_authority
         self.fee_schedule = self._twin.fee_schedule
@@ -104,7 +106,7 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
         for sym in symbols:
             seq = S.next_seq(ledger, session_id=session_id)
             d = S.scan(bd, symbol=sym, seq=seq, forecast_fn=src["forecast_fn"], signal_fn=src["signal_fn"],
-                       chain_fn=src["chain_fn"], spot_fn=src["spot_fn"], quote_fn=src["quote_fn"])
+                       chain_fn=src["chain_fn"], spot_fn=src["spot_fn"], quote_fn=src["quote_fn"], funnel_fn=src.get("funnel_fn"))
             report["decisions"].append({k: d.get(k) for k in ("scan_id", "symbol", "decision", "why", "forecast_id",
                                                               "intent_id", "fill_id", "decision_persisted",
                                                               "refusal_persisted")})
@@ -132,6 +134,9 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     report["fee_schedule"] = bd.fee_schedule.describe()
     report["exit_policy"] = bd.exit_policy.describe()
     report["execution_policy"] = bd.execution_policy.describe()
+    report["selection_policy"] = (getattr(provider, "selection_policy", None) or "PILOT_RULE_V1")
+    if hasattr(provider, "funnel_engine") and provider.funnel_engine is not None:
+        report["funnel_engine"] = provider.funnel_engine.describe()
     if out:
         Path(out).write_text(json.dumps(report, indent=1, sort_keys=True, allow_nan=False, default=str))
     return report
@@ -144,9 +149,15 @@ def run_from_args(a, *, pilot_sources=None) -> int:
         provider = pilot_sources
     elif getattr(a, "pilot_synthetic_fixture", False):
         from .synthetic_harness import make_harness
-        provider = _HarnessProvider(make_harness(Path(a.ledger), symbols=syms))
+        h = make_harness(Path(a.ledger), symbols=syms)
+        if getattr(a, "pilot_selection_policy", "PILOT_RULE_V1") == "FULL_FUNNEL_V1":
+            from apex.pulse_options.sources import synthetic_twin_sources
+            provider = TwinProvider(synthetic_twin_sources(clock=h.clock, quote_fn=h.quotes, exit_quote_fn=h.exit_quotes, chain_fn=h.chain_fn,
+                                                           sleep_fn=h.advance, selection_policy="FULL_FUNNEL_V1"))
+        else:
+            provider = _HarnessProvider(h)
     else:
-        provider = ProductionSources()
+        provider = ProductionSources(selection_policy=getattr(a, "pilot_selection_policy", "PILOT_RULE_V1"))
     session_id = getattr(a, "pilot_session_id", None) or time.strftime("PILOT-%Y%m%dT%H%M%SZ", time.gmtime())
     release = getattr(a, "pilot_release", None) or "UNPINNED"
     cycles = 1 if a.dry_run else max(1, int(a.minutes // max(1, a.interval_min)))
@@ -155,6 +166,23 @@ def run_from_args(a, *, pilot_sources=None) -> int:
     print(json.dumps({k: rep[k] for k in ("route", "session_id", "data_provenance", "execution_mode", "decisions")},
                      indent=1, default=str), flush=True)
     return 0
+
+
+class TwinProvider:
+    """Adapts TwinSources (either provenance) to the provider interface used above."""
+
+    def __init__(self, twin):
+        self._twin = twin
+        self.provenance = twin.provenance
+        self.clock = twin.clock
+        self.risk_authority = twin.risk_authority
+        self.fee_schedule = twin.fee_schedule
+        self.sleep_fn = twin.sleep_fn
+        self.selection_policy = twin.selection_policy
+        self.funnel_engine = twin.funnel_engine
+
+    def sources(self) -> dict:
+        return self._twin.sources()
 
 
 class _HarnessProvider:

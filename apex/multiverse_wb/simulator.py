@@ -31,7 +31,7 @@ class SimulatorRefused(ValueError):
 class ConditionalSimulator:
     def __init__(self, *, S0: float, variance_model: dict, nu: float | None, iv0: float, spread_bps0: float,
                  iv_process: str = "IV_FIXED", iv_param: float = 1.0, spread_process: str = "SPREAD_FIXED", spread_param: float = 1.0,
-                 regime: dict | None = None, cutoff_epoch: float = 0.0):
+                 regime: dict | None = None, cutoff_epoch: float = 0.0, drift_per_bar: float = 0.0):
         """variance_model: {"kind": "GARCH", "omega","alpha","beta","gamma","h_last","e_last"} or {"kind": "FLAT", "h": var}.
         regime: {"probabilities": [p0, p1], "variance_multipliers": [m0, m1]} (mixture over states, sampled per path)."""
         if not (S0 > 0 and iv0 > 0 and spread_bps0 >= 0):
@@ -46,17 +46,20 @@ class ConditionalSimulator:
         self.iv_process, self.iv_param, self.spread_process, self.spread_param = iv_process, iv_param, spread_process, spread_param
         self.regime = regime
         self.cutoff_epoch = cutoff_epoch
+        if isinstance(drift_per_bar, bool) or not isinstance(drift_per_bar, (int, float)) or not math.isfinite(drift_per_bar):
+            raise SimulatorRefused("DRIFT_INVALID")
+        self.drift_per_bar = float(drift_per_bar)
         if regime:
             p = np.array(regime["probabilities"], dtype=float)
             if abs(p.sum() - 1) > 1e-9 or np.any(p < 0):
                 raise SimulatorRefused("REGIME_PROBABILITIES_INVALID")
 
     def describe(self) -> dict:
-        return {"S0": self.S0, "variance_model": self.vm, "nu": self.nu, "iv0": self.iv0, "spread_bps0": self.spread0,
+        return {"S0": self.S0, "variance_model": self.vm, "nu": self.nu, "iv0": self.iv0, "spread_bps0": self.spread0, "drift_per_bar": self.drift_per_bar,
                 "iv_process": self.iv_process, "iv_param": self.iv_param, "spread_process": self.spread_process, "spread_param": self.spread_param,
                 "regime": self.regime, "cutoff_epoch": self.cutoff_epoch, "discretization": "1-minute steps, log-return recursion",
                 "jumps": "NOT_INCLUDED (no declared estimator)", "parameter_hash": digest({"vm": self.vm, "nu": self.nu, "iv": [self.iv_process, self.iv_param],
-                                                                                        "spread": [self.spread_process, self.spread_param], "regime": self.regime}),
+                                                                                        "spread": [self.spread_process, self.spread_param], "regime": self.regime, "drift": self.drift_per_bar}),
                 "restrictions": self.restrictions()}
 
     def restrictions(self) -> list:
@@ -70,6 +73,8 @@ class ConditionalSimulator:
         if not self.regime:
             r.append("no regime mixture")
         r.append("no jumps")
+        if self.drift_per_bar:
+            r.append("declared constant drift per bar (from the location forecast)")
         return r
 
     def simulate(self, *, horizon_bars: int, n_paths: int, seed: int) -> dict:
@@ -88,7 +93,7 @@ class ConditionalSimulator:
         for t in range(1, horizon_bars + 1):
             Z = std_t_rvs(rng, self.nu, n_paths) if self.nu else rng.standard_normal(n_paths)
             E = np.sqrt(H * mult) * Z
-            logS[:, t] = logS[:, t - 1] + E
+            logS[:, t] = logS[:, t - 1] + self.drift_per_bar + E
             if vm["kind"] == "GARCH":
                 H = vm["omega"] + (vm["alpha"] + vm["gamma"] * (E < 0)) * E * E + vm["beta"] * H
             hpath[:, t] = H * mult

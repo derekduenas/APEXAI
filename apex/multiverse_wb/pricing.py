@@ -86,6 +86,20 @@ def bsm_price(*, S, K, T, sigma, r=0.0, q=0.0, right="CALL") -> float:
     return K * math.exp(-r * T) * N(-d2) - S * math.exp(-q * T) * N(-d1)
 
 
+def bsm_price_vec(S, K, T, sigma, r=0.0, q=0.0, right="CALL"):
+    """Vectorized BSM over arrays of S and sigma (same length); K, T scalars. Same formula as bsm_price."""
+    import numpy as np
+    S = np.asarray(S, dtype=float); sig = np.asarray(sigma, dtype=float)
+    if T <= 0 or K <= 0 or np.any(S <= 0) or np.any(sig <= 0):
+        raise PricingRefused("VEC_INPUT_INVALID")
+    sq = sig * math.sqrt(T)
+    d1 = (np.log(S / K) + (r - q + 0.5 * sig * sig) * T) / sq
+    d2 = d1 - sq
+    if right == "CALL":
+        return S * math.exp(-q * T) * N(d1) - K * math.exp(-r * T) * N(d2)
+    return K * math.exp(-r * T) * N(-d2) - S * math.exp(-q * T) * N(-d1)
+
+
 def bsm_greeks(*, S, K, T, sigma, r=0.0, q=0.0, right="CALL") -> dict:
     S, K, T, sigma = _pos(S, "S"), _pos(K, "K"), _pos(T, "T"), _pos(sigma, "sigma")
     sq = sigma * math.sqrt(T)

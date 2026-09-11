@@ -75,6 +75,9 @@ def funnel_trace(bd: B.Boundary, *, ids: dict, decision: str, why) -> dict:
     rows = L.read_all(bd.ledger)
     fc = next((r for r in rows if r.get("kind") == "pilot_forecast" and r.get("forecast_id") == ids.get("forecast_id")), None) if ids.get("forecast_id") else None
     it = next((r for r in rows if r.get("kind") == "pilot_intent" and r.get("intent_id") == ids.get("intent_id")), None) if ids.get("intent_id") else None
+    fn = rows[ids["funnel_seq"] - 1] if ids.get("funnel_seq") and ids["funnel_seq"] <= len(rows) and rows[ids["funnel_seq"] - 1].get("kind") == "pilot_funnel" else None
+    if fn is not None:
+        return _funnel_trace_from_engine(fn, seq=ids["funnel_seq"], fc=fc, it=it, decision=decision, why=why)
     t = {}
     t["state_snapshot"] = {"state_hash": (fc.get("inputs") or {}).get("state_hash")} if fc and (fc.get("inputs") or {}).get("state_hash") else \
         {"missing": "NO_STATE_HASH: forecast provider did not attach a twin state" if fc else "NO_FORECAST: %s" % (why or "refused before a forecast")}
@@ -93,6 +96,36 @@ def funnel_trace(bd: B.Boundary, *, ids: dict, decision: str, why) -> dict:
                           if it else {"missing": "NO_INTENT"})
     t["final"] = {"decision": decision, "why": why}
     t["contract"] = "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence"
+    return t
+
+
+def _funnel_trace_from_engine(fn: dict, *, seq: int, fc, it, decision: str, why) -> dict:
+    """FUNNEL_TRACE_V2: the stages filled from the persisted engine trace (kind pilot_funnel) that preceded the decision."""
+    tr = fn.get("trace") or {}
+    t = {}
+    t["state_snapshot"] = ({"state_hash": (fc.get("inputs") or {}).get("state_hash")} if fc and (fc.get("inputs") or {}).get("state_hash")
+                           else {"state_hash": tr.get("state_hash")} if tr.get("state_hash") else {"missing": "NO_STATE_HASH"})
+    t["situation_regime"] = {**(tr.get("regime") or {"missing": "NOT_REACHED: %s" % fn.get("why")}), "heuristic_direction": tr.get("heuristic_direction")}
+    t["model_bundle"] = {"forecast": ({"model_id": fc["model_id"], "params_hash": fc["params_hash"], "family": fc["family"], "validation": fc.get("validation_status")}
+                                      if fc else {"missing": "NO_FORECAST"}),
+                         "variance": tr.get("variance") or {"missing": "NOT_REACHED: %s" % fn.get("why")}, "fit": tr.get("fit"),
+                         "implied": tr.get("implied") or {"missing": "NOT_REACHED"}}
+    t["simulation_bundle"] = tr.get("simulation") or {"missing": "NOT_REACHED: %s" % fn.get("why")}
+    ew = tr.get("expression_war")
+    t["eligible_expressions"] = ({"rule": fn.get("rule_id"), "set": [c["label"] for c in ew["table"]], "eligible": [c["label"] for c in ew["table"] if c.get("status") == "ELIGIBLE"],
+                                  "chosen": (tr.get("selected") or {}).get("label"), "contract_id": it.get("contract_id") if it else None,
+                                  "no_best_option_claim": "the selection is the best MODEL-CONDITIONAL expected value among the finite set; not a best-option claim"}
+                                 if ew else {"missing": "NOT_REACHED: %s" % fn.get("why")})
+    t["expected_economics"] = ({"selected": tr.get("selected"), "note": ew["expected_value_note"], "established": False, "fees": ew["fees"]}
+                               if ew else {"missing": "NOT_REACHED: %s" % fn.get("why")})
+    t["prime"] = tr.get("prime") or {"missing": "NOT_REACHED: %s" % fn.get("why")}
+    t["risk_decision"] = ({"provenance": (it.get("risk") or {}).get("risk_provenance"), "authority_id": (it.get("risk") or {}).get("authority_id"),
+                           "certified_max_loss": (it.get("risk") or {}).get("certified_max_loss"),
+                           "kernel_approved_at_commit": ((it.get("risk") or {}).get("kernel_check_at_commit") or {}).get("approved")}
+                          if it else {"missing": "NO_INTENT: %s" % (why or fn.get("why")), "envelope_at_selection": (tr.get("prime") or {}).get("risk")})
+    t["final"] = {"decision": decision, "why": why}
+    t["funnel_ref"] = {"seq": seq, "entry_hash": fn.get("entry_hash"), "engine_decision": fn.get("decision")}
+    t["contract"] = "FUNNEL_TRACE_V2: every stage carries the engine's recorded value or a named reason for its absence"
     return t
 
 
@@ -155,11 +188,16 @@ def _duplicate_delivery(bd: B.Boundary, *, scan_id: str, symbol: str, prior: lis
     return out
 
 
-def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain_fn, spot_fn, quote_fn) -> dict:
-    """One scan: forecast -> intent -> fill, in that order, each a receipt;
+def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain_fn, spot_fn, quote_fn, funnel_fn=None) -> dict:
+    """One scan: forecast -> (funnel) -> intent -> fill, in that order, each a receipt;
     ends in exactly one decision: TRADE / WAIT / REFUSE. A BoundaryRefused
     becomes a REFUSE decision that says whether the refusal was persisted;
-    provider exceptions fail closed the same way."""
+    provider exceptions fail closed the same way.
+
+    With `funnel_fn` (FULL_FUNNEL_V1) the deterministic rule is replaced by the
+    engine: its result is persisted as a `pilot_funnel` record BEFORE any intent,
+    a WAIT ends the scan as a WAIT decision carrying the whole trace, a TRADE
+    proposal goes through the same risk-bound intent + fill path as the rule."""
     scan_id = scan_id_for(bd.session_id, seq, symbol)
     ids: dict = {"receipts": {}}
     prior = [r for r in L.read_all(bd.ledger) if r.get("scan_id") == scan_id]
@@ -183,15 +221,37 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
             bd.refuse("forecast", "FORECAST_PROVIDER_FAILED: %s: %s" % (type(e).__name__, str(e)[:300]), scan_id=scan_id)
         f_receipt = bd.record_forecast(forecast, scan_id=scan_id)
         ids["forecast_id"] = f_receipt["forecast_id"]; ids["receipts"]["forecast"] = f_receipt
-        # 2. deterministic rule -> risk-bound intent persisted
-        try:
-            signal = signal_fn(symbol, as_of)
-            proposal = choose(symbol=symbol, direction_signal=signal, spot=spot_fn(symbol, as_of),
-                              as_of=to_utc_string(as_of), available=chain_fn(symbol, as_of))
-        except RuleRefused as e:
-            bd.refuse("rule", str(e), refs={"forecast_seq": f_receipt["seq"]}, scan_id=scan_id)
-        except Exception as e:                                             # noqa: BLE001
-            bd.refuse("rule", "INPUT_PROVIDER_FAILED: %s: %s" % (type(e).__name__, str(e)[:300]), scan_id=scan_id)
+        if funnel_fn is not None:
+            # 2a. THE FUNNEL: every layer decides together; the engine's trace is persisted before any intent
+            try:
+                res = funnel_fn(symbol, as_of, forecast)
+            except Exception as e:                                         # noqa: BLE001
+                bd.refuse("funnel", "FUNNEL_PROVIDER_FAILED: %s: %s" % (type(e).__name__, str(e)[:300]), scan_id=scan_id)
+            if not isinstance(res, dict) or res.get("decision") not in ("TRADE", "WAIT") or "trace" not in res:
+                bd.refuse("funnel", "FUNNEL_RESULT_MALFORMED: %r" % (type(res).__name__,), scan_id=scan_id)
+            frec = {"kind": "pilot_funnel", "scan_id": scan_id, "symbol": symbol, "session_id": bd.session_id, "release": bd.release,
+                    "forecast_ref": {"seq": f_receipt["seq"], "forecast_hash": f_receipt.get("forecast_hash")}, "rule_id": res.get("rule_id"),
+                    "decision": res["decision"], "why": res.get("why"), "proposal": res.get("proposal"), "trace": res["trace"],
+                    "engine": res.get("engine"), "at_utc": bd.clock.now_utc(), **bd.labels}
+            assert_prospective(frec)
+            try:
+                fr_receipt = L.append_with_receipt(bd.ledger, frec)
+            except L.LedgerRefused as e:
+                bd.refuse("funnel", "FUNNEL_NOT_PERSISTED: %s" % str(e)[:200], scan_id=scan_id)
+            ids["funnel_seq"] = fr_receipt["seq"]; ids["receipts"]["funnel"] = fr_receipt
+            if res["decision"] != "TRADE":
+                return _decision(bd, scan_id=scan_id, symbol=symbol, decision="WAIT", why="FUNNEL_WAIT: %s" % res.get("why"), ids=ids)
+            proposal = dict(res["proposal"]); signal = proposal.pop("direction_signal", None)
+        else:
+            # 2b. deterministic rule -> risk-bound intent persisted
+            try:
+                signal = signal_fn(symbol, as_of)
+                proposal = choose(symbol=symbol, direction_signal=signal, spot=spot_fn(symbol, as_of),
+                                  as_of=to_utc_string(as_of), available=chain_fn(symbol, as_of))
+            except RuleRefused as e:
+                bd.refuse("rule", str(e), refs={"forecast_seq": f_receipt["seq"]}, scan_id=scan_id)
+            except Exception as e:                                         # noqa: BLE001
+                bd.refuse("rule", "INPUT_PROVIDER_FAILED: %s: %s" % (type(e).__name__, str(e)[:300]), scan_id=scan_id)
         i_receipt = bd.record_intent(forecast_receipt=f_receipt, intent=proposal, signal_used=signal, scan_id=scan_id)
         ids["intent_id"] = i_receipt["intent_id"]; ids["receipts"]["intent"] = i_receipt
         # 3+4. quote only after the intent is on disk; fill exactly once

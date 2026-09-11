@@ -338,6 +338,8 @@ def build_parser() -> argparse.ArgumentParser:
                     help="with --pilot-boundary: drive the boundary from "
                          "the EXPLICIT synthetic harness; records are "
                          "labelled SYNTHETIC_FIXTURE and are not evidence")
+    ap.add_argument("--pilot-selection-policy", default="PILOT_RULE_V1", choices=("PILOT_RULE_V1", "FULL_FUNNEL_V1"),
+                    help="PILOT_RULE_V1 = deterministic rule; FULL_FUNNEL_V1 = the funnel engine (every layer) selects or WAITs")
     ap.add_argument("--pilot-session-id", default=None)
     ap.add_argument("--pilot-release", default=None)
     return ap

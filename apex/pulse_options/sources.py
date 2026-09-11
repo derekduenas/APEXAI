@@ -13,9 +13,11 @@ refuses NO_DIRECTION_SIGNAL). It is recorded on the forecast as `direction_signa
 part of the distribution."""
 from __future__ import annotations
 
+import math
 import time
+from datetime import datetime
 
-from apex.options_pilot.clock import Clock
+from apex.options_pilot.clock import Clock, to_utc_string
 from apex.options_pilot.fees import SYNTHETIC_FEES, UNVERIFIED_FEES
 from apex.options_pilot.risk_authority import CertifiedRiskAuthority
 
@@ -27,9 +29,22 @@ from .snapshot import compose, usable_value
 DIRECTION_RULE = "HEURISTIC_DIRECTION_V1: LONG if ret_15 > 0, SHORT if ret_15 < 0, None otherwise; not a forecast"
 
 
+SELECTION_POLICIES = ("PILOT_RULE_V1", "FULL_FUNNEL_V1")
+
+
 class TwinSources:
     def __init__(self, *, provenance: str, clock: Clock, bar_source, chain_fn, quote_fn, exit_quote_fn,
-                 fee_schedule, sleep_fn=time.sleep, book_fn=None, warmup_minutes: int = 65, artifact=None):
+                 fee_schedule, sleep_fn=time.sleep, book_fn=None, warmup_minutes: int = 65, artifact=None,
+                 selection_policy: str = "PILOT_RULE_V1", funnel_engine=None, funnel_history_days: int = 7):
+        if selection_policy not in SELECTION_POLICIES:
+            raise ValueError("SELECTION_POLICY_UNKNOWN: %r" % (selection_policy,))
+        self.selection_policy = selection_policy
+        self.funnel_engine = funnel_engine
+        if selection_policy == "FULL_FUNNEL_V1" and self.funnel_engine is None:
+            from apex.decision_wb.engine import FunnelEngine
+            self.funnel_engine = FunnelEngine()
+        self.funnel_history_days = funnel_history_days
+        self._funnel_fitted_day: dict = {}
         self.provenance = provenance
         self.clock = clock
         self.bar_source = bar_source
@@ -60,7 +75,9 @@ class TwinSources:
     # ------------------------------------------------------------ the injected functions
     def forecast_fn(self, symbol: str, as_of: float) -> dict:
         snap = self.snapshot(symbol, as_of)
-        return self.artifact.forecast(snap, created_epoch=self.clock.now(), direction_signal=self.signal_fn(symbol, as_of, snap))
+        # under the funnel the heuristic label is NOT the selector: it is recorded on the funnel trace, not on the forecast
+        signal = None if self.selection_policy == "FULL_FUNNEL_V1" else self.signal_fn(symbol, as_of, snap)
+        return self.artifact.forecast(snap, created_epoch=self.clock.now(), direction_signal=signal)
 
     def signal_fn(self, symbol: str, as_of: float, snap: dict | None = None):
         snap = snap or self.last_snapshot.get(symbol) or self.snapshot(symbol, as_of)
@@ -76,14 +93,94 @@ class TwinSources:
     def chain_fn(self, symbol: str, as_of: float):
         return self._chain_fn(symbol, as_of)
 
+    # ------------------------------------------------------------ THE FUNNEL (FULL_FUNNEL_V1): every layer decides together
+    def _fit_funnel_for_day(self, symbol: str, day_start: float, day: str) -> dict:
+        st = self.store(symbol)
+        hist = self.bar_source.bars(symbol, start_epoch=day_start - self.funnel_history_days * 86400.0, end_epoch=day_start)
+        load_bars(st, hist)
+        rows = returns_rows(st.bars_available_by(day_start))            # strictly prior to the session day
+        info = self.funnel_engine.fit(rows, cutoff_epoch=day_start, label="%s %s" % (symbol, day))
+        self._funnel_fitted_day[symbol] = day
+        return info
+
+    def _funnel_quotes(self, symbol: str, as_of: float, spot, chain: list) -> dict:
+        """Indicative quotes for the engine: chain entries carrying bid+ask are used as-is; the eligible set around ATM at the
+        first expiry with DTE >= 21 is completed through the quote provider (INDICATIVE: the fill happens after the intent)."""
+        from apex.decision_wb.engine import DTE_MIN_DAYS
+        from datetime import date
+        quotes = {}
+        for c in chain:
+            key = (c["expiration"], float(c["strike"]), c["right"])
+            if _num(c.get("bid")) and _num(c.get("ask")):
+                quotes[key] = {"bid": c["bid"], "ask": c["ask"], "bid_size": c.get("bid_size", 0), "ask_size": c.get("ask_size", 0),
+                               "timestamp_epoch": c.get("timestamp_epoch", as_of), "indicative": True, "source": "CHAIN"}
+        today = date.fromisoformat(to_utc_string(as_of)[:10])
+        exps = sorted({c["expiration"] for c in chain if (date.fromisoformat(c["expiration"]) - today).days >= DTE_MIN_DAYS})
+        if not exps or not _num(spot):
+            return quotes
+        exp = exps[0]
+        strikes = sorted({float(c["strike"]) for c in chain if c["expiration"] == exp})
+        atm = min(strikes, key=lambda k: (abs(k - spot), k)); i = strikes.index(atm); k_side = self.funnel_engine.k_side
+        for k in strikes[max(0, i - k_side): i + k_side + 1]:
+            for right in ("CALL", "PUT"):
+                key = (exp, k, right)
+                if key in quotes or not any(c["expiration"] == exp and float(c["strike"]) == k and c["right"] == right for c in chain):
+                    continue
+                try:
+                    q = self._quote_fn({"symbol": symbol, "expiration": exp, "strike": k, "right": right})
+                except Exception as e:                                     # noqa: BLE001 - a missing indicative quote is a rejected candidate, not a crash
+                    quotes[key] = {"bid": 0.0, "ask": 0.0, "bid_size": 0, "ask_size": 0, "timestamp_epoch": as_of, "indicative": True, "source": "QUOTE_FAILED: %s" % type(e).__name__}
+                    continue
+                if isinstance(q, dict):
+                    quotes[key] = {"bid": q.get("bid", 0.0), "ask": q.get("ask", 0.0), "bid_size": q.get("bid_size", 0), "ask_size": q.get("ask_size", 0),
+                                   "timestamp_epoch": q.get("timestamp_epoch", as_of), "indicative": True, "source": "QUOTE_PROVIDER"}
+        return quotes
+
+    def funnel_fn(self, symbol: str, as_of: float, forecast: dict) -> dict:
+        day = to_utc_string(as_of)[:10]
+        day_start = datetime.fromisoformat(day + "T00:00:00+00:00").timestamp()
+        if self._funnel_fitted_day.get(symbol) != day:
+            self._fit_funnel_for_day(symbol, day_start, day)
+        snap = self.last_snapshot.get(symbol) or self.snapshot(symbol, as_of)
+        st = self.store(symbol)
+        prefix = [r["ret_1"] for r in returns_rows([b for b in st.bars_available_by(as_of) if b["event_time"] >= day_start])]
+        spot = usable_value(snap, "last_bar_close")
+        chain = self._chain_fn(symbol, as_of)
+        quotes = self._funnel_quotes(symbol, as_of, spot, chain)
+        res = self.funnel_engine.decide(symbol=symbol, as_of=as_of, day=day, snapshot=snap, forecast=forecast, spot=spot, quotes=quotes,
+                                        prefix_returns=prefix, fee_schedule=self.fee_schedule, heuristic_direction=self.signal_fn(symbol, as_of, snap))
+        res["trace"]["inputs"] = {"n_quotes": len(quotes), "quote_sources": sorted({q["source"] for q in quotes.values()}), "prefix_bars": len(prefix),
+                                  "history_days": self.funnel_history_days, "chain_size": len(chain)}
+        res["engine"] = self.funnel_engine.describe()
+        return res
+
     def sources(self) -> dict:
-        return {"forecast_fn": self.forecast_fn, "signal_fn": lambda s, t: self.signal_fn(s, t),
-                "chain_fn": self.chain_fn, "spot_fn": self.spot_fn, "quote_fn": self._quote_fn, "exit_quote_fn": self._exit_quote_fn}
+        out = {"forecast_fn": self.forecast_fn, "signal_fn": lambda s, t: self.signal_fn(s, t),
+               "chain_fn": self.chain_fn, "spot_fn": self.spot_fn, "quote_fn": self._quote_fn, "exit_quote_fn": self._exit_quote_fn}
+        if self.selection_policy == "FULL_FUNNEL_V1":
+            out["funnel_fn"] = self.funnel_fn
+        return out
 
 
-def synthetic_twin_sources(*, clock: Clock, quote_fn, exit_quote_fn, chain_fn, sleep_fn, seed: int = 7) -> TwinSources:
+def _num(x) -> bool:
+    return isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(x) and x > 0
+
+
+def returns_rows(bars: list) -> list:
+    """Consecutive-minute log returns only: a gap (overnight, halt, missing bar) yields no return, so pooled fits never see a jump
+    that is an artifact of the calendar. Rows carry event_time/available for the models' data firewall."""
+    rows = []
+    for a, b in zip(bars, bars[1:]):
+        if b["event_time"] - a["event_time"] == 60.0 and a["close"] > 0 and b["close"] > 0:
+            rows.append({"event_time": b["event_time"], "available": b["available"], "ret_1": math.log(b["close"] / a["close"])})
+    return rows
+
+
+def synthetic_twin_sources(*, clock: Clock, quote_fn, exit_quote_fn, chain_fn, sleep_fn, seed: int = 7, selection_policy: str = "PILOT_RULE_V1",
+                           funnel_engine=None) -> TwinSources:
     return TwinSources(provenance="SYNTHETIC_FIXTURE", clock=clock, bar_source=SyntheticBarProvider(seed=seed), chain_fn=chain_fn,
-                       quote_fn=quote_fn, exit_quote_fn=exit_quote_fn, fee_schedule=SYNTHETIC_FEES, sleep_fn=sleep_fn)
+                       quote_fn=quote_fn, exit_quote_fn=exit_quote_fn, fee_schedule=SYNTHETIC_FEES, sleep_fn=sleep_fn,
+                       selection_policy=selection_policy, funnel_engine=funnel_engine)
 
 
 class _LiveBars:
@@ -95,7 +192,7 @@ class _LiveBars:
         return self.adapter.bars(symbol, start_epoch=start_epoch, end_epoch=end_epoch)
 
 
-def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn=None) -> TwinSources:
+def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn=None, selection_policy: str = "PILOT_RULE_V1") -> TwinSources:
     """LIVE_FEED sources. Connectivity is gated: with the default environment every provider call raises
     ProviderUnavailable before any network access, and the boundary persists the refusal."""
     gate = gate or LiveGate()
@@ -118,4 +215,4 @@ def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn
 
     return TwinSources(provenance="LIVE_FEED", clock=Clock(time.time), bar_source=_LiveBars(alpaca), chain_fn=chain_fn,
                        quote_fn=quote_fn, exit_quote_fn=quote_fn, fee_schedule=UNVERIFIED_FEES, sleep_fn=time.sleep,
-                       book_fn=lambda s, t: alpaca.nbbo(s))
+                       book_fn=lambda s, t: alpaca.nbbo(s), selection_policy=selection_policy)

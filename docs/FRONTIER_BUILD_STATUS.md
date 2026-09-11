@@ -27,6 +27,7 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 | M4 — Multiverse + market-implied | `SYNTHETIC_VERIFIED` | `80ea8de` | `apex/multiverse_wb/{simulator,pricing,surface,expression_war}.py`; `tests/test_multiverse_wb.py` (8) |
 | M5 — fusion, supervision, learning | `SYNTHETIC_VERIFIED` | `ceb7e7f` | `apex/decision_wb/{fusion,supervision,experience,enrichment}.py`; `tests/test_decision_wb.py` (4) |
 | M6 — operator view + commissioning package | `SYNTHETIC_VERIFIED` (package PREPARED; activation NOT authorized) | `9cfb70f` | `apex/options_pilot/operator_view.py`; `scripts/options_pilot_scale_check.py` + `docs/evidence/scale_check_10_sessions_OUTPUT.json`; `docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md`; funnel trace on every decision |
+| M7 — THE FUNNEL: every layer in one decision path (`FULL_FUNNEL_V1`) | `SYNTHETIC_VERIFIED` (default policy stays `PILOT_RULE_V1`; activation NOT authorized) | this commit | `apex/decision_wb/engine.py`; `TwinSources.funnel_fn`; `session.scan(funnel_fn=)` + `FUNNEL_TRACE_V2`; `--pilot-selection-policy`; replay variant `apex/backtest_wb/funnel.py` + PILOT-REPLAY-002 contract (declared, not run); `tests/test_funnel_engine.py` (17) + replay planted-drift test; `docs/FUNNEL_INTEGRATION.md` |
 
 ## M0 — closed at `360536cb` (reconciled against the mandate's four items)
 
@@ -230,6 +231,23 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
   (fee verification, kernel cap vs SPY prices, live smoke, collection, independent acceptance, deployment
   mechanics), expected records, authorities, stop conditions, recovery, operator commands, and the
   implemented / synthetically verified / accepted / authorized state table.
+
+## M7 — the funnel (what was built)
+
+See `docs/FUNNEL_INTEGRATION.md`. One engine (`FunnelEngine`) is used by the live session path and by the replay:
+twin → artifact location → walk-forward GARCH-t variance (EWMA fallback declared) → causal regime filter → ATM
+implied vol → joint simulation with declared drift → expression comparison (WAIT + near-ATM set, both rights,
+risk envelope inside the set) → PRIME supervision → risk-bound intent or WAIT. The engine's result is persisted as a
+`pilot_funnel` record before any intent and every decision's trace is filled from it. First contact with SPY-scale
+prices makes the kernel-cap blocker explicit (all near-ATM asks rejected by the envelope).
+
+## Backtests (development studies, exposed sessions ≤ 2021 only)
+
+- PILOT-REPLAY-001 COMPLETED on the host: the deterministic rule did not demonstrate improvement over WAIT
+  (−5.48 USD/trade, CI [−6.40, −4.50]); direction label no skill (49.6 %). `docs/PILOT_REPLAY_001_RESULT.md`.
+- SHARADAR-DAILYVOL-001 COMPLETED: `docs/SHARADAR_DAILYVOL_001_RESULT.md`.
+- PILOT-REPLAY-002 (FULL_FUNNEL vs POLICY vs WAIT on common rows) DECLARED, NOT RUN — held by the operator until
+  the funnel is complete.
 
 ## Evidence index
 

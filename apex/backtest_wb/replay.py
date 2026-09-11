@@ -95,8 +95,19 @@ def _hhmm(epoch: float) -> str:
     return datetime.fromtimestamp(epoch, tz=timezone.utc).astimezone(ET).strftime("%H:%M")
 
 
+def fill_and_exit(q: dict, xq: dict | None, fee_schedule=SYNTHETIC_FEES) -> dict:
+    """Entry at ask (m), exit at bid (m+15), fees once per side. Shared by every variant."""
+    fe, fx = fee_schedule.entry(1)["total"], fee_schedule.exit(1)["total"]
+    if xq is None or xq["bid"] <= 0 or xq["bid_size"] < 1:
+        return {"exit": {"status": "NOT_ESTIMABLE", "why": "EXIT_BID_MISSING_OR_ZERO"}, "pnl": None}
+    gross = MULT * (xq["bid"] - q["ask"])
+    return {"exit": {"status": "RESOLVED", "bid": xq["bid"], "bid_size": xq["bid_size"]},
+            "pnl": {"gross": round(gross, 2), "fees": round(fe + fx, 2), "net": round(gross - fe - fx, 2),
+                    "spread_crossing_cost": round(MULT * ((q["ask"] - q["bid"]) / 2 + (xq["ask"] - xq["bid"]) / 2), 2) if xq["ask"] > 0 else None}}
+
+
 def replay_session(root: Path, symbol: str, day: str, *, artifact: FrozenArtifact, fee_schedule=SYNTHETIC_FEES, seed: int = 11,
-                   out_path: Path | None = None) -> list:
+                   out_path: Path | None = None, funnel=None) -> list:
     bars = load_bars(root, symbol, day)
     if len(bars) < 60:
         return [{"kind": "replay_session_refused", "day": day, "why": "TOO_FEW_REGULAR_BARS: %d" % len(bars)}]
@@ -179,9 +190,17 @@ def replay_session(root: Path, symbol: str, day: str, *, artifact: FrozenArtifac
             else:
                 v["pnl"] = None
             rec["variants"][name] = v
+        if funnel is not None:
+            try:
+                rec["variants"]["FULL_FUNNEL"] = funnel.decide(day=day, m=m, snapshot=snap, forecast=fc, q_now=q_now, q_exit=q_exit, spot=spot,
+                                                              bars_prefix=[b for b in bars if b["event_time"] < m], fee_schedule=fee_schedule)
+            except Exception as e:                                             # noqa: BLE001 - the funnel's failures are recorded, never hidden
+                rec["variants"]["FULL_FUNNEL"] = {"decision": "REFUSE", "why": "FUNNEL_FAILED: %s: %s" % (type(e).__name__, str(e)[:160]), "direction": None}
         rec["decision"] = rec["variants"]["POLICY"].get("decision")
         rec["why"] = rec["variants"]["POLICY"].get("why")
         records.append(rec)
+    if funnel is not None:
+        funnel.end_session(day=day, bars=bars)
     if out_path is not None:
         for r in records:
             chain_append(out_path, r)
