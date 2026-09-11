@@ -258,3 +258,17 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 - **Other configured MCP servers** (bigdata.com, daloopa, LSEG, S&P Global, finance BigQuery) are present but
   unauthenticated in this session; they are candidate event/fundamental sources for the enrichment schema once
   authorized, not part of the pilot path.
+
+## Host live smoke and collector (operator-authorized 2026-09-11)
+
+- **§A smoke executed on the host** (contained, gated by authorization file + switch + credentials): all four
+  provider steps succeeded in under 0.2 s each; 91 Alpaca bars ingested with zero rejections; NBBO carried sizes;
+  ThetaData returned 332 quotes for the nearest ≥ 21 DTE expiration with ET-naive timestamps localized and their
+  age at receipt recorded (≈ 6.7 h: market closed). The twin composed a snapshot whose bar fields were all STALE
+  and the artifact refused to forecast — the pipeline's staleness gates fired exactly as designed. Evidence:
+  `docs/evidence/host_live_smoke_2026-09-11_closed_market.json`. Note: the legacy `underlying_nbbo` helper drops
+  the quote timestamp; the collector therefore uses `AlpacaBarsAdapter.nbbo`, which keeps it.
+- **§B collector launched** as transient unit `apex-pilot-collector` (observation only, hash-chained records,
+  heartbeat, stop rules). It is not the pilot; it writes no pilot or live ledger record. First regular session it
+  will see: 2026-09-11 09:30 ET.
+- **Robinhood MCP market-hours smoke** scheduled once for 2026-09-11 09:40 ET from the agent session.

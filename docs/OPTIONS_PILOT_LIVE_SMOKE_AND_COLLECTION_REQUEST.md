@@ -1,8 +1,17 @@
 # Request: read-only live smoke and prospective collection for the options pilot twin
 
-**Status: PREPARED, NOT EXECUTED.** Nothing in this request has been run. It is
-the operator decision package the M2 mandate asks for; executing either part
-needs an explicit operator authorization outside this build.
+**Status (updated 2026-09-11): operator-authorized in chat ("yup do your thing" / "yup LFG") and EXECUTED.**
+- §A read-only smoke: run on the host at 02:56:58Z under containment with `APEX_PILOT_LIVE_DATA=ENABLED` and the
+  authorization file `/apex-data/pilot_smoke/AUTHORIZATION.txt`. Result COMPLETED: Alpaca 91 bars accepted (0 rejected),
+  NBBO with sizes, ThetaData 2,124 expirations, 332 quotes for 2026-10-02; every option quote 24,118–24,243 s old at
+  receipt (market closed) so the snapshot was STALE throughout and the artifact refused `ret_1 is STALE` — the
+  correct closed-market answer. Evidence: `docs/evidence/host_live_smoke_2026-09-11_closed_market.json`.
+- §B prospective collection: `scripts/options_pilot_collector.py` launched at ~02:58Z as transient unit
+  `apex-pilot-collector` (wmresearch.slice, MemoryMax=300M, user apex), idle outside regular hours, 10 sessions,
+  SPY/QQQ/IWM, root `/apex-data/pilot_collection/`, heartbeat `HEARTBEAT.json`, stop file `STOP`.
+- Robinhood MCP (agent-session channel): read-only smoke done at 02:46–02:49Z (`docs/evidence/robinhood_smoke_2026-09-11.json`);
+  a one-time market-hours smoke is scheduled for 2026-09-11 09:40 ET.
+The legacy options service, its maintenance block, the live options ledger and the deployed release are untouched.
 
 ## A. Read-only live smoke (one session, one symbol)
 

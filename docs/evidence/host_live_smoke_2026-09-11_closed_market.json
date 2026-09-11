@@ -1,0 +1,259 @@
+{
+ "kind": "live_smoke_read_only",
+ "evidence_class": "SMOKE_READ_ONLY",
+ "data_provenance": "LIVE_FEED",
+ "symbol": "SPY",
+ "authorization": "OPTIONS_PILOT_LIVE_SMOKE_AUTHORIZED 2026-09-11 operator (Derek) in chat: \"yup do your thing\" / \"yup LFG\" \u2014 read-only smoke of Alpaca bars+NBBO and ThetaData chain; no orders; no ledger writes",
+ "gate": {
+  "switch": "ENABLED",
+  "switch_ok": true,
+  "credentials_present": {
+   "ALPACA_API_KEY_ID": true,
+   "ALPACA_API_SECRET_KEY": true
+  },
+  "enabled": true
+ },
+ "started_utc": "2026-09-11T02:56:57.992920+00:00",
+ "steps": [
+  {
+   "step": "alpaca_bars",
+   "ok": true,
+   "receipt_epoch": 1789095418.1136498,
+   "elapsed_s": 0.117
+  },
+  {
+   "step": "alpaca_nbbo",
+   "ok": true,
+   "receipt_epoch": 1789095418.151612,
+   "elapsed_s": 0.037
+  },
+  {
+   "step": "theta_expirations",
+   "ok": true,
+   "receipt_epoch": 1789095418.2032704,
+   "elapsed_s": 0.052
+  },
+  {
+   "step": "theta_chain",
+   "ok": true,
+   "receipt_epoch": 1789095418.2244132,
+   "elapsed_s": 0.02
+  }
+ ],
+ "bar_window_utc": [
+  "2026-09-10T18:30:00+00:00",
+  "2026-09-10T20:00:00+00:00"
+ ],
+ "bars": {
+  "n_raw": 91,
+  "first": "2026-09-10T18:30:00Z",
+  "last": "2026-09-10T20:00:00Z",
+  "ingest": {
+   "accepted": 91,
+   "problems": [],
+   "counters": {
+    "trades": 0,
+    "duplicates": 0,
+    "out_of_order": 0,
+    "late": 0,
+    "revisions": 0,
+    "provider_bars": 91,
+    "rejected": 0
+   }
+  }
+ },
+ "nbbo": {
+  "bid": 757.49,
+  "ask": 757.53,
+  "bid_size": 480,
+  "ask_size": 120,
+  "timestamp": null
+ },
+ "expirations": {
+  "n": 2124,
+  "nearest_ge_21dte": "2026-10-02"
+ },
+ "chain": {
+  "n_quotes": 332,
+  "fields": [
+   "ask",
+   "ask_size",
+   "bid",
+   "bid_size",
+   "expiration",
+   "moneyness_status",
+   "right",
+   "strike",
+   "symbol",
+   "timestamp"
+  ],
+  "sample": {
+   "symbol": "SPY",
+   "expiration": "2026-10-02",
+   "strike": "820.000",
+   "right": "PUT",
+   "timestamp": "2026-09-10T16:14:36.048",
+   "bid": "61.11",
+   "ask": "64.39",
+   "bid_size": "10",
+   "ask_size": "126",
+   "moneyness_status": "CAUSAL"
+  },
+  "quote_age_s_at_receipt": {
+   "min": 24118.00741314888,
+   "max": 24243.18941307068,
+   "n": 332
+  },
+  "timestamp_convention": "provider ET-naive wall clock localized to America/New_York (recorded)"
+ },
+ "snapshot": {
+  "as_of_utc": "2026-09-11T02:56:58.613650Z",
+  "state_hash": "8c9dd00c77265a42c4837320b4a668c97f867f11aecdf67de3b023ce3d8dd8c1",
+  "quality_census": {
+   "NOT_AVAILABLE": 4,
+   "SESSION_INAPPLICABLE": 2,
+   "STALE": 16,
+   "VALID": 10
+  },
+  "missingness": 0.6875,
+  "fields": {
+   "session_phase": {
+    "value": "CLOSED",
+    "quality": "VALID"
+   },
+   "minute_of_session": {
+    "value": null,
+    "quality": "SESSION_INAPPLICABLE"
+   },
+   "seasonality_bucket": {
+    "value": null,
+    "quality": "SESSION_INAPPLICABLE"
+   },
+   "last_bar_close": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "last_bar_age_s": {
+    "value": 24958.614,
+    "quality": "VALID"
+   },
+   "last_bar_revision_count": {
+    "value": 0,
+    "quality": "VALID"
+   },
+   "ret_1": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "rv_1": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "ret_5": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "rv_5": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "ret_10": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "rv_10": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "ret_15": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "rv_15": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "ret_30": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "rv_30": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "ret_60": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "rv_60": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "session_vwap": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "vwap_distance_bps": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "session_range_position": {
+    "value": null,
+    "quality": "STALE"
+   },
+   "prior_close": {
+    "value": null,
+    "quality": "NOT_AVAILABLE"
+   },
+   "gap_from_prior_close_bps": {
+    "value": null,
+    "quality": "NOT_AVAILABLE"
+   },
+   "underlying_bid": {
+    "value": 757.49,
+    "quality": "VALID"
+   },
+   "underlying_ask": {
+    "value": 757.53,
+    "quality": "VALID"
+   },
+   "underlying_spread_bps": {
+    "value": 0.5280458343779438,
+    "quality": "VALID"
+   },
+   "underlying_bid_size": {
+    "value": 480,
+    "quality": "VALID"
+   },
+   "underlying_ask_size": {
+    "value": 120,
+    "quality": "VALID"
+   },
+   "chain_quote_count": {
+    "value": 332,
+    "quality": "VALID"
+   },
+   "chain_expirations": {
+    "value": [
+     "2026-10-02",
+     "2026-10-09",
+     "2026-10-16"
+    ],
+    "quality": "VALID"
+   },
+   "next_scheduled_event_type": {
+    "value": null,
+    "quality": "NOT_AVAILABLE"
+   },
+   "seconds_to_next_scheduled_event": {
+    "value": null,
+    "quality": "NOT_AVAILABLE"
+   }
+  }
+ },
+ "forecast": {
+  "refused": "FeaturesRefused: FEATURE_UNAVAILABLE: ret_1 is STALE (window ends at a stale bar)"
+ },
+ "result": "COMPLETED",
+ "finished_utc": "2026-09-11T02:56:58.229576+00:00"
+}
