@@ -1,0 +1,183 @@
+{
+ "sessions": 10,
+ "symbols": [
+  "SPY",
+  "QQQ",
+  "IWM"
+ ],
+ "cycles": 3,
+ "records": 470,
+ "kinds": {
+  "pilot_session_open": 10,
+  "pilot_forecast": 90,
+  "pilot_intent": 90,
+  "pilot_fill": 90,
+  "pilot_decision": 90,
+  "pilot_intent_expired": 18,
+  "pilot_intent_cancelled": 9,
+  "pilot_session_close": 10,
+  "pilot_outcome": 63
+ },
+ "per_session": [
+  {
+   "session": "SCALE-001",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 0,
+    "WAIT": 9,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 10000.0,
+   "integrity": [],
+   "cash_identity": true
+  },
+  {
+   "session": "SCALE-002",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 9,
+    "WAIT": 0,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 10162.27,
+   "integrity": [],
+   "cash_identity": true
+  },
+  {
+   "session": "SCALE-003",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 9,
+    "WAIT": 0,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 10324.54,
+   "integrity": [],
+   "cash_identity": true
+  },
+  {
+   "session": "SCALE-004",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 9,
+    "WAIT": 0,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 10486.81,
+   "integrity": [],
+   "cash_identity": true
+  },
+  {
+   "session": "SCALE-005",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 0,
+    "WAIT": 9,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 10486.81,
+   "integrity": [],
+   "cash_identity": true
+  },
+  {
+   "session": "SCALE-006",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 9,
+    "WAIT": 0,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 10649.08,
+   "integrity": [],
+   "cash_identity": true
+  },
+  {
+   "session": "SCALE-007",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 9,
+    "WAIT": 0,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 10811.35,
+   "integrity": [],
+   "cash_identity": true
+  },
+  {
+   "session": "SCALE-008",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 9,
+    "WAIT": 0,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 10973.62,
+   "integrity": [],
+   "cash_identity": true
+  },
+  {
+   "session": "SCALE-009",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 0,
+    "WAIT": 9,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 10973.62,
+   "integrity": [],
+   "cash_identity": true
+  },
+  {
+   "session": "SCALE-010",
+   "rc": 0,
+   "decisions": {
+    "TRADE": 9,
+    "WAIT": 0,
+    "REFUSE": 0
+   },
+   "completion": "CLOSED_CLEAN",
+   "outstanding": 0,
+   "cash": 11135.89,
+   "integrity": [],
+   "cash_identity": true
+  }
+ ],
+ "binding_problems": [],
+ "chain_verified": true,
+ "book_all_sessions": {
+  "cash": 11135.89,
+  "total_realized_pnl": 1135.89,
+  "positions_open": 0,
+  "integrity_problems": [],
+  "cash_identity": {
+   "lhs_cash": 11135.89,
+   "rhs": 11135.89,
+   "holds": true,
+   "formula": "cash == start - open_cost - open_entry_fees + total_realized_pnl (realized already net of both fees)"
+  }
+ },
+ "operator_view_ok": true,
+ "elapsed_s": 54.0,
+ "max_rss_bytes": 129470464,
+ "ledger_bytes": 1907541,
+ "provenance": "SYNTHETIC_FIXTURE",
+ "evidence_class": "PROSPECTIVE_PAPER (synthetic orchestration, not market evidence)"
+}

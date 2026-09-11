@@ -66,10 +66,41 @@ def _payload_of(rec: dict, receipt: dict, *, reconciled: bool) -> dict:
             "reconciled": reconciled, "receipts": {}}
 
 
+FUNNEL_STAGES = ("state_snapshot", "situation_regime", "model_bundle", "simulation_bundle", "eligible_expressions", "expected_economics",
+                 "risk_decision", "final")
+
+
+def funnel_trace(bd: B.Boundary, *, ids: dict, decision: str, why) -> dict:
+    """The funnel trace persisted with every decision: each required stage names what it used or WHY it is missing."""
+    rows = L.read_all(bd.ledger)
+    fc = next((r for r in rows if r.get("kind") == "pilot_forecast" and r.get("forecast_id") == ids.get("forecast_id")), None) if ids.get("forecast_id") else None
+    it = next((r for r in rows if r.get("kind") == "pilot_intent" and r.get("intent_id") == ids.get("intent_id")), None) if ids.get("intent_id") else None
+    t = {}
+    t["state_snapshot"] = {"state_hash": (fc.get("inputs") or {}).get("state_hash")} if fc and (fc.get("inputs") or {}).get("state_hash") else \
+        {"missing": "NO_STATE_HASH: forecast provider did not attach a twin state" if fc else "NO_FORECAST: %s" % (why or "refused before a forecast")}
+    t["situation_regime"] = {"missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast",
+                             "direction_signal": fc.get("direction_signal") if fc else None}
+    t["model_bundle"] = ({"model_id": fc["model_id"], "params_hash": fc["params_hash"], "family": fc["family"], "validation": fc.get("validation_status")}
+                         if fc else {"missing": "NO_FORECAST"})
+    t["simulation_bundle"] = {"missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"}
+    t["eligible_expressions"] = ({"rule": it.get("expression_rule"), "chosen": it.get("expression"), "contract_id": it.get("contract_id"),
+                                  "set": ["WAIT", it.get("expression")], "no_best_option_claim": it.get("no_best_option_claim")}
+                                 if it else {"missing": "NO_INTENT: %s" % (why or "rule/risk refused")})
+    t["expected_economics"] = {"missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"}
+    t["risk_decision"] = ({"provenance": (it.get("risk") or {}).get("risk_provenance"), "authority_id": (it.get("risk") or {}).get("authority_id"),
+                           "certified_max_loss": (it.get("risk") or {}).get("certified_max_loss"),
+                           "kernel_approved_at_commit": ((it.get("risk") or {}).get("kernel_check_at_commit") or {}).get("approved")}
+                          if it else {"missing": "NO_INTENT"})
+    t["final"] = {"decision": decision, "why": why}
+    t["contract"] = "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence"
+    return t
+
+
 def _decision(bd: B.Boundary, *, scan_id: str, symbol: str, decision: str, why, ids: dict, persisted_refusal=None) -> dict:
     rec = {"kind": "pilot_decision", "txn_id": "decision:" + scan_id, "scan_id": scan_id, "symbol": symbol,
            "session_id": bd.session_id, "release": bd.release, "decision": decision, "why": why,
            "forecast_id": ids.get("forecast_id"), "intent_id": ids.get("intent_id"), "fill_id": ids.get("fill_id"),
+           "funnel_trace": funnel_trace(bd, ids=ids, decision=decision, why=why),
            "refusal_persisted": persisted_refusal, "decided_utc": bd.clock.now_utc(), **bd.labels}
     assert_prospective(rec)
     out = {"scan_id": scan_id, "symbol": symbol, "decision": decision, "why": why, **ids, "receipts": ids.get("receipts", {}),
@@ -176,7 +207,8 @@ def resolve(bd: B.Boundary, *, fill_receipt: dict, exit_quote_fn, recovery: bool
     return bd.record_outcome(fill_receipt=fill_receipt, exit_quote_fn=exit_quote_fn, recovery=recovery)
 
 
-def attempt_exits(bd: B.Boundary, *, exit_quote_fn, sleep_fn, recovery: bool = False, positions: list | None = None) -> list:
+def attempt_exits(bd: B.Boundary, *, exit_quote_fn, sleep_fn, recovery: bool = False, positions: list | None = None,
+                  wait_for_due: bool = True) -> list:
     """Drive the frozen exit policy over this session's unresolved positions:
     wait until due, value, retry inside the window, record exhaustion.
     Returns one entry per position with the final state THIS run reached."""
@@ -197,6 +229,9 @@ def attempt_exits(bd: B.Boundary, *, exit_quote_fn, sleep_fn, recovery: bool = F
             n_att = len(B.Boundary.valuation_attempts(L.read_all(bd.ledger), pos["seq"]))
             status = pol.status(now=bd.clock.now(), committed_epoch=committed, attempts=n_att)
             if status == "NOT_DUE":
+                if not wait_for_due:
+                    entry["final"] = "NOT_DUE"
+                    break
                 sleep_fn(max(0.0, committed + pol.horizon_s - bd.clock.now()))
                 continue
             if status == "EXHAUSTED" and not recovery:

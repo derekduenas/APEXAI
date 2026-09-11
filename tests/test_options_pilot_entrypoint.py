@@ -279,3 +279,21 @@ def test_f6_lifecycle_recovery_through_the_entry_point(tmp_path, fenced):
     assert rep6["unresolved_positions"] == [] and rep6["completion"] == "CLOSED_CLEAN"
     assert len(S.unresolved_fills(led)) == 1                                           # still LC-2's obligation, untouched
     L.verify_chain(led)
+
+
+def test_every_decision_carries_a_funnel_trace_with_named_missing_stages(tmp_path, fenced):
+    h = SyntheticHarness(tmp_path / "led.jsonl", session_id="FT-1", risk="certified")
+    h.quotes.override = lambda c: {**c, "bid": 2.4, "ask": 2.5, "bid_size": 9, "ask_size": 12, "timestamp_epoch": h.now() - (30.0 if c["symbol"] == "QQQ" else 1.0)}
+    base = h.base_forecast
+    h.forecast_override = lambda s, t: (_ for _ in ()).throw(ConnectionError("down")) if s == "AAPL" else base(s, t)
+    sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "FT-1", symbols="SPY,QQQ,AAPL"), pilot_sources=E._HarnessProvider(h))
+    rows = L.read_all(tmp_path / "led.jsonl")
+    decs = {r["symbol"]: r for r in rows if r["kind"] == "pilot_decision"}
+    for r in decs.values():
+        tr = r["funnel_trace"]
+        assert set(S.FUNNEL_STAGES) <= set(tr) and tr["contract"].startswith("FUNNEL_TRACE_V1")
+        assert "missing" in tr["simulation_bundle"] and "missing" in tr["expected_economics"] and "missing" in tr["situation_regime"]
+    assert decs["SPY"]["funnel_trace"]["final"]["decision"] == "TRADE" and decs["SPY"]["funnel_trace"]["risk_decision"]["kernel_approved_at_commit"] is True
+    assert decs["SPY"]["funnel_trace"]["model_bundle"]["params_hash"].startswith("SYNTHETIC:") and decs["SPY"]["funnel_trace"]["eligible_expressions"]["set"] == ["WAIT", "LONG_CALL"]
+    assert decs["QQQ"]["funnel_trace"]["final"]["decision"] == "WAIT"
+    assert decs["AAPL"]["funnel_trace"]["state_snapshot"]["missing"].startswith("NO_FORECAST") and decs["AAPL"]["funnel_trace"]["eligible_expressions"]["missing"].startswith("NO_INTENT")

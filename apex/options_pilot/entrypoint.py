@@ -75,6 +75,7 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     ledger = Path(ledger)
     bd = build_boundary(ledger, provider=provider, session_id=session_id, release=release)
     src = provider.sources()
+    sleep = getattr(provider, "sleep_fn", None) or sleep_fn        # a controlled clock 'sleeps' by advancing
     report = {"route": ROUTE_PILOT, "session_id": session_id, "release": release,
               "execution_mode": bd.labels["execution_mode"], "data_provenance": bd.labels["data_provenance"],
               "evidence_class": bd.labels["evidence_class"], "decision_power": bd.labels["decision_power"],
@@ -93,7 +94,13 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     # would be refused at the boundary (SESSION_CLOSED) and would then sit as unfinished obligations of their own.
     already_closed = session_id in S.closed_sessions(S.L.read_all(ledger))
     report["mode"] = "RECOVERY_ONLY" if already_closed else "SCAN_AND_RESOLVE"
+    report["housekeeping"] = []
     for cycle in range(0 if already_closed else max(1, cycles)):
+        if cycle:
+            # each cycle starts with housekeeping: expire/re-quote open intents (terminal records for expired ones)
+            # and value positions that are DUE now, without waiting for the ones that are not
+            report["housekeeping"].append({"cycle": cycle, "resumed": S.resume(bd, quote_fn=src["quote_fn"]),
+                                           "exits": S.attempt_exits(bd, exit_quote_fn=src["exit_quote_fn"], sleep_fn=sleep, wait_for_due=False)})
         for sym in symbols:
             seq = S.next_seq(ledger, session_id=session_id)
             d = S.scan(bd, symbol=sym, seq=seq, forecast_fn=src["forecast_fn"], signal_fn=src["signal_fn"],
@@ -104,14 +111,15 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
             if d["decision"] == "TRADE" and d.get("receipts", {}).get("fill"):
                 fills.append(d["receipts"]["fill"])
         if cycle + 1 < cycles and interval_s > 0:
-            sleep_fn(interval_s)
-    sleep = getattr(provider, "sleep_fn", None) or sleep_fn
+            sleep(interval_s)
     # RECOVERED positions (from earlier processes) get one labelled recovery attempt each; positions this run created are
     # driven through the frozen exit policy (wait until due, value, retry inside the window, record exhaustion).
-    new_fills = [f for f in fills if f["seq"] not in {r["seq"] for r in recovered["own"]}]
+    recovered_seqs = {r["seq"] for r in recovered["own"]}
     for entry in S.attempt_exits(bd, exit_quote_fn=src["exit_quote_fn"], sleep_fn=sleep, recovery=True, positions=recovered["own"]):
         report["outcomes"].append({"fill_seq": entry["fill_seq"], "recovery": True, "final": entry["final"], "attempts": entry["attempts"]})
-    for entry in S.attempt_exits(bd, exit_quote_fn=src["exit_quote_fn"], sleep_fn=sleep, recovery=False, positions=new_fills):
+    # every position of THIS session still unresolved (including ones opened mid-run) is driven to a terminal exit state
+    remaining = [p for p in S.recover_positions(bd)["own"] if p["seq"] not in recovered_seqs]
+    for entry in S.attempt_exits(bd, exit_quote_fn=src["exit_quote_fn"], sleep_fn=sleep, recovery=False, positions=remaining):
         report["outcomes"].append({"fill_seq": entry["fill_seq"], "recovery": False, "final": entry["final"], "attempts": entry["attempts"]})
     still_open = S.recover_positions(bd)
     report["unresolved_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id",

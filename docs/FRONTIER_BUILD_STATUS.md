@@ -25,8 +25,8 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 | M2 — PULSE / Twin / inference adapters | `SYNTHETIC_VERIFIED` | `d026b87` | `apex/pulse_options/{ingest,snapshot,features,inference,providers,sources}.py` + `exp002_artifact.json`; `tests/test_pulse_options_twin.py` (22); smoke script + collection request prepared, not executed |
 | M3 — World Model workbench | `SYNTHETIC_VERIFIED` (foundation benchmarks `BLOCKED_RESOURCE` / `BLOCKED_LICENSE`) | `e277e4c` | `apex/worldmodel_wb/*`; `tests/test_worldmodel_wb.py` (14); `docs/evidence/garch_reference_vs_arch_OUTPUT.json` |
 | M4 — Multiverse + market-implied | `SYNTHETIC_VERIFIED` | `80ea8de` | `apex/multiverse_wb/{simulator,pricing,surface,expression_war}.py`; `tests/test_multiverse_wb.py` (8) |
-| M5 — fusion, supervision, learning | `SYNTHETIC_VERIFIED` | see manifest (`M5.commit`) | `apex/decision_wb/{fusion,supervision,experience,enrichment}.py`; `tests/test_decision_wb.py` (4) |
-| M6 — operator view + commissioning package | `NOT_STARTED` | — | — |
+| M5 — fusion, supervision, learning | `SYNTHETIC_VERIFIED` | `ceb7e7f` | `apex/decision_wb/{fusion,supervision,experience,enrichment}.py`; `tests/test_decision_wb.py` (4) |
+| M6 — operator view + commissioning package | `SYNTHETIC_VERIFIED` (package PREPARED; activation NOT authorized) | see manifest (`M6.commit`) | `apex/options_pilot/operator_view.py`; `scripts/options_pilot_scale_check.py` + `docs/evidence/scale_check_10_sessions_OUTPUT.json`; `docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md`; funnel trace on every decision |
 
 ## M0 — closed at `360536cb` (reconciled against the mandate's four items)
 
@@ -74,7 +74,7 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
   attempts; the report carries book, fee schedule, exit and execution policies.
 - **Production route**: `ProductionSources` uses the certified authority with the UNVERIFIED fee schedule and
   LIVE_FEED provenance, so every intent is refused `FEE_SCHEDULE_UNVERIFIED` until a provider schedule is
-  verified and recorded. The forecast provider is still `NO_REVIEWED_INFERENCE_ADAPTER` (M2).
+  verified and recorded. (At M1 the forecast provider was still `NO_REVIEWED_INFERENCE_ADAPTER`; M2 replaced it with the gated twin sources.)
 
 ## Known limitations carried forward
 
@@ -207,3 +207,35 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 - **Enrichment** (`enrichment.py`): source-linked event records with event/publication/receipt clocks,
   dedup keys, extraction uncertainty and prompt/model versions; a schedule is a known covariate, a release is
   usable only from its publication time; `NoLLMClient` refuses — this build makes no model calls.
+
+## M6 — what was built
+
+- **Funnel trace** (`session.funnel_trace`, stamped on every `pilot_decision`): state snapshot hash, situation/
+  regime (named as NOT_AVAILABLE_IN_PILOT), model bundle (model id, params hash, family, validation status),
+  simulation bundle (NOT_USED_IN_PILOT), eligible expression set with WAIT, expected economics (UNESTABLISHED),
+  risk decision (provenance, authority, certified max loss, kernel approval at commit), final decision. A
+  missing stage names why.
+- **Operator view** (`operator_view.py`): read-only rendering of persisted records — feed age, release and
+  model versions, active policies, Book, reservations, positions/unresolved exits, recent forecasts, intents,
+  fills, outcomes, refusals, decisions — every item carrying the ledger seq it came from; chain verification in
+  process health; no gauges, no fabricated fills. (No dashboard script exists on this branch to extend; this is
+  the view layer a later reviewed change may serve read-only.)
+- **Representative-scale check** (`scripts/options_pilot_scale_check.py`): 10 synthetic sessions × 3 symbols ×
+  3 cycles through the real entry point with the certified authority — 470 records, 90 forecasts = intents =
+  fills = decisions, 63 outcomes, 18 expired, 9 cancelled at close, 0 binding problems, chain verified, cash
+  identity holds, 0 open positions, 54 s, 129 MB peak RSS. The run surfaced and fixed two loop defects (a wall-
+  clock sleep between cycles on a controlled clock; open WAIT intents blocking the family cap until housekeeping
+  expired them) — housekeeping and due-exit valuation now run at the start of every cycle.
+- **Commissioning package** (`docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md`): scope, blocking prerequisites
+  (fee verification, kernel cap vs SPY prices, live smoke, collection, independent acceptance, deployment
+  mechanics), expected records, authorities, stop conditions, recovery, operator commands, and the
+  implemented / synthetically verified / accepted / authorized state table.
+
+## Evidence index
+
+- Local (Mac, repo venv): new suites 156 passed (`tests/test_options_pilot_{boundary,entrypoint,accounting,
+  operator_view}.py`, `tests/test_pulse_options_twin.py`, `tests/test_worldmodel_wb.py`, `tests/test_multiverse_wb.py`,
+  `tests/test_decision_wb.py`); regression set (`tests/test_options_*.py`, ledger concurrency, live book, outbox
+  users, organism shadow) 497 passed.
+- Contained run on the research host at the final commit: see `docs/evidence/frontier_contained_run.txt`
+  (added at the final checkpoint).
