@@ -33,14 +33,14 @@ OQ = {"results": [{"quote": {"instrument_id": "bcd66aaa-9789-41c7-96be-4ec1ac748
 IDX = {"quotes": [{"instrument_id": "3b912aa2", "symbol": "VIX", "value": "17.84", "state": "", "venue_timestamp": "2026-09-10T16:15:01.33168-04:00", "updated_at": "2026-09-10T17:59:16.03301433-04:00"}]}
 
 
-def _bars_fixture(n=90, start="2026-09-10T18:30:00Z"):
+def _bars_fixture(n=90, start="2026-09-10T18:30:00Z", gap_at=40):
     base = RH._epoch(start); px = 757.67
     bars = []
     for i in range(n):
         o = px; c = px + (0.1 if i % 3 else -0.15); h = max(o, c) + 0.05; l = min(o, c) - 0.05
         b = {"begins_at": RH.datetime.utcfromtimestamp(base + 60 * i).strftime("%Y-%m-%dT%H:%M:%SZ"), "open_price": "%.6f" % o, "close_price": "%.6f" % c,
              "high_price": "%.6f" % h, "low_price": "%.6f" % l, "volume": 20000 + i, "session": "reg"}
-        if i == 40:
+        if gap_at is not None and i == gap_at:
             b["interpolated"] = True
         bars.append(b); px = c
     return {"results": [{"symbol": "SPY", "interval": "minute", "bounds": "regular", "bars": bars}]}
@@ -79,7 +79,7 @@ def test_parsers_record_conventions_and_the_twin_forecasts_from_real_shaped_bars
     assert snap["fields"]["ret_60"]["quality"] == "NOT_ESTIMABLE"                    # the dropped interpolated minute (19:10) is a gap: refused, not filled
     assert snap["fields"]["ret_30"]["quality"] == "VALID" and snap["fields"]["underlying_bid_size"]["quality"] == "NOT_AVAILABLE"
     # with a gap-free window the frozen artifact forecasts from these bars
-    b2 = RH.RobinhoodMCPAdapter.parse_bars(_bars_fixture(n=60, start="2026-09-10T19:00:00Z"), symbol="SPY", receipt_time=T_RCPT)
+    b2 = RH.RobinhoodMCPAdapter.parse_bars(_bars_fixture(n=60, start="2026-09-10T19:00:00Z", gap_at=None), symbol="SPY", receipt_time=T_RCPT)
     st2 = G.BarStore("SPY", source="ROBINHOOD_MCP"); load_bars(st2, [{**x, "receipt_time": x["event_time"] + 61} for x in b2["bars"]])
     snap2 = SN.compose(symbol="SPY", as_of=as_of, bars=st2.bars_available_by(as_of), source="ROBINHOOD_MCP")
     fc = I.default_artifact().forecast(snap2, created_epoch=as_of)
