@@ -27,7 +27,8 @@ from pathlib import Path
 from . import session as S
 from .boundary import Boundary
 from .clock import Clock
-from .risk_gate import ProductionRiskAuthority
+from .fees import UNVERIFIED_FEES
+from .risk_authority import CertifiedRiskAuthority
 
 ROUTE_PILOT = "PILOT_BOUNDARY"
 ROUTE_LEGACY = "LEGACY_GEOMETRY_LOOP"
@@ -50,12 +51,15 @@ def _production_forecast(symbol, as_of):
 
 class ProductionSources:
     """Live-feed sources for the pilot path. Forecast provider not
-    integrated; risk authority refuses. Both are named refusals."""
+    integrated; the certified authority refuses every LIVE_FEED intent
+    while the fee schedule is UNVERIFIED. Both are named refusals."""
     provenance = "LIVE_FEED"
+    fee_schedule = UNVERIFIED_FEES
+    sleep_fn = staticmethod(time.sleep)
 
     def __init__(self):
         self.clock = Clock(time.time)
-        self.risk_authority = ProductionRiskAuthority()
+        self.risk_authority = CertifiedRiskAuthority(fee_schedule=self.fee_schedule, provenance=self.provenance)
 
     def sources(self) -> dict:
         def no_quote(contract):
@@ -67,7 +71,8 @@ class ProductionSources:
 
 def build_boundary(ledger, *, provider, session_id: str, release: str) -> Boundary:
     return Boundary(ledger, clock=provider.clock, provenance=provider.provenance,
-                    risk_authority=provider.risk_authority, session_id=session_id, release=release)
+                    risk_authority=provider.risk_authority, session_id=session_id, release=release,
+                    fee_schedule=getattr(provider, "fee_schedule", UNVERIFIED_FEES))
 
 
 def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release: str, cycles: int = 1,
@@ -107,13 +112,14 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
                 fills.append(d["receipts"]["fill"])
         if cycle + 1 < cycles and interval_s > 0:
             sleep_fn(interval_s)
-    for fr in fills:
-        try:
-            o = S.resolve(bd, fill_receipt=fr, exit_quote_fn=src["exit_quote_fn"])
-            report["outcomes"].append({"fill_seq": fr["seq"], "status": o["status"], "seq": o["seq"],
-                                       "discharges_position": o.get("discharges_position"), "attempt": o.get("attempt")})
-        except Exception as e:                                                 # noqa: BLE001
-            report["outcomes"].append({"fill_seq": fr["seq"], "status": "REFUSED", "why": "%s: %s" % (type(e).__name__, str(e)[:160])})
+    sleep = getattr(provider, "sleep_fn", None) or sleep_fn
+    # RECOVERED positions (from earlier processes) get one labelled recovery attempt each; positions this run created are
+    # driven through the frozen exit policy (wait until due, value, retry inside the window, record exhaustion).
+    new_fills = [f for f in fills if f["seq"] not in {r["seq"] for r in recovered["own"]}]
+    for entry in S.attempt_exits(bd, exit_quote_fn=src["exit_quote_fn"], sleep_fn=sleep, recovery=True, positions=recovered["own"]):
+        report["outcomes"].append({"fill_seq": entry["fill_seq"], "recovery": True, "final": entry["final"], "attempts": entry["attempts"]})
+    for entry in S.attempt_exits(bd, exit_quote_fn=src["exit_quote_fn"], sleep_fn=sleep, recovery=False, positions=new_fills):
+        report["outcomes"].append({"fill_seq": entry["fill_seq"], "recovery": False, "final": entry["final"], "attempts": entry["attempts"]})
     still_open = S.recover_positions(bd)
     report["unresolved_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id",
                                                                 "valuation_attempts", "last_attempt_why")} for r in still_open["own"]]
@@ -121,6 +127,10 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     close_rec = S.L.read_all(ledger)[report["session_close"]["seq"] - 1]
     report["completion"] = close_rec.get("completion")
     report["outstanding_obligations"] = close_rec.get("outstanding_obligations")
+    report["book"] = close_rec.get("book")
+    report["fee_schedule"] = bd.fee_schedule.describe()
+    report["exit_policy"] = bd.exit_policy.describe()
+    report["execution_policy"] = bd.execution_policy.describe()
     if out:
         Path(out).write_text(json.dumps(report, indent=1, sort_keys=True, allow_nan=False, default=str))
     return report
@@ -154,6 +164,8 @@ class _HarnessProvider:
         self.h = h
         self.clock = h.clock
         self.risk_authority = h.risk
+        self.fee_schedule = h.fee_schedule
+        self.sleep_fn = h.advance                      # the controlled clock 'sleeps' by advancing
 
     def sources(self) -> dict:
         return self.h.sources()

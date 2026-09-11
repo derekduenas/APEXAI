@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from . import boundary as B
 from . import ledger as L
+from .book import intent_finished
 from .clock import to_utc_string
 from .expression_rule import RuleRefused, choose
 from .records import INTENT_TTL_S, assert_prospective
@@ -171,20 +172,69 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
                          persisted_refusal=e.persisted)
 
 
-def resolve(bd: B.Boundary, *, fill_receipt: dict, exit_quote_fn) -> dict:
-    return bd.record_outcome(fill_receipt=fill_receipt, exit_quote_fn=exit_quote_fn)
+def resolve(bd: B.Boundary, *, fill_receipt: dict, exit_quote_fn, recovery: bool = False) -> dict:
+    return bd.record_outcome(fill_receipt=fill_receipt, exit_quote_fn=exit_quote_fn, recovery=recovery)
+
+
+def attempt_exits(bd: B.Boundary, *, exit_quote_fn, sleep_fn, recovery: bool = False, positions: list | None = None) -> list:
+    """Drive the frozen exit policy over this session's unresolved positions:
+    wait until due, value, retry inside the window, record exhaustion.
+    Returns one entry per position with the final state THIS run reached."""
+    pol = bd.exit_policy
+    out = []
+    positions = recover_positions(bd)["own"] if positions is None else positions
+    for pos in positions:
+        rows = L.read_all(bd.ledger)
+        fl = rows[pos["seq"] - 1]
+        committed = fl.get("committed_epoch")
+        entry = {"fill_seq": pos["seq"], "intent_id": pos.get("intent_id"), "attempts": [], "final": None}
+        if pos.get("exit_exhausted") or any(x.get("kind") == "pilot_exit_exhausted" and (x.get("fill_ref") or {}).get("seq") == pos["seq"] for x in rows):
+            if not recovery:
+                entry["final"] = "EXIT_EXHAUSTED_UNRESOLVED"
+                out.append(entry)
+                continue
+        while True:
+            n_att = len(B.Boundary.valuation_attempts(L.read_all(bd.ledger), pos["seq"]))
+            status = pol.status(now=bd.clock.now(), committed_epoch=committed, attempts=n_att)
+            if status == "NOT_DUE":
+                sleep_fn(max(0.0, committed + pol.horizon_s - bd.clock.now()))
+                continue
+            if status == "EXHAUSTED" and not recovery:
+                bd.record_exit_exhausted(pos)
+                entry["final"] = "EXIT_EXHAUSTED_UNRESOLVED"
+                break
+            try:
+                o = bd.record_outcome(fill_receipt=pos, exit_quote_fn=exit_quote_fn, recovery=recovery or status == "EXHAUSTED")
+            except B.BoundaryRefused as e:
+                entry["attempts"].append({"refused": str(e)[:160]})
+                entry["final"] = "REFUSED"
+                break
+            entry["attempts"].append({"seq": o["seq"], "status": o["status"], "attempt": o.get("attempt"), "reconciled": o.get("reconciled")})
+            if o.get("discharges_position"):
+                entry["final"] = o["status"]
+                break
+            if recovery:
+                entry["final"] = "UNRESOLVED_AFTER_RECOVERY_ATTEMPT"
+                break
+            sleep_fn(pol.retry_spacing_s)
+        out.append(entry)
+    return out
 
 
 def unfilled_intents(ledger, *, rows: list | None = None) -> list:
-    """Intents on disk with no fill and no terminal record referencing them."""
+    """Intents on disk that are not FINISHED: no FILLED attempt, no terminal
+    REFUSE attempt, no expiry/cancellation record. A WAIT attempt leaves the
+    intent open for a re-quote (bounded by the execution policy and TTL)."""
     rows = L.read_all(ledger) if rows is None else rows
-    done = set()
-    for r in rows:
+    attempts: dict = {}
+    terminal = set()
+    for i, r in enumerate(rows):
         if r.get("kind") == "pilot_fill":
-            done.add((r.get("intent_ref") or {}).get("seq"))
+            attempts.setdefault((r.get("intent_ref") or {}).get("seq"), []).append((i + 1, r))
         if r.get("kind") in ("pilot_intent_expired", "pilot_intent_cancelled"):
-            done.add((r.get("intent_ref") or {}).get("seq"))
-    return [(i + 1, r) for i, r in enumerate(rows) if r.get("kind") == "pilot_intent" and (i + 1) not in done]
+            terminal.add((r.get("intent_ref") or {}).get("seq"))
+    return [(i + 1, r) for i, r in enumerate(rows) if r.get("kind") == "pilot_intent"
+            and not intent_finished(attempts.get(i + 1, []), (i + 1) in terminal)]
 
 
 def unresolved_fills(ledger, *, rows: list | None = None) -> list:
@@ -284,13 +334,31 @@ def close_session(bd: B.Boundary) -> dict:
     for r in rows:
         if r.get("session_id") == bd.session_id:
             counts[r.get("kind")] = counts.get(r.get("kind"), 0) + 1
+    # An open (unfilled) paper intent of THIS session carries no exposure: it is CANCELLED at close, as a terminal record
+    # (exclusive with fills under the transaction), so nothing can fill against a closed session and nothing dangles.
+    cancelled = []
+    for seq, r in unfilled_intents(bd.ledger, rows=rows):
+        if r.get("session_id") != bd.session_id:
+            continue
+        receipt = {"path": str(bd.ledger), "seq": seq, "entry_hash": r["entry_hash"], "kind": "pilot_intent"}
+        try:
+            bd.expire_intent(receipt, r, why="SESSION_CLOSE: unfilled at close", kind="pilot_intent_cancelled")
+            cancelled.append(seq)
+        except B.BoundaryRefused as e:                       # e.g. a fill won the race: it stays a position
+            cancelled.append({"seq": seq, "refused": str(e)[:120]})
+    rows = L.read_all(bd.ledger)
     open_ = [seq for seq, r in unfilled_intents(bd.ledger, rows=rows) if r.get("session_id") == bd.session_id]
     positions = [seq for seq, r in unresolved_fills(bd.ledger, rows=rows) if r.get("session_id") == bd.session_id]
+    exhausted = [seq for seq in positions if any(x.get("kind") == "pilot_exit_exhausted" and (x.get("fill_ref") or {}).get("seq") == seq for x in rows)]
+    book = bd.book(rows)
     n_prior = sum(1 for r in rows if r.get("kind") == "pilot_session_close" and r.get("session_id") == bd.session_id)
     rec = {"kind": "pilot_session_close", "txn_id": "session_close:%s:%d" % (bd.session_id, n_prior + 1),
            "close_number": n_prior + 1, "session_id": bd.session_id,
            "release": bd.release, "record_counts": counts, "unfinished_intent_seqs_at_close": open_,
-           "unresolved_fill_seqs_at_close": positions,
+           "intents_cancelled_at_close": cancelled, "unresolved_fill_seqs_at_close": positions,
+           "exit_exhausted_fill_seqs_at_close": exhausted,
+           "failed_valuation_attempts_at_close": {str(seq): len(B.Boundary.valuation_attempts(rows, seq)) for seq in positions},
+           "book": book.summary(),
            "outstanding_obligations": len(open_) + len(positions),
            "completion": "CLOSED_CLEAN" if not open_ and not positions else "CLOSED_WITH_OUTSTANDING_OBLIGATIONS",
            "closed_utc": bd.clock.now_utc(), **bd.labels}

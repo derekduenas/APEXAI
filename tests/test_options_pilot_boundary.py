@@ -50,6 +50,14 @@ def _rec(h, receipt):
     return _rows(h)[receipt["seq"] - 1]
 
 
+def _exit(h, fill_receipt, exit_quote_fn=None, **kw):
+    """Advance the controlled clock to the frozen exit policy's due instant (if not already past) and value."""
+    rec = _rec(h, fill_receipt)
+    if rec.get("status") == "FILLED":
+        h.t = max(h.t, rec["exit_schedule"]["exit_due_epoch"])
+    return S.resolve(h.bd, fill_receipt=fill_receipt, exit_quote_fn=exit_quote_fn or h.exit_quotes, **kw)
+
+
 # ================================================================== reproduced failures (the old boundary)
 
 def test_reproduced_old_defects_are_now_refused(tmp_path):
@@ -118,10 +126,13 @@ def test_order_is_proven_by_ledger_sequence_and_history_is_chain_verified(tmp_pa
     assert (dec["forecast_id"], dec["intent_id"], dec["fill_id"]) == (f["forecast_id"], i["intent_id"], fl["fill_id"])
     # resolve at a later clock with a fresh exit quote
     h.advance(60.0)
-    o = S.resolve(h.bd, fill_receipt=fl, exit_quote_fn=h.exit_quotes)
+    o = _exit(h, fl, h.exit_quotes)
     assert o["status"] == "RESOLVED" and o["seq"] > fl["seq"]
     outc = _rec(h, o)
-    assert outc["exit_side"] == "BID" and outc["pnl"] == 20.0 and outc["fees"] == "NOT_MODELLED_IN_THIS_BRICK"
+    assert outc["exit_side"] == "BID" and outc["gross_pnl"] == 20.0
+    assert fill["fees_entry"]["total"] == 0.97 and outc["fees_exit"]["total"] == 1.0 and outc["pnl"] == 18.03   # fees once per side
+    assert outc["pnl_status"] == "NET_OF_FEES" and fill["cashflow_entry"] == -250.97 and outc["cashflow_exit"] == 269.0
+    assert fill["simulated"] is True and fill["exit_schedule"]["policy_id"] == "EXIT_AT_HORIZON_15M_V1"
     close = S.close_session(h.bd)
     assert _rec(h, close)["unfinished_intent_seqs_at_close"] == []
 
@@ -129,7 +140,7 @@ def test_order_is_proven_by_ledger_sequence_and_history_is_chain_verified(tmp_pa
 def test_every_record_is_prospective_paper_synthetic_and_never_replay(tmp_path):
     h = _h(tmp_path)
     d = _scan(h)
-    S.resolve(h.bd, fill_receipt=d["receipts"]["fill"], exit_quote_fn=h.exit_quotes)
+    _exit(h, d["receipts"]["fill"], h.exit_quotes)
     h.forecast_override = lambda s, t: {**h.base_forecast(s, t), "horizon_minutes": 30}
     d2 = _scan(h)
     assert d2["decision"] == "REFUSE" and d2["refusal_persisted"] is True
@@ -522,9 +533,11 @@ def test_freshness_is_measured_after_receipt_for_the_selected_side(tmp_path):
     h.quotes.age = 16.0
     d = _scan(h)
     assert d["decision"] == "WAIT" and d["why"].startswith("STALE_SELECTED_CONTRACT: ASK side 16.000s")
-    h.quotes.age = 14.9
+    h.quotes.age = 14.7                                   # 14.95 s at the simulated execution instant (0.25 s latency)
     d2 = _scan(h)
     assert d2["decision"] == "TRADE"
+    h.quotes.age = 14.9                                   # fresh at receipt, 15.15 s at simulated execution -> WAIT
+    assert _scan(h)["decision"] == "WAIT"
     h.quotes.age = -2.0
     d3 = _scan(h)
     assert d3["decision"] == "REFUSE" and d3["why"].startswith("QUOTE_FROM_THE_FUTURE")
@@ -536,7 +549,7 @@ def test_no_size_is_wait_and_resolves_to_no_position(tmp_path):
     d = _scan(h)
     fill = _rec(h, d["receipts"]["fill"])
     assert d["decision"] == "WAIT" and fill["why"] == "NO_SIZE_AT_ASK" and fill["net_debit"] == 0.0
-    o = S.resolve(h.bd, fill_receipt=d["receipts"]["fill"], exit_quote_fn=h.exit_quotes)
+    o = _exit(h, d["receipts"]["fill"], h.exit_quotes)
     assert o["status"] == "NO_POSITION"
 
 
@@ -567,23 +580,23 @@ def test_stale_and_missing_exit_quotes_are_not_estimable_never_imputed(tmp_path)
     d = _scan(h)
     h.advance(60.0)
     h.exit_quotes.age = 61.0
-    o = S.resolve(h.bd, fill_receipt=d["receipts"]["fill"], exit_quote_fn=h.exit_quotes)
+    o = _exit(h, d["receipts"]["fill"], h.exit_quotes)
     rec = _rec(h, o)
     assert rec["status"] == "NOT_ESTIMABLE" and rec["why"].startswith("STALE_SELECTED_CONTRACT: BID side 61.000s")
     d2 = _scan(h)
-    o2 = S.resolve(h.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=lambda c: None)
+    o2 = _exit(h, d2["receipts"]["fill"], lambda c: None)
     rec2 = _rec(h, o2)
     assert rec2["status"] == "NOT_ESTIMABLE" and rec2["pnl"] is None and "never imputed" in rec2["exit_law"]
     assert rec2["discharges_position"] is False and rec2["attempt"] == 1
     h.exit_quotes.age = 1.0
-    later = S.resolve(h.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=h.exit_quotes)   # a later attempt discharges
+    later = _exit(h, d2["receipts"]["fill"], h.exit_quotes)   # a later attempt discharges
     assert later["status"] == "RESOLVED" and later["attempt"] == 2 and later["reconciled"] is False
-    again = S.resolve(h.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=h.exit_quotes)   # after discharge: reconciled
+    again = _exit(h, d2["receipts"]["fill"], h.exit_quotes)   # after discharge: reconciled
     assert again["reconciled"] is True and again["seq"] == later["seq"]
     assert len(B.Boundary.valuation_attempts(_rows(h), d2["receipts"]["fill"]["seq"])) == 2
     d3 = _scan(h)
     h.exit_quotes.age = 1.0; h.exit_quotes.fail_with = OSError("feed gone")
-    o3 = S.resolve(h.bd, fill_receipt=d3["receipts"]["fill"], exit_quote_fn=h.exit_quotes)
+    o3 = _exit(h, d3["receipts"]["fill"], h.exit_quotes)
     assert _rec(h, o3)["why"].startswith("EXIT_QUOTE_PROVIDER_FAILED: OSError")
 
 
@@ -687,9 +700,9 @@ def test_concurrent_intents_cannot_consume_one_forecast_twice(tmp_path):
     barrier = threading.Barrier(n)
     ok, bad = [], []
     class GatedRisk(RG.SyntheticRiskAuthority):
-        def approve(self, intent):
+        def approve(self, intent, *, book=None):
             barrier.wait(timeout=10)
-            return super().approve(intent)
+            return super().approve(intent, book=book)
     h.bd.risk = GatedRisk(harness_token="I_AM_A_SYNTHETIC_HARNESS")
     def worker(i):
         prop = _proposal(contract={"symbol": SYM, "expiration": "2026-10-09", "strike": 640.0 + 5.0 * i, "right": "CALL"})
@@ -765,13 +778,15 @@ def test_resume_policy_retires_stale_intents_instead_of_executing_forever(tmp_pa
     e = SyntheticHarness(led, session_id="S-A", release="r1", t0=T0 - 200.0)
     fe = e.bd.record_forecast(e.forecast_fn(SYM, e.now()), scan_id="S-A:0003:SPY")
     e.bd.record_intent(forecast_receipt=fe, intent=_proposal(), signal_used="LONG", scan_id="S-A:0003:SPY")
-    assert len(S.unfilled_intents(led)) == 5
+    # B's close CANCELLED its own unfilled intent (SESSION_CLOSE); four remain unfinished
+    assert len(S.unfilled_intents(led)) == 4
+    b_cancel = [r for r in L.read_all(led) if r["kind"] == "pilot_intent_cancelled" and r["session_id"] == "S-B"]
+    assert len(b_cancel) == 1 and b_cancel[0]["why"].startswith("SESSION_CLOSE")
     a.t = T0 + 10.0                                  # restart A ten seconds after its intent was persisted
     acts = S.resume(a.bd, quote_fn=a.quotes)
     by = {x["intent_id"]: x for x in acts}
     kinds = {r["scan_id"]: r for r in L.read_all(led) if r["kind"] == "pilot_intent"}
     assert by[kinds["S-A:0001:SPY"]["intent_id"]]["action"] == "EXECUTED"
-    assert by[kinds["S-B:0001:SPY"]["intent_id"]]["action"] == "CANCELLED" and "SESSION_CLOSED" in by[kinds["S-B:0001:SPY"]["intent_id"]]["why"]
     assert by[kinds["S-A:0002:SPY"]["intent_id"]]["action"] == "CANCELLED" and "WRONG_RELEASE" in by[kinds["S-A:0002:SPY"]["intent_id"]]["why"]
     assert by[kinds["S-D:0001:SPY"]["intent_id"]]["action"] == "CANCELLED" and "STALE_AUTHORIZATION" in by[kinds["S-D:0001:SPY"]["intent_id"]]["why"]
     assert by[kinds["S-A:0003:SPY"]["intent_id"]]["action"] == "EXPIRED"
@@ -901,9 +916,11 @@ def test_f2_cancellation_inside_the_quote_window_wins_and_no_fill_follows(tmp_pa
     _fr3, ir3 = _pending_intent(h3)
     def closing_quote(c):
         S.close_session(h3.bd); return h3.quotes(c)
-    with pytest.raises(B.BoundaryRefused, match="SESSION_CLOSED_AT_COMMIT"):
+    # the close cancels the open intent (terminal record) so the commit sees the cancellation; either exclusion holds
+    with pytest.raises(B.BoundaryRefused, match="INTENT_TERMINAL_AT_COMMIT: pilot_intent_cancelled|SESSION_CLOSED_AT_COMMIT"):
         h3.bd.execute_intent(intent_receipt=ir3, quote_fn=closing_quote)
     assert _kinds(h3).count("pilot_fill") == 0
+    assert [r for r in _rows(h3) if r["kind"] == "pilot_intent_cancelled"][0]["why"].startswith("SESSION_CLOSE")
     # intent expiry crossed between receipt and commit: see test_r4_expiry_between_receipt_and_commit_persists_terminal
 
 
@@ -966,14 +983,14 @@ def test_f3_reconciliation_verifies_the_existing_fill_and_its_chain(tmp_path):
         h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
     assert len(h.quotes.calls) == n_quotes
     with pytest.raises(L.LedgerRefused, match="RECONCILE_ALTERED"):
-        L.commit_once(h.ledger, txn_id="fill:" + r["intent_id"], build=lambda rows: {}, kind="pilot_fill")
+        L.commit_once(h.ledger, txn_id=rec["txn_id"], build=lambda rows: {}, kind="pilot_fill")
     acts = S.resume(h.bd, quote_fn=h.quotes)                                              # resume cannot launder it either
     assert acts == [] or all(a["action"] != "EXECUTED" for a in acts)
     # a consistently re-hashed alteration breaks the link from the next record and is caught the same way
     h2 = _h(tmp_path / "b")
     _fr2, ir2 = _pending_intent(h2)
     r2 = h2.bd.execute_intent(intent_receipt=ir2, quote_fn=h2.quotes)
-    S.resolve(h2.bd, fill_receipt=r2, exit_quote_fn=h2.exit_quotes)                     # a successor exists
+    _exit(h2, r2, h2.exit_quotes)                     # a successor exists
     lines = h2.ledger.read_text().splitlines()
     rec = json.loads(lines[r2["seq"] - 1]); rec["net_debit"] = 1.0; rec["entry_hash"] = L.recompute_entry_hash(rec)
     lines[r2["seq"] - 1] = json.dumps(rec, sort_keys=True); h2.ledger.write_text("\n".join(lines) + "\n")
@@ -1050,7 +1067,7 @@ def test_f6_unresolved_positions_are_recovered_reported_and_block_clean_completi
     rec2 = S.recover_positions(other.bd)
     assert rec2["own"] == [] and len(rec2["foreign"]) == 1 and rec2["foreign"][0]["session_id"] == h.session_id
     # the owning session discharges it; a second close is a NEW record that says so
-    o = S.resolve(h.bd, fill_receipt=rec["own"][0], exit_quote_fn=h.exit_quotes)
+    o = _exit(h, rec["own"][0], h.exit_quotes)
     assert o["status"] == "RESOLVED"
     close2 = S.close_session(h.bd)
     c2 = _rec(h, close2)
@@ -1097,7 +1114,7 @@ def test_r4_missing_or_stale_exit_keeps_the_position_outstanding(tmp_path):
     assert d["decision"] == "TRADE", d
     fill = d["receipts"]["fill"]
     # the ORDINARY missing-exit path: provider returns None
-    o1 = S.resolve(h.bd, fill_receipt=fill, exit_quote_fn=lambda c: None)
+    o1 = _exit(h, fill, lambda c: None)
     assert o1["status"] == "NOT_ESTIMABLE" and o1["discharges_position"] is False and o1["attempt"] == 1
     assert [seq for seq, _ in S.unresolved_fills(h.ledger)] == [fill["seq"]]
     rec = S.recover_positions(h.bd)
@@ -1106,14 +1123,14 @@ def test_r4_missing_or_stale_exit_keeps_the_position_outstanding(tmp_path):
     assert c1["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS" and c1["unresolved_fill_seqs_at_close"] == [fill["seq"]]
     # a STALE exit is likewise an attempt, not a discharge
     h.advance(60.0); h.exit_quotes.age = 61.0
-    o2 = S.resolve(h.bd, fill_receipt=fill, exit_quote_fn=h.exit_quotes)
+    o2 = _exit(h, fill, h.exit_quotes)
     assert o2["status"] == "NOT_ESTIMABLE" and o2["attempt"] == 2 and len(S.unresolved_fills(h.ledger)) == 1
     # restart recovers it from disk
     h2 = SyntheticHarness(h.ledger, t0=h.now() + 5.0)
     rec2 = S.recover_positions(h2.bd)
     assert [r["seq"] for r in rec2["own"]] == [fill["seq"]] and rec2["own"][0]["valuation_attempts"] == 2
     # a valid exit discharges it; the close then says clean
-    o3 = S.resolve(h2.bd, fill_receipt=rec2["own"][0], exit_quote_fn=h2.exit_quotes)
+    o3 = _exit(h2, rec2["own"][0], h2.exit_quotes)
     assert o3["status"] == "RESOLVED" and o3["discharges_position"] is True and o3["attempt"] == 3
     assert S.unresolved_fills(h.ledger) == []
     c2 = _rec(h, S.close_session(h2.bd))
@@ -1123,7 +1140,7 @@ def test_r4_missing_or_stale_exit_keeps_the_position_outstanding(tmp_path):
     d2 = _scan(h3)
     assert d2["decision"] == "TRADE", d2
     h3.exit_quotes.fail_with = OSError("feed gone")
-    o4 = S.resolve(h3.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=h3.exit_quotes)
+    o4 = _exit(h3, d2["receipts"]["fill"], h3.exit_quotes)
     assert o4["status"] == "NOT_ESTIMABLE" and o4["discharges_position"] is False and len(S.unresolved_fills(h.ledger)) == 1
     assert S.recover_positions(h3.bd)["own"][0]["last_attempt_why"].startswith("EXIT_QUOTE_PROVIDER_FAILED: OSError")
     L.verify_chain(h.ledger)

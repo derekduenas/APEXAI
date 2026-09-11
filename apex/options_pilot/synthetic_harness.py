@@ -19,6 +19,8 @@ import math
 from . import boundary as B
 from .clock import Clock, to_utc_string
 from .records import FORECAST_TARGET, FORECAST_UNITS, canonical_hash
+from .fees import SYNTHETIC_FEES
+from .risk_authority import CertifiedRiskAuthority
 from .risk_gate import SyntheticRiskAuthority
 
 HARNESS_TOKEN = "I_AM_A_SYNTHETIC_HARNESS"
@@ -74,22 +76,27 @@ class SyntheticQuotes:
 
 class SyntheticHarness:
     def __init__(self, ledger, *, session_id: str = "SYN-SESSION-1", release: str = "synthetic-release", t0: float = T0,
-                 risk_refuse_with: str | None = None, symbols=("SPY",)):
+                 risk_refuse_with: str | None = None, symbols=("SPY",), risk: str = "synthetic", fee_schedule=SYNTHETIC_FEES):
         self.t = float(t0)
         self.clock = Clock(lambda: self.t)
         self.ledger = ledger
         self.session_id, self.release = session_id, release
-        self.risk = SyntheticRiskAuthority(harness_token=HARNESS_TOKEN, refuse_with=risk_refuse_with)
+        self.fee_schedule = fee_schedule
+        if risk == "certified":
+            self.risk = CertifiedRiskAuthority(fee_schedule=fee_schedule, provenance="SYNTHETIC_FIXTURE")
+        else:
+            self.risk = SyntheticRiskAuthority(harness_token=HARNESS_TOKEN, refuse_with=risk_refuse_with)
         self.bd = B.Boundary(ledger, clock=self.clock, provenance="SYNTHETIC_FIXTURE", risk_authority=self.risk,
-                             session_id=session_id, release=release)
+                             session_id=session_id, release=release, fee_schedule=fee_schedule)
         self.quotes = SyntheticQuotes(self)
         self.exit_quotes = SyntheticQuotes(self)
         self.exit_quotes.bid, self.exit_quotes.ask = 2.70, 2.80
         self.signal = "LONG"
         self.spot = 646.3
         self.inputs = {"ret_1": 1.0e-4, "ret_5": -2.0e-4, "rv_30": 1.0e-4}
-        self.chain = [{"expiration": "2026-10-09", "strike": k, "right": r} for k in (640.0, 645.0, 650.0, 655.0)
-                      for r in ("CALL", "PUT")] + [{"expiration": "2026-09-18", "strike": 645.0, "right": "CALL"}]
+        # chain entries carry an INDICATIVE reference ask (never executable); the envelope is derived from it
+        self.chain = [{"expiration": "2026-10-09", "strike": k, "right": r, "ask": 2.45} for k in (640.0, 645.0, 650.0, 655.0)
+                      for r in ("CALL", "PUT")] + [{"expiration": "2026-09-18", "strike": 645.0, "right": "CALL", "ask": 1.10}]
         self.forecast_override = None
         self.symbols = list(symbols)
 

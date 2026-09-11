@@ -44,6 +44,10 @@ def choose(*, symbol: str, direction_signal: str | None, spot: float, as_of: str
     if not strikes:
         raise RuleRefused("NO_STRIKES for %s %s" % (exp, right))
     strike = min(strikes, key=lambda k: (abs(k - spot), k))
+    ref = [c.get("ask") for c in available if c.get("right") == right and c["expiration"] == exp and float(c["strike"]) == strike]
+    reference_ask = ref[0] if ref and isinstance(ref[0], (int, float)) and not isinstance(ref[0], bool) else None
     return {"expression": "LONG_CALL" if right == "CALL" else "LONG_PUT", "action": "BUY",
             "contract": {"symbol": symbol, "expiration": exp, "strike": strike, "right": right},
-            "quantity": 1, "expression_rule": RULE_ID}
+            "quantity": 1, "expression_rule": RULE_ID,
+            "reference_ask": reference_ask,          # INDICATIVE only (chain snapshot); never a fill price
+            }

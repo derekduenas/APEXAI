@@ -1,0 +1,26 @@
+{
+  "mandate": "APEX_Frontier_Build_Mandate.md (2026-09-11)",
+  "branch": "frontier-build",
+  "base": "360536cb (options-pilot-001 r4)",
+  "states_allowed": ["NOT_STARTED", "IN_PROGRESS", "IMPLEMENTED_UNREVIEWED", "SYNTHETIC_VERIFIED", "BLOCKED", "ACCEPTED"],
+  "operational_states_separate": ["SHADOW_AUTHORIZED", "DEPLOYED"],
+  "milestones": {
+    "M0": {"state": "SYNTHETIC_VERIFIED", "commit": "360536cbd19b1c6da19563f245d7b85b70b23655",
+           "evidence": ["docs/OPTIONS_PILOT_RECORDING_BOUNDARY.md#10", "tests/test_options_pilot_boundary.py::test_r4_*",
+                        "tests/test_options_pilot_entrypoint.py::test_f6_lifecycle_recovery_through_the_entry_point"],
+           "independent_acceptance": "PENDING"},
+    "M1": {"state": "SYNTHETIC_VERIFIED", "commit": null,
+           "modules": ["apex/options_pilot/fees.py", "apex/options_pilot/book.py", "apex/options_pilot/risk_authority.py",
+                       "apex/options_pilot/exit_policy.py", "apex/options_pilot/boundary.py", "apex/options_pilot/session.py",
+                       "apex/options_pilot/entrypoint.py"],
+           "tests": ["tests/test_options_pilot_accounting.py", "tests/test_options_pilot_boundary.py", "tests/test_options_pilot_entrypoint.py"],
+           "independent_acceptance": "PENDING"},
+    "M2": {"state": "NOT_STARTED"}, "M3": {"state": "NOT_STARTED"}, "M4": {"state": "NOT_STARTED"},
+    "M5": {"state": "NOT_STARTED"}, "M6": {"state": "NOT_STARTED"}
+  },
+  "preserved": ["EXP-001B NO_SIGNAL", "EXP-002 INVALID_NULL_CONTROL", "EXP-003 withdrawn", "EXP-004 NOT_SELECTED",
+                "signing keys", "installed admissions", "frozen registrations", "deployed release 73fc712d3",
+                "maintenance block", "live options ledger (94 records)"],
+  "not_authorized": ["deployment", "service start", "maintenance-block removal", "broker connection", "orders",
+                     "historical fitting", "rescoring", "sealed-data access", "new market-data collection"]
+}

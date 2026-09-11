@@ -32,7 +32,10 @@ from __future__ import annotations
 
 from . import ledger as L
 from . import risk_gate as RG
+from .book import Book, load_book
 from .clock import Clock, ClockRefused, check_reading, to_utc_string
+from .exit_policy import EXIT_POLICY_V1, ExitPolicy
+from .fees import EXECUTION_POLICY_V1, UNVERIFIED_FEES, ExecutionPolicy, FeeSchedule
 from .records import (FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_prospective, canonical_hash, labels_for,
                       validate_forecast, validate_intent, validate_quote)
 
@@ -58,6 +61,10 @@ class BoundaryRefused(RuntimeError):
         self.receipt = receipt
 
 
+def is_real_env(env) -> bool:
+    return isinstance(env, dict) and isinstance(env.get("max_entry_price"), (int, float)) and not isinstance(env.get("max_entry_price"), bool)
+
+
 class _CommitRefused(L.LedgerRefused):
     """Raised inside a fill's commit transaction. `terminal_kind` names the
     terminal transition that must be persisted (expiry / cancellation) when
@@ -74,13 +81,21 @@ class Boundary:
     one risk authority + one session identity."""
 
     def __init__(self, ledger, *, clock: Clock, provenance: str, risk_authority: RG.RiskAuthority,
-                 session_id: str, release: str):
+                 session_id: str, release: str, fee_schedule: FeeSchedule = UNVERIFIED_FEES,
+                 execution_policy: ExecutionPolicy = EXECUTION_POLICY_V1, exit_policy: ExitPolicy = EXIT_POLICY_V1):
         self.ledger = ledger
         self.clock = clock
         self.labels = labels_for(provenance)
         self.risk = risk_authority
         self.session_id = session_id
         self.release = release
+        self.fee_schedule = fee_schedule
+        self.execution_policy = execution_policy
+        self.exit_policy = exit_policy
+
+    def book(self, rows: list | None = None) -> Book:
+        return load_book(self.ledger, session_id=self.session_id, rows=rows,
+                         fee_schedules={self.fee_schedule.schedule_id: self.fee_schedule})
 
     # ------------------------------------------------------------ refusal
     def refuse(self, stage: str, reason: str, *, refs: dict | None = None, scan_id: str | None = None):
@@ -134,13 +149,23 @@ class Boundary:
         problem = self._forecast_eligibility_problem(fr, created, stage="INTENT")
         if problem:
             self.refuse("intent", problem, scan_id=scan_id)
+        from .risk_authority import envelope_for
+        envelope = envelope_for(reference_ask=intent.get("reference_ask"), quantity=1)
+        if not envelope["feasible"]:
+            self.refuse("intent", envelope["why_infeasible"], scan_id=scan_id)
+        fees = {"schedule_id": self.fee_schedule.schedule_id, "schedule_hash": self.fee_schedule.schedule_hash,
+                "provenance": self.fee_schedule.provenance, "known": self.fee_schedule.known}
         try:
             body = validate_intent(intent, forecast=fr, forecast_receipt=forecast_receipt, signal_used=signal_used,
-                                   session_id=self.session_id, scan_id=scan_id, release=self.release, created_epoch=created)
+                                   session_id=self.session_id, scan_id=scan_id, release=self.release, created_epoch=created,
+                                   risk_envelope=envelope, fees=fees,
+                                   execution_policy={"policy_id": self.execution_policy.policy_id,
+                                                     "policy_hash": self.execution_policy.policy_hash,
+                                                     "max_fill_attempts": self.execution_policy.max_fill_attempts})
         except RecordRefused as e:
             self.refuse("intent", str(e), scan_id=scan_id)
         try:
-            approval = self.risk.approve(body)
+            approval = self.risk.approve(body, book=self.book())
             body["risk"] = RG.verify_approval(body, approval)
         except RG.RiskRefused as e:
             self.refuse("intent", str(e), refs={"intent_id": body["intent_id"]}, scan_id=scan_id)
@@ -153,6 +178,16 @@ class Boundary:
                               where=lambda r: (r.get("forecast_ref") or {}).get("seq") == forecast_receipt["seq"])
             if consumed:
                 raise L.LedgerRefused("FORECAST_ALREADY_CONSUMED: by intent seq %d" % consumed[0][0])
+            # ATOMIC RESERVATION: the kernel is re-run against the Book AS OF THIS SNAPSHOT, under the lock, so two
+            # concurrent intents cannot both pass on a stale state. The intent record IS the reservation.
+            if hasattr(self.risk, "kernel_check") and body["risk"].get("certificate"):
+                fresh = self.book(rows)
+                kc = self.risk.kernel_check(body, body["risk"]["certificate"], fresh)
+                if not kc.get("approved"):
+                    raise L.LedgerRefused("RISK_LIMIT_AT_COMMIT: " + "; ".join(kc.get("refusals") or ["no reason"]))
+                body["risk"]["kernel_check_at_commit"] = kc
+                body["risk"]["book_state_hash_at_commit"] = fresh.state_hash()
+                body["risk"]["book_summary_at_commit"] = fresh.summary()
             body["persisted_utc"] = self.clock.now_utc()
             body["persisted_epoch"] = self.clock.now()
             return body
@@ -296,31 +331,52 @@ class Boundary:
         return {"path": str(self.ledger), "seq": seq, "entry_hash": on_disk.get("entry_hash"), "kind": "pilot_fill",
                 "receipt": "RECONCILED: fill for this intent already on disk, chain- and reference-verified; no second append",
                 "status": on_disk.get("status"), "decision": on_disk.get("decision"), "why": on_disk.get("why"),
-                "reconciled": True, "intent_id": it.get("intent_id"), "scan_id": it.get("scan_id"), "fill_id": on_disk.get("fill_id")}
+                "reconciled": True, "intent_id": it.get("intent_id"), "scan_id": it.get("scan_id"), "fill_id": on_disk.get("fill_id"),
+                "attempt": on_disk.get("attempt")}
+
+    @staticmethod
+    def fill_attempts(rows: list, intent_seq: int) -> list:
+        return [(i + 1, r) for i, r in enumerate(rows)
+                if r.get("kind") == "pilot_fill" and (r.get("intent_ref") or {}).get("seq") == intent_seq]
+
+    @staticmethod
+    def finishing_attempt(attempts: list):
+        """The attempt that FINISHED the intent: FILLED, or a terminal REFUSE. WAIT attempts do not finish it."""
+        for seq, r in attempts:
+            if r.get("status") == "FILLED" or r.get("decision") == "REFUSE":
+                return seq, r
+        return None
 
     def execute_intent(self, *, intent_receipt: dict, quote_fn) -> dict:
         """Verify the persisted intent and its history, THEN obtain the
-        quote, THEN commit the fill exactly once. The final commit RE-CHECKS,
-        inside the transaction, everything that could have changed while the
-        quote was in flight: cancellation/expiry records, session closure,
-        clock expiry, authorization, and the referenced history."""
+        quote, THEN commit ONE fill attempt exactly once. Attempts are
+        numbered; a WAIT attempt leaves the intent open for a re-quote
+        (bounded by the execution policy and the intent TTL); FILLED and
+        REFUSE finish it. The final commit RE-CHECKS, inside the
+        transaction, everything that could have changed while the quote was
+        in flight."""
         with L.transaction(self.ledger):
             rows = L.read_all(self.ledger)
         it, _fr = self._verify_intent_identity(intent_receipt, stage="fill", rows=rows)
         scan_id, intent_id = it.get("scan_id"), it.get("intent_id")
         contract = it["contract"]
-        txn_id = "fill:" + intent_id
-        # 1. HISTORICAL RECEIPT RECONCILIATION comes first and needs identity + integrity only: a late redelivery of an
-        #    already-committed fill gets its receipt back even if its forecast is no longer current.
-        prior = L.find(self.ledger, kind="pilot_fill", rows=rows, where=lambda r: r.get("txn_id") == txn_id)
-        if prior:
-            return self._reconcile_fill(prior[0][0], prior[0][1], intent_receipt=intent_receipt, it=it, rows=rows)
+        attempts = self.fill_attempts(rows, intent_receipt["seq"])
+        done = self.finishing_attempt(attempts)
+        # 1. HISTORICAL RECEIPT RECONCILIATION comes first and needs identity + integrity only.
+        if done:
+            return self._reconcile_fill(done[0], done[1], intent_receipt=intent_receipt, it=it, rows=rows)
         terminal = self._terminal(rows, intent_id)
         if terminal:
             self.refuse("fill", "INTENT_TERMINAL: %s at seq %d" % (terminal[0][1]["kind"], terminal[0][0]), scan_id=scan_id)
         closed = self._session_closed(rows)
         if closed:
             self.refuse("fill", "SESSION_CLOSED: close record at seq %d" % closed[0][0], scan_id=scan_id)
+        if len(attempts) >= self.execution_policy.max_fill_attempts:
+            why_x = "REQUOTES_EXHAUSTED: %d attempts under %s" % (len(attempts), self.execution_policy.policy_id)
+            self.expire_intent(intent_receipt, it, why=why_x, kind="pilot_intent_cancelled")
+            self.refuse("fill", why_x, scan_id=scan_id)
+        attempt = len(attempts) + 1
+        txn_id = "fill:%s:%d" % (intent_id, attempt)
         # 2. ELIGIBILITY FOR A NEW FILL: active authority, intent unexpired, forecast eligible NOW.
         self._require_new_fill_eligibility(intent_receipt, it, rows=rows)
         t_request = self.clock.now()
@@ -331,7 +387,6 @@ class Boundary:
             raw, provider_error = None, "%s: %s" % (type(e).__name__, str(e)[:300])
         t_receipt = self.clock.now()                                       # freshness measured AFTER receipt
         if t_receipt > it["expiry_epoch"]:
-            # the intent died while the quote was in flight: a terminal record, never a fill record
             why_exp = "INTENT_EXPIRED_DURING_QUOTE: receipt %.3f > expiry %.3f" % (t_receipt, it["expiry_epoch"])
             self.expire_intent(intent_receipt, it, why=why_exp)
             self.refuse("fill", why_exp, scan_id=scan_id)
@@ -343,45 +398,62 @@ class Boundary:
                 quote = validate_quote(raw, contract=contract)
             except RecordRefused as e:
                 why, decision = str(e), "REFUSE"
+        env = it.get("risk_envelope") or {}
+        latency = self.execution_policy.simulated_latency_s
+        t_exec = t_receipt + latency                                       # simulated execution instant
         if why is None:
             age = t_receipt - quote["timestamp_epoch"]
+            age_exec = t_exec - quote["timestamp_epoch"]
             if age < 0:
                 why, decision = "QUOTE_FROM_THE_FUTURE: age at receipt %.3fs" % age, "REFUSE"
-            elif age > MAX_SELECTED_QUOTE_AGE_S:
-                why, decision = "STALE_SELECTED_CONTRACT: ASK side %.3fs old at receipt > %.0fs" % (age, MAX_SELECTED_QUOTE_AGE_S), "WAIT"
+            elif age_exec > MAX_SELECTED_QUOTE_AGE_S:
+                why, decision = ("STALE_SELECTED_CONTRACT: ASK side %.3fs old at receipt (%.3fs at simulated execution) > %.0fs"
+                                 % (age, age_exec, MAX_SELECTED_QUOTE_AGE_S)), "WAIT"
             elif quote["ask_size"] < 1:
                 why, decision = "NO_SIZE_AT_ASK", "WAIT"
-        fill = {"kind": "pilot_fill", "txn_id": txn_id, "intent_id": intent_id, "scan_id": scan_id,
+            elif is_real_env(env) and quote["ask"] > env["max_entry_price"]:
+                why, decision = ("ASK_ABOVE_ENVELOPE: executable ask %.2f > reserved max_entry_price %.2f"
+                                 % (quote["ask"], env["max_entry_price"])), "WAIT"
+        fill = {"kind": "pilot_fill", "txn_id": txn_id, "attempt": attempt, "intent_id": intent_id, "scan_id": scan_id,
                 "session_id": self.session_id, "release": self.release,
                 "intent_ref": {"seq": intent_receipt["seq"], "entry_hash": intent_receipt["entry_hash"], "intent_id": intent_id},
                 "contract": contract, "contract_id": it["contract_id"], "quantity_intended": 1,
                 "quote_request_epoch": t_request, "quote_request_utc": to_utc_string(t_request),
                 "quote_receipt_epoch": t_receipt, "quote_receipt_utc": to_utc_string(t_receipt),
+                "simulated_execution_epoch": t_exec, "simulated_latency_s": latency,
                 "provider_latency_s": t_receipt - t_request,
                 "quote_observed": ({k: quote[k] for k in ("bid", "ask", "bid_size", "ask_size", "timestamp_epoch",
                                                           "timestamp_utc", "timestamp_meaning")} if quote else None),
                 "quote_age_at_receipt_s": (t_receipt - quote["timestamp_epoch"]) if quote else None,
                 "quote_ts_minus_intent_persisted_s": (quote["timestamp_epoch"] - it["persisted_epoch"]) if quote else None,
+                "risk_envelope": env or None,
+                "execution_policy": {"policy_id": self.execution_policy.policy_id, "policy_hash": self.execution_policy.policy_hash},
+                "simulated": True, "fill_label": self.execution_policy.fill_label,
                 "eligibility_policy": ELIGIBILITY_POLICY, "order_proof": ORDER_PROOF,
                 "history_verified": "intent + referenced forecast re-read, chain-verified, content-agreed, authorization "
                                     "checked against the ACTIVE authority and provenance -- before the quote AND again "
                                     "inside the commit transaction",
                 "commit_checks": COMMIT_CHECKS, **self.labels}
         if why is not None:
-            fill.update(status="UNFILLED", decision=decision, why=why, quantity_filled=0, net_debit=0.0)
+            fill.update(status="UNFILLED", decision=decision, why=why, quantity_filled=0, net_debit=0.0,
+                        fees_entry=None, cashflow_entry=0.0)
         else:
             px = quote["ask"]
-            fill.update(status="FILLED", decision="TRADE", quantity_filled=1, side_crossed="ASK", price=px,
-                        net_debit=round(px * CONTRACT_MULTIPLIER, 2),
+            fee = self.fee_schedule.entry(1)
+            debit = round(px * CONTRACT_MULTIPLIER, 2)
+            fill.update(status="FILLED", decision="TRADE", quantity_filled=1, side_crossed="ASK", price=px, net_debit=debit,
+                        fees_entry=fee, cashflow_entry=(round(-(debit + fee["total"]), 2) if fee["total"] is not None else None),
+                        cashflow_law="cashflow_entry = -(ask x multiplier x quantity + entry fees); fees charged exactly once here",
                         fill_law="long leg pays THAT contract's ASK; no midpoint, no model price")
         fill["fill_id"] = canonical_hash({"txn_id": txn_id, "status": fill["status"]})[:24]
 
         def build(rows):
             # THE STATE THE FILL CLAIMS IS ESTABLISHED HERE, UNDER THE LOCK, FROM THIS SNAPSHOT.
-            again = L.find(self.ledger, kind="pilot_fill", rows=rows,
-                           where=lambda r: (r.get("intent_ref") or {}).get("seq") == intent_receipt["seq"])
+            again = self.finishing_attempt(self.fill_attempts(rows, intent_receipt["seq"]))
             if again:
-                raise L.LedgerRefused("DUPLICATE_DELIVERY: intent seq %d already has fill seq %d" % (intent_receipt["seq"], again[0][0]))
+                raise L.LedgerRefused("DUPLICATE_DELIVERY: intent seq %d already finished by fill seq %d" % (intent_receipt["seq"], again[0]))
+            if len(self.fill_attempts(rows, intent_receipt["seq"])) + 1 != attempt:
+                raise L.LedgerRefused("ATTEMPT_NUMBER_RACED: intent seq %d" % intent_receipt["seq"])
             term = self._terminal(rows, intent_id)
             if term:
                 raise L.LedgerRefused("INTENT_TERMINAL_AT_COMMIT: %s at seq %d (cancellation/expiry won the race)"
@@ -389,9 +461,9 @@ class Boundary:
             cl = self._session_closed(rows)
             if cl:
                 raise L.LedgerRefused("SESSION_CLOSED_AT_COMMIT: close record at seq %d" % cl[0][0])
-            problem, _it2, _fr2, term = self._history_problem(intent_receipt, rows, for_new_fill=True)
+            problem, _it2, _fr2, term_kind = self._history_problem(intent_receipt, rows, for_new_fill=True)
             if problem:
-                raise _CommitRefused("%s_AT_COMMIT: %s" % ("INELIGIBLE" if term else "HISTORY_INVALID", problem), terminal_kind=term)
+                raise _CommitRefused("%s_AT_COMMIT: %s" % ("INELIGIBLE" if term_kind else "HISTORY_INVALID", problem), terminal_kind=term_kind)
             try:
                 L.verify_chain(self.ledger, rows=rows)
             except L.ChainBroken as e:
@@ -399,6 +471,8 @@ class Boundary:
             t_commit = self.clock.now()
             fill["committed_utc"] = to_utc_string(t_commit)
             fill["committed_epoch"] = t_commit
+            if fill["status"] == "FILLED":
+                fill["exit_schedule"] = self.exit_policy.schedule(t_commit)
             assert_prospective(fill)
             return fill
 
@@ -406,8 +480,6 @@ class Boundary:
             receipt, fresh = L.commit_once(self.ledger, txn_id=txn_id, build=build, kind="pilot_fill")
         except _CommitRefused as e:
             if e.terminal_kind:
-                # the intent became ineligible between quote receipt and commit: PERSIST the terminal transition
-                # (its own transaction re-checks that no fill and no terminal record exist), then refuse
                 self.expire_intent(intent_receipt, it, why=e.problem, kind=e.terminal_kind)
             self.refuse("fill", e.problem, refs={"intent_seq": intent_receipt["seq"]}, scan_id=scan_id)
         except L.LedgerRefused as e:
@@ -416,7 +488,7 @@ class Boundary:
             rows = L.read_all(self.ledger)
             return self._reconcile_fill(receipt["seq"], rows[receipt["seq"] - 1], intent_receipt=intent_receipt, it=it, rows=rows)
         receipt.update(status=fill["status"], decision=fill["decision"], why=fill.get("why"), intent_id=intent_id,
-                       scan_id=scan_id, fill_id=fill["fill_id"])
+                       scan_id=scan_id, fill_id=fill["fill_id"], attempt=attempt)
         return receipt
 
     def expire_intent(self, intent_receipt: dict, it: dict, *, why: str, kind: str = "pilot_intent_expired") -> dict:
@@ -435,11 +507,10 @@ class Boundary:
                 L.verify_receipt(self.ledger, intent_receipt, expected_kind="pilot_intent", rows=rows)
             except L.LedgerRefused as e:
                 raise L.LedgerRefused("TERMINAL_REF_%s" % e)
-            filled = L.find(self.ledger, kind="pilot_fill", rows=rows,
-                            where=lambda r: (r.get("intent_ref") or {}).get("seq") == intent_receipt["seq"])
+            filled = self.finishing_attempt(self.fill_attempts(rows, intent_receipt["seq"]))   # a WAIT attempt is not a fill
             if filled:
                 raise L.LedgerRefused("FILL_EXISTS: intent seq %d has fill seq %d; cannot %s a filled intent"
-                                      % (intent_receipt["seq"], filled[0][0], kind))
+                                      % (intent_receipt["seq"], filled[0], kind))
             term = self._terminal(rows, it["intent_id"])
             if term:
                 raise L.LedgerRefused("INTENT_ALREADY_TERMINAL: %s at seq %d" % (term[0][1]["kind"], term[0][0]))
@@ -477,7 +548,28 @@ class Boundary:
                 "status": on_disk.get("status"), "pnl": on_disk.get("pnl"), "reconciled": True, "scan_id": scan_id,
                 "discharges_position": on_disk.get("discharges_position"), "attempt": on_disk.get("attempt")}
 
-    def record_outcome(self, *, fill_receipt: dict, exit_quote_fn) -> dict:
+    def record_exit_exhausted(self, fill_receipt: dict) -> dict:
+        """The AUTOMATIC exit policy stops trying. The position REMAINS an unresolved obligation."""
+        rows = L.read_all(self.ledger)
+        fl = L.verify_receipt(self.ledger, fill_receipt, expected_kind="pilot_fill", rows=rows)
+        rec = {"kind": "pilot_exit_exhausted", "txn_id": "exit_exhausted:%s" % fl["intent_id"], "intent_id": fl["intent_id"],
+               "fill_ref": {"seq": fill_receipt["seq"], "entry_hash": fill_receipt["entry_hash"]}, "scan_id": fl.get("scan_id"),
+               "session_id": self.session_id, "release": self.release, "attempts": len(self.valuation_attempts(rows, fill_receipt["seq"])),
+               "exit_policy": self.exit_policy.describe(), "obligation": "POSITION REMAINS UNRESOLVED; P&L UNKNOWN; exposure open",
+               "at_utc": self.clock.now_utc(), **self.labels}
+        assert_prospective(rec)
+
+        def build(rows):
+            if self.discharging_outcomes(rows, fill_receipt["seq"]):
+                raise L.LedgerRefused("POSITION_ALREADY_DISCHARGED: fill seq %d" % fill_receipt["seq"])
+            return rec
+        try:
+            receipt, _ = L.commit_once(self.ledger, txn_id=rec["txn_id"], build=build, kind="pilot_exit_exhausted")
+        except L.LedgerRefused as e:
+            self.refuse("exit", str(e), scan_id=fl.get("scan_id"))
+        return receipt
+
+    def record_outcome(self, *, fill_receipt: dict, exit_quote_fn, recovery: bool = False) -> dict:
         """One VALUATION ATTEMPT for a fill. RESOLVED and NO_POSITION discharge
         the position; NOT_ESTIMABLE (missing/stale/malformed exit, provider
         failure) is persisted as an attempt and the position REMAINS an
@@ -503,6 +595,20 @@ class Boundary:
                "fill_id": fl.get("fill_id"), "scan_id": scan_id, "session_id": self.session_id, "release": self.release,
                "fill_ref": {"seq": fill_receipt["seq"], "entry_hash": fill_receipt["entry_hash"]},
                "contract_id": fl["contract_id"], **self.labels}
+        if fl["status"] == "FILLED":
+            # THE FROZEN EXIT POLICY governs WHEN a valuation may happen. A recovery run may attempt an exhausted or
+            # late position, labelled as such; it may never value a position before it is due.
+            committed = fl.get("committed_epoch")
+            status = self.exit_policy.status(now=self.clock.now(), committed_epoch=committed, attempts=attempt - 1) \
+                if isinstance(committed, (int, float)) else "UNSCHEDULED"
+            if status == "NOT_DUE":
+                self.refuse("outcome", "EXIT_NOT_DUE: clock %s < exit_due %s under %s"
+                            % (self.clock.now_utc(), to_utc_string(committed + self.exit_policy.horizon_s), self.exit_policy.policy_id),
+                            scan_id=scan_id)
+            if status == "EXHAUSTED" and not recovery:
+                self.refuse("outcome", "EXIT_WINDOW_EXHAUSTED: automatic attempts stopped; recovery attempt required", scan_id=scan_id)
+            out.update(exit_policy={"policy_id": self.exit_policy.policy_id, "policy_hash": self.exit_policy.policy_hash},
+                       exit_policy_status=status + ("_RECOVERY_ATTEMPT" if recovery else ""))
         if fl["status"] != "FILLED":
             out.update(status="NO_POSITION", pnl=0.0, why="intent was %s (%s)" % (fl["status"], fl.get("why")),
                        discharges_position=True)
@@ -538,9 +644,19 @@ class Boundary:
                            exit_law="a long leg exits at THAT contract's BID; missing/stale -> NOT_ESTIMABLE, never imputed; "
                                     "the position REMAINS an unresolved obligation until a later attempt discharges it")
             else:
-                out.update(status="RESOLVED", exit_side="BID", exit_price=q["bid"],
-                           pnl=round((q["bid"] - fl["price"]) * CONTRACT_MULTIPLIER, 2), entry_price=fl["price"],
-                           fees="NOT_MODELLED_IN_THIS_BRICK", discharges_position=True)
+                q_n = int(fl.get("quantity_filled", 1))
+                fee_x = self.fee_schedule.exit(q_n)
+                fee_e = (fl.get("fees_entry") or {}).get("total")
+                credit = round(q["bid"] * CONTRACT_MULTIPLIER * q_n, 2)
+                fees_known = fee_x["total"] is not None and fee_e is not None
+                out.update(status="RESOLVED", exit_side="BID", exit_price=q["bid"], entry_price=fl["price"],
+                           gross_pnl=round(credit - fl["net_debit"], 2), fees_exit=fee_x, fees_entry_ref=fee_e,
+                           cashflow_exit=(round(credit - fee_x["total"], 2) if fee_x["total"] is not None else None),
+                           pnl=(round(credit - fl["net_debit"] - fee_e - fee_x["total"], 2) if fees_known else None),
+                           pnl_status=("NET_OF_FEES" if fees_known else "FEES_UNKNOWN"),
+                           pnl_law="pnl = q x M x (exit bid - entry ask) - entry fees - exit fees; spread crossing is already in the "
+                                   "quoted sides and is not subtracted again; fees charged exactly once per side",
+                           discharges_position=True)
         out["resolved_utc"] = self.clock.now_utc()
         assert_prospective(out)
 

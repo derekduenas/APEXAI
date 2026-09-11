@@ -80,7 +80,8 @@ def test_pilot_route_calls_the_boundary_and_cannot_fall_back_to_geometry(tmp_pat
     d = rep["decisions"][0]
     assert d["scan_id"] == "PS-1:0001:SPY" and d["decision"] == "TRADE"
     assert d["forecast_id"] and d["intent_id"] and d["fill_id"] and d["decision_persisted"] is True
-    assert rep["outcomes"] == [{"fill_seq": 4, "status": "RESOLVED", "seq": 6, "discharges_position": True, "attempt": 1}]
+    assert rep["outcomes"] == [{"fill_seq": 4, "recovery": False, "final": "RESOLVED",
+                                "attempts": [{"seq": 6, "status": "RESOLVED", "attempt": 1, "reconciled": False}]}]
     L.verify_chain(tmp_path / "led.jsonl")
 
 
@@ -93,7 +94,8 @@ def test_production_route_refuses_honestly_with_persisted_refusals(tmp_path, fen
     for r in rows:
         assert r["data_provenance"] == "LIVE_FEED" and r["synthetic"] is False
     rep = json.loads((tmp_path / "out.json").read_text())
-    assert rep["risk_authority"] == "ProductionRiskAuthority" and rep["data_provenance"] == "LIVE_FEED"
+    assert rep["risk_authority"] == "CertifiedRiskAuthority" and rep["data_provenance"] == "LIVE_FEED"
+    assert rep["fee_schedule"]["provenance"] == "UNVERIFIED"
     for d in rep["decisions"]:
         assert d["decision"] == "REFUSE" and "NO_REVIEWED_INFERENCE_ADAPTER" in d["why"] and d["refusal_persisted"] is True
     assert not any(r["kind"] in ("pilot_forecast", "pilot_intent", "pilot_fill") for r in rows)
@@ -106,12 +108,13 @@ def test_production_risk_authority_refuses_even_if_a_forecast_is_supplied(tmp_pa
         pass
     prov = Prov(h)
     prov.provenance = "LIVE_FEED"
-    prov.risk_authority = E.ProductionRiskAuthority()
+    prov.fee_schedule = E.UNVERIFIED_FEES
+    prov.risk_authority = E.CertifiedRiskAuthority(fee_schedule=E.UNVERIFIED_FEES, provenance="LIVE_FEED")
     rc = sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "PROD-2"), pilot_sources=prov)
     assert rc == 0
     rows = L.read_all(tmp_path / "led.jsonl")
     assert [r["kind"] for r in rows] == ["pilot_session_open", "pilot_forecast", "pilot_refusal", "pilot_decision", "pilot_session_close"]
-    assert "RISK_INTEGRATION_MISSING" in rows[2]["reason"] and rows[3]["decision"] == "REFUSE"
+    assert "FEE_SCHEDULE_UNVERIFIED" in rows[2]["reason"] and rows[3]["decision"] == "REFUSE"     # an unknown cost is not zero
 
 
 def test_synthetic_fixture_flag_runs_the_explicit_harness_from_the_cli(tmp_path, fenced):
@@ -150,7 +153,11 @@ def test_trade_wait_refuse_in_one_cycle_with_stable_ids(tmp_path, fenced):
     decs = [r for r in rows if r["kind"] == "pilot_decision"]
     assert [d["decision"] for d in decs] == ["TRADE", "WAIT", "REFUSE"]
     assert len({d["scan_id"] for d in decs}) == 3
-    assert rep["outcomes"] == [{"fill_seq": 4, "status": "RESOLVED", "seq": 12, "discharges_position": True, "attempt": 1}]
+    assert rep["outcomes"] == [{"fill_seq": 4, "recovery": False, "final": "RESOLVED",
+                                "attempts": [{"seq": 12, "status": "RESOLVED", "attempt": 1, "reconciled": False}]}]
+    kinds = [r["kind"] for r in rows]
+    assert kinds[-2:] == ["pilot_intent_cancelled", "pilot_session_close"]           # the QQQ WAIT intent is cancelled at close
+    assert [r for r in rows if r["kind"] == "pilot_intent_cancelled"][0]["why"].startswith("SESSION_CLOSE")
 
 
 def test_restart_resumes_without_re_executing_and_continues_the_sequence(tmp_path, fenced):
@@ -176,9 +183,10 @@ def test_restart_resumes_without_re_executing_and_continues_the_sequence(tmp_pat
                                            "contract_id": "SPY|2026-10-09|645.0|CALL", "valuation_attempts": 0,
                                            "last_attempt_why": None}]
     assert rep["decisions"][0]["scan_id"] == "RS-1:0002:SPY" and rep["decisions"][0]["decision"] == "TRADE"
-    assert sorted(o["fill_seq"] for o in rep["outcomes"]) == sorted([resumed_seq, rep["decisions"][0]["fill_id"] and
-                                                                     [r for r in L.read_all(led) if r.get("fill_id") == rep["decisions"][0]["fill_id"]][0]["intent_ref"]["seq"] + 1])
-    assert all(o["status"] == "RESOLVED" for o in rep["outcomes"]) and rep["unresolved_positions"] == []
+    new_fill_seq = [i + 1 for i, r in enumerate(L.read_all(led)) if r.get("fill_id") == rep["decisions"][0]["fill_id"]][0]
+    assert sorted(o["fill_seq"] for o in rep["outcomes"]) == sorted([resumed_seq, new_fill_seq])
+    assert all(o["final"] == "RESOLVED" for o in rep["outcomes"]) and rep["unresolved_positions"] == []
+    assert [o["recovery"] for o in sorted(rep["outcomes"], key=lambda o: o["fill_seq"])] == [True, False]
     assert rep["completion"] == "CLOSED_CLEAN" and rep["outstanding_obligations"] == 0
     kinds = [r["kind"] for r in L.read_all(led)]
     assert kinds.count("pilot_fill") == 2 and kinds.count("pilot_forecast") == 2 and kinds.count("pilot_session_open") == 1
@@ -205,14 +213,16 @@ def test_report_is_strict_json_and_names_mode_and_provenance(tmp_path, fenced):
 
 def test_f6_lifecycle_recovery_through_the_entry_point(tmp_path, fenced):
     """A resumed position must not vanish. The ORDINARY missing/stale-exit paths (provider returns None, then a
-    stale quote) leave it an explicit outstanding obligation across restarts until a valid exit discharges it."""
+    stale quote) leave it an explicit outstanding obligation across restarts until a valid exit discharges it.
+    Exits are driven by the FROZEN exit policy: due at +900 s, up to 5 attempts in a 120 s window, then exhausted."""
     led = tmp_path / "led.jsonl"
     h = SyntheticHarness(led, session_id="LC-1")
     h.quotes.fail_with = KeyboardInterrupt()
     with pytest.raises(KeyboardInterrupt):
         sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
                   pilot_sources=E._HarnessProvider(h))
-    # run 2: resume fills the pending intent; the exit provider returns None for everything
+    # run 2: resume fills the pending intent (a RECOVERED position: one labelled recovery attempt after it is due);
+    # the new scan's position is driven through the policy; the exit provider returns None for everything
     h2 = SyntheticHarness(led, session_id="LC-1", t0=T0 + 5.0)
     h2.exit_quotes.override = lambda c: None
     rc = sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
@@ -221,37 +231,47 @@ def test_f6_lifecycle_recovery_through_the_entry_point(tmp_path, fenced):
     rep = json.loads((tmp_path / "out.json").read_text())
     assert rep["mode"] == "SCAN_AND_RESOLVE" and rep["resumed"][0]["status"] == "FILLED"
     assert len(rep["recovered_positions"]) == 1 and len(rep["outcomes"]) == 2
-    assert all(o["status"] == "NOT_ESTIMABLE" and o["discharges_position"] is False and o["attempt"] == 1 for o in rep["outcomes"])
+    rec_out = [o for o in rep["outcomes"] if o["recovery"]][0]
+    new_out = [o for o in rep["outcomes"] if not o["recovery"]][0]
+    assert rec_out["final"] == "UNRESOLVED_AFTER_RECOVERY_ATTEMPT" and len(rec_out["attempts"]) == 1
+    assert new_out["final"] == "EXIT_EXHAUSTED_UNRESOLVED" and len(new_out["attempts"]) == 5
+    assert all(a["status"] == "NOT_ESTIMABLE" for a in rec_out["attempts"] + new_out["attempts"])
     assert len(rep["unresolved_positions"]) == 2 and rep["outstanding_obligations"] == 2
-    assert all(p["valuation_attempts"] == 1 and p["last_attempt_why"] == "EXIT_QUOTE_MISSING" for p in rep["unresolved_positions"])
+    assert {p["valuation_attempts"] for p in rep["unresolved_positions"]} == {1, 5}
+    assert all(p["last_attempt_why"] == "EXIT_QUOTE_MISSING" for p in rep["unresolved_positions"])
     assert rep["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS"
-    close = L.read_all(led)[rep["session_close"]["seq"] - 1]
+    rows = L.read_all(led)
+    close = rows[rep["session_close"]["seq"] - 1]
     assert sorted(close["unresolved_fill_seqs_at_close"]) == sorted(p["seq"] for p in rep["unresolved_positions"])
-    # run 3, same (closed) session, recovery only: exit quotes are STALE -> still outstanding, attempts now 2
-    h3 = SyntheticHarness(led, session_id="LC-1", t0=T0 + 70.0)
+    assert len(close["exit_exhausted_fill_seqs_at_close"]) == 1 and close["failed_valuation_attempts_at_close"]
+    assert any(r["kind"] == "pilot_exit_exhausted" for r in rows)
+    # run 3, same (closed) session, recovery only: exit quotes are STALE -> one recovery attempt each, still outstanding
+    h3 = SyntheticHarness(led, session_id="LC-1", t0=h2.now() + 5.0)
     h3.exit_quotes.age = 61.0
     sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
               pilot_sources=E._HarnessProvider(h3))
     rep3 = json.loads((tmp_path / "out.json").read_text())
     assert rep3["mode"] == "RECOVERY_ONLY" and rep3["decisions"] == [] and len(rep3["recovered_positions"]) == 2
-    assert all(o["status"] == "NOT_ESTIMABLE" and o["attempt"] == 2 for o in rep3["outcomes"])
-    assert len(rep3["unresolved_positions"]) == 2 and rep3["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS"
+    assert all(o["recovery"] and o["final"] == "UNRESOLVED_AFTER_RECOVERY_ATTEMPT" for o in rep3["outcomes"])
+    assert {p["valuation_attempts"] for p in rep3["unresolved_positions"]} == {2, 6}
+    assert rep3["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS"
     assert all(p["last_attempt_why"].startswith("STALE_SELECTED_CONTRACT") for p in rep3["unresolved_positions"])
-    # run 4: valid exits discharge both; a NEW close record says clean
-    h4 = SyntheticHarness(led, session_id="LC-1", t0=T0 + 80.0)
+    # run 4: valid exits discharge both; a NEW close record says clean; the Book cash identity holds
+    h4 = SyntheticHarness(led, session_id="LC-1", t0=h3.now() + 5.0)
     sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
               pilot_sources=E._HarnessProvider(h4))
     rep4 = json.loads((tmp_path / "out.json").read_text())
-    assert rep4["mode"] == "RECOVERY_ONLY" and all(o["status"] == "RESOLVED" and o["attempt"] == 3 for o in rep4["outcomes"])
+    assert rep4["mode"] == "RECOVERY_ONLY" and all(o["final"] == "RESOLVED" for o in rep4["outcomes"])
     assert rep4["unresolved_positions"] == [] and rep4["completion"] == "CLOSED_CLEAN" and rep4["outstanding_obligations"] == 0
+    assert rep4["book"]["cash_identity"]["holds"] is True and rep4["book"]["integrity_problems"] == []
     assert L.read_all(led)[rep4["session_close"]["seq"] - 1]["close_number"] == 3
     assert not any(r["kind"] == "pilot_forecast" and r["scan_id"].startswith("LC-1:0003") for r in L.read_all(led))
     # a different session reports another session's outstanding position as foreign and does not touch it
-    h5 = SyntheticHarness(led, session_id="LC-2", t0=T0 + 90.0)
+    h5 = SyntheticHarness(led, session_id="LC-2", t0=h4.now() + 5.0)
     h5.exit_quotes.override = lambda c: None
     sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-2", "--pilot-release", "synthetic-release"),
               pilot_sources=E._HarnessProvider(h5))
-    h6 = SyntheticHarness(led, session_id="LC-3", t0=T0 + 100.0)
+    h6 = SyntheticHarness(led, session_id="LC-3", t0=h5.now() + 5.0)
     sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-3", "--pilot-release", "synthetic-release"),
               pilot_sources=E._HarnessProvider(h6))
     rep6 = json.loads((tmp_path / "out.json").read_text())

@@ -43,8 +43,8 @@ FORECAST_ELIGIBILITY_POLICY = ("FORECAST_ELIGIBILITY_V1: created <= clock; clock
                                "clock - input_cutoff <= 120s; re-checked at intent creation and at fill commit")
 
 KINDS = ("pilot_forecast", "pilot_intent", "pilot_fill", "pilot_outcome", "pilot_refusal", "pilot_decision",
-         "pilot_duplicate_delivery", "pilot_intent_expired", "pilot_intent_cancelled", "pilot_session_open",
-         "pilot_session_close")
+         "pilot_duplicate_delivery", "pilot_intent_expired", "pilot_intent_cancelled", "pilot_exit_exhausted",
+         "pilot_session_open", "pilot_session_close")
 
 
 class RecordRefused(ValueError):
@@ -259,7 +259,8 @@ def validate_quote(q, *, contract: dict) -> dict:
 # ---------------------------------------------------------------- intent
 
 def validate_intent(i: dict, *, forecast: dict, forecast_receipt: dict, signal_used: str, session_id: str,
-                    scan_id: str, release: str, created_epoch: float) -> dict:
+                    scan_id: str, release: str, created_epoch: float, risk_envelope: dict | None = None,
+                    fees: dict | None = None, execution_policy: dict | None = None) -> dict:
     for k in ("expression", "action", "contract", "quantity"):
         if k not in i:
             raise RecordRefused("INTENT_MISSING_FIELD: %s" % k)
@@ -294,7 +295,9 @@ def validate_intent(i: dict, *, forecast: dict, forecast_receipt: dict, signal_u
             "horizon_relationship": HORIZON_RELATIONSHIP,
             "created_utc": to_utc_string(created_epoch), "created_epoch": created_epoch,
             "expiry_utc": to_utc_string(created_epoch + INTENT_TTL_S), "expiry_epoch": created_epoch + INTENT_TTL_S,
-            "ttl_s": INTENT_TTL_S}
+            "ttl_s": INTENT_TTL_S,
+            "reference_ask": i.get("reference_ask") if is_real(i.get("reference_ask")) else None,
+            "risk_envelope": risk_envelope, "fees": fees, "execution_policy": execution_policy}
     body["intent_id"] = canonical_hash({"forecast_id": forecast["forecast_id"], "contract_id": body["contract_id"],
                                         "signal_used": signal_used, "session_id": session_id})[:24]
     return body

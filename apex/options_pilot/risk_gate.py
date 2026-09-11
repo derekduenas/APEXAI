@@ -22,7 +22,7 @@ from .records import canonical_hash, is_real
 
 BINDING_FIELDS = ("intent_id", "session_id", "scan_id", "contract_id", "expression", "action", "quantity",
                   "signal_used", "forecast_id")
-RISK_PROVENANCE = ("SYNTHETIC_FIXTURE",)
+RISK_PROVENANCE = ("SYNTHETIC_FIXTURE", "CERTIFIED_KERNEL")
 
 
 class RiskRefused(RuntimeError):
@@ -47,6 +47,14 @@ def _binding_view(intent: dict) -> dict:
     return v
 
 
+def envelope_binding_hash(intent: dict) -> str:
+    """Binds an approval to the risk ENVELOPE and fee schedule as well as the intent identity."""
+    env = intent.get("risk_envelope") or {}
+    return canonical_hash({"binding": binding_hash(_binding_view(intent)),
+                           "max_entry_price": env.get("max_entry_price"), "envelope_debit": env.get("envelope_debit"),
+                           "fee_schedule_id": (intent.get("fees") or {}).get("schedule_id")})
+
+
 def verify_approval(intent: dict, approval, *, authority=None) -> dict:
     """Recompute the binding; refuse self-attestation and foreign approvals.
     With `authority`, ALSO require that the ACTIVE authority honours this
@@ -67,6 +75,8 @@ def verify_approval(intent: dict, approval, *, authority=None) -> dict:
                           % (str(approval.get("binding_hash"))[:12], expected[:12]))
     if not is_real(approval.get("certified_max_loss")) or approval["certified_max_loss"] <= 0:
         raise RiskRefused("RISK_MAX_LOSS_INVALID: %r" % (approval.get("certified_max_loss"),))
+    if "envelope_binding_hash" in approval and approval["envelope_binding_hash"] != envelope_binding_hash(intent):
+        raise RiskRefused("RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE")
     if authority is not None:
         why = authority.accepts(approval)
         if why:
@@ -77,7 +87,7 @@ def verify_approval(intent: dict, approval, *, authority=None) -> dict:
 class RiskAuthority:
     authority_id = "ABSTRACT"
 
-    def approve(self, intent: dict) -> dict:                             # pragma: no cover - interface
+    def approve(self, intent: dict, *, book=None) -> dict:               # pragma: no cover - interface
         raise NotImplementedError
 
     def accepts(self, approval: dict) -> str | None:                     # pragma: no cover - interface
@@ -93,7 +103,7 @@ class ProductionRiskAuthority(RiskAuthority):
                 "authorization; certify()/risk_kernel.check() integration is the next brick)"
                 % (approval.get("risk_provenance"), approval.get("authority_id")))
 
-    def approve(self, intent: dict) -> dict:
+    def approve(self, intent: dict, *, book=None) -> dict:
         raise RiskIntegrationMissing(
             "RISK_INTEGRATION_MISSING: the production path has no risk authority in this brick; "
             "apex.organism.risk_certificate.certify() + apex.organism.risk_kernel.check() integration "
@@ -116,7 +126,7 @@ class SyntheticRiskAuthority(RiskAuthority):
                 approval.get("risk_provenance"), approval.get("authority_id"))
         return None
 
-    def approve(self, intent: dict) -> dict:
+    def approve(self, intent: dict, *, book=None) -> dict:
         if self.refuse_with:
             return {"approved": False, "why": self.refuse_with, "risk_provenance": "SYNTHETIC_FIXTURE",
                     "authority_id": self.authority_id}
