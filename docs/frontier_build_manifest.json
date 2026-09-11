@@ -164,7 +164,7 @@
    ],
    "default_selection_policy": "PILOT_RULE_V1",
    "activation": "NOT_AUTHORIZED",
-   "independent_acceptance": "PENDING",
+   "independent_acceptance": "ACCEPTED (r3, bounded scope: the four repairs at 525340c; live commissioning and profitability UNESTABLISHED)",
    "blockers": [
     "kernel cap 5 USD vs SPY near-ATM asks 13-19 USD (591/1886 replay scans RISK_ENVELOPE_INFEASIBLE)",
     "fee schedule UNVERIFIED",
@@ -201,6 +201,14 @@
      "tests/test_funnel_engine.py::test_full_mode_mandatory_wait_when_no_quote_is_valid"
     ]
    }
+  },
+  "R4": {
+   "state": "SPECIFICATION_DRAFT_1 (for review; nothing implemented, nothing fitted)",
+   "spec": "docs/R4_JOINT_MARKET_STATE_SPEC.md",
+   "objective": "joint 15-minute forecast of underlying, ATM IV, skew, spread and size; expressions vs WAIT on after-cost economics",
+   "baseline_preserved": "FULL_FUNNEL_V1 (IV_FIXED, SPREAD_FIXED)",
+   "selection_policy_added": "JOINT_FUNNEL_V1 (by name only)",
+   "authorizes": "nothing: no historical access, no backtest, no fitting, no activation, no promotion"
   }
  },
  "preserved": [

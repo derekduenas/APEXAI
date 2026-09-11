@@ -27,7 +27,8 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 | M4 — Multiverse + market-implied | `SYNTHETIC_VERIFIED` | `80ea8de` | `apex/multiverse_wb/{simulator,pricing,surface,expression_war}.py`; `tests/test_multiverse_wb.py` (8) |
 | M5 — fusion, supervision, learning | `SYNTHETIC_VERIFIED` | `ceb7e7f` | `apex/decision_wb/{fusion,supervision,experience,enrichment}.py`; `tests/test_decision_wb.py` (4) |
 | M6 — operator view + commissioning package | `SYNTHETIC_VERIFIED` (package PREPARED; activation NOT authorized) | `9cfb70f` | `apex/options_pilot/operator_view.py`; `scripts/options_pilot_scale_check.py` + `docs/evidence/scale_check_10_sessions_OUTPUT.json`; `docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md`; funnel trace on every decision |
-| M7 — THE FUNNEL in one decision path (`FULL_FUNNEL_V1`); r2 (8 findings) + r3 (4 findings) repairs | `SYNTHETIC_VERIFIED` (default policy stays `PILOT_RULE_V1`; activation NOT authorized; backtest hold kept) | `f0daac2` → r2 `3cc65b0` → r3 this commit | `apex/decision_wb/engine.py`; `TwinSources.funnel_fn`; `session.scan(funnel_fn=)` + `FUNNEL_TRACE_V2`; `--pilot-selection-policy`; replay variant `apex/backtest_wb/funnel.py` + PILOT-REPLAY-002 contract (declared, not run); `tests/test_funnel_engine.py` (17) + replay planted-drift test; `docs/FUNNEL_INTEGRATION.md` |
+| M7 — THE FUNNEL in one decision path (`FULL_FUNNEL_V1`); r2 (8 findings) + r3 (4 findings) repairs | `SYNTHETIC_VERIFIED`; r3 INDEPENDENTLY ACCEPTED within its bounded scope (the four repairs at `525340c`); live commissioning and profitability UNESTABLISHED; default policy stays `PILOT_RULE_V1`; backtest hold kept | `f0daac2` → `3cc65b0` → `525340c` |
+| R4 — joint market-state forecasting | `SPECIFICATION_DRAFT_1` for review: `docs/R4_JOINT_MARKET_STATE_SPEC.md`; nothing implemented, nothing fitted | this commit | `apex/decision_wb/engine.py`; `TwinSources.funnel_fn`; `session.scan(funnel_fn=)` + `FUNNEL_TRACE_V2`; `--pilot-selection-policy`; replay variant `apex/backtest_wb/funnel.py` + PILOT-REPLAY-002 contract (declared, not run); `tests/test_funnel_engine.py` (17) + replay planted-drift test; `docs/FUNNEL_INTEGRATION.md` |
 
 ## M0 — closed at `360536cb` (reconciled against the mandate's four items)
 
@@ -267,6 +268,30 @@ a separate mandatory-WAIT case. Table in `docs/FUNNEL_INTEGRATION.md`.
   the funnel is complete.
 
 ## Evidence index
+
+**Attribution.** Every test count below is BUILDER-REPORTED (run on the Mac venv by the builder); the reviewer has not
+executed the full suite or the end-to-end acceptance test. Independent acceptance of M7 r3 covers the four bounded
+repairs at `525340c` only; live commissioning and profitability remain UNESTABLISHED. The 11 full-tree failures are
+individually identified here and each was re-run at the parent commit `e36b7e9` in a temporary worktree, where it
+fails identically (builder-reported):
+`test_architecture_claims::test_no_execution_or_broker_dependency_exists` (module-closure audit over repo paths absent
+on this branch); `test_null_rig_memory::test_memory_does_not_grow_linearly_with_completed_sweep_seeds`;
+`test_real_data_boundary::test_a_sticky_world_writable_ancestor_is_accepted` (host-only sticky-dir probe);
+`test_research_board::{test_reconciliation_root_is_deterministic_and_order_independent,
+test_reconciliation_root_changes_if_a_legacy_board_changes, test_swapping_two_legacy_boards_changes_the_root,
+test_audit_script_passes}` (legacy board roots / audit script not on the Mac);
+`test_whole_ledger_guard::{test_every_registered_offender_still_exists, test_pulse_v1_minute_path_reads_no_ledger,
+test_checkpoint_module_declares_the_law}` (offender registry and `/opt/apex-repo` paths);
+`test_world_model_bootstrap::test_running_inside_research_containment` (`/proc/self/cgroup`).
+
+**What the funnel binding does and does not establish.** Persisting the `pilot_funnel` record and binding its
+canonical proposal into the intent establishes the recorded decision's ORDERING and INTEGRITY (the selection preceded
+the intent; the executed terms are the selected terms; nothing was altered). It does NOT by itself establish that every
+input was AVAILABLE at the decision instant (that is the per-input availability firewall: `available <= as_of` on bars,
+validated quote timestamps, snapshot refusal of future bars), that fitted parameters EXCLUDED future observations (the
+models' fit-cutoff firewall and the walk-forward tests), or that probabilities are CALIBRATED (PIT / scoring evidence,
+which for the artifact is negative and for the funnel does not yet exist). These are separate evidence classes and are
+reported separately.
 
 - M7 r3 (`525340c`): full tree on the Mac venv 4,810 passed / 26 skipped / 11 failed in 32 min; the 11 are the SAME
   environment set as r2 and `f0daac2` (all reproduce at the parent commit `e36b7e9`); none from the r3 repairs.
