@@ -22,8 +22,8 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 |---|---|---|---|
 | M0 — four remaining recording defects | `SYNTHETIC_VERIFIED` (awaiting independent acceptance) | `360536cb` (r4) | `docs/OPTIONS_PILOT_RECORDING_BOUNDARY.md` §10; tests `test_r4_*` (boundary) and `test_f6_lifecycle_recovery_through_the_entry_point`; contained run at 360536cb: 92 pilot / 461 regression passed |
 | M1 — execution accounting + operational paper loop | `SYNTHETIC_VERIFIED` | `78931c0` | `apex/options_pilot/{fees,book,risk_authority,exit_policy}.py`; boundary/session/entrypoint integration; `tests/test_options_pilot_accounting.py` (14) + the 92 r4 tests updated for fees/exit policy; local run 106 passed |
-| M2 — PULSE / Twin / inference adapters | `SYNTHETIC_VERIFIED` | see manifest (`M2.commit`) | `apex/pulse_options/{ingest,snapshot,features,inference,providers,sources}.py` + `exp002_artifact.json`; `tests/test_pulse_options_twin.py` (22); smoke script + collection request prepared, not executed |
-| M3 — World Model workbench | `NOT_STARTED` | — | — |
+| M2 — PULSE / Twin / inference adapters | `SYNTHETIC_VERIFIED` | `d026b87` | `apex/pulse_options/{ingest,snapshot,features,inference,providers,sources}.py` + `exp002_artifact.json`; `tests/test_pulse_options_twin.py` (22); smoke script + collection request prepared, not executed |
+| M3 — World Model workbench | `SYNTHETIC_VERIFIED` (foundation benchmarks `BLOCKED_RESOURCE` / `BLOCKED_LICENSE`) | see manifest (`M3.commit`) | `apex/worldmodel_wb/*`; `tests/test_worldmodel_wb.py` (14); `docs/evidence/garch_reference_vs_arch_OUTPUT.json` |
 | M4 — Multiverse + market-implied | `NOT_STARTED` | — | — |
 | M5 — fusion, supervision, learning | `NOT_STARTED` | — | — |
 | M6 — operator view + commissioning package | `NOT_STARTED` | — | — |
@@ -118,3 +118,43 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 - **Prepared, not executed**: `scripts/options_pilot_live_smoke.py` (dry-plan only; `--execute` refuses
   without the operator gates and has no HTTP client wired) and
   `docs/OPTIONS_PILOT_LIVE_SMOKE_AND_COLLECTION_REQUEST.md`.
+
+## M3 — what was built
+
+- **Contracts** (`worldmodel_wb/contracts.py`): `ForecastObject` declares what it supplies (mean | variance |
+  quantiles | density | paths); asking for anything else raises `UnsupportedOutput` — no synthesis from a point
+  forecast. `Model` = fit / forecast / serialize / load / describe with a fit budget (input refusals do not
+  consume a fit; an optimizer run does), a cutoff firewall on `fit`, and a deterministic artifact digest that
+  `load` re-verifies.
+- **Volatility** (`vol_models.py`): RollingVariance (frozen window), EWMA, GARCH(1,1) and GJR-GARCH(1,1) with
+  STANDARDIZED Student-t innovations, zero mean, MLE by L-BFGS-B on transformed parameters; refusals for
+  non-finite input, too few observations, non-stationarity, ν at a bound, optimizer failure. The convention is
+  tested (unit variance of the standardized t; `t_scale_from_variance` / `variance_from_t_scale`). Three horizon
+  objects are named on every forecast: next-bar variance, integrated variance (analytic recursion with its
+  assumptions stated), cumulative-return variance by SIMULATION with Monte Carlo error. **Reference comparison**
+  against `arch` 8.0.0 on one synthetic world (run with the system interpreter; the runner venv has no `arch`):
+  |α−α_arch| = 0.0018, |β−β_arch| = 0.0012, |ν−ν_arch| = 0.14, log-likelihood difference −5.4 nats over 6000
+  observations (`docs/evidence/garch_reference_vs_arch_OUTPUT.json`).
+- **Quantile trees** (`quantile_tree.py`): bounded stump boosting per quantile with pinball-gradient split
+  selection and scale-aware residual-quantile leaves; crossing rate measured BEFORE the predeclared
+  rearrangement (sort); out-of-sample pinball loss ≤ unconditional at every level on the synthetic world; the
+  forecast object says `joint_path_model: false`.
+- **Distributional boosting** (`dist_boost.py`): NGBoost-style natural-gradient boosting of Normal(μ, σ) with
+  stumps and the log score; improves the log score over a constant Normal and learns the scale channel
+  (corr(σ̂, rv_30) > 0.5) on a heteroskedastic synthetic world.
+- **Regime** (`regime.py`): two-state Gaussian Markov-switching fitted by EM on training rows; decisions see
+  FILTERED probabilities only (a longer prefix cannot change the value at t — tested); smoothed is a labelled
+  diagnostic; outputs carry probabilities, entropy, parameter digest, update cutoff, support counts, bars since
+  last transition and an ABSTAIN flag (unsupported state or high entropy).
+- **Tournament** (`tournament.py`): walk-forward folds with purge (outcome windows that intrude into validation
+  removed) and embargo; `DataFirewall`; log score (Normal, t), CRPS, pinball, PIT calibration report; paired
+  comparison on common rows with the coverage difference disclosed; `TrialRegistry` with a registered search
+  budget that refuses overrun and retains failures.
+- **Foundation benchmarks** (`foundation.py`): Chronos-2 and TimesFM 2.5 adapter interfaces (input transform,
+  output semantics) report `BLOCKED_RESOURCE` (no package/weights in the authorized environment; nothing
+  downloaded); TimesFM 3.0 is `BLOCKED_LICENSE` and excluded. None counts as an implemented model.
+- **Study contract** (`study_contract.py`): every proposed historical study must declare target, hypothesis,
+  comparator, eligible rows, null/assumptions, cadence, budgets, selection rule, reporting family, cutoff rule,
+  dependence inference and planned comparisons; validation yields a digest and grants no access.
+- **Not done, by mandate**: no historical fitting; no HAR (needs a trustworthy realized-variance dataset first);
+  no change-point / particle-filter challengers.
