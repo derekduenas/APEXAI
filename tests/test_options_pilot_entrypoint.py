@@ -97,7 +97,7 @@ def test_production_route_refuses_honestly_with_persisted_refusals(tmp_path, fen
     assert rep["risk_authority"] == "CertifiedRiskAuthority" and rep["data_provenance"] == "LIVE_FEED"
     assert rep["fee_schedule"]["provenance"] == "UNVERIFIED"
     for d in rep["decisions"]:
-        assert d["decision"] == "REFUSE" and "NO_REVIEWED_INFERENCE_ADAPTER" in d["why"] and d["refusal_persisted"] is True
+        assert d["decision"] == "REFUSE" and "LIVE_DATA_DISABLED" in d["why"] and d["refusal_persisted"] is True
     assert not any(r["kind"] in ("pilot_forecast", "pilot_intent", "pilot_fill") for r in rows)
 
 

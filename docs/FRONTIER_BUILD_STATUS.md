@@ -21,8 +21,8 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 | Milestone | State | Checkpoint | Evidence |
 |---|---|---|---|
 | M0 — four remaining recording defects | `SYNTHETIC_VERIFIED` (awaiting independent acceptance) | `360536cb` (r4) | `docs/OPTIONS_PILOT_RECORDING_BOUNDARY.md` §10; tests `test_r4_*` (boundary) and `test_f6_lifecycle_recovery_through_the_entry_point`; contained run at 360536cb: 92 pilot / 461 regression passed |
-| M1 — execution accounting + operational paper loop | `SYNTHETIC_VERIFIED` | see manifest (`m1_commit`) | `apex/options_pilot/{fees,book,risk_authority,exit_policy}.py`; boundary/session/entrypoint integration; `tests/test_options_pilot_accounting.py` (14) + the 92 r4 tests updated for fees/exit policy; local run 106 passed |
-| M2 — PULSE / Twin / inference adapters | `NOT_STARTED` | — | — |
+| M1 — execution accounting + operational paper loop | `SYNTHETIC_VERIFIED` | `78931c0` | `apex/options_pilot/{fees,book,risk_authority,exit_policy}.py`; boundary/session/entrypoint integration; `tests/test_options_pilot_accounting.py` (14) + the 92 r4 tests updated for fees/exit policy; local run 106 passed |
+| M2 — PULSE / Twin / inference adapters | `SYNTHETIC_VERIFIED` | see manifest (`M2.commit`) | `apex/pulse_options/{ingest,snapshot,features,inference,providers,sources}.py` + `exp002_artifact.json`; `tests/test_pulse_options_twin.py` (22); smoke script + collection request prepared, not executed |
 | M3 — World Model workbench | `NOT_STARTED` | — | — |
 | M4 — Multiverse + market-implied | `NOT_STARTED` | — | — |
 | M5 — fusion, supervision, learning | `NOT_STARTED` | — | — |
@@ -84,3 +84,37 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
   software default to be tuned here.
 - Fees: no provider schedule verified; production refuses. Verification is an operator task (M6 package).
 - Multi-contract and spread support (integer partial fills, legging, assignment) is out of scope for the pilot.
+
+## M2 — what was built
+
+- **Ingestion** (`pulse_options/ingest.py`): trades → completed 1-minute bars, or provider bars; every bar carries
+  `event_time`, `bar_complete`, `last_receipt`, `available = max(bar_complete, receipt)` and `publication_time`;
+  dedupe, out-of-order and late prints counted; revisions retained as versions (the version visible at an as-of
+  instant is the one available by then); a bar received or published before completion is refused; a missing
+  minute is data.
+- **Snapshot** (`snapshot.py`, `OPTIONS_TWIN_STATE_V0`): built only from inputs available by `as_of` (a future
+  bar refuses); 1/5/10/15/30/60-minute returns and realized variance, session phase / minute-of-session /
+  seasonality bucket (DST- and early-close-aware via `apex.intraday.sessions`), session VWAP and distance,
+  range position, prior close and gap (anchors), underlying top-of-book with spread, chain freshness, permitted
+  cross-market context, SCHEDULED events (schedule known-from; released values not taken). Every field is a
+  `pulse.twin.Field` with quality ∈ {VALID, STALE, UNKNOWN, NOT_AVAILABLE, NOT_ESTIMABLE, SESSION_INAPPLICABLE};
+  the state carries a content hash and a quality census.
+- **One feature implementation** (`features.py`): `[ret_1, ret_5, rv_30]` from the snapshot; parity with
+  `exp001b.bars.observable_rows` is tested to 1e-15; prefix invariance tested (later bars, a late print and a
+  revision after t leave the state hash and forecast at t unchanged); replay/live parity tested.
+- **Frozen-artifact adapter** (`inference.py` + `exp002_artifact.json`): EXP-002 `fit.params` copied verbatim
+  from the sealed result record (sha256 `0c397d70…`); `params_hash` recomputed with the experiment's recipe
+  (`ca04fc6e713e1a5c`) at load; forecasts reproduce `apex.world_model.exp002.models.forecast("L", …)` on
+  controlled inputs; provenance `INVALID_NULL_CONTROL`, `validated_edge_claim: false` on every forecast; the
+  heuristic direction label is recorded beside, never inside, the distribution.
+- **Providers** (`providers.py`): Alpaca bars/NBBO and ThetaData chain adapters that parse the documented
+  shapes (fixture-tested), keep raw timestamps and record the ET-naive → UTC conversion; `LiveGate` refuses
+  before any network access unless `APEX_PILOT_LIVE_DATA=ENABLED` AND credentials are present (presence only
+  is recorded). `SyntheticBarProvider` is a labelled fixture.
+- **Sources / entry point** (`sources.py`): `TwinSources` supplies the boundary's injected functions for both
+  provenances; `ProductionSources` now routes through gated live sources, so the production route refuses
+  `LIVE_DATA_DISABLED` before contacting anything; the twin-backed synthetic run goes through the real entry
+  point with the certified authority and no geometry fallback.
+- **Prepared, not executed**: `scripts/options_pilot_live_smoke.py` (dry-plan only; `--execute` refuses
+  without the operator gates and has no HTTP client wired) and
+  `docs/OPTIONS_PILOT_LIVE_SMOKE_AND_COLLECTION_REQUEST.md`.

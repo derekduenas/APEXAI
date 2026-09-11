@@ -28,7 +28,7 @@ from . import session as S
 from .boundary import Boundary
 from .clock import Clock
 from .fees import UNVERIFIED_FEES
-from .risk_authority import CertifiedRiskAuthority
+from .risk_authority import CertifiedRiskAuthority   # re-exported for tests and operators
 
 ROUTE_PILOT = "PILOT_BOUNDARY"
 ROUTE_LEGACY = "LEGACY_GEOMETRY_LOOP"
@@ -43,30 +43,23 @@ def route(args) -> str:
     return ROUTE_PILOT if getattr(args, "pilot_boundary", False) else ROUTE_LEGACY
 
 
-def _production_forecast(symbol, as_of):
-    raise ProviderNotIntegrated(
-        "NO_REVIEWED_INFERENCE_ADAPTER: the retained parameter artifact has no reviewed live-bar inference "
-        "adapter in this brick; the production pilot cannot produce a forecast and therefore cannot trade")
-
-
 class ProductionSources:
-    """Live-feed sources for the pilot path. Forecast provider not
-    integrated; the certified authority refuses every LIVE_FEED intent
-    while the fee schedule is UNVERIFIED. Both are named refusals."""
+    """LIVE_FEED sources = the twin-backed sources behind LiveGate. With the default environment
+    every provider call raises ProviderUnavailable BEFORE any network access, so each scan ends
+    REFUSE with a persisted reason; and the fee schedule is UNVERIFIED, so no intent could be
+    approved even with data. Both are named refusals, not fallbacks."""
     provenance = "LIVE_FEED"
-    fee_schedule = UNVERIFIED_FEES
-    sleep_fn = staticmethod(time.sleep)
 
     def __init__(self):
-        self.clock = Clock(time.time)
-        self.risk_authority = CertifiedRiskAuthority(fee_schedule=self.fee_schedule, provenance=self.provenance)
+        from apex.pulse_options.sources import live_twin_sources
+        self._twin = live_twin_sources()
+        self.clock = self._twin.clock
+        self.risk_authority = self._twin.risk_authority
+        self.fee_schedule = self._twin.fee_schedule
+        self.sleep_fn = time.sleep
 
     def sources(self) -> dict:
-        def no_quote(contract):
-            raise ProviderNotIntegrated("NO_QUOTE_ADAPTER: no reviewed quote adapter on the pilot path in this brick")
-        return {"forecast_fn": _production_forecast,
-                "signal_fn": lambda s, t: None, "chain_fn": lambda s, t: [], "spot_fn": lambda s, t: None,
-                "quote_fn": no_quote, "exit_quote_fn": no_quote}
+        return self._twin.sources()
 
 
 def build_boundary(ledger, *, provider, session_id: str, release: str) -> Boundary:
