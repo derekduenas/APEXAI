@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from apex.governance.chain_ledger import chain_append                            # noqa: E402
 from apex.intraday import options_feed as OF                                     # noqa: E402
 from apex.intraday.sessions import classify                                      # noqa: E402
-from apex.pulse_options.providers import LIVE_SWITCH, LiveGate                   # noqa: E402
+from apex.pulse_options.providers import LIVE_SWITCH, AlpacaBarsAdapter, LiveGate   # noqa: E402
 
 LAW = "OBSERVATION_ONLY: no decision, no forecast, no order, no pilot or live ledger record"
 
@@ -60,6 +60,7 @@ def main(argv=None) -> int:
     auth_line = next((l for l in auth.read_text().splitlines() if l.strip().startswith("OPTIONS_PILOT_COLLECTION_AUTHORIZED")), None) if auth.exists() else None
     gate = LiveGate(secret_fn=OF._secret)
     st = gate.status()
+    alpaca = AlpacaBarsAdapter(gate=gate, http_get=OF._get, headers_fn=OF._alpaca_headers)   # keeps provider timestamps + receipt clocks
     hb = root / "HEARTBEAT.json"
     def beat(**kw):
         hb.write_text(json.dumps({"utc": _now().isoformat(), "pid": os.getpid(), "law": LAW, **kw}, indent=1, default=str))
@@ -113,11 +114,11 @@ def main(argv=None) -> int:
             t = time.time()
             for sym in syms:
                 if t - last["nbbo"].get(sym, 0) >= 15:
-                    q = attempt("nbbo", lambda: OF.underlying_nbbo(sym))
+                    q = attempt("nbbo", lambda: alpaca.nbbo(sym))
                     if q is not None:
                         record(day, "nbbo", sym, q); last["nbbo"][sym] = t
                 if now.second >= 5 and t - last["bars"].get(sym, 0) >= 60:
-                    b = attempt("bars", lambda: OF.underlying_bars(sym, now - timedelta(minutes=5), now))
+                    b = attempt("bars", lambda: alpaca.bars(sym, start_epoch=time.time() - 300, end_epoch=time.time()))
                     if b is not None:
                         record(day, "bars", sym, b); last["bars"][sym] = t
                 if t - last["chain"].get(sym, 0) >= 60:
