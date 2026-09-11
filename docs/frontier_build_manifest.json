@@ -121,7 +121,7 @@
   },
   "M6": {
    "state": "SYNTHETIC_VERIFIED",
-   "commit": null,
+   "commit": "9cfb70f",
    "modules": [
     "apex/options_pilot/operator_view.py",
     "scripts/options_pilot_scale_check.py",
@@ -161,5 +161,32 @@
   "rescoring",
   "sealed-data access",
   "new market-data collection"
- ]
+ ],
+ "live_data_channels": {
+  "robinhood_mcp": {
+   "state": "READ_ONLY_SMOKE_DONE_2026-09-11",
+   "adapter": "apex/pulse_options/robinhood_mcp.py",
+   "tests": "tests/test_robinhood_mcp_adapter.py",
+   "evidence": "docs/evidence/robinhood_smoke_2026-09-11.json",
+   "reach": "agent session only (MCP); not reachable from host processes",
+   "orders": "NEVER via this build",
+   "authorization": "operator message 2026-09-11 for read-only quotes/chains/bars"
+  },
+  "alpaca_data_v2": {
+   "state": "ADAPTER_GATED_OFF",
+   "credentials": "data-only keys present on host secret backend (paper endpoint 401)",
+   "reach": "host"
+  },
+  "thetadata_v3": {
+   "state": "ADAPTER_GATED_OFF",
+   "reach": "host terminal 127.0.0.1:25503"
+  },
+  "unauthenticated_mcp_servers": [
+   "bigdata.com",
+   "daloopa",
+   "finance:bigquery",
+   "lseg",
+   "sp-global"
+  ]
+ }
 }

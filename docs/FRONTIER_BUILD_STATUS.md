@@ -26,7 +26,7 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 | M3 — World Model workbench | `SYNTHETIC_VERIFIED` (foundation benchmarks `BLOCKED_RESOURCE` / `BLOCKED_LICENSE`) | `e277e4c` | `apex/worldmodel_wb/*`; `tests/test_worldmodel_wb.py` (14); `docs/evidence/garch_reference_vs_arch_OUTPUT.json` |
 | M4 — Multiverse + market-implied | `SYNTHETIC_VERIFIED` | `80ea8de` | `apex/multiverse_wb/{simulator,pricing,surface,expression_war}.py`; `tests/test_multiverse_wb.py` (8) |
 | M5 — fusion, supervision, learning | `SYNTHETIC_VERIFIED` | `ceb7e7f` | `apex/decision_wb/{fusion,supervision,experience,enrichment}.py`; `tests/test_decision_wb.py` (4) |
-| M6 — operator view + commissioning package | `SYNTHETIC_VERIFIED` (package PREPARED; activation NOT authorized) | see manifest (`M6.commit`) | `apex/options_pilot/operator_view.py`; `scripts/options_pilot_scale_check.py` + `docs/evidence/scale_check_10_sessions_OUTPUT.json`; `docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md`; funnel trace on every decision |
+| M6 — operator view + commissioning package | `SYNTHETIC_VERIFIED` (package PREPARED; activation NOT authorized) | `9cfb70f` | `apex/options_pilot/operator_view.py`; `scripts/options_pilot_scale_check.py` + `docs/evidence/scale_check_10_sessions_OUTPUT.json`; `docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md`; funnel trace on every decision |
 
 ## M0 — closed at `360536cb` (reconciled against the mandate's four items)
 
@@ -239,3 +239,22 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
   users, organism shadow) 497 passed.
 - Contained run on the research host at the final commit: see `docs/evidence/frontier_contained_run.txt`
   (added at the final checkpoint).
+
+## Live data channels (post-mandate, operator-authorized 2026-09-11)
+
+- **Robinhood MCP (read-only)**: the operator authorized a read-only smoke from the agent session. Calls made:
+  equity quote, option chain, option instruments, option quotes, 90 minute-bars, index handles + VIX/SPX quotes,
+  one L2 book snapshot (empty after hours). No order, account, position or portfolio tool was called; no ledger
+  was written. Evidence: `docs/evidence/robinhood_smoke_2026-09-11.json`. Findings: minute bars are bar-START
+  labelled UTC with prices as strings; the equity quote has venue-timed bid/ask but NO sizes; option quotes carry
+  sized bid/ask with one `updated_at` (the last prior-session print at night → the boundary correctly treats it as
+  stale); SPY 758 CALL 21-DTE ask 11.11 confirms the kernel-cap infeasibility warning. Adapter
+  `apex/pulse_options/robinhood_mcp.py` (gated; read tools only; trading/position tools refused by construction;
+  interpolated bars dropped and counted) with fixture tests shaped from the observed responses. **Reach:** the MCP
+  is available only inside this agent session, not to processes on the research host, so it cannot be the pilot
+  service's production feed without a process-level client.
+- **Alpaca data v2 / ThetaData v3**: adapters exist and are gated off; credentials and the ThetaData terminal live
+  on the research host. Enabling them for the pilot process is the operator switch described in the request doc.
+- **Other configured MCP servers** (bigdata.com, daloopa, LSEG, S&P Global, finance BigQuery) are present but
+  unauthenticated in this session; they are candidate event/fundamental sources for the enrichment schema once
+  authorized, not part of the pilot path.
