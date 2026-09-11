@@ -11,6 +11,9 @@ from datetime import datetime
 
 from apex.decision_wb.engine import FunnelEngine
 
+REPLAY_BOOK = {"kind": "REPLAY_SYNTHETIC_BOOK: one contract per scan, no carried positions; declared, not a live book", "integrity_problems": [],
+               "n_positions": 0, "n_reservations": 0}
+
 
 class FunnelRunner:
     def __init__(self, *, window_sessions: int = 20, n_paths: int = 2000, seed: int = 11, strikes_each_side: int = 2, fit_budget: int = 400):
@@ -47,9 +50,9 @@ class FunnelRunner:
     def decide(self, *, day: str, m: float, snapshot: dict, forecast: dict, q_now: dict, q_exit: dict, spot, bars_prefix: list, fee_schedule) -> dict:
         self.prepare(day)
         prefix = [math.log(bars_prefix[i]["close"] / bars_prefix[i - 1]["close"]) for i in range(1, len(bars_prefix))]
-        quotes = {(e, float(k), r): {**q, "timestamp_epoch": m} for (e, k, r), q in q_now.items()}
+        quotes = {(e, float(k), r): dict(q) for (e, k, r), q in q_now.items()}          # corpus quotes carry their OWN timestamps
         res = self.engine.decide(symbol="SPY", as_of=m, day=day, snapshot=snapshot, forecast=forecast, spot=spot, quotes=quotes, prefix_returns=prefix,
-                                 fee_schedule=fee_schedule, heuristic_direction=forecast.get("direction_signal"))
+                                 fee_schedule=fee_schedule, book_summary=REPLAY_BOOK, heuristic_direction=forecast.get("direction_signal"))
         v = {"direction": None, "decision": res["decision"], "why": res["why"], "trace": res["trace"], "rule_id": res["rule_id"]}
         if res["decision"] != "TRADE":
             return v

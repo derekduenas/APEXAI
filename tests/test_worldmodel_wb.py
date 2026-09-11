@@ -283,3 +283,21 @@ def test_study_contract_refuses_incomplete_declarations_and_grants_nothing():
         SC.HistoricalStudyContract(**{**kw, "comparator": ""}).validate()
     with pytest.raises(C.ModelRefused, match="REPORTING_FAMILY_UNKNOWN"):
         SC.HistoricalStudyContract(**{**kw, "reporting_family": "VIBES"}).validate()
+
+
+def test_garch_refuses_an_unsuccessful_optimizer_outcome(monkeypatch):
+    """F7: success=False (e.g. ABNORMAL_TERMINATION_IN_LNSRCH) is not a fit; the derivative-free polish must itself converge."""
+    from scipy import optimize
+    x = VM.simulate_garch(n=3000, omega=2e-8, alpha=0.08, beta=0.90, nu=7.0, seed=5)
+    real = optimize.minimize
+
+    def fake(fun, x0, *a, **kw):
+        res = real(fun, x0, *a, **kw)
+        res.success = False; res.message = "ABNORMAL_TERMINATION_IN_LNSRCH"
+        return res
+    monkeypatch.setattr(optimize, "minimize", fake)
+    with pytest.raises(C.ModelRefused, match="OPTIMIZER_FAILED"):
+        VM.GARCH().fit(_rows_from_returns(x), cutoff_epoch=T0 + 60 * 3000 + 60)
+    monkeypatch.undo()
+    p = VM.GARCH().fit(_rows_from_returns(x), cutoff_epoch=T0 + 60 * 3000 + 60)
+    assert p["convergence"]["success"] is True and p["convergence"]["multi_start_nll_gap"] < 1e-3 * abs(p["nll"]) and "grad_inf_norm" in p["convergence"]

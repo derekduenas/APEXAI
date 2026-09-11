@@ -73,10 +73,25 @@ def compare(*, paths: dict, candidates: list, T_years_by_contract: dict, horizon
             "no_arbitrage_label": "a physical-vs-implied discrepancy is a research feature, never an arbitrage label"}
 
 
-def physical_vs_implied(*, physical_var_15m: float, implied_iv_annual: float, minutes_per_year: float = 252 * 390) -> dict:
-    """Compare at a COMPATIBLE horizon: implied variance scaled to 15 minutes vs the physical 15-minute variance forecast."""
-    implied_var_15m = implied_iv_annual ** 2 * (15.0 / minutes_per_year)
-    return {"physical_var_15m": physical_var_15m, "implied_var_15m": implied_var_15m,
+CALENDAR_YEAR_S = 365.0 * 86400.0
+HORIZON_15M_CALENDAR_YEARS = 900.0 / CALENDAR_YEAR_S          # expiry decay over the 15-minute hold, in the SAME calendar convention as T
+
+
+def physical_vs_implied(*, physical_var_15m: float, implied_iv_annual: float, T_years: float | None = None,
+                        trading_minutes_to_expiry: float | None = None, minutes_per_year: float = 252 * 390) -> dict:
+    """Compare at a COMPATIBLE horizon. Two clocks are kept apart and named:
+       - implied vol is annualized on CALENDAR time (T_years = calendar seconds to expiry / 365d);
+       - realized variance accrues on MARKET time (one-minute bars during regular hours).
+    Convention (declared): the option's total implied variance to expiry, iv^2 * T_years, is allocated uniformly over
+    the TRADING minutes remaining to expiry, so implied_var_15m = iv^2 * T_years * 15 / trading_minutes_to_expiry.
+    Without T_years the legacy per-trading-minute scaling iv^2 * 15 / (252*390) is used and labelled."""
+    if T_years is not None and trading_minutes_to_expiry:
+        implied_var_15m = implied_iv_annual ** 2 * T_years * (15.0 / trading_minutes_to_expiry)
+        convention = "iv^2 * T_calendar * 15 / trading_minutes_to_expiry (total implied variance allocated over trading minutes)"
+    else:
+        implied_var_15m = implied_iv_annual ** 2 * (15.0 / minutes_per_year)
+        convention = "LEGACY: iv^2 * 15 / (252*390) per trading minute"
+    return {"physical_var_15m": physical_var_15m, "implied_var_15m": implied_var_15m, "convention": convention,
             "log_ratio": math.log(physical_var_15m / implied_var_15m) if physical_var_15m > 0 and implied_var_15m > 0 else None,
             "interpretation": ("a difference between predicted realized variance and implied variance is a research FEATURE with a risk premium and model "
                                "uncertainty inside it; it is not a mechanical arbitrage signal"), "risk_premium_disclosed": True}

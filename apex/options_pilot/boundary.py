@@ -130,13 +130,51 @@ class Boundary:
         return receipt
 
     # ------------------------------------------------------------ 2. intent
-    def record_intent(self, *, forecast_receipt: dict, intent: dict, signal_used: str, scan_id: str) -> dict:
+    @staticmethod
+    def _funnel_binding_problem(fn: dict, *, scan_id, session_id, forecast_seq, contract: dict, expression: str, expression_rule) -> str | None:
+        """What the persisted funnel record must say for it to AUTHORIZE this exact intent."""
+        if fn.get("scan_id") != scan_id:
+            return "FUNNEL_SCAN_MISMATCH: funnel %r vs intent %r" % (fn.get("scan_id"), scan_id)
+        if fn.get("session_id") != session_id:
+            return "FUNNEL_SESSION_MISMATCH"
+        if fn.get("decision") != "TRADE":
+            return "FUNNEL_NOT_TRADE: persisted funnel decision is %r" % (fn.get("decision"),)
+        if (fn.get("forecast_ref") or {}).get("seq") != forecast_seq:
+            return "FUNNEL_FORECAST_MISMATCH: funnel consumed forecast seq %r, intent references %r" % ((fn.get("forecast_ref") or {}).get("seq"), forecast_seq)
+        prop = fn.get("proposal") or {}
+        pc = prop.get("contract") or {}
+        same = all(pc.get(k) == contract.get(k) for k in ("symbol", "expiration", "right")) and float(pc.get("strike", float("nan"))) == float(contract.get("strike", float("inf")))
+        if not same or prop.get("expression") != expression:
+            return "FUNNEL_PROPOSAL_MISMATCH: funnel proposed %s %s, intent carries %s %s" % (prop.get("expression"), pc, expression, contract)
+        if fn.get("rule_id") != expression_rule:
+            return "FUNNEL_POLICY_MISMATCH: funnel rule %r vs intent rule %r" % (str(fn.get("rule_id"))[:40], str(expression_rule)[:40])
+        return None
+
+    def record_intent(self, *, forecast_receipt: dict, intent: dict, signal_used: str, scan_id: str, funnel_receipt: dict | None = None) -> dict:
         """Forecast on disk, chain verified, unconsumed; intent bound to a
-        RiskAuthority approval; consumption of the forecast is atomic."""
+        RiskAuthority approval; consumption of the forecast is atomic.
+        Under the funnel policy the persisted `pilot_funnel` record must
+        verify and must authorize exactly this contract and policy; the
+        binding is stored on the intent and rechecked at fill and recovery."""
         try:
             fr = L.verify_receipt(self.ledger, forecast_receipt, expected_kind="pilot_forecast")
         except L.LedgerRefused as e:
             self.refuse("intent", "FORECAST_REF_%s" % e, refs={"forecast_receipt": forecast_receipt}, scan_id=scan_id)
+        funnel_ref = None
+        is_funnel_rule = str(intent.get("expression_rule") or "").startswith("FULL_FUNNEL")
+        if funnel_receipt is not None or is_funnel_rule:
+            if funnel_receipt is None:
+                self.refuse("intent", "FUNNEL_REQUIRED: expression rule %r needs a persisted pilot_funnel receipt" % str(intent.get("expression_rule"))[:40], scan_id=scan_id)
+            try:
+                fn = L.verify_receipt(self.ledger, funnel_receipt, expected_kind="pilot_funnel")
+            except L.LedgerRefused as e:
+                self.refuse("intent", "FUNNEL_REF_%s" % e, refs={"funnel_receipt": funnel_receipt}, scan_id=scan_id)
+            problem = self._funnel_binding_problem(fn, scan_id=scan_id, session_id=self.session_id, forecast_seq=forecast_receipt["seq"],
+                                                   contract=intent.get("contract") or {}, expression=intent.get("expression"), expression_rule=intent.get("expression_rule"))
+            if problem:
+                self.refuse("intent", problem, refs={"funnel_receipt": funnel_receipt}, scan_id=scan_id)
+            funnel_ref = {"seq": funnel_receipt["seq"], "entry_hash": funnel_receipt["entry_hash"], "rule_id": fn.get("rule_id"),
+                          "trace_digest": ((fn.get("trace") or {}).get("selected") or {}).get("trace_digest")}
         if fr.get("forecast_hash") != forecast_receipt.get("forecast_hash"):
             self.refuse("intent", "FORECAST_HASH_MISMATCH: receipt %r vs disk %r"
                         % (str(forecast_receipt.get("forecast_hash"))[:12], str(fr.get("forecast_hash"))[:12]), scan_id=scan_id)
@@ -164,6 +202,7 @@ class Boundary:
                                                      "max_fill_attempts": self.execution_policy.max_fill_attempts})
         except RecordRefused as e:
             self.refuse("intent", str(e), scan_id=scan_id)
+        body["funnel_ref"] = funnel_ref
         try:
             approval = self.risk.approve(body, book=self.book())
             body["risk"] = RG.verify_approval(body, approval)
@@ -269,6 +308,19 @@ class Boundary:
             return "INTENT_FORECAST_DISAGREE: symbol/session/scan", it, fr, None
         if fr.get("horizon_minutes") != 15 or it.get("horizon_relationship") is None:
             return "INTENT_HORIZON_UNDECLARED", it, fr, None
+        # the funnel binding is an EXECUTION DEPENDENCY: rechecked here for every fill attempt and on recovery
+        if it.get("funnel_ref") or str(it.get("expression_rule") or "").startswith("FULL_FUNNEL"):
+            ref = it.get("funnel_ref") or {}
+            if not ref.get("seq") or not ref.get("entry_hash"):
+                return "INTENT_FUNNEL_REF_MISSING: intent under %r carries no funnel binding" % str(it.get("expression_rule"))[:40], it, fr, None
+            try:
+                fn = L.verify_receipt(self.ledger, {"path": intent_receipt["path"], "seq": ref["seq"], "entry_hash": ref["entry_hash"]}, expected_kind="pilot_funnel", rows=rows)
+            except L.LedgerRefused as e:
+                return "INTENT_FUNNEL_REF_%s" % e, it, fr, None
+            problem = self._funnel_binding_problem(fn, scan_id=it.get("scan_id"), session_id=it.get("session_id"), forecast_seq=fref.get("seq"),
+                                                   contract=it["contract"], expression=it.get("expression"), expression_rule=it.get("expression_rule"))
+            if problem:
+                return "INTENT_FUNNEL_BINDING_%s" % problem, it, fr, None
         exp_right = "CALL" if it.get("signal_used") == "LONG" else "PUT" if it.get("signal_used") == "SHORT" else None
         if exp_right is None or it["contract"]["right"] != exp_right or it.get("action") != "BUY" or it.get("quantity") != 1:
             return "INTENT_CONTENT_DISAGREE: signal/right/action/quantity", it, fr, None

@@ -1,8 +1,22 @@
-# The Funnel — every intelligence layer in ONE decision path (M7, `FULL_FUNNEL_V1`)
+# The Funnel — the intelligence layers in ONE decision path (M7 r2, `FULL_FUNNEL_V1`)
 
-State: `SYNTHETIC_VERIFIED` on branch `frontier-build`. Not deployed, not activated, no orders. Independent
-acceptance pending. The deterministic pilot rule (`PILOT_RULE_V1`) remains the default selection policy; the
+State: `SYNTHETIC_VERIFIED` on branch `frontier-build` (r2 = the integration-repair milestone after the reviewer's
+eight findings at `f0daac2`). Not deployed, not activated, no orders. Independent acceptance pending. Layers this
+engine does NOT invoke are named on every trace: the SVI surface (ATM IV only), learned fusion, enrichment, jumps. The deterministic pilot rule (`PILOT_RULE_V1`) remains the default selection policy; the
 funnel is selected explicitly (`--pilot-selection-policy FULL_FUNNEL_V1`).
+
+## r2 — integration repairs (reviewer findings at `f0daac2` → what changed → the test that pins it)
+
+| # | Finding | Repair | Test |
+|---|---|---|---|
+| 1 | Student-t log returns → `E[exp(σZ)]` infinite; expected call payoff ill-defined | `simulator.draw_innovations`: standardized t **truncated at ±cap sd (8 by default) and renormalized** to unit variance — an explicit model choice, in the parameter hash and the restrictions; Gaussian innovations untouched. Engine records `tail_sensitivity` (selected candidate's expected value at caps 6 and 12). | `test_multiverse_wb::test_innovations_have_finite_exponential_moments…`; `test_funnel_engine::test_tail_truncation_is_declared_with_sensitivity` |
+| 2 | GARCH variance advanced an extra step at the handoff | ONE state convention: the simulator takes `h_next` (= `next_bar_variance`) as the variance of the FIRST simulated bar; the old `h_last/e_last` form is refused (`VARIANCE_STATE_CONVENTION`). The engine asserts exact first-step equality before using the paths. | `test_fitted_garch_feeds_the_simulator_consistently` (exact equality); `test_simulator_first_bar_variance_equals_the_forecast_exactly` |
+| 3 | Quote freshness bypassed upstream (missing timestamps defaulted; day-old ATM quotes supplied the IV) | Sources carry quote fields AS RECEIVED (no timestamp default). The engine runs `sanitize_quote` (timestamp present and ≤ 120 s old, sides, sizes, not crossed) on EVERY quote before IV inversion or ranking; rejected quotes are listed on the trace and can supply nothing. | `test_quotes_without_timestamps_are_rejected_not_defaulted`, `test_stale_atm_quotes_cannot_supply_the_iv`, `test_crossed_or_sizeless_quotes_are_rejected` |
+| 4 | Two clocks mixed (calendar T, trading-time horizon subtraction) | Expiry decay on CALENDAR time from timestamps (expiry = 16:00 ET; exit = as_of + 900 s; `HORIZON_15M_CALENDAR_YEARS = 900/(365·86400)`); variance on MARKET time. `physical_vs_implied` allocates `iv²·T_calendar` over trading minutes to expiry (declared). Identity `T_entry − horizon == T_exit` recorded per decision. | `test_expiry_decay_is_calendar_time_from_timestamps` |
+| 5 | Missing regime could still `ACT`; risk `approved=True` from the envelope; empty book substituted | FULL mode requires the regime model AND a ≥ 5-bar prefix; `REDUCED_NO_REGIME` must be selected by name and is labelled on the trace. Book summary is mandatory (no substitution); integrity problems abstain. The envelope check is labelled `PRELIMINARY_AFFORDABILITY`; the trace says kernel approval happens at intent commit. | `test_missing_regime_cannot_act_in_full_mode`, `test_short_prefix_blocks…`, `test_reduced_mode_is_selected_by_name…`, `test_book_summary_is_mandatory…` |
+| 6 | Persisted funnel not an execution dependency | `record_intent(funnel_receipt=)` verifies the `pilot_funnel` record and requires it to authorize exactly this scan, session, forecast, contract, expression and policy; the binding (`funnel_ref`) is stored on the intent and RECHECKED in `_history_problem` for every fill attempt and on recovery. | `TestFunnelBinding`: missing persistence, WAIT funnel, another scan's funnel, changed proposal / policy, altered record, execution-time recheck with the record-time check bypassed, healthy recovery |
+| 7 | GARCH accepted `success=False` (ABNORMAL) | Unsuccessful termination refused unless a Nelder–Mead polish from that point converges; a second feasible start must reach the same NLL; gradient norm recorded (`convergence` on the params). | `test_garch_refuses_an_unsuccessful_optimizer_outcome` |
+| 8 | Evaluator compared the wrong population (dropped WAIT rows) | `evaluate.paired_per_scan`: COMMON SCAN population, resolved TRADE = net, WAIT = 0, unresolved/refused EXCLUDED and counted; session-block bootstrap CI. The trades-only view is kept as SUPPLEMENTARY and labelled. | `test_per_scan_population_keeps_wait_as_zero_and_excludes_unresolved` (reviewer's 3-scan fixture: +6/scan vs −2 on the overlap) |
 
 ## What is wired (one path, one trace)
 

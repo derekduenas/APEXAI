@@ -112,8 +112,9 @@ class TwinSources:
         for c in chain:
             key = (c["expiration"], float(c["strike"]), c["right"])
             if _num(c.get("bid")) and _num(c.get("ask")):
-                quotes[key] = {"bid": c["bid"], "ask": c["ask"], "bid_size": c.get("bid_size", 0), "ask_size": c.get("ask_size", 0),
-                               "timestamp_epoch": c.get("timestamp_epoch", as_of), "indicative": True, "source": "CHAIN"}
+                # fields are carried AS RECEIVED: a missing timestamp or size stays missing and the engine's validator rejects the quote
+                quotes[key] = {k2: c[k2] for k2 in ("bid", "ask", "bid_size", "ask_size", "timestamp_epoch") if k2 in c}
+                quotes[key].update(indicative=True, source="CHAIN")
         today = date.fromisoformat(to_utc_string(as_of)[:10])
         exps = sorted({c["expiration"] for c in chain if (date.fromisoformat(c["expiration"]) - today).days >= DTE_MIN_DAYS})
         if not exps or not _num(spot):
@@ -129,14 +130,14 @@ class TwinSources:
                 try:
                     q = self._quote_fn({"symbol": symbol, "expiration": exp, "strike": k, "right": right})
                 except Exception as e:                                     # noqa: BLE001 - a missing indicative quote is a rejected candidate, not a crash
-                    quotes[key] = {"bid": 0.0, "ask": 0.0, "bid_size": 0, "ask_size": 0, "timestamp_epoch": as_of, "indicative": True, "source": "QUOTE_FAILED: %s" % type(e).__name__}
+                    quotes[key] = {"indicative": True, "source": "QUOTE_FAILED: %s" % type(e).__name__}       # no fields -> validator rejects it
                     continue
                 if isinstance(q, dict):
-                    quotes[key] = {"bid": q.get("bid", 0.0), "ask": q.get("ask", 0.0), "bid_size": q.get("bid_size", 0), "ask_size": q.get("ask_size", 0),
-                                   "timestamp_epoch": q.get("timestamp_epoch", as_of), "indicative": True, "source": "QUOTE_PROVIDER"}
+                    quotes[key] = {k2: q[k2] for k2 in ("bid", "ask", "bid_size", "ask_size", "timestamp_epoch") if k2 in q}
+                    quotes[key].update(indicative=True, source="QUOTE_PROVIDER")
         return quotes
 
-    def funnel_fn(self, symbol: str, as_of: float, forecast: dict) -> dict:
+    def funnel_fn(self, symbol: str, as_of: float, forecast: dict, book_summary: dict | None = None) -> dict:
         day = to_utc_string(as_of)[:10]
         day_start = datetime.fromisoformat(day + "T00:00:00+00:00").timestamp()
         if self._funnel_fitted_day.get(symbol) != day:
@@ -148,7 +149,8 @@ class TwinSources:
         chain = self._chain_fn(symbol, as_of)
         quotes = self._funnel_quotes(symbol, as_of, spot, chain)
         res = self.funnel_engine.decide(symbol=symbol, as_of=as_of, day=day, snapshot=snap, forecast=forecast, spot=spot, quotes=quotes,
-                                        prefix_returns=prefix, fee_schedule=self.fee_schedule, heuristic_direction=self.signal_fn(symbol, as_of, snap))
+                                        prefix_returns=prefix, fee_schedule=self.fee_schedule, book_summary=book_summary,
+                                        heuristic_direction=self.signal_fn(symbol, as_of, snap))
         res["trace"]["inputs"] = {"n_quotes": len(quotes), "quote_sources": sorted({q["source"] for q in quotes.values()}), "prefix_bars": len(prefix),
                                   "history_days": self.funnel_history_days, "chain_size": len(chain)}
         res["engine"] = self.funnel_engine.describe()

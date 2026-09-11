@@ -32,7 +32,7 @@ def test_simulator_moments_tails_horizon_and_analytic_special_case():
     assert np.allclose(np.log(S[:, -1] / S[:, 0]), np.sum(np.diff(np.log(S), axis=1), axis=1))
     assert np.allclose(out["h"][:, 0], h) and out["restrictions"][0].startswith("IV held fixed")
     # heavy tails with t innovations under GARCH
-    g = SIM.ConditionalSimulator(S0=645.0, variance_model={"kind": "GARCH", "omega": 2e-8, "alpha": 0.08, "beta": 0.9, "gamma": 0.0, "h_last": 2e-6, "e_last": 0.0},
+    g = SIM.ConditionalSimulator(S0=645.0, variance_model={"kind": "GARCH", "omega": 2e-8, "alpha": 0.08, "beta": 0.9, "gamma": 0.0, "h_next": 2e-6},
                                  nu=5.0, iv0=0.18, spread_bps0=40.0, cutoff_epoch=T0)
     og = g.simulate(horizon_bars=15, n_paths=40000, seed=2)
     assert og["moments"]["kurtosis_excess"] > 0.3
@@ -63,11 +63,37 @@ def test_regime_mixture_iv_and_spread_processes_and_unweighted_stresses():
 def test_fitted_garch_feeds_the_simulator_consistently():
     x = VM.simulate_garch(n=4000, omega=2e-8, alpha=0.08, beta=0.9, nu=7.0, seed=9)
     m = VM.GARCH(); p = m.fit([{"event_time": i * 60.0, "available": i * 60.0 + 60, "ret_1": float(v)} for i, v in enumerate(x)], cutoff_epoch=1e9)
-    sim = SIM.ConditionalSimulator(S0=645.0, variance_model={"kind": "GARCH", **{k: p[k] for k in ("omega", "alpha", "beta", "gamma", "h_last", "e_last")}},
+    f = m.forecast(cutoff_epoch=1e9, created_epoch=1e9, horizon_bars=15)
+    sim = SIM.ConditionalSimulator(S0=645.0, variance_model={"kind": "GARCH", **{k: p[k] for k in ("omega", "alpha", "beta", "gamma")}, "h_next": f.meta["next_bar_variance"]},
                                    nu=p["nu"], iv0=0.18, spread_bps0=40.0, cutoff_epoch=1e9)
     out = sim.simulate(horizon_bars=15, n_paths=30000, seed=4)
-    f = m.forecast(cutoff_epoch=1e9, created_epoch=1e9, horizon_bars=15)
+    # ONE state convention: the first simulated bar's variance IS the forecast's next_bar_variance, exactly (no extra recurrence step)
+    assert out["h_next"] == f.meta["next_bar_variance"] and np.all(out["h"][:, 0] == f.meta["next_bar_variance"])
     assert out["moments"]["var_log_return"] == pytest.approx(f.variance(), rel=0.15)
+    with pytest.raises(SIM.SimulatorRefused, match="VARIANCE_STATE_CONVENTION"):
+        SIM.ConditionalSimulator(S0=645.0, variance_model={"kind": "GARCH", "omega": 1e-8, "alpha": 0.05, "beta": 0.9, "gamma": 0.0, "h_last": 1e-6, "e_last": 0.0},
+                                 nu=6.0, iv0=0.18, spread_bps0=40.0)
+
+
+def test_innovations_have_finite_exponential_moments_and_the_truncation_is_declared():
+    import math
+    from scipy import stats
+    tr = SIM.truncated_t_scale(4.0, 8.0)
+    assert 0 < tr["truncated_mass"] < 1e-2 and tr["renormalization"] > 1.0
+    rng = np.random.default_rng(0)
+    z = SIM.draw_innovations(rng, nu=4.0, n=400000, innovations="TRUNCATED_T", tail_cap_sd=8.0)
+    assert np.max(np.abs(z)) <= 8.0 * tr["renormalization"] + 1e-9 and np.var(z) == pytest.approx(1.0, rel=0.02)
+    # bounded support => E[exp(sigma Z)] finite for every sigma; the untruncated t (nu=4) has none: its sample mean of exp(sigma z) explodes with n
+    assert np.isfinite(np.mean(np.exp(3.0 * z)))
+    sim = SIM.ConditionalSimulator(S0=100.0, variance_model={"kind": "FLAT", "h": 1e-6}, nu=4.0, iv0=0.2, spread_bps0=30.0)
+    d = sim.describe()
+    assert d["innovations"]["family"] == "TRUNCATED_T" and d["innovations"]["tail_cap_sd"] == 8.0 and d["innovations"]["finite_exponential_moments"] is True
+    assert any("TRUNCATED" in r for r in sim.restrictions())
+    with pytest.raises(SIM.SimulatorRefused, match="TAIL_CAP_INVALID"):
+        SIM.ConditionalSimulator(S0=100.0, variance_model={"kind": "FLAT", "h": 1e-6}, nu=4.0, iv0=0.2, spread_bps0=30.0, tail_cap_sd=2.0)
+    # the cap is part of the parameter hash: a different explicit choice is a different model
+    d2 = SIM.ConditionalSimulator(S0=100.0, variance_model={"kind": "FLAT", "h": 1e-6}, nu=4.0, iv0=0.2, spread_bps0=30.0, tail_cap_sd=6.0).describe()
+    assert d2["parameter_hash"] != d["parameter_hash"]
 
 
 # ================================================================== pricing

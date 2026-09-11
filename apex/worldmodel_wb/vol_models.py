@@ -173,8 +173,34 @@ class GARCH(_VarianceModel):
         v = float(np.var(x))
         x0 = [math.log(v * 0.05), -2.2, 1.9] + ([-3.0] if self.gjr else []) + [math.log(6.0)]
         res = optimize.minimize(_nll, x0, args=(x, self.gjr), method="L-BFGS-B")
-        if not res.success and "ABNORMAL" not in str(res.message):
-            raise ModelRefused("OPTIMIZER_FAILED: %s" % res.message)
+        method = "L-BFGS-B"
+        if not res.success:
+            # an unsuccessful termination is NOT accepted as a fit: polish with a derivative-free method from the L-BFGS-B point
+            # and accept only if THAT converges (ABNORMAL_TERMINATION_IN_LNSRCH is a line-search failure, not a solution)
+            res2 = optimize.minimize(_nll, res.x, args=(x, self.gjr), method="Nelder-Mead", options={"maxiter": 6000, "xatol": 1e-7, "fatol": 1e-9})
+            if not res2.success:
+                raise ModelRefused("OPTIMIZER_FAILED: L-BFGS-B %r; Nelder-Mead polish %r" % (str(res.message)[:60], str(res2.message)[:60]))
+            res = res2; method = "L-BFGS-B (unsuccessful) + Nelder-Mead polish (converged)"
+        # independent convergence check: a second start must reach the same optimum (within tolerance); the better point is kept
+        rng = np.random.default_rng(int(abs(res.fun)) % (2 ** 31))
+        start_b = None
+        for _ in range(8):                                             # a second start INSIDE the feasible region (not the penalty plateau)
+            cand = np.asarray(res.x, dtype=float) + rng.normal(0.0, 0.15, size=len(res.x))
+            if _nll(cand, x, self.gjr) < 1e11:
+                start_b = cand; break
+        if start_b is None:
+            raise ModelRefused("NOT_CONVERGED: no feasible second start near the optimum")
+        res_b = optimize.minimize(_nll, start_b, args=(x, self.gjr), method="L-BFGS-B")
+        if res_b.success and res_b.fun < res.fun:
+            res = res_b
+        tol = 1e-6 * max(1.0, abs(float(res.fun))) + 1e-6
+        if not (res_b.success or abs(float(res_b.fun) - float(res.fun)) <= 1e-3 * max(1.0, abs(float(res.fun)))):
+            raise ModelRefused("NOT_CONVERGED: second start failed (%s)" % str(res_b.message)[:60])
+        if abs(float(res_b.fun) - float(res.fun)) > 100 * tol:
+            raise ModelRefused("NOT_CONVERGED: multi-start NLL disagreement %.6g vs %.6g" % (float(res_b.fun), float(res.fun)))
+        grad = optimize.approx_fprime(np.asarray(res.x, dtype=float), lambda t: _nll(t, x, self.gjr), 1e-6)
+        convergence = {"method": method, "success": bool(res.success), "multi_start_nll_gap": abs(float(res_b.fun) - float(res.fun)),
+                       "grad_inf_norm": float(np.max(np.abs(grad))), "rule": "unsuccessful termination refused unless a derivative-free polish converges; a second start must agree on the NLL"}
         th = res.x
         omega, alpha, beta = math.exp(th[0]), _sig(th[1]), _sig(th[2])
         gamma = _sig(th[3]) if self.gjr else 0.0
@@ -185,7 +211,7 @@ class GARCH(_VarianceModel):
             raise ModelRefused("NU_AT_BOUND: nu=%.3f" % nu)
         h = _filter(x, omega, alpha, beta, gamma, v)
         self.p = {"omega": omega, "alpha": alpha, "beta": beta, "gamma": gamma, "nu": nu, "gjr": self.gjr,
-                  "h_last": float(h[-1]), "e_last": float(x[-1]), "n": int(len(x)), "nll": float(res.fun),
+                  "h_last": float(h[-1]), "e_last": float(x[-1]), "n": int(len(x)), "nll": float(res.fun), "convergence": convergence,
                   "unconditional_variance": omega / (1 - alpha - beta - gamma / 2), "persistence": alpha + beta + gamma / 2}
         return dict(self.p)
 

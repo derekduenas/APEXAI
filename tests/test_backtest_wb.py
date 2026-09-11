@@ -133,8 +133,31 @@ def test_full_funnel_on_planted_drift(tmp_path):
     assert runner.fits >= 2 and all(f.get("status") == "READY" or f.get("status").startswith("INSUFFICIENT_HISTORY") for f in runner.fit_log)
     s = EV.summarize(recs)
     assert s["variants"]["FULL_FUNNEL"]["trades"] == len(trades)
-    assert s["full_funnel_vs_policy"]["n_common"] >= 1 and s["full_funnel_vs_wait"]["mean_net_per_trade"] > 0
+    assert s["full_funnel_vs_policy"]["n_common_scans"] >= 1 and s["full_funnel_vs_policy"]["population"].startswith("COMMON_SCANS")
+    assert s["full_funnel_vs_wait_per_scan"]["mean_diff_per_scan"] > 0 and s["full_funnel_vs_wait"]["label"].startswith("SUPPLEMENTARY")
     assert "INSUFFICIENT_HISTORY" not in s["full_funnel_non_trade_reasons"] or s["full_funnel_non_trade_reasons"]["PRIME_ABSTAIN"] >= 1
     assert s["full_funnel_rights"] == {"CALL": len(trades)} and s["full_funnel_coverage"]["funnel_trades"] == len(trades)
     rows = [json.loads(l) for l in (tmp_path / "scans.jsonl").read_text().splitlines()]
     assert all("entry_hash" in r for r in rows) and len(rows) == len(recs)
+
+
+def test_per_scan_population_keeps_wait_as_zero_and_excludes_unresolved():
+    """Reviewer fixture: three scans. Per-trade overlap alone says the funnel is WORSE; the contract's per-scan estimand says it is BETTER."""
+    def scan(day, i, pol, ff):
+        return {"kind": "replay_scan", "day": day, "scan": i, "forecast": {"location": 0.0}, "variants": {"POLICY": pol, "FULL_FUNNEL": ff}}
+    trade = lambda net: {"decision": "TRADE", "pnl": {"net": net, "gross": net, "fees": 0.0}, "contract": {"right": "CALL"}}
+    wait = {"decision": "WAIT"}
+    scans = [scan("2019-06-03", 1, trade(10.0), trade(8.0)),        # both trade: funnel -2 on the overlap
+             scan("2019-06-03", 2, trade(-20.0), wait),             # policy loses 20, funnel legitimately waits (0)
+             scan("2019-06-03", 3, wait, trade(0.0))]                # funnel trades flat where policy waited
+    r = EV.paired_per_scan(scans, "FULL_FUNNEL", "POLICY", draws=50)
+    assert r["n_common_scans"] == 3 and r["mean_diff_per_scan"] == pytest.approx((8 - 10 - 0 + 20 + 0 - 0) / 3)      # = +6 per scan
+    assert r["pair_census"] == {"TRADE/TRADE": 1, "WAIT/TRADE": 1, "TRADE/WAIT": 1} and r["excluded"] == {"FULL_FUNNEL": {}, "POLICY": {}}
+    from apex.worldmodel_wb.tournament import paired_comparison
+    trades_only = paired_comparison({"2019-06-03:1": 8.0, "2019-06-03:3": 0.0}, {"2019-06-03:1": 10.0, "2019-06-03:2": -20.0})
+    assert trades_only["mean_diff"] == -2.0                                                                            # the wrong population's answer
+    # unresolved trades and refusals are EXCLUDED and counted, never scored as zero
+    scans.append(scan("2019-06-04", 1, trade(5.0), {"decision": "TRADE_UNRESOLVED", "pnl": None}))
+    scans.append(scan("2019-06-04", 2, {"decision": "REFUSE"}, trade(5.0)))
+    r2 = EV.paired_per_scan(scans, "FULL_FUNNEL", "POLICY", draws=50)
+    assert r2["n_common_scans"] == 3 and r2["excluded"] == {"FULL_FUNNEL": {"TRADE_UNRESOLVED": 1}, "POLICY": {"REFUSE": 1}}

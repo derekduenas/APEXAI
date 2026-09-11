@@ -224,7 +224,7 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
         if funnel_fn is not None:
             # 2a. THE FUNNEL: every layer decides together; the engine's trace is persisted before any intent
             try:
-                res = funnel_fn(symbol, as_of, forecast)
+                res = funnel_fn(symbol, as_of, forecast, book_summary=bd.book().summary())
             except Exception as e:                                         # noqa: BLE001
                 bd.refuse("funnel", "FUNNEL_PROVIDER_FAILED: %s: %s" % (type(e).__name__, str(e)[:300]), scan_id=scan_id)
             if not isinstance(res, dict) or res.get("decision") not in ("TRADE", "WAIT") or "trace" not in res:
@@ -242,7 +242,9 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
             if res["decision"] != "TRADE":
                 return _decision(bd, scan_id=scan_id, symbol=symbol, decision="WAIT", why="FUNNEL_WAIT: %s" % res.get("why"), ids=ids)
             proposal = dict(res["proposal"]); signal = proposal.pop("direction_signal", None)
+            funnel_receipt = {**fr_receipt, "scan_id": scan_id}
         else:
+            funnel_receipt = None
             # 2b. deterministic rule -> risk-bound intent persisted
             try:
                 signal = signal_fn(symbol, as_of)
@@ -252,7 +254,7 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
                 bd.refuse("rule", str(e), refs={"forecast_seq": f_receipt["seq"]}, scan_id=scan_id)
             except Exception as e:                                         # noqa: BLE001
                 bd.refuse("rule", "INPUT_PROVIDER_FAILED: %s: %s" % (type(e).__name__, str(e)[:300]), scan_id=scan_id)
-        i_receipt = bd.record_intent(forecast_receipt=f_receipt, intent=proposal, signal_used=signal, scan_id=scan_id)
+        i_receipt = bd.record_intent(forecast_receipt=f_receipt, intent=proposal, signal_used=signal, scan_id=scan_id, funnel_receipt=funnel_receipt)
         ids["intent_id"] = i_receipt["intent_id"]; ids["receipts"]["intent"] = i_receipt
         # 3+4. quote only after the intent is on disk; fill exactly once
         fill_receipt = bd.execute_intent(intent_receipt=i_receipt, quote_fn=quote_fn)

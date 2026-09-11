@@ -170,6 +170,23 @@
     "fee schedule UNVERIFIED",
     "live chain/quote adapters not commissioned",
     "expected values model-conditional (IV_FIXED)"
+   ],
+   "r2_repairs": {
+    "reviewed_commit": "f0daac2",
+    "findings_repaired": 8,
+    "table": "docs/FUNNEL_INTEGRATION.md#r2",
+    "tests": [
+     "tests/test_funnel_engine.py (27)",
+     "tests/test_multiverse_wb.py::test_innovations_have_finite_exponential_moments_and_the_truncation_is_declared",
+     "tests/test_worldmodel_wb.py::test_garch_refuses_an_unsuccessful_optimizer_outcome",
+     "tests/test_backtest_wb.py::test_per_scan_population_keeps_wait_as_zero_and_excludes_unresolved"
+    ]
+   },
+   "layers_not_invoked": [
+    "svi_surface",
+    "fusion",
+    "enrichment",
+    "jumps"
    ]
   }
  },
