@@ -67,7 +67,7 @@
   },
   "M3": {
    "state": "SYNTHETIC_VERIFIED",
-   "commit": null,
+   "commit": "e277e4c",
    "modules": [
     "apex/worldmodel_wb/contracts.py",
     "apex/worldmodel_wb/vol_models.py",
@@ -92,7 +92,18 @@
    "independent_acceptance": "PENDING"
   },
   "M4": {
-   "state": "NOT_STARTED"
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": null,
+   "modules": [
+    "apex/multiverse_wb/simulator.py",
+    "apex/multiverse_wb/pricing.py",
+    "apex/multiverse_wb/surface.py",
+    "apex/multiverse_wb/expression_war.py"
+   ],
+   "tests": [
+    "tests/test_multiverse_wb.py"
+   ],
+   "independent_acceptance": "PENDING"
   },
   "M5": {
    "state": "NOT_STARTED"

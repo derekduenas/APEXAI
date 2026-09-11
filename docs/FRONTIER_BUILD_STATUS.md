@@ -23,8 +23,8 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 | M0 — four remaining recording defects | `SYNTHETIC_VERIFIED` (awaiting independent acceptance) | `360536cb` (r4) | `docs/OPTIONS_PILOT_RECORDING_BOUNDARY.md` §10; tests `test_r4_*` (boundary) and `test_f6_lifecycle_recovery_through_the_entry_point`; contained run at 360536cb: 92 pilot / 461 regression passed |
 | M1 — execution accounting + operational paper loop | `SYNTHETIC_VERIFIED` | `78931c0` | `apex/options_pilot/{fees,book,risk_authority,exit_policy}.py`; boundary/session/entrypoint integration; `tests/test_options_pilot_accounting.py` (14) + the 92 r4 tests updated for fees/exit policy; local run 106 passed |
 | M2 — PULSE / Twin / inference adapters | `SYNTHETIC_VERIFIED` | `d026b87` | `apex/pulse_options/{ingest,snapshot,features,inference,providers,sources}.py` + `exp002_artifact.json`; `tests/test_pulse_options_twin.py` (22); smoke script + collection request prepared, not executed |
-| M3 — World Model workbench | `SYNTHETIC_VERIFIED` (foundation benchmarks `BLOCKED_RESOURCE` / `BLOCKED_LICENSE`) | see manifest (`M3.commit`) | `apex/worldmodel_wb/*`; `tests/test_worldmodel_wb.py` (14); `docs/evidence/garch_reference_vs_arch_OUTPUT.json` |
-| M4 — Multiverse + market-implied | `NOT_STARTED` | — | — |
+| M3 — World Model workbench | `SYNTHETIC_VERIFIED` (foundation benchmarks `BLOCKED_RESOURCE` / `BLOCKED_LICENSE`) | `e277e4c` | `apex/worldmodel_wb/*`; `tests/test_worldmodel_wb.py` (14); `docs/evidence/garch_reference_vs_arch_OUTPUT.json` |
+| M4 — Multiverse + market-implied | `SYNTHETIC_VERIFIED` | see manifest (`M4.commit`) | `apex/multiverse_wb/{simulator,pricing,surface,expression_war}.py`; `tests/test_multiverse_wb.py` (8) |
 | M5 — fusion, supervision, learning | `NOT_STARTED` | — | — |
 | M6 — operator view + commissioning package | `NOT_STARTED` | — | — |
 
@@ -158,3 +158,33 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
   dependence inference and planned comparisons; validation yields a digest and grants no access.
 - **Not done, by mandate**: no historical fitting; no HAR (needs a trustworthy realized-variance dataset first);
   no change-point / particle-filter challengers.
+
+## M4 — what was built
+
+- **Simulator** (`multiverse_wb/simulator.py`): joint paths of underlying (GARCH/GJR-t or flat variance, 1-minute
+  log-return recursion), variance, an IV state under a DECLARED process (fixed / stress-multiplier / drift), and
+  an execution spread process; optional regime mixture sampled per path; seeds, cutoff, parameter hash and
+  discretization preserved; every output lists its restrictions (e.g. "IV held fixed"); Monte Carlo error is
+  reported separately from model uncertainty (fit: not propagated; regime: mixture). Validated on synthetic
+  worlds: moments vs the analytic Gaussian special case, heavy tails under t, path-consistent horizon
+  aggregation, consistency with the fitted GARCH's integrated variance. Unweighted stress branches carry
+  `probability: None`. Jumps are not included (no declared estimator).
+- **Pricing** (`pricing.py`): quote sanitation (crossed/zero/size/stale/non-finite refused, never cleaned);
+  Black-Scholes-Merton European reference with continuous yield; put-call parity and finite-difference Greek
+  tests; IV inversion by Brent with no-arbitrage bounds and an intrinsic-price refusal; CRR binomial American
+  engine (early-exercise premium shown on a deep ITM put; convergence to BSM for the European-equivalent case);
+  the European formula on an AMERICAN instrument only under a DECLARED approximation; instrument metadata with
+  exercise style, settlement, multiplier 100 and refusal of adjusted contracts.
+- **Surface** (`surface.py`): raw SVI slice fit to total variance under the parameter constraints (Nelder-Mead
+  with restarts + Powell), Durrleman butterfly diagnostic and calendar diagnostic; violations are RECORDED on the
+  surface; `iv(k, T)` refuses failed slices and out-of-range expiries; interpolation in T is labelled.
+  European-only by construction.
+- **Expression comparison** (`expression_war.py`): WAIT + candidates under COMMON paths and documented costs at
+  the actual 15-minute exit (exit bid = model mid at (S_H, IV_H, T−H) minus half the spread scenario; entry at
+  the sanitized ask; fees once per side; certified max loss = debit + fees); expected net P&L, downside quantiles,
+  loss probability, MC standard error, an IV-sensitivity table, and `expected_value_established: false` while IV
+  is held fixed; rejected candidates keep their reason; `selection_authority: NONE` — the pilot's deterministic
+  rule still selects. `physical_vs_implied` compares at a compatible horizon and discloses the risk premium; no
+  arbitrage label exists.
+- **Not done, by mandate**: no fitted future-IV process (so no established expected value); no jump component;
+  no spread/multi-leg certification; no change to the pilot's selection.
