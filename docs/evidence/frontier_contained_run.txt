@@ -1,0 +1,24 @@
+commit=9cfb70f600bd66b15d14203662da995fcf41a4ac dirty=0 host=APEX date=2026-09-11T02:09:23Z
+cgroup=0::/wmresearch.slice/run-u53678.service
+python=Python 3.12.3 numpy=2.4.6 1.17.1
+== NEW SUITES
+........................................................................ [ 92%]
+............                                                             [100%]
+156 passed in 37.76s
+== REGRESSION
+.................................................................        [100%]
+497 passed in 26.08s
+== SCALE CHECK
+ "records": 470,
+ "kinds": {
+  "pilot_session_open": 10,
+  "pilot_forecast": 90,
+--
+ "binding_problems": [],
+ "chain_verified": true,
+ "book_all_sessions": {
+  "cash": 11135.89,
+--
+ "elapsed_s": 74.7,
+ "max_rss_bytes": 105259008,
+memory.peak_bytes=296558592 memory.current_bytes=24129536 memory.max=1468006400
