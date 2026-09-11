@@ -63,9 +63,10 @@ def load_bars(root: Path, symbol: str, day: str) -> list:
     doc = json.loads(gzip.open(Path(root) / symbol / ("underlying_%s.json.gz" % d8)).read())
     out = []
     for b in doc["bars"]:
-        if b.get("session") not in (None, "REG", "reg"):
-            continue
         t = datetime.fromisoformat(b["t"].replace("Z", "+00:00")).timestamp()
+        local = datetime.fromtimestamp(t, tz=ET)
+        if not ((9, 30) <= (local.hour, local.minute) < (16, 0)):          # regular hours by exchange-local time, not by label
+            continue
         out.append({"event_time": t, "open": float(b["o"]), "high": float(b["h"]), "low": float(b["l"]), "close": float(b["c"]),
                     "volume": float(b["v"]), "trades": b.get("n"), "vwap": b.get("vw"), "receipt_time": t + 60.0, "publication_time": None})
     return sorted(out, key=lambda x: x["event_time"])
