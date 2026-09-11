@@ -260,6 +260,11 @@ Layers not invoked (SVI surface, fusion, enrichment) are named on every trace.
 
 ## Evidence index
 
+- M7 r2 (`3cc65b0`): full tree on the Mac venv 4,803 passed / 26 skipped / 11 failed in 31 min; the 11 are the SAME
+  environment failures listed for `f0daac2` below (all reproduce at the parent commit `e36b7e9`); none from the repairs.
+  Touched suites (funnel engine 27, backtest 6, worldmodel, multiverse, decision, pilot boundary/entrypoint/accounting/
+  operator-view, twin, Robinhood adapter): 200 passed.
+
 - M7 (`f0daac2`): full tree on the Mac venv 4,784 passed / 26 skipped / 11 failed in 32 min; every one of the 11
   fails identically at the parent commit `e36b7e9` (host-only paths `/opt/apex-repo`, `/proc/self/cgroup`, the
   repo-wide ledger guard's offender registry, research-board legacy roots, sticky-dir probe, null-rig memory):
