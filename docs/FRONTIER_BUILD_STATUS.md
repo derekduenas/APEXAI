@@ -251,6 +251,12 @@ prices makes the kernel-cap blocker explicit (all near-ATM asks rejected by the 
 
 ## Evidence index
 
+- M7 (`f0daac2`): full tree on the Mac venv 4,784 passed / 26 skipped / 11 failed in 32 min; every one of the 11
+  fails identically at the parent commit `e36b7e9` (host-only paths `/opt/apex-repo`, `/proc/self/cgroup`, the
+  repo-wide ledger guard's offender registry, research-board legacy roots, sticky-dir probe, null-rig memory):
+  environment/pre-existing, none from the funnel. Touched suites: funnel engine 17, backtest 5, pilot
+  boundary/entrypoint/accounting/operator-view, twin, Robinhood adapter, worldmodel, multiverse, decision all pass.
+
 - Local (Mac, repo venv): new suites 156 passed (`tests/test_options_pilot_{boundary,entrypoint,accounting,
   operator_view}.py`, `tests/test_pulse_options_twin.py`, `tests/test_worldmodel_wb.py`, `tests/test_multiverse_wb.py`,
   `tests/test_decision_wb.py`); regression set (`tests/test_options_*.py`, ledger concurrency, live book, outbox
