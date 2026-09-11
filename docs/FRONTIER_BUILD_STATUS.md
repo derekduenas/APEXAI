@@ -268,6 +268,12 @@ a separate mandatory-WAIT case. Table in `docs/FUNNEL_INTEGRATION.md`.
 
 ## Evidence index
 
+- M7 r3 (`525340c`): full tree on the Mac venv 4,810 passed / 26 skipped / 11 failed in 32 min; the 11 are the SAME
+  environment set as r2 and `f0daac2` (all reproduce at the parent commit `e36b7e9`); none from the r3 repairs.
+  Touched suites: funnel engine 30 + worldmodel + multiverse = 63; backtest, decision, pilot boundary/entrypoint/
+  accounting/operator-view, twin, Robinhood adapter = 144; all pass. CLI smoke at this pin under `FULL_FUNNEL_V1`
+  (synthetic fixture): FULL mode, PRIME ACT, digest-bound intent, kernel-approved reservation, FILLED, RESOLVED, book closed clean.
+
 - M7 r2 (`3cc65b0`): full tree on the Mac venv 4,803 passed / 26 skipped / 11 failed in 31 min; the 11 are the SAME
   environment failures listed for `f0daac2` below (all reproduce at the parent commit `e36b7e9`); none from the repairs.
   Touched suites (funnel engine 27, backtest 6, worldmodel, multiverse, decision, pilot boundary/entrypoint/accounting/
