@@ -192,9 +192,12 @@ def unresolved_fills(ledger, *, rows: list | None = None) -> list:
     These are OUTSTANDING OBLIGATIONS: a session is not complete while any
     exist, whatever the intent side of the ledger says."""
     rows = L.read_all(ledger) if rows is None else rows
-    resolved = {(r.get("fill_ref") or {}).get("seq") for r in rows if r.get("kind") == "pilot_outcome"}
+    # ONLY a discharging outcome (RESOLVED / NO_POSITION) resolves a position. A NOT_ESTIMABLE valuation attempt is
+    # persisted evidence that an exit was unavailable; it does not discharge anything.
+    discharged = {(r.get("fill_ref") or {}).get("seq") for r in rows
+                  if r.get("kind") == "pilot_outcome" and r.get("discharges_position") is True}
     return [(i + 1, r) for i, r in enumerate(rows)
-            if r.get("kind") == "pilot_fill" and r.get("status") == "FILLED" and (i + 1) not in resolved]
+            if r.get("kind") == "pilot_fill" and r.get("status") == "FILLED" and (i + 1) not in discharged]
 
 
 def recover_positions(bd: B.Boundary) -> dict:
@@ -204,9 +207,12 @@ def recover_positions(bd: B.Boundary) -> dict:
     rows = L.read_all(bd.ledger)
     own, foreign = [], []
     for seq, r in unresolved_fills(bd.ledger, rows=rows):
+        attempts = [x for x in rows if x.get("kind") == "pilot_outcome" and (x.get("fill_ref") or {}).get("seq") == seq]
         receipt = {"path": str(bd.ledger), "seq": seq, "entry_hash": r.get("entry_hash"), "kind": "pilot_fill",
                    "intent_id": r.get("intent_id"), "scan_id": r.get("scan_id"), "fill_id": r.get("fill_id"),
-                   "contract_id": r.get("contract_id"), "receipt": "REBUILT from disk (unresolved position)"}
+                   "contract_id": r.get("contract_id"), "valuation_attempts": len(attempts),
+                   "last_attempt_why": (attempts[-1].get("why") if attempts else None),
+                   "receipt": "REBUILT from disk (unresolved position)"}
         if r.get("session_id") == bd.session_id and r.get("release") == bd.release \
                 and r.get("data_provenance") == bd.labels["data_provenance"]:
             own.append(receipt)

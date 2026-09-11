@@ -88,7 +88,8 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     # by an earlier process of this session) is an obligation this run must try to resolve and must report.
     recovered = S.recover_positions(bd)
     fills = list(recovered["own"])
-    report["recovered_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id")} for r in fills]
+    report["recovered_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id",
+                                                               "valuation_attempts", "last_attempt_why")} for r in fills]
     report["foreign_unresolved_positions"] = recovered["foreign"]
     # A session that is already CLOSED on disk is not reopened for new scans: this run is recovery-only. New intents
     # would be refused at the boundary (SESSION_CLOSED) and would then sit as unfinished obligations of their own.
@@ -109,12 +110,13 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     for fr in fills:
         try:
             o = S.resolve(bd, fill_receipt=fr, exit_quote_fn=src["exit_quote_fn"])
-            report["outcomes"].append({"fill_seq": fr["seq"], "status": o["status"], "seq": o["seq"]})
+            report["outcomes"].append({"fill_seq": fr["seq"], "status": o["status"], "seq": o["seq"],
+                                       "discharges_position": o.get("discharges_position"), "attempt": o.get("attempt")})
         except Exception as e:                                                 # noqa: BLE001
             report["outcomes"].append({"fill_seq": fr["seq"], "status": "REFUSED", "why": "%s: %s" % (type(e).__name__, str(e)[:160])})
     still_open = S.recover_positions(bd)
-    report["unresolved_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id")}
-                                      for r in still_open["own"]]
+    report["unresolved_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id",
+                                                                "valuation_attempts", "last_attempt_why")} for r in still_open["own"]]
     report["session_close"] = S.close_session(bd)
     close_rec = S.L.read_all(ledger)[report["session_close"]["seq"] - 1]
     report["completion"] = close_rec.get("completion")

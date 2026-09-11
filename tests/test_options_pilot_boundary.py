@@ -24,6 +24,8 @@ from apex.options_pilot.expression_rule import DTE_MIN_DAYS, RULE_ID
 from apex.options_pilot.synthetic_harness import SYNTHETIC_PARAMS, SyntheticHarness, T0, forecast_from_params
 
 SYM = "SPY"
+T_MINUTE = 1_789_000_020.0          # a minute boundary: the harness forecast's input cutoff equals its creation instant,
+                                    # so the intent TTL (120 s) rather than forecast freshness (120 s from cutoff) binds
 
 
 def _h(tmp_path, **kw) -> SyntheticHarness:
@@ -544,13 +546,13 @@ def test_intent_expiry_is_enforced_before_and_during_the_quote(tmp_path):
     ir = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
     assert _rec(h, ir)["expiry_epoch"] == _rec(h, ir)["created_epoch"] + R.INTENT_TTL_S
     h.advance(R.INTENT_TTL_S + 1)
-    with pytest.raises(B.BoundaryRefused, match="INTENT_EXPIRED before quote"):
+    with pytest.raises(B.BoundaryRefused, match="INTENT_EXPIRED: clock"):
         h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
     assert not h.quotes.calls and _kinds(h)[-2:] == ["pilot_intent_expired", "pilot_refusal"]
     with pytest.raises(B.BoundaryRefused, match="INTENT_TERMINAL: pilot_intent_expired"):
         h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
-    # expiry crossed while the provider was slow: refused, recorded on the fill
-    h2 = _h(tmp_path / "s")
+    # expiry crossed while the provider was slow: terminal record + refusal, never a fill
+    h2 = _h(tmp_path / "s", t0=T_MINUTE)
     fr2 = h2.bd.record_forecast(h2.forecast_fn(SYM, h2.now()), scan_id=SID)
     ir2 = h2.bd.record_intent(forecast_receipt=fr2, intent=_proposal(), signal_used="LONG", scan_id=SID)
     h2.advance(R.INTENT_TTL_S - 1)
@@ -572,8 +574,13 @@ def test_stale_and_missing_exit_quotes_are_not_estimable_never_imputed(tmp_path)
     o2 = S.resolve(h.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=lambda c: None)
     rec2 = _rec(h, o2)
     assert rec2["status"] == "NOT_ESTIMABLE" and rec2["pnl"] is None and "never imputed" in rec2["exit_law"]
-    again = S.resolve(h.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=h.exit_quotes)   # redelivery: reconciled
-    assert again["reconciled"] is True and again["seq"] == o2["seq"] and _kinds(h).count("pilot_outcome") == 2
+    assert rec2["discharges_position"] is False and rec2["attempt"] == 1
+    h.exit_quotes.age = 1.0
+    later = S.resolve(h.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=h.exit_quotes)   # a later attempt discharges
+    assert later["status"] == "RESOLVED" and later["attempt"] == 2 and later["reconciled"] is False
+    again = S.resolve(h.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=h.exit_quotes)   # after discharge: reconciled
+    assert again["reconciled"] is True and again["seq"] == later["seq"]
+    assert len(B.Boundary.valuation_attempts(_rows(h), d2["receipts"]["fill"]["seq"])) == 2
     d3 = _scan(h)
     h.exit_quotes.age = 1.0; h.exit_quotes.fail_with = OSError("feed gone")
     o3 = S.resolve(h.bd, fill_receipt=d3["receipts"]["fill"], exit_quote_fn=h.exit_quotes)
@@ -897,21 +904,7 @@ def test_f2_cancellation_inside_the_quote_window_wins_and_no_fill_follows(tmp_pa
     with pytest.raises(B.BoundaryRefused, match="SESSION_CLOSED_AT_COMMIT"):
         h3.bd.execute_intent(intent_receipt=ir3, quote_fn=closing_quote)
     assert _kinds(h3).count("pilot_fill") == 0
-    # intent expiry crossed between receipt and commit is caught at commit
-    h4 = _h(tmp_path / "d")
-    _fr4, ir4 = _pending_intent(h4)
-    real_now = h4.bd.clock.now
-    reads = {"n": 0}
-    def ticking():
-        reads["n"] += 1
-        return real_now() + (R.INTENT_TTL_S + 1 if reads["n"] >= 6 else 0.0)   # the commit-time reading is late
-    h4.bd.clock = C.Clock(ticking)
-    try:
-        h4.bd.execute_intent(intent_receipt=ir4, quote_fn=h4.quotes)
-        outcome = "returned"
-    except B.BoundaryRefused as e:
-        outcome = str(e)
-    assert _kinds(h4).count("pilot_fill") == 0 or all(r.get("status") != "FILLED" for r in _rows(h4) if r["kind"] == "pilot_fill"), outcome
+    # intent expiry crossed between receipt and commit: see test_r4_expiry_between_receipt_and_commit_persists_terminal
 
 
 def test_f2_concurrent_cancel_and_execute_are_mutually_exclusive(tmp_path):
@@ -1063,3 +1056,126 @@ def test_f6_unresolved_positions_are_recovered_reported_and_block_clean_completi
     c2 = _rec(h, close2)
     assert close2["seq"] > close["seq"] and c2["close_number"] == 2 and c2["completion"] == "CLOSED_CLEAN"
     assert S.recover_positions(h.bd) == {"own": [], "foreign": []}
+
+
+# ================================================================== r4: the four remaining cases against 0c23f702
+
+def _advance_before_commit(monkeypatch, h, seconds: float, *, kind="pilot_fill"):
+    """Model 'the clock moves between quote receipt and the commit transaction' deterministically:
+    advance the controlled clock immediately before the fill's commit_once."""
+    real = L.commit_once
+    def late(path, *, txn_id, build, kind=None):
+        if kind == "pilot_fill":
+            h.advance(seconds)
+        return real(path, txn_id=txn_id, build=build, kind=kind)
+    monkeypatch.setattr(B.L, "commit_once", late)
+
+
+def test_r4_expiry_between_receipt_and_commit_persists_terminal(tmp_path, monkeypatch):
+    h = _h(tmp_path, t0=T_MINUTE)
+    _fr, ir = _pending_intent(h)
+    h.advance(R.INTENT_TTL_S - 1)                       # still alive at request and at receipt
+    _advance_before_commit(monkeypatch, h, 5.0)         # dead by the time the commit transaction runs
+    with pytest.raises(B.BoundaryRefused, match="INELIGIBLE_AT_COMMIT: INTENT_EXPIRED"):
+        h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    kinds = _kinds(h)
+    assert kinds[-2:] == ["pilot_intent_expired", "pilot_refusal"] and kinds.count("pilot_fill") == 0
+    assert len(h.quotes.calls) == 1
+    exp = [r for r in _rows(h) if r["kind"] == "pilot_intent_expired"][0]
+    assert exp["intent_id"] == ir["intent_id"] and "INTENT_EXPIRED" in exp["why"]
+    assert S.unfilled_intents(h.ledger) == []            # the intent is finished, not left dangling
+    monkeypatch.undo()
+    assert S.resume(h.bd, quote_fn=h.quotes) == []
+    with pytest.raises(B.BoundaryRefused, match="INTENT_TERMINAL: pilot_intent_expired"):
+        h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    L.verify_chain(h.ledger)
+
+
+def test_r4_missing_or_stale_exit_keeps_the_position_outstanding(tmp_path):
+    h = _h(tmp_path)
+    d = _scan(h)
+    assert d["decision"] == "TRADE", d
+    fill = d["receipts"]["fill"]
+    # the ORDINARY missing-exit path: provider returns None
+    o1 = S.resolve(h.bd, fill_receipt=fill, exit_quote_fn=lambda c: None)
+    assert o1["status"] == "NOT_ESTIMABLE" and o1["discharges_position"] is False and o1["attempt"] == 1
+    assert [seq for seq, _ in S.unresolved_fills(h.ledger)] == [fill["seq"]]
+    rec = S.recover_positions(h.bd)
+    assert len(rec["own"]) == 1 and rec["own"][0]["valuation_attempts"] == 1 and rec["own"][0]["last_attempt_why"] == "EXIT_QUOTE_MISSING"
+    c1 = _rec(h, S.close_session(h.bd))
+    assert c1["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS" and c1["unresolved_fill_seqs_at_close"] == [fill["seq"]]
+    # a STALE exit is likewise an attempt, not a discharge
+    h.advance(60.0); h.exit_quotes.age = 61.0
+    o2 = S.resolve(h.bd, fill_receipt=fill, exit_quote_fn=h.exit_quotes)
+    assert o2["status"] == "NOT_ESTIMABLE" and o2["attempt"] == 2 and len(S.unresolved_fills(h.ledger)) == 1
+    # restart recovers it from disk
+    h2 = SyntheticHarness(h.ledger, t0=h.now() + 5.0)
+    rec2 = S.recover_positions(h2.bd)
+    assert [r["seq"] for r in rec2["own"]] == [fill["seq"]] and rec2["own"][0]["valuation_attempts"] == 2
+    # a valid exit discharges it; the close then says clean
+    o3 = S.resolve(h2.bd, fill_receipt=rec2["own"][0], exit_quote_fn=h2.exit_quotes)
+    assert o3["status"] == "RESOLVED" and o3["discharges_position"] is True and o3["attempt"] == 3
+    assert S.unresolved_fills(h.ledger) == []
+    c2 = _rec(h, S.close_session(h2.bd))
+    assert c2["completion"] == "CLOSED_CLEAN" and c2["close_number"] == 2
+    # provider failure is an attempt too (a NEW session: the closed one correctly refuses new scans)
+    h3 = SyntheticHarness(h.ledger, session_id="SYN-SESSION-3", t0=h2.now() + 5.0)
+    d2 = _scan(h3)
+    assert d2["decision"] == "TRADE", d2
+    h3.exit_quotes.fail_with = OSError("feed gone")
+    o4 = S.resolve(h3.bd, fill_receipt=d2["receipts"]["fill"], exit_quote_fn=h3.exit_quotes)
+    assert o4["status"] == "NOT_ESTIMABLE" and o4["discharges_position"] is False and len(S.unresolved_fills(h.ledger)) == 1
+    assert S.recover_positions(h3.bd)["own"][0]["last_attempt_why"].startswith("EXIT_QUOTE_PROVIDER_FAILED: OSError")
+    L.verify_chain(h.ledger)
+
+
+def test_r4_late_duplicate_delivery_reconciles_after_the_forecast_target_ended(tmp_path):
+    h = _h(tmp_path)
+    _fr, ir = _pending_intent(h)
+    first = h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    assert first["status"] == "FILLED"
+    n = len(_rows(h))
+    h.advance(1000.0)                                   # forecast target ended, intent TTL long past
+    again = h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    assert again["reconciled"] is True and again["seq"] == first["seq"] and again["status"] == "FILLED"
+    assert len(h.quotes.calls) == 1 and len(_rows(h)) == n          # no quote, no refusal, no new record
+    # ...but a NEW fill for a different, still-pending intent is refused and cancelled on the same clock
+    _fr2, ir2 = _pending_intent(h, scan_id="SYN-SESSION-1:0002:SPY")
+    h.advance(1000.0)
+    with pytest.raises(B.BoundaryRefused, match="INTENT_EXPIRED"):
+        h.bd.execute_intent(intent_receipt=ir2, quote_fn=h.quotes)
+    assert _kinds(h)[-2:] == ["pilot_intent_expired", "pilot_refusal"]
+
+
+def test_r4_forecast_freshness_is_rechecked_at_intent_and_at_commit(tmp_path, monkeypatch):
+    # (a) at intent creation: forecast persisted fresh, cutoff 130 s old by the time the intent is proposed
+    h = _h(tmp_path)
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=SID)
+    cutoff = _rec(h, fr)["epoch"]["input_cutoff"]
+    h.advance(130.0 - (h.now() - cutoff))
+    assert h.now() - cutoff == pytest.approx(130.0)
+    with pytest.raises(B.BoundaryRefused, match="FORECAST_STALE_BEFORE_INTENT: input cutoff 130.0s"):
+        h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=SID)
+    # (b) before the quote: intent unexpired (TTL 120) but the forecast cutoff is 130 s old -> cancelled, no quote
+    h2 = _h(tmp_path / "b")
+    _fr2, ir2 = _pending_intent(h2)
+    cutoff2 = _rec(h2, _fr2)["epoch"]["input_cutoff"]
+    h2.advance(130.0 - (h2.now() - cutoff2))
+    assert h2.now() <= _rec(h2, ir2)["expiry_epoch"]
+    with pytest.raises(B.BoundaryRefused, match="FORECAST_STALE_BEFORE_EXECUTION"):
+        h2.bd.execute_intent(intent_receipt=ir2, quote_fn=h2.quotes)
+    assert h2.quotes.calls == [] and _kinds(h2)[-2:] == ["pilot_intent_cancelled", "pilot_refusal"]
+    assert S.unfilled_intents(h2.ledger) == []
+    # (c) between receipt and commit: fresh at the quote, 130 s old at the commit transaction -> cancelled, no fill
+    h3 = _h(tmp_path / "c")
+    _fr3, ir3 = _pending_intent(h3)
+    cutoff3 = _rec(h3, _fr3)["epoch"]["input_cutoff"]
+    h3.advance(110.0 - (h3.now() - cutoff3))
+    _advance_before_commit(monkeypatch, h3, 20.0)
+    with pytest.raises(B.BoundaryRefused, match="INELIGIBLE_AT_COMMIT: FORECAST_STALE_BEFORE_EXECUTION"):
+        h3.bd.execute_intent(intent_receipt=ir3, quote_fn=h3.quotes)
+    assert len(h3.quotes.calls) == 1 and _kinds(h3)[-2:] == ["pilot_intent_cancelled", "pilot_refusal"]
+    assert _kinds(h3).count("pilot_fill") == 0 and S.unfilled_intents(h3.ledger) == []
+    monkeypatch.undo()
+    assert S.resume(h3.bd, quote_fn=h3.quotes) == []
+    L.verify_chain(h3.ledger)

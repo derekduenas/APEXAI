@@ -1,11 +1,12 @@
-# OPTIONS-PILOT-001 r3 — the recording boundary, repaired and integrated
+# OPTIONS-PILOT-001 r4 — the recording boundary, repaired and integrated
 
 **Prospective paper only. No feed adapter, no broker, no orders, no capital,
 no service change.** The maintenance block on `apex-options-paper.service`
 stays in place; the deployed release is untouched. This is the review
 candidate for the brick "REPAIR THE RECORDING BOUNDARY AND PROVE THE REAL
 SESSION INTEGRATION" plus the bounded r3 repair pass (six findings against
-`48fde2d1`, §9). Branch `options-pilot-001`, built on `6022a187`.
+`48fde2d1`, §9) and the r4 pass (four findings against `0c23f702`, §10).
+Branch `options-pilot-001`, built on `6022a187`.
 
 ## 0. Reproduced failures (before the repair)
 
@@ -224,3 +225,24 @@ Test runs for r3 (contained, same worktree): pilot boundary + entry point
 **88 passed** (72 → 79 boundary, 8 → 9 entry point); `tests/test_options_*.py` +
 `test_ledger_concurrency.py` + `test_live_book.py` + outbox users: **457 passed** =
 88 pilot + 369 pre-existing, 0 failed.
+
+
+## 10. r4 — the four remaining cases against `0c23f702`, repaired
+
+| # | Finding | Repair | Acceptance test |
+|---|---|---|---|
+| 1 | Expiry between quote receipt and commit produced `INTENT_EXPIRED_AT_COMMIT` but **no terminal record**; the intent stayed unfinished | The fill's commit `build` now raises a typed refusal carrying the terminal kind for TIME-based failures (intent expiry → `pilot_intent_expired`; forecast target ended / cutoff stale → `pilot_intent_cancelled`). After the fill transaction refuses, `expire_intent` persists that transition in **its own** transaction, which re-checks that no fill and no terminal record exist (mutual exclusion preserved), then the refusal is persisted. Structural failures (`HISTORY_INVALID_AT_COMMIT`, `INTENT_TERMINAL_AT_COMMIT`, `SESSION_CLOSED_AT_COMMIT`) refuse without a terminal record, as before. | `test_r4_expiry_between_receipt_and_commit_persists_terminal` — clock advanced deterministically immediately before the fill's `commit_once`: ledger ends `pilot_intent_expired, pilot_refusal`, no fill, one quote call, `unfilled_intents == []`, resume is a no-op, a later delivery is `INTENT_TERMINAL`. The r2/r3 expiry test now also **requires** the terminal record. |
+| 2 | A missing exit quote produced `NOT_ESTIMABLE`, then `CLOSED_CLEAN` with zero obligations; restart recovered nothing | Outcomes are **valuation attempts** (`attempt` n, `txn_id = outcome:<intent>:<n>`). Only `RESOLVED` and `NO_POSITION` carry `discharges_position: true`; `NOT_ESTIMABLE` (missing, stale, malformed, provider failure) is persisted as an attempt and the position **remains** an unresolved obligation. `unresolved_fills` counts only discharging outcomes; `recover_positions` carries `valuation_attempts` and `last_attempt_why`; once discharged, further calls reconcile to the discharging record (verified). | `test_r4_missing_or_stale_exit_keeps_the_position_outstanding` (provider `None` → attempt 1, close says outstanding; stale → attempt 2; restart recovers it with 2 attempts; valid exit → attempt 3 discharges, `CLOSED_CLEAN`; provider failure → attempt, still outstanding). Entry point: `test_f6_lifecycle_recovery_through_the_entry_point` rewritten to use the **actual provider** returning `None`, then a stale quote, across three restarts (2 → 2 → 0 outstanding, `close_number` 3), with a foreign session's obligation reported and untouched. |
+| 3 | A valid fill retried after its forecast target ended returned `FORECAST_TARGET_ENDED_BEFORE_EXECUTION` instead of its receipt | `_history_problem(for_new_fill=False)` checks identity and integrity only (receipt, contract, session, release, provenance, forecast reference/agreement, content, stored binding). `execute_intent` reconciles an existing fill on that basis **first**; only a NEW fill requires `for_new_fill=True` (active authority, unexpired intent, forecast eligible now). | `test_r4_late_duplicate_delivery_reconciles_after_the_forecast_target_ended` (1000 s later: same receipt back, no quote, no new record; a different still-pending intent on the same clock is expired and refused) |
+| 4 | A forecast with a 130 s-old input cutoff still filled | `_forecast_eligibility_problem` applies the **complete** policy (target in the future AND cutoff within 120 s) at intent creation (`FORECAST_STALE_BEFORE_INTENT`), before the quote, and inside the commit (`FORECAST_STALE_BEFORE_EXECUTION`, cancelling the intent). | `test_r4_forecast_freshness_is_rechecked_at_intent_and_at_commit` (a: at intent; b: before the quote, no quote requested, intent cancelled; c: fresh at the quote and 130 s old at the commit → cancelled, no fill) |
+
+**Policy interplay made visible by the tests:** the intent TTL (120 s from
+persistence) and forecast freshness (120 s from input cutoff) both bind at a
+fill; whichever is tighter decides, and each names its own terminal record.
+Tests that need the TTL to bind use a clock on a minute boundary so the
+fixture forecast's cutoff equals its creation instant.
+
+Test runs for r4 (contained, same worktree): pilot boundary + entry point
+**92 passed** (83 boundary, 9 entry point); `tests/test_options_*.py` +
+`test_ledger_concurrency.py` + `test_live_book.py` + outbox users:
+**461 passed** = 92 pilot + 369 pre-existing, 0 failed.
