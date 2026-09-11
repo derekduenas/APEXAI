@@ -28,9 +28,9 @@ The legacy options service, its maintenance block, the live options ledger and t
 | Output | gate status (credential PRESENCE only), bar counters (accepted/duplicates/out-of-order/late/revisions/rejected), the snapshot with per-field quality, one forecast record labelled `LIVE_FEED` + `SMOKE_READ_ONLY` + `NOT_VALIDATED`, the exact request URLs (no secrets) |
 | What it does not prove | edge; feed behaviour over a session; that the artifact's live features equal the historical recipe (that needs the collection below) |
 
-The HTTP client is deliberately not wired in this build: `--execute` refuses
-`HTTP_CLIENT_NOT_WIRED`. The commissioning change that wires it is a
-one-function addition reviewed together with this request.
+`--execute` uses the repository's existing feed client (`apex.intraday.options_feed._get` and the
+same endpoint functions the legacy session used), behind the three gates above. It was wired in
+commit `47a651f` after the operator's authorization in chat.
 
 ## B. Prospective collection (observation only)
 
