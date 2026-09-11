@@ -84,8 +84,17 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
               "risk_authority": type(provider.risk_authority).__name__, "resumed": [], "decisions": [], "outcomes": []}
     report["session_open"] = S.open_session(bd, symbols=symbols)
     report["resumed"] = S.resume(bd, quote_fn=src["quote_fn"])
-    fills = []
-    for cycle in range(max(1, cycles)):
+    # LIFECYCLE RECOVERY: every unresolved POSITION on disk (including ones a resume just created, and ones left
+    # by an earlier process of this session) is an obligation this run must try to resolve and must report.
+    recovered = S.recover_positions(bd)
+    fills = list(recovered["own"])
+    report["recovered_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id")} for r in fills]
+    report["foreign_unresolved_positions"] = recovered["foreign"]
+    # A session that is already CLOSED on disk is not reopened for new scans: this run is recovery-only. New intents
+    # would be refused at the boundary (SESSION_CLOSED) and would then sit as unfinished obligations of their own.
+    already_closed = session_id in S.closed_sessions(S.L.read_all(ledger))
+    report["mode"] = "RECOVERY_ONLY" if already_closed else "SCAN_AND_RESOLVE"
+    for cycle in range(0 if already_closed else max(1, cycles)):
         for sym in symbols:
             seq = S.next_seq(ledger, session_id=session_id)
             d = S.scan(bd, symbol=sym, seq=seq, forecast_fn=src["forecast_fn"], signal_fn=src["signal_fn"],
@@ -93,7 +102,7 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
             report["decisions"].append({k: d.get(k) for k in ("scan_id", "symbol", "decision", "why", "forecast_id",
                                                               "intent_id", "fill_id", "decision_persisted",
                                                               "refusal_persisted")})
-            if d["decision"] == "TRADE":
+            if d["decision"] == "TRADE" and d.get("receipts", {}).get("fill"):
                 fills.append(d["receipts"]["fill"])
         if cycle + 1 < cycles and interval_s > 0:
             sleep_fn(interval_s)
@@ -103,7 +112,13 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
             report["outcomes"].append({"fill_seq": fr["seq"], "status": o["status"], "seq": o["seq"]})
         except Exception as e:                                                 # noqa: BLE001
             report["outcomes"].append({"fill_seq": fr["seq"], "status": "REFUSED", "why": "%s: %s" % (type(e).__name__, str(e)[:160])})
+    still_open = S.recover_positions(bd)
+    report["unresolved_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id")}
+                                      for r in still_open["own"]]
     report["session_close"] = S.close_session(bd)
+    close_rec = S.L.read_all(ledger)[report["session_close"]["seq"] - 1]
+    report["completion"] = close_rec.get("completion")
+    report["outstanding_obligations"] = close_rec.get("outstanding_obligations")
     if out:
         Path(out).write_text(json.dumps(report, indent=1, sort_keys=True, allow_nan=False, default=str))
     return report

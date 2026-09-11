@@ -1,10 +1,11 @@
-# OPTIONS-PILOT-001 r2 — the recording boundary, repaired and integrated
+# OPTIONS-PILOT-001 r3 — the recording boundary, repaired and integrated
 
 **Prospective paper only. No feed adapter, no broker, no orders, no capital,
 no service change.** The maintenance block on `apex-options-paper.service`
 stays in place; the deployed release is untouched. This is the review
 candidate for the brick "REPAIR THE RECORDING BOUNDARY AND PROVE THE REAL
-SESSION INTEGRATION". Branch `options-pilot-001`, built on `6022a187`.
+SESSION INTEGRATION" plus the bounded r3 repair pass (six findings against
+`48fde2d1`, §9). Branch `options-pilot-001`, built on `6022a187`.
 
 ## 0. Reproduced failures (before the repair)
 
@@ -194,3 +195,32 @@ place so the annotation stays true of the old path.
   reconciliation against an external record.
 - GARCH, regime models, Multiverse, a dashboard.
 - Lifting the maintenance block; any service start; any broker order.
+
+
+## 9. r3 — the six findings against `48fde2d1`, repaired
+
+The reviewer reproduced six cases in which a path returned or committed a
+record without establishing the state it claimed. Each is now a negative
+acceptance test (`test_f1_…` … `test_f6_…` in the boundary file; `test_f6_…`
+in the entry-point file), and the r2 tests are unchanged except where the
+old expectation was itself the defect (noted below).
+
+| # | Finding | Repair | Acceptance test |
+|---|---|---|---|
+| 1 | A synthetic pending intent resumed through a `ProductionRiskAuthority` / `LIVE_FEED` boundary returned FILLED | `RiskAuthority.accepts(approval)`: the **active** authority must honour a stored approval (production honours none in this brick; synthetic honours only its own). `Boundary.authorization_problem` also requires the intent's `data_provenance` to equal the boundary's. Checked in `_history_problem` (before the quote AND inside the commit transaction) and in `session.resume` (which cancels with `STALE_AUTHORIZATION: …`). Outcomes check provenance too. | `test_f1_production_authority_and_provenance_are_checked_on_execution_and_resume` — direct execution refuses, resume cancels, no quote is ever requested; both mismatches (provenance; authority) and the reverse (LIVE intent on a synthetic boundary) |
+| 2 | Quote callback cancelled the intent; ledger then read intent → cancellation → fill | The fill's `build(rows)` runs under the transaction lock from one snapshot and re-checks: no fill, **no expiry/cancellation record**, session not closed, intent + forecast history and authorization re-verified, whole chain verifies, clock ≤ expiry. `expire_intent` is symmetric: its build refuses if a fill or terminal record exists (`FILL_EXISTS`, `INTENT_ALREADY_TERMINAL`). Expiry crossed while the quote was in flight now yields a terminal record + refusal, never a fill record (an r2 test expected an UNFILLED fill there; that expectation was the defect and was changed). `COMMIT_CHECKS` is stamped on every fill. | `test_f2_cancellation_inside_the_quote_window_wins_and_no_fill_follows` (cancel-in-callback → `INTENT_TERMINAL_AT_COMMIT`; fill-then-cancel → `FILL_EXISTS`; close-in-callback → `SESSION_CLOSED_AT_COMMIT`; late commit clock), `test_f2_concurrent_cancel_and_execute_are_mutually_exclusive` (two threads, barrier, both orderings forced: exactly one of {fill, cancelled} exists, the loser's refusal is persisted) |
+| 3 | A fill altered on disk (`net_debit`, hash untouched) was returned as `reconciled: true, FILLED` | `_reconcile_fill` verifies the existing record, the **whole** chain and its references (intent seq/hash, intent_id, contract_id, session) before returning it; `commit_once` reconciliation verifies the whole chain, not just the prefix (a consistently re-hashed record breaks its successor's link); outcome reconciliation likewise | `test_f3_reconciliation_verifies_the_existing_fill_and_its_chain` (hash untouched → `RECONCILE_ALTERED`, no quote; `commit_once` refuses; re-hashed with a successor → refused) |
+| 4 | Duplicate scan returned REFUSE while its receipt pointed at the persisted TRADE decision | A scan_id with a persisted decision returns **that decision's payload** (verified), flagged `duplicate_delivery`/`reconciled`; the delivery is recorded as a separate `pilot_duplicate_delivery` record referencing the decision, never as a decision. A scan_id with records but no decision (interrupted) is refused `INCOMPLETE_SCAN`, and that refusal is its first and only decision. `_decision` returns the on-disk payload whenever `commit_once` reconciles. | `test_f4_duplicate_scan_returns_the_persisted_decision_not_a_new_story`, updated `test_duplicate_delivery_and_duplicate_scan…` |
+| 5 | A forecast whose target ended at 23:40 was accepted at 00:26:40 and traded | `FORECAST_ELIGIBILITY_V1` (stamped on every forecast): `created ≤ clock`; `clock < target_end`; `clock − input_cutoff ≤ 120 s`. Re-checked at intent creation (`FORECAST_TARGET_ENDED_BEFORE_INTENT`) and at fill commit (`FORECAST_TARGET_ENDED_BEFORE_EXECUTION`, inside `_history_problem`). | `test_f5_a_forecast_about_a_completed_target_is_not_prospective_evidence` (target ended → refused; stale cutoff → refused; persisted-in-time forecast cannot back an intent after its target ends) |
+| 6 | `run_pilot` resumed and filled an intent, returned no outcomes, closed with an empty unfinished list | `session.unresolved_fills` / `recover_positions` (own vs foreign); `run_pilot` recovers every unresolved own position from disk (including ones resume just created), attempts resolution, and reports `recovered_positions`, `unresolved_positions`, `foreign_unresolved_positions`, `outstanding_obligations`, `completion`. `close_session` records `unresolved_fill_seqs_at_close` and `completion: CLOSED_CLEAN \| CLOSED_WITH_OUTSTANDING_OBLIGATIONS`; each close is a new numbered record. A run against an already-closed session is `RECOVERY_ONLY` (no new scans against a closed session). | `test_f6_unresolved_positions_are_recovered_reported_and_block_clean_completion`, entry-point `test_f6_lifecycle_recovery_through_the_entry_point` (run dies → resume fills → resolution fails → close says outstanding 2 → recovery-only run resolves both → CLOSED_CLEAN; a different session reports them as foreign and does not touch them), updated `test_restart_resumes…` (resumed fill is resolved) |
+
+**Completion wording corrected:** a session close no longer implies completion
+because every intent has a fill. `completion` is `CLOSED_CLEAN` only when there
+is no unfinished intent and no unresolved position of that session; otherwise
+`CLOSED_WITH_OUTSTANDING_OBLIGATIONS` with the seqs listed. Unresolved
+positions are retained and reported; exit strategy and fees remain deferred.
+
+Test runs for r3 (contained, same worktree): pilot boundary + entry point
+**88 passed** (72 → 79 boundary, 8 → 9 entry point); `tests/test_options_*.py` +
+`test_ledger_concurrency.py` + `test_live_book.py` + outbox users: **457 passed** =
+88 pilot + 369 pre-existing, 0 failed.

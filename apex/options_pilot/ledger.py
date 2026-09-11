@@ -128,7 +128,8 @@ def append_with_receipt(path: Path, entry: dict) -> dict:
             "receipt": "RE-READ from disk after append; seq is the 1-indexed line number; link to predecessor verified"}
 
 
-def verify_receipt(path: Path, receipt: dict, *, expected_kind: str | None = None, chain: bool = True) -> dict:
+def verify_receipt(path: Path, receipt: dict, *, expected_kind: str | None = None, chain: bool = True,
+                   rows: list | None = None) -> dict:
     """Re-read the record a receipt points to and prove it is intact AND,
     with chain=True (default), that the whole history up to it verifies as
     one chain. Refuses: missing file, seq out of range, kind mismatch,
@@ -137,7 +138,7 @@ def verify_receipt(path: Path, receipt: dict, *, expected_kind: str | None = Non
         raise LedgerRefused("RECEIPT_MALFORMED: %r" % (sorted(receipt) if isinstance(receipt, dict) else type(receipt).__name__))
     if str(receipt["path"]) != str(Path(path)):
         raise LedgerRefused("RECEIPT_FOREIGN_LEDGER: %r" % receipt["path"])
-    rows = read_all(path)
+    rows = read_all(path) if rows is None else rows
     seq = receipt["seq"]
     if type(seq) is not int or seq < 1 or seq > len(rows):
         raise LedgerRefused("RECEIPT_SEQ_UNKNOWN: seq=%r, ledger has %d records" % (seq, len(rows)))
@@ -211,9 +212,11 @@ def commit_once(path: Path, *, txn_id: str, build, kind: str | None = None) -> t
         for i, r in enumerate(rows):
             if r.get("txn_id") == txn_id and (kind is None or r.get("kind") == kind):
                 receipt = {"path": str(path), "seq": i + 1, "entry_hash": r.get("entry_hash"), "kind": r.get("kind"),
-                           "receipt": "RECONCILED: record with this txn_id already on disk; no second append"}
-                if recompute_entry_hash(r) != r.get("entry_hash"):
-                    raise LedgerRefused("RECONCILE_ALTERED: txn %s record at seq %d does not verify" % (txn_id, i + 1))
+                           "receipt": "RECONCILED: record with this txn_id already on disk (chain-verified); no second append"}
+                try:                                     # a matching txn_id is not enough: the WHOLE chain must verify
+                    verify_chain(path, rows=rows)
+                except ChainBroken as e:
+                    raise LedgerRefused("RECONCILE_ALTERED: txn %s at seq %d: %s" % (txn_id, i + 1, e)) from e
                 return receipt, False
         rec = build(rows)
         if rec.get("txn_id") != txn_id:

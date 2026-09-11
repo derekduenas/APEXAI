@@ -555,8 +555,9 @@ def test_intent_expiry_is_enforced_before_and_during_the_quote(tmp_path):
     ir2 = h2.bd.record_intent(forecast_receipt=fr2, intent=_proposal(), signal_used="LONG", scan_id=SID)
     h2.advance(R.INTENT_TTL_S - 1)
     h2.quotes.slow_s = 5.0
-    r = h2.bd.execute_intent(intent_receipt=ir2, quote_fn=h2.quotes)
-    assert r["status"] == "UNFILLED" and r["why"].startswith("INTENT_EXPIRED_DURING_QUOTE")
+    with pytest.raises(B.BoundaryRefused, match="INTENT_EXPIRED_DURING_QUOTE"):
+        h2.bd.execute_intent(intent_receipt=ir2, quote_fn=h2.quotes)
+    assert _kinds(h2)[-2:] == ["pilot_intent_expired", "pilot_refusal"] and _kinds(h2).count("pilot_fill") == 0
 
 
 def test_stale_and_missing_exit_quotes_are_not_estimable_never_imputed(tmp_path):
@@ -628,9 +629,11 @@ def test_duplicate_delivery_and_duplicate_scan_are_refused(tmp_path):
     again = h.bd.execute_intent(intent_receipt=d["receipts"]["intent"], quote_fn=h.quotes)
     assert again["reconciled"] is True and again["seq"] == d["receipts"]["fill"]["seq"] and again["status"] == "FILLED"
     assert _kinds(h).count("pilot_fill") == 1 and len(h.quotes.calls) == n_quotes     # no second quote, no second fill
-    d2 = _scan(h, seq=1)
-    assert d2["decision"] == "REFUSE" and d2["why"].startswith("DUPLICATE_SCAN")
-    assert _kinds(h).count("pilot_forecast") == 1
+    d2 = _scan(h, seq=1)                                   # duplicate scan: the PERSISTED decision comes back
+    assert d2["decision"] == "TRADE" and d2["duplicate_delivery"] is True and d2["reconciled"] is True
+    assert d2["fill_id"] == d["fill_id"] and d2["decision_receipt"]["seq"] == d["decision_receipt"]["seq"]
+    assert _kinds(h).count("pilot_forecast") == 1 and _kinds(h).count("pilot_decision") == 1
+    assert _kinds(h)[-1] == "pilot_duplicate_delivery"
 
 
 def test_a_forecast_cannot_back_two_intents(tmp_path):
@@ -814,3 +817,249 @@ def test_next_seq_survives_restart(tmp_path):
     h2 = SyntheticHarness(h.ledger)                    # same session id, new process
     assert S.next_seq(h2.ledger, session_id=h2.session_id) == 3
     assert S.next_seq(h2.ledger, session_id="OTHER") == 1
+
+
+# ================================================================== r3: the six reproduced findings
+
+def _pending_intent(h, scan_id=SID):
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id=scan_id)
+    ir = h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id=scan_id)
+    return fr, ir
+
+
+def test_f1_production_authority_and_provenance_are_checked_on_execution_and_resume(tmp_path):
+    """A synthetic pending intent must never fill through a production boundary."""
+    h = _h(tmp_path)
+    _fr, ir = _pending_intent(h)
+    prod = B.Boundary(h.ledger, clock=h.clock, provenance="LIVE_FEED", risk_authority=RG.ProductionRiskAuthority(),
+                      session_id=h.session_id, release=h.release)
+    calls = []
+    def quote_fn(c):
+        calls.append(c); return h.quotes(c)
+    with pytest.raises(B.BoundaryRefused, match="PROVENANCE_INCOMPATIBLE: intent 'SYNTHETIC_FIXTURE' vs boundary 'LIVE_FEED'"):
+        prod.execute_intent(intent_receipt=ir, quote_fn=quote_fn)
+    acts = S.resume(prod, quote_fn=quote_fn)
+    assert len(acts) == 1 and acts[0]["action"] == "CANCELLED" and "STALE_AUTHORIZATION" in acts[0]["why"]
+    assert "PROVENANCE_INCOMPATIBLE" in acts[0]["why"] and calls == []
+    # provenance matches but the ACTIVE authority is production: the stored synthetic approval is not authorization
+    h2 = _h(tmp_path / "b")
+    _fr2, ir2 = _pending_intent(h2)
+    prod2 = B.Boundary(h2.ledger, clock=h2.clock, provenance="SYNTHETIC_FIXTURE", risk_authority=RG.ProductionRiskAuthority(),
+                       session_id=h2.session_id, release=h2.release)
+    with pytest.raises(B.BoundaryRefused, match="RISK_AUTHORITY_INCOMPATIBLE: the production authority honours no stored approval"):
+        prod2.execute_intent(intent_receipt=ir2, quote_fn=quote_fn)
+    acts2 = S.resume(prod2, quote_fn=quote_fn)
+    assert acts2[0]["action"] == "CANCELLED" and "RISK_AUTHORITY_INCOMPATIBLE" in acts2[0]["why"] and calls == []
+    for led in (h.ledger, h2.ledger):
+        rows = L.read_all(led)
+        assert not any(r["kind"] == "pilot_fill" for r in rows)
+        assert not any(r.get("data_provenance") == "LIVE_FEED" and r["kind"] == "pilot_fill" for r in rows)
+    # a synthetic boundary likewise refuses a LIVE_FEED-labelled intent
+    h3 = _h(tmp_path / "c")
+    _fr3, ir3 = _pending_intent(h3)
+    lines = h3.ledger.read_text().splitlines()
+    recs = [json.loads(x) for x in lines]; recs[ir3["seq"] - 1]["data_provenance"] = "LIVE_FEED"
+    prev, out = "GENESIS", []
+    for r in recs:
+        body = {k: v for k, v in r.items() if k not in ("entry_hash", "prev_hash")}
+        body["prev_hash"] = prev; body["entry_hash"] = L.recompute_entry_hash(body); prev = body["entry_hash"]; out.append(json.dumps(body, sort_keys=True))
+    h3.ledger.write_text("\n".join(out) + "\n")
+    ir3 = {**ir3, "entry_hash": recs[ir3["seq"] - 1]["entry_hash"]}
+    with pytest.raises(B.BoundaryRefused, match="PROVENANCE_INCOMPATIBLE"):
+        h3.bd.execute_intent(intent_receipt={**ir3, "entry_hash": json.loads(out[ir3["seq"] - 1])["entry_hash"]}, quote_fn=quote_fn)
+
+
+def test_f2_cancellation_inside_the_quote_window_wins_and_no_fill_follows(tmp_path):
+    h = _h(tmp_path)
+    _fr, ir = _pending_intent(h)
+    it = _rec(h, ir)
+    def cancelling_quote(c):
+        h.bd.expire_intent(ir, it, why="OPERATOR_CANCEL during quote", kind="pilot_intent_cancelled")
+        return h.quotes(c)
+    with pytest.raises(B.BoundaryRefused, match="INTENT_TERMINAL_AT_COMMIT: pilot_intent_cancelled"):
+        h.bd.execute_intent(intent_receipt=ir, quote_fn=cancelling_quote)
+    kinds = _kinds(h)
+    assert kinds == ["pilot_forecast", "pilot_intent", "pilot_intent_cancelled", "pilot_refusal"]
+    assert not any(k == "pilot_fill" for k in kinds)
+    # and the reverse exclusion: a filled intent cannot be cancelled or expired afterwards
+    h2 = _h(tmp_path / "b")
+    _fr2, ir2 = _pending_intent(h2)
+    r = h2.bd.execute_intent(intent_receipt=ir2, quote_fn=h2.quotes)
+    assert r["status"] == "FILLED"
+    with pytest.raises(B.BoundaryRefused, match="FILL_EXISTS"):
+        h2.bd.expire_intent(ir2, _rec(h2, ir2), why="late cancel", kind="pilot_intent_cancelled")
+    assert _kinds(h2).count("pilot_intent_cancelled") == 0
+    # session closure during the quote window is caught at commit too
+    h3 = _h(tmp_path / "c")
+    _fr3, ir3 = _pending_intent(h3)
+    def closing_quote(c):
+        S.close_session(h3.bd); return h3.quotes(c)
+    with pytest.raises(B.BoundaryRefused, match="SESSION_CLOSED_AT_COMMIT"):
+        h3.bd.execute_intent(intent_receipt=ir3, quote_fn=closing_quote)
+    assert _kinds(h3).count("pilot_fill") == 0
+    # intent expiry crossed between receipt and commit is caught at commit
+    h4 = _h(tmp_path / "d")
+    _fr4, ir4 = _pending_intent(h4)
+    real_now = h4.bd.clock.now
+    reads = {"n": 0}
+    def ticking():
+        reads["n"] += 1
+        return real_now() + (R.INTENT_TTL_S + 1 if reads["n"] >= 6 else 0.0)   # the commit-time reading is late
+    h4.bd.clock = C.Clock(ticking)
+    try:
+        h4.bd.execute_intent(intent_receipt=ir4, quote_fn=h4.quotes)
+        outcome = "returned"
+    except B.BoundaryRefused as e:
+        outcome = str(e)
+    assert _kinds(h4).count("pilot_fill") == 0 or all(r.get("status") != "FILLED" for r in _rows(h4) if r["kind"] == "pilot_fill"), outcome
+
+
+def test_f2_concurrent_cancel_and_execute_are_mutually_exclusive(tmp_path):
+    """Deterministic release: both workers pass a barrier; whichever commits first wins, the other refuses.
+    Repeated with both orderings forced by a second barrier stage."""
+    for first in ("cancel", "execute"):
+        h = _h(tmp_path / first)
+        _fr, ir = _pending_intent(h)
+        it = _rec(h, ir)
+        gate = threading.Barrier(2)
+        order = threading.Event()
+        results = {}
+        def quote_fn(c):
+            gate.wait(timeout=10)
+            if first == "cancel":
+                order.wait(timeout=10)                       # let the cancel commit first
+            return h.quotes(c)
+        def executor():
+            try:
+                results["execute"] = h.bd.execute_intent(intent_receipt=ir, quote_fn=quote_fn)["status"]
+            except B.BoundaryRefused as e:
+                results["execute"] = "REFUSED: " + str(e)
+        def canceller():
+            gate.wait(timeout=10)
+            if first == "execute":
+                # wait until a fill is on disk, then try to cancel
+                for _ in range(200):
+                    if any(r["kind"] == "pilot_fill" for r in _rows(h)):
+                        break
+                    threading.Event().wait(0.01)
+            try:
+                h.bd.expire_intent(ir, it, why="race cancel", kind="pilot_intent_cancelled")
+                results["cancel"] = "CANCELLED"
+            except B.BoundaryRefused as e:
+                results["cancel"] = "REFUSED: " + str(e)
+            order.set()
+        ts = [threading.Thread(target=executor), threading.Thread(target=canceller)]
+        [t.start() for t in ts]; [t.join(timeout=30) for t in ts]
+        kinds = _kinds(h)
+        n_fill, n_cancel = kinds.count("pilot_fill"), kinds.count("pilot_intent_cancelled")
+        assert (n_fill, n_cancel) in ((1, 0), (0, 1)), (first, kinds, results)
+        if first == "cancel":
+            assert results["cancel"] == "CANCELLED" and "INTENT_TERMINAL_AT_COMMIT" in results["execute"]
+        else:
+            assert results["execute"] == "FILLED" and "FILL_EXISTS" in results["cancel"]
+        L.verify_chain(h.ledger)
+
+
+def test_f3_reconciliation_verifies_the_existing_fill_and_its_chain(tmp_path):
+    h = _h(tmp_path)
+    _fr, ir = _pending_intent(h)
+    r = h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    assert r["status"] == "FILLED"
+    lines = h.ledger.read_text().splitlines()
+    rec = json.loads(lines[r["seq"] - 1]); rec["net_debit"] = 1.0                     # altered, hash untouched
+    lines[r["seq"] - 1] = json.dumps(rec, sort_keys=True); h.ledger.write_text("\n".join(lines) + "\n")
+    n_quotes = len(h.quotes.calls)
+    with pytest.raises(B.BoundaryRefused, match="RECONCILE_ALTERED: existing fill seq %d" % r["seq"]):
+        h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    assert len(h.quotes.calls) == n_quotes
+    with pytest.raises(L.LedgerRefused, match="RECONCILE_ALTERED"):
+        L.commit_once(h.ledger, txn_id="fill:" + r["intent_id"], build=lambda rows: {}, kind="pilot_fill")
+    acts = S.resume(h.bd, quote_fn=h.quotes)                                              # resume cannot launder it either
+    assert acts == [] or all(a["action"] != "EXECUTED" for a in acts)
+    # a consistently re-hashed alteration breaks the link from the next record and is caught the same way
+    h2 = _h(tmp_path / "b")
+    _fr2, ir2 = _pending_intent(h2)
+    r2 = h2.bd.execute_intent(intent_receipt=ir2, quote_fn=h2.quotes)
+    S.resolve(h2.bd, fill_receipt=r2, exit_quote_fn=h2.exit_quotes)                     # a successor exists
+    lines = h2.ledger.read_text().splitlines()
+    rec = json.loads(lines[r2["seq"] - 1]); rec["net_debit"] = 1.0; rec["entry_hash"] = L.recompute_entry_hash(rec)
+    lines[r2["seq"] - 1] = json.dumps(rec, sort_keys=True); h2.ledger.write_text("\n".join(lines) + "\n")
+    with pytest.raises(B.BoundaryRefused, match="RECONCILE_ALTERED"):
+        h2.bd.execute_intent(intent_receipt=ir2, quote_fn=h2.quotes)
+
+
+def test_f4_duplicate_scan_returns_the_persisted_decision_not_a_new_story(tmp_path):
+    h = _h(tmp_path)
+    d1 = _scan(h)
+    assert d1["decision"] == "TRADE"
+    d2 = _scan(h, seq=1)
+    for k in ("decision", "why", "forecast_id", "intent_id", "fill_id"):
+        assert d2[k] == d1[k], k
+    assert d2["duplicate_delivery"] is True and d2["reconciled"] is True
+    dec_seq = d1["decision_receipt"]["seq"]
+    assert d2["decision_receipt"]["seq"] == dec_seq and _rec(h, d2["decision_receipt"])["decision"] == "TRADE"
+    rows = _rows(h)
+    assert [r["kind"] for r in rows].count("pilot_decision") == 1
+    diag = [r for r in rows if r["kind"] == "pilot_duplicate_delivery"]
+    assert len(diag) == 1 and diag[0]["decision_ref"]["seq"] == dec_seq and diag[0]["scan_id"] == d1["scan_id"]
+    # an interrupted scan (records but no decision) is refused as INCOMPLETE_SCAN, and that refusal IS its first decision
+    h2 = _h(tmp_path / "b")
+    h2.quotes.fail_with = KeyboardInterrupt()
+    with pytest.raises(KeyboardInterrupt):
+        _scan(h2)
+    h2.quotes.fail_with = None
+    d = _scan(h2, seq=1)
+    assert d["decision"] == "REFUSE" and "INCOMPLETE_SCAN" in d["why"] and d["refusal_persisted"] is True
+    assert _kinds(h2).count("pilot_decision") == 1 and _kinds(h2).count("pilot_fill") == 0
+    d_again = _scan(h2, seq=1)
+    assert d_again["decision"] == "REFUSE" and d_again["duplicate_delivery"] is True and "INCOMPLETE_SCAN" in d_again["why"]
+
+
+def test_f5_a_forecast_about_a_completed_target_is_not_prospective_evidence(tmp_path):
+    h = _h(tmp_path)
+    stale_by_an_hour = h.base_forecast(SYM, h.now() - 3600.0)                     # target ended 23:40, clock 00:26:40
+    assert stale_by_an_hour["target_end_utc"].startswith("2026-09-09T23:40:00")
+    h.forecast_override = stale_by_an_hour
+    d = _scan(h)
+    assert d["decision"] == "REFUSE" and "FORECAST_TARGET_ALREADY_ENDED" in d["why"]
+    assert _kinds(h).count("pilot_intent") == 0
+    # stale inputs (cutoff 160 s before the clock) refuse even though the target is still in the future
+    h.forecast_override = h.base_forecast(SYM, h.now() - 130.0)
+    d2 = _scan(h)
+    assert d2["decision"] == "REFUSE" and "FORECAST_STALE" in d2["why"]
+    # re-checked at intent creation: a forecast persisted in time cannot back an intent after its target ended
+    h.forecast_override = None
+    fr = h.bd.record_forecast(h.forecast_fn(SYM, h.now()), scan_id="SYN-SESSION-1:0009:SPY")
+    h.advance(900.0)
+    with pytest.raises(B.BoundaryRefused, match="FORECAST_TARGET_ENDED_BEFORE_INTENT"):
+        h.bd.record_intent(forecast_receipt=fr, intent=_proposal(), signal_used="LONG", scan_id="SYN-SESSION-1:0009:SPY")
+    f = _rec(h, fr)
+    assert f["eligibility_policy"].startswith("FORECAST_ELIGIBILITY_V1")
+
+
+def test_f6_unresolved_positions_are_recovered_reported_and_block_clean_completion(tmp_path):
+    h = _h(tmp_path)
+    _fr, ir = _pending_intent(h)
+    h.quotes.fail_with = KeyboardInterrupt()
+    with pytest.raises(KeyboardInterrupt):
+        h.bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+    h.quotes.fail_with = None
+    acts = S.resume(h.bd, quote_fn=h.quotes)
+    assert acts[0]["action"] == "EXECUTED" and acts[0]["status"] == "FILLED"
+    rec = S.recover_positions(h.bd)
+    assert len(rec["own"]) == 1 and rec["own"][0]["seq"] == acts[0]["receipt"]["seq"] and rec["foreign"] == []
+    close = S.close_session(h.bd)
+    c = _rec(h, close)
+    assert c["unfinished_intent_seqs_at_close"] == [] and c["unresolved_fill_seqs_at_close"] == [rec["own"][0]["seq"]]
+    assert c["outstanding_obligations"] == 1 and c["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS"
+    # another session sees it as foreign: reported, not resolved
+    other = SyntheticHarness(h.ledger, session_id="SYN-SESSION-2")
+    rec2 = S.recover_positions(other.bd)
+    assert rec2["own"] == [] and len(rec2["foreign"]) == 1 and rec2["foreign"][0]["session_id"] == h.session_id
+    # the owning session discharges it; a second close is a NEW record that says so
+    o = S.resolve(h.bd, fill_receipt=rec["own"][0], exit_quote_fn=h.exit_quotes)
+    assert o["status"] == "RESOLVED"
+    close2 = S.close_session(h.bd)
+    c2 = _rec(h, close2)
+    assert close2["seq"] > close["seq"] and c2["close_number"] == 2 and c2["completion"] == "CLOSED_CLEAN"
+    assert S.recover_positions(h.bd) == {"own": [], "foreign": []}

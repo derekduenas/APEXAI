@@ -170,10 +170,19 @@ def test_restart_resumes_without_re_executing_and_continues_the_sequence(tmp_pat
     rep = json.loads((tmp_path / "out.json").read_text())
     assert rep["session_open"]["receipt"].startswith("RECONCILED")                 # idempotent open
     assert len(rep["resumed"]) == 1 and rep["resumed"][0]["action"] == "EXECUTED" and rep["resumed"][0]["status"] == "FILLED"
+    resumed_seq = rep["resumed"][0]["receipt"]["seq"]
+    assert rep["recovered_positions"] == [{"seq": resumed_seq, "intent_id": rep["resumed"][0]["intent_id"],
+                                           "scan_id": "RS-1:0001:SPY", "fill_id": rep["resumed"][0]["receipt"]["fill_id"],
+                                           "contract_id": "SPY|2026-10-09|645.0|CALL"}]
     assert rep["decisions"][0]["scan_id"] == "RS-1:0002:SPY" and rep["decisions"][0]["decision"] == "TRADE"
+    assert sorted(o["fill_seq"] for o in rep["outcomes"]) == sorted([resumed_seq, rep["decisions"][0]["fill_id"] and
+                                                                     [r for r in L.read_all(led) if r.get("fill_id") == rep["decisions"][0]["fill_id"]][0]["intent_ref"]["seq"] + 1])
+    assert all(o["status"] == "RESOLVED" for o in rep["outcomes"]) and rep["unresolved_positions"] == []
+    assert rep["completion"] == "CLOSED_CLEAN" and rep["outstanding_obligations"] == 0
     kinds = [r["kind"] for r in L.read_all(led)]
     assert kinds.count("pilot_fill") == 2 and kinds.count("pilot_forecast") == 2 and kinds.count("pilot_session_open") == 1
-    assert S.unfilled_intents(led) == []
+    assert kinds.count("pilot_outcome") == 2
+    assert S.unfilled_intents(led) == [] and S.unresolved_fills(led) == []
     # a third restart after close: the closed session's nothing-to-do, and a fresh session id starts at 0001
     h3 = SyntheticHarness(led, session_id="RS-2", t0=T0 + 10.0)
     sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "RS-2", "--pilot-release", "synthetic-release"),
@@ -191,3 +200,60 @@ def test_report_is_strict_json_and_names_mode_and_provenance(tmp_path, fenced):
     rep = json.loads(txt)
     assert rep["execution_mode"] == "PROSPECTIVE_ORCHESTRATION" and rep["data_provenance"] == "SYNTHETIC_FIXTURE"
     assert rep["evidence_class"] == "PROSPECTIVE_PAPER" and rep["decision_power"] == "NONE_PAPER"
+
+
+def test_f6_lifecycle_recovery_through_the_entry_point(tmp_path, fenced, monkeypatch):
+    """A resumed position must not vanish: it is resolved, or reported as outstanding and recovered next run."""
+    led = tmp_path / "led.jsonl"
+    h = SyntheticHarness(led, session_id="LC-1")
+    h.quotes.fail_with = KeyboardInterrupt()
+    with pytest.raises(KeyboardInterrupt):
+        sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
+                  pilot_sources=E._HarnessProvider(h))
+    # run 2: resume fills the pending intent, but every resolution fails -> outstanding obligation reported
+    h2 = SyntheticHarness(led, session_id="LC-1", t0=T0 + 5.0)
+    monkeypatch.setattr(E.S, "resolve", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("exit provider unreachable")))
+    rc = sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
+                   pilot_sources=E._HarnessProvider(h2))
+    assert rc == 0
+    rep = json.loads((tmp_path / "out.json").read_text())
+    assert rep["resumed"][0]["status"] == "FILLED"
+    assert len(rep["recovered_positions"]) == 1 and len(rep["outcomes"]) == 2
+    assert all(o["status"] == "REFUSED" for o in rep["outcomes"])
+    assert len(rep["unresolved_positions"]) == 2 and rep["outstanding_obligations"] == 2
+    assert rep["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS"
+    close = L.read_all(led)[rep["session_close"]["seq"] - 1]
+    assert sorted(close["unresolved_fill_seqs_at_close"]) == sorted(p["seq"] for p in rep["unresolved_positions"])
+    monkeypatch.undo()
+    assert rep["mode"] == "SCAN_AND_RESOLVE"
+    # run 3, same (now CLOSED) session: recovery only -- both positions are recovered from disk and resolved,
+    # no new scan is opened against a closed session, and a NEW close record says CLOSED_CLEAN
+    h3 = SyntheticHarness(led, session_id="LC-1", t0=T0 + 10.0)
+    rc = sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
+                   pilot_sources=E._HarnessProvider(h3))
+    rep3 = json.loads((tmp_path / "out.json").read_text())
+    assert rep3["mode"] == "RECOVERY_ONLY" and rep3["decisions"] == []
+    assert len(rep3["recovered_positions"]) == 2
+    assert len(rep3["outcomes"]) == 2 and all(o["status"] == "RESOLVED" for o in rep3["outcomes"])
+    assert rep3["unresolved_positions"] == [] and rep3["completion"] == "CLOSED_CLEAN" and rep3["outstanding_obligations"] == 0
+    assert L.read_all(led)[rep3["session_close"]["seq"] - 1]["close_number"] == 2
+    assert not any(r["kind"] == "pilot_forecast" and r["scan_id"].startswith("LC-1:0003") for r in L.read_all(led))
+    # a different session reports the foreign position and does not touch it
+    h4 = SyntheticHarness(led, session_id="LC-2", t0=T0 + 20.0)
+    h4.quotes.fail_with = KeyboardInterrupt()
+    with pytest.raises(KeyboardInterrupt):
+        sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-2", "--pilot-release", "synthetic-release"),
+                  pilot_sources=E._HarnessProvider(h4))
+    h5 = SyntheticHarness(led, session_id="LC-2", t0=T0 + 25.0)
+    monkeypatch.setattr(E.S, "resolve", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("exit provider unreachable")))
+    sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-2", "--pilot-release", "synthetic-release"),
+              pilot_sources=E._HarnessProvider(h5))
+    monkeypatch.undo()
+    h6 = SyntheticHarness(led, session_id="LC-3", t0=T0 + 30.0)
+    sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-3", "--pilot-release", "synthetic-release"),
+              pilot_sources=E._HarnessProvider(h6))
+    rep6 = json.loads((tmp_path / "out.json").read_text())
+    assert len(rep6["foreign_unresolved_positions"]) == 2 and all(p["session_id"] == "LC-2" for p in rep6["foreign_unresolved_positions"])
+    assert rep6["unresolved_positions"] == [] and rep6["completion"] == "CLOSED_CLEAN"
+    assert len(S.unresolved_fills(led)) == 2                                           # still LC-2's obligation, untouched
+    L.verify_chain(led)

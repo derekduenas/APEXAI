@@ -47,8 +47,11 @@ def _binding_view(intent: dict) -> dict:
     return v
 
 
-def verify_approval(intent: dict, approval) -> dict:
-    """Recompute the binding; refuse self-attestation and foreign approvals."""
+def verify_approval(intent: dict, approval, *, authority=None) -> dict:
+    """Recompute the binding; refuse self-attestation and foreign approvals.
+    With `authority`, ALSO require that the ACTIVE authority honours this
+    approval: a stored synthetic approval is not authorization on a
+    production boundary, at execution or on resume."""
     if not isinstance(approval, dict):
         raise RiskRefused("RISK_APPROVAL_NOT_A_RECORD: %r" % type(approval).__name__)
     if approval.get("approved") is not True:
@@ -64,6 +67,10 @@ def verify_approval(intent: dict, approval) -> dict:
                           % (str(approval.get("binding_hash"))[:12], expected[:12]))
     if not is_real(approval.get("certified_max_loss")) or approval["certified_max_loss"] <= 0:
         raise RiskRefused("RISK_MAX_LOSS_INVALID: %r" % (approval.get("certified_max_loss"),))
+    if authority is not None:
+        why = authority.accepts(approval)
+        if why:
+            raise RiskRefused("RISK_AUTHORITY_INCOMPATIBLE: %s" % why)
     return approval
 
 
@@ -73,9 +80,18 @@ class RiskAuthority:
     def approve(self, intent: dict) -> dict:                             # pragma: no cover - interface
         raise NotImplementedError
 
+    def accepts(self, approval: dict) -> str | None:                     # pragma: no cover - interface
+        """None if this ACTIVE authority honours a stored approval, else the reason it does not."""
+        raise NotImplementedError
+
 
 class ProductionRiskAuthority(RiskAuthority):
     authority_id = "PRODUCTION_NOT_INTEGRATED"
+
+    def accepts(self, approval: dict) -> str | None:
+        return ("the production authority honours no stored approval in this brick (stored %r/%r is not production "
+                "authorization; certify()/risk_kernel.check() integration is the next brick)"
+                % (approval.get("risk_provenance"), approval.get("authority_id")))
 
     def approve(self, intent: dict) -> dict:
         raise RiskIntegrationMissing(
@@ -93,6 +109,12 @@ class SyntheticRiskAuthority(RiskAuthority):
             raise RiskRefused("SYNTHETIC_AUTHORITY_OUTSIDE_HARNESS")
         self.max_loss = float(max_loss)
         self.refuse_with = refuse_with
+
+    def accepts(self, approval: dict) -> str | None:
+        if approval.get("risk_provenance") != "SYNTHETIC_FIXTURE" or approval.get("authority_id") != self.authority_id:
+            return "synthetic authority honours only its own SYNTHETIC_FIXTURE approvals, got %r/%r" % (
+                approval.get("risk_provenance"), approval.get("authority_id"))
+        return None
 
     def approve(self, intent: dict) -> dict:
         if self.refuse_with:

@@ -37,9 +37,14 @@ HORIZON_RELATIONSHIP = ("the forecast horizon is 15 minutes; the pilot holds a f
                         "close. These are DIFFERENT horizons. The forecast is recorded and is NOT extrapolated to the "
                         "hold horizon; any request to use it as a hold-horizon expectation is refused")
 INTENT_TTL_S = 120.0
+FORECAST_FRESHNESS_S = 120.0
+FORECAST_ELIGIBILITY_POLICY = ("FORECAST_ELIGIBILITY_V1: created <= clock; clock < target_end (the target is still in the "
+                               "future -- a forecast about a completed target is not prospective decision evidence); "
+                               "clock - input_cutoff <= 120s; re-checked at intent creation and at fill commit")
 
 KINDS = ("pilot_forecast", "pilot_intent", "pilot_fill", "pilot_outcome", "pilot_refusal", "pilot_decision",
-         "pilot_intent_expired", "pilot_intent_cancelled", "pilot_session_open", "pilot_session_close")
+         "pilot_duplicate_delivery", "pilot_intent_expired", "pilot_intent_cancelled", "pilot_session_open",
+         "pilot_session_close")
 
 
 class RecordRefused(ValueError):
@@ -166,6 +171,11 @@ def validate_forecast(f: dict, *, now_epoch: float, provenance: str, session_id:
         raise RecordRefused("FORECAST_CREATED_BEFORE_INPUT_CUTOFF")
     if cre > now_epoch:
         raise RecordRefused("FORECAST_FROM_THE_FUTURE: created %.3f > clock %.3f" % (cre, now_epoch))
+    if now_epoch >= end:
+        raise RecordRefused("FORECAST_TARGET_ALREADY_ENDED: target_end %s is not after clock %s"
+                            % (to_utc_string(end), to_utc_string(now_epoch)))
+    if now_epoch - cut > FORECAST_FRESHNESS_S:
+        raise RecordRefused("FORECAST_STALE: input cutoff %.1fs before clock > %.0fs policy" % (now_epoch - cut, FORECAST_FRESHNESS_S))
     sig = f.get("direction_signal")
     if sig is not None and sig not in ("LONG", "SHORT"):
         raise RecordRefused("DIRECTION_SIGNAL_INVALID: %r" % (sig,))
@@ -178,6 +188,7 @@ def validate_forecast(f: dict, *, now_epoch: float, provenance: str, session_id:
                                       "horizon of the identified parameter artifact; NOT an expected directional move, "
                                       "NOT a hold-to-close forecast"),
                  "horizon_relationship": HORIZON_RELATIONSHIP,
+                 "eligibility_policy": FORECAST_ELIGIBILITY_POLICY,
                  "drives_expression_selection": False,
                  "direction_signal": sig, "inputs": f.get("inputs"),
                  "direction_signal_meaning": "HEURISTIC trend label; not part of the forecast distribution",

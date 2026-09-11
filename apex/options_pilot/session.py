@@ -56,22 +56,70 @@ def next_seq(ledger, *, session_id: str) -> int:
     return best + 1
 
 
+def _payload_of(rec: dict, receipt: dict, *, reconciled: bool) -> dict:
+    """The decision as PERSISTED. Whatever the caller computed is irrelevant
+    once a decision record exists for the scan: the disk tells the story."""
+    return {"scan_id": rec["scan_id"], "symbol": rec["symbol"], "decision": rec["decision"], "why": rec.get("why"),
+            "forecast_id": rec.get("forecast_id"), "intent_id": rec.get("intent_id"), "fill_id": rec.get("fill_id"),
+            "refusal_persisted": rec.get("refusal_persisted"), "decision_receipt": receipt, "decision_persisted": True,
+            "reconciled": reconciled, "receipts": {}}
+
+
 def _decision(bd: B.Boundary, *, scan_id: str, symbol: str, decision: str, why, ids: dict, persisted_refusal=None) -> dict:
     rec = {"kind": "pilot_decision", "txn_id": "decision:" + scan_id, "scan_id": scan_id, "symbol": symbol,
            "session_id": bd.session_id, "release": bd.release, "decision": decision, "why": why,
            "forecast_id": ids.get("forecast_id"), "intent_id": ids.get("intent_id"), "fill_id": ids.get("fill_id"),
            "refusal_persisted": persisted_refusal, "decided_utc": bd.clock.now_utc(), **bd.labels}
     assert_prospective(rec)
-    out = {"scan_id": scan_id, "symbol": symbol, "decision": decision, "why": why, **ids, "receipts": ids.get("receipts", {})}
+    out = {"scan_id": scan_id, "symbol": symbol, "decision": decision, "why": why, **ids, "receipts": ids.get("receipts", {}),
+           "reconciled": False}
     try:
-        receipt, _ = L.commit_once(bd.ledger, txn_id=rec["txn_id"], build=lambda rows: rec, kind="pilot_decision")
-        out["decision_receipt"] = receipt
-        out["decision_persisted"] = True
+        receipt, fresh = L.commit_once(bd.ledger, txn_id=rec["txn_id"], build=lambda rows: rec, kind="pilot_decision")
     except L.LedgerRefused as e:
         out["decision_persisted"] = False
         out["decision_persist_error"] = str(e)[:200]
+        if persisted_refusal is not None:
+            out["refusal_persisted"] = persisted_refusal
+        return out
+    if not fresh:                                    # a decision for this scan already exists: return ITS payload
+        on_disk = L.read_all(bd.ledger)[receipt["seq"] - 1]
+        return {**_payload_of(on_disk, receipt, reconciled=True), "receipts": out["receipts"]}
+    out["decision_receipt"] = receipt
+    out["decision_persisted"] = True
     if persisted_refusal is not None:
         out["refusal_persisted"] = persisted_refusal
+    return out
+
+
+def _duplicate_delivery(bd: B.Boundary, *, scan_id: str, symbol: str, prior: list) -> dict:
+    """A scan_id that already has a persisted DECISION: verify it and return
+    the persisted payload. The duplicate delivery itself is recorded as a
+    separate diagnostic record, never as a decision."""
+    rows = L.read_all(bd.ledger)
+    decisions = [(i + 1, r) for i, r in enumerate(rows) if r.get("kind") == "pilot_decision" and r.get("scan_id") == scan_id]
+    if not decisions:
+        # records exist but no decision was ever persisted: the earlier scan was interrupted. This is the
+        # FIRST decision for the scan_id; any intent it left behind is the resume policy's job.
+        return None
+    seq, rec = decisions[0]
+    receipt = {"path": str(bd.ledger), "seq": seq, "entry_hash": rec.get("entry_hash")}
+    try:
+        L.verify_receipt(bd.ledger, receipt, expected_kind="pilot_decision", rows=rows)
+    except L.LedgerRefused as e:
+        return _decision(bd, scan_id=scan_id, symbol=symbol, decision="REFUSE",
+                         why="DUPLICATE_SCAN_DECISION_ALTERED: %s" % e, ids={"receipts": {}})
+    diag = {"kind": "pilot_duplicate_delivery", "scan_id": scan_id, "symbol": symbol, "session_id": bd.session_id,
+            "release": bd.release, "decision_ref": {"seq": seq, "entry_hash": rec.get("entry_hash")},
+            "note": "a second delivery of this scan_id; the persisted decision stands and was returned unchanged",
+            "at_utc": bd.clock.now_utc(), **bd.labels}
+    assert_prospective(diag)
+    out = _payload_of(rec, {**receipt, "kind": "pilot_decision", "receipt": "RECONCILED: persisted decision returned"}, reconciled=True)
+    out["duplicate_delivery"] = True
+    try:
+        out["duplicate_delivery_receipt"] = L.append_with_receipt(bd.ledger, diag)
+    except L.LedgerRefused as e:
+        out["duplicate_delivery_receipt"] = None
+        out["duplicate_delivery_persist_error"] = str(e)[:200]
     return out
 
 
@@ -84,8 +132,16 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
     ids: dict = {"receipts": {}}
     prior = [r for r in L.read_all(bd.ledger) if r.get("scan_id") == scan_id]
     if prior:
-        return _decision(bd, scan_id=scan_id, symbol=symbol, decision="REFUSE",
-                         why="DUPLICATE_SCAN: scan_id already has %d record(s), first kind %r" % (len(prior), prior[0].get("kind")), ids=ids)
+        dup = _duplicate_delivery(bd, scan_id=scan_id, symbol=symbol, prior=prior)
+        if dup is not None:
+            return dup
+        try:
+            bd.refuse("scan", "INCOMPLETE_SCAN: scan_id already has %d record(s) (first kind %r) but no decision; "
+                      "not re-run -- unfinished intents belong to the resume policy" % (len(prior), prior[0].get("kind")),
+                      scan_id=scan_id)
+        except B.BoundaryRefused as e:
+            return _decision(bd, scan_id=scan_id, symbol=symbol, decision="REFUSE", why=str(e), ids=ids,
+                             persisted_refusal=e.persisted)
     as_of = bd.clock.now()
     try:
         # 1. forecast persisted first, before any quote is consulted
@@ -131,6 +187,36 @@ def unfilled_intents(ledger, *, rows: list | None = None) -> list:
     return [(i + 1, r) for i, r in enumerate(rows) if r.get("kind") == "pilot_intent" and (i + 1) not in done]
 
 
+def unresolved_fills(ledger, *, rows: list | None = None) -> list:
+    """FILLED fills (positions) with no outcome record referencing them.
+    These are OUTSTANDING OBLIGATIONS: a session is not complete while any
+    exist, whatever the intent side of the ledger says."""
+    rows = L.read_all(ledger) if rows is None else rows
+    resolved = {(r.get("fill_ref") or {}).get("seq") for r in rows if r.get("kind") == "pilot_outcome"}
+    return [(i + 1, r) for i, r in enumerate(rows)
+            if r.get("kind") == "pilot_fill" and r.get("status") == "FILLED" and (i + 1) not in resolved]
+
+
+def recover_positions(bd: B.Boundary) -> dict:
+    """Rebuild fill receipts FROM DISK for every unresolved position. Own
+    (this session + release + provenance) positions are returned as
+    resolvable receipts; foreign ones are reported, not touched."""
+    rows = L.read_all(bd.ledger)
+    own, foreign = [], []
+    for seq, r in unresolved_fills(bd.ledger, rows=rows):
+        receipt = {"path": str(bd.ledger), "seq": seq, "entry_hash": r.get("entry_hash"), "kind": "pilot_fill",
+                   "intent_id": r.get("intent_id"), "scan_id": r.get("scan_id"), "fill_id": r.get("fill_id"),
+                   "contract_id": r.get("contract_id"), "receipt": "REBUILT from disk (unresolved position)"}
+        if r.get("session_id") == bd.session_id and r.get("release") == bd.release \
+                and r.get("data_provenance") == bd.labels["data_provenance"]:
+            own.append(receipt)
+        else:
+            foreign.append({**receipt, "session_id": r.get("session_id"), "release": r.get("release"),
+                            "data_provenance": r.get("data_provenance"),
+                            "why_not_resolved_here": "belongs to another session/release/provenance; reported, not touched"})
+    return {"own": own, "foreign": foreign}
+
+
 def closed_sessions(rows: list) -> set:
     return {r.get("session_id") for r in rows if r.get("kind") == "pilot_session_close"}
 
@@ -159,18 +245,22 @@ def resume(bd: B.Boundary, *, quote_fn) -> list:
         elif rec.get("session_id") != bd.session_id:
             why = "STALE_AUTHORIZATION: intent belongs to session %r, resuming %r" % (rec.get("session_id"), bd.session_id)
         else:
-            try:
-                B.RG.verify_approval(rec, rec.get("risk"))
-            except B.RG.RiskRefused as e:
-                why = "STALE_AUTHORIZATION: %s" % e
-        if why:
-            r = bd.expire_intent(receipt, rec, why=why, kind="pilot_intent_cancelled")
-            actions.append({"seq": seq, "intent_id": rec.get("intent_id"), "action": "CANCELLED", "why": why, "receipt": r})
-            continue
-        if bd.clock.now() > rec.get("expiry_epoch", rec.get("created_epoch", 0) + INTENT_TTL_S):
-            why = "EXPIRED: clock %.3f > expiry %.3f" % (bd.clock.now(), rec.get("expiry_epoch"))
-            r = bd.expire_intent(receipt, rec, why=why, kind="pilot_intent_expired")
-            actions.append({"seq": seq, "intent_id": rec.get("intent_id"), "action": "EXPIRED", "why": why, "receipt": r})
+            problem = bd.authorization_problem(rec)          # active authority + provenance, not just the stored binding
+            if problem:
+                why = "STALE_AUTHORIZATION: %s" % problem
+        try:
+            if why:
+                r = bd.expire_intent(receipt, rec, why=why, kind="pilot_intent_cancelled")
+                actions.append({"seq": seq, "intent_id": rec.get("intent_id"), "action": "CANCELLED", "why": why, "receipt": r})
+                continue
+            if bd.clock.now() > rec.get("expiry_epoch", rec.get("created_epoch", 0) + INTENT_TTL_S):
+                why = "EXPIRED: clock %.3f > expiry %.3f" % (bd.clock.now(), rec.get("expiry_epoch"))
+                r = bd.expire_intent(receipt, rec, why=why, kind="pilot_intent_expired")
+                actions.append({"seq": seq, "intent_id": rec.get("intent_id"), "action": "EXPIRED", "why": why, "receipt": r})
+                continue
+        except B.BoundaryRefused as e:
+            actions.append({"seq": seq, "intent_id": rec.get("intent_id"), "action": "REFUSED", "why": str(e),
+                            "refusal_persisted": e.persisted})
             continue
         try:
             fr = bd.execute_intent(intent_receipt=receipt, quote_fn=quote_fn)
@@ -189,8 +279,14 @@ def close_session(bd: B.Boundary) -> dict:
         if r.get("session_id") == bd.session_id:
             counts[r.get("kind")] = counts.get(r.get("kind"), 0) + 1
     open_ = [seq for seq, r in unfilled_intents(bd.ledger, rows=rows) if r.get("session_id") == bd.session_id]
-    rec = {"kind": "pilot_session_close", "txn_id": "session_close:" + bd.session_id, "session_id": bd.session_id,
+    positions = [seq for seq, r in unresolved_fills(bd.ledger, rows=rows) if r.get("session_id") == bd.session_id]
+    n_prior = sum(1 for r in rows if r.get("kind") == "pilot_session_close" and r.get("session_id") == bd.session_id)
+    rec = {"kind": "pilot_session_close", "txn_id": "session_close:%s:%d" % (bd.session_id, n_prior + 1),
+           "close_number": n_prior + 1, "session_id": bd.session_id,
            "release": bd.release, "record_counts": counts, "unfinished_intent_seqs_at_close": open_,
+           "unresolved_fill_seqs_at_close": positions,
+           "outstanding_obligations": len(open_) + len(positions),
+           "completion": "CLOSED_CLEAN" if not open_ and not positions else "CLOSED_WITH_OUTSTANDING_OBLIGATIONS",
            "closed_utc": bd.clock.now_utc(), **bd.labels}
     assert_prospective(rec)
     receipt, _ = L.commit_once(bd.ledger, txn_id=rec["txn_id"], build=lambda rows: rec, kind="pilot_session_close")
