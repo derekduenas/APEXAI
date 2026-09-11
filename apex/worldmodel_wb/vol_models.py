@@ -190,17 +190,23 @@ class GARCH(_VarianceModel):
                 start_b = cand; break
         if start_b is None:
             raise ModelRefused("NOT_CONVERGED: no feasible second start near the optimum")
+        res_a = res                                                    # BOTH results are preserved; nothing is selected before the rule is applied
         res_b = optimize.minimize(_nll, start_b, args=(x, self.gjr), method="L-BFGS-B")
-        if res_b.success and res_b.fun < res.fun:
-            res = res_b
-        tol = 1e-6 * max(1.0, abs(float(res.fun))) + 1e-6
-        if not (res_b.success or abs(float(res_b.fun) - float(res.fun)) <= 1e-3 * max(1.0, abs(float(res.fun)))):
+        fun_a, fun_b = float(res_a.fun), float(res_b.fun)
+        gap = abs(fun_a - fun_b)
+        scale = max(1.0, abs(min(fun_a, fun_b)))
+        if not res_b.success:
             raise ModelRefused("NOT_CONVERGED: second start failed (%s)" % str(res_b.message)[:60])
-        if abs(float(res_b.fun) - float(res.fun)) > 100 * tol:
-            raise ModelRefused("NOT_CONVERGED: multi-start NLL disagreement %.6g vs %.6g" % (float(res_b.fun), float(res.fun)))
+        if gap > 1e-4 * scale:                                         # declared acceptance rule: |NLL_a - NLL_b| <= 1e-4 * max(1, |NLL|)
+            raise ModelRefused("NOT_CONVERGED: multi-start NLL disagreement %.6g vs %.6g (gap %.3g > %.3g)" % (fun_a, fun_b, gap, 1e-4 * scale))
+        res = res_b if fun_b < fun_a else res_a                        # only now: the better of two AGREEING optima
         grad = optimize.approx_fprime(np.asarray(res.x, dtype=float), lambda t: _nll(t, x, self.gjr), 1e-6)
-        convergence = {"method": method, "success": bool(res.success), "multi_start_nll_gap": abs(float(res_b.fun) - float(res.fun)),
-                       "grad_inf_norm": float(np.max(np.abs(grad))), "rule": "unsuccessful termination refused unless a derivative-free polish converges; a second start must agree on the NLL"}
+        convergence = {"method": method, "success": bool(res.success),
+                       "start_a": {"success": bool(res_a.success), "message": str(res_a.message)[:60], "nll": fun_a},
+                       "start_b": {"success": bool(res_b.success), "message": str(res_b.message)[:60], "nll": fun_b},
+                       "multi_start_nll_gap": gap, "gap_tolerance": 1e-4 * scale, "selected": "b" if res is res_b else "a",
+                       "grad_inf_norm": float(np.max(np.abs(grad))),
+                       "rule": "unsuccessful termination refused unless a derivative-free polish converges; two starts must agree on the NLL within 1e-4 relative BEFORE the better is selected"}
         th = res.x
         omega, alpha, beta = math.exp(th[0]), _sig(th[1]), _sig(th[2])
         gamma = _sig(th[3]) if self.gjr else 0.0

@@ -1,9 +1,20 @@
-# The Funnel — the intelligence layers in ONE decision path (M7 r2, `FULL_FUNNEL_V1`)
+# The Funnel — the intelligence layers in ONE decision path (M7 r3, `FULL_FUNNEL_V1`)
 
 State: `SYNTHETIC_VERIFIED` on branch `frontier-build` (r2 = the integration-repair milestone after the reviewer's
-eight findings at `f0daac2`). Not deployed, not activated, no orders. Independent acceptance pending. Layers this
+eight findings at `f0daac2`; r3 = the bounded repair of the four items found in the independent review of `3cc65b0`). Not deployed, not activated, no orders. Independent acceptance pending. Layers this
 engine does NOT invoke are named on every trace: the SVI surface (ATM IV only), learned fusion, enrichment, jumps. The deterministic pilot rule (`PILOT_RULE_V1`) remains the default selection policy; the
 funnel is selected explicitly (`--pilot-selection-policy FULL_FUNNEL_V1`).
+
+## r3 — bounded repair of the four items from the independent review of `3cc65b0`
+
+| # | Finding | Repair | Test |
+|---|---|---|---|
+| 1 | `NaN` timestamps bypassed quote validation (comparisons against NaN are False); six NaN-stamped quotes produced TRADE | `sanitize_quote` requires a finite, correctly typed timestamp, clock and max-age BEFORE any subtraction (`QUOTE_TIMESTAMP_INVALID`, `CLOCK_INVALID`, `MAX_AGE_INVALID`); bid size ≥ 0 | `test_multiverse_wb::test_sanitize_quote_refuses_non_finite_or_mistyped_timestamps_before_arithmetic`; `test_funnel_engine::test_nan_timestamps_are_refused_and_never_reach_pricing` (all-NaN → WAIT with nothing priced; a NaN/valid mix → IV inversion and the candidate set see only the validated quotes, asserted by recording every pricing call; inf / str / bool / None stamps) |
+| 2 | Multi-start agreement compared the second result with itself (1000 vs 900 accepted, gap 0) | Both results preserved; the gap `|NLL_a − NLL_b|` is measured FIRST against the declared rule (≤ 1e-4 relative), refusal otherwise; only then is the better of two AGREEING optima selected. Each start's termination status, message and objective are recorded separately (`convergence.start_a/start_b/selected`) | `test_worldmodel_wb::test_garch_multi_start_disagreement_is_measured_before_selection` (injected 1000 vs 900 → `NOT_CONVERGED … 1000 vs 900`) |
+| 3 | Binding ignored the proposal's economic terms (`reference_ask` 2.45 → 4.50 widened the envelope from 2.70 to 4.95 while the checked fields stayed identical) | `Boundary.canonical_proposal` / `proposal_digest`: symbol, expiration, strike, right, expression, action, quantity, policy AND `reference_ask`. Verified at intent creation (against the caller's terms), at every fill attempt and on recovery (against the intent's OWN persisted terms, plus the stored `proposal_digest` and the envelope's recorded reference ask) | `TestFunnelBinding::test_changed_reference_ask_is_refused_at_intent_and_at_execution` (refused at intent with the field named; with the record-time check bypassed, refused at the fill and on recovery); `test_canonical_proposal_covers_every_execution_relevant_term` |
+| 4 | End-to-end evidence was reduced-mode and conditional | `test_full_mode_acceptance_selection_to_reconciled_exit`: FULL mode → the REAL engine selects (regime supplied, PRIME ACT) → persisted funnel → intent bound by digest with the kernel's certified reservation at commit → FILLED → RESOLVED exit that discharges the position → book closed with zero positions and no integrity problems; every step asserted unconditionally, no stub. Separate: `test_full_mode_mandatory_wait_when_no_quote_is_valid` (real engine, all quotes 1000 s old → WAIT persisted, no intent) and the existing refusal cases | as named |
+
+The 8-sd truncation remains a modelling assumption: it makes the payoff expectation exist under the bounded simulator; it does not establish that the tail model represents markets. The cap sensitivity travels with every decision for that reason.
 
 ## r2 — integration repairs (reviewer findings at `f0daac2` → what changed → the test that pins it)
 

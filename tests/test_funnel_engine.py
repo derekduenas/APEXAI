@@ -131,6 +131,50 @@ class TestEngine:
         assert r["decision"] == "WAIT" and "no valid quote" in r["why"]
         assert r["trace"]["quotes"]["valid"] == 0 and all("QUOTE_FIELD_MISSING: timestamp_epoch" in v for v in r["trace"]["quotes"]["rejection_reasons"].values())
 
+    def test_nan_timestamps_are_refused_and_never_reach_pricing(self, engine, monkeypatch):
+        """r3.1: NaN/inf/str/bool timestamps and a NaN clock are refused BEFORE any subtraction; pricing sees only validated quotes."""
+        import apex.decision_wb.engine as ENG
+        seen_iv, seen_cmp = [], []
+        real_iv, real_cmp = ENG.implied_vol, ENG.EW.compare
+
+        def rec_iv(**kw):
+            assert math.isfinite(kw["price"]) and kw["price"] > 0
+            seen_iv.append(kw); return real_iv(**kw)
+
+        def rec_cmp(**kw):
+            for c in kw["candidates"]:
+                ts = c["quote"]["timestamp_epoch"]
+                assert isinstance(ts, (int, float)) and math.isfinite(ts) and AS_OF - ts <= engine.quote_max_age_s
+            seen_cmp.append(kw); return real_cmp(**kw)
+        monkeypatch.setattr(ENG, "implied_vol", rec_iv)
+        monkeypatch.setattr(ENG.EW, "compare", rec_cmp)
+        # (a) every quote NaN-stamped: nothing is priced, the engine waits
+        q = {k: {**v, "timestamp_epoch": float("nan")} for k, v in _quotes(200.2).items()}
+        r = _decide(engine, +0.006, quotes=q)
+        assert r["decision"] == "WAIT" and "no valid quote" in r["why"] and r["trace"]["quotes"]["valid"] == 0
+        assert all("QUOTE_TIMESTAMP_INVALID" in v for v in r["trace"]["quotes"]["rejection_reasons"].values())
+        assert seen_iv == [] and seen_cmp == []
+        json.dumps(r, allow_nan=False)
+        # (b) a mix: the six NaN-stamped quotes are excluded from IV inversion AND from the candidate set; the valid four remain
+        q2 = _quotes(200.2)
+        bad = [k for k in q2 if k[1] in (195.0, 200.0, 205.0)]
+        for k in bad:
+            q2[k] = {**q2[k], "timestamp_epoch": float("nan")}
+        r2 = _decide(engine, +0.006, quotes=q2)
+        assert r2["trace"]["quotes"]["rejected"] == 6 and r2["trace"]["quotes"]["valid"] == 4
+        assert all(kw["K"] not in (195.0, 200.0, 205.0) for kw in seen_iv)
+        assert all(len(kw["candidates"]) == 4 for kw in seen_cmp)
+        # (c) other invalid stamps and an invalid clock
+        for bad_ts in (float("inf"), "1788000000", True, None):
+            q3 = {k: {**v, "timestamp_epoch": bad_ts} for k, v in _quotes(200.2).items()}
+            r3 = _decide(engine, +0.006, quotes=q3)
+            assert r3["decision"] == "WAIT" and r3["trace"]["quotes"]["valid"] == 0, bad_ts
+        from apex.multiverse_wb.pricing import PricingRefused, sanitize_quote
+        with pytest.raises(PricingRefused, match="CLOCK_INVALID"):
+            sanitize_quote(_quotes(200.2)[("2026-10-09", 200.0, "CALL")], now=float("nan"), max_age_s=120.0)
+        with pytest.raises(PricingRefused, match="MAX_AGE_INVALID"):
+            sanitize_quote(_quotes(200.2)[("2026-10-09", 200.0, "CALL")], now=AS_OF, max_age_s=float("nan"))
+
     def test_stale_atm_quotes_cannot_supply_the_iv(self, engine):
         q = _quotes(200.2)
         for k in list(q):
@@ -373,6 +417,34 @@ class TestFunnelBinding:
         rows = L.read_all(led)
         assert not any(r["kind"] == "pilot_intent" for r in rows) and sum(1 for r in rows if r["kind"] == "pilot_refusal") == 2
 
+    def test_changed_reference_ask_is_refused_at_intent_and_at_execution(self, tmp_path, monkeypatch):
+        """r3.3: the reference ask the envelope is built from is part of the canonical binding."""
+        led, h, bd = _session(tmp_path)
+        fr = self._forecast_receipt(h, bd, "FUN-1:0001:SPY")
+        fn = self._funnel_record(bd, scan_id="FUN-1:0001:SPY", f_receipt=fr)                   # funnel selected at reference ask 2.45
+        pricier = {**PROPOSAL, "reference_ask": 4.50}                                            # same contract/expression/policy, wider envelope
+        with pytest.raises(B.BoundaryRefused, match="FUNNEL_PROPOSAL_MISMATCH.*reference_ask"):
+            bd.record_intent(forecast_receipt=fr, intent=self._intent(pricier), signal_used="LONG", scan_id="FUN-1:0001:SPY", funnel_receipt=fn)
+        assert not any(r["kind"] == "pilot_intent" for r in L.read_all(led))
+        # execution-time: record-time check bypassed (older release / other writer) -> the fill and recovery refuse on the intent's own terms
+        monkeypatch.setattr(B.Boundary, "_funnel_binding_problem", classmethod(lambda cls, *a, **k: None))
+        ir = bd.record_intent(forecast_receipt=fr, intent=self._intent(pricier), signal_used="LONG", scan_id="FUN-1:0001:SPY", funnel_receipt=fn)
+        monkeypatch.undo()
+        it = next(r for r in L.read_all(led) if r["kind"] == "pilot_intent")
+        assert it["reference_ask"] == 4.50 and it["risk_envelope"]["max_entry_price"] == 4.95 and it["funnel_ref"]["proposal_digest"] == B.Boundary.proposal_digest(PROPOSAL)
+        with pytest.raises(B.BoundaryRefused, match="INTENT_FUNNEL_BINDING_FUNNEL_PROPOSAL_MISMATCH.*reference_ask"):
+            bd.execute_intent(intent_receipt=ir, quote_fn=h.quotes)
+        assert not any(r["kind"] == "pilot_fill" for r in L.read_all(led))
+        acts = S.resume(bd, quote_fn=h.quotes)
+        assert len(acts) == 1 and acts[0]["action"] == "REFUSED" and "reference_ask" in acts[0]["why"]
+
+    def test_canonical_proposal_covers_every_execution_relevant_term(self):
+        c = B.Boundary.canonical_proposal(PROPOSAL)
+        assert set(c) == {"symbol", "expiration", "strike", "right", "expression", "action", "quantity", "expression_rule", "reference_ask"}
+        assert B.Boundary.proposal_digest(PROPOSAL) == B.Boundary.proposal_digest({**PROPOSAL, "direction_signal": "SHORT", "expected_net_pnl_model": 9.9})
+        for k, v in (("reference_ask", 2.46), ("quantity", 2), ("action", "SELL"), ("expression_rule", "OTHER")):
+            assert B.Boundary.proposal_digest({**PROPOSAL, k: v}) != B.Boundary.proposal_digest(PROPOSAL), k
+
     def test_altered_funnel_record_blocks_execution_and_recovery(self, tmp_path):
         led, h, bd = _session(tmp_path)
         fr = self._forecast_receipt(h, bd, "FUN-1:0001:SPY")
@@ -414,7 +486,63 @@ class TestFunnelBinding:
 
 
 # ------------------------------------------------------------------ end to end: synthetic twin + real engine through run_pilot
-def test_full_funnel_end_to_end_on_the_synthetic_twin(tmp_path):
+def _full_mode_run(tmp_path, *, session_id, quote_age_s=1.0, n_paths=400, seed=3):
+    led = tmp_path / "led.jsonl"
+    h = SyntheticHarness(led, session_id=session_id, t0=REG)
+    h.quotes.age = quote_age_s
+    engine = FunnelEngine(n_paths=n_paths, seed=seed, mode="FULL")
+    twin = synthetic_twin_sources(clock=h.clock, quote_fn=h.quotes, exit_quote_fn=h.exit_quotes, chain_fn=h.chain_fn, sleep_fn=h.advance,
+                                  selection_policy="FULL_FUNNEL_V1", funnel_engine=engine)
+    rep = EP.run_pilot(ledger=led, out=tmp_path / "out.json", symbols=["SPY"], provider=EP.TwinProvider(twin), session_id=session_id,
+                       release="synthetic-release", cycles=1)
+    return led, h, engine, rep
+
+
+def test_full_mode_acceptance_selection_to_reconciled_exit(tmp_path):
+    """r3.4 ACCEPTANCE: FULL mode -> the REAL engine selects -> persisted funnel -> certified reservation (kernel at commit) -> fill -> exit
+    -> reconciled outcome. No stub; the completed trade is asserted unconditionally."""
+    led, h, engine, rep = _full_mode_run(tmp_path, session_id="FUN-FULL")
+    rows = L.read_all(led); kinds = [r["kind"] for r in rows]
+    assert rep["selection_policy"] == "FULL_FUNNEL_V1" and rep["funnel_engine"]["mode"] == "FULL" and engine.fit_info["status"] == "READY", engine.fit_info
+    assert engine.regime is not None and engine.variance is not None
+    # the engine selected (not a stub): the persisted funnel carries the full trace and a TRADE proposal
+    fn = next(r for r in rows if r["kind"] == "pilot_funnel")
+    assert fn["decision"] == "TRADE" and fn["rule_id"] == FUNNEL_RULE_ID and fn["trace"]["mode"] == "FULL"
+    assert fn["trace"]["prime"]["decision"] == "ACT" and fn["trace"]["prime"]["regime_supplied"] is True and fn["trace"]["quotes"]["valid"] >= 2
+    assert fn["trace"]["simulation"]["first_bar_variance_equals_forecast"] is True and "regime" in fn["trace"] and "probabilities" in fn["trace"]["regime"]
+    # intent bound to that funnel, reservation certified by the kernel at commit
+    it = next(r for r in rows if r["kind"] == "pilot_intent")
+    assert it["funnel_ref"]["seq"] == kinds.index("pilot_funnel") + 1 and it["funnel_ref"]["proposal_digest"] == B.Boundary.proposal_digest(fn["proposal"])
+    assert it["contract"] == fn["proposal"]["contract"] and it["reference_ask"] == fn["proposal"]["reference_ask"] and it["expression_rule"] == FUNNEL_RULE_ID
+    assert it["risk"]["risk_provenance"] == "CERTIFIED_KERNEL" and it["risk"]["kernel_check_at_commit"]["approved"] is True
+    # fill, exit, reconciliation
+    fill = next(r for r in rows if r["kind"] == "pilot_fill")
+    assert fill["status"] == "FILLED" and fill["decision"] == "TRADE"
+    d = rep["decisions"][0]
+    assert d["decision"] == "TRADE" and d["decision_persisted"] is True and d["intent_id"] == it["intent_id"] and d["fill_id"] == fill["fill_id"]
+    assert len(rep["outcomes"]) == 1 and rep["outcomes"][0]["final"] == "RESOLVED" and rep["outcomes"][0]["recovery"] is False
+    out = next(r for r in rows if r["kind"] == "pilot_outcome")
+    assert out["status"] == "RESOLVED" and out["discharges_position"] is True and isinstance(out["pnl"], (int, float, dict)) and out["pnl"] is not None
+    assert rep["unresolved_positions"] == [] and not rep["outstanding_obligations"]
+    assert rep["book"]["n_positions"] == 0 and rep["book"]["integrity_problems"] == [] and rep["book"]["n_closed"] == 1
+    dec = next(r for r in rows if r["kind"] == "pilot_decision")
+    assert dec["funnel_trace"]["contract"].startswith("FUNNEL_TRACE_V2") and dec["funnel_trace"]["funnel_ref"]["seq"] == it["funnel_ref"]["seq"]
+    L.verify_chain(led, rows=rows)
+    json.dumps(rep, allow_nan=False)
+
+
+def test_full_mode_mandatory_wait_when_no_quote_is_valid(tmp_path):
+    """Same FULL-mode run, but every indicative quote is 1000 s old: the engine WAITs with the reasons persisted; no intent, no fill."""
+    led, h, engine, rep = _full_mode_run(tmp_path, session_id="FUN-FULL-WAIT", quote_age_s=1000.0)
+    rows = L.read_all(led); kinds = [r["kind"] for r in rows]
+    assert engine.fit_info["status"] == "READY"
+    fn = next(r for r in rows if r["kind"] == "pilot_funnel")
+    assert fn["decision"] == "WAIT" and "no valid quote" in fn["why"] and fn["trace"]["quotes"]["valid"] == 0
+    assert all("QUOTE_STALE_OR_FUTURE" in v for v in fn["trace"]["quotes"]["rejection_reasons"].values())
+    assert rep["decisions"][0]["decision"] == "WAIT" and "pilot_intent" not in kinds and "pilot_fill" not in kinds and rep["outcomes"] == []
+
+
+def test_reduced_mode_end_to_end_on_the_synthetic_twin(tmp_path):
     led = tmp_path / "led.jsonl"
     h = SyntheticHarness(led, session_id="FUN-E2E", t0=REG)
     engine = FunnelEngine(n_paths=400, seed=3, mode="REDUCED_NO_REGIME")     # synthetic Gaussian bars: GARCH-t refuses (EWMA fallback declared); regime named optional

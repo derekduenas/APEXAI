@@ -187,7 +187,20 @@
     "fusion",
     "enrichment",
     "jumps"
-   ]
+   ],
+   "r3_repairs": {
+    "reviewed_commit": "3cc65b0",
+    "findings_repaired": 4,
+    "table": "docs/FUNNEL_INTEGRATION.md#r3",
+    "tests": [
+     "tests/test_funnel_engine.py::TestEngine::test_nan_timestamps_are_refused_and_never_reach_pricing",
+     "tests/test_multiverse_wb.py::test_sanitize_quote_refuses_non_finite_or_mistyped_timestamps_before_arithmetic",
+     "tests/test_worldmodel_wb.py::test_garch_multi_start_disagreement_is_measured_before_selection",
+     "tests/test_funnel_engine.py::TestFunnelBinding::test_changed_reference_ask_is_refused_at_intent_and_at_execution",
+     "tests/test_funnel_engine.py::test_full_mode_acceptance_selection_to_reconciled_exit",
+     "tests/test_funnel_engine.py::test_full_mode_mandatory_wait_when_no_quote_is_valid"
+    ]
+   }
   }
  },
  "preserved": [

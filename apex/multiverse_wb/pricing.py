@@ -64,10 +64,18 @@ def sanitize_quote(q: dict, *, now: float, max_age_s: float = 15.0) -> dict:
         raise PricingRefused("QUOTE_NO_ASK")
     if bid < 0 or ask < bid:
         raise PricingRefused("QUOTE_CROSSED_OR_NEGATIVE: bid %r ask %r" % (bid, ask))
-    if type(q["bid_size"]) is not int or type(q["ask_size"]) is not int or q["ask_size"] < 1:
+    if type(q["bid_size"]) is not int or type(q["ask_size"]) is not int or q["ask_size"] < 1 or q["bid_size"] < 0:
         raise PricingRefused("QUOTE_SIZE_INVALID")
-    age = now - q["timestamp_epoch"]
-    if age < 0 or age > max_age_s:
+    ts = q["timestamp_epoch"]
+    # finiteness and type BEFORE any subtraction: a NaN timestamp makes every comparison False and would slip through
+    if isinstance(ts, bool) or not isinstance(ts, (int, float)) or not math.isfinite(ts):
+        raise PricingRefused("QUOTE_TIMESTAMP_INVALID: %r" % (ts,))
+    if isinstance(now, bool) or not isinstance(now, (int, float)) or not math.isfinite(now):
+        raise PricingRefused("CLOCK_INVALID: %r" % (now,))
+    if isinstance(max_age_s, bool) or not isinstance(max_age_s, (int, float)) or not math.isfinite(max_age_s) or max_age_s < 0:
+        raise PricingRefused("MAX_AGE_INVALID: %r" % (max_age_s,))
+    age = now - ts
+    if not math.isfinite(age) or age < 0 or age > max_age_s:
         raise PricingRefused("QUOTE_STALE_OR_FUTURE: age %.1fs" % age)
     mid = 0.5 * (bid + ask)
     return {"bid": float(bid), "ask": float(ask), "mid": mid, "spread": float(ask - bid), "spread_rel": (ask - bid) / mid if mid > 0 else None,

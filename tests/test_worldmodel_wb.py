@@ -301,3 +301,27 @@ def test_garch_refuses_an_unsuccessful_optimizer_outcome(monkeypatch):
     monkeypatch.undo()
     p = VM.GARCH().fit(_rows_from_returns(x), cutoff_epoch=T0 + 60 * 3000 + 60)
     assert p["convergence"]["success"] is True and p["convergence"]["multi_start_nll_gap"] < 1e-3 * abs(p["nll"]) and "grad_inf_norm" in p["convergence"]
+
+
+def test_garch_multi_start_disagreement_is_measured_before_selection(monkeypatch):
+    """r3.2: two starts with objectives 1000 vs 900 are a DISAGREEMENT (gap 100), not an accepted fit with gap 0."""
+    from scipy import optimize
+    x = VM.simulate_garch(n=3000, omega=2e-8, alpha=0.08, beta=0.90, nu=7.0, seed=5)
+    real = optimize.minimize
+    calls = []
+
+    def fake(fun, x0, *a, **kw):
+        res = real(fun, x0, *a, **kw)
+        res.fun = 1000.0 if not calls else 900.0
+        res.success = True
+        calls.append(res.fun)
+        return res
+    monkeypatch.setattr(optimize, "minimize", fake)
+    with pytest.raises(C.ModelRefused, match="NOT_CONVERGED: multi-start NLL disagreement 1000 vs 900"):
+        VM.GARCH().fit(_rows_from_returns(x), cutoff_epoch=T0 + 60 * 3000 + 60)
+    assert calls == [1000.0, 900.0]
+    monkeypatch.undo()
+    p = VM.GARCH().fit(_rows_from_returns(x), cutoff_epoch=T0 + 60 * 3000 + 60)
+    cv = p["convergence"]
+    assert cv["start_a"]["success"] and cv["start_b"]["success"] and cv["multi_start_nll_gap"] <= cv["gap_tolerance"] and cv["selected"] in ("a", "b")
+    assert p["nll"] == min(cv["start_a"]["nll"], cv["start_b"]["nll"])

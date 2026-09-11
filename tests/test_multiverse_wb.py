@@ -206,3 +206,18 @@ def test_expression_comparison_under_common_paths_records_everything():
     assert cmp["common_paths"]["seed"] == 7 and cmp["common_paths"]["parameter_hash"] == paths["parameter_hash"]
     pv = EW.physical_vs_implied(physical_var_15m=2e-8 * 15, implied_iv_annual=0.18)
     assert pv["risk_premium_disclosed"] is True and "not a mechanical arbitrage signal" in pv["interpretation"] and pv["log_ratio"] is not None
+
+
+def test_sanitize_quote_refuses_non_finite_or_mistyped_timestamps_before_arithmetic():
+    from apex.multiverse_wb.pricing import PricingRefused, sanitize_quote
+    good = {"bid": 1.0, "ask": 1.1, "bid_size": 5, "ask_size": 5, "timestamp_epoch": 1000.0}
+    assert sanitize_quote(good, now=1001.0, max_age_s=15.0)["age_s"] == 1.0
+    for bad in (float("nan"), float("inf"), -float("inf"), "1000", True, None):
+        with pytest.raises(PricingRefused, match="QUOTE_TIMESTAMP_INVALID"):
+            sanitize_quote({**good, "timestamp_epoch": bad}, now=1001.0, max_age_s=15.0)
+    with pytest.raises(PricingRefused, match="CLOCK_INVALID"):
+        sanitize_quote(good, now=float("nan"), max_age_s=15.0)
+    with pytest.raises(PricingRefused, match="MAX_AGE_INVALID"):
+        sanitize_quote(good, now=1001.0, max_age_s=-1.0)
+    with pytest.raises(PricingRefused, match="QUOTE_SIZE_INVALID"):
+        sanitize_quote({**good, "bid_size": -1}, now=1001.0, max_age_s=15.0)

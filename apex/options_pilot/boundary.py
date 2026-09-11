@@ -131,8 +131,22 @@ class Boundary:
 
     # ------------------------------------------------------------ 2. intent
     @staticmethod
-    def _funnel_binding_problem(fn: dict, *, scan_id, session_id, forecast_seq, contract: dict, expression: str, expression_rule) -> str | None:
-        """What the persisted funnel record must say for it to AUTHORIZE this exact intent."""
+    def canonical_proposal(p: dict) -> dict:
+        """The execution-relevant terms of a proposal, in one canonical shape: what the funnel selected IS what the intent may carry."""
+        c = p.get("contract") or {}
+        ra = p.get("reference_ask")
+        return {"symbol": c.get("symbol"), "expiration": c.get("expiration"), "strike": (float(c["strike"]) if isinstance(c.get("strike"), (int, float)) and not isinstance(c.get("strike"), bool) else None),
+                "right": c.get("right"), "expression": p.get("expression"), "action": p.get("action"), "quantity": p.get("quantity"),
+                "expression_rule": p.get("expression_rule"), "reference_ask": (float(ra) if isinstance(ra, (int, float)) and not isinstance(ra, bool) else None)}
+
+    @classmethod
+    def proposal_digest(cls, p: dict) -> str:
+        return canonical_hash(cls.canonical_proposal(p))
+
+    @classmethod
+    def _funnel_binding_problem(cls, fn: dict, *, scan_id, session_id, forecast_seq, intent_terms: dict) -> str | None:
+        """What the persisted funnel record must say for it to AUTHORIZE this exact intent: scan, session, forecast, and the CANONICAL
+        proposal (contract, expression, action, quantity, policy AND the reference ask the envelope is built from)."""
         if fn.get("scan_id") != scan_id:
             return "FUNNEL_SCAN_MISMATCH: funnel %r vs intent %r" % (fn.get("scan_id"), scan_id)
         if fn.get("session_id") != session_id:
@@ -142,12 +156,13 @@ class Boundary:
         if (fn.get("forecast_ref") or {}).get("seq") != forecast_seq:
             return "FUNNEL_FORECAST_MISMATCH: funnel consumed forecast seq %r, intent references %r" % ((fn.get("forecast_ref") or {}).get("seq"), forecast_seq)
         prop = fn.get("proposal") or {}
-        pc = prop.get("contract") or {}
-        same = all(pc.get(k) == contract.get(k) for k in ("symbol", "expiration", "right")) and float(pc.get("strike", float("nan"))) == float(contract.get("strike", float("inf")))
-        if not same or prop.get("expression") != expression:
-            return "FUNNEL_PROPOSAL_MISMATCH: funnel proposed %s %s, intent carries %s %s" % (prop.get("expression"), pc, expression, contract)
-        if fn.get("rule_id") != expression_rule:
-            return "FUNNEL_POLICY_MISMATCH: funnel rule %r vs intent rule %r" % (str(fn.get("rule_id"))[:40], str(expression_rule)[:40])
+        a, b = cls.canonical_proposal(prop), cls.canonical_proposal(intent_terms)
+        diff = sorted(k for k in a if a[k] != b[k])
+        if diff:
+            kind = "FUNNEL_POLICY_MISMATCH" if diff == ["expression_rule"] else "FUNNEL_PROPOSAL_MISMATCH"
+            return "%s: fields %s differ (funnel %s vs intent %s)" % (kind, diff, {k: a[k] for k in diff}, {k: b[k] for k in diff})
+        if fn.get("rule_id") != intent_terms.get("expression_rule"):
+            return "FUNNEL_POLICY_MISMATCH: funnel rule %r vs intent rule %r" % (str(fn.get("rule_id"))[:40], str(intent_terms.get("expression_rule"))[:40])
         return None
 
     def record_intent(self, *, forecast_receipt: dict, intent: dict, signal_used: str, scan_id: str, funnel_receipt: dict | None = None) -> dict:
@@ -169,11 +184,11 @@ class Boundary:
                 fn = L.verify_receipt(self.ledger, funnel_receipt, expected_kind="pilot_funnel")
             except L.LedgerRefused as e:
                 self.refuse("intent", "FUNNEL_REF_%s" % e, refs={"funnel_receipt": funnel_receipt}, scan_id=scan_id)
-            problem = self._funnel_binding_problem(fn, scan_id=scan_id, session_id=self.session_id, forecast_seq=forecast_receipt["seq"],
-                                                   contract=intent.get("contract") or {}, expression=intent.get("expression"), expression_rule=intent.get("expression_rule"))
+            problem = self._funnel_binding_problem(fn, scan_id=scan_id, session_id=self.session_id, forecast_seq=forecast_receipt["seq"], intent_terms=intent)
             if problem:
                 self.refuse("intent", problem, refs={"funnel_receipt": funnel_receipt}, scan_id=scan_id)
             funnel_ref = {"seq": funnel_receipt["seq"], "entry_hash": funnel_receipt["entry_hash"], "rule_id": fn.get("rule_id"),
+                          "proposal_digest": self.proposal_digest(fn.get("proposal") or {}),
                           "trace_digest": ((fn.get("trace") or {}).get("selected") or {}).get("trace_digest")}
         if fr.get("forecast_hash") != forecast_receipt.get("forecast_hash"):
             self.refuse("intent", "FORECAST_HASH_MISMATCH: receipt %r vs disk %r"
@@ -317,10 +332,17 @@ class Boundary:
                 fn = L.verify_receipt(self.ledger, {"path": intent_receipt["path"], "seq": ref["seq"], "entry_hash": ref["entry_hash"]}, expected_kind="pilot_funnel", rows=rows)
             except L.LedgerRefused as e:
                 return "INTENT_FUNNEL_REF_%s" % e, it, fr, None
-            problem = self._funnel_binding_problem(fn, scan_id=it.get("scan_id"), session_id=it.get("session_id"), forecast_seq=fref.get("seq"),
-                                                   contract=it["contract"], expression=it.get("expression"), expression_rule=it.get("expression_rule"))
+            # the intent's OWN persisted terms (contract, expression, quantity, policy, reference ask) must still be what the funnel selected
+            intent_terms = {"contract": it.get("contract"), "expression": it.get("expression"), "action": it.get("action"), "quantity": it.get("quantity"),
+                            "expression_rule": it.get("expression_rule"), "reference_ask": it.get("reference_ask")}
+            problem = self._funnel_binding_problem(fn, scan_id=it.get("scan_id"), session_id=it.get("session_id"), forecast_seq=fref.get("seq"), intent_terms=intent_terms)
             if problem:
                 return "INTENT_FUNNEL_BINDING_%s" % problem, it, fr, None
+            if ref.get("proposal_digest") != self.proposal_digest(fn.get("proposal") or {}):
+                return "INTENT_FUNNEL_BINDING_DIGEST_MISMATCH: intent bound %r, funnel proposal is %r" % (str(ref.get("proposal_digest"))[:12], self.proposal_digest(fn.get("proposal") or {})[:12]), it, fr, None
+            env_ref = (it.get("risk_envelope") or {}).get("reference_ask")
+            if env_ref is not None and env_ref != it.get("reference_ask"):
+                return "INTENT_FUNNEL_BINDING_ENVELOPE_REFERENCE_MISMATCH: envelope built from %r, intent reference %r" % (env_ref, it.get("reference_ask")), it, fr, None
         exp_right = "CALL" if it.get("signal_used") == "LONG" else "PUT" if it.get("signal_used") == "SHORT" else None
         if exp_right is None or it["contract"]["right"] != exp_right or it.get("action") != "BUY" or it.get("quantity") != 1:
             return "INTENT_CONTENT_DISAGREE: signal/right/action/quantity", it, fr, None

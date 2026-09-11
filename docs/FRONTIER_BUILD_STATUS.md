@@ -27,7 +27,7 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 | M4 — Multiverse + market-implied | `SYNTHETIC_VERIFIED` | `80ea8de` | `apex/multiverse_wb/{simulator,pricing,surface,expression_war}.py`; `tests/test_multiverse_wb.py` (8) |
 | M5 — fusion, supervision, learning | `SYNTHETIC_VERIFIED` | `ceb7e7f` | `apex/decision_wb/{fusion,supervision,experience,enrichment}.py`; `tests/test_decision_wb.py` (4) |
 | M6 — operator view + commissioning package | `SYNTHETIC_VERIFIED` (package PREPARED; activation NOT authorized) | `9cfb70f` | `apex/options_pilot/operator_view.py`; `scripts/options_pilot_scale_check.py` + `docs/evidence/scale_check_10_sessions_OUTPUT.json`; `docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md`; funnel trace on every decision |
-| M7 — THE FUNNEL in one decision path (`FULL_FUNNEL_V1`), r2 integration repairs (8 reviewer findings) | `SYNTHETIC_VERIFIED` (default policy stays `PILOT_RULE_V1`; activation NOT authorized; backtest hold kept) | `f0daac2` → r2 this commit | `apex/decision_wb/engine.py`; `TwinSources.funnel_fn`; `session.scan(funnel_fn=)` + `FUNNEL_TRACE_V2`; `--pilot-selection-policy`; replay variant `apex/backtest_wb/funnel.py` + PILOT-REPLAY-002 contract (declared, not run); `tests/test_funnel_engine.py` (17) + replay planted-drift test; `docs/FUNNEL_INTEGRATION.md` |
+| M7 — THE FUNNEL in one decision path (`FULL_FUNNEL_V1`); r2 (8 findings) + r3 (4 findings) repairs | `SYNTHETIC_VERIFIED` (default policy stays `PILOT_RULE_V1`; activation NOT authorized; backtest hold kept) | `f0daac2` → r2 `3cc65b0` → r3 this commit | `apex/decision_wb/engine.py`; `TwinSources.funnel_fn`; `session.scan(funnel_fn=)` + `FUNNEL_TRACE_V2`; `--pilot-selection-policy`; replay variant `apex/backtest_wb/funnel.py` + PILOT-REPLAY-002 contract (declared, not run); `tests/test_funnel_engine.py` (17) + replay planted-drift test; `docs/FUNNEL_INTEGRATION.md` |
 
 ## M0 — closed at `360536cb` (reconciled against the mandate's four items)
 
@@ -249,6 +249,14 @@ first-step equality, quote validation before IV/ranking, calendar-vs-market cloc
 named reduced mode and affordability distinguished from kernel approval, the persisted funnel bound into the intent and
 rechecked at fill/recovery, GARCH refusing unsuccessful optimizer outcomes, and the per-scan evaluator population.
 Layers not invoked (SVI surface, fusion, enrichment) are named on every trace.
+
+### M7 r3 — bounded repair (four items from the independent review of `3cc65b0`)
+
+NaN/mistyped timestamps and clocks refused before any arithmetic and proven never to reach pricing; multi-start
+agreement measured on both preserved optimizer results before selection; the funnel binding now covers the canonical
+proposal including `reference_ask`, checked at intent, fill and recovery; a FULL-mode synthetic acceptance test runs the
+real engine through selection → persisted funnel → certified reservation → fill → reconciled exit unconditionally, with
+a separate mandatory-WAIT case. Table in `docs/FUNNEL_INTEGRATION.md`.
 
 ## Backtests (development studies, exposed sessions ≤ 2021 only)
 
