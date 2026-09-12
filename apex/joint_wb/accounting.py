@@ -35,7 +35,8 @@ def T_at(expiry_epoch: float, t_eval: float) -> float:
     return (expiry_epoch - t_eval) / CALENDAR_YEAR_S
 
 
-def price_paths(*, S, x_iv, x_sk, x_sp, x_sz, K: float, K_atm: float, right: str, expiry_epoch: float, t_eval: float) -> dict:
+def price_paths(*, S, x_iv, x_sk, x_sp, x_sz, K: float, K_atm: float, right: str, expiry_epoch: float, t_eval: float,
+                size_floor: bool = True) -> dict:
     """Vectorized state -> (mid, bid, size) with the declared RANGE guards; `log iv_K` may be negative."""
     T = T_at(expiry_epoch, t_eval)
     S = np.asarray(S, dtype=float)
@@ -49,11 +50,14 @@ def price_paths(*, S, x_iv, x_sk, x_sp, x_sz, K: float, K_atm: float, right: str
     iv = np.exp(log_iv)
     mid = bsm_price_vec(S, K, T, iv, r=0.0, q=0.0, right=right)
     sp = np.exp(np.asarray(x_sp, dtype=float))
-    sz = np.maximum(0.0, np.exp(np.asarray(x_sz, dtype=float)) - 1.0)
+    raw_sz = np.exp(np.asarray(x_sz, dtype=float)) - 1.0
+    # with the floor REMOVED (adverse scenario), a negative implied size means UNAVAILABLE — never a negative
+    # executable size
+    sz = np.maximum(0.0, raw_sz) if size_floor else np.where(raw_sz < 0.0, -1.0, raw_sz)
     if not (np.all(np.isfinite(mid)) and np.all(np.isfinite(sp)) and np.all(np.isfinite(sz))):
         return {"unpriceable": ~(np.isfinite(mid) & np.isfinite(sp) & np.isfinite(sz)), "why": "NONFINITE_PRICE_STATE", "T": T}
     return {"unpriceable": np.zeros(len(S), dtype=bool), "mid": mid, "bid": mid * (1.0 - sp / 2.0), "size": sz,
-            "iv": iv, "spread_rel": sp, "T": T}
+            "iv": iv, "spread_rel": sp, "T": T, "size_floor": size_floor}
 
 
 def account(*, primary: dict, extension: dict | None, entry_ask: float, fees_in: float, fees_out: float,

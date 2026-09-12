@@ -88,10 +88,16 @@ def decide(*, ranked: list, veto_eval=None, comparator: str = "JOINT", eligibili
             return {"decision": "WAIT", "why": why, "selected": best["label"], "trace": trace}
 
     # rule 3: adverse scenarios (ablations are recorded, never gates)
-    r3 = {"pass": True, "scenarios": (adverse or {}).get("scenarios", {}), "ablations_recorded_not_gates": (adverse or {}).get("ablations", {})}
+    a = adverse or {}
+    r3 = {"pass": True, "scenarios": a.get("scenarios", {}), "parameters": a.get("parameters", {}),
+          "registered": a.get("registered", []), "complete": a.get("complete"),
+          "ablations_recorded_not_gates": a.get("ablations", {}),
+          "rule": "every registered adverse scenario is evaluated independently; a missing or non-positive value FAILS"}
     for name, val in r3["scenarios"].items():
-        if val is not None and not val > 0:
+        if val is None or not val > 0:                       # a scenario that could not be evaluated cannot pass
             r3["pass"] = False; r3["first_failure"] = name; break
+    if r3["registered"] and not set(r3["registered"]) <= set(r3["scenarios"]):
+        r3["pass"] = False; r3["first_failure"] = "REGISTRY_INCOMPLETE"
     trace["rules"]["3"] = r3
     if not r3["pass"]:
         return {"decision": "WAIT", "why": "NOT_ROBUST_TO_ASSUMPTIONS:%s" % r3["first_failure"], "selected": best["label"], "trace": trace}

@@ -64,6 +64,15 @@ def _fitted(*, n_sessions=30, seed=5, A=A_TRUE):
     return MDL.fit(built, cutoff_epoch=max(r["available_deadline"] for r in rows) + 1.0, label="fixture")
 
 
+def _certified(approved=True, why=None):
+    """A stand-in for the BOUNDARY's certified authority. The engine validates provenance; it never self-attests."""
+    from apex.options_pilot.risk_authority import AUTHORITY_ID, CERTIFIED_PROVENANCE
+    def fn(proposal):
+        return {"approved": approved, "risk_provenance": CERTIFIED_PROVENANCE, "authority_id": AUTHORITY_ID,
+                "why": why, "certificate": {"risk_class": "DEFINED_MAX_LOSS"}}
+    return fn
+
+
 def _engine(*, comparator="JOINT", n_paths=600, seed=11):
     e = ENG.JointEngine(n_paths=n_paths, seed=seed, comparator=comparator)
     e.attach(_fitted(), permission=SW.permission())
@@ -73,10 +82,11 @@ def _engine(*, comparator="JOINT", n_paths=600, seed=11):
 _MISSING = object()
 
 
-def _decide(engine, *, ms=None, v_hat=1e-6, drift=0.0, book=_MISSING, h=None):
+def _decide(engine, *, ms=None, v_hat=1e-6, drift=0.0, book=_MISSING, h=None, scan_id="SCAN-1", risk=_MISSING):
     return engine.decide(market_state=ms if ms is not None else _state(),
                          variance_state={"kind": "FLAT", "h": h or 1e-6 / 15.0},
                          v_hat=v_hat, nu=None, drift_per_bar=drift, fee_schedule=SYNTHETIC_FEES,
+                         scan_id=scan_id, certified_risk_fn=(_certified() if risk is _MISSING else risk),
                          book_summary=({"integrity_problems": []} if book is _MISSING else book))
 
 
@@ -131,6 +141,7 @@ class TestInputsAndEndpoint:
         sel = EP.select_endpoint(qs, target_epoch=target, keys_required=tuple(keys))
         assert sel["t_e"] is None and sel["why"].startswith("ENDPOINT_NOT_COHERENT")
         qs[keys[0]].append({**q[keys[0]], "timestamp_epoch": target + 15.0, "available_time": target + 16.0})
+        qs[keys[1]][0]["available_time"] = target + 20.0          # available AT the instant, not after it
         sel2 = EP.select_endpoint(qs, target_epoch=target, keys_required=tuple(keys))
         assert sel2["t_e"] == target + 20.0 and sel2["slice_dispersion_s"] == 5.0
 
@@ -601,8 +612,8 @@ class TestEngineIdentities:
         assert max(abs(vals["JOINT"][k] - vals["C_DIAG"][k]) for k in vals["JOINT"]) < 1e-3
 
     def test_T17_deterministic_reconstruction(self):
-        a = _decide(_engine(n_paths=200, seed=3))
-        b = _decide(_engine(n_paths=200, seed=3))
+        a = _decide(_engine(n_paths=200, seed=3), scan_id="S-A")
+        b = _decide(_engine(n_paths=200, seed=3), scan_id="S-A")
         assert a["trace"]["selected"]["trace_digest"] == b["trace"]["selected"]["trace_digest"] if a["decision"] == "TRADE" else a["why"] == b["why"]
         assert json.dumps(a["trace"], default=str) == json.dumps(b["trace"], default=str)
 

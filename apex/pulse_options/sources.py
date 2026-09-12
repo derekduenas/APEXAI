@@ -142,7 +142,7 @@ class TwinSources:
                     quotes[key].update(indicative=True, source="QUOTE_PROVIDER")
         return quotes
 
-    def funnel_fn(self, symbol: str, as_of: float, forecast: dict, book_summary: dict | None = None) -> dict:
+    def funnel_fn(self, symbol: str, as_of: float, forecast: dict, book_summary: dict | None = None, **_ignored) -> dict:
         day = to_utc_string(as_of)[:10]
         day_start = datetime.fromisoformat(day + "T00:00:00+00:00").timestamp()
         if self._funnel_fitted_day.get(symbol) != day:
@@ -161,13 +161,16 @@ class TwinSources:
         res["engine"] = self.funnel_engine.describe()
         return res
 
-    def joint_fn(self, symbol: str, as_of: float, forecast: dict, book_summary: dict | None = None) -> dict:
+    def joint_fn(self, symbol: str, as_of: float, forecast: dict, book_summary: dict | None = None,
+                 certified_risk_fn=None, scan_id: str | None = None) -> dict:
         """R4 selection policy. The context callable supplies the market state and the variance inputs the
         contract requires; this object does not invent them."""
         ctx = self.joint_context_fn(symbol, as_of, forecast)
         res = self.joint_engine.decide(market_state=ctx["market_state"], variance_state=ctx["variance_state"],
                                        v_hat=ctx["v_hat"], nu=ctx.get("nu"), drift_per_bar=ctx.get("drift_per_bar", 0.0),
-                                       fee_schedule=self.fee_schedule, book_summary=book_summary, forecast=forecast)
+                                       fee_schedule=self.fee_schedule, book_summary=book_summary,
+                                       scan_id=scan_id or ctx.get("scan_id") or "%s:%.0f" % (symbol, as_of),
+                                       certified_risk_fn=certified_risk_fn, forecast=forecast)
         res["engine"] = self.joint_engine.describe()
         return res
 

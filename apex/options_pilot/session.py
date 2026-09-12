@@ -26,7 +26,7 @@ from . import ledger as L
 from .book import intent_finished
 from .clock import to_utc_string
 from .expression_rule import RuleRefused, choose
-from .records import INTENT_TTL_S, assert_prospective
+from .records import INTENT_TTL_S, assert_prospective, canonical_hash
 
 PROTOCOL_ID = "OPTIONS-PILOT-001"
 
@@ -223,8 +223,28 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
         ids["forecast_id"] = f_receipt["forecast_id"]; ids["receipts"]["forecast"] = f_receipt
         if funnel_fn is not None:
             # 2a. THE FUNNEL: every layer decides together; the engine's trace is persisted before any intent
+            def _certified_risk(proposal: dict) -> dict:
+                """The BOUNDARY's own certified authority answers, against the real Book. A selection engine never
+                attests its own risk approval; the kernel re-checks again at intent commit."""
+                from .records import contract_id as _cid
+                from .risk_authority import CERTIFIED_PROVENANCE as _CP, envelope_for as _env
+                env = _env(reference_ask=proposal.get("reference_ask"), quantity=1)
+                c = proposal.get("contract") or {}
+                body = {"expression": proposal.get("expression"), "contract": c, "quantity": proposal.get("quantity", 1),
+                        "risk_envelope": env, "action": "BUY", "session_id": bd.session_id, "scan_id": scan_id,
+                        "contract_id": _cid(c) if c else None,
+                        "intent_id": "PRESELECTION:%s" % canonical_hash({"scan_id": scan_id, "contract": c})[:16],
+                        "signal_used": ("LONG" if (proposal.get("expression") == "LONG_CALL") else "SHORT")}
+                try:
+                    approval = bd.risk.approve(body, book=bd.book())
+                except Exception as e:                                     # noqa: BLE001 - a refusal is an answer
+                    return {"approved": False, "risk_provenance": _CP, "authority_id": getattr(bd.risk, "authority_id", None),
+                            "why": "RISK_AUTHORITY_REFUSED: %s: %s" % (type(e).__name__, str(e)[:160])}
+                return {**approval, "envelope": env, "book_state_hash": bd.book().state_hash()}
+
             try:
-                res = funnel_fn(symbol, as_of, forecast, book_summary=bd.book().summary())
+                res = funnel_fn(symbol, as_of, forecast, book_summary=bd.book().summary(),
+                                certified_risk_fn=_certified_risk, scan_id=scan_id)
             except Exception as e:                                         # noqa: BLE001
                 bd.refuse("funnel", "FUNNEL_PROVIDER_FAILED: %s: %s" % (type(e).__name__, str(e)[:300]), scan_id=scan_id)
             if not isinstance(res, dict) or res.get("decision") not in ("TRADE", "WAIT") or "trace" not in res:

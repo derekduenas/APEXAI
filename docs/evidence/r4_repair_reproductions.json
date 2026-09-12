@@ -1,0 +1,112 @@
+{
+ "candidate": "1ffd217b314d8bae68d3ae6f486258b240d69187",
+ "contract_blob": "902256e3c3c5025a450a4bb607410933bb0c4b25",
+ "reproduced": 12,
+ "total": 12,
+ "findings": {
+  "F1_rule3_stub": {
+   "reproduced": true,
+   "detail": {
+    "scenarios_recorded": [
+     "BASE"
+    ],
+    "expected": [
+     "truncation_0.999",
+     "truncation_0.99999",
+     "spread_x1.5",
+     "extension_x1.5",
+     "a_iv_minus_1se",
+     "size_floor_removed"
+    ]
+   }
+  },
+  "F2_self_attested_risk": {
+   "reproduced": true,
+   "detail": {
+    "line": [
+     "risk_decision={\"approved\": True, \"kind\": \"PRELIMINARY_AFFORDABILITY\"},"
+    ]
+   }
+  },
+  "F3_gaussian_claim": {
+   "reproduced": true,
+   "detail": {
+    "line": [
+     "density={\"family\": \"GAUSSIAN\", \"location\": float(r.mean()), \"variance\": float(r.var())},"
+    ],
+    "underlying": "truncated-t / GARCH ensemble"
+   }
+  },
+  "F4_endpoint_lookahead": {
+   "reproduced": true,
+   "detail": {
+    "t_e": 1789053300.0,
+    "available_time": 1789053330.0,
+    "why": "a quote available only after the selected instant was used to select it"
+   }
+  },
+  "F5_not_using_lookup_at": {
+   "reproduced": true,
+   "detail": {
+    "uses": "rows[-1]",
+    "registered": "lookup_at"
+   }
+  },
+  "F6_execution_quote_age": {
+   "reproduced": true,
+   "detail": {
+    "quote_age_s": 100.0,
+    "execution_limit_s": 15.0,
+    "decision": "TRADE",
+    "eligible": 6
+   }
+  },
+  "F7_skew_ignores_frozen_source": {
+   "reproduced": true,
+   "detail": {
+    "atm_source": "BOTH",
+    "k_minus_rights_used": "PUT only",
+    "x_sk": -0.3501173976141333,
+    "expected": "IV_SOURCE_CHANGED / incomplete"
+   }
+  },
+  "F8_truncated_pin": {
+   "reproduced": true,
+   "detail": {
+    "state_pin": "902256e3",
+    "full": "902256e3c3c5025a450a4bb607410933bb0c4b25"
+   }
+  },
+  "F9_seed_from_mutable_counter": {
+   "reproduced": true,
+   "detail": {
+    "seed_call1": 1198767,
+    "seed_call2": 1198768,
+    "source": "self.decisions increments per call"
+   }
+  },
+  "F10_brier_wrong_quantity": {
+   "reproduced": true,
+   "detail": {
+    "used": "P(simulated exit bid > 0)",
+    "required": "modelled availability under the path-accounting rule"
+   }
+  },
+  "F11_attach_accepts_any_permission": {
+   "reproduced": true,
+   "detail": {
+    "permission_passed": {
+     "anything": true
+    },
+    "status": "READY"
+   }
+  },
+  "F12_T11_conflict_open": {
+   "reproduced": true,
+   "detail": {
+    "contract": "T11a/T11b require Sigma == 0",
+    "production": "COVARIANCE_NOT_PD refuses it"
+   }
+  }
+ }
+}

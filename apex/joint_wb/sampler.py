@@ -78,13 +78,14 @@ def blocks_from_sigma(sigma: np.ndarray) -> dict:
             "L11": np.linalg.cholesky(s11), "L22": np.linalg.cholesky(s22), "LC": np.linalg.cholesky(c)}
 
 
-def pregenerate(*, sigma: np.ndarray, n_paths: int, seed: int) -> dict:
-    """ALL option-state randomness for one scan, drawn before any candidate is evaluated (§3.2)."""
+def pregenerate(*, sigma: np.ndarray, n_paths: int, seed: int, trunc_q: float = TRUNCATION_Q) -> dict:
+    """ALL option-state randomness for one scan, drawn before any candidate is evaluated (§3.2).
+    `trunc_q` is the declared truncation quantile; the adverse scenarios of §5.3 rule 3 vary it explicitly."""
     b = blocks_from_sigma(sigma)
     rng = np.random.default_rng(seed)
     base = {}
     for tag in ("horizon", "extension"):
-        base[tag] = {"w1": draw_base(rng, n=n_paths, d=2), "w2": draw_base(rng, n=n_paths, d=2)}
+        base[tag] = {"w1": draw_base(rng, n=n_paths, d=2, q=trunc_q), "w2": draw_base(rng, n=n_paths, d=2, q=trunc_q)}
     out = {"blocks": b, "seed": seed, "n_paths": n_paths, "truncation": {}, "e": {}}
     for tag, bb in base.items():
         w1, w2 = bb["w1"]["w"], bb["w2"]["w"]
@@ -92,7 +93,7 @@ def pregenerate(*, sigma: np.ndarray, n_paths: int, seed: int) -> dict:
         out["e"][tag] = {"e1": e1, "e2_joint": e1 @ b["M"].T + w2 @ b["LC"].T, "e2_diag": w2 @ b["L22"].T,
                          "w1": w1, "w2": w2}
         out["truncation"][tag] = {k: {kk: bb[k][kk] for kk in ("c2", "kappa", "rejected", "accepted_mass", "d")} for k in ("w1", "w2")}
-    out["M"], out["C"] = b["M"], b["C"]
+    out["M"], out["C"], out["trunc_q"] = b["M"], b["C"], trunc_q
     out["compound_label"] = COMPOUND_LABEL
     return out
 

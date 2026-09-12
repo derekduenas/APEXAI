@@ -60,32 +60,55 @@ def select_endpoint(quotes_by_key: dict, *, target_epoch: float, keys_required: 
 
     # candidate instants: the event times of required-key quotes, clipped to the window, earliest first
     cands = sorted({r[0] for k in keys_required for r in admissible[k]} | {target_epoch})
+    sane = {k: [r[1] for r in v] for k, v in admissible.items()}
     for t in cands:
         if t < target_epoch or t > target_epoch + delta_max_s:
             continue
-        chosen, ok = {}, True
+        # SELECTION uses ONLY what was available AT t: event_time <= t AND available_time <= t. A quote that
+        # arrives after t cannot participate in choosing t (no look-ahead). The registered deadline is a SEPARATE,
+        # later check applied once t_e is fixed.
+        chosen, ok, ambiguous = {}, True, None
         for key in keys_required:
-            rows = [r for r in admissible[key] if r[0] <= t and r[1].get("available_time", r[0]) <= t + AVAILABILITY_DEADLINE_S]
-            if not rows:
+            look = lookup_at(sane[key], instant=t, key=key)          # the registered deterministic lookup (§1.5)
+            if look["quote"] is None:
+                if look["why"].startswith("ENDPOINT_AMBIGUOUS"):
+                    ambiguous = look["why"]
                 ok = False; break
-            chosen[key] = rows[-1]                                  # latest event_time <= t (§1.5)
+            chosen[key] = look["quote"]
+        if ambiguous:
+            return {"t_e": None, "excluded": True, "why": ambiguous, "census": census, "estimand": ESTIMAND_LABEL}
         if not ok:
             continue
-        ev = [r[0] for r in chosen.values()]
+        ev = [q["timestamp_epoch"] for q in chosen.values()]
         if max(ev) - min(ev) > coherence_s:
             continue
         for key in keys_optional:
-            rows = [r for r in admissible.get(key, []) if r[0] <= t and r[1].get("available_time", r[0]) <= t + AVAILABILITY_DEADLINE_S]
-            if rows and max(max(ev), rows[-1][0]) - min(min(ev), rows[-1][0]) <= coherence_s:
-                chosen[key] = rows[-1]
-        offsets = {str(k): round(r[0] - target_epoch, 6) for k, r in chosen.items()}
-        lags = {str(k): round(r[1].get("available_time", r[0]) - r[0], 6) for k, r in chosen.items()}
-        evs = [r[0] for r in chosen.values()]
-        return {"t_e": t, "excluded": False, "delta_s": round(t - target_epoch, 6), "quotes": {k: r[2] for k, r in chosen.items()},
-                "raw": {k: r[1] for k, r in chosen.items()}, "offsets_s": offsets, "receipt_lags_s": lags,
+            look = lookup_at(sane.get(key, []), instant=t, key=key)
+            if look["quote"] is not None:
+                e2 = look["quote"]["timestamp_epoch"]
+                if max(max(ev), e2) - min(min(ev), e2) <= coherence_s:
+                    chosen[key] = look["quote"]
+        # registered endpoint deadline, applied AFTER the instant is chosen (§1.4)
+        late = {str(k): q.get("available_time", q["timestamp_epoch"]) - (t + AVAILABILITY_DEADLINE_S)
+                for k, q in chosen.items() if q.get("available_time", q["timestamp_epoch"]) > t + AVAILABILITY_DEADLINE_S}
+        if late:
+            return {"t_e": None, "excluded": True, "why": "ENDPOINT_AVAILABILITY_DEADLINE_EXCEEDED: %s" % late,
+                    "census": census, "estimand": ESTIMAND_LABEL}
+        offsets = {str(k): round(q["timestamp_epoch"] - target_epoch, 6) for k, q in chosen.items()}
+        lags = {str(k): round(q.get("available_time", q["timestamp_epoch"]) - q["timestamp_epoch"], 6) for k, q in chosen.items()}
+        evs = [q["timestamp_epoch"] for q in chosen.values()]
+        sanitized = {}
+        for k, q in chosen.items():
+            for et, raw, sq in admissible[k]:
+                if raw is q:
+                    sanitized[k] = sq; break
+        return {"t_e": t, "excluded": False, "delta_s": round(t - target_epoch, 6), "quotes": sanitized,
+                "raw": dict(chosen), "offsets_s": offsets, "receipt_lags_s": lags,
                 "slice_dispersion_s": round(max(evs) - min(evs), 6), "max_abs_offset_s": round(max(abs(v) for v in offsets.values()), 6),
                 "mean_offset_s": round(sum(offsets.values()) / len(offsets), 6), "census": census,
                 "estimand": ESTIMAND_LABEL, "tight_sensitivity_eligible": max(abs(v) for v in offsets.values()) <= TIGHT_OFFSET_S,
+                "selection_rule": "SELECTION: event_time <= t AND available_time <= t (no look-ahead); DEADLINE: available_time <= t_e + %.0f s"
+                                  % AVAILABILITY_DEADLINE_S,
                 "keys_missing_optional": [str(k) for k in keys_optional if k not in chosen]}
     return {"t_e": None, "excluded": True, "why": "ENDPOINT_NOT_COHERENT: no jointly coherent instant in the window",
             "census": census, "estimand": ESTIMAND_LABEL}

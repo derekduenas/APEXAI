@@ -21,7 +21,9 @@ UNDERLYING_PAIR_MAX_S = 5.0          # contemporaneous underlying reference for 
 SPOT_ASYNC_GAP_MAX = 0.002
 BAR_MAX_AGE_S = 120.0
 NBBO_MAX_AGE_S = 15.0
-QUOTE_MAX_AGE_S = 120.0              # indicative
+QUOTE_MAX_AGE_S = 120.0              # INDICATIVE age (ranking, reporting)
+EXECUTION_MAX_AGE_S = 15.0           # EXECUTABLE age at the decision boundary: only these may produce an intent
+CONTRACT_PIN = "902256e3c3c5025a450a4bb607410933bb0c4b25"
 
 
 class StateRefused(ValueError):
@@ -104,31 +106,38 @@ def atm_iv(*, quotes: dict, identity: dict, underlyings: list, T_years: float, i
     return {"iv": sum(out[r] for r in need) / len(need), "iv_source": src, "by_right": per, "why": None}
 
 
-def slice_skew(*, quotes: dict, identity: dict, underlyings: list, T_years: float) -> dict:
-    """x_sk = [log iv(K_-) - log iv(K_+)] / log(K_-/K_+), anchor-free (§2.1)."""
+def slice_skew(*, quotes: dict, identity: dict, underlyings: list, T_years: float, iv_source: str) -> dict:
+    """x_sk = [log iv(K_-) - log iv(K_+)] / log(K_-/K_+), anchor-free (§2.1), computed with the FROZEN aggregation
+    source. A leg that cannot supply exactly those rights is IV_SOURCE_CHANGED, never silently averaged over a
+    different set — a call-to-put switch is not a market move (§1.4)."""
     if not identity["skew_available"]:
         return {"x_sk": None, "why": "SKEW_STRIKES_NOT_DISTINCT"}
+    need = {"BOTH": ("CALL", "PUT"), "CALL_ONLY": ("CALL",), "PUT_ONLY": ("PUT",)}.get(iv_source)
+    if need is None:
+        return {"x_sk": None, "why": "IV_SOURCE_UNDECLARED"}
     ivs = {}
     for label, k in (("minus", identity["K_minus"]), ("plus", identity["K_plus"])):
         vals = []
-        for right in ("CALL", "PUT"):
+        for right in need:
             q = quotes.get((identity["expiration"], k, right))
             if q is None or not q.get("usable_for_iv", q["bid"] > 0):
-                continue
+                return {"x_sk": None, "why": "IV_SOURCE_CHANGED: leg %s cannot supply %s under frozen source %s"
+                                             % (label, right, iv_source)}
             ref = underlying_reference(underlyings, at=q["timestamp_epoch"])
             if ref is None:
-                continue
+                return {"x_sk": None, "why": "IV_SOURCE_CHANGED: leg %s %s has NO_CONTEMPORANEOUS_UNDERLYING" % (label, right)}
             try:
                 vals.append(implied_vol(price=q["mid"], S=ref["value"], K=k, T=T_years, right=right)["iv"])
-            except PricingRefused:
-                pass
-        if not vals:
+            except PricingRefused as e:
+                return {"x_sk": None, "why": "SKEW_LEG_REFUSED:%s %s (%s)" % (label, right, str(e)[:50])}
+        if len(vals) != len(need):
             return {"x_sk": None, "why": "SKEW_LEG_MISSING:%s" % label}
         ivs[label] = sum(vals) / len(vals)
     denom = math.log(identity["K_minus"] / identity["K_plus"])
     if not math.isfinite(denom) or denom == 0:
         return {"x_sk": None, "why": "SKEW_DENOMINATOR_INVALID"}
-    return {"x_sk": (math.log(ivs["minus"]) - math.log(ivs["plus"])) / denom, "iv_minus": ivs["minus"], "iv_plus": ivs["plus"], "why": None}
+    return {"x_sk": (math.log(ivs["minus"]) - math.log(ivs["plus"])) / denom, "iv_minus": ivs["minus"],
+            "iv_plus": ivs["plus"], "iv_source": iv_source, "why": None}
 
 
 def compose(*, symbol: str, t_d: float, bars: list, underlyings: list, chain: list, raw_quotes: dict,
@@ -161,8 +170,14 @@ def compose(*, symbol: str, t_d: float, bars: list, underlyings: list, chain: li
             sq = sanitize_quote(q, now=t_d, max_age_s=quote_max_age_s)
         except PricingRefused as e:
             rejected[str(key)] = str(e); continue
-        valid[(key[0], float(key[1]), key[2])] = {**sq, "timestamp_epoch": q["timestamp_epoch"],
-                                                  "available_time": q.get("available_time", q["timestamp_epoch"])}
+        age = t_d - q["timestamp_epoch"]
+        valid[(key[0], float(key[1]), key[2])] = {
+            **sq, "timestamp_epoch": q["timestamp_epoch"], "available_time": q.get("available_time", q["timestamp_epoch"]),
+            "age_s": age, "indicative_ok": True,
+            "executable": bool(age <= EXECUTION_MAX_AGE_S),
+            "freshness_decision": ("EXECUTABLE: age %.3fs <= %.0fs" % (age, EXECUTION_MAX_AGE_S) if age <= EXECUTION_MAX_AGE_S
+                                   else "INDICATIVE_ONLY: age %.3fs > %.0fs execution limit; may be ranked, may NOT produce an intent"
+                                        % (age, EXECUTION_MAX_AGE_S))}
     if not valid:
         raise StateRefused("NO_VALID_QUOTE: %d rejected (%s)" % (len(rejected), sorted(set(rejected.values()))[:3]))
 
@@ -173,18 +188,19 @@ def compose(*, symbol: str, t_d: float, bars: list, underlyings: list, chain: li
     a = atm_iv(quotes=valid, identity=ident, underlyings=underlyings, T_years=T_entry, iv_source=iv_source)
     if a["iv"] is None:
         raise StateRefused("ATM_IV_UNAVAILABLE: %s" % (a.get("why") or a["by_right"]))
-    sk = slice_skew(quotes=valid, identity=ident, underlyings=underlyings, T_years=T_entry)
+    ident = {**ident, "iv_source": a["iv_source"]}          # the aggregation source is FROZEN on the identity
+    sk = slice_skew(quotes=valid, identity=ident, underlyings=underlyings, T_years=T_entry, iv_source=ident["iv_source"])
     qa = valid.get((ident["expiration"], ident["K_atm"], "CALL")) or valid.get((ident["expiration"], ident["K_atm"], "PUT"))
     sp_obs = qa["spread"] / qa["mid"] if qa["mid"] > 0 else None
     if sp_obs is None or not math.isfinite(sp_obs) or sp_obs < 0:
         raise StateRefused("SPREAD_INVALID: %r" % (sp_obs,))
     floored = sp_obs < SPREAD_FLOOR
     sz = float(min(qa["bid_size"], qa["ask_size"]))
-    body = {"kind": "market_state", "symbol": symbol, "t_d": t_d, "contract_pin": "902256e3",
+    body = {"kind": "market_state", "symbol": symbol, "t_d": t_d, "contract_pin": CONTRACT_PIN,
             "S_0": {"value": S_0, "event_time": last["event_time"], "available_time": last["available_time"],
                     "source": last["source"], "age_s": t_d - last["event_time"], "quality": last["quality"]},
             "S_nbbo": ({"value": S_nbbo} if S_nbbo else None), "spot_async_gap": gap,
-            "identity": {k: ident[k] for k in ("expiration", "expiry_epoch", "K_atm", "K_minus", "K_plus", "skew_available", "rule")},
+            "identity": {k: ident[k] for k in ("expiration", "expiry_epoch", "K_atm", "K_minus", "K_plus", "skew_available", "rule", "iv_source")},
             "T_entry_years": T_entry, "T_exit_years": (ident["expiry_epoch"] - (t_d + 900.0)) / CALENDAR_YEAR_S,
             "x_iv": math.log(a["iv"]), "iv_atm": a["iv"], "iv_source": a["iv_source"], "iv_by_right": a["by_right"],
             "x_sk": sk["x_sk"], "skew_why": sk.get("why"), "skew_quality": ("VALID" if sk["x_sk"] is not None else "MISSING"),

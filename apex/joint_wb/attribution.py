@@ -102,7 +102,8 @@ def economics(scans: list, comparator: str, *, seed: int = 11, draws: int = 2000
 
 
 def forecast_quality(rows: list, comparators: list, *, seed: int = 11, draws: int = 2000) -> dict:
-    """rows: [{session, contract, realized:{bid, executable}, samples:{comparator: array|None}}].
+    """rows: [{session, contract, realized:{bid, executable}, samples:{comparator: array|None},
+    availability:{comparator: modelled FAILURE rate from PATH_ACCOUNTING_V1}}].
     A contract leaves the scored population for ALL comparators when ANY comparator produced no distribution."""
     exclusions, scored, censored = {}, [], 0
     for r in rows:
@@ -140,9 +141,19 @@ def forecast_quality(rows: list, comparators: list, *, seed: int = 11, draws: in
             "crps": boot, "rank_uniformity": (rank_uniformity(ranks, n_ensemble=len(scored[0]["samples"][c])) if scored else None),
             "unexecutable_scored_at_observed_bid": unexec,
             "exclusion_sensitivity_observed_worst": ({"value": worst, "label": SENSITIVITY_LABEL} if exclusions else None)}
-    if scored and any(r["realized"].get("executable") is not None for r in scored):
-        for c in comparators:
-            p = [float(np.mean(np.asarray(r["samples"][c]) > 0)) for r in scored]
-            o = [1.0 if r["realized"].get("executable", True) else 0.0 for r in scored]
-            out["per_comparator"][c]["executability_brier"] = brier(p, o)
+    for c in comparators:
+        rows_with_p = [r for r in scored if (r.get("availability") or {}).get(c) is not None
+                       and r["realized"].get("executable") is not None]
+        if not rows_with_p:
+            out["per_comparator"][c]["executability_brier"] = {
+                "unavailable": ("MODELLED_AVAILABILITY_NOT_SUPPLIED: the executability probability must come from the "
+                                "path-accounting rule (bid/size achievability under the selected size policy and the "
+                                "endpoint rules), not from the price sample")}
+            continue
+        p = [1.0 - float(r["availability"][c]) for r in rows_with_p]      # availability = 1 - failure rate
+        o = [1.0 if r["realized"]["executable"] else 0.0 for r in rows_with_p]
+        out["per_comparator"][c]["executability_brier"] = {
+            **brier(p, o), "probability_source": ("PATH_ACCOUNTING_V1 MODEL_CONDITIONAL_AVAILABILITY under the "
+                                                  "selected size policy and the endpoint rules"),
+            "n_rows_with_modelled_availability": len(rows_with_p)}
     return out

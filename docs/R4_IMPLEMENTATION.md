@@ -1,4 +1,6 @@
-# R4 implementation r1 — synthetic only, against contract blob `902256e3`
+# R4 implementation — synthetic only, against contract blob `902256e3…`
+
+**r2 (this branch) repairs the twelve findings raised against r1 `1ffd217b`; see the table at the end.**
 
 Status: `IMPLEMENTED_SYNTHETIC_VERIFIED` on branch `r4-implementation`, based on contract commit
 `0ce431afe4ac9e3873397b25832a372f3ff22373`. Contract blob verified `902256e3c3c5025a450a4bb607410933bb0c4b25`
@@ -113,3 +115,47 @@ Retained files and journal only. The unit exited cleanly: `Result=success`, `Exe
 collection of two healthy endpoints for the rest of the day. A per-endpoint counter with bounded retry and backoff
 would have ridden it out. That is a change to the collector's stop policy and is NOT made here; restarting remains
 a separate decision.
+
+
+---
+
+# r2 — bounded repair of the twelve findings against `1ffd217b`
+
+Branch `r4-repair-r2`, based on `1ffd217b314d8bae68d3ae6f486258b240d69187`. The contract file is UNCHANGED:
+blob `902256e3c3c5025a450a4bb607410933bb0c4b25` before and after. Every finding was REPRODUCED first and the
+fixtures saved to `docs/evidence/r4_repair_reproductions.json` (12/12 reproduced); re-running the same probes
+against the repaired code gives `docs/evidence/r4_repair_after.json` (1/12 remaining, the contract conflict).
+
+| # | Finding | Repair | Test |
+|---|---|---|---|
+| F1 | Rule 3 was a stub returning only `BASE`, so the gate passed trivially | all six registered scenarios are built and evaluated independently on the selected candidate, each recorded with its exact parameters; a missing or non-positive value FAILS the gate, and an incomplete registry fails it too | `TestF1AdverseScenarios` (3 tests, incl. failure→WAIT with the scenario named) |
+| F2 | `engine.py` manufactured `risk_decision={"approved": True}` | the engine constructs no approval. It requires a `certified_risk_fn` supplied by the BOUNDARY, validates `risk_provenance == CERTIFIED_KERNEL` and the authority id, and abstains otherwise. `session.scan` supplies the real `CertifiedRiskAuthority` against the real `Book`, with the full binding body; the kernel still re-checks at intent commit | `TestF2CertifiedRisk` (4 tests, incl. the fake-approval tripwire over four shapes) |
+| F3 | A Gaussian density was claimed from a simulated ensemble | the density is `EMPIRICAL_ENSEMBLE` with quantiles, an ensemble digest, the true underlying innovation family and the generating restrictions, plus the statement that it is a sample distribution and not a calibrated or fill probability | `TestF3ForecastDensity` (also under truncated-t innovations) |
+| F4 | Selection could use a quote available after the selected instant | selection admits only `event_time ≤ t` AND `available_time ≤ t`; the registered `t_e + 60 s` deadline is a separate, later check that can only exclude | `test_a_quote_available_after_t_cannot_select_t`, `test_deadline_is_a_separate_later_check` |
+| F5 | Selection used `rows[-1]`, so input order could decide | every key at `t_e` goes through the registered `lookup_at`; ambiguity surfaces as `ENDPOINT_AMBIGUOUS` | `test_selection_uses_the_registered_lookup_and_is_order_free`, `test_unresolved_ambiguity_is_named` |
+| F6 | Candidates used the 120 s indicative age to produce intents | quotes carry `age_s`, `executable`, `freshness_decision` and the receipt time. Only a quote ≤ 15 s old at the decision boundary may enter the ranked set; older ones are `INDICATIVE_ONLY`, reported but unable to produce an intent | `TestF6ExecutionFreshness` (14.9 s accepted, 15.1 s refused) |
+| F7 | `slice_skew` averaged whatever rights were present | the aggregation source is frozen on the identity and passed explicitly; a leg that cannot supply exactly those rights returns `IV_SOURCE_CHANGED` and the row is incomplete | `TestF7FrozenIVSource` (2 tests) |
+| F8 | The state recorded a truncated `"902256e3"` | the full 40-character blob everywhere, asserted absent-of-truncation across state, trace, proposal and engine description | `test_F8_full_pin_everywhere` |
+| F9 | The seed came from the mutable `self.decisions` | `scan_id` is required and the seed is `H(base_seed, scan_id)`; repeated identical scans are bit-identical, different scan ids are distinguishable and recorded, candidate permutation is bit-identical | `TestF9Reproducibility` (4 tests) |
+| F10 | Brier used `P(sample > 0)` | the probability comes from `PATH_ACCOUNTING_V1` modelled availability under the selected size policy; without it the score reports `MODELLED_AVAILABILITY_NOT_SUPPLIED` rather than substituting the price sample | `test_F10_brier_uses_modelled_availability_not_the_price_sample` |
+| F11 | `attach()` accepted any truthy permission | `validate_permission` requires the contract pin, a registered dataset and matching role, the use, the artefact, the run fields for a non-synthetic dataset, and parameter provenance on the fit; it also records the CR1 SE used by adverse scenario 5 | `TestF11Authorization` (4 tests) |
+| F12 | T11 contract conflict | NOT closed in code. No degenerate production path was added. A separate amendment draft is carried in `docs/R4_AMENDMENT_DRAFT_T11.md`; the contract and its hash are untouched | `test_T11_contract_conflict_sigma_exactly_zero_is_unreachable` |
+
+## r2 evidence (builder-reported)
+
+- Focused: `tests/test_joint_wb.py` 43 passed, `tests/test_joint_wb_repairs.py` 26 passed — **69**.
+- Regression across every touched suite: **272 passed** (adds the funnel, pilot boundary/entrypoint/accounting/
+  operator-view, twin, multiverse, worldmodel, decision, backtest and Robinhood suites).
+- Registered scale, `docs/evidence/r4_scale_synthetic_r2.json`: at 4,000 paths a decision now takes a median of
+  **0.447 s** (min 0.305, max 0.556) against 0.121 s in r1, because each decision additionally builds and prices
+  six adverse scenarios, four of which rebuild the state paths. Python traced peak **6.9 MiB**, process max RSS
+  **95.6 MiB**.
+- One caller-contract change: `session.scan` now passes `certified_risk_fn` and `scan_id` to any funnel callable,
+  so the `FULL_FUNNEL` test doubles were updated to accept them. `TwinSources.funnel_fn` already tolerated extras.
+
+## What r2 did NOT touch
+
+No historical data, no collector read, no fitting on real data, no backtest, no admission request, no service
+activation, no deployment, no risk-limit change, no broker call, no paper order. The collector remains stopped and
+its retry/backoff policy is deliberately NOT changed here: that is an operational change and does not belong in a
+model repair.

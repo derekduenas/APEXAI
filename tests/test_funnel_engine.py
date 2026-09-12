@@ -297,8 +297,9 @@ PROPOSAL = {"expression": "LONG_CALL", "action": "BUY", "contract": CONTRACT, "q
 
 
 def _funnel_stub(decision, proposal=None, why="stub", rule_id=FUNNEL_RULE_ID):
-    def fn(symbol, as_of, forecast, book_summary=None):
+    def fn(symbol, as_of, forecast, book_summary=None, certified_risk_fn=None, scan_id=None, **_kw):
         assert book_summary is not None and "integrity_problems" in book_summary                # the session passes the real book summary
+        assert callable(certified_risk_fn) and scan_id, "the session supplies the certified risk callable and the scan key"
         return {"decision": decision, "why": why, "proposal": proposal, "rule_id": rule_id,
                 "trace": {"engine": "STUB", "regime": {"probabilities": [0.7, 0.3], "abstain": False}, "variance": {"model": "GARCH-t (stub)"},
                           "simulation": {"n_paths": 10, "restrictions": ["IV held fixed"]},
@@ -353,11 +354,11 @@ class TestSessionWiring:
     def test_funnel_failure_and_malformed_result_fail_closed(self, tmp_path):
         led, h, bd = _session(tmp_path)
 
-        def boom(symbol, as_of, forecast, book_summary=None):
+        def boom(symbol, as_of, forecast, book_summary=None, **_kw):
             raise RuntimeError("engine exploded")
         d = _scan(h, bd, boom)
         assert d["decision"] == "REFUSE" and "FUNNEL_PROVIDER_FAILED" in d["why"] and d["refusal_persisted"] is True
-        d2 = _scan(h, bd, lambda s, t, f, book_summary=None: {"decision": "MAYBE"}, seq=2)
+        d2 = _scan(h, bd, lambda s, t, f, book_summary=None, **_kw: {"decision": "MAYBE"}, seq=2)
         assert d2["decision"] == "REFUSE" and "FUNNEL_RESULT_MALFORMED" in d2["why"]
 
     def test_proposal_disagreeing_with_a_labelled_forecast_is_refused_by_the_record(self, tmp_path):
