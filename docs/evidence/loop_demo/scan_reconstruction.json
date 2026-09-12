@@ -1,0 +1,194 @@
+{
+ "kind": "LOOP_SCAN_RECONSTRUCTION",
+ "source": "docs/evidence/loop_demo/REPLAY_QUARANTINED_PILOT_RULE_V2.jsonl (persisted ledger only)",
+ "fill": {
+  "committed_utc": "2026-09-11T13:30:23.096973Z",
+  "committed_epoch": 1789133423.0969734,
+  "debit": 495.0,
+  "exit_due_utc": "2026-09-11T13:45:23.096973Z",
+  "window_close_utc": "2026-09-11T13:47:23.096973Z",
+  "max_attempts": 5,
+  "policy": "EXIT_AT_HORIZON_15M_V1"
+ },
+ "outcome": {
+  "status": "RESOLVED",
+  "attempt": 1,
+  "exit_price": 4.73,
+  "recorded_at_clock_utc": null,
+  "pnl": -22.09
+ },
+ "scans": [
+  {
+   "scan": 1,
+   "decided_utc": "2026-09-11T13:30:23.096973Z",
+   "decision": "TRADE",
+   "why": "",
+   "exit_due_by_now": false,
+   "exit_window_closed_by_now": false,
+   "seconds_past_due": -900.0,
+   "position_open_at_this_scan": false,
+   "reserved_or_open_exposure_usd": 0.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "no open position"
+  },
+  {
+   "scan": 2,
+   "decided_utc": "2026-09-11T13:45:22.389474Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": false,
+   "exit_window_closed_by_now": false,
+   "seconds_past_due": -0.707,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 3,
+   "decided_utc": "2026-09-11T14:00:22.956769Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 899.86,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 4,
+   "decided_utc": "2026-09-11T14:15:22.793569Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 1799.697,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 5,
+   "decided_utc": "2026-09-11T14:30:23.428577Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 2700.332,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 6,
+   "decided_utc": "2026-09-11T14:45:23.217055Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 3600.12,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 7,
+   "decided_utc": "2026-09-11T15:00:23.565820Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 4500.469,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 8,
+   "decided_utc": "2026-09-11T15:15:23.639687Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 5400.543,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 9,
+   "decided_utc": "2026-09-11T15:30:24.010899Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 6300.914,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 10,
+   "decided_utc": "2026-09-11T15:45:24.137967Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 7201.041,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 11,
+   "decided_utc": "2026-09-11T16:00:24.599869Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 8101.503,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  },
+  {
+   "scan": 12,
+   "decided_utc": "2026-09-11T16:15:24.606100Z",
+   "decision": "REFUSE",
+   "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+   "exit_due_by_now": true,
+   "exit_window_closed_by_now": true,
+   "seconds_past_due": 9001.509,
+   "position_open_at_this_scan": true,
+   "reserved_or_open_exposure_usd": 495.0,
+   "housekeeping_ran_before_this_scan": false,
+   "risk_inputs_checked": "same_underlying_risk 495 open + 500 new = 995 > 600 cap"
+  }
+ ],
+ "finding": {
+  "question": "why did one position block the remaining eleven scans",
+  "answer": "DRIVER DEFECT, not a system property. The exit came due at 2026-09-11T13:45:23.096973Z, ONE SECOND after scan 2 (2026-09-11T13:45:22.389474Z), and its window closed at 2026-09-11T13:47:23.096973Z. scripts/loop_demonstration.py ran all 12 scans first and only then attempted exits, so no housekeeping ran between scans. apex/options_pilot/entrypoint.run_pilot performs S.resume + S.attempt_exits at the start of every cycle after the first (entrypoint.py:167-172); the driver omitted that step.",
+  "second_defect": "the driver also REWOUND the clock: it processed scans through 16:15:24Z and then set the clock back to 2026-09-11T13:45:23.096973Z to run the exit, violating the frozen contract's own chronological discipline (LOOP_EVALUATION_CONTRACT.md 6).",
+  "consequences": [
+   "scan 2 at 13:45:22 was refused BEFORE the exit was due (1.1 s early) - that refusal is correct",
+   "scans 3-12 were refused only because the position was never valued; with housekeeping the exit was due and would have been attempted",
+   "the claim 'the kernel permits at most one position at a time' is WITHDRAWN - it was never tested",
+   "the claim 'the same-underlying cap binds on real data' stands only for scan 2; scans 3-12 are driver artifacts"
+  ],
+  "not_evidence_of": [
+   "an unreleased reservation (the reservation is derived from the open fill, and the fill was genuinely open)",
+   "an unresolved exit (the exit RESOLVED on attempt 1 when it was finally attempted)"
+  ],
+  "status": "DRIVER DEFECT CONFIRMED; the demonstration's refusal counts for scans 3-12 are void as evidence about the system"
+ }
+}

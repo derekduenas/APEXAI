@@ -1,0 +1,22 @@
+{
+ "kind": "LOOP_DECISION_TAXONOMY",
+ "computed_from": "persisted per-scan decisions",
+ "agreement": {
+  "trade_vs_no_trade": 11,
+  "exact_decision_label": 0,
+  "same_contract": 11,
+  "scans": 12
+ },
+ "taxonomy": {
+  "WAIT": {
+   "POLICY_ABSTENTION": 12
+  },
+  "PILOT_RULE_V2": {
+   "TRADE": 1,
+   "RISK_REFUSAL": 11
+  },
+  "FULL_FUNNEL_V1": {
+   "CANDIDATE_EXCLUSION (all candidates failed the envelope)": 12
+  }
+ }
+}

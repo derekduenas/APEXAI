@@ -1,3 +1,8 @@
+> **SUPERSEDED on five points by docs/LOOP_DEMONSTRATION_CORRECTIONS.md (2026-09-12).** Retained unedited. The
+> eleven consecutive refusals were a DRIVER defect, not the kernel working correctly; the historical-prevalence
+> claim about the timestamp defect is withdrawn; the 32-percent cost attribution is withdrawn; agreement is 11 of 12
+> on trade-versus-no-trade; and the loss attribution is UNRESOLVED, not ordinary uncertainty.
+
 # LOOP_DEMONSTRATION_RESULT — one fully traceable funnel-to-outcome run (2026-09-12)
 
 Under `docs/LOOP_EVALUATION_CONTRACT.md`, frozen and committed at `c1d40e5` **before** this ran. Evidence:
