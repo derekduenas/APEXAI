@@ -203,9 +203,9 @@
    }
   },
   "R4": {
-   "state": "SPECIFICATION_DRAFT_2_1 (for review; nothing implemented, nothing fitted)",
+   "state": "SPECIFICATION_DRAFT_3 (for review; nothing implemented, nothing fitted)",
    "spec": "docs/R4_JOINT_MARKET_STATE_SPEC.md",
-   "supersedes": "DRAFT_2 at 65834d0 (which superseded DRAFT_1 at cf4155f), after independent review of each",
+   "supersedes": "DRAFT_2_1 f848163 <- DRAFT_2 65834d0 <- DRAFT_1 cf4155f, after independent review of each",
    "objective": "joint 15-minute forecast of underlying, ATM IV, skew, spread and size; expressions vs WAIT on after-cost economics",
    "operational_default": "PILOT_RULE_V1 (verified in code at 2011f03)",
    "baselines": [
@@ -241,7 +241,21 @@
     "no statistical quantity gates acceptance; coverage band removed; deviations are findings",
     "predictor-domain refusals (q, v-hat) and deterministic endpoint lookup rules"
    ],
-   "outstanding": "reviewer acceptance of DRAFT 2.1; no implementation, fitting, historical access or admission request before that"
+   "outstanding": "reviewer acceptance of DRAFT 3; no implementation, fitting, historical access or admission request before that",
+   "draft3_corrections": [
+    "pricing map anchored at the frozen strike K_atm (iv at K_atm reproduces exp(x_iv) exactly); log-IV sign claim replaced by range guards",
+    "ENDPOINT_SELECTION_V1: one jointly-coherent endpoint instant shared by training, simulation target and scoring; timing error delta <= 60 s recorded",
+    "T recomputed at the extension endpoint; all randomness pre-generated per scan so candidate order cannot change any path (T29)",
+    "bounds language withdrawn: accounting SCENARIOS S1/S2 with E_sel = min and U = |difference|; gate cannot pass via inverted ordering (T28)",
+    "cannot-flatter claims withdrawn; forecast-quality results labelled SCORED_POPULATION_CONDITIONAL on any exclusion; observed-worst is a sensitivity, not a bound",
+    "null control replaced by C_PERM (predictor permutation) whose population contrast is exactly zero; zero-dynamics identity split into T11a compatible states and T11b matched size policy",
+    "finite-ensemble rank reference specified (discrete uniform on N+1, chi-square on the rank histogram)",
+    "only complete four-output rows enter the joint fit; missingness ceiling is an engineering threshold, not an unbiasedness claim; exclude-vs-refuse split resolved",
+    "WILD_CLUSTER_BOOTSTRAP_T_V1 fully specified; cross-session dependence limitation stated; inference-resampling budget separated from the 8-run production estimation budget (T31)",
+    "every R4 dataset read requires explicit R4 authorization (nothing inherited from EXP-001B); role approval separated from run authorization; prospective collection is not out-of-sample status"
+   ],
+   "tests_declared": "T1-T31 identities and fixtures (acceptance) plus reported frequencies (gating nothing)",
+   "checklist": "docs/R4_JOINT_MARKET_STATE_SPEC.md section 10 (equation-to-test)"
   }
  },
  "preserved": [
