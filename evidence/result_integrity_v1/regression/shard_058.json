@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_no_inputs_checked_is_unknown",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_all_checked_but_nothing_fired_is_familiar",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_material_disagreement_fires_data_conflict",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_invalid_quality_is_a_lethal_defect",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_degraded_system_health_fires_structural_risk",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_unstable_edge_fires_correlation_break",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_weak_world_lab_support_fires_weak_analog_support",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_strong_world_lab_support_does_not_fire",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_material_model_conflict_fires",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_single_dissenter_is_not_material_conflict",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_unreachable_mechanism_refuses_construction[OUT_OF_DISTRIBUTION]",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_unreachable_mechanism_refuses_construction[REGIME_NOVELTY]",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_unreachable_mechanism_refuses_construction[LIQUIDITY_ANOMALY]",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_caution_never_decreases_across_a_sequence",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_caution_can_increase_from_a_low_prior",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_caution_is_monotone_over_a_realistic_sequence",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_priority_lethal_beats_every_other_mechanism",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_determinism_same_inputs_twice_byte_identical",
+   "file": "tests/test_frontier2_assassin2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_assassin2.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_assassin2.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_assassin2.py::test_no_inputs_checked_is_unknown": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_all_checked_but_nothing_fired_is_familiar": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_material_disagreement_fires_data_conflict": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_invalid_quality_is_a_lethal_defect": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_degraded_system_health_fires_structural_risk": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_unstable_edge_fires_correlation_break": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_weak_world_lab_support_fires_weak_analog_support": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_strong_world_lab_support_does_not_fire": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_material_model_conflict_fires": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_single_dissenter_is_not_material_conflict": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_unreachable_mechanism_refuses_construction[OUT_OF_DISTRIBUTION]": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_unreachable_mechanism_refuses_construction[REGIME_NOVELTY]": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_unreachable_mechanism_refuses_construction[LIQUIDITY_ANOMALY]": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_caution_never_decreases_across_a_sequence": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_caution_can_increase_from_a_low_prior": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_caution_is_monotone_over_a_realistic_sequence": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_priority_lethal_beats_every_other_mechanism": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_determinism_same_inputs_twice_byte_identical": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_assassin2.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_assassin2.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 19,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_assassin2.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36244.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115863552",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.39
+ }
+}

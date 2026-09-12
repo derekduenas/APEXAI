@@ -1,0 +1,110 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_live_session.py::test_a_clean_setup_reaches_paper_attack_and_seals_first",
+   "file": "tests/test_options_live_session.py"
+  },
+  {
+   "nodeid": "tests/test_options_live_session.py::test_an_attack_resolves_with_friction_attribution",
+   "file": "tests/test_options_live_session.py"
+  },
+  {
+   "nodeid": "tests/test_options_live_session.py::test_a_degraded_feed_is_refused_not_silently_skipped",
+   "file": "tests/test_options_live_session.py"
+  },
+  {
+   "nodeid": "tests/test_options_live_session.py::test_a_feed_failure_is_recorded_as_a_refusal",
+   "file": "tests/test_options_live_session.py"
+  },
+  {
+   "nodeid": "tests/test_options_live_session.py::test_no_position_is_opened_without_a_sealed_card",
+   "file": "tests/test_options_live_session.py"
+  },
+  {
+   "nodeid": "tests/test_options_live_session.py::test_the_stock_comparator_uses_the_real_equity_spread",
+   "file": "tests/test_options_live_session.py"
+  },
+  {
+   "nodeid": "tests/test_options_live_session.py::test_protocol_is_preregistered_with_no_trade_quota",
+   "file": "tests/test_options_live_session.py"
+  }
+ ],
+ "collected_count": 7,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_live_session.py::test_a_clean_setup_reaches_paper_attack_and_seals_first": {
+   "file": "tests/test_options_live_session.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_live_session.py::test_an_attack_resolves_with_friction_attribution": {
+   "file": "tests/test_options_live_session.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_live_session.py::test_a_degraded_feed_is_refused_not_silently_skipped": {
+   "file": "tests/test_options_live_session.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_live_session.py::test_a_feed_failure_is_recorded_as_a_refusal": {
+   "file": "tests/test_options_live_session.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_live_session.py::test_no_position_is_opened_without_a_sealed_card": {
+   "file": "tests/test_options_live_session.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_live_session.py::test_the_stock_comparator_uses_the_real_equity_spread": {
+   "file": "tests/test_options_live_session.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_live_session.py::test_protocol_is_preregistered_with_no_trade_quota": {
+   "file": "tests/test_options_live_session.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 7,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_live_session.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34781.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116109312",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.89
+ }
+}

@@ -1,0 +1,200 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_feature_factory.py::test_the_registry_has_no_duplicate_ids",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_counterexample_two_features_with_the_same_formula_are_detected",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_the_real_registry_contains_no_identical_formulas",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_counterexample_reciprocal_ratios_are_flagged_algebraic",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_every_built_spec_has_complete_metadata",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_positive_control_ratio_is_computed_exactly",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_positive_control_growth_pairs_across_four_quarters",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_counterexample_a_zero_denominator_is_excluded_not_infinite",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_accruals_subtracts_in_the_right_order",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_the_factory_is_deterministic",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_pit_a_future_filing_is_not_used_before_it_exists",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_counterexample_the_pit_validator_flags_a_late_knowability_date",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_a_per_date_scalar_difference_is_identical_information",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_counterexample_correlated_features_are_not_called_identical",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_summary_separates_identical_from_correlated",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_data_gaps_are_marked_not_faked",
+   "file": "tests/test_feature_factory.py"
+  },
+  {
+   "nodeid": "tests/test_feature_factory.py::test_roe_roa_are_built_from_raw_not_the_empty_vendor_field",
+   "file": "tests/test_feature_factory.py"
+  }
+ ],
+ "collected_count": 17,
+ "collect_errors": [],
+ "results": {
+  "tests/test_feature_factory.py::test_the_registry_has_no_duplicate_ids": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_counterexample_two_features_with_the_same_formula_are_detected": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_the_real_registry_contains_no_identical_formulas": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_counterexample_reciprocal_ratios_are_flagged_algebraic": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_every_built_spec_has_complete_metadata": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_positive_control_ratio_is_computed_exactly": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_positive_control_growth_pairs_across_four_quarters": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_counterexample_a_zero_denominator_is_excluded_not_infinite": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_accruals_subtracts_in_the_right_order": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_the_factory_is_deterministic": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_pit_a_future_filing_is_not_used_before_it_exists": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_counterexample_the_pit_validator_flags_a_late_knowability_date": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_a_per_date_scalar_difference_is_identical_information": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_counterexample_correlated_features_are_not_called_identical": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_summary_separates_identical_from_correlated": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_data_gaps_are_marked_not_faked": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_feature_factory.py::test_roe_roa_are_built_from_raw_not_the_empty_vendor_field": {
+   "file": "tests/test_feature_factory.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 17,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_feature_factory.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35287.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115253248",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.1
+ }
+}

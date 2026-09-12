@@ -1,0 +1,128 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_phase04_contracts.py::test_measured_5017_bottleneck_reads_degraded_not_healthy",
+   "file": "tests/test_phase04_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_phase04_contracts.py::test_full_164_coverage_is_healthy_and_discovery_valid",
+   "file": "tests/test_phase04_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_phase04_contracts.py::test_zero_streamed_is_failed_not_a_crash",
+   "file": "tests/test_phase04_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_phase04_contracts.py::test_gap_detection_excludes_symbol_from_continuous",
+   "file": "tests/test_phase04_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_phase04_contracts.py::test_agreeing_sources_are_not_material",
+   "file": "tests/test_phase04_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_phase04_contracts.py::test_material_price_disagreement_is_flagged_never_silently_resolved",
+   "file": "tests/test_phase04_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_phase04_contracts.py::test_stale_source_is_flagged_material",
+   "file": "tests/test_phase04_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_phase04_contracts.py::test_no_priced_source_is_material_not_a_crash",
+   "file": "tests/test_phase04_contracts.py"
+  },
+  {
+   "nodeid": "tests/test_phase04_contracts.py::test_eodhd_provider_conforms_to_the_broad_provider_protocol",
+   "file": "tests/test_phase04_contracts.py"
+  }
+ ],
+ "collected_count": 9,
+ "collect_errors": [],
+ "results": {
+  "tests/test_phase04_contracts.py::test_measured_5017_bottleneck_reads_degraded_not_healthy": {
+   "file": "tests/test_phase04_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase04_contracts.py::test_full_164_coverage_is_healthy_and_discovery_valid": {
+   "file": "tests/test_phase04_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase04_contracts.py::test_zero_streamed_is_failed_not_a_crash": {
+   "file": "tests/test_phase04_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase04_contracts.py::test_gap_detection_excludes_symbol_from_continuous": {
+   "file": "tests/test_phase04_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase04_contracts.py::test_agreeing_sources_are_not_material": {
+   "file": "tests/test_phase04_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase04_contracts.py::test_material_price_disagreement_is_flagged_never_silently_resolved": {
+   "file": "tests/test_phase04_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase04_contracts.py::test_stale_source_is_flagged_material": {
+   "file": "tests/test_phase04_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase04_contracts.py::test_no_priced_source_is_material_not_a_crash": {
+   "file": "tests/test_phase04_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_phase04_contracts.py::test_eodhd_provider_conforms_to_the_broad_provider_protocol": {
+   "file": "tests/test_phase04_contracts.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 9,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_phase04_contracts.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.5,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35388.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115544064",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.07
+ }
+}

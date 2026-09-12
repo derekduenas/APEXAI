@@ -1,0 +1,357 @@
+{
+ "contract": "RESEARCH_ACTIVATION_V1",
+ "status": "OK",
+ "action": "setup",
+ "applied": true,
+ "started_utc": "2026-09-10T14:43:38Z",
+ "state": "COMPLETE",
+ "commit": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
+ "source_tree_sha256": "8fbe6ed6155df0e4b8fb09f6dd8ce54c7e1cf064cea29592e08fa44a41996991",
+ "expected_view_files": 1511,
+ "runner": "system",
+ "targets": {
+  "research_user": "apexresearch4",
+  "runner_root": "/opt/apex-runner-exp004",
+  "research_root": "/apex-data/research-exp004",
+  "checkout": "/apex-data/research-exp004/checkout",
+  "view": "/apex-data/research-exp004/dataset_view",
+  "out": "/apex-data/research-exp004/out"
+ },
+ "planned_stages": [
+  {
+   "stage": "research_root",
+   "object": "/apex-data/research-exp004",
+   "class": "capability",
+   "kind": "dir"
+  },
+  {
+   "stage": "out",
+   "object": "/apex-data/research-exp004/out",
+   "class": "evidence",
+   "kind": "dir"
+  },
+  {
+   "stage": "account",
+   "object": "apexresearch4",
+   "class": "capability",
+   "kind": "account"
+  },
+  {
+   "stage": "own_research_paths",
+   "object": "/apex-data/research-exp004",
+   "class": "capability",
+   "kind": "own"
+  },
+  {
+   "stage": "runner_root",
+   "object": "/opt/apex-runner-exp004",
+   "class": "capability",
+   "kind": "dir"
+  },
+  {
+   "stage": "venv",
+   "object": "/opt/apex-runner-exp004/venv",
+   "class": "capability",
+   "kind": "venv"
+  },
+  {
+   "stage": "requirements",
+   "object": "/opt/apex-runner-exp004/requirements.txt",
+   "class": "capability",
+   "kind": "file"
+  },
+  {
+   "stage": "packages",
+   "object": "/opt/apex-runner-exp004/venv [packages]",
+   "class": "capability",
+   "kind": "packages"
+  },
+  {
+   "stage": "pinned",
+   "object": "/opt/apex-runner-exp004/pinned.txt",
+   "class": "evidence",
+   "kind": "file"
+  },
+  {
+   "stage": "harden_runner",
+   "object": "/opt/apex-runner-exp004",
+   "class": "capability",
+   "kind": "own"
+  },
+  {
+   "stage": "checkout",
+   "object": "/apex-data/research-exp004/checkout",
+   "class": "capability",
+   "kind": "checkout"
+  },
+  {
+   "stage": "dataset_view",
+   "object": "/apex-data/research-exp004/dataset_view",
+   "class": "capability",
+   "kind": "dataset_view"
+  }
+ ],
+ "created": [
+  {
+   "object": "/apex-data/research-exp004",
+   "class": "capability",
+   "kind": "dir",
+   "stage": "research_root",
+   "utc": "2026-09-10T14:43:38Z",
+   "evidence": {
+    "exists": true,
+    "mode": "755"
+   }
+  },
+  {
+   "object": "/apex-data/research-exp004/out",
+   "class": "evidence",
+   "kind": "dir",
+   "stage": "out",
+   "utc": "2026-09-10T14:43:38Z",
+   "evidence": {
+    "exists": true,
+    "mode": "755"
+   }
+  },
+  {
+   "object": "apexresearch4",
+   "class": "capability",
+   "kind": "account",
+   "stage": "account",
+   "utc": "2026-09-10T14:43:39Z",
+   "evidence": {
+    "uid": 112,
+    "groups": [
+     "apexresearch4"
+    ],
+    "privileged_groups": []
+   }
+  },
+  {
+   "object": "/apex-data/research-exp004",
+   "class": "capability",
+   "kind": "own",
+   "stage": "own_research_paths",
+   "utc": "2026-09-10T14:43:39Z",
+   "evidence": {
+    "research_root_uid": 112,
+    "entries_checked": 4
+   }
+  },
+  {
+   "object": "/opt/apex-runner-exp004",
+   "class": "capability",
+   "kind": "dir",
+   "stage": "runner_root",
+   "utc": "2026-09-10T14:43:39Z",
+   "evidence": {
+    "exists": true,
+    "mode": "755"
+   }
+  },
+  {
+   "object": "/opt/apex-runner-exp004/venv",
+   "class": "capability",
+   "kind": "venv",
+   "stage": "venv",
+   "utc": "2026-09-10T14:43:44Z",
+   "evidence": {
+    "python": "/opt/apex-runner-exp004/venv/bin/python"
+   }
+  },
+  {
+   "object": "/opt/apex-runner-exp004/requirements.txt",
+   "class": "capability",
+   "kind": "file",
+   "stage": "requirements",
+   "utc": "2026-09-10T14:43:44Z",
+   "evidence": {
+    "pins": [
+     "numpy==2.4.6"
+    ]
+   }
+  },
+  {
+   "object": "/opt/apex-runner-exp004/venv [packages]",
+   "class": "capability",
+   "kind": "packages",
+   "stage": "packages",
+   "utc": "2026-09-10T14:43:51Z",
+   "evidence": {
+    "numpy": "2.4.6"
+   }
+  },
+  {
+   "object": "/opt/apex-runner-exp004/pinned.txt",
+   "class": "evidence",
+   "kind": "file",
+   "stage": "pinned",
+   "utc": "2026-09-10T14:43:51Z",
+   "evidence": {
+    "lines": 1
+   }
+  },
+  {
+   "object": "/opt/apex-runner-exp004",
+   "class": "capability",
+   "kind": "own",
+   "stage": "harden_runner",
+   "utc": "2026-09-10T14:43:52Z",
+   "evidence": {
+    "runner_root_mode": "755",
+    "runner_root_uid": 0,
+    "uid_separation_checked": true,
+    "entries_checked": 2628,
+    "symlinks_skipped": 4
+   }
+  },
+  {
+   "object": "/apex-data/research-exp004/checkout",
+   "class": "capability",
+   "kind": "checkout",
+   "stage": "checkout",
+   "utc": "2026-09-10T14:43:53Z",
+   "evidence": {
+    "commit": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
+    "tree_sha256": "8fbe6ed6155df0e4b8fb09f6dd8ce54c7e1cf064cea29592e08fa44a41996991",
+    "n_files": 67
+   }
+  },
+  {
+   "object": "/apex-data/research-exp004/dataset_view",
+   "class": "capability",
+   "kind": "dataset_view",
+   "stage": "dataset_view",
+   "utc": "2026-09-10T14:43:57Z",
+   "evidence": {
+    "files": 1511,
+    "first": "SPY_2016-01-04.json",
+    "last": "SPY_2021-12-31.json"
+   }
+  }
+ ],
+ "stages": [
+  {
+   "stage": "research_root",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:38Z",
+   "evidence": {
+    "exists": true,
+    "mode": "755"
+   }
+  },
+  {
+   "stage": "out",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:38Z",
+   "evidence": {
+    "exists": true,
+    "mode": "755"
+   }
+  },
+  {
+   "stage": "account",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:39Z",
+   "evidence": {
+    "uid": 112,
+    "groups": [
+     "apexresearch4"
+    ],
+    "privileged_groups": []
+   }
+  },
+  {
+   "stage": "own_research_paths",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:39Z",
+   "evidence": {
+    "research_root_uid": 112,
+    "entries_checked": 4
+   }
+  },
+  {
+   "stage": "runner_root",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:39Z",
+   "evidence": {
+    "exists": true,
+    "mode": "755"
+   }
+  },
+  {
+   "stage": "venv",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:44Z",
+   "evidence": {
+    "python": "/opt/apex-runner-exp004/venv/bin/python"
+   }
+  },
+  {
+   "stage": "requirements",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:44Z",
+   "evidence": {
+    "pins": [
+     "numpy==2.4.6"
+    ]
+   }
+  },
+  {
+   "stage": "packages",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:51Z",
+   "evidence": {
+    "numpy": "2.4.6"
+   }
+  },
+  {
+   "stage": "pinned",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:51Z",
+   "evidence": {
+    "lines": 1
+   }
+  },
+  {
+   "stage": "harden_runner",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:52Z",
+   "evidence": {
+    "runner_root_mode": "755",
+    "runner_root_uid": 0,
+    "uid_separation_checked": true,
+    "entries_checked": 2628,
+    "symlinks_skipped": 4
+   }
+  },
+  {
+   "stage": "checkout",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:53Z",
+   "evidence": {
+    "commit": "ea87faa42537a14678bb6fc5cb1e9aacc83cf40f",
+    "tree_sha256": "8fbe6ed6155df0e4b8fb09f6dd8ce54c7e1cf064cea29592e08fa44a41996991",
+    "n_files": 67
+   }
+  },
+  {
+   "stage": "dataset_view",
+   "status": "VERIFIED",
+   "utc": "2026-09-10T14:43:57Z",
+   "evidence": {
+    "files": 1511,
+    "first": "SPY_2016-01-04.json",
+    "last": "SPY_2021-12-31.json"
+   }
+  }
+ ],
+ "resumed_from": null,
+ "finished_utc": "2026-09-10T14:43:57Z",
+ "view": {
+  "files": 1511,
+  "first": "SPY_2016-01-04.json",
+  "last": "SPY_2021-12-31.json"
+ }
+}

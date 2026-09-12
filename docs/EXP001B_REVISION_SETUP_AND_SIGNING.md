@@ -1,0 +1,159 @@
+# EXP-001B — REVISION SETUP AND SIGNING PACKAGE
+
+> **This commit is a REVIEW CANDIDATE.** It is not accepted merely
+> because this package describes it. Acceptance requires the remaining
+> source review and setup verification.
+
+A **bounded-memory engineering revision of the same registered experiment**, after
+an aborted attempt. The registration, the hypothesis and the statistical procedure
+are unchanged. Changing bound code requires a fresh admission and a fresh checkout;
+it does not require a new registration.
+
+Read-only. Nothing here has been signed or executed.
+
+---
+
+## 1. ONE CANDIDATE REVISION, CONTAINING BOTH
+
+`a35ab1a24ebbd8942713234a97551aaf6256057b`
+
+| | |
+|---|---|
+| bound experiment tree | `06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345`, 48 files |
+| identical to the qualified tree | **yes** |
+| launcher `scripts/research_activation.py` | sha256 `efa9d3e84ccc09a2b0dd2c963a6a10d469bc9f1e38a876d0c66e9c23875d6184` |
+
+**The launcher is not a bound path, so the admission cannot pin it.** Matching the
+bound experiment hash establishes the experiment and nothing else. That gap is
+closed two ways: the launcher is pinned by the *commit*, and the operator runs it
+**from the fresh checkout** rather than from anywhere else, after checking its
+hash. The previous request pinned `22ea5104`, which carried the qualified `run.py`
+but not the later launcher repairs, so it is superseded.
+
+### Which tests establish which half
+
+| half | established by |
+|---|---|
+| experiment (`run.py`) | 5 equivalence tests against the pre-repair source: sealed forecast ledger byte-identical, outcomes ledger identical, whole record identical apart from elapsed time, `dm` and `n0` compared value by value; plus the 65-test exp001b suite; plus the aligned qualification |
+| launcher | outcome classification through the real CLI with controlled child processes (7), result-to-run binding (5), the exit-4 contract (4), resumption (6), the verifier repairs, and sealing through the real execute path with disposable authority (3) |
+
+---
+
+## 2. FRESH ENVIRONMENT
+
+| object | path |
+|---|---|
+| research root | `/apex-data/research-rev2` |
+| checkout | `/apex-data/research-rev2/checkout` |
+| dataset view | `/apex-data/research-rev2/dataset_view` |
+| output | `/apex-data/research-rev2/out` |
+| runner root | `/opt/apex-runner-rev2` |
+| account | `apexresearch2` |
+| decision | `/etc/apex/admissions/exp001b_admission_rev2.json` |
+
+A second runner root is needed because preflight requires every destination to be
+free and the existing one must stay intact.
+
+**Preserved untouched:** the existing checkout at `277e4a02`, `/opt/apex-runner`,
+the trust root with the signed v2 decision, and the aborted run directory, which
+stays read-only.
+
+### The blocker is now resolved
+
+Two things blocked it, not one. The CLI had no flags for the roots, **and fresh
+setup requires the research account to be absent**, so the existing `apexresearch`
+would have blocked a second environment. Both are now handled.
+
+`--research-root`, `--runner-root` and `--research-user` are implemented. Absent
+flags leave production behaviour identical. `validate_targets` runs **before any
+mutation** in every action and refuses overlapping roots, protected locations, and
+any target that could reach the preserved environment. An environment is either
+exactly the production default triple or disjoint from it in all three — including
+the account, because rollback removes an account by name and a shared account would
+let one teardown delete the other's identity.
+
+Revision 2 uses the dedicated account **`apexresearch2`**.
+
+The re-pin guard is **not bypassed and not weakened.** It correctly refuses to
+move the existing checkout across a bound-tree change, which is exactly why a
+fresh checkout is required. The only change made to it was its refusal *text*,
+which wrongly called this a new experiment.
+
+---
+
+## 3. HOW EACH PROPERTY IS VERIFIED
+
+| property | check |
+|---|---|
+| checkout identity | commit equals the admitted commit, bound tree equals `06eee315…`, working tree clean |
+| **launcher identity** | sha256 of the launcher in the fresh checkout equals `efa9d3e8…`, checked **before** invoking it |
+| dataset view | `verify` **re-hashes every admitted file** and refuses on a mismatch; count must be 1511 |
+| environment | unprivileged uid with no privileged groups, venv interpreter present, numpy pinned at 2.4.6, runner tree root-owned and not group- or other-writable across every entry |
+| activation record | state COMPLETE, every stage VERIFIED with its evidence, plus the append-only stage log |
+| sandbox configuration | `probe` **enters** the sandbox and measures nine properties with zero deviations, and a test asserts the probed property list is identical to the launch list |
+
+Check the launcher hash first:
+
+```bash
+sha256sum /apex-data/research-rev2/checkout/scripts/research_activation.py
+```
+
+---
+
+## 4. SIGNING
+
+Unchanged from the established process, and the key stays where it is. Start from
+`results/exp001b_admission_request_v3.json`, set `decision` to ADMIT, fill
+`provenance`, confirm `code.commit` is `a35ab1a2…`, then:
+
+```bash
+ssh-keygen -Y sign -f ~/.ssh/apex_admission_ed25519 -n apex-admission exp001b_admission.json
+```
+
+The trust root and your public key are already installed and unchanged. Only the
+decision and signature need replacing. Verify on the host before proceeding:
+
+```bash
+ssh-keygen -Y verify -f /etc/apex/admissions/trust/allowed_signers -I apex-admission -n apex-admission -s /etc/apex/admissions/exp001b_admission.json.sig < /etc/apex/admissions/exp001b_admission.json
+```
+
+Any rerun writes to a **new run directory**. The aborted one is closed.
+
+---
+
+## 5. THE QUALIFICATION, INCLUDING WHAT IT DOES NOT SETTLE
+
+166,110 validation rows, matching an independently calculated expectation exactly,
+covering every eligible minute of every admitted session including the three early
+closes. Both grading passes completed.
+
+| | |
+|---|---|
+| effective cap | 1,468,006,400 bytes |
+| cgroup peak, read before exit | 1,468,006,400 bytes |
+| memory events | `max 1`, `oom 0`, `oom_kill 0` |
+| anonymous working set peak | 881,557,504 bytes |
+
+**Headroom at peak was zero in cgroup terms. The peak equalled the cap.**
+
+The counters show the limit was reached once and that no kill occurred. Reclaim of
+clean page cache from the 567 MB output file is the explanation most consistent
+with that, and with the anonymous set peaking well below the cap. **It was not
+directly instrumented, so it is a supported reading rather than a conclusively
+established cause,** and other contributions to the cgroup total were not measured
+separately. The practical consequence stands either way: the margin is not
+anonymous headroom, and a workload that grew the anonymous set materially could
+still fail.
+
+---
+
+## 6. SEQUENCE FROM HERE
+
+1. Targeted source review of this one revision.
+2. Add the two root flags so the second environment can be built through the wrapper.
+3. Setup, verify, probe.
+4. Authority signs the v3 request bound to `a35ab1a2…`.
+5. Install decision and signature; verify on host.
+6. Verify, prepare, then execute into a new run directory.
+
+No signing and no historical execution have occurred.

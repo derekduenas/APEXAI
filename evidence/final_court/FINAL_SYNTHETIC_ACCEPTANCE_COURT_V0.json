@@ -1,0 +1,27 @@
+{
+ "court_id": "COURT-FINAL-ae42a5e4fda7",
+ "court_hash": "cc9ecb3f5cdef1c5f0b9e037b36adaad5bc2b6946d8b38a11d412c18ca730bb7",
+ "code_commit": "bd6366c48",
+ "precourt_tree_commit": "5b41c4715",
+ "surface_hash": "f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d",
+ "precourt_regression_artifact_sha256": "8ad40e018a8d5e3eb4914938f00b492171c9f2b69ddd42559d1ec1e5735ca55c",
+ "cells_expected": 300,
+ "cells_executed": 0,
+ "duplicate_cells": 0,
+ "missing_cells": 300,
+ "integrity_failure": "UNEXPECTED AttributeError: 'dict' object has no attribute 'config'",
+ "judgement": {
+  "controls": {},
+  "cross_control": {},
+  "all_pass": false
+ },
+ "FINAL_SYNTHETIC_ACCEPTANCE_COURT_V0": "RUN_INVALID",
+ "oom_kill_before": 4,
+ "oom_kill_after": 4,
+ "elapsed_s": 4.8,
+ "resource": {
+  "ru_maxrss_MiB": 170.4,
+  "cgroup": "0::/wmresearch.slice/run-u35489.service"
+ },
+ "cells": []
+}

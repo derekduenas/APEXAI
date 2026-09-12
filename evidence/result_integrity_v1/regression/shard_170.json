@@ -1,0 +1,344 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_research_discovery.py::test_the_screenable_content_is_a_certified_dossier",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_an_incomplete_hypothesis_is_refused_by_the_shared_definition",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_a_hypothesis_with_no_features_is_refused",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_provenance_is_not_part_of_the_scientific_identity",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_changing_the_science_changes_the_hash",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_a_before_002_hypothesis_needs_no_rejustification",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_a_postmortem_hypothesis_is_flagged_as_descendant",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_an_explicit_descendant_is_flagged_even_if_epoch_is_clean",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_an_invalid_epoch_is_refused",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_a_twin_state_is_deterministic",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_a_twin_that_uses_a_future_filing_is_refused",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_a_twin_at_the_filing_date_itself_is_allowed",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_a_new_feature_set_is_novel",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_the_same_feature_set_as_a_closed_experiment_is_a_modification",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_a_subset_of_a_closed_experiment_is_redundant",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_an_identical_prior_dossier_is_a_duplicate",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_a_multi_family_combination_is_a_recombination",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_the_novelty_assessment_carries_no_number",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_a_combination_requires_an_economic_reason",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_a_combination_without_a_reason_is_refused",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_a_single_feature_is_not_a_combination",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_the_combination_object_cannot_hold_a_score",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_a_role_view_cannot_express_a_score",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_a_dossier_without_the_adversary_is_refused",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_a_dossier_without_replication_is_refused",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_disagreement_is_preserved_not_averaged",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_an_unknown_role_is_refused",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_a_survivor_reaches_a_review_packet_that_decides_nothing",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_a_redundant_hypothesis_never_reaches_the_screen",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_the_human_packet_surfaces_a_descendant_of_failure",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_the_discovery_layer_cannot_reach_registration",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_counterexample_the_no_registration_check_can_detect_a_breach",
+   "file": "tests/test_research_discovery.py"
+  },
+  {
+   "nodeid": "tests/test_research_discovery.py::test_an_iterated_hypothesis_gets_a_new_identity_after_screening",
+   "file": "tests/test_research_discovery.py"
+  }
+ ],
+ "collected_count": 33,
+ "collect_errors": [],
+ "results": {
+  "tests/test_research_discovery.py::test_the_screenable_content_is_a_certified_dossier": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_an_incomplete_hypothesis_is_refused_by_the_shared_definition": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_a_hypothesis_with_no_features_is_refused": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_provenance_is_not_part_of_the_scientific_identity": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_changing_the_science_changes_the_hash": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_a_before_002_hypothesis_needs_no_rejustification": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_a_postmortem_hypothesis_is_flagged_as_descendant": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_an_explicit_descendant_is_flagged_even_if_epoch_is_clean": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_an_invalid_epoch_is_refused": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_a_twin_state_is_deterministic": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_a_twin_that_uses_a_future_filing_is_refused": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_a_twin_at_the_filing_date_itself_is_allowed": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_a_new_feature_set_is_novel": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_the_same_feature_set_as_a_closed_experiment_is_a_modification": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_a_subset_of_a_closed_experiment_is_redundant": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_an_identical_prior_dossier_is_a_duplicate": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_a_multi_family_combination_is_a_recombination": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_the_novelty_assessment_carries_no_number": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_a_combination_requires_an_economic_reason": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_a_combination_without_a_reason_is_refused": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_a_single_feature_is_not_a_combination": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_the_combination_object_cannot_hold_a_score": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_a_role_view_cannot_express_a_score": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_a_dossier_without_the_adversary_is_refused": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_a_dossier_without_replication_is_refused": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_disagreement_is_preserved_not_averaged": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_an_unknown_role_is_refused": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_a_survivor_reaches_a_review_packet_that_decides_nothing": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_a_redundant_hypothesis_never_reaches_the_screen": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_the_human_packet_surfaces_a_descendant_of_failure": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_the_discovery_layer_cannot_reach_registration": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_counterexample_the_no_registration_check_can_detect_a_breach": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_discovery.py::test_an_iterated_hypothesis_gets_a_new_identity_after_screening": {
+   "file": "tests/test_research_discovery.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 33,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_research_discovery.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.5,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36356.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116781056",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.47
+ }
+}

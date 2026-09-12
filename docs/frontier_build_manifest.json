@@ -1,0 +1,366 @@
+{
+ "mandate": "APEX_Frontier_Build_Mandate.md (2026-09-11)",
+ "branch": "frontier-build",
+ "base": "360536cb (options-pilot-001 r4)",
+ "states_allowed": [
+  "NOT_STARTED",
+  "IN_PROGRESS",
+  "IMPLEMENTED_UNREVIEWED",
+  "SYNTHETIC_VERIFIED",
+  "BLOCKED",
+  "ACCEPTED"
+ ],
+ "operational_states_separate": [
+  "SHADOW_AUTHORIZED",
+  "DEPLOYED"
+ ],
+ "milestones": {
+  "M0": {
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": "360536cbd19b1c6da19563f245d7b85b70b23655",
+   "evidence": [
+    "docs/OPTIONS_PILOT_RECORDING_BOUNDARY.md#10",
+    "tests/test_options_pilot_boundary.py::test_r4_*",
+    "tests/test_options_pilot_entrypoint.py::test_f6_lifecycle_recovery_through_the_entry_point"
+   ],
+   "independent_acceptance": "PENDING"
+  },
+  "M1": {
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": "78931c0",
+   "modules": [
+    "apex/options_pilot/fees.py",
+    "apex/options_pilot/book.py",
+    "apex/options_pilot/risk_authority.py",
+    "apex/options_pilot/exit_policy.py",
+    "apex/options_pilot/boundary.py",
+    "apex/options_pilot/session.py",
+    "apex/options_pilot/entrypoint.py"
+   ],
+   "tests": [
+    "tests/test_options_pilot_accounting.py",
+    "tests/test_options_pilot_boundary.py",
+    "tests/test_options_pilot_entrypoint.py"
+   ],
+   "independent_acceptance": "PENDING"
+  },
+  "M2": {
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": "d026b87",
+   "modules": [
+    "apex/pulse_options/ingest.py",
+    "apex/pulse_options/snapshot.py",
+    "apex/pulse_options/features.py",
+    "apex/pulse_options/inference.py",
+    "apex/pulse_options/providers.py",
+    "apex/pulse_options/sources.py",
+    "apex/pulse_options/exp002_artifact.json",
+    "scripts/options_pilot_live_smoke.py"
+   ],
+   "tests": [
+    "tests/test_pulse_options_twin.py"
+   ],
+   "prepared_not_executed": [
+    "docs/OPTIONS_PILOT_LIVE_SMOKE_AND_COLLECTION_REQUEST.md"
+   ],
+   "independent_acceptance": "PENDING"
+  },
+  "M3": {
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": "e277e4c",
+   "modules": [
+    "apex/worldmodel_wb/contracts.py",
+    "apex/worldmodel_wb/vol_models.py",
+    "apex/worldmodel_wb/quantile_tree.py",
+    "apex/worldmodel_wb/dist_boost.py",
+    "apex/worldmodel_wb/regime.py",
+    "apex/worldmodel_wb/tournament.py",
+    "apex/worldmodel_wb/foundation.py",
+    "apex/worldmodel_wb/study_contract.py"
+   ],
+   "tests": [
+    "tests/test_worldmodel_wb.py"
+   ],
+   "evidence": [
+    "docs/evidence/garch_reference_vs_arch_OUTPUT.json"
+   ],
+   "blocked": {
+    "chronos2": "BLOCKED_RESOURCE",
+    "timesfm25": "BLOCKED_RESOURCE",
+    "timesfm30": "BLOCKED_LICENSE"
+   },
+   "independent_acceptance": "PENDING"
+  },
+  "M4": {
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": "80ea8de",
+   "modules": [
+    "apex/multiverse_wb/simulator.py",
+    "apex/multiverse_wb/pricing.py",
+    "apex/multiverse_wb/surface.py",
+    "apex/multiverse_wb/expression_war.py"
+   ],
+   "tests": [
+    "tests/test_multiverse_wb.py"
+   ],
+   "independent_acceptance": "PENDING"
+  },
+  "M5": {
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": "ceb7e7f",
+   "modules": [
+    "apex/decision_wb/fusion.py",
+    "apex/decision_wb/supervision.py",
+    "apex/decision_wb/experience.py",
+    "apex/decision_wb/enrichment.py"
+   ],
+   "tests": [
+    "tests/test_decision_wb.py"
+   ],
+   "independent_acceptance": "PENDING"
+  },
+  "M6": {
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": "9cfb70f",
+   "modules": [
+    "apex/options_pilot/operator_view.py",
+    "scripts/options_pilot_scale_check.py",
+    "apex/options_pilot/session.py (funnel_trace)"
+   ],
+   "tests": [
+    "tests/test_options_pilot_operator_view.py",
+    "tests/test_options_pilot_entrypoint.py::test_every_decision_carries_a_funnel_trace_with_named_missing_stages"
+   ],
+   "evidence": [
+    "docs/evidence/scale_check_10_sessions_OUTPUT.json"
+   ],
+   "commissioning_package": "docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md",
+   "activation": "NOT_AUTHORIZED",
+   "independent_acceptance": "PENDING"
+  },
+  "M7": {
+   "state": "SYNTHETIC_VERIFIED",
+   "commit": "PENDING (this commit)",
+   "name": "the funnel: every layer in one decision path (FULL_FUNNEL_V1)",
+   "modules": [
+    "apex/decision_wb/engine.py",
+    "apex/pulse_options/sources.py (funnel_fn, selection_policy)",
+    "apex/options_pilot/session.py (funnel step, FUNNEL_TRACE_V2)",
+    "apex/options_pilot/entrypoint.py (TwinProvider, funnel_fn)",
+    "scripts/options_paper_session.py (--pilot-selection-policy)",
+    "apex/backtest_wb/{funnel,contract2}.py",
+    "scripts/pilot_replay_002.py",
+    "apex/multiverse_wb/simulator.py (drift_per_bar)",
+    "apex/multiverse_wb/pricing.py (bsm_price_vec)"
+   ],
+   "tests": [
+    "tests/test_funnel_engine.py",
+    "tests/test_backtest_wb.py::test_full_funnel_on_planted_drift"
+   ],
+   "evidence": [
+    "docs/FUNNEL_INTEGRATION.md",
+    "docs/PILOT_REPLAY_001_RESULT.md",
+    "docs/evidence/pilot_replay_001_summary.json"
+   ],
+   "default_selection_policy": "PILOT_RULE_V1",
+   "activation": "NOT_AUTHORIZED",
+   "independent_acceptance": "ACCEPTED (r3, bounded scope: the four repairs at 525340c; live commissioning and profitability UNESTABLISHED)",
+   "blockers": [
+    "kernel cap 5 USD vs SPY near-ATM asks 13-19 USD (591/1886 replay scans RISK_ENVELOPE_INFEASIBLE)",
+    "fee schedule UNVERIFIED",
+    "live chain/quote adapters not commissioned",
+    "expected values model-conditional (IV_FIXED)"
+   ],
+   "r2_repairs": {
+    "reviewed_commit": "f0daac2",
+    "findings_repaired": 8,
+    "table": "docs/FUNNEL_INTEGRATION.md#r2",
+    "tests": [
+     "tests/test_funnel_engine.py (27)",
+     "tests/test_multiverse_wb.py::test_innovations_have_finite_exponential_moments_and_the_truncation_is_declared",
+     "tests/test_worldmodel_wb.py::test_garch_refuses_an_unsuccessful_optimizer_outcome",
+     "tests/test_backtest_wb.py::test_per_scan_population_keeps_wait_as_zero_and_excludes_unresolved"
+    ]
+   },
+   "layers_not_invoked": [
+    "svi_surface",
+    "fusion",
+    "enrichment",
+    "jumps"
+   ],
+   "r3_repairs": {
+    "reviewed_commit": "3cc65b0",
+    "findings_repaired": 4,
+    "table": "docs/FUNNEL_INTEGRATION.md#r3",
+    "tests": [
+     "tests/test_funnel_engine.py::TestEngine::test_nan_timestamps_are_refused_and_never_reach_pricing",
+     "tests/test_multiverse_wb.py::test_sanitize_quote_refuses_non_finite_or_mistyped_timestamps_before_arithmetic",
+     "tests/test_worldmodel_wb.py::test_garch_multi_start_disagreement_is_measured_before_selection",
+     "tests/test_funnel_engine.py::TestFunnelBinding::test_changed_reference_ask_is_refused_at_intent_and_at_execution",
+     "tests/test_funnel_engine.py::test_full_mode_acceptance_selection_to_reconciled_exit",
+     "tests/test_funnel_engine.py::test_full_mode_mandatory_wait_when_no_quote_is_valid"
+    ]
+   }
+  },
+  "R4": {
+   "state": "SPECIFICATION_CLOSED_V1 (implementation contract; nothing implemented, nothing fitted)",
+   "spec": "docs/R4_JOINT_MARKET_STATE_SPEC.md",
+   "supersedes": "review patch 24b055e (ACCEPTED) <- e8c6a53 <- 4d84548 <- f848163 <- 65834d0 <- cf4155f",
+   "objective": "joint 15-minute forecast of underlying, ATM IV, skew, spread and size; expressions vs WAIT on after-cost economics",
+   "operational_default": "PILOT_RULE_V1 (verified in code at 2011f03)",
+   "baselines": [
+    "OPERATIONAL_REFERENCE (frozen r3 FULL_FUNNEL_V1 at 525340c)",
+    "MATCHED_FROZEN (R4 machinery, frozen state)"
+   ],
+   "selection_policy_added": "JOINT_FUNNEL_V1 (by name only; no promotion rule)",
+   "draft2_changes": [
+    "multivariate regression on common predictors; no contemporaneous option-state regressors",
+    "elliptical truncation with analytic renormalization kappa",
+    "three clocks + frozen contract identity + dataset-and-role permissions",
+    "complete path accounting with conservative/optimistic bounds; UNPRICEABLE refuses the candidate",
+    "two distinct baselines; C_DIAG renamed and narrowed; exact Shapley+dependence identity",
+    "identity-based acceptance; frequencies reported separately with CIs",
+    "CRPS instead of KDE log score; unresolved outcomes valued conservatively in the primary estimand; Bonferroni multiplicity; delta-IV ablation moved out of the gate",
+    "fit accounting enumerated (8 runs); time-of-day buckets removed"
+   ],
+   "authorizes": "nothing: no historical access, no backtest, no fitting, no activation, no promotion",
+   "operator_decisions_recorded": {
+    "state_representation": "APPROVED with two clarifications (predictor-domain refusals; endpoint lookup determinism)",
+    "decision_constants": "APPROVED as provisional engineering constants, not validated thresholds; sensitivity record + no-retune rule",
+    "collector_fitting": "APPROVED CONDITIONALLY: PILOT-COLLECTION after 20 completed sessions under strict walk-forward conditions; HIST-A-OPTIONS still gated by R4-FIT-001",
+    "fit_budget": "APPROVED: 8 estimation runs per session day, retries counted exactly, no time-of-day variants",
+    "selection_by_name": "APPROVED: JOINT_FUNNEL_V1 by name; PILOT_RULE_V1 remains the operational default; no promotion rule"
+   },
+   "draft2_1_changes": [
+    "session-cluster-robust CR1 + wild cluster bootstrap-t as the primary interval; HC1 demoted to descriptive; overlap acknowledged",
+    "decision rule 0: m = 0 -> WAIT / NO_ELIGIBLE_CANDIDATE with the per-reason census",
+    "attribution when a comparator refuses a candidate: scan stays in the economic population, contract leaves the CRPS population for all comparators, censuses reported",
+    "exit-window mechanics exact: extension generation and scaling, both-endpoint cases, extension-undefined valued from the primary evaluation",
+    "endpoint scoring: missing realized bid censored and counted; unexecutable scored at the observed bid with a flag; executability scored separately by Brier",
+    "forecast-vs-pricing separation block required in every record (T21)",
+    "no statistical quantity gates acceptance; coverage band removed; deviations are findings",
+    "predictor-domain refusals (q, v-hat) and deterministic endpoint lookup rules"
+   ],
+   "draft3_corrections": [
+    "pricing map anchored at the frozen strike K_atm (iv at K_atm reproduces exp(x_iv) exactly); log-IV sign claim replaced by range guards",
+    "ENDPOINT_SELECTION_V1: one jointly-coherent endpoint instant shared by training, simulation target and scoring; timing error delta <= 60 s recorded",
+    "T recomputed at the extension endpoint; all randomness pre-generated per scan so candidate order cannot change any path (T29)",
+    "bounds language withdrawn: accounting SCENARIOS S1/S2 with E_sel = min and U = |difference|; gate cannot pass via inverted ordering (T28)",
+    "cannot-flatter claims withdrawn; forecast-quality results labelled SCORED_POPULATION_CONDITIONAL on any exclusion; observed-worst is a sensitivity, not a bound",
+    "null control replaced by C_PERM (predictor permutation) whose population contrast is exactly zero; zero-dynamics identity split into T11a compatible states and T11b matched size policy",
+    "finite-ensemble rank reference specified (discrete uniform on N+1, chi-square on the rank histogram)",
+    "only complete four-output rows enter the joint fit; missingness ceiling is an engineering threshold, not an unbiasedness claim; exclude-vs-refuse split resolved",
+    "WILD_CLUSTER_BOOTSTRAP_T_V1 fully specified; cross-session dependence limitation stated; inference-resampling budget separated from the 8-run production estimation budget (T31)",
+    "every R4 dataset read requires explicit R4 authorization (nothing inherited from EXP-001B); role approval separated from run authorization; prospective collection is not out-of-sample status"
+   ],
+   "tests_declared": "T1-T36 identities and fixtures (acceptance) plus reported frequencies (gating nothing)",
+   "checklist": "docs/R4_JOINT_MARKET_STATE_SPEC.md section 10 (equation-to-test)",
+   "amendment_A": {
+    "A1": "C_PERM is SYNTHETIC-ONLY with a stated invariance argument (i.i.d. sessions, session-level permutation unit, independent evaluation sample, expectation averaged over training+permutation+evaluation); removed from the historical comparator table; JOINT-C_DIAG retained for cross-block dependence",
+    "A2": "per-quote signed offsets |o_j| <= 60 s, receipt lags and slice dispersion recorded; symmetric window closes the delta=0-with-stale-quote hole; tighter sensitivity uses actual offsets; estimand renamed TARGET_PROXY_V1 (delayed/stale quote proxy)",
+    "A3": "one construction: confidence interval by TEST INVERSION with the algorithm specified (bracket, 25-point scan, bisection, 3 widenings, CI_UNBOUNDED, CI_NONCONVEX_ACCEPTANCE); exactly one coefficient in one equation restricted, other equations untouched; same-seed rerun labelled reproducibility not correctness",
+    "A4": "paired per-path scenario samples retained; WAIT gate requires simultaneous lower limits > 0 for BOTH scenarios over the candidate x scenario family; runner-up check labelled HEURISTIC_SCREEN_NO_CONFIDENCE_CLAIM; E[min(S1,S2)] forbidden as a substitute",
+    "A5": "TRUNCATION_BLOCK_SEQUENTIAL_V1 so shared coordinate blocks are bitwise identical across comparators (a shared 4-D radius coupled the blocks); SIZE_PROXY_V2 SELECT_THEN_VETO (rank under ASSUME_AVAILABLE, veto c* only, no substitution); spread proxy's ranking influence disclosed"
+   },
+   "spec_pin": {
+    "file": "docs/R4_JOINT_MARKET_STATE_SPEC.md",
+    "blob": "902256e3c3c5025a450a4bb607410933bb0c4b25",
+    "sha256": "66cba7095bce903d0b3cd474631b90ea962fda97325d70d1abf9670cee49ce50",
+    "meaning": "the R4 implementation contract is this file at this blob; code may not silently diverge from it; any later change is a numbered amendment with its own review",
+    "accepted_patch_commit": "24b055ebc34ad214ceeae3059b1f0de7f054bbb5",
+    "patched_blob_sha256": "a11a0cee408cfc64ecfea415ef79ef6e643107adad3f99bbec592ffd15e1682c"
+   },
+   "accepted_design_choices": [
+    "retained block-sequential sampler with COMPOUND_COUPLING_LAW_CONTRAST scope (isolated dependence attribution unavailable in V1)",
+    "selected-only economic veto: rank without size, re-evaluate c* under modelled size on the same paths, veto to WAIT only, never rerank or substitute"
+   ],
+   "closeout_corrections": [
+    "6.2 stale claim that JOINT-C_DIAG answers cross-block residual dependence removed; no V1 contrast isolates it",
+    "status line lifecycle and branch corrected; document is now the closed implementation contract",
+    "7 record schema now carries PER-BLOCK truncation fields (c^2(d_b), kappa(c,d_b), accepted mass, rejections) for block 1, block 2 and the extension, plus M and C with PD checks and the separate ranking/veto values",
+    "4.3 discloses that the economic Sh(F2) and D terms bundle the size-veto policy (label INCLUDES_SIZE_VETO_POLICY); forecast-quality Sh(F2) is unaffected",
+    "5.3 discloses that rules 1 and 4 form an intersection that shrinks the trade set without simultaneous coverage across both gate families (label GATES_INTERSECTION_NOT_SIMULTANEOUS_COVERAGE)",
+    "9 names the marginal-preserving dependence contrast and a veto-free size-modelling comparator as the separations outside V1"
+   ],
+   "not_authorized_by_closing": [
+    "fitting run (R4-FIT-001 / R4-FIT-002)",
+    "historical access",
+    "live-feed and fee commissioning",
+    "service activation",
+    "admission request",
+    "prospective paper trading",
+    "backtest",
+    "orders"
+   ],
+   "next": "implement and independently test R4 on synthetic inputs against this pinned contract"
+  }
+ },
+ "preserved": [
+  "EXP-001B NO_SIGNAL",
+  "EXP-002 INVALID_NULL_CONTROL",
+  "EXP-003 withdrawn",
+  "EXP-004 NOT_SELECTED",
+  "signing keys",
+  "installed admissions",
+  "frozen registrations",
+  "deployed release 73fc712d3",
+  "maintenance block",
+  "live options ledger (94 records)"
+ ],
+ "not_authorized": [
+  "deployment",
+  "service start",
+  "maintenance-block removal",
+  "broker connection",
+  "orders",
+  "historical fitting",
+  "rescoring",
+  "sealed-data access",
+  "new market-data collection"
+ ],
+ "live_data_channels": {
+  "robinhood_mcp": {
+   "state": "READ_ONLY_SMOKE_DONE_2026-09-11",
+   "adapter": "apex/pulse_options/robinhood_mcp.py",
+   "tests": "tests/test_robinhood_mcp_adapter.py",
+   "evidence": "docs/evidence/robinhood_smoke_2026-09-11.json",
+   "reach": "agent session only (MCP); not reachable from host processes",
+   "orders": "NEVER via this build",
+   "authorization": "operator message 2026-09-11 for read-only quotes/chains/bars"
+  },
+  "alpaca_data_v2": {
+   "state": "ADAPTER_GATED_OFF",
+   "credentials": "data-only keys present on host secret backend (paper endpoint 401)",
+   "reach": "host"
+  },
+  "thetadata_v3": {
+   "state": "ADAPTER_GATED_OFF",
+   "reach": "host terminal 127.0.0.1:25503"
+  },
+  "unauthenticated_mcp_servers": [
+   "bigdata.com",
+   "daloopa",
+   "finance:bigquery",
+   "lseg",
+   "sp-global"
+  ]
+ },
+ "studies": {
+  "PILOT-REPLAY-001": {
+   "status": "COMPLETED",
+   "evidence": "docs/evidence/pilot_replay_001_summary.json",
+   "result": "docs/PILOT_REPLAY_001_RESULT.md",
+   "conclusion": "DID_NOT_DEMONSTRATE_IMPROVEMENT_OVER_WAIT; direction label no skill"
+  },
+  "PILOT-REPLAY-002": {
+   "status": "DECLARED_NOT_RUN",
+   "contract": "apex/backtest_wb/contract2.py",
+   "runner": "scripts/pilot_replay_002.py",
+   "hold": "operator: no backtests until the funnel is complete"
+  },
+  "SHARADAR-DAILYVOL-001": {
+   "status": "COMPLETED",
+   "result": "docs/SHARADAR_DAILYVOL_001_RESULT.md"
+  }
+ }
+}

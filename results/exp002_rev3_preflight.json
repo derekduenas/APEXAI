@@ -1,0 +1,117 @@
+{
+ "contract": "RESEARCH_ACTIVATION_V1",
+ "status": "OK",
+ "utc": "2026-09-09T05:18:21Z",
+ "action": "preflight",
+ "targets_validated": {
+  "research_root": "/apex-data/research-exp002",
+  "runner_root": "/opt/apex-runner-exp002",
+  "research_user": "apexresearch3",
+  "environment": "REVISION (disjoint from the production default)",
+  "disjoint_from_default": true
+ },
+ "targets": {
+  "research_user": "apexresearch3",
+  "runner_root": "/opt/apex-runner-exp002",
+  "venv": "/opt/apex-runner-exp002/venv",
+  "checkout": "/apex-data/research-exp002/checkout",
+  "view": "/apex-data/research-exp002/dataset_view",
+  "out": "/apex-data/research-exp002/out",
+  "trust_root": "/etc/apex/admissions",
+  "allowed_signers": "/etc/apex/admissions/trust/allowed_signers"
+ },
+ "requirements": [
+  "numpy==2.4.6"
+ ],
+ "checks": [
+  {
+   "check": "identity_absent",
+   "ok": true,
+   "detail": "apexresearch3 does not exist yet"
+  },
+  {
+   "check": "destination_free:runner_root",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:research_root",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:checkout",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:view",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "source_repo",
+   "ok": true,
+   "detail": "/opt/apex-repo"
+  },
+  {
+   "check": "system_python",
+   "ok": true,
+   "detail": "/usr/bin/python3.12"
+  },
+  {
+   "check": "corpus_readable",
+   "ok": true,
+   "detail": "/apex-data/history-b/etf_continuous/bars"
+  },
+  {
+   "check": "manifest_present",
+   "ok": true,
+   "detail": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json"
+  },
+  {
+   "check": "manifest_hash",
+   "ok": true,
+   "detail": "3ac8b250eefb47c5"
+  },
+  {
+   "check": "inventory_count",
+   "ok": true,
+   "detail": "1511 selected, expected 1511"
+  },
+  {
+   "check": "trust_root_present",
+   "ok": true,
+   "detail": "/etc/apex/admissions (authority creates)"
+  },
+  {
+   "check": "allowed_signers_present",
+   "ok": true,
+   "detail": "/etc/apex/admissions/trust/allowed_signers (authority installs)"
+  },
+  {
+   "check": "commit_resolves",
+   "ok": true,
+   "detail": "a7b0b2f935115792e090d31e159fb4942929f12b"
+  }
+ ],
+ "blocking": [],
+ "resuming": false,
+ "inventory": {
+  "selected_from_manifest": 1511,
+  "expected": 1511,
+  "first": "2016-01-04",
+  "last": "2021-12-31",
+  "symbol": "SPY",
+  "range": [
+   "2016-01-04",
+   "2021-12-31"
+  ]
+ },
+ "resolved_commit": {
+  "commit": "a7b0b2f935115792e090d31e159fb4942929f12b",
+  "tree_sha256": "cf28f17315c3adbb195cd79e888571b492272b35fffd71880f20ce0614722a1f",
+  "n_files": 57
+ },
+ "ok": true
+}

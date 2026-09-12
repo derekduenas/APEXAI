@@ -1,0 +1,52 @@
+{
+ "answer_class": "TIMELINE_RECONSTRUCTION_WITH_A_STATED_GAP \u2014 not definitive",
+ "bytecode_headers": "every exp002 .pyc records a source mtime and size equal to the current file's; the pycs were written by the py_compile step 79 ms before launch and are what the process imported",
+ "checkout_modified_during_capture": false,
+ "conclusion": "Provenance is a timeline reconstruction: patch -> compile -> start, files unchanged since, working tree clean at e9891db6, bytecode headers matching the files. The remaining limitation is that the process did not record hashes of what it imported, so the loaded bytes are reconstructed, not captured.",
+ "content_identity": {
+  "dirty_files": 0,
+  "sha256_prefixes_match_commit": {
+   "apex/world_model/exp002/bootstrap.py": "f9b7a66d7efeed56",
+   "apex/world_model/exp002/controls.py": "399b3b86b58df683",
+   "apex/world_model/exp002/models.py": "37a8351b728e25a0",
+   "apex/world_model/exp002/registration.py": "b6336c35b8658902",
+   "apex/world_model/exp002/run.py": "395421c5e2d8ab0d",
+   "apex/world_model/exp002/scoring.py": "3243ea4c20857535",
+   "apex/world_model/exp002/studentt.py": "d211424f438c26df",
+   "scripts/exp002_synthetic_qualification.py": "52881546ccbaee55"
+  },
+  "worktree_head": "e9891db68d2832191f9b0d9629aec06199be330c"
+ },
+ "every_other_imported_source_file": "modified BEFORE process start: exp002/{__init__,bootstrap,controls,registration,run,scoring,studentt}.py, scripts/exp002_synthetic_qualification.py, exp001b/{models,registration}.py, exp001/models.py, grader.py, inference.py, forecast.py, targets.py, canonical.py",
+ "follow_up_not_done_here": "record sys.modules file paths and sha256 at startup in scripts/exp002_synthetic_qualification.py, mirroring the historical path; not applied to the running checkout",
+ "not_established_by_this": "that the commit itself has been reviewed; e9891db6 remains reported evidence until reviewed",
+ "process": {
+  "PYTHONPATH": "/apex-data/tmp/exp002_wt",
+  "cwd": "/apex-data/tmp/exp002_wt",
+  "exe": "/usr/bin/python3.12 (via /opt/apex-runner-rev2/venv/bin/python)",
+  "exec_main_start_utc_microseconds": "2026-09-09 02:25:02.216409",
+  "pid": 2016572,
+  "start_source": "systemd ExecMainStartTimestampMonotonic converted with the realtime-monotonic offset",
+  "unit": "exp002-qual.service"
+ },
+ "provenance": "EXP002_SYNTHETIC_QUALIFICATION_SOURCE_IDENTITY",
+ "question": "what exact source did the running qualification process load, given that it was launched before the first commit and refusal handling was changed immediately beforehand?",
+ "the_one_file_modified_nearest_the_launch": {
+  "bytecode_written_epoch": 1788920702.137688,
+  "change": "wrap the registered baseline's own ValueError as ArmRefused(REGISTERED_BASELINE_REFUSED); no successful-path behaviour changed",
+  "file": "apex/world_model/exp002/models.py",
+  "modified_epoch": 1788920702.032686,
+  "note": "one-second timestamps (ps lstart 02:25:01, systemd ActiveEnter 02:25:02, file mtime 02:25:02) could NOT order these events; nanosecond file times and the microsecond unit start stamp can, and do",
+  "ordering_patch_then_compile_then_start": true,
+  "process_started_epoch": 1788920702.216409,
+  "start_minus_compile_seconds": 0.079,
+  "start_minus_patch_seconds": 0.184
+ },
+ "what_the_process_itself_captured": {
+  "contrast": "the historical execute path DOES record imports and asserts all_imports_match_admitted_commit; the synthetic script lacks that step",
+  "import_path": "PYTHONPATH=/apex-data/tmp/exp002_wt and cwd, read from /proc/<pid> while running",
+  "module_bytes_or_hashes": "NOT captured. The qualification script records only registration_hash() (sha256 of registration.py). It does not record sys.modules paths or hashes of the modules it imported."
+ },
+ "what_the_timeline_does_NOT_establish": "which module bytes the interpreter actually read. Ordering plus unchanged files makes any other content implausible, but it is an inference from records, not a capture by the process.",
+ "what_the_timeline_establishes": "the refusal-handling patch, the bytecode compile and the process start happened in that order 184 ms apart, and no imported source file was modified after start"
+}

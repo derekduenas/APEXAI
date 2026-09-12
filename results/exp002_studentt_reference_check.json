@@ -1,0 +1,162 @@
+{
+ "evidence_status": "THIS FILE is the numerical-validation evidence: it records an executed comparison. The committed test tests/test_exp002_reference_scipy.py repeats a subset only where scipy is importable; when it is skipped, that skip is NOT a validation pass and must not be reported as one.",
+ "fit_vs_scipy_mle": [
+  {
+   "at_upper": false,
+   "converged": true,
+   "nll_at_scipy": 100218.96371789376,
+   "nll_ours": 100218.96371738441,
+   "nu_true": 3.0,
+   "ours_nu": 2.938069685056956,
+   "ours_s": 0.8949775946046508,
+   "s_true": 0.9,
+   "scipy_nu": 2.9381086700053825,
+   "scipy_s": 0.8949811287145928
+  },
+  {
+   "at_upper": false,
+   "converged": true,
+   "nll_at_scipy": 108454.84261780801,
+   "nll_ours": 108454.84261774585,
+   "nu_true": 5.0,
+   "ours_nu": 5.242392495052801,
+   "ours_s": 1.209295515781324,
+   "s_true": 1.2,
+   "scipy_nu": 5.242379346726898,
+   "scipy_s": 1.2092935661529758
+  },
+  {
+   "at_upper": false,
+   "converged": true,
+   "nll_at_scipy": 68940.45536613677,
+   "nll_ours": 68940.45536613124,
+   "nu_true": 12.0,
+   "ours_nu": 11.423623927055424,
+   "ours_s": 0.6981879013923719,
+   "s_true": 0.7,
+   "scipy_nu": 11.423674543870748,
+   "scipy_s": 0.698188130906422
+  },
+  {
+   "at_upper": false,
+   "converged": true,
+   "nll_at_scipy": 86897.28995875473,
+   "nll_ours": 86897.28995875416,
+   "nu_true": 40.0,
+   "ours_nu": 42.81646770000083,
+   "ours_s": 1.0058771017402734,
+   "s_true": 1.0,
+   "scipy_nu": 42.81643674624019,
+   "scipy_s": 1.0058770760993312
+  }
+ ],
+ "fitter_settings": {
+  "agreement": "nu and s to ~1e-3 relative; negative log-likelihood to <1e-3 absolute on n=60000",
+  "location_fixed_consistently": true,
+  "ours": "fit_scale_nu: two-parameter ML over (log s, log nu) with location FIXED at 0 by construction (the model has no location parameter; inputs are residuals), Nelder-Mead, init nu0=6, s0=std(z)*sqrt((nu0-2)/nu0), simplex step 0.1, stop max|df|<1e-8 and diameter<1e-8, max 500 iterations, nu bounds [2.1, 50] as infinite walls",
+  "sample": "numpy default_rng(20260909).standard_t(nu_true, 60000) * s_true, four (nu, s) pairs",
+  "scipy": "scipy.stats.t.fit(z, floc=0.0): location FIXED at 0, df and scale free"
+ },
+ "max_abs_err": {
+  "cdf_abs_or_tail_relative": 6.666155100234282e-11,
+  "implied_sd_relative": 1.49039146700115e-16,
+  "logpdf": 1.4210854715202004e-14,
+  "ppf_standardised_units": 1.4118996976855041e-08
+ },
+ "mu": 0.00037,
+ "nu_bounds_declared": [
+  2.1,
+  50.0
+ ],
+ "nu_range_checked": [
+  2.1,
+  2.5,
+  3.0,
+  4.0,
+  5.0,
+  8.0,
+  10.0,
+  20.0,
+  30.0,
+  50.0
+ ],
+ "quantile_levels": [
+  1e-06,
+  0.0001,
+  0.001,
+  0.01,
+  0.05,
+  0.25,
+  0.5,
+  0.75,
+  0.95,
+  0.99,
+  0.999,
+  0.9999,
+  0.999999
+ ],
+ "scale": 0.00021,
+ "scipy_version": "1.18.1",
+ "versions": {
+  "correction": "an earlier commit message said the committed test ran under 1.18.1; it ran under 1.17.1. Agreement against two independent scipy versions is recorded as such.",
+  "numpy": "2.4.6 (pinned in the disposable venv to match the research runner)",
+  "python": "3.12",
+  "scipy": "1.18.1",
+  "scipy_committed_test": "1.17.1 (shared test venv /opt/apex/shared/venv; the committed test EXECUTED there, 25 cases passed, it did not skip)",
+  "scipy_executed_record": "1.18.1 (disposable venv, this file)",
+  "venv": "disposable /tmp/refvenv, created for this check and deleted afterwards; scipy is NOT a production dependency"
+ },
+ "worst": {
+  "cdf": {
+   "nu": 50.0,
+   "ours": 1.0944697426129579e-07,
+   "relative_on_tail": true,
+   "scipy": 1.0944697425399989e-07,
+   "x": -6
+  },
+  "implied_sd": {
+   "nu": 3.0,
+   "ours": 0.0003637306695894642,
+   "scipy": 0.00036373066958946427
+  },
+  "logpdf": {
+   "nu": 30.0,
+   "ours": -61.19791389905291,
+   "scipy": -61.19791389905289,
+   "x": -50
+  },
+  "ppf": {
+   "nu": 2.1,
+   "ours_std": 534.115026874309,
+   "q": 0.999999,
+   "scipy_std": 534.115026888428
+  }
+ },
+ "x_grid_standardised": [
+  -50,
+  -20,
+  -10,
+  -6,
+  -4,
+  -3,
+  -2,
+  -1,
+  -0.5,
+  -0.1,
+  -0.001,
+  -1e-06,
+  0.0,
+  1e-06,
+  0.001,
+  0.1,
+  0.5,
+  1,
+  2,
+  3,
+  4,
+  6,
+  10,
+  20,
+  50
+ ]
+}

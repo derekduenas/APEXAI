@@ -1,0 +1,83 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_whole_ledger_guard.py::test_no_new_whole_ledger_read_in_a_repeating_runtime_path",
+   "file": "tests/test_whole_ledger_guard.py"
+  },
+  {
+   "nodeid": "tests/test_whole_ledger_guard.py::test_every_registered_offender_still_exists",
+   "file": "tests/test_whole_ledger_guard.py"
+  },
+  {
+   "nodeid": "tests/test_whole_ledger_guard.py::test_pulse_v1_minute_path_reads_no_ledger",
+   "file": "tests/test_whole_ledger_guard.py"
+  },
+  {
+   "nodeid": "tests/test_whole_ledger_guard.py::test_checkpoint_module_declares_the_law",
+   "file": "tests/test_whole_ledger_guard.py"
+  }
+ ],
+ "collected_count": 4,
+ "collect_errors": [],
+ "results": {
+  "tests/test_whole_ledger_guard.py::test_no_new_whole_ledger_read_in_a_repeating_runtime_path": {
+   "file": "tests/test_whole_ledger_guard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_whole_ledger_guard.py::test_every_registered_offender_still_exists": {
+   "file": "tests/test_whole_ledger_guard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_whole_ledger_guard.py::test_pulse_v1_minute_path_reads_no_ledger": {
+   "file": "tests/test_whole_ledger_guard.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_whole_ledger_guard.py::test_checkpoint_module_declares_the_law": {
+   "file": "tests/test_whole_ledger_guard.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 4,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_whole_ledger_guard.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 162.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35185.service",
+   "memory_max": "1468006400",
+   "memory_peak": "119689216",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 8.54
+ }
+}

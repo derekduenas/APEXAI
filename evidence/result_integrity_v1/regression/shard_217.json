@@ -1,0 +1,128 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_r51.py::test_engine_frozen_n0v0_preserved",
+   "file": "tests/test_world_model_r51.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r51.py::test_target_world_independent_same_family_fail_closed",
+   "file": "tests/test_world_model_r51.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r51.py::test_n0_v1_features_from_A_targets_from_B_no_permutation",
+   "file": "tests/test_world_model_r51.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r51.py::test_n0_v1_runs_through_pipeline_with_executed_split_and_identity",
+   "file": "tests/test_world_model_r51.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r51.py::test_n0_v1_both_processes_structured_and_independent",
+   "file": "tests/test_world_model_r51.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r51.py::test_n1_transformation_unchanged_and_geometry_exact",
+   "file": "tests/test_world_model_r51.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r51.py::test_n1_e1860_is_the_frozen_construction",
+   "file": "tests/test_world_model_r51.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r51.py::test_dev_seeds_fresh_disjoint_paired_target_seeds",
+   "file": "tests/test_world_model_r51.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r51.py::test_budget_r51",
+   "file": "tests/test_world_model_r51.py"
+  }
+ ],
+ "collected_count": 9,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_r51.py::test_engine_frozen_n0v0_preserved": {
+   "file": "tests/test_world_model_r51.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r51.py::test_target_world_independent_same_family_fail_closed": {
+   "file": "tests/test_world_model_r51.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r51.py::test_n0_v1_features_from_A_targets_from_B_no_permutation": {
+   "file": "tests/test_world_model_r51.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r51.py::test_n0_v1_runs_through_pipeline_with_executed_split_and_identity": {
+   "file": "tests/test_world_model_r51.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r51.py::test_n0_v1_both_processes_structured_and_independent": {
+   "file": "tests/test_world_model_r51.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r51.py::test_n1_transformation_unchanged_and_geometry_exact": {
+   "file": "tests/test_world_model_r51.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r51.py::test_n1_e1860_is_the_frozen_construction": {
+   "file": "tests/test_world_model_r51.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r51.py::test_dev_seeds_fresh_disjoint_paired_target_seeds": {
+   "file": "tests/test_world_model_r51.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r51.py::test_budget_r51": {
+   "file": "tests/test_world_model_r51.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 9,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_r51.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 171.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36439.service",
+   "memory_max": "1468006400",
+   "memory_peak": "128716800",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 9.05
+ }
+}

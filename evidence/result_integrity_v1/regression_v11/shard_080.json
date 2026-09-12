@@ -1,0 +1,128 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_system_cognition.py::test_all_healthy_components_is_overall_healthy",
+   "file": "tests/test_frontier2_system_cognition.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_system_cognition.py::test_one_degraded_component_caps_the_whole_system",
+   "file": "tests/test_frontier2_system_cognition.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_system_cognition.py::test_degraded_observation_integrity_alone_prevents_high_quality",
+   "file": "tests/test_frontier2_system_cognition.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_system_cognition.py::test_unsupplied_components_read_unknown_not_healthy",
+   "file": "tests/test_frontier2_system_cognition.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_system_cognition.py::test_all_twelve_components_tracked",
+   "file": "tests/test_frontier2_system_cognition.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_system_cognition.py::test_unknown_overall_quality_refused_at_construction",
+   "file": "tests/test_frontier2_system_cognition.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_system_cognition.py::test_failed_beats_degraded_as_worst",
+   "file": "tests/test_frontier2_system_cognition.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_system_cognition.py::test_determinism_same_inputs_twice_byte_identical",
+   "file": "tests/test_frontier2_system_cognition.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_system_cognition.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_system_cognition.py"
+  }
+ ],
+ "collected_count": 9,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_system_cognition.py::test_all_healthy_components_is_overall_healthy": {
+   "file": "tests/test_frontier2_system_cognition.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_system_cognition.py::test_one_degraded_component_caps_the_whole_system": {
+   "file": "tests/test_frontier2_system_cognition.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_system_cognition.py::test_degraded_observation_integrity_alone_prevents_high_quality": {
+   "file": "tests/test_frontier2_system_cognition.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_system_cognition.py::test_unsupplied_components_read_unknown_not_healthy": {
+   "file": "tests/test_frontier2_system_cognition.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_system_cognition.py::test_all_twelve_components_tracked": {
+   "file": "tests/test_frontier2_system_cognition.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_system_cognition.py::test_unknown_overall_quality_refused_at_construction": {
+   "file": "tests/test_frontier2_system_cognition.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_system_cognition.py::test_failed_beats_degraded_as_worst": {
+   "file": "tests/test_frontier2_system_cognition.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_system_cognition.py::test_determinism_same_inputs_twice_byte_identical": {
+   "file": "tests/test_frontier2_system_cognition.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_system_cognition.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_system_cognition.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 9,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_system_cognition.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36575.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115367936",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.0
+ }
+}

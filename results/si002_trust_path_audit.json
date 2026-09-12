@@ -1,0 +1,344 @@
+{
+ "host_user": {
+  "euid": 1000,
+  "groups": [
+   27,
+   100,
+   1000
+  ],
+  "uid": 1000
+ },
+ "produced_utc": "2026-09-07T23:36:39Z",
+ "production_trust_check": {
+  "refusal": "TRUST_PATH_MISSING: admission_root /etc/apex/admissions: [Errno 2] No such file or directory: '/etc/apex'",
+  "status": "WOULD_REFUSE"
+ },
+ "research_account_privilege": {
+  "can_become_root": true,
+  "note": "if this account can become root, NO filesystem ownership check is a boundary against it; research must run as an account without sudo",
+  "sudo_l_output": "Matching Defaults entries for apex on APEX:\n    env_reset, mail_badpass, secure_path=/usr/local/sbin\\:/usr/local/bin\\:/usr/sbin\\:/usr/bin\\:/sbin\\:/bin\\:/snap/bin, use_pty\n\nUser apex may run the following commands on APEX:\n    (ALL : ALL) ALL\n    (ALL) NOPASSWD: ALL",
+  "sudo_l_returncode": 0
+ },
+ "targets": {
+  "manifest_dir": {
+   "chain": [
+    {
+     "dir": true,
+     "gid": 0,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": false,
+     "parent_writable_by_euid": false,
+     "path": "/",
+     "sticky": false,
+     "uid": 0,
+     "writable_by_euid": false
+    },
+    {
+     "dir": true,
+     "gid": 1000,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": true,
+     "parent_writable_by_euid": false,
+     "path": "/apex-data",
+     "sticky": false,
+     "uid": 1000,
+     "writable_by_euid": true
+    },
+    {
+     "dir": true,
+     "gid": 1000,
+     "group_or_other_writable": true,
+     "mode": "775",
+     "owned_by_euid": true,
+     "parent_writable_by_euid": true,
+     "path": "/apex-data/governance",
+     "sticky": false,
+     "uid": 1000,
+     "writable_by_euid": true
+    },
+    {
+     "dir": true,
+     "gid": 1000,
+     "group_or_other_writable": true,
+     "mode": "775",
+     "owned_by_euid": true,
+     "parent_writable_by_euid": true,
+     "path": "/apex-data/governance/admissions",
+     "sticky": false,
+     "uid": 1000,
+     "writable_by_euid": true
+    },
+    {
+     "dir": true,
+     "gid": 1000,
+     "group_or_other_writable": true,
+     "mode": "775",
+     "owned_by_euid": true,
+     "parent_writable_by_euid": true,
+     "path": "/apex-data/governance/admissions/manifests",
+     "sticky": false,
+     "uid": 1000,
+     "writable_by_euid": true
+    }
+   ],
+   "exists": true,
+   "path": "/apex-data/governance/admissions/manifests"
+  },
+  "output_root": {
+   "chain": [
+    {
+     "dir": true,
+     "gid": 0,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": false,
+     "parent_writable_by_euid": false,
+     "path": "/",
+     "sticky": false,
+     "uid": 0,
+     "writable_by_euid": false
+    },
+    {
+     "dir": true,
+     "gid": 1000,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": true,
+     "parent_writable_by_euid": false,
+     "path": "/apex-data",
+     "sticky": false,
+     "uid": 1000,
+     "writable_by_euid": true
+    },
+    {
+     "absent": true,
+     "error": "[Errno 2] No such file or directory: '/apex-data/research'",
+     "path": "/apex-data/research"
+    }
+   ],
+   "exists": false,
+   "path": "/apex-data/research"
+  },
+  "production_admission_root": {
+   "chain": [
+    {
+     "dir": true,
+     "gid": 0,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": false,
+     "parent_writable_by_euid": false,
+     "path": "/",
+     "sticky": false,
+     "uid": 0,
+     "writable_by_euid": false
+    },
+    {
+     "dir": true,
+     "gid": 0,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": false,
+     "parent_writable_by_euid": false,
+     "path": "/etc",
+     "sticky": false,
+     "uid": 0,
+     "writable_by_euid": false
+    },
+    {
+     "absent": true,
+     "error": "[Errno 2] No such file or directory: '/etc/apex'",
+     "path": "/etc/apex"
+    }
+   ],
+   "exists": false,
+   "path": "/etc/apex/admissions"
+  },
+  "production_allowed_signers": {
+   "chain": [
+    {
+     "dir": true,
+     "gid": 0,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": false,
+     "parent_writable_by_euid": false,
+     "path": "/",
+     "sticky": false,
+     "uid": 0,
+     "writable_by_euid": false
+    },
+    {
+     "dir": true,
+     "gid": 0,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": false,
+     "parent_writable_by_euid": false,
+     "path": "/etc",
+     "sticky": false,
+     "uid": 0,
+     "writable_by_euid": false
+    },
+    {
+     "absent": true,
+     "error": "[Errno 2] No such file or directory: '/etc/apex'",
+     "path": "/etc/apex"
+    }
+   ],
+   "exists": false,
+   "path": "/etc/apex/admissions/trust/allowed_signers"
+  },
+  "superseded_admission_root": {
+   "chain": [
+    {
+     "dir": true,
+     "gid": 0,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": false,
+     "parent_writable_by_euid": false,
+     "path": "/",
+     "sticky": false,
+     "uid": 0,
+     "writable_by_euid": false
+    },
+    {
+     "dir": true,
+     "gid": 1000,
+     "group_or_other_writable": false,
+     "mode": "755",
+     "owned_by_euid": true,
+     "parent_writable_by_euid": false,
+     "path": "/apex-data",
+     "sticky": false,
+     "uid": 1000,
+     "writable_by_euid": true
+    },
+    {
+     "dir": true,
+     "gid": 1000,
+     "group_or_other_writable": true,
+     "mode": "775",
+     "owned_by_euid": true,
+     "parent_writable_by_euid": true,
+     "path": "/apex-data/governance",
+     "sticky": false,
+     "uid": 1000,
+     "writable_by_euid": true
+    },
+    {
+     "dir": true,
+     "gid": 1000,
+     "group_or_other_writable": true,
+     "mode": "775",
+     "owned_by_euid": true,
+     "parent_writable_by_euid": true,
+     "path": "/apex-data/governance/admissions",
+     "sticky": false,
+     "uid": 1000,
+     "writable_by_euid": true
+    }
+   ],
+   "exists": true,
+   "path": "/apex-data/governance/admissions"
+  }
+ },
+ "verdicts": {
+  "manifest_dir": {
+   "replaceable_components": [
+    "/apex-data",
+    "/apex-data/governance",
+    "/apex-data/governance/admissions",
+    "/apex-data/governance/admissions/manifests"
+   ],
+   "research_account_can_replace_some_component": true,
+   "why": "a component whose PARENT is writable by this account can be renamed away and replaced, whatever the component's own owner and mode say"
+  },
+  "output_root": {
+   "replaceable_components": [
+    "/apex-data"
+   ],
+   "research_account_can_replace_some_component": true,
+   "why": "a component whose PARENT is writable by this account can be renamed away and replaced, whatever the component's own owner and mode say"
+  },
+  "production_admission_root": {
+   "replaceable_components": [],
+   "research_account_can_replace_some_component": false,
+   "why": "a component whose PARENT is writable by this account can be renamed away and replaced, whatever the component's own owner and mode say"
+  },
+  "production_allowed_signers": {
+   "replaceable_components": [],
+   "research_account_can_replace_some_component": false,
+   "why": "a component whose PARENT is writable by this account can be renamed away and replaced, whatever the component's own owner and mode say"
+  },
+  "superseded_admission_root": {
+   "replaceable_components": [
+    "/apex-data",
+    "/apex-data/governance",
+    "/apex-data/governance/admissions"
+   ],
+   "research_account_can_replace_some_component": true,
+   "why": "a component whose PARENT is writable by this account can be renamed away and replaced, whatever the component's own owner and mode say"
+  }
+ },
+ "verifier": {
+  "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+  "chain": [
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "parent_writable_by_euid": false,
+    "path": "/",
+    "sticky": false,
+    "uid": 0,
+    "writable_by_euid": false
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "parent_writable_by_euid": false,
+    "path": "/usr",
+    "sticky": false,
+    "uid": 0,
+    "writable_by_euid": false
+   },
+   {
+    "dir": true,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "parent_writable_by_euid": false,
+    "path": "/usr/bin",
+    "sticky": false,
+    "uid": 0,
+    "writable_by_euid": false
+   },
+   {
+    "dir": false,
+    "gid": 0,
+    "group_or_other_writable": false,
+    "mode": "755",
+    "owned_by_euid": false,
+    "parent_writable_by_euid": false,
+    "path": "/usr/bin/ssh-keygen",
+    "sticky": false,
+    "uid": 0,
+    "writable_by_euid": false
+   }
+  ],
+  "status": "TRUSTED",
+  "trusted_constant": "/usr/bin/ssh-keygen",
+  "trusted_executable_resolved": "/usr/bin/ssh-keygen",
+  "which_ssh_keygen": "/usr/bin/ssh-keygen"
+ }
+}

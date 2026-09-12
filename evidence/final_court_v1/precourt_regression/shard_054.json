@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_selection_is_deterministic_and_prioritizes_real_candidates",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_l2_is_bounded_to_four_and_quotes_to_twenty",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_no_llm_participates_in_selection",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_a_missing_book_is_unknown_never_zero_imbalance",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_fastwatch_writes_only_to_its_own_ledger",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_fastwatch_cannot_mint_official_record_kinds",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_fastwatch_spends_from_the_lab_budget_only",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_fastwatch_observation_carries_the_latency_fields",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_official_pipeline_is_byte_identical_with_fastwatch_present",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_mission_control_measures_every_row",
+   "file": "tests/test_eyes1_sensory.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1_sensory.py::test_mission_control_flags_and_exits_nonzero_on_unmeasured_rows",
+   "file": "tests/test_eyes1_sensory.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_eyes1_sensory.py::test_selection_is_deterministic_and_prioritizes_real_candidates": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_l2_is_bounded_to_four_and_quotes_to_twenty": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_no_llm_participates_in_selection": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_a_missing_book_is_unknown_never_zero_imbalance": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_fastwatch_writes_only_to_its_own_ledger": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_fastwatch_cannot_mint_official_record_kinds": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_fastwatch_spends_from_the_lab_budget_only": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_fastwatch_observation_carries_the_latency_fields": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_official_pipeline_is_byte_identical_with_fastwatch_present": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_mission_control_measures_every_row": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1_sensory.py::test_mission_control_flags_and_exits_nonzero_on_unmeasured_rows": {
+   "file": "tests/test_eyes1_sensory.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_eyes1_sensory.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35843.service",
+   "memory_max": "1468006400",
+   "memory_peak": "162275328",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.48
+ }
+}

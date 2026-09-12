@@ -1,0 +1,461 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_no_incumbent_can_import_edgeforge",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_every_edgeforge_output_is_powerless",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_a_genome_from_corrupted_lineage_refuses_to_exist",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_unknown_stays_unknown_and_is_never_imputed",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_forward_filling_is_refused_by_construction",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_every_field_carries_full_provenance",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_state_hash_is_content_sensitive",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_a_hypothesis_without_falsifiers_is_refused",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_no_invented_probability_may_ride_in_as_evidence",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_the_tournament_preserves_disagreement_and_refuses_to_average",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_a_single_hypothesis_is_flagged_as_a_story",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_disagreement_records_redundancy_and_carries_no_conclusion",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_analog_selection_cannot_see_the_future_by_construction",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_analogs_are_chosen_by_pre_state_distance",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_low_coverage_candidates_are_excluded_not_imputed",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_missing_futures_are_dropped_and_reported_never_fabricated",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_fake_branch_probabilities_are_refused",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_adversarial_worlds_are_labelled_stress_not_probability",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_every_attack_fights_the_identical_world_set",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_summaries_speak_world_fractions_not_probabilities",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_no_trade_is_a_first_class_baseline",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_bsm_reprice_carries_its_modelled_pedigree",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_an_axis_without_a_mechanism_reason_is_refused",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_the_surface_finds_decision_boundaries",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_brute_force_surfaces_are_refused",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_an_edge_without_competing_explanations_is_a_story",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_why_small_wins_is_mandatory_even_when_unknown",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_claimed_small_advantage_requires_evidence",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_giant_terrain_with_no_small_advantage_is_flagged",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_edges_cannot_self_promote",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_mutation_births_a_child_and_never_edits_the_parent",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_capital_accelerant_grants_nothing",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_experiments_register_before_results_exist",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_corrupted_dataset_boundaries_are_dead_on_arrival",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_an_experiment_needs_a_multiple_testing_family",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_null_results_stay_visible_in_the_family_denominator",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_thresholds_are_imported_from_the_incumbent_never_restated",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_a_knife_edge_makes_threshold_placement_a_priority_hypothesis",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_an_interior_verdict_narrows_the_search_without_diagnosing",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_reconstructed_inputs_cannot_found_a_proximity_claim",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_distances_are_per_dimension_never_a_scalar",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_an_unestimable_dimension_invents_no_distance",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_cohort_comparison_asks_whether_states_actually_differed",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_separated_cohorts_are_reported_as_separated",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_the_boundary_map_holds_no_authority",
+   "file": "tests/test_edgeforge_v0.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_v0.py::test_boundary_distances_are_recorded_but_never_read_by_a_gate",
+   "file": "tests/test_edgeforge_v0.py"
+  }
+ ],
+ "collected_count": 46,
+ "collect_errors": [],
+ "results": {
+  "tests/test_edgeforge_v0.py::test_no_incumbent_can_import_edgeforge": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_every_edgeforge_output_is_powerless": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_a_genome_from_corrupted_lineage_refuses_to_exist": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_unknown_stays_unknown_and_is_never_imputed": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_forward_filling_is_refused_by_construction": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_every_field_carries_full_provenance": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_state_hash_is_content_sensitive": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_a_hypothesis_without_falsifiers_is_refused": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_no_invented_probability_may_ride_in_as_evidence": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_the_tournament_preserves_disagreement_and_refuses_to_average": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_a_single_hypothesis_is_flagged_as_a_story": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_disagreement_records_redundancy_and_carries_no_conclusion": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_analog_selection_cannot_see_the_future_by_construction": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_analogs_are_chosen_by_pre_state_distance": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_low_coverage_candidates_are_excluded_not_imputed": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_missing_futures_are_dropped_and_reported_never_fabricated": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_fake_branch_probabilities_are_refused": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_adversarial_worlds_are_labelled_stress_not_probability": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_every_attack_fights_the_identical_world_set": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_summaries_speak_world_fractions_not_probabilities": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_no_trade_is_a_first_class_baseline": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_bsm_reprice_carries_its_modelled_pedigree": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_an_axis_without_a_mechanism_reason_is_refused": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_the_surface_finds_decision_boundaries": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_brute_force_surfaces_are_refused": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_an_edge_without_competing_explanations_is_a_story": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_why_small_wins_is_mandatory_even_when_unknown": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_claimed_small_advantage_requires_evidence": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_giant_terrain_with_no_small_advantage_is_flagged": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_edges_cannot_self_promote": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_mutation_births_a_child_and_never_edits_the_parent": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_capital_accelerant_grants_nothing": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_experiments_register_before_results_exist": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_corrupted_dataset_boundaries_are_dead_on_arrival": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_an_experiment_needs_a_multiple_testing_family": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_null_results_stay_visible_in_the_family_denominator": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_thresholds_are_imported_from_the_incumbent_never_restated": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_a_knife_edge_makes_threshold_placement_a_priority_hypothesis": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_an_interior_verdict_narrows_the_search_without_diagnosing": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_reconstructed_inputs_cannot_found_a_proximity_claim": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_distances_are_per_dimension_never_a_scalar": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_an_unestimable_dimension_invents_no_distance": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_cohort_comparison_asks_whether_states_actually_differed": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_separated_cohorts_are_reported_as_separated": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_the_boundary_map_holds_no_authority": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_v0.py::test_boundary_distances_are_recorded_but_never_read_by_a_gate": {
+   "file": "tests/test_edgeforge_v0.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 46,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_edgeforge_v0.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34982.service",
+   "memory_max": "1468006400",
+   "memory_peak": "117092352",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.86
+ }
+}

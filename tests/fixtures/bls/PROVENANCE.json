@@ -1,0 +1,37 @@
+{
+ "contract": "BLS_FIXTURE_PROVENANCE_V0",
+ "fixtures": {
+  "captured_CUUR0000SA0_REQUEST_SUCCEEDED.json": {
+   "origin": "CAPTURED",
+   "url": "https://api.bls.gov/publicAPI/v2/timeseries/data/CUUR0000SA0",
+   "requested_utc": "2026-09-08T03:06:06.594023+00:00",
+   "received_utc": "2026-09-08T03:06:06.832869+00:00",
+   "http_status": 200,
+   "bytes": 2935,
+   "sha256": "56b2a859d381c8e8f9b935de8afdb50e20b91d1426115c4e50961bce426e7b9f",
+   "note": "a single read-only GET from the host; this is the SUCCESS variant"
+  },
+  "constructed_REQUEST_NOT_PROCESSED_quota.json": {
+   "origin": "CONSTRUCTED_NOT_CAPTURED",
+   "sha256": "8d9002e358500c15289353dab7b54137d85b2ad5ffdfb9cb368f3516687d48a5",
+   "why": "the live API succeeded at capture time, so the failing response could not be captured without deliberately exhausting a public quota. This fixture reproduces the DOCUMENTED BLS refusal format; it is labelled constructed and must never be presented as captured.",
+   "reproduces": "KeyError('series') in the original expression, i.e. the recorded failure \"BLS CUUR0000SA0: unexpected shape ('series')\""
+  }
+ },
+ "evidence_for_the_quota_diagnosis": {
+  "kind": "OBSERVED, independent of any fixture",
+  "cycles_per_day_successful_bls": {
+   "2026-08-27": 9,
+   "2026-08-28": 8,
+   "2026-08-31": 8,
+   "2026-09-01": 8,
+   "2026-09-02": 8,
+   "2026-09-03": 8,
+   "2026-09-04": 8
+  },
+  "series_polled_per_cycle": 3,
+  "implied_requests_before_failure": "3 x 8 = 24, or 3 x 9 = 27",
+  "documented_unregistered_daily_allowance": 25,
+  "conclusion": "requests stop being served after roughly 25 per day, then every later cycle fails for the rest of the day and recovers the next day"
+ }
+}

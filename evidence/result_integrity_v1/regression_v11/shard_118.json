@@ -1,0 +1,254 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_delta_bounds",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_gamma_nonnegative",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_vega_positive",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_price_respects_intrinsic_and_upper_bound",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_price_monotonic_in_vol",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_call_price_nondecreasing_in_spot",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_put_price_nonincreasing_in_spot",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_iv_round_trip_reprices_within_tolerance",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_put_call_parity_holds",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_finite_difference_delta_matches_analytic",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_american_call_price_close_to_bsm_no_dividend",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_property_american_put_never_cheaper_than_bsm_european_put",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_one_minute_to_expiry",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_deep_itm_call",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_deep_itm_call_mid_below_intrinsic_yields_low_quality",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_deep_otm_put",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_very_high_iv_input_does_not_crash_pricer",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_very_low_iv_input_does_not_crash_pricer",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_wide_nbbo_flags_low_quality_not_a_crash",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_ex_dividend_tomorrow_refuses_without_a_schedule",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_zero_liquidity_contract_no_quote_is_low_quality_not_a_crash",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_stale_quote_with_no_current_nbbo_is_refused_not_guessed",
+   "file": "tests/test_option_analytics_adversarial.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_adversarial.py::test_stress_locked_crossed_market_refused",
+   "file": "tests/test_option_analytics_adversarial.py"
+  }
+ ],
+ "collected_count": 23,
+ "collect_errors": [],
+ "results": {
+  "tests/test_option_analytics_adversarial.py::test_property_delta_bounds": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_gamma_nonnegative": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_vega_positive": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_price_respects_intrinsic_and_upper_bound": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_price_monotonic_in_vol": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_call_price_nondecreasing_in_spot": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_put_price_nonincreasing_in_spot": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_iv_round_trip_reprices_within_tolerance": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_put_call_parity_holds": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_finite_difference_delta_matches_analytic": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_american_call_price_close_to_bsm_no_dividend": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_property_american_put_never_cheaper_than_bsm_european_put": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_one_minute_to_expiry": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_deep_itm_call": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_deep_itm_call_mid_below_intrinsic_yields_low_quality": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_deep_otm_put": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_very_high_iv_input_does_not_crash_pricer": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_very_low_iv_input_does_not_crash_pricer": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_wide_nbbo_flags_low_quality_not_a_crash": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_ex_dividend_tomorrow_refuses_without_a_schedule": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_zero_liquidity_contract_no_quote_is_low_quality_not_a_crash": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_stale_quote_with_no_current_nbbo_is_refused_not_guessed": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_adversarial.py::test_stress_locked_crossed_market_refused": {
+   "file": "tests/test_option_analytics_adversarial.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 23,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_option_analytics_adversarial.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36615.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115621888",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 7.85
+ }
+}

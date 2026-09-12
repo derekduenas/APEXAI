@@ -1,0 +1,1576 @@
+{
+ "definition": {
+  "court_version": "NULL_COURT_V0",
+  "court_id": "COURT-a4c366b64b0d",
+  "code_commit": "aba8437b4",
+  "model_identity": {
+   "model_id": "M0_SYNTHETIC_BASELINE_V0",
+   "model_version": "0.1.0",
+   "configuration": {
+    "ridge_lambda": 1.0,
+    "residual": "gaussian",
+    "bias_penalised": false
+   }
+  },
+  "model_config_hash": "b6aec556e20cf6617cf7797cb0ef0d84a1819f13d857131e2e0517ae49ddc925",
+  "seed_set": [
+   1000,
+   1037,
+   1074,
+   1111,
+   1148,
+   1185,
+   1222,
+   1259,
+   1296,
+   1333,
+   1370,
+   1407,
+   1444,
+   1481,
+   1518,
+   1555,
+   1592,
+   1629,
+   1666,
+   1703,
+   1740,
+   1777,
+   1814,
+   1851,
+   1888
+  ],
+  "seed_set_hash": "f14b10a1b928878170b97f94367f1e0442b5bc7bb568a037f6077cc9858a0cd8",
+  "controls": {
+   "N0": {
+    "name": "BLOCK_DERANGED_TARGETS",
+    "block_steps": 20,
+    "destroys": "pairing X_t <-> y_t",
+    "preserves": "X entirely; each y block's internal autocorrelation",
+    "expected": "NO_SIGNAL"
+   },
+   "N1": {
+    "name": "FORWARD_TIME_DISPLACEMENT",
+    "shift_steps": 200,
+    "destroys": "the planted z_t -> drift channel; residual autocorrelation 0.96^200 = 2.85e-04",
+    "preserves": "causal ORDER (grader accepts); each series' own path dependence; the purge",
+    "expected": "NO_SIGNAL"
+   },
+   "N2": {
+    "name": "NOISE_FEATURES",
+    "destroys": "all information in X",
+    "preserves": "y and outcome records exactly; X shape",
+    "expected": "NO_SIGNAL"
+   },
+   "N3": {
+    "name": "ROW_DERANGED_FEATURES",
+    "destroys": "pairing X_t <-> y_t and X's temporal structure",
+    "preserves": "X's marginal distribution exactly; y untouched",
+    "expected": "NO_SIGNAL"
+   },
+   "N4": {
+    "name": "RANDOM_RANKER",
+    "destroys": "any use of features (the model ignores x)",
+    "preserves": "the training sd, exactly as the null comparator",
+    "expected": "NO_SIGNAL"
+   }
+  },
+  "positive_controls": {
+   "P0": {
+    "name": "S1_CAUSAL_TREND_UNTRANSFORMED",
+    "expected": "SIGNAL_DETECTED"
+   }
+  },
+  "decision_rule": "SIGNAL_DETECTED iff mean(d) > 0 and mean(d)/stderr(d) > 2.0, d_i = logL_model - logL_null per evaluation sample",
+  "z_rule": 2.0,
+  "decision_rule_hash": "9565f7196d3f3cb44e657114b8ca3da7d039159c7bfd29758ed3aaff0a0aa86d",
+  "error_control": {
+   "individual_nominal_alpha": 0.023,
+   "trials_per_control": 25,
+   "expected_false_positives": 0.575,
+   "max_tolerated_false_positives": 3,
+   "court_false_fail_probability_per_control": 0.002404343894910405,
+   "court_false_fail_probability_across_controls": 0.011964049603874649,
+   "independence_assumption": "ACROSS seeds only (disjoint PRNG streams -> independent worlds). Says nothing about WITHIN-world calibration, which is what the court measures."
+  },
+  "positive_control_rule": {
+   "min_detection_rate": 0.8,
+   "min_positive_direction_rate": 0.9
+  },
+  "base_world": {
+   "type": "S1_CAUSAL_TREND",
+   "sigma": 0.002,
+   "params": {
+    "mu": 0.0015,
+    "flip_prob": 0.02
+   },
+   "n_steps": 1200,
+   "observe_latent": true
+  },
+  "number_of_tests": 150,
+  "authority": "SYNTHETIC_RESEARCH_ONLY"
+ },
+ "court_hash": "ea6b1b41b1d447ffbcf0f1b7aa0b67240773e5f99ee1a81e3652242a8cb1d0ba",
+ "results": {
+  "N0": {
+   "cells": [
+    {
+     "control": "N0",
+     "seed": 1000,
+     "verdict": "NO_SIGNAL",
+     "z": -1.1443641059403697,
+     "mean_loglik_gain": -0.006315615400333776,
+     "n_eval": 465,
+     "world_hash": "36698f3646997345cf358ed5492f1b3c36eafb1bd781a7fd82e85fac71c521bb"
+    },
+    {
+     "control": "N0",
+     "seed": 1037,
+     "verdict": "NO_SIGNAL",
+     "z": -16.71909655448909,
+     "mean_loglik_gain": -0.2840784236124457,
+     "n_eval": 465,
+     "world_hash": "f3bfc920f6cbf309a0f8f4fff1ebac6c9926ab767915497e754596118cbf9b9c"
+    },
+    {
+     "control": "N0",
+     "seed": 1074,
+     "verdict": "NO_SIGNAL",
+     "z": -2.245258126148059,
+     "mean_loglik_gain": -0.02162530504782697,
+     "n_eval": 465,
+     "world_hash": "6de797dc94d1399f85c3dccc23a60904850832d2a966ad08f0bbd4fd1be1949b"
+    },
+    {
+     "control": "N0",
+     "seed": 1111,
+     "verdict": "NO_SIGNAL",
+     "z": -0.4977216771295859,
+     "mean_loglik_gain": -0.009291869651155544,
+     "n_eval": 465,
+     "world_hash": "69fc5c722eaa2123a4c5fb2dd3260cc76b4068712d3ba268e230aab007c33823"
+    },
+    {
+     "control": "N0",
+     "seed": 1148,
+     "verdict": "NO_SIGNAL",
+     "z": -5.5056987531301,
+     "mean_loglik_gain": -0.09645939975876602,
+     "n_eval": 465,
+     "world_hash": "6ff43f9af9ff70502a72ac764b922b87a9e6ba6bf9ae5ab945e2dbd4092d345d"
+    },
+    {
+     "control": "N0",
+     "seed": 1185,
+     "verdict": "NO_SIGNAL",
+     "z": -11.824687135948004,
+     "mean_loglik_gain": -0.05114654051602194,
+     "n_eval": 465,
+     "world_hash": "240535b6358e45ca2a5d20b631b65470282922a53fc41e0e96ca75dbd8bdf43c"
+    },
+    {
+     "control": "N0",
+     "seed": 1222,
+     "verdict": "NO_SIGNAL",
+     "z": -0.7990734585425988,
+     "mean_loglik_gain": -0.009290696638184293,
+     "n_eval": 465,
+     "world_hash": "a16f004a41b5e3c4a7857f242105f724b85175074af321fb2b36a4f27d0e1c27"
+    },
+    {
+     "control": "N0",
+     "seed": 1259,
+     "verdict": "NO_SIGNAL",
+     "z": -10.401809632903113,
+     "mean_loglik_gain": -0.4525953613125446,
+     "n_eval": 465,
+     "world_hash": "f5186d73c8e32dc3f816ece0762bd4e57fa9a0a6e1b4d997e682114e9b26d1c5"
+    },
+    {
+     "control": "N0",
+     "seed": 1296,
+     "verdict": "NO_SIGNAL",
+     "z": 1.278183153756227,
+     "mean_loglik_gain": 0.01741726548793287,
+     "n_eval": 465,
+     "world_hash": "23942e891b7e38f73744ebcd663fc1157251e614de7598af5596361a1e165c8d"
+    },
+    {
+     "control": "N0",
+     "seed": 1333,
+     "verdict": "NO_SIGNAL",
+     "z": -5.9610542863730815,
+     "mean_loglik_gain": -0.03883818475113754,
+     "n_eval": 465,
+     "world_hash": "856c56edb90e2def0388027035e7b27dd19551f1c492a25cc8fa59a7b24b186d"
+    },
+    {
+     "control": "N0",
+     "seed": 1370,
+     "verdict": "NO_SIGNAL",
+     "z": 0.16325157653876532,
+     "mean_loglik_gain": 0.0031812316316067487,
+     "n_eval": 465,
+     "world_hash": "d7e91c57e0a546cd5b5bcf97ca805b70969e2fec69e74d5054951e296fa0319f"
+    },
+    {
+     "control": "N0",
+     "seed": 1407,
+     "verdict": "NO_SIGNAL",
+     "z": -3.775123054901846,
+     "mean_loglik_gain": -0.04773541993882351,
+     "n_eval": 465,
+     "world_hash": "82b1f14409a2b3e66a8705541c7a6f07b768ee28b254ecc4ac7b8e2a733aa1fd"
+    },
+    {
+     "control": "N0",
+     "seed": 1444,
+     "verdict": "NO_SIGNAL",
+     "z": -1.0199804127616772,
+     "mean_loglik_gain": -0.01454540264956494,
+     "n_eval": 465,
+     "world_hash": "8164a9a26090d152178519f1ae1ebed2919e3a02bd1d105830989d27354db2c5"
+    },
+    {
+     "control": "N0",
+     "seed": 1481,
+     "verdict": "NO_SIGNAL",
+     "z": -0.8762190586647771,
+     "mean_loglik_gain": -0.03331888716023142,
+     "n_eval": 465,
+     "world_hash": "c3798b9d0425aa70df85abbf19be928c7d5ccd9198c294fd32348bfde6aefff8"
+    },
+    {
+     "control": "N0",
+     "seed": 1518,
+     "verdict": "NO_SIGNAL",
+     "z": -0.44538193686559663,
+     "mean_loglik_gain": -0.0039509796873291175,
+     "n_eval": 465,
+     "world_hash": "ab68c97a1fc981c7f08ed3637ed4ddb0bab8ef0198f2002dc2bf2ad0b7084e68"
+    },
+    {
+     "control": "N0",
+     "seed": 1555,
+     "verdict": "NO_SIGNAL",
+     "z": -0.7597856590728717,
+     "mean_loglik_gain": -0.008473361437294918,
+     "n_eval": 465,
+     "world_hash": "0d6e02fa94c228b2f37ec20d4940f718da60773b79998e712744307eb1e69b10"
+    },
+    {
+     "control": "N0",
+     "seed": 1592,
+     "verdict": "NO_SIGNAL",
+     "z": 0.2633045462976993,
+     "mean_loglik_gain": 0.0012230821363345557,
+     "n_eval": 465,
+     "world_hash": "71da68114fab36e6ce3871d97212442597f96d0b15392775235844bcaaf9a2e4"
+    },
+    {
+     "control": "N0",
+     "seed": 1629,
+     "verdict": "NO_SIGNAL",
+     "z": -1.4478034438574985,
+     "mean_loglik_gain": -0.01586528440428798,
+     "n_eval": 465,
+     "world_hash": "239bc9dfa7e3d5b70feecdca97f333abfc9e6686e5ae5d678b1b184e7c975a2b"
+    },
+    {
+     "control": "N0",
+     "seed": 1666,
+     "verdict": "NO_SIGNAL",
+     "z": -3.221131940801314,
+     "mean_loglik_gain": -0.021471986939429286,
+     "n_eval": 465,
+     "world_hash": "25f664c9b8e827dde48088010b93e06efcc32b7282f3fe119ceb71b9c4fb0852"
+    },
+    {
+     "control": "N0",
+     "seed": 1703,
+     "verdict": "NO_SIGNAL",
+     "z": 0.21441471318608296,
+     "mean_loglik_gain": 0.0021209383101968124,
+     "n_eval": 465,
+     "world_hash": "e401ba7c95ef57539bb1abeb8b151d3f2c7b1e4c5f4278f13ac46adf7ac1143a"
+    },
+    {
+     "control": "N0",
+     "seed": 1740,
+     "verdict": "NO_SIGNAL",
+     "z": -0.6708317214261456,
+     "mean_loglik_gain": -0.0025947226669949587,
+     "n_eval": 465,
+     "world_hash": "1f6a0585bc50f7eb17f04e007d60e8e9bc8c9c5a5414a607b6e2f3b9c7e4e25d"
+    },
+    {
+     "control": "N0",
+     "seed": 1777,
+     "verdict": "NO_SIGNAL",
+     "z": -1.4974379580697281,
+     "mean_loglik_gain": -0.015032590327502475,
+     "n_eval": 465,
+     "world_hash": "4b71014750d57f2d3d2cb413c909861adb02db84b4735616584aa25ced417758"
+    },
+    {
+     "control": "N0",
+     "seed": 1814,
+     "verdict": "NO_SIGNAL",
+     "z": -7.212105379994457,
+     "mean_loglik_gain": -0.11104348672181673,
+     "n_eval": 465,
+     "world_hash": "9a5b6f741664922ca7b8c96b2daf47bd0ee4e2e6e61df3472f4ddafe2d014a4a"
+    },
+    {
+     "control": "N0",
+     "seed": 1851,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 4.288788328837368,
+     "mean_loglik_gain": 0.025982006542062747,
+     "n_eval": 465,
+     "world_hash": "2a0d86e7290001756d5e6063412681119eef385a3add29718b319b39ac0dd5a7"
+    },
+    {
+     "control": "N0",
+     "seed": 1888,
+     "verdict": "NO_SIGNAL",
+     "z": -8.730549185677589,
+     "mean_loglik_gain": -0.105078456392479,
+     "n_eval": 465,
+     "world_hash": "e1174730decb8fcfe78a6e52275ebb32cf4fbf3d3e060d4bffba1637e4c9dca3"
+    }
+   ],
+   "judgement": {
+    "control": "N0",
+    "court_verdict": "PASS",
+    "n": 25,
+    "false_positives": 1,
+    "false_positive_rate": 0.04,
+    "expected_under_nominal_alpha": 0.575,
+    "max_tolerated": 3,
+    "z_min": -16.71909655448909,
+    "z_median": -1.1443641059403697,
+    "z_max": 4.288788328837368,
+    "z_over_2_fraction": 0.04
+   }
+  },
+  "N1": {
+   "cells": [
+    {
+     "control": "N1",
+     "seed": 1000,
+     "verdict": "NO_SIGNAL",
+     "z": 0.5068610373002761,
+     "mean_loglik_gain": 0.01682163063927926,
+     "n_eval": 265,
+     "world_hash": "36698f3646997345cf358ed5492f1b3c36eafb1bd781a7fd82e85fac71c521bb"
+    },
+    {
+     "control": "N1",
+     "seed": 1037,
+     "verdict": "NO_SIGNAL",
+     "z": -6.718131970698265,
+     "mean_loglik_gain": -0.04380077345024465,
+     "n_eval": 265,
+     "world_hash": "f3bfc920f6cbf309a0f8f4fff1ebac6c9926ab767915497e754596118cbf9b9c"
+    },
+    {
+     "control": "N1",
+     "seed": 1074,
+     "verdict": "NO_SIGNAL",
+     "z": -6.65868508492985,
+     "mean_loglik_gain": -0.09825721467154279,
+     "n_eval": 265,
+     "world_hash": "6de797dc94d1399f85c3dccc23a60904850832d2a966ad08f0bbd4fd1be1949b"
+    },
+    {
+     "control": "N1",
+     "seed": 1111,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 4.711545915421067,
+     "mean_loglik_gain": 0.16196450774530538,
+     "n_eval": 265,
+     "world_hash": "69fc5c722eaa2123a4c5fb2dd3260cc76b4068712d3ba268e230aab007c33823"
+    },
+    {
+     "control": "N1",
+     "seed": 1148,
+     "verdict": "NO_SIGNAL",
+     "z": -0.8951289580167611,
+     "mean_loglik_gain": -0.025949903633093373,
+     "n_eval": 265,
+     "world_hash": "6ff43f9af9ff70502a72ac764b922b87a9e6ba6bf9ae5ab945e2dbd4092d345d"
+    },
+    {
+     "control": "N1",
+     "seed": 1185,
+     "verdict": "NO_SIGNAL",
+     "z": -11.777298904226898,
+     "mean_loglik_gain": -0.1371793356126827,
+     "n_eval": 265,
+     "world_hash": "240535b6358e45ca2a5d20b631b65470282922a53fc41e0e96ca75dbd8bdf43c"
+    },
+    {
+     "control": "N1",
+     "seed": 1222,
+     "verdict": "NO_SIGNAL",
+     "z": 1.152714564908315,
+     "mean_loglik_gain": 0.00933623099989455,
+     "n_eval": 265,
+     "world_hash": "a16f004a41b5e3c4a7857f242105f724b85175074af321fb2b36a4f27d0e1c27"
+    },
+    {
+     "control": "N1",
+     "seed": 1259,
+     "verdict": "NO_SIGNAL",
+     "z": 0.06068639289835322,
+     "mean_loglik_gain": 0.004996168553713081,
+     "n_eval": 265,
+     "world_hash": "f5186d73c8e32dc3f816ece0762bd4e57fa9a0a6e1b4d997e682114e9b26d1c5"
+    },
+    {
+     "control": "N1",
+     "seed": 1296,
+     "verdict": "NO_SIGNAL",
+     "z": -10.512481495498067,
+     "mean_loglik_gain": -0.24792805158718678,
+     "n_eval": 265,
+     "world_hash": "23942e891b7e38f73744ebcd663fc1157251e614de7598af5596361a1e165c8d"
+    },
+    {
+     "control": "N1",
+     "seed": 1333,
+     "verdict": "NO_SIGNAL",
+     "z": -1.76216961399221,
+     "mean_loglik_gain": -0.050530438969481326,
+     "n_eval": 265,
+     "world_hash": "856c56edb90e2def0388027035e7b27dd19551f1c492a25cc8fa59a7b24b186d"
+    },
+    {
+     "control": "N1",
+     "seed": 1370,
+     "verdict": "NO_SIGNAL",
+     "z": -7.36348406414432,
+     "mean_loglik_gain": -0.1297879077299533,
+     "n_eval": 265,
+     "world_hash": "d7e91c57e0a546cd5b5bcf97ca805b70969e2fec69e74d5054951e296fa0319f"
+    },
+    {
+     "control": "N1",
+     "seed": 1407,
+     "verdict": "NO_SIGNAL",
+     "z": 0.8681968549982844,
+     "mean_loglik_gain": 0.011724331844224509,
+     "n_eval": 265,
+     "world_hash": "82b1f14409a2b3e66a8705541c7a6f07b768ee28b254ecc4ac7b8e2a733aa1fd"
+    },
+    {
+     "control": "N1",
+     "seed": 1444,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 2.4922394595559187,
+     "mean_loglik_gain": 0.10266569148268345,
+     "n_eval": 265,
+     "world_hash": "8164a9a26090d152178519f1ae1ebed2919e3a02bd1d105830989d27354db2c5"
+    },
+    {
+     "control": "N1",
+     "seed": 1481,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 2.193170244108216,
+     "mean_loglik_gain": 0.0366717505596246,
+     "n_eval": 265,
+     "world_hash": "c3798b9d0425aa70df85abbf19be928c7d5ccd9198c294fd32348bfde6aefff8"
+    },
+    {
+     "control": "N1",
+     "seed": 1518,
+     "verdict": "NO_SIGNAL",
+     "z": -17.91534310945168,
+     "mean_loglik_gain": -0.26601229471595145,
+     "n_eval": 265,
+     "world_hash": "ab68c97a1fc981c7f08ed3637ed4ddb0bab8ef0198f2002dc2bf2ad0b7084e68"
+    },
+    {
+     "control": "N1",
+     "seed": 1555,
+     "verdict": "NO_SIGNAL",
+     "z": -2.9939259511377703,
+     "mean_loglik_gain": -0.055763654145713305,
+     "n_eval": 265,
+     "world_hash": "0d6e02fa94c228b2f37ec20d4940f718da60773b79998e712744307eb1e69b10"
+    },
+    {
+     "control": "N1",
+     "seed": 1592,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 2.789535008081383,
+     "mean_loglik_gain": 0.05602819006687624,
+     "n_eval": 265,
+     "world_hash": "71da68114fab36e6ce3871d97212442597f96d0b15392775235844bcaaf9a2e4"
+    },
+    {
+     "control": "N1",
+     "seed": 1629,
+     "verdict": "NO_SIGNAL",
+     "z": -0.043688850223697805,
+     "mean_loglik_gain": -0.0005131663462791427,
+     "n_eval": 265,
+     "world_hash": "239bc9dfa7e3d5b70feecdca97f333abfc9e6686e5ae5d678b1b184e7c975a2b"
+    },
+    {
+     "control": "N1",
+     "seed": 1666,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 7.986191431416875,
+     "mean_loglik_gain": 0.08575605487115952,
+     "n_eval": 265,
+     "world_hash": "25f664c9b8e827dde48088010b93e06efcc32b7282f3fe119ceb71b9c4fb0852"
+    },
+    {
+     "control": "N1",
+     "seed": 1703,
+     "verdict": "NO_SIGNAL",
+     "z": -1.464711745584779,
+     "mean_loglik_gain": -0.01544739191183101,
+     "n_eval": 265,
+     "world_hash": "e401ba7c95ef57539bb1abeb8b151d3f2c7b1e4c5f4278f13ac46adf7ac1143a"
+    },
+    {
+     "control": "N1",
+     "seed": 1740,
+     "verdict": "NO_SIGNAL",
+     "z": -4.1647931930862665,
+     "mean_loglik_gain": -0.09206621473214713,
+     "n_eval": 265,
+     "world_hash": "1f6a0585bc50f7eb17f04e007d60e8e9bc8c9c5a5414a607b6e2f3b9c7e4e25d"
+    },
+    {
+     "control": "N1",
+     "seed": 1777,
+     "verdict": "NO_SIGNAL",
+     "z": -6.222313989493328,
+     "mean_loglik_gain": -0.12824357366022182,
+     "n_eval": 265,
+     "world_hash": "4b71014750d57f2d3d2cb413c909861adb02db84b4735616584aa25ced417758"
+    },
+    {
+     "control": "N1",
+     "seed": 1814,
+     "verdict": "NO_SIGNAL",
+     "z": -6.300506761979859,
+     "mean_loglik_gain": -0.28248085017920993,
+     "n_eval": 265,
+     "world_hash": "9a5b6f741664922ca7b8c96b2daf47bd0ee4e2e6e61df3472f4ddafe2d014a4a"
+    },
+    {
+     "control": "N1",
+     "seed": 1851,
+     "verdict": "NO_SIGNAL",
+     "z": -6.064670778641468,
+     "mean_loglik_gain": -0.27921109036723285,
+     "n_eval": 265,
+     "world_hash": "2a0d86e7290001756d5e6063412681119eef385a3add29718b319b39ac0dd5a7"
+    },
+    {
+     "control": "N1",
+     "seed": 1888,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 7.832387870122629,
+     "mean_loglik_gain": 0.21310252696483012,
+     "n_eval": 265,
+     "world_hash": "e1174730decb8fcfe78a6e52275ebb32cf4fbf3d3e060d4bffba1637e4c9dca3"
+    }
+   ],
+   "judgement": {
+    "control": "N1",
+    "court_verdict": "CONTROL_FAILURE",
+    "n": 25,
+    "false_positives": 6,
+    "false_positive_rate": 0.24,
+    "expected_under_nominal_alpha": 0.575,
+    "max_tolerated": 3,
+    "z_min": -17.91534310945168,
+    "z_median": -1.464711745584779,
+    "z_max": 7.986191431416875,
+    "z_over_2_fraction": 0.24
+   }
+  },
+  "N2": {
+   "cells": [
+    {
+     "control": "N2",
+     "seed": 1000,
+     "verdict": "NO_SIGNAL",
+     "z": 0.09361836992419427,
+     "mean_loglik_gain": 0.0004980473446034254,
+     "n_eval": 465,
+     "world_hash": "36698f3646997345cf358ed5492f1b3c36eafb1bd781a7fd82e85fac71c521bb"
+    },
+    {
+     "control": "N2",
+     "seed": 1037,
+     "verdict": "NO_SIGNAL",
+     "z": -1.014856786311815,
+     "mean_loglik_gain": -0.005658877675860302,
+     "n_eval": 465,
+     "world_hash": "f3bfc920f6cbf309a0f8f4fff1ebac6c9926ab767915497e754596118cbf9b9c"
+    },
+    {
+     "control": "N2",
+     "seed": 1074,
+     "verdict": "NO_SIGNAL",
+     "z": -0.63582135311783,
+     "mean_loglik_gain": -0.0019497193227895223,
+     "n_eval": 465,
+     "world_hash": "6de797dc94d1399f85c3dccc23a60904850832d2a966ad08f0bbd4fd1be1949b"
+    },
+    {
+     "control": "N2",
+     "seed": 1111,
+     "verdict": "NO_SIGNAL",
+     "z": -2.920765545506773,
+     "mean_loglik_gain": -0.013032863150204424,
+     "n_eval": 465,
+     "world_hash": "69fc5c722eaa2123a4c5fb2dd3260cc76b4068712d3ba268e230aab007c33823"
+    },
+    {
+     "control": "N2",
+     "seed": 1148,
+     "verdict": "NO_SIGNAL",
+     "z": -1.7941060164375373,
+     "mean_loglik_gain": -0.01014010210166624,
+     "n_eval": 465,
+     "world_hash": "6ff43f9af9ff70502a72ac764b922b87a9e6ba6bf9ae5ab945e2dbd4092d345d"
+    },
+    {
+     "control": "N2",
+     "seed": 1185,
+     "verdict": "NO_SIGNAL",
+     "z": -0.6237265917132071,
+     "mean_loglik_gain": -0.0037235910302137365,
+     "n_eval": 465,
+     "world_hash": "240535b6358e45ca2a5d20b631b65470282922a53fc41e0e96ca75dbd8bdf43c"
+    },
+    {
+     "control": "N2",
+     "seed": 1222,
+     "verdict": "NO_SIGNAL",
+     "z": -0.7679016277048913,
+     "mean_loglik_gain": -0.0044442159579062964,
+     "n_eval": 465,
+     "world_hash": "a16f004a41b5e3c4a7857f242105f724b85175074af321fb2b36a4f27d0e1c27"
+    },
+    {
+     "control": "N2",
+     "seed": 1259,
+     "verdict": "NO_SIGNAL",
+     "z": -1.5176722923075205,
+     "mean_loglik_gain": -0.006827537958909141,
+     "n_eval": 465,
+     "world_hash": "f5186d73c8e32dc3f816ece0762bd4e57fa9a0a6e1b4d997e682114e9b26d1c5"
+    },
+    {
+     "control": "N2",
+     "seed": 1296,
+     "verdict": "NO_SIGNAL",
+     "z": -0.5921653611086676,
+     "mean_loglik_gain": -0.0015954817428498874,
+     "n_eval": 465,
+     "world_hash": "23942e891b7e38f73744ebcd663fc1157251e614de7598af5596361a1e165c8d"
+    },
+    {
+     "control": "N2",
+     "seed": 1333,
+     "verdict": "NO_SIGNAL",
+     "z": 0.6582151612292467,
+     "mean_loglik_gain": 0.002368302686608754,
+     "n_eval": 465,
+     "world_hash": "856c56edb90e2def0388027035e7b27dd19551f1c492a25cc8fa59a7b24b186d"
+    },
+    {
+     "control": "N2",
+     "seed": 1370,
+     "verdict": "NO_SIGNAL",
+     "z": 1.1346445471544946,
+     "mean_loglik_gain": 0.0026633457247380306,
+     "n_eval": 465,
+     "world_hash": "d7e91c57e0a546cd5b5bcf97ca805b70969e2fec69e74d5054951e296fa0319f"
+    },
+    {
+     "control": "N2",
+     "seed": 1407,
+     "verdict": "NO_SIGNAL",
+     "z": -0.5835917131832367,
+     "mean_loglik_gain": -0.0020739995459955933,
+     "n_eval": 465,
+     "world_hash": "82b1f14409a2b3e66a8705541c7a6f07b768ee28b254ecc4ac7b8e2a733aa1fd"
+    },
+    {
+     "control": "N2",
+     "seed": 1444,
+     "verdict": "NO_SIGNAL",
+     "z": -2.8786783036396644,
+     "mean_loglik_gain": -0.01734142729221756,
+     "n_eval": 465,
+     "world_hash": "8164a9a26090d152178519f1ae1ebed2919e3a02bd1d105830989d27354db2c5"
+    },
+    {
+     "control": "N2",
+     "seed": 1481,
+     "verdict": "NO_SIGNAL",
+     "z": -0.8718720795529928,
+     "mean_loglik_gain": -0.0033395135768622686,
+     "n_eval": 465,
+     "world_hash": "c3798b9d0425aa70df85abbf19be928c7d5ccd9198c294fd32348bfde6aefff8"
+    },
+    {
+     "control": "N2",
+     "seed": 1518,
+     "verdict": "NO_SIGNAL",
+     "z": -1.835306286291224,
+     "mean_loglik_gain": -0.008537350434502948,
+     "n_eval": 465,
+     "world_hash": "ab68c97a1fc981c7f08ed3637ed4ddb0bab8ef0198f2002dc2bf2ad0b7084e68"
+    },
+    {
+     "control": "N2",
+     "seed": 1555,
+     "verdict": "NO_SIGNAL",
+     "z": -1.4016959890491587,
+     "mean_loglik_gain": -0.0063087990819738525,
+     "n_eval": 465,
+     "world_hash": "0d6e02fa94c228b2f37ec20d4940f718da60773b79998e712744307eb1e69b10"
+    },
+    {
+     "control": "N2",
+     "seed": 1592,
+     "verdict": "NO_SIGNAL",
+     "z": -1.0525215463064665,
+     "mean_loglik_gain": -0.004569542918360656,
+     "n_eval": 465,
+     "world_hash": "71da68114fab36e6ce3871d97212442597f96d0b15392775235844bcaaf9a2e4"
+    },
+    {
+     "control": "N2",
+     "seed": 1629,
+     "verdict": "NO_SIGNAL",
+     "z": 0.0014426855100078083,
+     "mean_loglik_gain": 4.936963585381686e-06,
+     "n_eval": 465,
+     "world_hash": "239bc9dfa7e3d5b70feecdca97f333abfc9e6686e5ae5d678b1b184e7c975a2b"
+    },
+    {
+     "control": "N2",
+     "seed": 1666,
+     "verdict": "NO_SIGNAL",
+     "z": -0.8255412277132589,
+     "mean_loglik_gain": -0.002512997836479866,
+     "n_eval": 465,
+     "world_hash": "25f664c9b8e827dde48088010b93e06efcc32b7282f3fe119ceb71b9c4fb0852"
+    },
+    {
+     "control": "N2",
+     "seed": 1703,
+     "verdict": "NO_SIGNAL",
+     "z": -2.0389761974020453,
+     "mean_loglik_gain": -0.017766184214143138,
+     "n_eval": 465,
+     "world_hash": "e401ba7c95ef57539bb1abeb8b151d3f2c7b1e4c5f4278f13ac46adf7ac1143a"
+    },
+    {
+     "control": "N2",
+     "seed": 1740,
+     "verdict": "NO_SIGNAL",
+     "z": -1.6709348659981236,
+     "mean_loglik_gain": -0.004272447225845166,
+     "n_eval": 465,
+     "world_hash": "1f6a0585bc50f7eb17f04e007d60e8e9bc8c9c5a5414a607b6e2f3b9c7e4e25d"
+    },
+    {
+     "control": "N2",
+     "seed": 1777,
+     "verdict": "NO_SIGNAL",
+     "z": -0.7635331267864819,
+     "mean_loglik_gain": -0.003678538026793747,
+     "n_eval": 465,
+     "world_hash": "4b71014750d57f2d3d2cb413c909861adb02db84b4735616584aa25ced417758"
+    },
+    {
+     "control": "N2",
+     "seed": 1814,
+     "verdict": "NO_SIGNAL",
+     "z": -2.0030899819968844,
+     "mean_loglik_gain": -0.011358609726909445,
+     "n_eval": 465,
+     "world_hash": "9a5b6f741664922ca7b8c96b2daf47bd0ee4e2e6e61df3472f4ddafe2d014a4a"
+    },
+    {
+     "control": "N2",
+     "seed": 1851,
+     "verdict": "NO_SIGNAL",
+     "z": -1.463993294136063,
+     "mean_loglik_gain": -0.0044348957649307675,
+     "n_eval": 465,
+     "world_hash": "2a0d86e7290001756d5e6063412681119eef385a3add29718b319b39ac0dd5a7"
+    },
+    {
+     "control": "N2",
+     "seed": 1888,
+     "verdict": "NO_SIGNAL",
+     "z": 0.3302221399915307,
+     "mean_loglik_gain": 0.0011005094559210105,
+     "n_eval": 465,
+     "world_hash": "e1174730decb8fcfe78a6e52275ebb32cf4fbf3d3e060d4bffba1637e4c9dca3"
+    }
+   ],
+   "judgement": {
+    "control": "N2",
+    "court_verdict": "PASS",
+    "n": 25,
+    "false_positives": 0,
+    "false_positive_rate": 0.0,
+    "expected_under_nominal_alpha": 0.575,
+    "max_tolerated": 3,
+    "z_min": -2.920765545506773,
+    "z_median": -0.8718720795529928,
+    "z_max": 1.1346445471544946,
+    "z_over_2_fraction": 0.0
+   }
+  },
+  "N3": {
+   "cells": [
+    {
+     "control": "N3",
+     "seed": 1000,
+     "verdict": "NO_SIGNAL",
+     "z": -0.589886928184986,
+     "mean_loglik_gain": -0.00284527239558354,
+     "n_eval": 465,
+     "world_hash": "36698f3646997345cf358ed5492f1b3c36eafb1bd781a7fd82e85fac71c521bb"
+    },
+    {
+     "control": "N3",
+     "seed": 1037,
+     "verdict": "NO_SIGNAL",
+     "z": -5.100615088325425,
+     "mean_loglik_gain": -0.029179367655494625,
+     "n_eval": 465,
+     "world_hash": "f3bfc920f6cbf309a0f8f4fff1ebac6c9926ab767915497e754596118cbf9b9c"
+    },
+    {
+     "control": "N3",
+     "seed": 1074,
+     "verdict": "NO_SIGNAL",
+     "z": -1.688619092891756,
+     "mean_loglik_gain": -0.009176512512283798,
+     "n_eval": 465,
+     "world_hash": "6de797dc94d1399f85c3dccc23a60904850832d2a966ad08f0bbd4fd1be1949b"
+    },
+    {
+     "control": "N3",
+     "seed": 1111,
+     "verdict": "NO_SIGNAL",
+     "z": -0.4759922015597009,
+     "mean_loglik_gain": -0.0017045977054350192,
+     "n_eval": 465,
+     "world_hash": "69fc5c722eaa2123a4c5fb2dd3260cc76b4068712d3ba268e230aab007c33823"
+    },
+    {
+     "control": "N3",
+     "seed": 1148,
+     "verdict": "NO_SIGNAL",
+     "z": -0.9977669289497342,
+     "mean_loglik_gain": -0.0016925146805165017,
+     "n_eval": 465,
+     "world_hash": "6ff43f9af9ff70502a72ac764b922b87a9e6ba6bf9ae5ab945e2dbd4092d345d"
+    },
+    {
+     "control": "N3",
+     "seed": 1185,
+     "verdict": "NO_SIGNAL",
+     "z": -5.065457652441076,
+     "mean_loglik_gain": -0.04169783016846351,
+     "n_eval": 465,
+     "world_hash": "240535b6358e45ca2a5d20b631b65470282922a53fc41e0e96ca75dbd8bdf43c"
+    },
+    {
+     "control": "N3",
+     "seed": 1222,
+     "verdict": "NO_SIGNAL",
+     "z": -1.6614667008101844,
+     "mean_loglik_gain": -0.0072566208457669115,
+     "n_eval": 465,
+     "world_hash": "a16f004a41b5e3c4a7857f242105f724b85175074af321fb2b36a4f27d0e1c27"
+    },
+    {
+     "control": "N3",
+     "seed": 1259,
+     "verdict": "NO_SIGNAL",
+     "z": 0.43082727774124596,
+     "mean_loglik_gain": 0.002385491866382611,
+     "n_eval": 465,
+     "world_hash": "f5186d73c8e32dc3f816ece0762bd4e57fa9a0a6e1b4d997e682114e9b26d1c5"
+    },
+    {
+     "control": "N3",
+     "seed": 1296,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 8.08968875021584,
+     "mean_loglik_gain": 0.034262829745060376,
+     "n_eval": 465,
+     "world_hash": "23942e891b7e38f73744ebcd663fc1157251e614de7598af5596361a1e165c8d"
+    },
+    {
+     "control": "N3",
+     "seed": 1333,
+     "verdict": "NO_SIGNAL",
+     "z": -1.0443942666045676,
+     "mean_loglik_gain": -0.005324603945175886,
+     "n_eval": 465,
+     "world_hash": "856c56edb90e2def0388027035e7b27dd19551f1c492a25cc8fa59a7b24b186d"
+    },
+    {
+     "control": "N3",
+     "seed": 1370,
+     "verdict": "NO_SIGNAL",
+     "z": -0.9083514376640732,
+     "mean_loglik_gain": -0.004411280040826851,
+     "n_eval": 465,
+     "world_hash": "d7e91c57e0a546cd5b5bcf97ca805b70969e2fec69e74d5054951e296fa0319f"
+    },
+    {
+     "control": "N3",
+     "seed": 1407,
+     "verdict": "NO_SIGNAL",
+     "z": -0.84804524091394,
+     "mean_loglik_gain": -0.0016031047331088307,
+     "n_eval": 465,
+     "world_hash": "82b1f14409a2b3e66a8705541c7a6f07b768ee28b254ecc4ac7b8e2a733aa1fd"
+    },
+    {
+     "control": "N3",
+     "seed": 1444,
+     "verdict": "NO_SIGNAL",
+     "z": -1.5548102098481185,
+     "mean_loglik_gain": -0.010807520510287879,
+     "n_eval": 465,
+     "world_hash": "8164a9a26090d152178519f1ae1ebed2919e3a02bd1d105830989d27354db2c5"
+    },
+    {
+     "control": "N3",
+     "seed": 1481,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 6.877752865838913,
+     "mean_loglik_gain": 0.03519897420175516,
+     "n_eval": 465,
+     "world_hash": "c3798b9d0425aa70df85abbf19be928c7d5ccd9198c294fd32348bfde6aefff8"
+    },
+    {
+     "control": "N3",
+     "seed": 1518,
+     "verdict": "NO_SIGNAL",
+     "z": -1.7736679177810484,
+     "mean_loglik_gain": -0.007459694719708459,
+     "n_eval": 465,
+     "world_hash": "ab68c97a1fc981c7f08ed3637ed4ddb0bab8ef0198f2002dc2bf2ad0b7084e68"
+    },
+    {
+     "control": "N3",
+     "seed": 1555,
+     "verdict": "NO_SIGNAL",
+     "z": -1.8550815353575967,
+     "mean_loglik_gain": -0.00445980091359411,
+     "n_eval": 465,
+     "world_hash": "0d6e02fa94c228b2f37ec20d4940f718da60773b79998e712744307eb1e69b10"
+    },
+    {
+     "control": "N3",
+     "seed": 1592,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 3.4068387471187638,
+     "mean_loglik_gain": 0.014409688346934506,
+     "n_eval": 465,
+     "world_hash": "71da68114fab36e6ce3871d97212442597f96d0b15392775235844bcaaf9a2e4"
+    },
+    {
+     "control": "N3",
+     "seed": 1629,
+     "verdict": "NO_SIGNAL",
+     "z": -1.3854357445146577,
+     "mean_loglik_gain": -0.0056544533136873775,
+     "n_eval": 465,
+     "world_hash": "239bc9dfa7e3d5b70feecdca97f333abfc9e6686e5ae5d678b1b184e7c975a2b"
+    },
+    {
+     "control": "N3",
+     "seed": 1666,
+     "verdict": "NO_SIGNAL",
+     "z": -1.031096316323416,
+     "mean_loglik_gain": -0.0031814213657187147,
+     "n_eval": 465,
+     "world_hash": "25f664c9b8e827dde48088010b93e06efcc32b7282f3fe119ceb71b9c4fb0852"
+    },
+    {
+     "control": "N3",
+     "seed": 1703,
+     "verdict": "NO_SIGNAL",
+     "z": -0.5952361778360515,
+     "mean_loglik_gain": -0.0026331388150819,
+     "n_eval": 465,
+     "world_hash": "e401ba7c95ef57539bb1abeb8b151d3f2c7b1e4c5f4278f13ac46adf7ac1143a"
+    },
+    {
+     "control": "N3",
+     "seed": 1740,
+     "verdict": "NO_SIGNAL",
+     "z": 0.41480558579903976,
+     "mean_loglik_gain": 0.0013904413766473954,
+     "n_eval": 465,
+     "world_hash": "1f6a0585bc50f7eb17f04e007d60e8e9bc8c9c5a5414a607b6e2f3b9c7e4e25d"
+    },
+    {
+     "control": "N3",
+     "seed": 1777,
+     "verdict": "NO_SIGNAL",
+     "z": -1.4451912586729645,
+     "mean_loglik_gain": -0.007942981040494372,
+     "n_eval": 465,
+     "world_hash": "4b71014750d57f2d3d2cb413c909861adb02db84b4735616584aa25ced417758"
+    },
+    {
+     "control": "N3",
+     "seed": 1814,
+     "verdict": "NO_SIGNAL",
+     "z": 0.8838704118502144,
+     "mean_loglik_gain": 0.005322847387588556,
+     "n_eval": 465,
+     "world_hash": "9a5b6f741664922ca7b8c96b2daf47bd0ee4e2e6e61df3472f4ddafe2d014a4a"
+    },
+    {
+     "control": "N3",
+     "seed": 1851,
+     "verdict": "NO_SIGNAL",
+     "z": 0.8357743319373744,
+     "mean_loglik_gain": 0.003661282911821641,
+     "n_eval": 465,
+     "world_hash": "2a0d86e7290001756d5e6063412681119eef385a3add29718b319b39ac0dd5a7"
+    },
+    {
+     "control": "N3",
+     "seed": 1888,
+     "verdict": "NO_SIGNAL",
+     "z": -4.543673401520895,
+     "mean_loglik_gain": -0.03232908674108631,
+     "n_eval": 465,
+     "world_hash": "e1174730decb8fcfe78a6e52275ebb32cf4fbf3d3e060d4bffba1637e4c9dca3"
+    }
+   ],
+   "judgement": {
+    "control": "N3",
+    "court_verdict": "PASS",
+    "n": 25,
+    "false_positives": 3,
+    "false_positive_rate": 0.12,
+    "expected_under_nominal_alpha": 0.575,
+    "max_tolerated": 3,
+    "z_min": -5.100615088325425,
+    "z_median": -0.9977669289497342,
+    "z_max": 8.08968875021584,
+    "z_over_2_fraction": 0.12
+   }
+  },
+  "N4": {
+   "cells": [
+    {
+     "control": "N4",
+     "seed": 1000,
+     "verdict": "NO_SIGNAL",
+     "z": -7.1305873022418655,
+     "mean_loglik_gain": -0.3915278236606038,
+     "n_eval": 465,
+     "world_hash": "36698f3646997345cf358ed5492f1b3c36eafb1bd781a7fd82e85fac71c521bb"
+    },
+    {
+     "control": "N4",
+     "seed": 1037,
+     "verdict": "NO_SIGNAL",
+     "z": -8.909748197428748,
+     "mean_loglik_gain": -0.5742022818457414,
+     "n_eval": 465,
+     "world_hash": "f3bfc920f6cbf309a0f8f4fff1ebac6c9926ab767915497e754596118cbf9b9c"
+    },
+    {
+     "control": "N4",
+     "seed": 1074,
+     "verdict": "NO_SIGNAL",
+     "z": -7.201970552377899,
+     "mean_loglik_gain": -0.41568170108498537,
+     "n_eval": 465,
+     "world_hash": "6de797dc94d1399f85c3dccc23a60904850832d2a966ad08f0bbd4fd1be1949b"
+    },
+    {
+     "control": "N4",
+     "seed": 1111,
+     "verdict": "NO_SIGNAL",
+     "z": -8.869584518987038,
+     "mean_loglik_gain": -0.4061571026430814,
+     "n_eval": 465,
+     "world_hash": "69fc5c722eaa2123a4c5fb2dd3260cc76b4068712d3ba268e230aab007c33823"
+    },
+    {
+     "control": "N4",
+     "seed": 1148,
+     "verdict": "NO_SIGNAL",
+     "z": -9.279327257377865,
+     "mean_loglik_gain": -0.5409542556043637,
+     "n_eval": 465,
+     "world_hash": "6ff43f9af9ff70502a72ac764b922b87a9e6ba6bf9ae5ab945e2dbd4092d345d"
+    },
+    {
+     "control": "N4",
+     "seed": 1185,
+     "verdict": "NO_SIGNAL",
+     "z": -8.324180636696582,
+     "mean_loglik_gain": -0.5903385081959979,
+     "n_eval": 465,
+     "world_hash": "240535b6358e45ca2a5d20b631b65470282922a53fc41e0e96ca75dbd8bdf43c"
+    },
+    {
+     "control": "N4",
+     "seed": 1222,
+     "verdict": "NO_SIGNAL",
+     "z": -7.149585403738322,
+     "mean_loglik_gain": -0.4150933268057606,
+     "n_eval": 465,
+     "world_hash": "a16f004a41b5e3c4a7857f242105f724b85175074af321fb2b36a4f27d0e1c27"
+    },
+    {
+     "control": "N4",
+     "seed": 1259,
+     "verdict": "NO_SIGNAL",
+     "z": -8.020542830793351,
+     "mean_loglik_gain": -0.47220799976594596,
+     "n_eval": 465,
+     "world_hash": "f5186d73c8e32dc3f816ece0762bd4e57fa9a0a6e1b4d997e682114e9b26d1c5"
+    },
+    {
+     "control": "N4",
+     "seed": 1296,
+     "verdict": "NO_SIGNAL",
+     "z": -8.53745402772109,
+     "mean_loglik_gain": -0.5080633338044016,
+     "n_eval": 465,
+     "world_hash": "23942e891b7e38f73744ebcd663fc1157251e614de7598af5596361a1e165c8d"
+    },
+    {
+     "control": "N4",
+     "seed": 1333,
+     "verdict": "NO_SIGNAL",
+     "z": -8.176175554716169,
+     "mean_loglik_gain": -0.5117650683787822,
+     "n_eval": 465,
+     "world_hash": "856c56edb90e2def0388027035e7b27dd19551f1c492a25cc8fa59a7b24b186d"
+    },
+    {
+     "control": "N4",
+     "seed": 1370,
+     "verdict": "NO_SIGNAL",
+     "z": -8.566957429185505,
+     "mean_loglik_gain": -0.5051741270817041,
+     "n_eval": 465,
+     "world_hash": "d7e91c57e0a546cd5b5bcf97ca805b70969e2fec69e74d5054951e296fa0319f"
+    },
+    {
+     "control": "N4",
+     "seed": 1407,
+     "verdict": "NO_SIGNAL",
+     "z": -8.005552587947944,
+     "mean_loglik_gain": -0.44090336944588393,
+     "n_eval": 465,
+     "world_hash": "82b1f14409a2b3e66a8705541c7a6f07b768ee28b254ecc4ac7b8e2a733aa1fd"
+    },
+    {
+     "control": "N4",
+     "seed": 1444,
+     "verdict": "NO_SIGNAL",
+     "z": -9.612114228907537,
+     "mean_loglik_gain": -0.5398104227903506,
+     "n_eval": 465,
+     "world_hash": "8164a9a26090d152178519f1ae1ebed2919e3a02bd1d105830989d27354db2c5"
+    },
+    {
+     "control": "N4",
+     "seed": 1481,
+     "verdict": "NO_SIGNAL",
+     "z": -8.878513190500621,
+     "mean_loglik_gain": -0.46133337915894124,
+     "n_eval": 465,
+     "world_hash": "c3798b9d0425aa70df85abbf19be928c7d5ccd9198c294fd32348bfde6aefff8"
+    },
+    {
+     "control": "N4",
+     "seed": 1518,
+     "verdict": "NO_SIGNAL",
+     "z": -8.971248712735612,
+     "mean_loglik_gain": -0.5106708836298627,
+     "n_eval": 465,
+     "world_hash": "ab68c97a1fc981c7f08ed3637ed4ddb0bab8ef0198f2002dc2bf2ad0b7084e68"
+    },
+    {
+     "control": "N4",
+     "seed": 1555,
+     "verdict": "NO_SIGNAL",
+     "z": -9.294500640454821,
+     "mean_loglik_gain": -0.5984265058085914,
+     "n_eval": 465,
+     "world_hash": "0d6e02fa94c228b2f37ec20d4940f718da60773b79998e712744307eb1e69b10"
+    },
+    {
+     "control": "N4",
+     "seed": 1592,
+     "verdict": "NO_SIGNAL",
+     "z": -8.764608905798038,
+     "mean_loglik_gain": -0.5747603820002666,
+     "n_eval": 465,
+     "world_hash": "71da68114fab36e6ce3871d97212442597f96d0b15392775235844bcaaf9a2e4"
+    },
+    {
+     "control": "N4",
+     "seed": 1629,
+     "verdict": "NO_SIGNAL",
+     "z": -8.422652524677925,
+     "mean_loglik_gain": -0.4318486599321653,
+     "n_eval": 465,
+     "world_hash": "239bc9dfa7e3d5b70feecdca97f333abfc9e6686e5ae5d678b1b184e7c975a2b"
+    },
+    {
+     "control": "N4",
+     "seed": 1666,
+     "verdict": "NO_SIGNAL",
+     "z": -9.0376487516376,
+     "mean_loglik_gain": -0.48010550131246693,
+     "n_eval": 465,
+     "world_hash": "25f664c9b8e827dde48088010b93e06efcc32b7282f3fe119ceb71b9c4fb0852"
+    },
+    {
+     "control": "N4",
+     "seed": 1703,
+     "verdict": "NO_SIGNAL",
+     "z": -7.2080203316464555,
+     "mean_loglik_gain": -0.44309116124108144,
+     "n_eval": 465,
+     "world_hash": "e401ba7c95ef57539bb1abeb8b151d3f2c7b1e4c5f4278f13ac46adf7ac1143a"
+    },
+    {
+     "control": "N4",
+     "seed": 1740,
+     "verdict": "NO_SIGNAL",
+     "z": -8.618312489067298,
+     "mean_loglik_gain": -0.4776218065827893,
+     "n_eval": 465,
+     "world_hash": "1f6a0585bc50f7eb17f04e007d60e8e9bc8c9c5a5414a607b6e2f3b9c7e4e25d"
+    },
+    {
+     "control": "N4",
+     "seed": 1777,
+     "verdict": "NO_SIGNAL",
+     "z": -9.677162866566022,
+     "mean_loglik_gain": -0.6023680202523082,
+     "n_eval": 465,
+     "world_hash": "4b71014750d57f2d3d2cb413c909861adb02db84b4735616584aa25ced417758"
+    },
+    {
+     "control": "N4",
+     "seed": 1814,
+     "verdict": "NO_SIGNAL",
+     "z": -8.222808516721226,
+     "mean_loglik_gain": -0.5136246061096621,
+     "n_eval": 465,
+     "world_hash": "9a5b6f741664922ca7b8c96b2daf47bd0ee4e2e6e61df3472f4ddafe2d014a4a"
+    },
+    {
+     "control": "N4",
+     "seed": 1851,
+     "verdict": "NO_SIGNAL",
+     "z": -8.937790833443273,
+     "mean_loglik_gain": -0.512827047946262,
+     "n_eval": 465,
+     "world_hash": "2a0d86e7290001756d5e6063412681119eef385a3add29718b319b39ac0dd5a7"
+    },
+    {
+     "control": "N4",
+     "seed": 1888,
+     "verdict": "NO_SIGNAL",
+     "z": -7.852971389721847,
+     "mean_loglik_gain": -0.4745171124288859,
+     "n_eval": 465,
+     "world_hash": "e1174730decb8fcfe78a6e52275ebb32cf4fbf3d3e060d4bffba1637e4c9dca3"
+    }
+   ],
+   "judgement": {
+    "control": "N4",
+    "court_verdict": "PASS",
+    "n": 25,
+    "false_positives": 0,
+    "false_positive_rate": 0.0,
+    "expected_under_nominal_alpha": 0.575,
+    "max_tolerated": 3,
+    "z_min": -9.677162866566022,
+    "z_median": -8.566957429185505,
+    "z_max": -7.1305873022418655,
+    "z_over_2_fraction": 0.0
+   }
+  },
+  "P0": {
+   "cells": [
+    {
+     "control": "P0",
+     "seed": 1000,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 4.1036932815914495,
+     "mean_loglik_gain": 0.26226357159409713,
+     "n_eval": 465,
+     "world_hash": "36698f3646997345cf358ed5492f1b3c36eafb1bd781a7fd82e85fac71c521bb"
+    },
+    {
+     "control": "P0",
+     "seed": 1037,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 10.609239821779152,
+     "mean_loglik_gain": 0.46178085224681487,
+     "n_eval": 465,
+     "world_hash": "f3bfc920f6cbf309a0f8f4fff1ebac6c9926ab767915497e754596118cbf9b9c"
+    },
+    {
+     "control": "P0",
+     "seed": 1074,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 15.04063882039472,
+     "mean_loglik_gain": 0.4326616965499167,
+     "n_eval": 465,
+     "world_hash": "6de797dc94d1399f85c3dccc23a60904850832d2a966ad08f0bbd4fd1be1949b"
+    },
+    {
+     "control": "P0",
+     "seed": 1111,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 6.234288111581153,
+     "mean_loglik_gain": 0.30969188471653647,
+     "n_eval": 465,
+     "world_hash": "69fc5c722eaa2123a4c5fb2dd3260cc76b4068712d3ba268e230aab007c33823"
+    },
+    {
+     "control": "P0",
+     "seed": 1148,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 11.000593385900451,
+     "mean_loglik_gain": 0.5288681453759588,
+     "n_eval": 465,
+     "world_hash": "6ff43f9af9ff70502a72ac764b922b87a9e6ba6bf9ae5ab945e2dbd4092d345d"
+    },
+    {
+     "control": "P0",
+     "seed": 1185,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 16.751927341641345,
+     "mean_loglik_gain": 0.6204795006074988,
+     "n_eval": 465,
+     "world_hash": "240535b6358e45ca2a5d20b631b65470282922a53fc41e0e96ca75dbd8bdf43c"
+    },
+    {
+     "control": "P0",
+     "seed": 1222,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 4.811226360454781,
+     "mean_loglik_gain": 0.22167804468338073,
+     "n_eval": 465,
+     "world_hash": "a16f004a41b5e3c4a7857f242105f724b85175074af321fb2b36a4f27d0e1c27"
+    },
+    {
+     "control": "P0",
+     "seed": 1259,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 13.137088976457488,
+     "mean_loglik_gain": 0.5982443222126176,
+     "n_eval": 465,
+     "world_hash": "f5186d73c8e32dc3f816ece0762bd4e57fa9a0a6e1b4d997e682114e9b26d1c5"
+    },
+    {
+     "control": "P0",
+     "seed": 1296,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 13.513367192648582,
+     "mean_loglik_gain": 0.5349729277460784,
+     "n_eval": 465,
+     "world_hash": "23942e891b7e38f73744ebcd663fc1157251e614de7598af5596361a1e165c8d"
+    },
+    {
+     "control": "P0",
+     "seed": 1333,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 13.68604733575298,
+     "mean_loglik_gain": 0.4926211118788365,
+     "n_eval": 465,
+     "world_hash": "856c56edb90e2def0388027035e7b27dd19551f1c492a25cc8fa59a7b24b186d"
+    },
+    {
+     "control": "P0",
+     "seed": 1370,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 5.7473969592647975,
+     "mean_loglik_gain": 0.3872067271175785,
+     "n_eval": 465,
+     "world_hash": "d7e91c57e0a546cd5b5bcf97ca805b70969e2fec69e74d5054951e296fa0319f"
+    },
+    {
+     "control": "P0",
+     "seed": 1407,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 18.98158635746068,
+     "mean_loglik_gain": 0.5320136648727695,
+     "n_eval": 465,
+     "world_hash": "82b1f14409a2b3e66a8705541c7a6f07b768ee28b254ecc4ac7b8e2a733aa1fd"
+    },
+    {
+     "control": "P0",
+     "seed": 1444,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 9.859672752212306,
+     "mean_loglik_gain": 0.3841868398609559,
+     "n_eval": 465,
+     "world_hash": "8164a9a26090d152178519f1ae1ebed2919e3a02bd1d105830989d27354db2c5"
+    },
+    {
+     "control": "P0",
+     "seed": 1481,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 4.789799475194319,
+     "mean_loglik_gain": 0.4125371436545788,
+     "n_eval": 465,
+     "world_hash": "c3798b9d0425aa70df85abbf19be928c7d5ccd9198c294fd32348bfde6aefff8"
+    },
+    {
+     "control": "P0",
+     "seed": 1518,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 13.657275387884775,
+     "mean_loglik_gain": 0.43149253354354095,
+     "n_eval": 465,
+     "world_hash": "ab68c97a1fc981c7f08ed3637ed4ddb0bab8ef0198f2002dc2bf2ad0b7084e68"
+    },
+    {
+     "control": "P0",
+     "seed": 1555,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 11.611172363771612,
+     "mean_loglik_gain": 0.4062737397636732,
+     "n_eval": 465,
+     "world_hash": "0d6e02fa94c228b2f37ec20d4940f718da60773b79998e712744307eb1e69b10"
+    },
+    {
+     "control": "P0",
+     "seed": 1592,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 13.318302347024384,
+     "mean_loglik_gain": 0.4205955338390075,
+     "n_eval": 465,
+     "world_hash": "71da68114fab36e6ce3871d97212442597f96d0b15392775235844bcaaf9a2e4"
+    },
+    {
+     "control": "P0",
+     "seed": 1629,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 5.026691893360862,
+     "mean_loglik_gain": 0.3159012293113606,
+     "n_eval": 465,
+     "world_hash": "239bc9dfa7e3d5b70feecdca97f333abfc9e6686e5ae5d678b1b184e7c975a2b"
+    },
+    {
+     "control": "P0",
+     "seed": 1666,
+     "verdict": "NO_SIGNAL",
+     "z": 0.5317725330262669,
+     "mean_loglik_gain": 0.04105985073480659,
+     "n_eval": 465,
+     "world_hash": "25f664c9b8e827dde48088010b93e06efcc32b7282f3fe119ceb71b9c4fb0852"
+    },
+    {
+     "control": "P0",
+     "seed": 1703,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 11.1580508813194,
+     "mean_loglik_gain": 0.3945794772681933,
+     "n_eval": 465,
+     "world_hash": "e401ba7c95ef57539bb1abeb8b151d3f2c7b1e4c5f4278f13ac46adf7ac1143a"
+    },
+    {
+     "control": "P0",
+     "seed": 1740,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 7.332189454826081,
+     "mean_loglik_gain": 0.32731007850839233,
+     "n_eval": 465,
+     "world_hash": "1f6a0585bc50f7eb17f04e007d60e8e9bc8c9c5a5414a607b6e2f3b9c7e4e25d"
+    },
+    {
+     "control": "P0",
+     "seed": 1777,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 6.168981096077849,
+     "mean_loglik_gain": 0.26836474913481667,
+     "n_eval": 465,
+     "world_hash": "4b71014750d57f2d3d2cb413c909861adb02db84b4735616584aa25ced417758"
+    },
+    {
+     "control": "P0",
+     "seed": 1814,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 8.196321734847093,
+     "mean_loglik_gain": 0.4114428498537404,
+     "n_eval": 465,
+     "world_hash": "9a5b6f741664922ca7b8c96b2daf47bd0ee4e2e6e61df3472f4ddafe2d014a4a"
+    },
+    {
+     "control": "P0",
+     "seed": 1851,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 11.601915067384237,
+     "mean_loglik_gain": 0.477463667058871,
+     "n_eval": 465,
+     "world_hash": "2a0d86e7290001756d5e6063412681119eef385a3add29718b319b39ac0dd5a7"
+    },
+    {
+     "control": "P0",
+     "seed": 1888,
+     "verdict": "SIGNAL_DETECTED",
+     "z": 10.767141992726788,
+     "mean_loglik_gain": 0.4754432585787005,
+     "n_eval": 465,
+     "world_hash": "e1174730decb8fcfe78a6e52275ebb32cf4fbf3d3e060d4bffba1637e4c9dca3"
+    }
+   ],
+   "judgement": {
+    "control": "P0",
+    "court_verdict": "PASS",
+    "n": 25,
+    "detections": 24,
+    "detection_rate": 0.96,
+    "positive_direction_rate": 1.0,
+    "z_min": 0.5317725330262669,
+    "z_median": 10.767141992726788,
+    "z_max": 18.98158635746068
+   }
+  }
+ },
+ "verdicts": {
+  "N0": "PASS",
+  "N1": "CONTROL_FAILURE",
+  "N2": "PASS",
+  "N3": "PASS",
+  "N4": "PASS",
+  "P0": "PASS"
+ },
+ "court_pass": false,
+ "elapsed_s": 142.4
+}

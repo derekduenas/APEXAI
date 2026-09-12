@@ -1,0 +1,13 @@
+{
+ "R7_COURT_OPENED": true,
+ "court_id": "COURT-FINAL-ae42a5e4fda7",
+ "court_hash": "cc9ecb3f5cdef1c5f0b9e037b36adaad5bc2b6946d8b38a11d412c18ca730bb7",
+ "code_commit": "bd6366c48",
+ "precourt_tree_commit": "5b41c4715",
+ "tree_differs_from_code_commit_by": "sealed predeclaration evidence only (no code)",
+ "seed_manifest_hash": "fa9d5c2a91ccd95c6226ceb1eb8b8bef92aa850bbd68cae103a283cc48b7250f",
+ "utc": "2026-09-05T18:35:33Z",
+ "precourt_regression_artifact_sha256": "8ad40e018a8d5e3eb4914938f00b492171c9f2b69ddd42559d1ec1e5735ca55c",
+ "acceptance_set": "CONSUMED from this instant",
+ "oom_kill_baseline": 4
+}

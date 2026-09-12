@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_resource_profile.py::test_post_restart_peak_alone_is_refused",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_historical_peak_survives_a_restart",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_current_peak_never_becomes_the_basis",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_new_service_with_no_history_is_refused",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_short_observation_window_is_refused",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_market_facing_service_needs_a_full_day",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_stale_version_profile_is_refused",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_peak_from_a_defective_regime_is_refused",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_profile_carries_provenance_and_hash",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_profile_hash_changes_with_evidence",
+   "file": "tests/test_resource_profile.py"
+  },
+  {
+   "nodeid": "tests/test_resource_profile.py::test_refusal_message_names_the_reason",
+   "file": "tests/test_resource_profile.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_resource_profile.py::test_post_restart_peak_alone_is_refused": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_historical_peak_survives_a_restart": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_current_peak_never_becomes_the_basis": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_new_service_with_no_history_is_refused": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_short_observation_window_is_refused": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_market_facing_service_needs_a_full_day": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_stale_version_profile_is_refused": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_peak_from_a_defective_regime_is_refused": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_profile_carries_provenance_and_hash": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_profile_hash_changes_with_evidence": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resource_profile.py::test_refusal_message_names_the_reason": {
+   "file": "tests/test_resource_profile.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_resource_profile.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 157.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34830.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114929664",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.57
+ }
+}

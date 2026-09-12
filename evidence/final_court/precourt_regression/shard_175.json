@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_library_package_exists",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_library_reaches_no_production_authority",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_library_reaches_no_credit_governance",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_library_never_imports_apex_research",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_apex_research_never_imports_the_library",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_no_production_module_reaches_the_library",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_no_capital_broker_or_placement_keyword_in_the_library",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_library_placement_scan_is_clean",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_no_ml_library_imported_anywhere_in_the_library",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_retrieval_never_returns_an_ml_training_shaped_field",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_every_research_library_test_file_isolates_its_ledgers",
+   "file": "tests/test_research_library_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_firewall.py::test_real_research_library_results_directory_has_no_test_pollution",
+   "file": "tests/test_research_library_firewall.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_research_library_firewall.py::test_library_package_exists": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_library_reaches_no_production_authority": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_library_reaches_no_credit_governance": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_library_never_imports_apex_research": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_apex_research_never_imports_the_library": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_no_production_module_reaches_the_library": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_no_capital_broker_or_placement_keyword_in_the_library": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_library_placement_scan_is_clean": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_no_ml_library_imported_anywhere_in_the_library": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_retrieval_never_returns_an_ml_training_shaped_field": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_every_research_library_test_file_isolates_its_ledgers": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_firewall.py::test_real_research_library_results_directory_has_no_test_pollution": {
+   "file": "tests/test_research_library_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_research_library_firewall.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35407.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116948992",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.98
+ }
+}

@@ -1,0 +1,191 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_same_structure_under_price_scaling_reads_identically",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_stale_input_is_unknown_not_neutral",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_insufficient_bars_is_unknown",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_unknown_never_becomes_zero_or_neutral",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_missing_liquidity_cannot_yield_excellent_entry",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_equity_v1_ceiling_is_GOOD_because_quotes_are_not_persisted",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_chase_cannot_be_rescued_by_trend_strength",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_tight_invalidation_alone_does_not_imply_good_trade",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_good_thesis_bad_entry_remains_distinguishable",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_geometry_cannot_see_the_thesis_at_all",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_future_bars_never_enter_computation",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_short_direction_mirrors_long",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_atr_and_vwap_are_real_computations",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_atr_refuses_short_history",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_pedigree_declares_it_is_not_outcome_tuned",
+   "file": "tests/test_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_attack_geometry.py::test_entry_tiers_match_what_captain_accepts",
+   "file": "tests/test_attack_geometry.py"
+  }
+ ],
+ "collected_count": 16,
+ "collect_errors": [],
+ "results": {
+  "tests/test_attack_geometry.py::test_same_structure_under_price_scaling_reads_identically": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_stale_input_is_unknown_not_neutral": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_insufficient_bars_is_unknown": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_unknown_never_becomes_zero_or_neutral": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_missing_liquidity_cannot_yield_excellent_entry": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_equity_v1_ceiling_is_GOOD_because_quotes_are_not_persisted": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_chase_cannot_be_rescued_by_trend_strength": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_tight_invalidation_alone_does_not_imply_good_trade": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_good_thesis_bad_entry_remains_distinguishable": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_geometry_cannot_see_the_thesis_at_all": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_future_bars_never_enter_computation": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_short_direction_mirrors_long": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_atr_and_vwap_are_real_computations": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_atr_refuses_short_history": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_pedigree_declares_it_is_not_outcome_tuned": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_attack_geometry.py::test_entry_tiers_match_what_captain_accepts": {
+   "file": "tests/test_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 16,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_attack_geometry.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34945.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115048448",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.51
+ }
+}

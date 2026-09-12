@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_a_matching_filing_is_a_known_catalyst",
+   "file": "tests/test_catalyst_eyes.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_pit_law_an_event_is_invisible_before_its_known_from",
+   "file": "tests/test_catalyst_eyes.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_measured_absence_is_not_uncertainty",
+   "file": "tests/test_catalyst_eyes.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_no_identity_bridge_is_uncertain_never_guessed",
+   "file": "tests/test_catalyst_eyes.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_a_stale_archive_is_uncertain_not_quiet",
+   "file": "tests/test_catalyst_eyes.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_an_empty_archive_is_uncertain",
+   "file": "tests/test_catalyst_eyes.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_as_of_must_be_tz_aware",
+   "file": "tests/test_catalyst_eyes.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_the_frozen_pipeline_does_not_consume_catalyst_state",
+   "file": "tests/test_catalyst_eyes.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_captain_eyes_refuses_replay_imagery",
+   "file": "tests/test_catalyst_eyes.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_eyes.py::test_captain_eyes_with_no_decisions_reports_nothing_to_see",
+   "file": "tests/test_catalyst_eyes.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_catalyst_eyes.py::test_a_matching_filing_is_a_known_catalyst": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_eyes.py::test_pit_law_an_event_is_invisible_before_its_known_from": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_eyes.py::test_measured_absence_is_not_uncertainty": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_eyes.py::test_no_identity_bridge_is_uncertain_never_guessed": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_eyes.py::test_a_stale_archive_is_uncertain_not_quiet": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_eyes.py::test_an_empty_archive_is_uncertain": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_eyes.py::test_as_of_must_be_tz_aware": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_eyes.py::test_the_frozen_pipeline_does_not_consume_catalyst_state": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_eyes.py::test_captain_eyes_refuses_replay_imagery": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_eyes.py::test_captain_eyes_with_no_decisions_reports_nothing_to_see": {
+   "file": "tests/test_catalyst_eyes.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_catalyst_eyes.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34670.service",
+   "memory_max": "1468006400",
+   "memory_peak": "157642752",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.46
+ }
+}

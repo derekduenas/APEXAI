@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_happy_path_produces_high_quality_state",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_already_expired_refused_not_crashed",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_no_rate_curve_coverage_refused",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_no_curve_at_all_refused",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_no_dividend_schedule_refused",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_price_sanity_violation_refused",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_locked_market_refused",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_short_dated_flag_and_quality_cap",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_missing_quote_yields_low_quality_not_refused",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_unknown_state_quality_refused_at_construction",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_refused_state_must_carry_reason",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_canonical_state.py::test_decision_power_stamped_throughout",
+   "file": "tests/test_option_analytics_canonical_state.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_option_analytics_canonical_state.py::test_happy_path_produces_high_quality_state": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_already_expired_refused_not_crashed": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_no_rate_curve_coverage_refused": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_no_curve_at_all_refused": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_no_dividend_schedule_refused": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_price_sanity_violation_refused": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_locked_market_refused": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_short_dated_flag_and_quality_cap": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_missing_quote_yields_low_quality_not_refused": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_unknown_state_quality_refused_at_construction": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_refused_state_must_carry_reason": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_canonical_state.py::test_decision_power_stamped_throughout": {
+   "file": "tests/test_option_analytics_canonical_state.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_option_analytics_canonical_state.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35911.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115335168",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.8
+ }
+}

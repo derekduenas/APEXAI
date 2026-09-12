@@ -1,0 +1,335 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_state_is_observation_never_a_label",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_iv_and_rv_are_computed_by_our_own_stack",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_insufficient_data_refuses_rather_than_guesses",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_realized_vol_is_causal_and_windowed",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_term_structure_and_skew_present_or_not_estimable",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_stock_is_always_a_competitor",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_long_leg_pays_ask_short_leg_receives_bid",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_no_midpoint_or_theoretical_fill_anywhere",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_vertical_caps_the_favorable_tail_explicitly",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_breakeven_is_computed_and_expressed_as_required_move",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_no_forecast_means_no_option_beats_stock",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_breakeven_reach_ratio_exposes_the_real_hurdle",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_candidate_rules_are_predeclared_and_deterministic",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_no_expression_without_a_spot_reference",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_expression_vocabulary_closed",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_one_contract_is_not_universally_100_shares",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_delta_unavailable_yields_not_estimable_not_a_guess",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_vertical_net_delta_is_long_minus_short",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_r_comes_from_the_declared_plan_not_the_instrument",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_planned_invalidation_without_a_number_refuses",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_all_four_comparison_bases_are_preserved",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_equal_risk_budget_scales_by_declared_1R",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_stock_execution_pedigree_is_honest",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_option_vs_stock_superiority_is_not_proven",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_options_compete_against_each_other_on_equal_terms",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_compare_forbids_a_single_metric_winner",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_defined_risk_is_defined_only_at_expiry",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_friction_is_knowable_before_the_trade",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_observed_stock_quote_makes_the_comparison_legitimate",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_a_short_stock_leg_receives_the_bid",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_without_an_observed_quote_stock_stays_limited",
+   "file": "tests/test_options_predator_core.py"
+  },
+  {
+   "nodeid": "tests/test_options_predator_core.py::test_a_crossed_stock_quote_is_not_treated_as_observed",
+   "file": "tests/test_options_predator_core.py"
+  }
+ ],
+ "collected_count": 32,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_predator_core.py::test_state_is_observation_never_a_label": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_iv_and_rv_are_computed_by_our_own_stack": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_insufficient_data_refuses_rather_than_guesses": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_realized_vol_is_causal_and_windowed": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_term_structure_and_skew_present_or_not_estimable": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_stock_is_always_a_competitor": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_long_leg_pays_ask_short_leg_receives_bid": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_no_midpoint_or_theoretical_fill_anywhere": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_vertical_caps_the_favorable_tail_explicitly": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_breakeven_is_computed_and_expressed_as_required_move": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_no_forecast_means_no_option_beats_stock": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_breakeven_reach_ratio_exposes_the_real_hurdle": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_candidate_rules_are_predeclared_and_deterministic": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_no_expression_without_a_spot_reference": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_expression_vocabulary_closed": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_one_contract_is_not_universally_100_shares": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_delta_unavailable_yields_not_estimable_not_a_guess": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_vertical_net_delta_is_long_minus_short": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_r_comes_from_the_declared_plan_not_the_instrument": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_planned_invalidation_without_a_number_refuses": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_all_four_comparison_bases_are_preserved": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_equal_risk_budget_scales_by_declared_1R": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_stock_execution_pedigree_is_honest": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_option_vs_stock_superiority_is_not_proven": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_options_compete_against_each_other_on_equal_terms": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_compare_forbids_a_single_metric_winner": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_defined_risk_is_defined_only_at_expiry": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_friction_is_knowable_before_the_trade": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_observed_stock_quote_makes_the_comparison_legitimate": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_a_short_stock_leg_receives_the_bid": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_without_an_observed_quote_stock_stays_limited": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_predator_core.py::test_a_crossed_stock_quote_is_not_treated_as_observed": {
+   "file": "tests/test_options_predator_core.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 32,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_predator_core.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36631.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115572736",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.23
+ }
+}

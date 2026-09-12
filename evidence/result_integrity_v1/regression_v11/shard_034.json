@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_curve_v2.py::test_scale_invariance_x10",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_shift_invariance_plus_100000",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_split_adjustment_invariance",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_exact_flat_is_neutral_zero",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_exact_linear_trend_is_neutral_in_diff_mode",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_jump_out_of_perfect_flatness_is_refused_not_fabricated",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_micro_noise_wobble_does_not_elevate",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_dollar_linear_trend_is_near_zero",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_abrupt_reversal_after_noisy_trend_is_detected",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_single_break_elevation_is_not_mathematically_capped",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_accelerating_trend_detects_bend_consistently",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_single_spike_suppresses_subsequent_windows_not_permanently",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_insufficient_history_refuses",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_empty_is_no_support",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_formula_version_and_hash_are_stamped_on_every_record",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_v1_threshold_is_retired_not_deleted",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_elevated_uses_the_z_threshold",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_sigma_window_constants_are_the_preregistered_values",
+   "file": "tests/test_curve_v2.py"
+  },
+  {
+   "nodeid": "tests/test_curve_v2.py::test_non_degeneracy_on_real_thursday_bars_descriptive_only",
+   "file": "tests/test_curve_v2.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_curve_v2.py::test_scale_invariance_x10": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_shift_invariance_plus_100000": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_split_adjustment_invariance": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_exact_flat_is_neutral_zero": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_exact_linear_trend_is_neutral_in_diff_mode": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_jump_out_of_perfect_flatness_is_refused_not_fabricated": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_micro_noise_wobble_does_not_elevate": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_dollar_linear_trend_is_near_zero": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_abrupt_reversal_after_noisy_trend_is_detected": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_single_break_elevation_is_not_mathematically_capped": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_accelerating_trend_detects_bend_consistently": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_single_spike_suppresses_subsequent_windows_not_permanently": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_insufficient_history_refuses": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_empty_is_no_support": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_formula_version_and_hash_are_stamped_on_every_record": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_v1_threshold_is_retired_not_deleted": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_elevated_uses_the_z_threshold": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_sigma_window_constants_are_the_preregistered_values": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_curve_v2.py::test_non_degeneracy_on_real_thursday_bars_descriptive_only": {
+   "file": "tests/test_curve_v2.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: no live bar data in this environment"
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 18,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 1,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_curve_v2.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36529.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115216384",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.38
+ }
+}

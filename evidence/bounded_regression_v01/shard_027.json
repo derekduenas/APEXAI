@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_costs.py::test_the_base_profile_is_ten_basis_points_per_side",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_the_base_profile_is_twenty_basis_points_round_trip",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_the_sensitivity_profile_is_exactly_double",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_commission_is_zero_but_remains_a_parameter",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_the_default_profile_is_the_one_bps_profile",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_the_short_term_tax_rate_is_recorded_for_context",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_a_profile_missing_a_component_is_rejected_not_defaulted",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_an_unknown_profile_raises",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_costs_live_in_config_not_in_code",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_decile_results_are_labelled_gross",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_the_stage_6_gap_is_declared",
+   "file": "tests/test_costs.py"
+  },
+  {
+   "nodeid": "tests/test_costs.py::test_net_spread_applies_costs_to_realised_turnover_on_both_legs",
+   "file": "tests/test_costs.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_costs.py::test_the_base_profile_is_ten_basis_points_per_side": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_the_base_profile_is_twenty_basis_points_round_trip": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_the_sensitivity_profile_is_exactly_double": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_commission_is_zero_but_remains_a_parameter": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_the_default_profile_is_the_one_bps_profile": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_the_short_term_tax_rate_is_recorded_for_context": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_a_profile_missing_a_component_is_rejected_not_defaulted": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_an_unknown_profile_raises": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_costs_live_in_config_not_in_code": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_decile_results_are_labelled_gross": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_the_stage_6_gap_is_declared": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_costs.py::test_net_spread_applies_costs_to_realised_turnover_on_both_legs": {
+   "file": "tests/test_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_costs.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.5,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34968.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114970624",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.69
+ }
+}

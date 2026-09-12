@@ -1,0 +1,8 @@
+{
+ "status": "REQUEST_NOT_PROCESSED",
+ "responseTime": 0,
+ "message": [
+  "Sorry, you have exceeded your daily threshold for requests. Please register for an API key at https://data.bls.gov/registrationEngine/"
+ ],
+ "Results": {}
+}

@@ -1,0 +1,76 @@
+2026-09-05T19:02:06Z R7.1 chain start commit=31a586606 dirty=0 surface=f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d
+2026-09-05T19:02:06Z STEP 1: pre-court bounded regression on exact commit (contained shards)
+master inventory: 4012 nodeids in 222 files, errors 0, hash 4a3b9b28f95c6444, ok True
+shard 219/222 tests/test_world_model_r71_qualification.py          rc=1   31.8s rss= 292.0MiB peak=243 oom=0 PASS=12/FAIL=1 PROBLEMS:FAIL:tests/test_world_model_r71_qualification.py::test_no_acceptance_namespace_exists_during_qualification
+totals {'PASS': 3992, 'FAIL': 1, 'ERROR': 0, 'SKIP': 19, 'XFAIL': 0, 'XPASS': 0, 'UNREPORTED': 0} | missing 0 unexpected 0 dup 0 unaccounted 0 | shards failed ['tests/test_world_model_r71_qualification.py'] | surface changed False | max peak 699 MiB | oom 0
+BOUNDED_FULL_REGRESSION_V0: FAIL elapsed 1521s
+2026-09-05T19:27:27Z precourt regression: FAIL 31a586606 False 4012 {'PASS': 3992, 'FAIL': 1, 'ERROR': 0, 'SKIP': 19, 'XFAIL': 0, 'XPASS': 0, 'UNREPORTED': 0}
+2026-09-05T19:27:27Z PRECOURT REGRESSION NOT PASS -> COURT NOT OPENED
+2026-09-05T19:29:08Z R7.1 chain start commit=4148bce91 dirty=0 surface=f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d
+2026-09-05T19:29:08Z STEP 1: pre-court bounded regression on exact commit (contained shards)
+master inventory: 4012 nodeids in 222 files, errors 0, hash 6d14e7c4e8b431dc, ok True
+totals {'PASS': 3993, 'FAIL': 0, 'ERROR': 0, 'SKIP': 19, 'XFAIL': 0, 'XPASS': 0, 'UNREPORTED': 0} | missing 0 unexpected 0 dup 0 unaccounted 0 | shards failed [] | surface changed False | max peak 698 MiB | oom 0
+BOUNDED_FULL_REGRESSION_V0: PASS elapsed 1519s
+2026-09-05T19:54:27Z precourt regression: PASS 4148bce91 False 4012 {'PASS': 3993, 'FAIL': 0, 'ERROR': 0, 'SKIP': 19, 'XFAIL': 0, 'XPASS': 0, 'UNREPORTED': 0}
+2026-09-05T19:54:27Z STEP 2: OPEN the court (one-way) and run 300 cells (contained)
+COURT OPENED COURT-FINAL-f6ba5c856014 cells expected 300
+index  1/50 done | N0:no N1:DET N2:no N3:no N4:no P0:no
+index  2/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index  3/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index  4/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index  5/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index  6/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index  7/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index  8/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index  9/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 10/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 11/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 12/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 13/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 14/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 15/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 16/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 17/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 18/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 19/50 done | N0:no N1:no N2:no N3:no N4:no P0:no
+index 20/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 21/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 22/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 23/50 done | N0:DET N1:no N2:no N3:no N4:no P0:DET
+index 24/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 25/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 26/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 27/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 28/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 29/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 30/50 done | N0:no N1:no N2:no N3:no N4:no P0:no
+index 31/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 32/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 33/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 34/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 35/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 36/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 37/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 38/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 39/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 40/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 41/50 done | N0:no N1:no N2:no N3:no N4:no P0:no
+index 42/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 43/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 44/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 45/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 46/50 done | N0:no N1:no N2:no N3:no N4:no P0:no
+index 47/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 48/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 49/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+index 50/50 done | N0:no N1:no N2:no N3:no N4:no P0:DET
+N0  N0_SHADOW_TARGET_NULL_V1       det  1/50 PASS | p med 0.905 | t med -2.20 | bl med 88.0 | HAC 4 NOV 2 | eval [1860] train [701]
+N1  N1_TIME_DESTRUCTION_E1860_V1   det  1/50 PASS | p med 0.991 | t med -3.53 | bl med 80.5 | HAC 2 NOV 1 | eval [1860] train [501]
+N2  N2_NOISE_FEATURES (controls.py det  0/50 PASS | p med 0.935 | t med -1.49 | bl med 15.0 | HAC 0 NOV 0 | eval [1860] train [701]
+N3  N3_SHADOW_FEATURE_NULL_V1      det  0/50 PASS | p med 0.960 | t med -2.94 | bl med 79.5 | HAC 0 NOV 0 | eval [1860] train [701]
+N4  N4_RANDOM_RANKER (controls.py  det  0/50 PASS | p med 1.000 | t med -17.01 | bl med 15.0 | HAC 0 NOV 0 | eval [1860] train [701]
+P0  P0_CAUSAL_TREND_POWERED_V2     det 45/50 PASS dir 46/50 | p med 0.001 | t med +6.70 | bl med 32.5 | HAC 45 NOV 42 | eval [1860] train [701]
+overlap: {'N0∩N1': [], 'N0∩N2': [], 'N0∩N3': [], 'N0∩N4': [], 'N1∩N2': [], 'N1∩N3': [], 'N1∩N4': [], 'N2∩N3': [], 'N2∩N4': [], 'N3∩N4': []} | pooled: 2/250 (DESCRIPTIVE ONLY)
+FINAL_SYNTHETIC_ACCEPTANCE_COURT_V1: PASS | integrity: None | oom 4 -> 4 | elapsed 1335s rss 178MiB
+2026-09-05T20:16:43Z court runner exit=0
+2026-09-05T20:16:43Z chain done

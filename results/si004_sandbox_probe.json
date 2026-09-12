@@ -1,0 +1,57 @@
+{
+ "all_expectations_met": true,
+ "checkout": "/apex-data/tmp/si002_wt",
+ "corpus_sha256_prefix": "1854e4324ce1fef8",
+ "deviations": {},
+ "expected": {
+  "admitted_readable": true,
+  "core_evidence_readable": false,
+  "corpus_writable": false,
+  "evaluation_readable": false,
+  "git_status_ok": true,
+  "history_a_readable": false,
+  "manifest_readable": true,
+  "network_reachable": false,
+  "other_corpus_files_visible": false,
+  "secrets_readable": false
+ },
+ "limitations": [
+  "measures the containment, not the apexresearch account, which does not exist yet",
+  "a root-capable account is unaffected by any of this; the administrator remains trusted",
+  "the real view holds 1,511 admitted sessions; this probe stages one"
+ ],
+ "observations": {
+  "admitted_readable": true,
+  "core_evidence_readable": false,
+  "corpus_writable": false,
+  "evaluation_readable": false,
+  "git_status_ok": true,
+  "history_a_readable": false,
+  "manifest_readable": true,
+  "network_reachable": false,
+  "other_corpus_files_visible": false,
+  "secrets_readable": false,
+  "visible_files": "1",
+  "whoami": "apex"
+ },
+ "probe_user": "apex",
+ "probe_user_stands_in_for": "apexresearch (not yet created)",
+ "produced_utc": "2026-09-08T00:19:17Z",
+ "raw": [
+  "whoami=apex",
+  "visible_files=1",
+  "admitted_readable=true",
+  "evaluation_readable=false",
+  "other_corpus_files_visible=false",
+  "core_evidence_readable=false",
+  "history_a_readable=false",
+  "secrets_readable=false",
+  "corpus_writable=false",
+  "manifest_readable=true",
+  "network_reachable=false",
+  "git_status_ok=true"
+ ],
+ "systemd_run_rc": 0,
+ "view_copy_matches_corpus_sha256": true,
+ "what_this_is": "read-only probe of the launch containment; no setup performed"
+}

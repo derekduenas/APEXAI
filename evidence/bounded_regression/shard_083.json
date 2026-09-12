@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_the_token_path_is_where_tokens_are_actually_written",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_counterexample_the_repo_root_path_is_the_one_that_never_exists",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_the_status_reports_absent_when_no_token_exists",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_counterexample_the_status_reports_present_when_a_token_exists",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_the_status_never_creates_the_token",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_a_locked_period_without_a_token_is_refused",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_counterexample_a_stale_token_naming_another_experiment_is_refused",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_an_unlocked_period_needs_no_token",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_the_report_check_passes_when_no_token_exists",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_the_report_check_passes_on_a_token_naming_another_experiment",
+   "file": "tests/test_governance_unlock.py"
+  },
+  {
+   "nodeid": "tests/test_governance_unlock.py::test_counterexample_the_report_check_FAILS_on_a_token_naming_this_experiment",
+   "file": "tests/test_governance_unlock.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_governance_unlock.py::test_the_token_path_is_where_tokens_are_actually_written": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_counterexample_the_repo_root_path_is_the_one_that_never_exists": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_the_status_reports_absent_when_no_token_exists": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_counterexample_the_status_reports_present_when_a_token_exists": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_the_status_never_creates_the_token": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_a_locked_period_without_a_token_is_refused": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_counterexample_a_stale_token_naming_another_experiment_is_refused": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_an_unlocked_period_needs_no_token": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_the_report_check_passes_when_no_token_exists": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_the_report_check_passes_on_a_token_naming_another_experiment": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governance_unlock.py::test_counterexample_the_report_check_FAILS_on_a_token_naming_this_experiment": {
+   "file": "tests/test_governance_unlock.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_governance_unlock.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34733.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114774016",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.77
+ }
+}

@@ -1,0 +1,101 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_crypto_arena.py::test_future_poison_crypto_state",
+   "file": "tests/test_crypto_arena.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_arena.py::test_breakout_excludes_current_bar",
+   "file": "tests/test_crypto_arena.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_arena.py::test_playbooks_fail_closed_on_missing_world",
+   "file": "tests/test_crypto_arena.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_arena.py::test_world_uncertainty_conservative",
+   "file": "tests/test_crypto_arena.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_arena.py::test_crypto_evidence_never_mixes_with_equity",
+   "file": "tests/test_crypto_arena.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_arena.py::test_resolver_waits_for_maturity_and_swarm_budget",
+   "file": "tests/test_crypto_arena.py"
+  }
+ ],
+ "collected_count": 6,
+ "collect_errors": [],
+ "results": {
+  "tests/test_crypto_arena.py::test_future_poison_crypto_state": {
+   "file": "tests/test_crypto_arena.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_arena.py::test_breakout_excludes_current_bar": {
+   "file": "tests/test_crypto_arena.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_arena.py::test_playbooks_fail_closed_on_missing_world": {
+   "file": "tests/test_crypto_arena.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_arena.py::test_world_uncertainty_conservative": {
+   "file": "tests/test_crypto_arena.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_arena.py::test_crypto_evidence_never_mixes_with_equity": {
+   "file": "tests/test_crypto_arena.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_arena.py::test_resolver_waits_for_maturity_and_swarm_budget": {
+   "file": "tests/test_crypto_arena.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 6,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_crypto_arena.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35819.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115896320",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.66
+ }
+}

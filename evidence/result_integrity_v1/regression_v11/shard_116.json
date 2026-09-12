@@ -1,0 +1,182 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_the_complete_chain_produces_a_reasoned_trade",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_evidence_the_modules_actually_connect",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_no_trade_on_insufficient_net_edge",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_no_trade_on_inadequate_calibration_for_live_intent",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_no_trade_on_synthetic_distribution_always",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_no_trade_on_excessive_risk",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_no_trade_on_insufficient_capacity",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_no_trade_when_costs_consume_the_edge",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_no_trade_when_regime_uncertainty_raises_the_bar",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_no_trade_on_governance_violation",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_no_trade_on_insufficient_evidence",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_options_expression_is_demoted_without_calibration",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_calibrated_cannot_be_minted_without_reality_evidence",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_ranking_is_by_net_economics_not_gross",
+   "file": "tests/test_opportunity_chain.py"
+  },
+  {
+   "nodeid": "tests/test_opportunity_chain.py::test_the_report_can_say_no_trade_and_keeps_refusals",
+   "file": "tests/test_opportunity_chain.py"
+  }
+ ],
+ "collected_count": 15,
+ "collect_errors": [],
+ "results": {
+  "tests/test_opportunity_chain.py::test_the_complete_chain_produces_a_reasoned_trade": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_evidence_the_modules_actually_connect": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_no_trade_on_insufficient_net_edge": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_no_trade_on_inadequate_calibration_for_live_intent": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_no_trade_on_synthetic_distribution_always": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_no_trade_on_excessive_risk": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_no_trade_on_insufficient_capacity": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_no_trade_when_costs_consume_the_edge": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_no_trade_when_regime_uncertainty_raises_the_bar": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_no_trade_on_governance_violation": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_no_trade_on_insufficient_evidence": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_options_expression_is_demoted_without_calibration": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_calibrated_cannot_be_minted_without_reality_evidence": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_ranking_is_by_net_economics_not_gross": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_opportunity_chain.py::test_the_report_can_say_no_trade_and_keeps_refusals": {
+   "file": "tests/test_opportunity_chain.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 15,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_opportunity_chain.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36613.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115372032",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.55
+ }
+}

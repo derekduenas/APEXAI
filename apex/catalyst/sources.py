@@ -61,6 +61,11 @@ COVERAGE_CLASSES = ("MACRO_OFFICIAL", "CORPORATE_OFFICIAL",
                     "COMPANY_IR", "REGULATORY", "BROAD_DISCOVERY")
 
 
+from apex.catalyst.bls_parse import (BLSResponseRefused,
+                                    PUBLICATION_TIME_NOT_AVAILABLE,
+                                    parse_bls_response)
+
+
 class SourceUnavailable(RuntimeError):
     """This source could not be read. Not an event, not a silence."""
 
@@ -326,25 +331,37 @@ def fetch_bls(*, release_sha: str = "UNKNOWN") -> list:
     for sid, label in BLS_SERIES.items():
         body = _get(f"https://api.bls.gov/publicAPI/v2/timeseries/"
                     f"data/{sid}")
+        # The provider explains itself in `status` and `message`. The old
+        # code went straight for Results.series and reported every failure
+        # as "unexpected shape" -- which turned a QUOTA refusal into a
+        # phantom schema defect for eight months of cycles.
         try:
-            series = json.loads(body)["Results"]["series"][0]["data"]
-        except (json.JSONDecodeError, KeyError, IndexError) as e:
-            raise SourceUnavailable(f"BLS {sid}: unexpected shape ({e})")
-        if not series:
+            parsed = parse_bls_response(body, expect_series=sid)
+        except BLSResponseRefused as e:
+            raise SourceUnavailable(f"BLS {sid}: {e}") from e
+        d = parsed["latest"] or (parsed["datapoints"][0]
+                                 if parsed["datapoints"] else None)
+        if d is None:
             continue
-        d = series[0]
-        period = f"{d.get('year')}-{d.get('periodName')}"
-        title = f"{label}: {d.get('value')} ({period})"
-        blob = f"{sid}|{period}|{d.get('value')}"
+        # identity keeps the ORIGINAL key shape (year-PeriodName) so the
+        # repair does not re-emit observations already recorded under it
+        period = f"{d.year}-{d.period_name}"
+        title = f"{label}: {d.value} ({period})"
         out.append(RawObservation(
             source_observation_id=_obs_id("BLS", sid, period),
             source="BLS", source_type="STATISTICAL_API",
             source_authority="PRIMARY_OFFICIAL",
             locator=f"https://data.bls.gov/timeseries/{sid}",
-            title=title, published_time=period,
+            title=title,
+            # a reference period is what the number MEASURES, never when it
+            # was published; this endpoint carries no release instant, and
+            # retrieval time is not promoted into its place
+            published_time=PUBLICATION_TIME_NOT_AVAILABLE,
             retrieved_time=now, first_seen_time=now, known_from=now,
-            raw_text_hash=hashlib.sha256(blob.encode()).hexdigest(),
-            raw_excerpt=f"series={sid} value={d.get('value')}",
+            raw_text_hash=d.content_sha256,
+            raw_excerpt=(f"series={sid} value={d.value} "
+                         f"reference_period={d.reference_period} "
+                         f"raw_sha256={parsed['raw_sha256'][:16]}"),
             entity_hints=entity_hints(label), release_sha=release_sha))
     return out
 

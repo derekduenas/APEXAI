@@ -1,0 +1,218 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_unknown_is_a_value_not_zero",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_attack_ready_requires_bounded_loss",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_attack_class_requires_known_entry",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_attack_class_carries_no_percentage",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_attack_ready_is_not_execution_authority",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_state_vocabulary_is_closed",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_observe_never_approves_a_real_card",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_commissioning_test_exercises_plumbing_only",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_bad_data_is_pipeline_stop_not_no_trade",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_no_trade_is_a_positive_decision",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_uncommissioned_foundation_blocks",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_missing_invalidation_blocks_exploratory",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_lethal_contradiction_blocks",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_cohorts_never_merge",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_router_is_pure",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_unknown_authority_refused",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_eligibility_law_is_recorded_not_activated",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_doctrine_characteristics_exist_and_default_unknown",
+   "file": "tests/test_predator_opportunity_router.py"
+  },
+  {
+   "nodeid": "tests/test_predator_opportunity_router.py::test_doctrine_fields_carry_through_the_record",
+   "file": "tests/test_predator_opportunity_router.py"
+  }
+ ],
+ "collected_count": 19,
+ "collect_errors": [],
+ "results": {
+  "tests/test_predator_opportunity_router.py::test_unknown_is_a_value_not_zero": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_attack_ready_requires_bounded_loss": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_attack_class_requires_known_entry": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_attack_class_carries_no_percentage": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_attack_ready_is_not_execution_authority": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_state_vocabulary_is_closed": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_observe_never_approves_a_real_card": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_commissioning_test_exercises_plumbing_only": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_bad_data_is_pipeline_stop_not_no_trade": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_no_trade_is_a_positive_decision": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_uncommissioned_foundation_blocks": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_missing_invalidation_blocks_exploratory": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_lethal_contradiction_blocks": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_cohorts_never_merge": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_router_is_pure": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_unknown_authority_refused": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_eligibility_law_is_recorded_not_activated": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_doctrine_characteristics_exist_and_default_unknown": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_predator_opportunity_router.py::test_doctrine_fields_carry_through_the_record": {
+   "file": "tests/test_predator_opportunity_router.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 19,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_predator_opportunity_router.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34810.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115138560",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.86
+ }
+}

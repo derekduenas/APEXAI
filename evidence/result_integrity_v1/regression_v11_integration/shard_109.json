@@ -1,0 +1,209 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_a_missing_key_names_the_variable_and_shows_how_to_set_it",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_a_blank_key_counts_as_missing",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_the_key_cannot_be_supplied_through_config_or_a_file",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_urls_are_redacted_before_being_shown",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_full_entitlement_is_reported_with_columns",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_a_denied_table_is_named_and_blocks_everything",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_throttling_is_never_reported_as_an_entitlement_verdict",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_the_report_flags_the_throttled_state_explicitly",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_probe_costs_one_call_per_table",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_zero_rows_is_a_failure_not_an_empty_dataset",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_a_mid_download_throttle_discards_the_partial_result",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_the_manifest_records_everything_lineage_needs",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_the_manifest_never_contains_the_key",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_the_written_file_hashes_to_the_manifest_value",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_the_snapshot_file_is_readable_by_the_existing_adapter",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_entitlement_report_serialises_without_the_key",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_credentials_are_stripped_at_the_sink_not_just_by_callers",
+   "file": "tests/test_nasdaq_api.py"
+  },
+  {
+   "nodeid": "tests/test_nasdaq_api.py::test_stripping_handles_a_url_with_no_query",
+   "file": "tests/test_nasdaq_api.py"
+  }
+ ],
+ "collected_count": 18,
+ "collect_errors": [],
+ "results": {
+  "tests/test_nasdaq_api.py::test_a_missing_key_names_the_variable_and_shows_how_to_set_it": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_a_blank_key_counts_as_missing": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_the_key_cannot_be_supplied_through_config_or_a_file": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_urls_are_redacted_before_being_shown": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_full_entitlement_is_reported_with_columns": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_a_denied_table_is_named_and_blocks_everything": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_throttling_is_never_reported_as_an_entitlement_verdict": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_the_report_flags_the_throttled_state_explicitly": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_probe_costs_one_call_per_table": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_zero_rows_is_a_failure_not_an_empty_dataset": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_a_mid_download_throttle_discards_the_partial_result": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_the_manifest_records_everything_lineage_needs": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_the_manifest_never_contains_the_key": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_the_written_file_hashes_to_the_manifest_value": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_the_snapshot_file_is_readable_by_the_existing_adapter": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_entitlement_report_serialises_without_the_key": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_credentials_are_stripped_at_the_sink_not_just_by_callers": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nasdaq_api.py::test_stripping_handles_a_url_with_no_query": {
+   "file": "tests/test_nasdaq_api.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 18,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_nasdaq_api.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36904.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115183616",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.58
+ }
+}

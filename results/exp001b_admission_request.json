@@ -1,0 +1,71 @@
+{
+ "CORRECTED": "Rejected once by the boundary as SCOPE_INVALID. Three fields were wrong and all three were mine: source_families carried an invented label instead of the manifest's, availability was prose where the contract requires structured kinds matching the manifest, and authority_classification used a value that does not exist. The corrected document was validated end to end against the real boundary with a throwaway key before being offered for signature.",
+ "NOTE": "THIS IS A REQUEST, NOT A DECISION. It is unsigned. Its decision field is not ADMIT and its provenance names no principal, so it cannot be used as an admission. Note what does and does not provide that guarantee: the identity string is NOT the boundary -- it selects which public key in allowed_signers must have signed. The boundary is possession of the private signing key, which is held off-host and must never exist on the research host, together with protection of the allowed_signers file itself. Only the admission authority may author and sign the decision.",
+ "availability": {
+  "corporate_actions": "RAW_UNADJUSTED_EXPLICIT",
+  "event_time": {
+   "kind": "PER_ROW",
+   "latest": "2026-08-28"
+  },
+  "publication_time": {
+   "kind": "NOT_AVAILABLE"
+  },
+  "receipt_time": {
+   "at": "2026-08-29",
+   "kind": "BULK"
+  },
+  "restricted_use": "HISTORICAL_RESEARCH_ONLY: no publication or revision record exists for these bars; they may not be used to claim point-in-time availability or to model vendor revisions; receipt was bulk on 2026-08-29, so no row is evidence of what was knowable before that date except by its event time",
+  "revision_time": {
+   "kind": "NOT_AVAILABLE"
+  }
+ },
+ "code": {
+  "commit": "277e4a023c7f070c7421fb587cba6dfcedcb3be8",
+  "note": "This is the commit prepared in the research checkout and verified there. It carries the corrected wrapper: resolved-path trust-root containment, the two explicit operator commands, and the honest statement of what preparation checks. Later commits on this branch add only documentation, recorded evidence and tests; the bound source tree is byte-identical (616a1912..., 48 files), so pinning this commit pins exactly the code that will run.",
+  "source_tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545"
+ },
+ "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
+ "dataset": {
+  "dataset_id": "history-b/etf_continuous",
+  "manifest_path": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json",
+  "manifest_sha256": "3ac8b250eefb47c5f66c7217508e1080f5f86ae5e4a63c20062a4e931a424c39",
+  "root": "/apex-data/history-b/etf_continuous/bars"
+ },
+ "decision": "REQUESTED_NOT_GRANTED",
+ "output": {
+  "authority_classification": "RESEARCH_HISTORICAL",
+  "root": "/apex-data/research/out"
+ },
+ "provenance": {
+  "decided_by": "UNSIGNED_REQUEST_AWAITING_AUTHORITY",
+  "decided_utc": null,
+  "review_reference": "EXP001B-ACTIVATION-001"
+ },
+ "purpose": {
+  "experiment_id": "ALPHA-EXP-001B",
+  "registration_hash": "b3930727334f24379f72df3919c98d689448b2f3f265b2fa6013559ee1bef5c9",
+  "research_purpose": "Execute the frozen train/validation protocol of ALPHA-EXP-001B on admitted historical SPY sessions, producing a distributional result only."
+ },
+ "scope": {
+  "fields": [
+   "open",
+   "high",
+   "low",
+   "close",
+   "volume",
+   "event_time_utc"
+  ],
+  "source_families": [
+   "alpaca_sip_raw_1m"
+  ],
+  "temporal_range": {
+   "end": "2021-12-31",
+   "evaluation_period_sealed": "2022-01-01 onward is NOT admitted",
+   "sessions": 1511,
+   "start": "2016-01-04"
+  },
+  "universe": [
+   "SPY"
+  ]
+ }
+}

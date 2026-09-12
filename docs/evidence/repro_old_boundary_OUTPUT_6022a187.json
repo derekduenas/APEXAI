@@ -1,0 +1,7 @@
+{"F1_nan_timestamp": {"line_has_NaN": true, "status": "FILLED"},
+ "F2_self_attested_risk": {"status": "FILLED"},
+ "F3_malformed_time_endswith_Z": {"status": "FILLED"},
+ "F4_freshness_before_receipt": {"status": "FILLED", "why": null},
+ "F5_non_atomic_duplicate": {"fills_on_disk": 6, "refused": 0},
+ "F6_bool_size": {"status": "FILLED"},
+ "F7_single_record_verify": {"seq2_verifies_despite_altered_seq1": true}}

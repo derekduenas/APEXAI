@@ -1,0 +1,263 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_governor.py::test_every_trading_change_is_locked",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_self_supplied_approval_does_not_unlock_tier_three",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_the_lock_is_structural_not_advisory",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_the_catalog_is_a_whitelist_not_a_blocklist",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_operational_and_research_are_autonomous",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_disk_repair_may_never_delete_sealed_evidence",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_research_may_request_recording_but_not_decisions",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_the_catalog_report_names_what_is_locked",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_hypothesis_without_a_falsifier_is_refused",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_hypothesis_without_evidence_is_refused",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_diagnosis_cannot_smuggle_a_trading_change_as_a_repair",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_diagnoses_rank_by_confidence",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_refused_action_is_still_recorded",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_an_authorized_action_records_its_grant",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_proposal_is_a_document_not_a_deployment",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_proposal_without_a_falsifier_is_advocacy",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_the_six_questions_must_all_be_answered",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_an_answer_without_an_artifact_is_an_impression",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_tuesday_scores_as_a_day_with_gaps",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_the_default_answer_to_building_is_defer",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_market_loss_is_not_a_proven_gap",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_suspicion_without_an_artifact_is_deferred",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_a_real_defect_proceeds_with_scope_limited_to_it",
+   "file": "tests/test_governor.py"
+  },
+  {
+   "nodeid": "tests/test_governor.py::test_you_must_say_out_loud_what_cheaper_thing_you_considered",
+   "file": "tests/test_governor.py"
+  }
+ ],
+ "collected_count": 24,
+ "collect_errors": [],
+ "results": {
+  "tests/test_governor.py::test_every_trading_change_is_locked": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_self_supplied_approval_does_not_unlock_tier_three": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_the_lock_is_structural_not_advisory": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_the_catalog_is_a_whitelist_not_a_blocklist": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_operational_and_research_are_autonomous": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_disk_repair_may_never_delete_sealed_evidence": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_research_may_request_recording_but_not_decisions": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_the_catalog_report_names_what_is_locked": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_hypothesis_without_a_falsifier_is_refused": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_hypothesis_without_evidence_is_refused": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_diagnosis_cannot_smuggle_a_trading_change_as_a_repair": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_diagnoses_rank_by_confidence": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_refused_action_is_still_recorded": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_an_authorized_action_records_its_grant": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_proposal_is_a_document_not_a_deployment": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_proposal_without_a_falsifier_is_advocacy": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_the_six_questions_must_all_be_answered": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_an_answer_without_an_artifact_is_an_impression": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_tuesday_scores_as_a_day_with_gaps": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_the_default_answer_to_building_is_defer": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_market_loss_is_not_a_proven_gap": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_suspicion_without_an_artifact_is_deferred": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_a_real_defect_proceeds_with_scope_limited_to_it": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_governor.py::test_you_must_say_out_loud_what_cheaper_thing_you_considered": {
+   "file": "tests/test_governor.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 24,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_governor.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34734.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114950144",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.77
+ }
+}

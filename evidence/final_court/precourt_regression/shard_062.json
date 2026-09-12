@@ -1,0 +1,209 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_ignore_no_change_is_tier_0",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_material_change_with_no_seriousness_is_tier_1",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_watch_is_tier_1",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_serious_is_tier_4",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_wait_for_entry_is_tier_4",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_wait_for_confirmation_is_tier_3",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_develop_low_info_value_is_tier_2",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_develop_high_info_value_is_tier_3",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_degrading_thesis_still_gets_a_real_check_not_zero",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_high_uncertainty_escalates_a_low_tier",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_high_uncertainty_never_downgrades_an_already_higher_tier",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_unknown_seriousness_refused",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_unknown_uncertainty_refused",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_bad_tier_refused_at_construction",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_no_trade_or_risk_authority_fields",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_all_five_tiers_documented",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_determinism_same_inputs_twice_byte_identical",
+   "file": "tests/test_frontier2_compute_router2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_compute_router2.py::test_persist_writes_and_chains",
+   "file": "tests/test_frontier2_compute_router2.py"
+  }
+ ],
+ "collected_count": 18,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_compute_router2.py::test_ignore_no_change_is_tier_0": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_material_change_with_no_seriousness_is_tier_1": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_watch_is_tier_1": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_serious_is_tier_4": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_wait_for_entry_is_tier_4": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_wait_for_confirmation_is_tier_3": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_develop_low_info_value_is_tier_2": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_develop_high_info_value_is_tier_3": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_degrading_thesis_still_gets_a_real_check_not_zero": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_high_uncertainty_escalates_a_low_tier": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_high_uncertainty_never_downgrades_an_already_higher_tier": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_unknown_seriousness_refused": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_unknown_uncertainty_refused": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_bad_tier_refused_at_construction": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_no_trade_or_risk_authority_fields": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_all_five_tiers_documented": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_determinism_same_inputs_twice_byte_identical": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_compute_router2.py::test_persist_writes_and_chains": {
+   "file": "tests/test_frontier2_compute_router2.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 18,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_compute_router2.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35294.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115163136",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.6
+ }
+}

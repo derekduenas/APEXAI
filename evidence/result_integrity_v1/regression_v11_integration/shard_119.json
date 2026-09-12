@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_american_call_converges_to_bsm_in_no_dividend_limit",
+   "file": "tests/test_option_analytics_american.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_american_put_never_below_european_binomial_put",
+   "file": "tests/test_option_analytics_american.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_deep_itm_put_has_meaningful_early_exercise_premium",
+   "file": "tests/test_option_analytics_american.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_unknown_option_type_refused",
+   "file": "tests/test_option_analytics_american.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_nonpositive_n_steps_refused",
+   "file": "tests/test_option_analytics_american.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_call_delta_close_to_bsm_no_dividend",
+   "file": "tests/test_option_analytics_american.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_call_gamma_close_to_bsm_no_dividend",
+   "file": "tests/test_option_analytics_american.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_call_vega_close_to_bsm_no_dividend",
+   "file": "tests/test_option_analytics_american.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_call_theta_same_sign_as_bsm",
+   "file": "tests/test_option_analytics_american.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_american.py::test_greeks_all_five_fields_present",
+   "file": "tests/test_option_analytics_american.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_option_analytics_american.py::test_american_call_converges_to_bsm_in_no_dividend_limit": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_american.py::test_american_put_never_below_european_binomial_put": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_american.py::test_deep_itm_put_has_meaningful_early_exercise_premium": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_american.py::test_unknown_option_type_refused": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_american.py::test_nonpositive_n_steps_refused": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_american.py::test_call_delta_close_to_bsm_no_dividend": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_american.py::test_call_gamma_close_to_bsm_no_dividend": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_american.py::test_call_vega_close_to_bsm_no_dividend": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_american.py::test_call_theta_same_sign_as_bsm": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_american.py::test_greeks_all_five_fields_present": {
+   "file": "tests/test_option_analytics_american.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_option_analytics_american.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36915.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115286016",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.16
+ }
+}

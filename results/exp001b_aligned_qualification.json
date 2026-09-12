@@ -1,0 +1,129 @@
+{
+ "actual_versus_expected": {
+  "coverage": "every eligible minute of every admitted validation session, early closes included",
+  "forecasts_match_rows": true,
+  "match": true,
+  "match_train": true,
+  "refusal_reconciliation": "total bars 502*390 + 3*210 = 196410; refused 30300 (30 warmup + 30 embargo per session x 505); 196410 - 30300 = 166110",
+  "refusals_validation": {
+   "EMBARGO": 15150,
+   "MISSING_FEATURE_BARS": 0,
+   "MISSING_TARGET_BAR": 0,
+   "WARMUP": 15150
+  },
+  "train_expected": 330360,
+  "train_usable_rows": 330360,
+  "validation_expected": 166110,
+  "validation_forecasts_written": 166110,
+  "validation_usable_rows": 166110,
+  "why_this_is_adequate_scale": "the aborted historical run wrote 165958 rows and was still running, so the real workload lies between 165958 and 166110. Full regular-session coverage is an upper bound on it."
+ },
+ "artifacts_preserved": {
+  "earlier_runs_kept_as_evidence_of_the_fixture_defect": [
+   "/apex-data/qualification_misaligned_run1 (540 bars, misaligned)",
+   "the first demonstration's artifacts were deleted; that deletion is recorded in results/exp001b_qualification_reconciliation.json and is not undone"
+  ],
+  "fixture_count": 1511,
+  "fixture_provenance_sha256": "00e58a7747b4e6620cdb4070e01bc03bf3036d013f86e8193088c442d1cd19fe",
+  "fixture_root": "/apex-data/qualification/fixtures",
+  "outputs": {
+   "forecasts_validation.jsonl": {
+    "bytes": 566798551,
+    "records": 166110,
+    "sha256": "a265e5f780d56927c3e1accf036d27d1bcbc1a401a6259662c33c3a43ad5de22"
+   },
+   "outcomes.jsonl": {
+    "bytes": 380,
+    "records": 1,
+    "sha256": "19341143024f62126223b9d2e3c561cf6240f11480ddf550b5929397a8415047"
+   }
+  }
+ },
+ "both_grading_passes": {
+  "n0_is_no_signal": true,
+  "note": "NO_SIGNAL on synthetic noise is the expected outcome and says nothing about markets",
+  "null_pass_n0": {
+   "completed": true,
+   "n": 166110,
+   "t": 1.5277260568971314,
+   "verdict": "NO_SIGNAL"
+  },
+  "real_pass_dm": {
+   "completed": true,
+   "n": 166110,
+   "t": -2.3008031554667294,
+   "verdict": "NO_SIGNAL"
+  },
+  "terminal_status": "NO_SIGNAL"
+ },
+ "data": "SYNTHETIC fixtures aligned to the registered calendar; no real market data read",
+ "exit_code_contract": {
+  "0": "COMPLETED_WITH_RESULT - the only success",
+  "3": "REFUSED",
+  "4": "FAILED",
+  "5": "OOM_KILLED",
+  "6": "TIMED_OUT",
+  "7": "COMPLETED_WITHOUT_RESULT",
+  "8": "NOT_STARTED",
+  "child_exit_4_rule": "the experiment's exit 4 is EVALUATION_SEALED, a completed run. The wrapper accepts it ONLY when a result was counted, which requires a run directory new to this launch, a run record naming this launch's decision, and a completed status. A bare exit 4 falls back to FAILED.",
+  "tests": [
+   "exit 4 without a bound result -> FAILED, non-zero",
+   "exit 4 with a result from another decision -> not counted, non-zero",
+   "exit 4 with a valid bound result -> COMPLETED, exit 0",
+   "exit 5 with a sealed result -> still FAILED; only 4 has this standing"
+  ]
+ },
+ "expected_rows_independently_calculated": {
+  "method": "from the registered calendar and the eligibility rules alone, with no historical outcomes read: usable = regular_minutes - WARMUP(30) - HORIZON(15) - EMBARGO(15)",
+  "train_early_closes": 9,
+  "train_expected": 330360,
+  "train_sessions": 1006,
+  "validation_arithmetic": "502*(390-60) + 3*(210-60) = 165660 + 450 = 166110",
+  "validation_early_closes": 3,
+  "validation_expected": 166110,
+  "validation_session_lengths": {
+   "210_min": 3,
+   "390_min": 502
+  },
+  "validation_sessions": 505
+ },
+ "fixture_defect_found_and_fixed": {
+  "consequence": "the 390-bar and 540-bar runs produced identical output. The inputs DID differ; the loader's clipping meant the difference never reached the computation.",
+  "defect": "synthetic sessions started at a fixed 14:30 UTC year round. The regular session opens 13:30 UTC in summer and 14:30 in winter, and the loader clips to [open, close], so summer sessions lost their first hour and bars past the close were discarded.",
+  "evidence": "2020-06-01 first bar 13:30:00Z = open; 2020-12-01 first bar 14:30:00Z = open; both 390 bars",
+  "fix": "sessions are generated from the calendar's own open time for exactly regular_minutes bars, so early closes are handled too"
+ },
+ "memory": {
+  "DISCREPANCY": "the cgroup's own memory.peak, read from inside the unit before exit, equals memory.max exactly. systemd's closing summary reports 743.7M. These disagree and I cannot resolve it post hoc because the unit ran with --collect and its cgroup is gone.",
+  "cgroup": "/wmresearch.slice/exp001b-requal2.service",
+  "cgroup_memory_events_before_exit": {
+   "high": 0,
+   "low": 0,
+   "max": 1,
+   "oom": 0,
+   "oom_group_kill": 0,
+   "oom_kill": 0
+  },
+  "cgroup_memory_peak_bytes_read_before_exit": 1468006400,
+  "effective_cap_bytes": 1468006400,
+  "honest_reading": "the cgroup total REACHED the cap. It did not OOM because the pressure was reclaimable page cache from the 567 MB output file, and reclaim succeeded: oom and oom_kill are both zero. The anonymous working set peaked at 841 MiB, well under the cap.",
+  "independent_evidence": "memory.events recorded max=1, which means the cgroup reached its limit once and reclaim was invoked. That supports the higher figure and is not consistent with a peak of 743.7M.",
+  "risk_assessment": "safe as run, because clean page cache is evictable and the kernel evicted it. But the margin is in reclaimable cache, not in anonymous headroom, so a workload that grew the ANONYMOUS set by ~560 MB would OOM.",
+  "self_ru_maxrss_bytes": 881557504,
+  "systemd_summary_memory_peak": "743.7M",
+  "what_NOT_to_conclude": "there was not 559 MB of headroom. My script computed that from the self-only figure. In cgroup terms the headroom at peak was zero."
+ },
+ "qualification": "EXP001B_ALIGNED_SCALE_QUALIFICATION",
+ "runtime": {
+  "cpu": "15min 16.1s",
+  "elapsed_seconds": 1437.3,
+  "fixture_generation_seconds": 13.8,
+  "minutes": 24.0
+ },
+ "sealing_test_scope": {
+  "production_trust_untouched": true,
+  "what_it_does_NOT_establish": "that production import-provenance verification passed. verify_imports_against_commit was STUBBED, as the neighbouring outcome test does, because the throwaway checkout is not where the real modules live. Provenance has its own separate tests.",
+  "what_it_establishes": "the execute and seal path runs, seals exactly one result, binds it to its own decision, refuses a second seal, and the wrapper's binding check accepts it and rejects it under a different decision"
+ },
+ "unit": "exp001b-requal2.service"
+}

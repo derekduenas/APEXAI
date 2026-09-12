@@ -1,0 +1,488 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_exactly_800_populated_buckets",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_801_populated_buckets_drops_the_oldest",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_800_buckets_spanning_far_more_than_800_wall_minutes",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_many_trades_in_the_same_minute",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_identical_timestamps_keep_arrival_order",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_quiet_symbol_is_not_truncated",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_high_volume_symbol",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_outage_reclassifies_finalized_bars",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_incomplete_and_gap_classifications",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_high_low_ineligible_conditions",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_all_prints_ineligible_falls_back",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_forming_minute_never_emitted",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_bucket_assignment_matches_pandas_exactly",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_future_event_time_is_the_callers_gate_not_a_crash",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_clock_regression_does_not_move_the_watermark_backwards",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_unknown_symbol_is_refused_not_created",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_late_trade_inside_tolerance_is_folded_in",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_late_trade_beyond_tolerance_is_refused_and_counted",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_duplicate_inside_horizon_is_suppressed",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_dedup_keys_expire_with_their_window_not_by_clearing",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_duplicate_after_expiry_cannot_corrupt_a_finalized_bar",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_bound_a_working_state_plateaus_while_buckets_advance",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_bound_b_per_symbol_ceiling_forces_closure_and_records_it",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_bound_b_dedup_ceiling_evicts_oldest_not_everything",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_bound_c_detects_a_stopped_prune_clock",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_bound_c_detects_dedup_set_queue_divergence",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_bound_c_detects_too_many_open_buckets",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_construction_rejects_nonsense_bounds",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_default_retention_is_the_consumers_contract",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_evicting_working_state_never_touches_canonical_history",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_randomised_equivalence_against_the_reference_builder",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_stats_shape_is_operational_not_a_ledger",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_equivalence_holds_under_dense_tied_timestamps_when_monotonic",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_tied_timestamps_resolve_to_arrival_order_deterministically",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_out_of_order_counter_is_the_guarantees_own_tripwire",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_volume_dtype_matches_the_reference_for_integer_sizes",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_fabric_ingest_path_is_bounded_end_to_end",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_health_degrades_and_reports_when_a_bound_is_violated",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_provider_interface_still_reports_known_from_and_latency",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_eodhd_fabric_cannot_be_reactivated_by_accident",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_eodhd_inspection_is_still_possible_but_explicit",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_eodhd_daemon_entrypoint_cannot_start_it",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_generic_out_of_order_alone_does_NOT_degrade_semantic_health",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_ns_tie_under_non_monotonic_arrival_degrades_semantic_health",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_ns_tie_under_monotonic_arrival_stays_exact",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_ambiguity_sample_is_bounded",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_late_refusal_weakens_the_claim_but_is_not_ordering_ambiguity",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_health_degrades_never_fails_on_ordering_ambiguity",
+   "file": "tests/test_trade_working_set.py"
+  },
+  {
+   "nodeid": "tests/test_trade_working_set.py::test_equivalence_claim_is_never_unconditional_in_the_artifact",
+   "file": "tests/test_trade_working_set.py"
+  }
+ ],
+ "collected_count": 49,
+ "collect_errors": [],
+ "results": {
+  "tests/test_trade_working_set.py::test_exactly_800_populated_buckets": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_801_populated_buckets_drops_the_oldest": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_800_buckets_spanning_far_more_than_800_wall_minutes": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_many_trades_in_the_same_minute": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_identical_timestamps_keep_arrival_order": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_quiet_symbol_is_not_truncated": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_high_volume_symbol": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_outage_reclassifies_finalized_bars": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_incomplete_and_gap_classifications": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_high_low_ineligible_conditions": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_all_prints_ineligible_falls_back": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_forming_minute_never_emitted": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_bucket_assignment_matches_pandas_exactly": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_future_event_time_is_the_callers_gate_not_a_crash": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_clock_regression_does_not_move_the_watermark_backwards": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_unknown_symbol_is_refused_not_created": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_late_trade_inside_tolerance_is_folded_in": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_late_trade_beyond_tolerance_is_refused_and_counted": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_duplicate_inside_horizon_is_suppressed": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_dedup_keys_expire_with_their_window_not_by_clearing": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_duplicate_after_expiry_cannot_corrupt_a_finalized_bar": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_bound_a_working_state_plateaus_while_buckets_advance": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_bound_b_per_symbol_ceiling_forces_closure_and_records_it": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_bound_b_dedup_ceiling_evicts_oldest_not_everything": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_bound_c_detects_a_stopped_prune_clock": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_bound_c_detects_dedup_set_queue_divergence": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_bound_c_detects_too_many_open_buckets": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_construction_rejects_nonsense_bounds": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_default_retention_is_the_consumers_contract": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_evicting_working_state_never_touches_canonical_history": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_randomised_equivalence_against_the_reference_builder": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_stats_shape_is_operational_not_a_ledger": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_equivalence_holds_under_dense_tied_timestamps_when_monotonic": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_tied_timestamps_resolve_to_arrival_order_deterministically": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_out_of_order_counter_is_the_guarantees_own_tripwire": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_volume_dtype_matches_the_reference_for_integer_sizes": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_fabric_ingest_path_is_bounded_end_to_end": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_health_degrades_and_reports_when_a_bound_is_violated": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_provider_interface_still_reports_known_from_and_latency": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_eodhd_fabric_cannot_be_reactivated_by_accident": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_eodhd_inspection_is_still_possible_but_explicit": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_eodhd_daemon_entrypoint_cannot_start_it": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_generic_out_of_order_alone_does_NOT_degrade_semantic_health": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_ns_tie_under_non_monotonic_arrival_degrades_semantic_health": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_ns_tie_under_monotonic_arrival_stays_exact": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_ambiguity_sample_is_bounded": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_late_refusal_weakens_the_claim_but_is_not_ordering_ambiguity": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_health_degrades_never_fails_on_ordering_ambiguity": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_trade_working_set.py::test_equivalence_claim_is_never_unconditional_in_the_artifact": {
+   "file": "tests/test_trade_working_set.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 49,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_trade_working_set.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 193.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34843.service",
+   "memory_max": "1468006400",
+   "memory_peak": "148103168",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 17.52
+ }
+}

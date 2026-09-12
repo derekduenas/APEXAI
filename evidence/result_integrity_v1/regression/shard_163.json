@@ -1,0 +1,461 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_pulse.py::test_an_untrustworthy_field_may_not_carry_a_number",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_valid_field_may_not_be_empty",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_the_quality_vocabulary_is_closed",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_sentinel_from_another_engine_is_honoured_not_overridden",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_missing_nbbo_yields_absence_not_zero",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_missing_quote_sizes_do_not_become_a_balanced_book",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_micro_state_withholds_size_features_without_sizes",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_cash_open_features_are_inapplicable_before_the_open",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_stale_quote_is_stale_not_current",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_known_from_is_the_latest_ingredient_not_the_schedule",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_tampered_packet_fails_verification",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_quality_census_and_missingness_are_reported",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_the_same_observation_recomputed_keeps_one_identity",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_different_minute_is_a_different_observation",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_different_universe_is_a_different_observation",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_window_we_did_not_observe_is_not_estimable",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_sufficiently_observed_window_returns_a_real_number",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_the_store_is_bounded_and_replaying_does_not_double_count",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_reconstruction_carrying_the_future_is_caught",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_reconstruction_may_not_be_labelled_live",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_the_parity_declaration_is_checked_against_real_packets",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_rolling_returns_are_declared_live_only",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_rebuilt_session_aggregates_are_declared_approximate",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_the_twin_carries_no_decision_authority",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_packet_states_how_wide_its_moment_really_is",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_each_field_carries_its_own_age",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_known_from_may_not_precede_as_of",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_known_from_gates_age_not_as_of",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_the_three_causes_of_missing_deep_state_stay_distinct",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_enrichment_records_the_rule_that_produced_the_coverage",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_boring_subject_is_NOT_ENRICHED_with_a_stated_reason",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_reference_sample_breaks_the_confound",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_an_unenriched_packet_says_so_explicitly",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_freshness_is_per_source_and_per_session",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_an_event_does_not_decay",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_an_undeclared_source_gets_the_strictest_rule",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_official_fact_and_model_opinion_are_separate_fields",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_an_event_with_no_interpreter_says_so",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_asked_and_found_nothing_differs_from_never_asked",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_an_unreachable_catalyst_is_a_provider_error",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_a_replay_refuses_present_day_cognition_about_an_old_event",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_the_premarket_path_is_accumulated_from_our_own_eyes",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_no_premarket_observations_is_not_a_flat_premarket",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_premarket_accumulation_ignores_the_regular_session",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_options_absence_premarket_is_expected_not_unknown",
+   "file": "tests/test_pulse.py"
+  },
+  {
+   "nodeid": "tests/test_pulse.py::test_cross_asset_absence_is_not_available_not_zero",
+   "file": "tests/test_pulse.py"
+  }
+ ],
+ "collected_count": 46,
+ "collect_errors": [],
+ "results": {
+  "tests/test_pulse.py::test_an_untrustworthy_field_may_not_carry_a_number": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_valid_field_may_not_be_empty": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_the_quality_vocabulary_is_closed": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_sentinel_from_another_engine_is_honoured_not_overridden": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_missing_nbbo_yields_absence_not_zero": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_missing_quote_sizes_do_not_become_a_balanced_book": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_micro_state_withholds_size_features_without_sizes": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_cash_open_features_are_inapplicable_before_the_open": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_stale_quote_is_stale_not_current": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_known_from_is_the_latest_ingredient_not_the_schedule": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_tampered_packet_fails_verification": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_quality_census_and_missingness_are_reported": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_the_same_observation_recomputed_keeps_one_identity": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_different_minute_is_a_different_observation": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_different_universe_is_a_different_observation": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_window_we_did_not_observe_is_not_estimable": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_sufficiently_observed_window_returns_a_real_number": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_the_store_is_bounded_and_replaying_does_not_double_count": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_reconstruction_carrying_the_future_is_caught": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_reconstruction_may_not_be_labelled_live": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_the_parity_declaration_is_checked_against_real_packets": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_rolling_returns_are_declared_live_only": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_rebuilt_session_aggregates_are_declared_approximate": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_the_twin_carries_no_decision_authority": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_packet_states_how_wide_its_moment_really_is": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_each_field_carries_its_own_age": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_known_from_may_not_precede_as_of": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_known_from_gates_age_not_as_of": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_the_three_causes_of_missing_deep_state_stay_distinct": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_enrichment_records_the_rule_that_produced_the_coverage": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_boring_subject_is_NOT_ENRICHED_with_a_stated_reason": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_reference_sample_breaks_the_confound": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_an_unenriched_packet_says_so_explicitly": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_freshness_is_per_source_and_per_session": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_an_event_does_not_decay": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_an_undeclared_source_gets_the_strictest_rule": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_official_fact_and_model_opinion_are_separate_fields": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_an_event_with_no_interpreter_says_so": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_asked_and_found_nothing_differs_from_never_asked": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_an_unreachable_catalyst_is_a_provider_error": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_a_replay_refuses_present_day_cognition_about_an_old_event": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_the_premarket_path_is_accumulated_from_our_own_eyes": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_no_premarket_observations_is_not_a_flat_premarket": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_premarket_accumulation_ignores_the_regular_session": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_options_absence_premarket_is_expected_not_unknown": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pulse.py::test_cross_asset_absence_is_not_available_not_zero": {
+   "file": "tests/test_pulse.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 46,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_pulse.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36349.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115810304",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.49
+ }
+}

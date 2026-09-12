@@ -1,0 +1,105 @@
+{
+ "1_workload_counts": {
+  "aborted_run_rows_before_death": 165958,
+  "aborted_run_was_still_running": true,
+  "can_the_exact_requirement_be_read_from_metadata": false,
+  "counting_semantics_compared": {
+   "aborted_historical_run": "one JSONL line per usable row, carrying BOTH m0 and m1",
+   "bytes_per_record_aborted": 3414.6,
+   "bytes_per_record_demo": 3412.9,
+   "conclusion": "the counts measure the same thing and are directly comparable",
+   "synthetic_demonstration": "identical: same chain_append call in the same code path"
+  },
+  "demonstrated_validation_rows": 146190,
+  "required_workload_used_for_requalification": {
+   "basis": "the proven lower bound of 165,958, exceeded with margin",
+   "margin_over_lower_bound": "at least 20%",
+   "rationale": "if the repaired implementation completes at a workload larger than the real one, it completes at the real one",
+   "target_validation_usable_rows": 200000
+  },
+  "session_counts_from_manifest": {
+   "admitted_window_2016_01_04_to_2021_12_31": 1511,
+   "demonstration_used": {
+    "train": 1006,
+    "validation": 505
+   },
+   "sessions_matched": true,
+   "train_2016_01_04_to_2019_12_31": 1006,
+   "validation_2020_01_01_to_2021_12_31": 505
+  },
+  "verdict": "THE DEMONSTRATION WAS UNDERSIZED. 146,190 < 165,958, and 165,958 is only a LOWER BOUND because the aborted run had not finished validation.",
+  "where_the_shortfall_came_from": "session counts were right; bars per session were not. The synthetic sessions carried 390 bars and yielded 289.5 usable rows each, while the real corpus yields at least 328.6 per session.",
+  "why_not": "the manifest records session_date, sha256, size and symbol per file, but not bar or row counts, and no retained artifact records them. Establishing the exact figure would require reading admitted market data, which is not done here."
+ },
+ "2_memory_figures": {
+  "apparent_conflict": "interim 1,096 MB versus final 1,046 MB",
+  "cap_MiB": 1400.0,
+  "cap_raw_bytes": 1468006400,
+  "cgroup_identity": "/wmresearch.slice/exp001b-scale-demo.service",
+  "cgroup_peak_MB_decimal": 1096.7,
+  "cgroup_peak_MiB": 1045.9,
+  "cgroup_peak_raw_bytes": 1096716288,
+  "gap_explanation": "page cache for the 499 MB forecast file, which counts against MemoryMax but not against getrusage",
+  "headroom_MiB": 354.1,
+  "headroom_raw_bytes": 371290112,
+  "my_error": "the final return divided by 1048576 and labelled the result MB. It was MiB. The interim figure divided by 1e6. Both describe the same 1,096,716,288 bytes.",
+  "resolved": "SAME RAW VALUE, two unit conventions. No peak decreased.",
+  "sampling": {
+   "cgroup_files_after_exit": "unavailable: the unit ran with --collect, so the cgroup and its memory.peak and memory.events were removed at exit. The last direct read of memory.events was during the run: all counters zero.",
+   "final_source": "systemd journal unit summary line at deactivation, 'Consumed 13min 1.889s CPU time, 1.0G memory peak'",
+   "interim_reads": "systemd MemoryPeak property, polled during the run",
+   "limitation": "post-hoc verification of the counters is therefore not possible for this run. The requalification will capture them before exit."
+  },
+  "self_only_rss_bytes": 778735616,
+  "self_vs_cgroup_gap_bytes": 317980672
+ },
+ "3_timing": {
+  "actual_minutes": 19.7,
+  "actual_run_seconds": 1180.8,
+  "estimate_given": "about three hours",
+  "lesson": "the rate was measured during a non-representative phase and should not have been extrapolated",
+  "overestimate_factor": 9.1,
+  "why_the_estimate_was_wrong": "it extrapolated from an early poll taken while the process was still admitting 1511 sessions, so the observed forecast rate was depressed by work that does not recur. I also assumed the null pass would cost as much as the first, when it neither seals nor writes."
+ },
+ "4_deleted_artifacts": {
+  "deleted": [
+   {
+    "contents": "1511 synthetic session files plus _PROVENANCE.json",
+    "path": "/apex-data/tmp/scale_fx",
+    "recoverable": "deterministically regenerable"
+   },
+   {
+    "bytes": 498909753,
+    "path": "/apex-data/tmp/scale_out/forecasts_validation.jsonl",
+    "records": 146190,
+    "recoverable": false
+   },
+   {
+    "bytes": 380,
+    "path": "/apex-data/tmp/scale_out/outcomes.jsonl",
+    "recoverable": false
+   }
+  ],
+  "deletion_was_wrong": true,
+  "permanently_lost": [
+   "sha256 of the forecast and outcome outputs, which were never computed before deletion",
+   "the outputs themselves: each record carries creation_time from wall clock, so regeneration cannot reproduce the bytes"
+  ],
+  "retained_and_sufficient_to_reproduce_the_INPUTS": {
+   "configuration": "1006 train, 505 validation, 390 bars, deterministic",
+   "executed_source": "984c5bba026ee156274eb84dfc304986760f2f72, bound tree 06eee315",
+   "generator": "scripts/exp001b_scale_demo.py (committed)",
+   "logs": "systemd journal for exp001b-scale-demo.service, holding the complete result JSON",
+   "result_summary": "results/exp001b_scale_demonstration.json",
+   "seeding": "seed = index + 1 per session, sessions taken in order from the exchange calendar starting 2016-01-04"
+  },
+  "will_not_do": "regenerate the fixtures and present them as the originals",
+  "wrong_rationale": "I deleted them because they were synthetic. Synthetic qualification artifacts are evidence for the engineering claim even though they establish nothing about markets."
+ },
+ "5_smallest_remaining_test": [
+  "one synthetic qualification run sized above the proven lower bound (target 200,000+ validation usable rows), preserving fixtures, outputs, hashes and cgroup counters captured BEFORE exit",
+  "one exercise of result sealing through the real execute path using a disposable test authority and synthetic data, with production trust untouched"
+ ],
+ "no_rerun_performed_before_this": true,
+ "reconciliation": "EXP001B_QUALIFICATION_DISCREPANCIES"
+}

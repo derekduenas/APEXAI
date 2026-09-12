@@ -1,0 +1,74 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_assassin.py::test_swarm_objection_wounds_and_is_attributed",
+   "file": "tests/test_assassin.py"
+  },
+  {
+   "nodeid": "tests/test_assassin.py::test_clean_candidate_survives_clean_with_attempts_recorded",
+   "file": "tests/test_assassin.py"
+  },
+  {
+   "nodeid": "tests/test_assassin.py::test_wounds_never_authorize_only_caution",
+   "file": "tests/test_assassin.py"
+  }
+ ],
+ "collected_count": 3,
+ "collect_errors": [],
+ "results": {
+  "tests/test_assassin.py::test_swarm_objection_wounds_and_is_attributed": {
+   "file": "tests/test_assassin.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_assassin.py::test_clean_candidate_survives_clean_with_attempts_recorded": {
+   "file": "tests/test_assassin.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_assassin.py::test_wounds_never_authorize_only_caution": {
+   "file": "tests/test_assassin.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 3,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_assassin.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36499.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114917376",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.29
+ }
+}

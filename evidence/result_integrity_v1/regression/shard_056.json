@@ -1,0 +1,227 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_features.py::test_skip_adjusted_return_uses_the_right_two_endpoints",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_skip_adjusted_return_survives_a_gap_between_the_endpoints",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_universe_mean_ignores_ineligible_securities",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_universe_excess_is_inert_after_zscoring",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_f4_market_relative_is_identical_to_f1_after_zscoring",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_simple_moving_average_requires_a_complete_window",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_fraction_above_sma_preserves_nan_rather_than_counting_it_as_below",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_wilder_atr_matches_the_hand_computed_recursion",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_wilder_atr_carries_state_across_a_gap_without_being_poisoned",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_true_range_takes_the_max_of_the_three_candidates",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_realised_volatility_is_log_return_std_with_ddof_one",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_volatility_ratio_annualisation_cancels",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_sector_relative_excludes_self_from_its_own_benchmark",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_sector_relative_requires_the_minimum_member_count",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_sector_benchmark_uses_only_eligible_members",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_winsorise_clips_at_the_interpolated_percentiles",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_zscore_is_cross_sectional_with_ddof_one",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_zscore_of_a_flat_cross_section_is_nan_not_zero",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_percentile_rank_and_deciles_are_equal_count",
+   "file": "tests/test_features.py"
+  },
+  {
+   "nodeid": "tests/test_features.py::test_decile_assignment_ignores_ineligible_securities",
+   "file": "tests/test_features.py"
+  }
+ ],
+ "collected_count": 20,
+ "collect_errors": [],
+ "results": {
+  "tests/test_features.py::test_skip_adjusted_return_uses_the_right_two_endpoints": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_skip_adjusted_return_survives_a_gap_between_the_endpoints": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_universe_mean_ignores_ineligible_securities": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_universe_excess_is_inert_after_zscoring": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_f4_market_relative_is_identical_to_f1_after_zscoring": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_simple_moving_average_requires_a_complete_window": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_fraction_above_sma_preserves_nan_rather_than_counting_it_as_below": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_wilder_atr_matches_the_hand_computed_recursion": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_wilder_atr_carries_state_across_a_gap_without_being_poisoned": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_true_range_takes_the_max_of_the_three_candidates": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_realised_volatility_is_log_return_std_with_ddof_one": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_volatility_ratio_annualisation_cancels": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_sector_relative_excludes_self_from_its_own_benchmark": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_sector_relative_requires_the_minimum_member_count": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_sector_benchmark_uses_only_eligible_members": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_winsorise_clips_at_the_interpolated_percentiles": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_zscore_is_cross_sectional_with_ddof_one": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_zscore_of_a_flat_cross_section_is_nan_not_zero": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_percentile_rank_and_deciles_are_equal_count": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_features.py::test_decile_assignment_ignores_ineligible_securities": {
+   "file": "tests/test_features.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 20,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_features.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36242.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114958336",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.61
+ }
+}

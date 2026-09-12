@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_first_ingest_verdict",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_identical_content_twice_is_duplicate",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_different_content_same_title_is_new_version",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_v1_is_never_rewritten",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_content_hash_is_deterministic_sha256",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_source_reference_and_hash_preserved",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_unknown_document_type_refused",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_unknown_research_status_refused",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_new_collection_not_in_the_named_tuple_still_works",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_provenance_fields_all_present",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_decision_power_stamped",
+   "file": "tests/test_research_library_documents.py"
+  },
+  {
+   "nodeid": "tests/test_research_library_documents.py::test_ledger_is_hash_chained",
+   "file": "tests/test_research_library_documents.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_research_library_documents.py::test_first_ingest_verdict": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_identical_content_twice_is_duplicate": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_different_content_same_title_is_new_version": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_v1_is_never_rewritten": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_content_hash_is_deterministic_sha256": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_source_reference_and_hash_preserved": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_unknown_document_type_refused": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_unknown_research_status_refused": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_new_collection_not_in_the_named_tuple_still_works": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_provenance_fields_all_present": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_decision_power_stamped": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_library_documents.py::test_ledger_is_hash_chained": {
+   "file": "tests/test_research_library_documents.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_research_library_documents.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34823.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115613696",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.69
+ }
+}

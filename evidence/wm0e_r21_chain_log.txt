@@ -1,0 +1,47 @@
+2026-09-05T03:44:26Z R2.1 chain start
+  slice memory.peak=1400MiB memory.events: low 0 high 0 max 70 oom 2 oom_kill 2 oom_group_kill 0 
+2026-09-05T03:44:26Z STEP 0: placement proof (no-alloc)
+cgroup      : /wmresearch.slice/run-u34445.service
+memory.max  : 1468006400 (unit)
+slice max   : 1610612736 (wmresearch.slice)
+in dedicated WM slice: True
+PRODUCTION_SERVICES_IN_WM_SLICE = 0
+2026-09-05T03:44:26Z STEP 1: focused WM tests (contained)
+.......................................................................  [100%]
+71 passed in 7.79s
+  slice memory.peak=1400MiB memory.events: low 0 high 0 max 70 oom 2 oom_kill 2 oom_group_kill 0 
+2026-09-05T03:44:38Z STEP 2: calibration exercise FROM THE BEGINNING (contained, V0.1)
+NULL_iid_n465                  rej=0.0350 CI=[0.021,0.058] p50=0.470 bl=15/15/23 clamp={'lower': 399, 'none': 1, 'upper': 0} t_sd=1.08 ok
+NULL_MA14_n465                 rej=0.0225 CI=[0.012,0.042] p50=0.496 bl=15/25/77 clamp={'lower': 28, 'none': 353, 'upper': 19} t_sd=1.22 ok
+NULL_MA14_n270                 rej=0.0450 CI=[0.029,0.070] p50=0.480 bl=15/20/45 clamp={'lower': 10, 'none': 366, 'upper': 24} t_sd=1.37 ok
+NULL_AR1_phi0.5_n465           rej=0.0300 CI=[0.017,0.052] p50=0.481 bl=15/15/76 clamp={'lower': 394, 'none': 6, 'upper': 0} t_sd=1.07 ok
+NULL_AR1_phi0.9_n465           rej=0.0325 CI=[0.019,0.055] p50=0.522 bl=16/29/77 clamp={'lower': 0, 'none': 399, 'upper': 1} t_sd=1.47 ok
+POWER_MA14_mu3_n465            rej=0.9925 CI=[0.978,0.997] p50=0.001 bl=15/26/77 clamp={'lower': 22, 'none': 349, 'upper': 29} t_sd=1.35 ok
+POWER_AR1_phi0.9_mu1.5_n465    rej=0.9025 CI=[0.869,0.928] p50=0.001 bl=17/30/61 clamp={'lower': 0, 'none': 400, 'upper': 0} t_sd=1.74 ok
+pooled dependent-null rejection: 0.0325 (max 0.040) -> True
+ENVELOPE_VERDICT: PASS  elapsed 291.6s
+2026-09-05T03:49:30Z calibration exit=0 elapsed=292s
+  slice memory.peak=1400MiB memory.events: low 0 high 0 max 70 oom 2 oom_kill 2 oom_group_kill 0 
+2026-09-05T03:49:30Z calibration committed at 950312fd5 sha256=61c6e14f9319d687
+2026-09-05T03:49:30Z ENVELOPE_VERDICT=PASS
+2026-09-05T03:49:30Z STEP 3: convene NULL_COURT_V2.1 once (contained)
+court_id   : COURT-V2-386a408b7417
+court_hash : 2262c39b7c7ca9259ce78b9fcf95f914152f76bc15cc0a162870b1e079acb0ab
+elapsed    : 316.3s
+
+ctl  verdict            n  det  p_med   t_med   bl_med hacdet iid_z_med      note
+N0   PASS              50    2  0.916   -1.66   28     3      -3.77          exp 1.25 max 5
+N1   PASS              50    4  0.749   -0.79   25     7      -2.05          exp 1.25 max 5
+N2   PASS              50    0  0.801   -0.73   15     0      -0.73          exp 1.25 max 5
+N3   CONTROL_FAILURE   50    7  0.717   -0.62   15     7      -0.84          exp 1.25 max 5
+N4   PASS              50    0  1.000   -8.30   15     0      -8.52          exp 1.25 max 5
+P0   CONTROL_FAILURE   50   31  0.010   +3.75   19     43     +9.32          det_rate 0.62 dir 1.00
+
+COURT_PASS : False
+2026-09-05T03:54:47Z court runner exit=0 elapsed=317s
+  slice memory.peak=1400MiB memory.events: low 0 high 0 max 70 oom 2 oom_kill 2 oom_group_kill 0 
+2026-09-05T03:54:47Z court committed at df8a247cd
+2026-09-05T03:54:47Z STEP 4: full regression (contained, 1400M unit cap)
+2026-09-05T03:57:52Z regression exit=1 elapsed=185s :: ........................ [ 45%] ........................................................................ [ 47%] ................................................
+  slice memory.peak=1400MiB memory.events: low 0 high 0 max 102 oom 3 oom_kill 3 oom_group_kill 0 
+2026-09-05T03:57:52Z chain done

@@ -1,0 +1,308 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_research_engines.py::test_positive_control_bootstrap_ci_excludes_zero",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_negative_control_bootstrap_ci_includes_zero",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_positive_control_permutation_rejects_null",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_negative_control_permutation_does_not_reject",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_bootstrap_is_deterministic_given_a_seed",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_permutation_p_value_is_never_exactly_zero",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_the_stats_engine_exposes_no_select_best",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_subperiod_reports_all_subperiods_and_ranks_none",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_a_bad_block_size_is_refused",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_multiple_comparison_exposes_the_denominator",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_manifest_science_id_is_stable_across_presentation_changes",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_a_science_change_changes_identity",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_provenance_changes_full_id_but_not_science_id",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_a_manifest_missing_a_science_key_is_refused",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_a_freeform_science_field_is_refused",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_the_search_denominator_counts_distinct_specs",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_a_different_hyperparameter_grid_is_a_new_comparison",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_select_best_is_refused",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_the_ml_package_fits_no_model",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_a_descriptive_claim_needs_no_placebo",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_a_causal_hypothesis_without_a_placebo_is_refused",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_a_causal_hypothesis_without_assumptions_is_refused",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_an_unsupported_identification_strategy_is_refused",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_a_well_formed_causal_hypothesis_is_accepted",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_regime_assignment_is_deterministic",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_regime_assigns_the_declared_labels",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_a_future_state_value_is_refused",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_counterexample_a_mismatched_label_count_is_refused",
+   "file": "tests/test_research_engines.py"
+  },
+  {
+   "nodeid": "tests/test_research_engines.py::test_the_regime_engine_cannot_select_the_best_regime",
+   "file": "tests/test_research_engines.py"
+  }
+ ],
+ "collected_count": 29,
+ "collect_errors": [],
+ "results": {
+  "tests/test_research_engines.py::test_positive_control_bootstrap_ci_excludes_zero": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_negative_control_bootstrap_ci_includes_zero": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_positive_control_permutation_rejects_null": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_negative_control_permutation_does_not_reject": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_bootstrap_is_deterministic_given_a_seed": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_permutation_p_value_is_never_exactly_zero": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_the_stats_engine_exposes_no_select_best": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_subperiod_reports_all_subperiods_and_ranks_none": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_a_bad_block_size_is_refused": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_multiple_comparison_exposes_the_denominator": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_manifest_science_id_is_stable_across_presentation_changes": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_a_science_change_changes_identity": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_provenance_changes_full_id_but_not_science_id": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_a_manifest_missing_a_science_key_is_refused": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_a_freeform_science_field_is_refused": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_the_search_denominator_counts_distinct_specs": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_a_different_hyperparameter_grid_is_a_new_comparison": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_select_best_is_refused": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_the_ml_package_fits_no_model": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_a_descriptive_claim_needs_no_placebo": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_a_causal_hypothesis_without_a_placebo_is_refused": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_a_causal_hypothesis_without_assumptions_is_refused": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_an_unsupported_identification_strategy_is_refused": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_a_well_formed_causal_hypothesis_is_accepted": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_regime_assignment_is_deterministic": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_regime_assigns_the_declared_labels": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_a_future_state_value_is_refused": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_counterexample_a_mismatched_label_count_is_refused": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_engines.py::test_the_regime_engine_cannot_select_the_best_regime": {
+   "file": "tests/test_research_engines.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 29,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_research_engines.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36671.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115445760",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.72
+ }
+}

@@ -1,0 +1,182 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_no_shadow_trade_without_preexisting_eligibility",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_capital_no_trade_and_refused_can_never_open",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_cohorts_are_labeled_and_never_conflated",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_one_freshness_law_imported_from_the_gateway",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_session_end_entry_refused_not_truncated",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_a_real_quote_fills_at_the_touch_with_measured_spread",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_no_future_quote_and_no_stale_quote",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_missing_quote_is_refused_never_zero_spread",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_stop_and_target_follow_the_decision_and_never_widen",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_target_exit_and_r_multiple",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_daily_flat_forces_exit_before_close",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_time_stop_at_the_frozen_horizon",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_no_duplicate_management_after_flat",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_no_broker_and_no_paper_vocabulary",
+   "file": "tests/test_shadow_paper.py"
+  },
+  {
+   "nodeid": "tests/test_shadow_paper.py::test_epoch1_and_frontier_decisions_identical_with_shadow_disabled",
+   "file": "tests/test_shadow_paper.py"
+  }
+ ],
+ "collected_count": 15,
+ "collect_errors": [],
+ "results": {
+  "tests/test_shadow_paper.py::test_no_shadow_trade_without_preexisting_eligibility": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_capital_no_trade_and_refused_can_never_open": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_cohorts_are_labeled_and_never_conflated": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_one_freshness_law_imported_from_the_gateway": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_session_end_entry_refused_not_truncated": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_a_real_quote_fills_at_the_touch_with_measured_spread": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_no_future_quote_and_no_stale_quote": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_missing_quote_is_refused_never_zero_spread": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_stop_and_target_follow_the_decision_and_never_widen": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_target_exit_and_r_multiple": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_daily_flat_forces_exit_before_close": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_time_stop_at_the_frozen_horizon": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_no_duplicate_management_after_flat": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_no_broker_and_no_paper_vocabulary": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_shadow_paper.py::test_epoch1_and_frontier_decisions_identical_with_shadow_disabled": {
+   "file": "tests/test_shadow_paper.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 15,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_shadow_paper.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35980.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116396032",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.84
+ }
+}

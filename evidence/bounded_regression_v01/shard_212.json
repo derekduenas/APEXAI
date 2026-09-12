@@ -1,0 +1,200 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_lag_is_derived_from_horizon_and_other_lags_are_refused",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_threshold_retained_not_searched",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_too_few_samples_refused",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_iid_fixture_hac_and_iid_se_agree",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_ar1_fixture_hac_exceeds_iid",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_ma14_overlap_iid_is_anticonservative_hac_is_centered",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_positive_mean_dependent_process_retains_power",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_non_overlap_subset_is_spaced_by_horizon_and_anchor_fixed",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_paired_differentials_refuse_mismatched_outcomes",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_development_set_is_the_observed_v0_set_and_is_excluded",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_holdout_is_deterministic_and_derived_not_chosen",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_holdout_derivation_skips_excluded_seeds_deterministically",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_court_v1_commits_to_everything_before_sitting",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_error_control_v1_exact_numbers_and_no_independence_assumed",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_research_budget_does_not_record_zero_attempts",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_no_rescue_logic_in_court_v1_source",
+   "file": "tests/test_world_model_inference.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_inference.py::test_one_cell_each_on_a_DEVELOPMENT_seed",
+   "file": "tests/test_world_model_inference.py"
+  }
+ ],
+ "collected_count": 17,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_inference.py::test_lag_is_derived_from_horizon_and_other_lags_are_refused": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_threshold_retained_not_searched": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_too_few_samples_refused": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_iid_fixture_hac_and_iid_se_agree": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_ar1_fixture_hac_exceeds_iid": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_ma14_overlap_iid_is_anticonservative_hac_is_centered": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_positive_mean_dependent_process_retains_power": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_non_overlap_subset_is_spaced_by_horizon_and_anchor_fixed": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_paired_differentials_refuse_mismatched_outcomes": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_development_set_is_the_observed_v0_set_and_is_excluded": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_holdout_is_deterministic_and_derived_not_chosen": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_holdout_derivation_skips_excluded_seeds_deterministically": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_court_v1_commits_to_everything_before_sitting": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_error_control_v1_exact_numbers_and_no_independence_assumed": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_research_budget_does_not_record_zero_attempts": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_no_rescue_logic_in_court_v1_source": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_inference.py::test_one_cell_each_on_a_DEVELOPMENT_seed": {
+   "file": "tests/test_world_model_inference.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 17,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_inference.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 164.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35190.service",
+   "memory_max": "1468006400",
+   "memory_peak": "121536512",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 6.45
+ }
+}

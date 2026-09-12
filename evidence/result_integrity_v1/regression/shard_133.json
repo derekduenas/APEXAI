@@ -1,0 +1,290 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_execution_refuses_without_a_sealed_card",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_resolution_refuses_without_a_sealed_card",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_single_leg_crosses_the_ask_with_pedigree",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_vertical_pays_ask_and_receives_bid",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_no_midpoint_or_model_price_anywhere",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_contracts_scale_capital_linearly",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_exit_marks_out_at_quoted_sides_not_mid",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_vertical_exit_buys_back_the_short_at_ask",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_mfe_mae_and_timings_measured_from_the_path",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_short_direction_mfe_is_sign_corrected",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_r_multiple_is_withheld_when_risk_was_never_declared",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_full_premium_declaration_makes_R_the_premium",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_planned_invalidation_gives_a_larger_R_multiple",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_the_three_risk_numbers_are_persisted_separately",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_unknown_risk_basis_is_refused",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_fill_records_its_execution_pedigree",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_missing_exit_quote_yields_not_estimable_not_zero",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_outcome_is_marked_replay_not_prospective",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_counterfactuals_compare_every_weapon_and_stay_measurement",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_counterfactuals_refuse_to_crown_a_winner",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_a_long_vertical_can_never_lose_more_than_its_debit",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_a_foreign_expiry_may_not_close_the_position",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_the_fill_records_which_contract_it_bought",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_an_option_without_contract_identity_is_refused",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_the_friction_identity_holds_exactly",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_a_right_thesis_can_still_lose_to_the_spread",
+   "file": "tests/test_options_paper_execution.py"
+  },
+  {
+   "nodeid": "tests/test_options_paper_execution.py::test_missing_exit_quotes_withhold_the_identity",
+   "file": "tests/test_options_paper_execution.py"
+  }
+ ],
+ "collected_count": 27,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_paper_execution.py::test_execution_refuses_without_a_sealed_card": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_resolution_refuses_without_a_sealed_card": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_single_leg_crosses_the_ask_with_pedigree": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_vertical_pays_ask_and_receives_bid": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_no_midpoint_or_model_price_anywhere": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_contracts_scale_capital_linearly": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_exit_marks_out_at_quoted_sides_not_mid": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_vertical_exit_buys_back_the_short_at_ask": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_mfe_mae_and_timings_measured_from_the_path": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_short_direction_mfe_is_sign_corrected": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_r_multiple_is_withheld_when_risk_was_never_declared": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_full_premium_declaration_makes_R_the_premium": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_planned_invalidation_gives_a_larger_R_multiple": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_the_three_risk_numbers_are_persisted_separately": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_unknown_risk_basis_is_refused": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_fill_records_its_execution_pedigree": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_missing_exit_quote_yields_not_estimable_not_zero": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_outcome_is_marked_replay_not_prospective": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_counterfactuals_compare_every_weapon_and_stay_measurement": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_counterfactuals_refuse_to_crown_a_winner": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_a_long_vertical_can_never_lose_more_than_its_debit": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_a_foreign_expiry_may_not_close_the_position": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_the_fill_records_which_contract_it_bought": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_an_option_without_contract_identity_is_refused": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_the_friction_identity_holds_exactly": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_a_right_thesis_can_still_lose_to_the_spread": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_paper_execution.py::test_missing_exit_quotes_withhold_the_identity": {
+   "file": "tests/test_options_paper_execution.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 27,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_paper_execution.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36319.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115683328",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.51
+ }
+}

@@ -1,0 +1,164 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_inference_engine_is_frozen",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_n3_v0_retired_not_edited_and_p0_v0_preserved",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_shadow_seed_namespace_and_distinctness",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_shadow_world_same_family_config_independent_path",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_n3_v1_features_come_from_shadow_targets_from_target",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_n3_v1_fails_closed_on_same_world_and_wrong_seed",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_n3_v1_no_truth_and_no_future_in_features",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_shadow_path_keeps_dependence_and_regime_persistence_and_is_independent",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_n3_v1_identity_is_a_function_of_both_world_hashes",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_p0_ladder_finite_and_off_ladder_refused",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_p0_v1_selection_and_future_acceptance_predeclared",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_development_seed_sets_are_new_and_disjoint_and_no_acceptance_set",
+   "file": "tests/test_world_model_r3.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r3.py::test_budget_r3_records_control_development_search",
+   "file": "tests/test_world_model_r3.py"
+  }
+ ],
+ "collected_count": 13,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_r3.py::test_inference_engine_is_frozen": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_n3_v0_retired_not_edited_and_p0_v0_preserved": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_shadow_seed_namespace_and_distinctness": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_shadow_world_same_family_config_independent_path": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_n3_v1_features_come_from_shadow_targets_from_target": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_n3_v1_fails_closed_on_same_world_and_wrong_seed": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_n3_v1_no_truth_and_no_future_in_features": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_shadow_path_keeps_dependence_and_regime_persistence_and_is_independent": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_n3_v1_identity_is_a_function_of_both_world_hashes": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_p0_ladder_finite_and_off_ladder_refused": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_p0_v1_selection_and_future_acceptance_predeclared": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_development_seed_sets_are_new_and_disjoint_and_no_acceptance_set": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r3.py::test_budget_r3_records_control_development_search": {
+   "file": "tests/test_world_model_r3.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 13,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_r3.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 163.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36039.service",
+   "memory_max": "1468006400",
+   "memory_peak": "121167872",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.84
+ }
+}

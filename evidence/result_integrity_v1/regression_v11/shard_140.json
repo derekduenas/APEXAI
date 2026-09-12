@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_package_exists",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_reaches_no_production_authority",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_reaches_no_credit_governance",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_no_production_module_reaches_options_research",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_no_broker_client_or_order_placement_keyword",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_placement_scan_is_clean",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_no_ml_library_imported",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_every_module_stamps_none_options_research_where_it_carries_decision_power",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_forward_distribution_reads_frontier2_only_as_files_not_imports",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_every_options_research_test_file_isolates_its_ledgers",
+   "file": "tests/test_options_research_firewall.py"
+  },
+  {
+   "nodeid": "tests/test_options_research_firewall.py::test_real_options_research_results_directory_has_no_test_pollution",
+   "file": "tests/test_options_research_firewall.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_options_research_firewall.py::test_package_exists": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_reaches_no_production_authority": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_reaches_no_credit_governance": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_no_production_module_reaches_options_research": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_no_broker_client_or_order_placement_keyword": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_placement_scan_is_clean": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_no_ml_library_imported": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_every_module_stamps_none_options_research_where_it_carries_decision_power": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_forward_distribution_reads_frontier2_only_as_files_not_imports": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_every_options_research_test_file_isolates_its_ledgers": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_options_research_firewall.py::test_real_options_research_results_directory_has_no_test_pollution": {
+   "file": "tests/test_options_research_firewall.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_options_research_firewall.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36637.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116822016",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.07
+ }
+}

@@ -1,0 +1,191 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_session_close_is_the_calendar_not_the_clock",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_resolver_run_time_cannot_change_the_economic_outcome",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_an_after_hours_bar_is_outside_the_eligible_window",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_half_days_and_holidays_are_not_assumed_to_be_normal",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_an_options_session_is_not_its_underlyings_session",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_unverified_years_are_labelled_not_silently_assumed",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_a_pre_entry_bar_can_never_become_mfe",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_bars_past_the_sealed_boundary_are_excluded",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_naive_timestamps_are_normalized_not_compared_raw",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_the_four_authorities_are_declared_not_assumed",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_an_ambiguous_stop_is_refused",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_a_broken_and_recovered_thesis_is_not_a_thesis_that_held",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_a_thesis_still_broken_at_the_boundary_says_so",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_an_unbroken_thesis_is_distinguishable",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_every_emitted_thesis_state_is_declared",
+   "file": "tests/test_resolution_semantics.py"
+  },
+  {
+   "nodeid": "tests/test_resolution_semantics.py::test_no_thesis_level_yields_not_estimable_not_a_guess",
+   "file": "tests/test_resolution_semantics.py"
+  }
+ ],
+ "collected_count": 16,
+ "collect_errors": [],
+ "results": {
+  "tests/test_resolution_semantics.py::test_session_close_is_the_calendar_not_the_clock": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_resolver_run_time_cannot_change_the_economic_outcome": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_an_after_hours_bar_is_outside_the_eligible_window": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_half_days_and_holidays_are_not_assumed_to_be_normal": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_an_options_session_is_not_its_underlyings_session": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_unverified_years_are_labelled_not_silently_assumed": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_a_pre_entry_bar_can_never_become_mfe": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_bars_past_the_sealed_boundary_are_excluded": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_naive_timestamps_are_normalized_not_compared_raw": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_the_four_authorities_are_declared_not_assumed": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_an_ambiguous_stop_is_refused": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_a_broken_and_recovered_thesis_is_not_a_thesis_that_held": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_a_thesis_still_broken_at_the_boundary_says_so": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_an_unbroken_thesis_is_distinguishable": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_every_emitted_thesis_state_is_declared": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_resolution_semantics.py::test_no_thesis_level_yields_not_estimable_not_a_guess": {
+   "file": "tests/test_resolution_semantics.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 16,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_resolution_semantics.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35412.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115486720",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.69
+ }
+}

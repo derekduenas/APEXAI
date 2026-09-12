@@ -1,0 +1,246 @@
+{
+ "name": "WORLD_MODEL_RESEARCH_BUDGET_V0_FINAL_PRE_R7",
+ "ledger": {
+  "budget_version": "WORLD_MODEL_RESEARCH_BUDGET_V0",
+  "attempts": [
+   [
+    "model_family",
+    "M0_SYNTHETIC_BASELINE_V0",
+    "ridge lambda=1.0 gaussian; the one informative family"
+   ],
+   [
+    "model_family",
+    "N_BASELINE_NULL_V0",
+    "unconditional gaussian; the null comparator"
+   ],
+   [
+    "horizon_variant",
+    "H_15M",
+    "frozen before any result"
+   ],
+   [
+    "feature_family_variant",
+    "WM0D_OBSERVABLE_FEATURES_V0",
+    "the one frozen observable set"
+   ],
+   [
+    "compatibility_observation",
+    "S2_smoke_WM0D",
+    "z=+7.71 observed; NOT optimised against; no credit"
+   ],
+   [
+    "compatibility_observation",
+    "S3_smoke_WM0D",
+    "z=+2.97 observed; NOT optimised against; no credit"
+   ],
+   [
+    "court_sitting",
+    "NULL_COURT_V0/COURT-a4c366b64b0d",
+    "FAIL; controls V0 (padded N0); uncommitted tree; N1 6/25"
+   ],
+   [
+    "court_sitting",
+    "NULL_COURT_V0/COURT-0d4063653ce6",
+    "FAIL; controls V0.1; code_commit field mislabelled by a shell race; N0 5/25 N1 6/25 N3 4/25"
+   ],
+   [
+    "court_sitting",
+    "NULL_COURT_V0/COURT-bad6d1f1cff0",
+    "FAIL; canonical V0 sitting; N1 6/25"
+   ],
+   [
+    "defect_registered",
+    "WM-STAT-001",
+    "IID_INFERENCE_INVALID_FOR_OVERLAPPING_FORECAST_LOSS; found by N1; rho_1 0.76-0.92, n_eff/n ~0.06"
+   ],
+   [
+    "inference_rule_revision",
+    "DEPENDENCE_AWARE_DM_HAC_V0",
+    "1st revision of the decision statistic: DM loss differential with Newey-West/Bartlett HAC, L = H-1 = 14 derived, threshold 2.0 retained; replaces the iid rule for NULL_COURT_V1"
+   ],
+   [
+    "inference_rule_revision",
+    "DEPENDENCE_AWARE_DM_HAC_V0#R1_STOPPED_AT_CALIBRATION",
+    "rejected before acceptance: type-I 0.063 on MA(14) overlap null, 0.096 on AR(1) 0.9; Bartlett at L=MA order recovers 67% of LRV; kept as diagnostic only"
+   ],
+   [
+    "inference_rule_revision",
+    "DEPENDENT_BLOCK_BOOTSTRAP_V0",
+    "2nd revision: circular moving-block bootstrap-t on the loss differential, PPW automatic block length with floor H and cap n/6, B=1999, alpha=0.025; the NEXT statistical methodology attempt"
+   ],
+   [
+    "defect_registered",
+    "WM-IMPL-001",
+    "R2 calibration crashed: PPW selector buffer covered lags <= m_max+K_N but the flat-top window reads <= 2*m_hat; IndexError on NULL_MA14_n465; no envelope verdict; no acceptance seed executed"
+   ],
+   [
+    "implementation_repair",
+    "DEPENDENT_BLOCK_BOOTSTRAP_V0->V0.1",
+    "autocovariance support extended to max(2*m_max, m_max+K_N); same declared method; semantic-equivalence tested on inputs V0 could execute"
+   ],
+   [
+    "null_control_design",
+    "N3_FEATURE_PERMUTATION_V0#RETIRED",
+    "failed acceptance 7/50 (max 5) in COURT-V2-386a408b7417; retired, not edited, not rerun"
+   ],
+   [
+    "null_control_design",
+    "N3_SHADOW_FEATURE_NULL_V1",
+    "features from an independent shadow world of the same declared family; targets from the target world"
+   ],
+   [
+    "positive_control_power_level",
+    "P0_CAUSAL_TREND_V0#1.00x",
+    "failed acceptance power 31/50 = 0.62 (required 0.80), direction 50/50"
+   ],
+   [
+    "positive_control_power_level",
+    "P0_V1_ladder#1.50x",
+    "predeclared development power-calibration level; inspected under frozen M0 + bootstrap V0.1"
+   ],
+   [
+    "positive_control_power_level",
+    "P0_V1_ladder#2.00x",
+    "predeclared development power-calibration level; inspected under frozen M0 + bootstrap V0.1"
+   ],
+   [
+    "positive_control_power_level",
+    "P0_V1_ladder#3.00x",
+    "predeclared development power-calibration level; inspected under frozen M0 + bootstrap V0.1"
+   ],
+   [
+    "positive_control_power_level",
+    "P0_V1_ladder#1.00x",
+    "predeclared ladder base = P0 V0 magnitude; inspected again on fresh development seeds"
+   ],
+   [
+    "positive_control_evaluation_length",
+    "P0_V2_eval_len#465",
+    "nested prefix of ONE world per seed; M0 fit once on the V0 training interval; mu = 1.0x; frozen court"
+   ],
+   [
+    "positive_control_evaluation_length",
+    "P0_V2_eval_len#930",
+    "nested prefix of ONE world per seed; M0 fit once on the V0 training interval; mu = 1.0x; frozen court"
+   ],
+   [
+    "positive_control_evaluation_length",
+    "P0_V2_eval_len#1395",
+    "nested prefix of ONE world per seed; M0 fit once on the V0 training interval; mu = 1.0x; frozen court"
+   ],
+   [
+    "positive_control_evaluation_length",
+    "P0_V2_eval_len#1860",
+    "nested prefix of ONE world per seed; M0 fit once on the V0 training interval; mu = 1.0x; frozen court"
+   ],
+   [
+    "null_control_validation",
+    "N0@E1860",
+    "development validation at the selected evaluation length (boundary 720, n_train 701, E 1860); frozen court; max 5/100"
+   ],
+   [
+    "null_control_validation",
+    "N1@E1860",
+    "development validation at the selected evaluation length (boundary 720, n_train 701, E 1860); frozen court; max 5/100"
+   ],
+   [
+    "null_control_validation",
+    "N2@E1860",
+    "development validation at the selected evaluation length (boundary 720, n_train 701, E 1860); frozen court; max 5/100"
+   ],
+   [
+    "null_control_validation",
+    "N3_SHADOW_V1@E1860",
+    "development validation at the selected evaluation length (boundary 720, n_train 701, E 1860); frozen court; max 5/100"
+   ],
+   [
+    "null_control_validation",
+    "N4@E1860",
+    "development validation at the selected evaluation length (boundary 720, n_train 701, E 1860); frozen court; max 5/100"
+   ],
+   [
+    "null_control_design",
+    "N0_SHADOW_TARGET_NULL_V1",
+    "features from world A, targets from an independent same-family world B; twin of N3_SHADOW_FEATURE_NULL_V1 with roles reversed"
+   ],
+   [
+    "null_control_validation",
+    "N0_SHADOW_TARGET_NULL_V1@E1860",
+    "100 paired feature/target worlds; max 5/100"
+   ],
+   [
+    "null_control_validation",
+    "N1_TIME_DESTRUCTION_E1860_V1@E1860",
+    "unchanged shift-200 transformation on T=2795 so 1860 usable pairs remain (WM-N1-GEOMETRY-001 closure); the R5 1660 result is retained"
+   ]
+  ],
+  "counts": {
+   "model_family": 2,
+   "hyperparameter_configuration": 0,
+   "feature_family_variant": 1,
+   "horizon_variant": 1,
+   "target_variant": 0,
+   "sampling_variant": 0,
+   "calibration_variant": 0,
+   "ablation_variant": 0,
+   "compatibility_observation": 2,
+   "court_sitting": 3,
+   "defect_registered": 2,
+   "inference_rule_revision": 3,
+   "implementation_repair": 1,
+   "null_control_design": 3,
+   "positive_control_power_level": 5,
+   "positive_control_evaluation_length": 4,
+   "null_control_validation": 7
+  }
+ },
+ "ledger_hash": "b7296a1a96e6eb2fbc827f6a7bfabb5af84af57a00daa2b402c46005697c2bbe",
+ "burden": {
+  "model_families_considered": 2,
+  "configurations_tried": 0,
+  "target_horizon_variants": 1,
+  "feature_variants": 1,
+  "prior_research_attempts": 34,
+  "compatibility_observations_not_credited": 2,
+  "budget_hash": "b7296a1a96e6eb2fbc827f6a7bfabb5af84af57a00daa2b402c46005697c2bbe"
+ },
+ "additional_history": {
+  "regression_infrastructure": [
+   "MONOLITHIC_CONTAINED_REGRESSION: REGRESSION_OOM, killed at ~47% inside 1400M (2026-09-05 03:57Z); resource-invalid",
+   "BOUNDED_FULL_REGRESSION_V0 (R6): fresh-process module sharding, 3983 nodeids; FAIL -- test_null_rig.py shard OOM",
+   "TEST-NULL-RIG-MEMORY-001: test-support memory repair; peak 698 MiB; exact semantic equivalence",
+   "BOUNDED_FULL_REGRESSION_V0.1 (R6.1): 3988/3988 nodeids, 3969 PASS / 19 SKIP, 0 OOM; PASS"
+  ],
+  "acceptance_sets_consumed": [
+   "WM0E_R1_HOLDOUT_V0: 50 seeds, consumed by COURT-V2-386a408b7417 (NULL_COURT_V2.1, FAIL)"
+  ],
+  "development_seed_sets_observed": {
+   "WM_0E_DEVELOPMENT_NULL_SET_V0": 25,
+   "WM0E_R3_N3_DEV_V0": 100,
+   "WM0E_R3_P0_DEV_V0": 50,
+   "WM0E_R4_P0_DEV_V0": 50,
+   "WM0E_R5_NEG_DEV_V0": 100,
+   "WM0E_R51_DEV_V0": 100
+  },
+  "failed_court_sittings": [
+   "COURT-a4c366b64b0d",
+   "COURT-0d4063653ce6",
+   "COURT-bad6d1f1cff0",
+   "COURT-V2-386a408b7417"
+  ],
+  "statistical_methodology_revisions": [
+   "iid z (WM-0D) -> DEPENDENCE_AWARE_DM_HAC_V0 (R1, stopped at calibration) -> DEPENDENT_BLOCK_BOOTSTRAP_V0 (R2, implementation error) -> V0.1 (R2.1, frozen)"
+  ],
+  "control_redesigns": [
+   "N3 V0 retired -> N3_SHADOW_FEATURE_NULL_V1",
+   "N0 V0 failed E1860 -> N0_SHADOW_TARGET_NULL_V1"
+  ],
+  "positive_control": [
+   "P0 V0 failed power (31/50)",
+   "magnitude ladder 1.0/1.5/2.0/3.0 failed (R3)",
+   "evaluation-length ladder 465/930/1395/1860 -> 1860 selected (R4)"
+  ],
+  "one_model_one_test": false
+ },
+ "snapshot_hash": "bc2f1ce47a433cc1d8ee9b68d6e5bed040d547a4fee3913fbdb10def8e378239"
+}

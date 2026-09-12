@@ -1,0 +1,164 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_packet_root.py::test_honest_set_verifies",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_packet_payload_altered_breaks_root",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_packet_removed_breaks_root",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_packet_inserted_breaks_root",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_reordering_does_not_change_root",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_swapping_contents_between_two_packets_breaks_root",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_count_preserved_but_substituted_breaks_root",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_duplicate_state_id_refused",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_missing_fields_refused",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_odd_leaf_promotion_not_duplication",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_empty_set_has_a_defined_root",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_commitment_carries_root_into_the_chained_body",
+   "file": "tests/test_packet_root.py"
+  },
+  {
+   "nodeid": "tests/test_packet_root.py::test_pulse_v0_scale",
+   "file": "tests/test_packet_root.py"
+  }
+ ],
+ "collected_count": 13,
+ "collect_errors": [],
+ "results": {
+  "tests/test_packet_root.py::test_honest_set_verifies": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_packet_payload_altered_breaks_root": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_packet_removed_breaks_root": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_packet_inserted_breaks_root": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_reordering_does_not_change_root": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_swapping_contents_between_two_packets_breaks_root": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_count_preserved_but_substituted_breaks_root": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_duplicate_state_id_refused": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_missing_fields_refused": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_odd_leaf_promotion_not_duplication": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_empty_set_has_a_defined_root": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_commitment_carries_root_into_the_chained_body": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_packet_root.py::test_pulse_v0_scale": {
+   "file": "tests/test_packet_root.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 13,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_packet_root.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 157.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36946.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115171328",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.52
+ }
+}

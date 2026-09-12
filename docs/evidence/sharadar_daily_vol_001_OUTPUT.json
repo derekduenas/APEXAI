@@ -1,0 +1,534 @@
+{
+ "study_id": "SHARADAR-DAILYVOL-001",
+ "contract": {
+  "valid": true,
+  "contract_digest": "55fa8e636f541003",
+  "authorizes_data_access": false,
+  "note": "a validated contract is a document a later admission request can cite; it grants nothing itself"
+ },
+ "rows": 4531,
+ "first": "2004-01-05",
+ "last": "2021-12-31",
+ "folds": [
+  2013,
+  2014,
+  2015,
+  2016,
+  2017,
+  2018,
+  2019,
+  2020,
+  2021
+ ],
+ "fits": [
+  {
+   "year": 2013,
+   "model": "ROLLING_VAR",
+   "fit": "OK",
+   "artifact": "c146572a6b758355",
+   "fit_count": 1
+  },
+  {
+   "year": 2013,
+   "model": "EWMA",
+   "fit": "OK",
+   "artifact": "5c510a65e7fb8600",
+   "fit_count": 1
+  },
+  {
+   "year": 2013,
+   "model": "GARCH11_T",
+   "fit": "OK",
+   "artifact": "c5aa5c10a709fccb",
+   "fit_count": 1
+  },
+  {
+   "year": 2013,
+   "model": "GJR_GARCH11_T",
+   "fit": "OK",
+   "artifact": "0a803f4cae80e1e5",
+   "fit_count": 1
+  },
+  {
+   "year": 2014,
+   "model": "ROLLING_VAR",
+   "fit": "OK",
+   "artifact": "d3d824f39309b679",
+   "fit_count": 1
+  },
+  {
+   "year": 2014,
+   "model": "EWMA",
+   "fit": "OK",
+   "artifact": "0bd5255ddc50a3dd",
+   "fit_count": 1
+  },
+  {
+   "year": 2014,
+   "model": "GARCH11_T",
+   "fit": "OK",
+   "artifact": "2636e432ee382a43",
+   "fit_count": 1
+  },
+  {
+   "year": 2014,
+   "model": "GJR_GARCH11_T",
+   "fit": "OK",
+   "artifact": "6973f99a1ed12f9b",
+   "fit_count": 1
+  },
+  {
+   "year": 2015,
+   "model": "ROLLING_VAR",
+   "fit": "OK",
+   "artifact": "bbdf3ec789397d76",
+   "fit_count": 1
+  },
+  {
+   "year": 2015,
+   "model": "EWMA",
+   "fit": "OK",
+   "artifact": "b68f7f0f89cc83a5",
+   "fit_count": 1
+  },
+  {
+   "year": 2015,
+   "model": "GARCH11_T",
+   "fit": "OK",
+   "artifact": "72fb7a29462fa85b",
+   "fit_count": 1
+  },
+  {
+   "year": 2015,
+   "model": "GJR_GARCH11_T",
+   "fit": "OK",
+   "artifact": "565e8f9cd4812154",
+   "fit_count": 1
+  },
+  {
+   "year": 2016,
+   "model": "ROLLING_VAR",
+   "fit": "OK",
+   "artifact": "cd098446b98e7593",
+   "fit_count": 1
+  },
+  {
+   "year": 2016,
+   "model": "EWMA",
+   "fit": "OK",
+   "artifact": "f3ed2e7e9ed85bfa",
+   "fit_count": 1
+  },
+  {
+   "year": 2016,
+   "model": "GARCH11_T",
+   "fit": "OK",
+   "artifact": "da3d23a0210198e5",
+   "fit_count": 1
+  },
+  {
+   "year": 2016,
+   "model": "GJR_GARCH11_T",
+   "fit": "OK",
+   "artifact": "0f69160c295b73a3",
+   "fit_count": 1
+  },
+  {
+   "year": 2017,
+   "model": "ROLLING_VAR",
+   "fit": "OK",
+   "artifact": "f4ce77efcde135bb",
+   "fit_count": 1
+  },
+  {
+   "year": 2017,
+   "model": "EWMA",
+   "fit": "OK",
+   "artifact": "3c9f95579a612b61",
+   "fit_count": 1
+  },
+  {
+   "year": 2017,
+   "model": "GARCH11_T",
+   "fit": "OK",
+   "artifact": "572405d29d4e7918",
+   "fit_count": 1
+  },
+  {
+   "year": 2017,
+   "model": "GJR_GARCH11_T",
+   "fit": "OK",
+   "artifact": "c3ae5a1d6ed73141",
+   "fit_count": 1
+  },
+  {
+   "year": 2018,
+   "model": "ROLLING_VAR",
+   "fit": "OK",
+   "artifact": "bd007b66104b9ef2",
+   "fit_count": 1
+  },
+  {
+   "year": 2018,
+   "model": "EWMA",
+   "fit": "OK",
+   "artifact": "80b79715721c1238",
+   "fit_count": 1
+  },
+  {
+   "year": 2018,
+   "model": "GARCH11_T",
+   "fit": "OK",
+   "artifact": "289499833e5a1d97",
+   "fit_count": 1
+  },
+  {
+   "year": 2018,
+   "model": "GJR_GARCH11_T",
+   "fit": "OK",
+   "artifact": "6f2974dfa618a722",
+   "fit_count": 1
+  },
+  {
+   "year": 2019,
+   "model": "ROLLING_VAR",
+   "fit": "OK",
+   "artifact": "5da25c714ab62095",
+   "fit_count": 1
+  },
+  {
+   "year": 2019,
+   "model": "EWMA",
+   "fit": "OK",
+   "artifact": "c3ecbd140c700254",
+   "fit_count": 1
+  },
+  {
+   "year": 2019,
+   "model": "GARCH11_T",
+   "fit": "OK",
+   "artifact": "5a8034dc85f029cc",
+   "fit_count": 1
+  },
+  {
+   "year": 2019,
+   "model": "GJR_GARCH11_T",
+   "fit": "OK",
+   "artifact": "1a4e61823416cc24",
+   "fit_count": 1
+  },
+  {
+   "year": 2020,
+   "model": "ROLLING_VAR",
+   "fit": "OK",
+   "artifact": "8c0532572f1f6d21",
+   "fit_count": 1
+  },
+  {
+   "year": 2020,
+   "model": "EWMA",
+   "fit": "OK",
+   "artifact": "6c0a88472ab3310c",
+   "fit_count": 1
+  },
+  {
+   "year": 2020,
+   "model": "GARCH11_T",
+   "fit": "OK",
+   "artifact": "f02249ace69d3d3c",
+   "fit_count": 1
+  },
+  {
+   "year": 2020,
+   "model": "GJR_GARCH11_T",
+   "fit": "OK",
+   "artifact": "e4f8d5ef1b7cc405",
+   "fit_count": 1
+  },
+  {
+   "year": 2021,
+   "model": "ROLLING_VAR",
+   "fit": "OK",
+   "artifact": "0d146e9ae80b5677",
+   "fit_count": 1
+  },
+  {
+   "year": 2021,
+   "model": "EWMA",
+   "fit": "OK",
+   "artifact": "69766c041a040bf3",
+   "fit_count": 1
+  },
+  {
+   "year": 2021,
+   "model": "GARCH11_T",
+   "fit": "OK",
+   "artifact": "53345fd2e7e1a0e2",
+   "fit_count": 1
+  },
+  {
+   "year": 2021,
+   "model": "GJR_GARCH11_T",
+   "fit": "OK",
+   "artifact": "438441ecfa9f9f62",
+   "fit_count": 1
+  }
+ ],
+ "mean_log_score": {
+  "ROLLING_VAR": 3.2789633456929987,
+  "EWMA": 3.3743317766335506,
+  "GARCH11_T": 3.445925109625364,
+  "GJR_GARCH11_T": 3.4697491146035166
+ },
+ "calibration": {
+  "ROLLING_VAR": {
+   "n": 2267,
+   "histogram": [
+    212,
+    136,
+    160,
+    211,
+    270,
+    281,
+    271,
+    237,
+    231,
+    258
+   ],
+   "expected_per_bin": 226.7,
+   "ks_stat": 0.08568490213290136,
+   "ks_pvalue": 6.266612571548038e-15,
+   "mean_pit": 0.5352285182126653,
+   "note": "PIT uniformity is necessary, not sufficient, for calibration; independence is not assumed here"
+  },
+  "EWMA": {
+   "n": 2267,
+   "histogram": [
+    200,
+    125,
+    169,
+    224,
+    271,
+    283,
+    285,
+    245,
+    235,
+    230
+   ],
+   "expected_per_bin": 226.7,
+   "ks_stat": 0.09002080437305021,
+   "ks_pvalue": 1.9525299033983538e-16,
+   "mean_pit": 0.5337860804069688,
+   "note": "PIT uniformity is necessary, not sufficient, for calibration; independence is not assumed here"
+  },
+  "GARCH11_T": {
+   "n": 2267,
+   "histogram": [
+    208,
+    141,
+    185,
+    205,
+    250,
+    258,
+    273,
+    236,
+    271,
+    240
+   ],
+   "expected_per_bin": 226.7,
+   "ks_stat": 0.0780059361671781,
+   "ks_pvalue": 1.9122819881350735e-12,
+   "mean_pit": 0.5352353459279761,
+   "note": "PIT uniformity is necessary, not sufficient, for calibration; independence is not assumed here"
+  },
+  "GJR_GARCH11_T": {
+   "n": 2267,
+   "histogram": [
+    212,
+    147,
+    182,
+    205,
+    243,
+    254,
+    246,
+    269,
+    272,
+    237
+   ],
+   "expected_per_bin": 226.7,
+   "ks_stat": 0.07296958787252938,
+   "ks_pvalue": 6.080124592930808e-11,
+   "mean_pit": 0.5347554386872527,
+   "note": "PIT uniformity is necessary, not sufficient, for calibration; independence is not assumed here"
+  }
+ },
+ "comparisons": {
+  "EWMA_vs_ROLLING_VAR": {
+   "n_common": 2267,
+   "coverage_a": 2267,
+   "coverage_b": 2267,
+   "coverage_difference": 0,
+   "mean_diff": 0.09536843094055127,
+   "sd_diff": 1.1271889963523738,
+   "dependence_note": "differences may be serially dependent; the inference method must be chosen for the new estimand and declared",
+   "year_block_bootstrap_ci95": [
+    0.04113176771236323,
+    0.17897080963351394
+   ],
+   "per_year_mean_diff": {
+    "2013": 0.042391312924386186,
+    "2014": 0.1006840266301218,
+    "2015": 0.039146799547942625,
+    "2016": 0.07616012037190432,
+    "2017": -0.0013278623318207013,
+    "2018": 0.3988799256833734,
+    "2019": 0.06690465479309884,
+    "2020": 0.09238821300749257,
+    "2021": 0.04392120934403177
+   },
+   "conclusion": "IMPROVES_OVER_COMPARATOR_ON_THIS_SAMPLE"
+  },
+  "GARCH11_T_vs_ROLLING_VAR": {
+   "n_common": 2267,
+   "coverage_a": 2267,
+   "coverage_b": 2267,
+   "coverage_difference": 0,
+   "mean_diff": 0.16696176393236445,
+   "sd_diff": 1.5891915958385159,
+   "dependence_note": "differences may be serially dependent; the inference method must be chosen for the new estimand and declared",
+   "year_block_bootstrap_ci95": [
+    0.08693643052747327,
+    0.2757876795187217
+   ],
+   "per_year_mean_diff": {
+    "2013": 0.06846629754528645,
+    "2014": 0.14672783813136528,
+    "2015": 0.06875773405129101,
+    "2016": 0.1840938729376899,
+    "2017": 0.03068347538647612,
+    "2018": 0.5621525407226733,
+    "2019": 0.14118532855431445,
+    "2020": 0.22596289948135032,
+    "2021": 0.07541918759946598
+   },
+   "conclusion": "IMPROVES_OVER_COMPARATOR_ON_THIS_SAMPLE"
+  },
+  "GJR_GARCH11_T_vs_ROLLING_VAR": {
+   "n_common": 2267,
+   "coverage_a": 2267,
+   "coverage_b": 2267,
+   "coverage_difference": 0,
+   "mean_diff": 0.19078576891051738,
+   "sd_diff": 1.6299502925847744,
+   "dependence_note": "differences may be serially dependent; the inference method must be chosen for the new estimand and declared",
+   "year_block_bootstrap_ci95": [
+    0.11533533948889192,
+    0.29970090080944084
+   ],
+   "per_year_mean_diff": {
+    "2013": 0.0973090416734631,
+    "2014": 0.1731884013651991,
+    "2015": 0.10243660938476976,
+    "2016": 0.2014888666141911,
+    "2017": 0.042071901248975654,
+    "2018": 0.582147604438044,
+    "2019": 0.17773782307176605,
+    "2020": 0.2280068557559931,
+    "2021": 0.11350000267805027
+   },
+   "conclusion": "IMPROVES_OVER_COMPARATOR_ON_THIS_SAMPLE"
+  }
+ },
+ "registry": {
+  "study_id": "SHARADAR-DAILYVOL-001",
+  "budget": 4,
+  "registered": 4,
+  "by_status": {
+   "SCORED": 4
+  },
+  "trials": [
+   {
+    "trial": 1,
+    "study_id": "SHARADAR-DAILYVOL-001",
+    "family": "ROLLING_VAR",
+    "features": [
+     "ret_1"
+    ],
+    "transform": "log(closeadj ratio)",
+    "window": "train before fold year",
+    "hyperparameters": {},
+    "seed": 0,
+    "policy_thresholds": {},
+    "ensemble_weights": {},
+    "status": "SCORED",
+    "result": {
+     "mean_log_score": 3.2789633456929987
+    },
+    "trial_digest": "4cf1cc65784ef3bd"
+   },
+   {
+    "trial": 2,
+    "study_id": "SHARADAR-DAILYVOL-001",
+    "family": "EWMA",
+    "features": [
+     "ret_1"
+    ],
+    "transform": "log(closeadj ratio)",
+    "window": "train before fold year",
+    "hyperparameters": {},
+    "seed": 0,
+    "policy_thresholds": {},
+    "ensemble_weights": {},
+    "status": "SCORED",
+    "result": {
+     "mean_log_score": 3.3743317766335506,
+     "vs_rolling": 0.09536843094055127
+    },
+    "trial_digest": "5ada7cd040b764f0"
+   },
+   {
+    "trial": 3,
+    "study_id": "SHARADAR-DAILYVOL-001",
+    "family": "GARCH11_T",
+    "features": [
+     "ret_1"
+    ],
+    "transform": "log(closeadj ratio)",
+    "window": "train before fold year",
+    "hyperparameters": {},
+    "seed": 0,
+    "policy_thresholds": {},
+    "ensemble_weights": {},
+    "status": "SCORED",
+    "result": {
+     "mean_log_score": 3.445925109625364,
+     "vs_rolling": 0.16696176393236445
+    },
+    "trial_digest": "e6313f084397080a"
+   },
+   {
+    "trial": 4,
+    "study_id": "SHARADAR-DAILYVOL-001",
+    "family": "GJR_GARCH11_T",
+    "features": [
+     "ret_1"
+    ],
+    "transform": "log(closeadj ratio)",
+    "window": "train before fold year",
+    "hyperparameters": {},
+    "seed": 0,
+    "policy_thresholds": {},
+    "ensemble_weights": {},
+    "status": "SCORED",
+    "result": {
+     "mean_log_score": 3.4697491146035166,
+     "vs_rolling": 0.19078576891051738
+    },
+    "trial_digest": "de71e0cc1431ef3a"
+   }
+  ],
+  "note": "the full trial history (including failures) is retained; selection among trials is disclosed"
+ },
+ "evidence_class": "HISTORICAL_DEVELOPMENT_STUDY",
+ "not_evidence_for": "the 15-minute options pilot (different horizon, different target)"
+}

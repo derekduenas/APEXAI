@@ -1,0 +1,19 @@
+{
+ "additive": true,
+ "correction_1_harness_claim": {
+  "consequence": "the NO_SIGNAL verdict is unaffected. What is unsupported is the stronger claim that the harness was shown able to find signal had one been present.",
+  "correct_statement": "the negative control behaved as required. Detection power is NOT established by it and requires separate positive-control evidence, which EXP-001B did not produce.",
+  "remedy": "a positive control is a required, blocking precondition of the next protocol, run before any challenger is fitted",
+  "what_I_wrote": "the N0 null control returned NO_SIGNAL, so the harness discriminates rather than being unable to detect anything",
+  "why_it_is_wrong": "a null returning NO_SIGNAL is CONSISTENT with correct behaviour but does not establish detection power. A harness incapable of detecting anything would also pass that test."
+ },
+ "correction_2_memory_counters": {
+  "remedy": "capture cgroup counters from inside the unit before exit, as the synthetic qualification already does",
+  "what_IS_established": "the process completed, exited 0 and sealed a result, so no kill occurred. That is established by the outcome itself, not by the counter sample.",
+  "what_I_wrote": "the counters were zero throughout the sampled period, and I presented that alongside 'no kill occurred' in a way that implies zero OOM counters for the whole run",
+  "what_is_NOT_established": "that no reclaim or limit-hit event occurred at any point. The final cgroup peak was not captured because the transient unit ran with --collect and its cgroup was removed at exit.",
+  "why_it_is_wrong": "the counters were read ONCE, about two minutes into a 21-minute run. The retained sampling does not cover the run."
+ },
+ "corrections": "EXP001B_REPORTING_CORRECTIONS",
+ "nothing_retracted": "the result stands unchanged: SCIENTIFIC_COMPLETE, NO_SIGNAL, t=0.7525 against a threshold of 2.0, n=165958, evaluation sealed"
+}

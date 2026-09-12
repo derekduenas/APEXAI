@@ -1,0 +1,111 @@
+{
+ "fresh_environment": {
+  "blocking_gap": {
+   "defaults_preserved": "absent flags leave production behaviour identical",
+   "implemented": [
+    "--research-root",
+    "--runner-root",
+    "--research-user"
+   ],
+   "research_user_rev2": "apexresearch2",
+   "resolved": true,
+   "validation": "validate_targets runs before any mutation in every action",
+   "what_it_was": "the CLI had no flags for the roots, AND fresh setup requires the research account to be absent, so the existing apexresearch would have blocked a second environment"
+  },
+  "derived": {
+   "activation_record": "/apex-data/research-rev2/_ACTIVATION_MANIFEST.json",
+   "checkout": "/apex-data/research-rev2/checkout",
+   "dataset_view": "/apex-data/research-rev2/dataset_view",
+   "out": "/apex-data/research-rev2/out",
+   "stage_log": "/apex-data/research-rev2/_ACTIVATION_LOG.jsonl"
+  },
+  "preserved_untouched": [
+   "/apex-data/research/checkout (pre-repair, 277e4a02)",
+   "/opt/apex-runner",
+   "/etc/apex/admissions and the signed v2 decision",
+   "the aborted run directory, read-only"
+  ],
+  "research_root": "/apex-data/research-rev2",
+  "research_user": "apexresearch2",
+  "runner_root": "/opt/apex-runner-rev2",
+  "why_a_second_runner_root": "preflight requires every destination to be free, and the existing /opt/apex-runner must be preserved intact"
+ },
+ "guard_untouched": {
+  "only_change_made": "its refusal TEXT, which called this a new experiment. It is an engineering revision of the same registered experiment. Behaviour is identical.",
+  "repin_guard": "not bypassed and not weakened. It correctly refuses to move the existing checkout across a bound-tree change; that is why a fresh checkout is required."
+ },
+ "how_each_property_will_be_verified": {
+  "activation_record": "state COMPLETE with every stage VERIFIED and its evidence, plus the append-only stage log",
+  "checkout_identity": "verify's checkout_identity check: commit equals the admitted commit, bound tree equals 06eee315eb02c697, working tree clean",
+  "dataset_view": "verify's dataset_inventory check RE-HASHES every admitted file and refuses on VIEW_HASH_MISMATCH; count must be 1511",
+  "environment": "identity (unprivileged uid, no privileged groups), venv interpreter present and executable, numpy pinned at 2.4.6, pinned.txt written, runner tree root-owned and not group- or other-writable across every entry",
+  "launcher_identity": "sha256 of scripts/research_activation.py in the fresh checkout must equal 5aeb8288647d5534, checked by the operator BEFORE invoking it",
+  "sandbox_configuration": "probe ENTERS the sandbox and measures nine properties with zero deviations; a test asserts the probed property list is identical to the launch property list, so what is measured is what will run"
+ },
+ "nothing_executed_or_signed": true,
+ "one_candidate_revision": {
+  "commit": "a35ab1a24ebbd8942713234a97551aaf6256057b",
+  "contains_both": true,
+  "experiment": {
+   "bound_source_tree_sha256": "06eee315eb02c697fd3a0f1723c6e12c9d878d89f31832149abf783fef1e8345",
+   "established_by": [
+    "tests/test_exp001b_bounded_memory.py \u2014 5 equivalence tests: sealed forecast ledger byte-identical, outcomes ledger identical, whole record identical apart from elapsed_s, dm and n0 compared value by value, and no forecast retention on a validation run",
+    "the existing exp001b suite \u2014 65 tests",
+    "results/exp001b_aligned_qualification.json \u2014 166,110 rows, both grading passes, matching an independent calculation"
+   ],
+   "identical_to_the_qualified_tree": true,
+   "n_files": 48,
+   "path": "apex/world_model/exp001b/run.py"
+  },
+  "launcher": {
+   "established_by": [
+    "tests/test_research_activation.py \u2014 outcome classification through the real CLI with controlled child processes (7), result-to-run binding (5), exit-4 contract (4), resumption (6)",
+    "tests/test_activation_verifier_review.py \u2014 verifier repairs and package self-consistency",
+    "tests/test_real_data_boundary.py \u2014 sealing through the real execute path with disposable authority (3)",
+    "tests/test_research_activation.py \u2014 two environments side by side: independent stand-up, rollback of the second leaving the first and its account intact, resume isolation, and target validation refusing shared accounts, preserved-environment reach, protected locations and overlapping roots (12)"
+   ],
+   "how_it_is_pinned_instead": "by the commit. The operator invokes it FROM the fresh checkout and verifies its sha256 first.",
+   "in_bound_tree": false,
+   "path": "scripts/research_activation.py",
+   "sha256": "efa9d3e84ccc09a2b0dd2c963a6a10d469bc9f1e38a876d0c66e9c23875d6184",
+   "why_that_matters": "the admission cannot pin it. Matching the bound experiment hash establishes the experiment only."
+  },
+  "review_status": "REVIEW_CANDIDATE, not accepted"
+ },
+ "output_root_reconciliation": {
+  "decision_filename": "/etc/apex/admissions/exp001b_admission_rev2.json",
+  "existing_signed_decision_preserved": "/etc/apex/admissions/exp001b_admission.json",
+  "matches_request": true,
+  "preserved": "/apex-data/research/out and the aborted run beneath it are untouched",
+  "revision_2_output_root": "/apex-data/research-rev2/out"
+ },
+ "plan": "EXP001B_REVISION_PLAN",
+ "qualification_carried_forward": {
+  "anonymous_working_set_peak_bytes": 881557504,
+  "both_grading_passes_completed": true,
+  "cgroup_memory_peak_bytes_before_exit": 1468006400,
+  "effective_cap_bytes": 1468006400,
+  "expected_independently": 166110,
+  "explanation": "the counters show the limit was reached once and no kill occurred. Reclaim of clean page cache from the 567 MB output file is the explanation most consistent with that and with the anonymous set peaking well below the cap. It was NOT directly instrumented, so it is the supported reading rather than a conclusively established cause. Other contributions to the cgroup total were not measured separately.",
+  "explanation_status": "SUPPORTED, NOT ESTABLISHED",
+  "headroom_at_peak": "ZERO in cgroup terms. The peak equalled the cap.",
+  "match": true,
+  "memory_events": {
+   "max": 1,
+   "oom": 0,
+   "oom_group_kill": 0,
+   "oom_kill": 0
+  },
+  "practical_consequence": "the margin is not anonymous headroom. A workload that grew the anonymous set materially could still fail.",
+  "rows": 166110
+ },
+ "read_only": true,
+ "sequence_from_here": [
+  "targeted source review of this one revision",
+  "add the two root flags so a second environment can be built through the wrapper",
+  "setup the fresh environment; verify; probe",
+  "authority signs the v3 request bound to ed4825684cd00ce5c70ef12bf12e3f08b684b212",
+  "install decision and signature; verify signature on host",
+  "verify, prepare, then execute into a NEW run directory"
+ ]
+}

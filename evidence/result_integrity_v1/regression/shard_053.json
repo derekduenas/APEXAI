@@ -1,0 +1,254 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_eyes1.py::test_the_packet_copies_canonical_values_and_never_recomputes",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_the_packet_carries_no_decision_power",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_packet_health_is_explicit_not_a_confidence_score",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_an_absent_microscope_is_not_a_clean_one",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_the_packet_hash_changes_when_any_field_changes",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_a_snapshot_contains_no_bar_after_T",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_rendering_is_deterministic",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_snapshot_metadata_survives_restart",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_the_challenger_image_withholds_the_answer",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_a_challenger_cannot_emit_trading_vocabulary",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_a_challenger_cannot_grant_itself_decision_power",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_out_of_vocabulary_enums_are_refused",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_a_hostile_model_reply_becomes_FAILED_not_authority",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_unavailable_does_not_read_as_nothing_concerning",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_the_visual_challenge_cannot_move_the_captain_directive",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_nothing_frozen_consumes_the_new_observational_fields",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_candle_conclusions_are_unrepresentable",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_the_challenger_cannot_even_quote_an_injected_instruction",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_direction_and_entry_are_separate_axes",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_trapped_participants_is_a_first_class_state",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_no_scalar_confidence_exists",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_the_brief_is_built_only_from_validated_fields",
+   "file": "tests/test_eyes1.py"
+  },
+  {
+   "nodeid": "tests/test_eyes1.py::test_the_doctrine_covers_every_scorecard_dimension",
+   "file": "tests/test_eyes1.py"
+  }
+ ],
+ "collected_count": 23,
+ "collect_errors": [],
+ "results": {
+  "tests/test_eyes1.py::test_the_packet_copies_canonical_values_and_never_recomputes": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_the_packet_carries_no_decision_power": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_packet_health_is_explicit_not_a_confidence_score": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_an_absent_microscope_is_not_a_clean_one": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_the_packet_hash_changes_when_any_field_changes": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_a_snapshot_contains_no_bar_after_T": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_rendering_is_deterministic": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_snapshot_metadata_survives_restart": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_the_challenger_image_withholds_the_answer": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_a_challenger_cannot_emit_trading_vocabulary": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_a_challenger_cannot_grant_itself_decision_power": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_out_of_vocabulary_enums_are_refused": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_a_hostile_model_reply_becomes_FAILED_not_authority": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_unavailable_does_not_read_as_nothing_concerning": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_the_visual_challenge_cannot_move_the_captain_directive": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_nothing_frozen_consumes_the_new_observational_fields": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_candle_conclusions_are_unrepresentable": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_the_challenger_cannot_even_quote_an_injected_instruction": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_direction_and_entry_are_separate_axes": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_trapped_participants_is_a_first_class_state": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_no_scalar_confidence_exists": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_the_brief_is_built_only_from_validated_fields": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_eyes1.py::test_the_doctrine_covers_every_scorecard_dimension": {
+   "file": "tests/test_eyes1.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 23,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_eyes1.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 169.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36239.service",
+   "memory_max": "1468006400",
+   "memory_peak": "127279104",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.91
+ }
+}

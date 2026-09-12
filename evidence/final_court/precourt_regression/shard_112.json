@@ -1,0 +1,398 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_earliest_filing_wins_not_the_restatement",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_the_loader_never_calls_last",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_impossible_filings_are_dropped",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_nonpositive_shares_are_dropped",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_only_arq_is_used",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_nsi_is_the_log_ratio_over_four_quarters",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_a_repurchase_is_negative_and_issuance_positive",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_a_uniform_rebasing_factor_cancels",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_no_winsorisation_clipping_or_smoothing_anywhere",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_an_extreme_value_survives_untouched",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_the_signal_is_invisible_before_it_is_filed",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_a_fiscal_period_label_does_not_confer_availability",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_an_excluding_action_in_the_window_removes_the_observation",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_an_action_outside_the_window_does_not_exclude",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_splits_are_NOT_in_the_exclusion_set",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_ranking_is_ascending_so_repurchasers_rank_first",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_ineligible_securities_never_enter_the_cross_section",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_ties_are_broken_deterministically",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_the_frozen_protocol_hash_is_intact",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_the_nsi_module_cannot_reach_experiment_001",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_ranked_set_equals_eligible_and_nsi_present",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_an_ineligible_security_that_got_ranked_is_caught",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_a_silently_dropped_eligible_security_is_caught",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_alignment_holds_when_eligibility_changes_between_dates",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_last_would_select_the_restatement",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_the_last_scan_is_not_vacuous",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_a_level_measure_breaks_under_rebasing",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_a_modified_protocol_is_detected",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_the_transformation_scan_detects_an_injected_clip",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_the_scan_detects_a_winsorisation_inside_a_real_function",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_the_transformation_scan_ignores_prose_not_code",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_the_isolation_scan_detects_an_injected_001_reference",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_the_isolation_scan_detects_a_composite_import",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_the_knowability_date_is_the_later_of_the_two_filings",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_pit_holds_on_every_populated_cell",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_a_future_filing_is_not_used_before_it_exists",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_the_pit_measure_flags_a_deliberately_late_filing",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_the_exclusion_rate_is_pairs_over_pairs",
+   "file": "tests/test_nsi_conformance.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_conformance.py::test_counterexample_a_cell_denominator_moves_with_the_date_grid",
+   "file": "tests/test_nsi_conformance.py"
+  }
+ ],
+ "collected_count": 39,
+ "collect_errors": [],
+ "results": {
+  "tests/test_nsi_conformance.py::test_earliest_filing_wins_not_the_restatement": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_the_loader_never_calls_last": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_impossible_filings_are_dropped": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_nonpositive_shares_are_dropped": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_only_arq_is_used": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_nsi_is_the_log_ratio_over_four_quarters": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_a_repurchase_is_negative_and_issuance_positive": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_a_uniform_rebasing_factor_cancels": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_no_winsorisation_clipping_or_smoothing_anywhere": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_an_extreme_value_survives_untouched": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_the_signal_is_invisible_before_it_is_filed": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_a_fiscal_period_label_does_not_confer_availability": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_an_excluding_action_in_the_window_removes_the_observation": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_an_action_outside_the_window_does_not_exclude": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_splits_are_NOT_in_the_exclusion_set": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_ranking_is_ascending_so_repurchasers_rank_first": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_ineligible_securities_never_enter_the_cross_section": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_ties_are_broken_deterministically": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_the_frozen_protocol_hash_is_intact": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_the_nsi_module_cannot_reach_experiment_001": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_ranked_set_equals_eligible_and_nsi_present": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_an_ineligible_security_that_got_ranked_is_caught": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_a_silently_dropped_eligible_security_is_caught": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_alignment_holds_when_eligibility_changes_between_dates": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_last_would_select_the_restatement": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_the_last_scan_is_not_vacuous": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_a_level_measure_breaks_under_rebasing": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_a_modified_protocol_is_detected": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_the_transformation_scan_detects_an_injected_clip": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_the_scan_detects_a_winsorisation_inside_a_real_function": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_the_transformation_scan_ignores_prose_not_code": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_the_isolation_scan_detects_an_injected_001_reference": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_the_isolation_scan_detects_a_composite_import": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_the_knowability_date_is_the_later_of_the_two_filings": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_pit_holds_on_every_populated_cell": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_a_future_filing_is_not_used_before_it_exists": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_the_pit_measure_flags_a_deliberately_late_filing": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_the_exclusion_rate_is_pairs_over_pairs": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_conformance.py::test_counterexample_a_cell_denominator_moves_with_the_date_grid": {
+   "file": "tests/test_nsi_conformance.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 39,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_nsi_conformance.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 163.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35344.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116494336",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.37
+ }
+}

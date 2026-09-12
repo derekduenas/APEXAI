@@ -1,0 +1,164 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_underwriting.py::test_1_rs_collapse_degrades_a_serious_candidate",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_2_waiting_for_entry_becomes_serious_after_reset",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_3_premarket_prior_can_read_contradicted",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_4_anti_anchoring_is_the_function_signature",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_5_staleness_is_measured_not_assumed",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_6_the_board_reranks_on_improvement",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_7_terminal_states_stay_dead",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_8_conditional_reasons_are_not_terminal",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_9_sensor_loops_survive_child_failure",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_10_underwriting_is_shadow_only",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_what_changed_is_computed_never_remembered",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_attention_scales_with_seriousness",
+   "file": "tests/test_underwriting.py"
+  },
+  {
+   "nodeid": "tests/test_underwriting.py::test_the_intraday_movie",
+   "file": "tests/test_underwriting.py"
+  }
+ ],
+ "collected_count": 13,
+ "collect_errors": [],
+ "results": {
+  "tests/test_underwriting.py::test_1_rs_collapse_degrades_a_serious_candidate": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_2_waiting_for_entry_becomes_serious_after_reset": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_3_premarket_prior_can_read_contradicted": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_4_anti_anchoring_is_the_function_signature": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_5_staleness_is_measured_not_assumed": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_6_the_board_reranks_on_improvement": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_7_terminal_states_stay_dead": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_8_conditional_reasons_are_not_terminal": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_9_sensor_loops_survive_child_failure": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_10_underwriting_is_shadow_only": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_what_changed_is_computed_never_remembered": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_attention_scales_with_seriousness": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_underwriting.py::test_the_intraday_movie": {
+   "file": "tests/test_underwriting.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 13,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_underwriting.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36385.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115220480",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.59
+ }
+}

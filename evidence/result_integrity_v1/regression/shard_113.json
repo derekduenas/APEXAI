@@ -1,0 +1,245 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_the_largest_repurchaser_scores_highest",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_counterexample_an_inverted_score_is_detected",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_the_largest_repurchaser_lands_in_decile_one",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_the_score_and_the_decile_point_in_opposite_directions_deliberately",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_counterexample_the_apex_001_numbering_would_be_detected",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_deciles_are_equal_count",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_counterexample_value_bucketing_is_not_equal_count",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_ties_break_deterministically_on_security_id",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_counterexample_column_order_cannot_change_the_tie_break",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_ineligible_securities_are_never_scored",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_counterexample_an_ineligible_security_would_displace_an_eligible_one",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_missing_nsi_is_excluded_never_filled",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_the_scoring_module_applies_no_transformation",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_the_scoring_module_never_reaches_apex_001",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_counterexample_the_isolation_scan_detects_an_injected_import",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_counterexample_the_transformation_scan_detects_an_injected_winsor",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_score_stays_inside_the_scorepanel_contract",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_build_nsi_scores_produces_a_valid_score_panel",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_deciles_are_balanced_for_awkward_counts[31]",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_deciles_are_balanced_for_awkward_counts[47]",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_deciles_are_balanced_for_awkward_counts[100]",
+   "file": "tests/test_nsi_scores.py"
+  },
+  {
+   "nodeid": "tests/test_nsi_scores.py::test_deciles_are_balanced_for_awkward_counts[233]",
+   "file": "tests/test_nsi_scores.py"
+  }
+ ],
+ "collected_count": 22,
+ "collect_errors": [],
+ "results": {
+  "tests/test_nsi_scores.py::test_the_largest_repurchaser_scores_highest": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_counterexample_an_inverted_score_is_detected": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_the_largest_repurchaser_lands_in_decile_one": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_the_score_and_the_decile_point_in_opposite_directions_deliberately": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_counterexample_the_apex_001_numbering_would_be_detected": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_deciles_are_equal_count": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_counterexample_value_bucketing_is_not_equal_count": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_ties_break_deterministically_on_security_id": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_counterexample_column_order_cannot_change_the_tie_break": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_ineligible_securities_are_never_scored": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_counterexample_an_ineligible_security_would_displace_an_eligible_one": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_missing_nsi_is_excluded_never_filled": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_the_scoring_module_applies_no_transformation": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_the_scoring_module_never_reaches_apex_001": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_counterexample_the_isolation_scan_detects_an_injected_import": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_counterexample_the_transformation_scan_detects_an_injected_winsor": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_score_stays_inside_the_scorepanel_contract": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_build_nsi_scores_produces_a_valid_score_panel": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_deciles_are_balanced_for_awkward_counts[31]": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_deciles_are_balanced_for_awkward_counts[47]": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_deciles_are_balanced_for_awkward_counts[100]": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nsi_scores.py::test_deciles_are_balanced_for_awkward_counts[233]": {
+   "file": "tests/test_nsi_scores.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 22,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_nsi_scores.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36299.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115507200",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.7
+ }
+}

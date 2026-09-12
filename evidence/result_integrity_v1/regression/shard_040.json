@@ -1,0 +1,713 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_firewall_covers_every_edgeforge_module",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_nothing_in_the_stack_grants_trading_authority",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_an_unclassifiable_state_cannot_join_the_partition",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_outcomes_do_not_get_second_chances",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_cohorts_partition_and_report_resolution_separately",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_analog_quality_flags_regime_concentration",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_analog_quality_flags_top5_dominance_and_narrow_era",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_single_return_resampling_is_refused",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_resampled_worlds_are_deterministic_and_classed",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_generator_refuses_regimes_with_too_little_data",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_an_untrained_generator_may_not_produce_worlds",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_generated_worlds_are_validated_against_real_ones",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_memorization_is_detected_when_paths_are_copies",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_model_cannot_silently_outvote_reality",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_an_empty_multiverse_is_refused",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_world_set_hash_is_stable_and_content_sensitive",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_generative_health_suspends_on_failure",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_adversary_can_actually_kill_an_edge",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_an_undeclared_stress_is_refused",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_breakpoints_are_reported_per_family_not_averaged",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_candidate_that_cannot_beat_flat_is_named",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_undeclared_baselines_are_refused",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_unsupported_certainty_is_refused",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_claim_without_a_resolution_rule_is_free_credibility",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_standing_refuses_a_busy_afternoon",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_standing_measures_across_independent_sessions",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_residual_search_finds_structure_the_incumbent_cannot_see",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_missing_variable_hypothesis_needs_falsifiers",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_scan_reports_the_whole_denominator",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_profitable_trade_can_be_a_bad_decision",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_losing_trade_can_be_a_good_decision",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_archaeology_requires_the_control_group",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_degenerate_tail_cut_says_no_comparison_was_possible",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_gate_value_names_backward_filtering_without_acting",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_an_edge_that_survives_institutional_size_is_not_ours",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_capacity_limited_edge_indicates_small_advantage",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_iid_capital_simulation_is_refused",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_clustered_simulation_reports_ruin_and_drawdown",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_kelly_is_a_reference_not_an_instruction",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_accelerant_research_returns_insufficient_when_unknown",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_critic_downgrades_an_unexamined_finding",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_critic_can_never_promote",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_challenger_must_say_how_it_expects_to_fail",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_challenger_cannot_be_born_on_a_trading_rung",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_mutation_births_a_child_with_a_fresh_record",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_ladder_stops_at_paper_review",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_rungs_require_their_own_evidence",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_feed_that_changes_nothing_is_overhead",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_an_unreconstructable_result_is_not_a_result",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_factory_cannot_spend_a_confirmatory_credit",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_report_leads_with_failures",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_world_budget_is_staged_behind_validation",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_correlation_is_not_compared_by_ratio",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_bounded_metrics_report_a_difference_and_scale_metrics_a_ratio",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_zero_real_value_refuses_a_ratio_rather_than_inventing_one",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_friendlier_world_source_is_flagged_not_hidden",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_diagnostic_preserves_tails_and_excursions",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_no_reference_class_is_reported_not_assumed",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_generating_worlds_is_not_authority_to_support_an_edge",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_an_unregistered_source_has_no_standing",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_downgraded_source_records_how_to_earn_its_way_back",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_reality_unfavorable_plus_resampler_favorable_is_not_mixed",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_positive_eligible_evidence_still_faces_the_other_vetoes",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_multiverse_of_only_ineligible_sources_supports_nothing",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_verdict_refuses_a_statistic_it_cannot_interpret",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_all_nine_deltas_are_preserved_even_when_not_estimable",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_an_undeclared_target_is_refused_not_guessed",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_declared_level_never_reached_is_none_not_absent",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_asymmetric_bias_is_flagged_where_a_mean_check_would_miss_it",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_deltas_are_reported_by_regime_when_regimes_are_known",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_missing_regimes_are_stated_not_assumed_away",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_the_diagnostic_carries_each_sources_authority",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_a_regime_confounded_global_comparison_says_so",
+   "file": "tests/test_edgeforge_frontier.py"
+  },
+  {
+   "nodeid": "tests/test_edgeforge_frontier.py::test_matched_regime_composition_is_not_called_confounded",
+   "file": "tests/test_edgeforge_frontier.py"
+  }
+ ],
+ "collected_count": 74,
+ "collect_errors": [],
+ "results": {
+  "tests/test_edgeforge_frontier.py::test_the_firewall_covers_every_edgeforge_module": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_nothing_in_the_stack_grants_trading_authority": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_an_unclassifiable_state_cannot_join_the_partition": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_outcomes_do_not_get_second_chances": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_cohorts_partition_and_report_resolution_separately": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_analog_quality_flags_regime_concentration": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_analog_quality_flags_top5_dominance_and_narrow_era": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_single_return_resampling_is_refused": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_resampled_worlds_are_deterministic_and_classed": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_generator_refuses_regimes_with_too_little_data": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_an_untrained_generator_may_not_produce_worlds": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_generated_worlds_are_validated_against_real_ones": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_memorization_is_detected_when_paths_are_copies": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_model_cannot_silently_outvote_reality": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_an_empty_multiverse_is_refused": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_world_set_hash_is_stable_and_content_sensitive": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_generative_health_suspends_on_failure": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_adversary_can_actually_kill_an_edge": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_an_undeclared_stress_is_refused": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_breakpoints_are_reported_per_family_not_averaged": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_candidate_that_cannot_beat_flat_is_named": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_undeclared_baselines_are_refused": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_unsupported_certainty_is_refused": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_claim_without_a_resolution_rule_is_free_credibility": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_standing_refuses_a_busy_afternoon": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_standing_measures_across_independent_sessions": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_residual_search_finds_structure_the_incumbent_cannot_see": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_missing_variable_hypothesis_needs_falsifiers": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_scan_reports_the_whole_denominator": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_profitable_trade_can_be_a_bad_decision": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_losing_trade_can_be_a_good_decision": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_archaeology_requires_the_control_group": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_degenerate_tail_cut_says_no_comparison_was_possible": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_gate_value_names_backward_filtering_without_acting": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_an_edge_that_survives_institutional_size_is_not_ours": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_capacity_limited_edge_indicates_small_advantage": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_iid_capital_simulation_is_refused": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_clustered_simulation_reports_ruin_and_drawdown": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_kelly_is_a_reference_not_an_instruction": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_accelerant_research_returns_insufficient_when_unknown": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_critic_downgrades_an_unexamined_finding": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_critic_can_never_promote": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_challenger_must_say_how_it_expects_to_fail": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_challenger_cannot_be_born_on_a_trading_rung": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_mutation_births_a_child_with_a_fresh_record": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_ladder_stops_at_paper_review": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_rungs_require_their_own_evidence": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_feed_that_changes_nothing_is_overhead": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_an_unreconstructable_result_is_not_a_result": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_factory_cannot_spend_a_confirmatory_credit": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_report_leads_with_failures": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_world_budget_is_staged_behind_validation": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_correlation_is_not_compared_by_ratio": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_bounded_metrics_report_a_difference_and_scale_metrics_a_ratio": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_zero_real_value_refuses_a_ratio_rather_than_inventing_one": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_friendlier_world_source_is_flagged_not_hidden": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_diagnostic_preserves_tails_and_excursions": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_no_reference_class_is_reported_not_assumed": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_generating_worlds_is_not_authority_to_support_an_edge": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_an_unregistered_source_has_no_standing": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_downgraded_source_records_how_to_earn_its_way_back": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_reality_unfavorable_plus_resampler_favorable_is_not_mixed": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_positive_eligible_evidence_still_faces_the_other_vetoes": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_multiverse_of_only_ineligible_sources_supports_nothing": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_verdict_refuses_a_statistic_it_cannot_interpret": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_all_nine_deltas_are_preserved_even_when_not_estimable": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_an_undeclared_target_is_refused_not_guessed": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_declared_level_never_reached_is_none_not_absent": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_asymmetric_bias_is_flagged_where_a_mean_check_would_miss_it": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_deltas_are_reported_by_regime_when_regimes_are_known": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_missing_regimes_are_stated_not_assumed_away": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_the_diagnostic_carries_each_sources_authority": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_a_regime_confounded_global_comparison_says_so": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_edgeforge_frontier.py::test_matched_regime_composition_is_not_called_confounded": {
+   "file": "tests/test_edgeforge_frontier.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 74,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_edgeforge_frontier.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36226.service",
+   "memory_max": "1468006400",
+   "memory_peak": "118820864",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.55
+ }
+}

@@ -1,0 +1,191 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_scanned_with_zero_matches_is_distinguishable_from_never_scanned",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_data_health_refusal_is_distinguishable_from_zero_matches",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_the_funnel_records_where_each_candidate_died",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_no_telemetry_field_changes_a_decision",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_the_trace_is_write_only_and_cannot_be_read_as_input",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_suspend_does_not_immediately_resume_at_the_same_threshold",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_recovery_requires_the_hysteresis_margin",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_resume_threshold_is_materially_healthier_than_suspend",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_intentional_suspension_is_distinguishable_from_a_crash",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_the_daemon_stays_alive_instead_of_exiting_into_keepalive",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_health_is_read_from_the_artifact_not_the_text_log",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_an_unreadable_health_artifact_is_not_reported_as_healthy",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_the_health_write_is_atomic",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_epoch0_predicates_and_thresholds_are_untouched",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_the_scan_tick_holds_no_decision_power",
+   "file": "tests/test_crypto_observability.py"
+  },
+  {
+   "nodeid": "tests/test_crypto_observability.py::test_zero_matches_remains_completely_legal",
+   "file": "tests/test_crypto_observability.py"
+  }
+ ],
+ "collected_count": 16,
+ "collect_errors": [],
+ "results": {
+  "tests/test_crypto_observability.py::test_scanned_with_zero_matches_is_distinguishable_from_never_scanned": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_data_health_refusal_is_distinguishable_from_zero_matches": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_the_funnel_records_where_each_candidate_died": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_no_telemetry_field_changes_a_decision": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_the_trace_is_write_only_and_cannot_be_read_as_input": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_suspend_does_not_immediately_resume_at_the_same_threshold": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_recovery_requires_the_hysteresis_margin": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_resume_threshold_is_materially_healthier_than_suspend": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_intentional_suspension_is_distinguishable_from_a_crash": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_the_daemon_stays_alive_instead_of_exiting_into_keepalive": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_health_is_read_from_the_artifact_not_the_text_log": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_an_unreadable_health_artifact_is_not_reported_as_healthy": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_the_health_write_is_atomic": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_epoch0_predicates_and_thresholds_are_untouched": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_the_scan_tick_holds_no_decision_power": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_crypto_observability.py::test_zero_matches_remains_completely_legal": {
+   "file": "tests/test_crypto_observability.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 16,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_crypto_observability.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36825.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115175424",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.45
+ }
+}

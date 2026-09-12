@@ -1,0 +1,200 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_live_book.py::test_the_live_book_cannot_place_orders",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_synthetic_intents_are_refused",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_unapproved_intents_are_refused",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_unbounded_loss_is_refused",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_unpreviewed_orders_are_refused",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_a_valid_intent_seals_once_and_only_once",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_fills_reconcile_one_to_one_and_never_guess",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_an_orphan_fill_is_sealed_unreconciled_not_dropped",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_state_reports_broker_truth_and_the_never_merge_law",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_nothing_on_a_trading_path_imports_the_live_book",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_live_can_never_increase_canonical_risk",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_no_sealed_policy_fails_closed",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_over_ceiling_structures_are_refused_first_class",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_the_279_structure_fits_the_operator_ceiling",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_open_intents_commit_against_the_experiment_budget",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_funding_the_account_more_changes_nothing",
+   "file": "tests/test_live_book.py"
+  },
+  {
+   "nodeid": "tests/test_live_book.py::test_policy_is_an_operator_decision_with_sane_ceilings",
+   "file": "tests/test_live_book.py"
+  }
+ ],
+ "collected_count": 17,
+ "collect_errors": [],
+ "results": {
+  "tests/test_live_book.py::test_the_live_book_cannot_place_orders": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_synthetic_intents_are_refused": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_unapproved_intents_are_refused": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_unbounded_loss_is_refused": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_unpreviewed_orders_are_refused": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_a_valid_intent_seals_once_and_only_once": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_fills_reconcile_one_to_one_and_never_guess": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_an_orphan_fill_is_sealed_unreconciled_not_dropped": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_state_reports_broker_truth_and_the_never_merge_law": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_nothing_on_a_trading_path_imports_the_live_book": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_live_can_never_increase_canonical_risk": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_no_sealed_policy_fails_closed": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_over_ceiling_structures_are_refused_first_class": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_the_279_structure_fits_the_operator_ceiling": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_open_intents_commit_against_the_experiment_budget": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_funding_the_account_more_changes_nothing": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_live_book.py::test_policy_is_an_operator_decision_with_sane_ceilings": {
+   "file": "tests/test_live_book.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 17,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_live_book.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.4,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34753.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116891648",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.72
+ }
+}

@@ -1,0 +1,200 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_session_coverage.py::test_a_full_session_from_true_open_is_full_and_anchor_valid",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_b_first_bar_exactly_09_30_00_is_the_boundary_pass_case",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_c_first_bar_one_minute_late_invalidates_anchor",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_d_first_bar_1017_et_is_invalid",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_e_missing_middle_interval_is_partial_anchor_still_valid",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_f_disconnect_then_reconnect_reads_as_partial_with_gap_recorded",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_g_known_prior_close_does_not_rescue_a_missing_true_open",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_h_opening_observed_then_immediate_gap_stays_anchor_valid",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_i_dst_boundary_summer_vs_winter_open_utc_offset",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_j_early_close_shrinks_required_session",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_k_market_holiday_returns_invalid_not_a_crash",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_l_premarket_bars_do_not_count_as_regular_session_coverage",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_m_postmarket_bars_do_not_count_as_regular_session_coverage",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_n_out_of_order_bars_do_not_corrupt_observed_start",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_o_duplicate_bars_are_not_double_counted",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_no_bars_at_all_is_invalid_not_a_crash",
+   "file": "tests/test_session_coverage.py"
+  },
+  {
+   "nodeid": "tests/test_session_coverage.py::test_as_of_must_be_tz_aware",
+   "file": "tests/test_session_coverage.py"
+  }
+ ],
+ "collected_count": 17,
+ "collect_errors": [],
+ "results": {
+  "tests/test_session_coverage.py::test_a_full_session_from_true_open_is_full_and_anchor_valid": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_b_first_bar_exactly_09_30_00_is_the_boundary_pass_case": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_c_first_bar_one_minute_late_invalidates_anchor": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_d_first_bar_1017_et_is_invalid": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_e_missing_middle_interval_is_partial_anchor_still_valid": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_f_disconnect_then_reconnect_reads_as_partial_with_gap_recorded": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_g_known_prior_close_does_not_rescue_a_missing_true_open": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_h_opening_observed_then_immediate_gap_stays_anchor_valid": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_i_dst_boundary_summer_vs_winter_open_utc_offset": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_j_early_close_shrinks_required_session": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_k_market_holiday_returns_invalid_not_a_crash": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_l_premarket_bars_do_not_count_as_regular_session_coverage": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_m_postmarket_bars_do_not_count_as_regular_session_coverage": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_n_out_of_order_bars_do_not_corrupt_observed_start": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_o_duplicate_bars_are_not_double_counted": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_no_bars_at_all_is_invalid_not_a_crash": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_session_coverage.py::test_as_of_must_be_tz_aware": {
+   "file": "tests/test_session_coverage.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 17,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_session_coverage.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36376.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115380224",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.72
+ }
+}

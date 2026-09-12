@@ -1,0 +1,190 @@
+{
+ "contract": "RESEARCH_ACTIVATION_V0",
+ "status": "OK",
+ "utc": "2026-09-08T00:53:28Z",
+ "targets": {
+  "research_user": "apexresearch",
+  "runner_root": "/opt/apex-runner",
+  "venv": "/opt/apex-runner/venv",
+  "checkout": "/apex-data/research/checkout",
+  "view": "/apex-data/research/dataset_view",
+  "out": "/apex-data/research/out",
+  "trust_root": "/etc/apex/admissions",
+  "allowed_signers": "/etc/apex/admissions/trust/allowed_signers"
+ },
+ "requirements": [
+  "numpy==2.4.6"
+ ],
+ "checks": [
+  {
+   "check": "identity_absent",
+   "ok": true,
+   "detail": "apexresearch does not exist yet"
+  },
+  {
+   "check": "destination_free:runner_root",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:research_root",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:checkout",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:view",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "source_repo",
+   "ok": true,
+   "detail": "/opt/apex-repo"
+  },
+  {
+   "check": "corpus_readable",
+   "ok": true,
+   "detail": "/apex-data/history-b/etf_continuous/bars"
+  },
+  {
+   "check": "manifest_present",
+   "ok": true,
+   "detail": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json"
+  },
+  {
+   "check": "manifest_hash",
+   "ok": true,
+   "detail": "3ac8b250eefb47c5"
+  },
+  {
+   "check": "trust_root_present",
+   "ok": false,
+   "detail": "/etc/apex/admissions (created by setup step A4)"
+  },
+  {
+   "check": "allowed_signers_present",
+   "ok": false,
+   "detail": "/etc/apex/admissions/trust/allowed_signers (installed by the admission authority)"
+  },
+  {
+   "check": "inventory_count",
+   "ok": true,
+   "detail": "1511 selected, expected 1511"
+  },
+  {
+   "check": "inventory_in_scope",
+   "ok": true,
+   "detail": "2016-01-04..2021-12-31"
+  },
+  {
+   "check": "commit_resolves",
+   "ok": true,
+   "detail": "ed2db56932378f6f289bd651900fbdf4ca47647c"
+  }
+ ],
+ "blocking": [],
+ "inventory": {
+  "selected_from_manifest": 1511,
+  "expected": 1511,
+  "first": "2016-01-04",
+  "last": "2021-12-31",
+  "symbol": "SPY",
+  "range": [
+   "2016-01-04",
+   "2021-12-31"
+  ]
+ },
+ "resolved_commit": {
+  "commit": "ed2db56932378f6f289bd651900fbdf4ca47647c",
+  "tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545",
+  "n_files": 48
+ },
+ "ok": true,
+ "action": "setup",
+ "applied": false,
+ "plan": [
+  {
+   "object": "/opt/apex-runner",
+   "class": "capability",
+   "kind": "dir",
+   "cmd": "install -d -o root -g root -m 0755 /opt/apex-runner"
+  },
+  {
+   "object": "/opt/apex-runner/venv",
+   "class": "capability",
+   "kind": "venv",
+   "cmd": "/usr/bin/python3.12 -m venv /opt/apex-runner/venv"
+  },
+  {
+   "object": "/opt/apex-runner/requirements.txt",
+   "class": "capability",
+   "kind": "file",
+   "cmd": "printf '%s\\n' numpy==2.4.6 > /opt/apex-runner/requirements.txt"
+  },
+  {
+   "object": "/opt/apex-runner/venv [packages]",
+   "class": "capability",
+   "kind": "packages",
+   "cmd": "/opt/apex-runner/venv/bin/pip install --no-cache-dir -r /opt/apex-runner/requirements.txt"
+  },
+  {
+   "object": "/opt/apex-runner/pinned.txt",
+   "class": "evidence",
+   "kind": "file",
+   "cmd": "/opt/apex-runner/venv/bin/pip freeze > /opt/apex-runner/pinned.txt"
+  },
+  {
+   "object": "/opt/apex-runner",
+   "class": "capability",
+   "kind": "own",
+   "cmd": "chown -R root:root /opt/apex-runner && chmod -R go-w /opt/apex-runner"
+  },
+  {
+   "object": "apexresearch",
+   "class": "capability",
+   "kind": "account",
+   "cmd": "adduser --system --group --disabled-password --shell /usr/sbin/nologin --home /home/apexresearch apexresearch && passwd -l apexresearch"
+  },
+  {
+   "object": "/apex-data/research",
+   "class": "capability",
+   "kind": "dir",
+   "cmd": "install -d -o apexresearch -g apexresearch -m 0755 /apex-data/research"
+  },
+  {
+   "object": "/apex-data/research/out",
+   "class": "evidence",
+   "kind": "dir",
+   "cmd": "install -d -o apexresearch -g apexresearch -m 0755 /apex-data/research/out"
+  },
+  {
+   "object": "/apex-data/research/checkout",
+   "class": "capability",
+   "kind": "checkout",
+   "cmd": "git clone --no-hardlinks /opt/apex-repo /apex-data/research/checkout && git -C /apex-data/research/checkout checkout --detach ed2db56932378f6f289bd651900fbdf4ca47647c && chown -R apexresearch:apexresearch /apex-data/research/checkout"
+  },
+  {
+   "object": "/apex-data/research/dataset_view",
+   "class": "capability",
+   "kind": "dataset_view",
+   "cmd": "research_activation.py setup --apply  (builds the view from the manifest, verifies 1511 hashes, reconciles the inventory)"
+  },
+  {
+   "object": "/apex-data/research/_ACTIVATION_MANIFEST.json",
+   "class": "evidence",
+   "kind": "file",
+   "cmd": "written by this wrapper at the end of setup"
+  }
+ ],
+ "view": {
+  "planned_files": 1511,
+  "destination": "/apex-data/research/dataset_view/etf_continuous/bars",
+  "applied": false
+ },
+ "created": []
+}

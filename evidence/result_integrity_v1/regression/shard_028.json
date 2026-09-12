@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_winsorise_row_depends_only_on_its_own_row",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_zscore_row_depends_only_on_its_own_row",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_percentile_rank_row_depends_only_on_its_own_row",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_the_probe_actually_disturbs_the_other_rows",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_the_composite_is_strictly_cross_sectional",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_an_affine_global_fit_is_provably_inert",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_the_audit_catches_a_global_winsorisation",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_the_audit_catches_a_past_only_expanding_fit",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_the_violation_names_what_it_caught",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_category_scores_are_audited_too",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_an_all_nan_probe_date_is_refused",
+   "file": "tests/test_cross_sectional_audit.py"
+  },
+  {
+   "nodeid": "tests/test_cross_sectional_audit.py::test_winsorisation_limits_are_per_date_not_global",
+   "file": "tests/test_cross_sectional_audit.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_cross_sectional_audit.py::test_winsorise_row_depends_only_on_its_own_row": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_zscore_row_depends_only_on_its_own_row": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_percentile_rank_row_depends_only_on_its_own_row": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_the_probe_actually_disturbs_the_other_rows": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_the_composite_is_strictly_cross_sectional": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_an_affine_global_fit_is_provably_inert": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_the_audit_catches_a_global_winsorisation": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_the_audit_catches_a_past_only_expanding_fit": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_the_violation_names_what_it_caught": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_category_scores_are_audited_too": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_an_all_nan_probe_date_is_refused": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_cross_sectional_audit.py::test_winsorisation_limits_are_per_date_not_global": {
+   "file": "tests/test_cross_sectional_audit.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_cross_sectional_audit.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 212.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36214.service",
+   "memory_max": "1468006400",
+   "memory_peak": "167714816",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 30.96
+ }
+}

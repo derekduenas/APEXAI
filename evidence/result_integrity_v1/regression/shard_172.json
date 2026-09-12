@@ -1,0 +1,362 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_research_ledger.py::test_a_fresh_ledger_has_the_full_budget",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_spending_a_credit_decrements_the_budget",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_budget_is_exhausted_after_five_experiments",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_the_same_experiment_cannot_evaluate_the_same_period_twice",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_a_modified_hypothesis_is_a_new_experiment_and_costs_a_credit",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_non_holdout_periods_do_not_consume_credits",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_the_ledger_survives_a_reload",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_each_entry_chains_to_its_predecessor",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_editing_a_recorded_entry_is_detected",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_deleting_an_entry_from_the_middle_is_detected",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_truncating_the_most_recent_entry_is_detected",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_deleting_the_head_anchor_is_detected",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_truncation_does_not_refund_a_credit",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_the_holdout_cannot_be_opened_before_validation_has_run",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_the_holdout_cannot_be_opened_after_validation_failed",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_an_inconclusive_validation_does_not_unlock_the_holdout",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_validation_started_but_never_recorded_does_not_unlock_the_holdout",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_a_passing_validation_unlocks_the_holdout_once",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_another_experiments_validation_does_not_unlock_this_one",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_validation_itself_needs_no_precondition",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_a_result_is_recorded_against_its_spend",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_a_result_cannot_be_recorded_without_spending_a_credit",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_a_result_cannot_be_overwritten",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_sequential_threshold_is_bonferroni_over_the_whole_budget",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_sequential_threshold_does_not_loosen_as_credits_are_spent",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_holm_is_more_powerful_than_bonferroni_on_the_same_family",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_holm_stops_at_the_first_failure",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_holm_on_the_recorded_family",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_required_tstat_under_the_budget_exceeds_the_preregistered_hurdle",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_budget_report_states_every_number_a_reviewer_needs",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_an_evaluation_without_a_dataset_fingerprint_is_refused",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_a_result_without_a_dataset_fingerprint_is_refused",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_the_dataset_fingerprint_is_persisted_with_the_result",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_the_fingerprint_is_covered_by_the_tamper_chain",
+   "file": "tests/test_research_ledger.py"
+  },
+  {
+   "nodeid": "tests/test_research_ledger.py::test_every_source_can_name_its_own_data",
+   "file": "tests/test_research_ledger.py"
+  }
+ ],
+ "collected_count": 35,
+ "collect_errors": [],
+ "results": {
+  "tests/test_research_ledger.py::test_a_fresh_ledger_has_the_full_budget": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_spending_a_credit_decrements_the_budget": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_budget_is_exhausted_after_five_experiments": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_the_same_experiment_cannot_evaluate_the_same_period_twice": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_a_modified_hypothesis_is_a_new_experiment_and_costs_a_credit": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_non_holdout_periods_do_not_consume_credits": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_the_ledger_survives_a_reload": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_each_entry_chains_to_its_predecessor": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_editing_a_recorded_entry_is_detected": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_deleting_an_entry_from_the_middle_is_detected": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_truncating_the_most_recent_entry_is_detected": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_deleting_the_head_anchor_is_detected": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_truncation_does_not_refund_a_credit": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_the_holdout_cannot_be_opened_before_validation_has_run": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_the_holdout_cannot_be_opened_after_validation_failed": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_an_inconclusive_validation_does_not_unlock_the_holdout": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_validation_started_but_never_recorded_does_not_unlock_the_holdout": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_a_passing_validation_unlocks_the_holdout_once": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_another_experiments_validation_does_not_unlock_this_one": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_validation_itself_needs_no_precondition": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_a_result_is_recorded_against_its_spend": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_a_result_cannot_be_recorded_without_spending_a_credit": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_a_result_cannot_be_overwritten": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_sequential_threshold_is_bonferroni_over_the_whole_budget": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_sequential_threshold_does_not_loosen_as_credits_are_spent": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_holm_is_more_powerful_than_bonferroni_on_the_same_family": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_holm_stops_at_the_first_failure": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_holm_on_the_recorded_family": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_required_tstat_under_the_budget_exceeds_the_preregistered_hurdle": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_budget_report_states_every_number_a_reviewer_needs": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_an_evaluation_without_a_dataset_fingerprint_is_refused": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_a_result_without_a_dataset_fingerprint_is_refused": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_the_dataset_fingerprint_is_persisted_with_the_result": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_the_fingerprint_is_covered_by_the_tamper_chain": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_research_ledger.py::test_every_source_can_name_its_own_data": {
+   "file": "tests/test_research_ledger.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 35,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_research_ledger.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 263.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36358.service",
+   "memory_max": "1468006400",
+   "memory_peak": "225390592",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.26
+ }
+}

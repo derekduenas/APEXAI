@@ -1,0 +1,135 @@
+{
+ "contract": "CATALYST_CAPTURE_HEALTH_EVIDENCE_V0",
+ "diagnosis_utc": "2026-09-08T02:32:03Z",
+ "base": {
+  "branch_base": "event-source-001",
+  "commit": "a851f85e7",
+  "checkout": "/apex-data/tmp/cs001_wt",
+  "dirty": 0
+ },
+ "method": "read-only. no service action, no daemon reload, no code change, no data modified, no market row read",
+ "evidence_hashes": {
+  "/apex-data/core/catalyst/cycles.jsonl": "351932b1b6d7d28dc2511ab0be4c6546b9f078e71bd8fd34e2dc9df20c18e9a2",
+  "/apex-data/core/heartbeats/apex-catalyst.json": "bcae160bef540da1976ffb3b945a0a844a07f305b5b0ae59c1a97ba1a7afd753",
+  "/opt/apex/current/scripts/catalyst_service.py": "a729e0be1a5755dd3cb86bc699fc2424a583554cd74389aef56a80d4d7e51747",
+  "/etc/systemd/system/apex-catalyst.service": "67bad30877db65bbe3c9ee051aca55c9dad15c529a8165d68277d04f6b9ac145"
+ },
+ "timezone": "all timestamps UTC unless suffixed ET; the service derives its session from the ET calendar day via apex.ops.timebase.ET",
+ "facts": [
+  {
+   "claim": "service unit is active/running with zero restarts",
+   "value": "ActiveState=active SubState=running Result=success NRestarts=0 ExecMainPID=737236 ExecMainStartTimestamp=2026-09-02T06:19:35Z",
+   "command": "systemctl show apex-catalyst.service",
+   "kind": "observed"
+  },
+  {
+   "claim": "process is sleeping on a timer, not blocked",
+   "value": "State: S (sleeping); wchan=hrtimer_nanosleep; threads=4; RSS=86616kB; %CPU=0.0; elapsed=5-20:12:27",
+   "command": "ps -o ...; /proc/737236/status; /proc/737236/wchan",
+   "kind": "observed"
+  },
+  {
+   "claim": "no journal output since the last cycle",
+   "value": "0 entries since 2026-09-04 20:02:00",
+   "command": "journalctl -u apex-catalyst.service --since '2026-09-04 20:02:00'",
+   "kind": "observed"
+  },
+  {
+   "claim": "live phase is IDLE because the ET day is not a trading day",
+   "value": {
+    "phase": "IDLE",
+    "session": "2026-09-07",
+    "why": "2026-09-07 is not a trading day"
+   },
+   "command": "read-only import of scripts/catalyst_service.py current_phase()",
+   "kind": "observed"
+  },
+  {
+   "claim": "the calendar marks the gap days as non-sessions",
+   "value": {
+    "2026-09-05": "WEEKEND",
+    "2026-09-06": "WEEKEND",
+    "2026-09-07": "HOLIDAY (Labor Day)",
+    "2026-09-08": "SESSION"
+   },
+   "command": "apex.world_model.exp001b.exchange_calendar.session_bounds",
+   "kind": "observed"
+  },
+  {
+   "claim": "the previous weekend shows the identical gap",
+   "value": {
+    "2026-08-27": 98,
+    "2026-08-28": 91,
+    "2026-08-29": 0,
+    "2026-08-30": 0,
+    "2026-08-31": 93,
+    "2026-09-01": 91,
+    "2026-09-02": 88,
+    "2026-09-03": 86,
+    "2026-09-04": 93
+   },
+   "command": "cycles per ET day from cycles.jsonl",
+   "kind": "observed"
+  },
+  {
+   "claim": "the last cycle ended cleanly",
+   "value": "2026-09-04:POST_CLOSE_SEAL ended 2026-09-04T20:02:01, 16/17 sources, 1 new event",
+   "command": "tail -1 cycles.jsonl",
+   "kind": "observed"
+  },
+  {
+   "claim": "heartbeat separates presence from work",
+   "value": {
+    "beat_utc": "2026-09-08T02:32:03.942832+00:00",
+    "last_work_utc": "2026-09-04T20:02:02.655137+00:00",
+    "work_completed": 267,
+    "last_error": null,
+    "backlog_remaining": 1
+   },
+   "command": "cat /apex-data/core/heartbeats/apex-catalyst.json",
+   "kind": "observed"
+  },
+  {
+   "claim": "output path is correct; no alternate destination",
+   "value": "/apex-data/runtime/results -> /apex-data/core (symlink), so results/catalyst/events.jsonl resolves to /apex-data/core/catalyst/events.jsonl; filesystem search for catalyst/event files modified since 20:02 returned only the heartbeat",
+   "command": "readlink -f; find /apex-data /opt/apex/current -newermt '2026-09-04 20:02:02'",
+   "kind": "observed"
+  },
+  {
+   "claim": "output inodes are stable and writable by the service user",
+   "value": "events.jsonl ino=1769477 size=11281367 mode=664 apex:apex; raw_observations ino=1769475; cycles ino=1769479",
+   "command": "stat -c",
+   "kind": "observed"
+  },
+  {
+   "claim": "BLS fails on essentially every cycle",
+   "value": "{\"BLS\": \"BLS CUUR0000SA0: unexpected shape ('series')\"}; 81 cycle records name it; sampled cycles all show sources_failed=1 with coverage 16/17",
+   "command": "cycles.jsonl failures field",
+   "kind": "observed"
+  },
+  {
+   "claim": "633 of 640 cycles recorded a last_error",
+   "value": {
+    "refused_google_news_cited_sources": 389,
+    "interpreter_timeout_180s": 88,
+    "bls_shape": 81,
+    "refused_yahoo_cited_sources": 37,
+    "brain_not_json": 12
+   },
+   "command": "last_error distribution over cycles.jsonl",
+   "kind": "observed"
+  },
+  {
+   "claim": "service loop beats presence without claiming work outside working phases",
+   "value": "else: beat.beat()   # presence only; no work claimed",
+   "command": "scripts/catalyst_service.py main loop",
+   "kind": "observed"
+  },
+  {
+   "claim": "the stall is correct idle behaviour",
+   "value": "weekend 5-6 Sep plus Labor Day 7 Sep; next work OVERNIGHT_SCAN 07:00 ET on 8 Sep",
+   "command": "synthesis of the facts above",
+   "kind": "inferred"
+  }
+ ]
+}

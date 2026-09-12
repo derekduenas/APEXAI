@@ -1,0 +1,227 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_weights_drift_with_returns",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_flat_returns_leave_weights_untouched",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_a_total_loss_removes_a_name_from_the_book",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_an_unchanged_book_has_zero_turnover",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_a_completely_replaced_book_has_full_turnover",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_replacing_half_the_book_is_half_turnover",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_turnover_accounts_for_drift_not_just_membership",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_a_name_that_left_the_universe_is_sold",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_cost_is_charged_on_every_unit_traded_both_directions",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_zero_turnover_is_free",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_doubling_the_cost_assumption_doubles_the_cost",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_annualised_turnover_scales_by_periods_per_year",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_full_replacement_every_period_is_1260_percent_annually",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_net_is_gross_minus_realised_cost",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_both_legs_are_charged",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_an_unchanging_book_is_charged_only_for_establishing_itself",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_a_static_book_pays_nothing_after_establishment",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_the_result_reports_realised_turnover_not_an_assumption",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_an_empty_decile_period_is_skipped_not_charged",
+   "file": "tests/test_turnover_costs.py"
+  },
+  {
+   "nodeid": "tests/test_turnover_costs.py::test_costs_cannot_be_computed_from_an_assumed_turnover",
+   "file": "tests/test_turnover_costs.py"
+  }
+ ],
+ "collected_count": 20,
+ "collect_errors": [],
+ "results": {
+  "tests/test_turnover_costs.py::test_weights_drift_with_returns": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_flat_returns_leave_weights_untouched": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_a_total_loss_removes_a_name_from_the_book": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_an_unchanged_book_has_zero_turnover": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_a_completely_replaced_book_has_full_turnover": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_replacing_half_the_book_is_half_turnover": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_turnover_accounts_for_drift_not_just_membership": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_a_name_that_left_the_universe_is_sold": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_cost_is_charged_on_every_unit_traded_both_directions": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_zero_turnover_is_free": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_doubling_the_cost_assumption_doubles_the_cost": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_annualised_turnover_scales_by_periods_per_year": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_full_replacement_every_period_is_1260_percent_annually": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_net_is_gross_minus_realised_cost": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_both_legs_are_charged": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_an_unchanging_book_is_charged_only_for_establishing_itself": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_a_static_book_pays_nothing_after_establishment": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_the_result_reports_realised_turnover_not_an_assumption": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_an_empty_decile_period_is_skipped_not_charged": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_turnover_costs.py::test_costs_cannot_be_computed_from_an_assumed_turnover": {
+   "file": "tests/test_turnover_costs.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 20,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_turnover_costs.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35137.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115109888",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.91
+ }
+}

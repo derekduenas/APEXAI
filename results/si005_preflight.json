@@ -1,0 +1,108 @@
+{
+ "contract": "RESEARCH_ACTIVATION_V0",
+ "status": "OK",
+ "utc": "2026-09-08T00:53:16Z",
+ "targets": {
+  "research_user": "apexresearch",
+  "runner_root": "/opt/apex-runner",
+  "venv": "/opt/apex-runner/venv",
+  "checkout": "/apex-data/research/checkout",
+  "view": "/apex-data/research/dataset_view",
+  "out": "/apex-data/research/out",
+  "trust_root": "/etc/apex/admissions",
+  "allowed_signers": "/etc/apex/admissions/trust/allowed_signers"
+ },
+ "requirements": [
+  "numpy==2.4.6"
+ ],
+ "checks": [
+  {
+   "check": "identity_absent",
+   "ok": true,
+   "detail": "apexresearch does not exist yet"
+  },
+  {
+   "check": "destination_free:runner_root",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:research_root",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:checkout",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "destination_free:view",
+   "ok": true,
+   "detail": "free"
+  },
+  {
+   "check": "source_repo",
+   "ok": true,
+   "detail": "/opt/apex-repo"
+  },
+  {
+   "check": "corpus_readable",
+   "ok": true,
+   "detail": "/apex-data/history-b/etf_continuous/bars"
+  },
+  {
+   "check": "manifest_present",
+   "ok": true,
+   "detail": "/apex-data/governance/admissions/manifests/etf_continuous_SPY_manifest_v0.json"
+  },
+  {
+   "check": "manifest_hash",
+   "ok": true,
+   "detail": "3ac8b250eefb47c5"
+  },
+  {
+   "check": "trust_root_present",
+   "ok": false,
+   "detail": "/etc/apex/admissions (created by setup step A4)"
+  },
+  {
+   "check": "allowed_signers_present",
+   "ok": false,
+   "detail": "/etc/apex/admissions/trust/allowed_signers (installed by the admission authority)"
+  },
+  {
+   "check": "inventory_count",
+   "ok": true,
+   "detail": "1511 selected, expected 1511"
+  },
+  {
+   "check": "inventory_in_scope",
+   "ok": true,
+   "detail": "2016-01-04..2021-12-31"
+  },
+  {
+   "check": "commit_resolves",
+   "ok": true,
+   "detail": "ed2db56932378f6f289bd651900fbdf4ca47647c"
+  }
+ ],
+ "blocking": [],
+ "inventory": {
+  "selected_from_manifest": 1511,
+  "expected": 1511,
+  "first": "2016-01-04",
+  "last": "2021-12-31",
+  "symbol": "SPY",
+  "range": [
+   "2016-01-04",
+   "2021-12-31"
+  ]
+ },
+ "resolved_commit": {
+  "commit": "ed2db56932378f6f289bd651900fbdf4ca47647c",
+  "tree_sha256": "616a191252be80aef59880a0c9f925de5f010ee44a65550975604009a4bb7545",
+  "n_files": 48
+ },
+ "ok": true
+}

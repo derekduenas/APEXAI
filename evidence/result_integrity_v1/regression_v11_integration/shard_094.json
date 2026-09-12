@@ -1,0 +1,164 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_analog_neighbours_immune_to_future_returns",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_analog_time_firewall_structural",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_analog_historical_carries_limitation_and_sparse_refuses_confidence",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_analog_no_rows_is_no_valid_analogs",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_ml_refuses_without_evidence_and_undeclared_horizon",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_ml_trains_deterministically_when_evidence_exists",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_bundle_monday_truth_and_no_fake_ensemble",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_disagreement_measured_not_hidden",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_swarm_non_ok_carries_no_claims",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_caution_is_monotone_never_aggressive",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_simulator_future_blind",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_simulator_declares_source_and_uncalibrated_weights",
+   "file": "tests/test_hunter_spine.py"
+  },
+  {
+   "nodeid": "tests/test_hunter_spine.py::test_decision_pass_survives_broken_intelligence",
+   "file": "tests/test_hunter_spine.py"
+  }
+ ],
+ "collected_count": 13,
+ "collect_errors": [],
+ "results": {
+  "tests/test_hunter_spine.py::test_analog_neighbours_immune_to_future_returns": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_analog_time_firewall_structural": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_analog_historical_carries_limitation_and_sparse_refuses_confidence": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_analog_no_rows_is_no_valid_analogs": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_ml_refuses_without_evidence_and_undeclared_horizon": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_ml_trains_deterministically_when_evidence_exists": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_bundle_monday_truth_and_no_fake_ensemble": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_disagreement_measured_not_hidden": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_swarm_non_ok_carries_no_claims": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_caution_is_monotone_never_aggressive": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_simulator_future_blind": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_simulator_declares_source_and_uncalibrated_weights": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hunter_spine.py::test_decision_pass_survives_broken_intelligence": {
+   "file": "tests/test_hunter_spine.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 13,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_hunter_spine.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 164.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36887.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116948992",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.42
+ }
+}

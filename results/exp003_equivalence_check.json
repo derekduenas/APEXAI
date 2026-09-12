@@ -1,0 +1,22 @@
+{
+ "check": "EXP003_ORTHOGONALISED_INCREMENT_vs_EXP002_C_ARM",
+ "increment_is_nonzero": 0.0005469090811118575,
+ "linear_mean_identical_in_both": true,
+ "market_data_used": false,
+ "max_abs_diff_fit": 4.336808689942018e-19,
+ "max_abs_diff_oos": 3.2526065174565133e-19,
+ "max_rel_diff_fit": 4.0988800730924057e-16,
+ "max_rel_diff_oos": 4.2751211931674295e-16,
+ "n_fit": 3000,
+ "n_oos": 500,
+ "predictor_scale_oos": 0.0007608220610575634,
+ "rank_deficient_behaviour": "REFUSED by the registered code: RANK_DEFICIENT: C design rank 3 < 6 at rcond=1e-12",
+ "ranks": {
+  "C_design": 6,
+  "increment": 3,
+  "projection": 3
+ },
+ "seed": 4242,
+ "synthetic_only": true,
+ "tail_input_residuals_max_abs_diff": 0.0
+}

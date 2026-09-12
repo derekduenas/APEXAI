@@ -1,0 +1,101 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_replay_lab.py::test_restamp_enforces_class_limitation_and_counterfactual",
+   "file": "tests/test_replay_lab.py"
+  },
+  {
+   "nodeid": "tests/test_replay_lab.py::test_rule17_tripwire_aborts_on_llm_view",
+   "file": "tests/test_replay_lab.py"
+  },
+  {
+   "nodeid": "tests/test_replay_lab.py::test_replay_results_can_never_graduate",
+   "file": "tests/test_replay_lab.py"
+  },
+  {
+   "nodeid": "tests/test_replay_lab.py::test_lab02_health_abort_semantics",
+   "file": "tests/test_replay_lab.py"
+  },
+  {
+   "nodeid": "tests/test_replay_lab.py::test_lab05b_governor_speaks_call_units",
+   "file": "tests/test_replay_lab.py"
+  },
+  {
+   "nodeid": "tests/test_replay_lab.py::test_lab05b_stale_counter_never_reads_as_exhausted",
+   "file": "tests/test_replay_lab.py"
+  }
+ ],
+ "collected_count": 6,
+ "collect_errors": [],
+ "results": {
+  "tests/test_replay_lab.py::test_restamp_enforces_class_limitation_and_counterfactual": {
+   "file": "tests/test_replay_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_replay_lab.py::test_rule17_tripwire_aborts_on_llm_view": {
+   "file": "tests/test_replay_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_replay_lab.py::test_replay_results_can_never_graduate": {
+   "file": "tests/test_replay_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_replay_lab.py::test_lab02_health_abort_semantics": {
+   "file": "tests/test_replay_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_replay_lab.py::test_lab05b_governor_speaks_call_units": {
+   "file": "tests/test_replay_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_replay_lab.py::test_lab05b_stale_counter_never_reads_as_exhausted": {
+   "file": "tests/test_replay_lab.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 6,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_replay_lab.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35957.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116129792",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.58
+ }
+}

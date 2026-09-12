@@ -1,0 +1,155 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_verification_law.py::test_a_missing_edit_is_caught_not_believed",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_a_present_edit_verifies",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_verifying_a_missing_file_fails_loudly",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_an_unstamped_artifact_is_refused",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_an_artifact_with_no_module_list_falls_back_to_the_commit",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_an_unrelated_commit_does_not_invalidate_a_still_current_run",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_an_artifact_from_edited_code_is_refused",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_a_current_artifact_passes",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_zero_failures_from_a_stale_artifact_is_never_reported",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_provenance_records_what_is_needed_to_attribute_a_run",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_code_digest_is_sensitive_to_content_not_just_the_commit",
+   "file": "tests/test_verification_law.py"
+  },
+  {
+   "nodeid": "tests/test_verification_law.py::test_a_missing_code_path_still_produces_a_stable_digest",
+   "file": "tests/test_verification_law.py"
+  }
+ ],
+ "collected_count": 12,
+ "collect_errors": [],
+ "results": {
+  "tests/test_verification_law.py::test_a_missing_edit_is_caught_not_believed": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_a_present_edit_verifies": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_verifying_a_missing_file_fails_loudly": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_an_unstamped_artifact_is_refused": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_an_artifact_with_no_module_list_falls_back_to_the_commit": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_an_unrelated_commit_does_not_invalidate_a_still_current_run": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_an_artifact_from_edited_code_is_refused": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_a_current_artifact_passes": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_zero_failures_from_a_stale_artifact_is_never_reported": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_provenance_records_what_is_needed_to_attribute_a_run": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_code_digest_is_sensitive_to_content_not_just_the_commit": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_verification_law.py::test_a_missing_code_path_still_produces_a_stable_digest": {
+   "file": "tests/test_verification_law.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 12,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_verification_law.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35472.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116416512",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.97
+ }
+}

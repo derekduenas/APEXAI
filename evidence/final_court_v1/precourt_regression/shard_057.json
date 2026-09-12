@@ -1,0 +1,272 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier1.py::test_before_card_refuses_future_information",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_outcome_references_the_exact_before_hash",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_an_edited_card_is_refused_at_outcome_time",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_a_card_cannot_be_resealed_differently",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_unknown_sections_are_visible_holes",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_detection_cannot_precede_its_known_from",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_polling_is_never_labeled_streaming",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_the_equity_fabric_reports_polling_honestly",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_dislocations_are_observations_with_mechanisms_not_signals",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_event_repricing_is_forbidden_under_uncertain_attribution",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_unknown_never_outranks_known_good",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_the_board_is_deterministic",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_the_reasoning_router_touches_only_compute",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_unknown_persistence_caps_the_tier",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_all_three_registries_are_not_yet_estimable",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_post_hoc_hypotheses_are_refused",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_the_preregistration_is_pinned",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_no_frozen_module_imports_the_frontier_package",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_the_frontier_package_never_writes_official_ledgers",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_frontier_power_is_the_only_power_in_the_package",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_two_desk_isolation_certificate",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_candidate_traces_preserve_the_dead",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_latency_claims_are_scoped_to_candidate_evolution",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_catalyst_absence_names_its_sources",
+   "file": "tests/test_frontier1.py"
+  },
+  {
+   "nodeid": "tests/test_frontier1.py::test_synthetic_cards_never_enter_the_learning_denominator",
+   "file": "tests/test_frontier1.py"
+  }
+ ],
+ "collected_count": 25,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier1.py::test_before_card_refuses_future_information": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_outcome_references_the_exact_before_hash": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_an_edited_card_is_refused_at_outcome_time": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_a_card_cannot_be_resealed_differently": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_unknown_sections_are_visible_holes": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_detection_cannot_precede_its_known_from": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_polling_is_never_labeled_streaming": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_the_equity_fabric_reports_polling_honestly": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_dislocations_are_observations_with_mechanisms_not_signals": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_event_repricing_is_forbidden_under_uncertain_attribution": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_unknown_never_outranks_known_good": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_the_board_is_deterministic": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_the_reasoning_router_touches_only_compute": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_unknown_persistence_caps_the_tier": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_all_three_registries_are_not_yet_estimable": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_post_hoc_hypotheses_are_refused": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_the_preregistration_is_pinned": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_no_frozen_module_imports_the_frontier_package": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_the_frontier_package_never_writes_official_ledgers": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_frontier_power_is_the_only_power_in_the_package": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_two_desk_isolation_certificate": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_candidate_traces_preserve_the_dead": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_latency_claims_are_scoped_to_candidate_evolution": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_catalyst_absence_names_its_sources": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier1.py::test_synthetic_cards_never_enter_the_learning_denominator": {
+   "file": "tests/test_frontier1.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 25,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier1.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 163.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35846.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116961280",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.68
+ }
+}

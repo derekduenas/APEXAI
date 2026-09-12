@@ -1,0 +1,110 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_nightly_pull_calendar.py::test_weekends_and_holidays_are_not_trading_days",
+   "file": "tests/test_nightly_pull_calendar.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull_calendar.py::test_the_calendar_is_the_one_the_intraday_clock_uses",
+   "file": "tests/test_nightly_pull_calendar.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull_calendar.py::test_the_window_is_trimmed_to_trading_days[2026-08-13-2026-08-16-expected0]",
+   "file": "tests/test_nightly_pull_calendar.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull_calendar.py::test_the_window_is_trimmed_to_trading_days[2026-08-14-2026-08-16-None]",
+   "file": "tests/test_nightly_pull_calendar.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull_calendar.py::test_the_window_is_trimmed_to_trading_days[2026-08-14-2026-08-15-None]",
+   "file": "tests/test_nightly_pull_calendar.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull_calendar.py::test_the_window_is_trimmed_to_trading_days[2026-08-14-2026-08-18-expected3]",
+   "file": "tests/test_nightly_pull_calendar.py"
+  },
+  {
+   "nodeid": "tests/test_nightly_pull_calendar.py::test_a_zero_row_trading_day_is_still_a_hard_failure",
+   "file": "tests/test_nightly_pull_calendar.py"
+  }
+ ],
+ "collected_count": 7,
+ "collect_errors": [],
+ "results": {
+  "tests/test_nightly_pull_calendar.py::test_weekends_and_holidays_are_not_trading_days": {
+   "file": "tests/test_nightly_pull_calendar.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull_calendar.py::test_the_calendar_is_the_one_the_intraday_clock_uses": {
+   "file": "tests/test_nightly_pull_calendar.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull_calendar.py::test_the_window_is_trimmed_to_trading_days[2026-08-13-2026-08-16-expected0]": {
+   "file": "tests/test_nightly_pull_calendar.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull_calendar.py::test_the_window_is_trimmed_to_trading_days[2026-08-14-2026-08-16-None]": {
+   "file": "tests/test_nightly_pull_calendar.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull_calendar.py::test_the_window_is_trimmed_to_trading_days[2026-08-14-2026-08-15-None]": {
+   "file": "tests/test_nightly_pull_calendar.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull_calendar.py::test_the_window_is_trimmed_to_trading_days[2026-08-14-2026-08-18-expected3]": {
+   "file": "tests/test_nightly_pull_calendar.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_nightly_pull_calendar.py::test_a_zero_row_trading_day_is_still_a_hard_failure": {
+   "file": "tests/test_nightly_pull_calendar.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 7,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_nightly_pull_calendar.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 157.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34761.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114761728",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.82
+ }
+}

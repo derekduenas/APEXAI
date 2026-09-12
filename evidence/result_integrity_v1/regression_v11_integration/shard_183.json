@@ -1,0 +1,1523 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_result_validator.py::test_frozen_reader_and_surface_are_untouched",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_original_reader_accepts_altered_result_field_but_validator_refuses[verdict-SIGNAL_DETECTED-contradicts]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_original_reader_accepts_altered_result_field_but_validator_refuses[p-nan-not a finite]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_original_reader_accepts_altered_result_field_but_validator_refuses[positive-True-contradicts]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_valid_no_signal_and_signal_detected_cells_pass",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_every_development_cell_validates_and_identity_helpers_are_the_real_ones",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_load_and_validate_runs_the_frozen_reader_first",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[contradictory_verdict]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_nan]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_inf]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[t_obs_nan]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[mean_d_inf]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[t_star_nan]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_above_one]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_zero]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_off_lattice]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_bool]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_string]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[index_bool]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[index_float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[direction_flipped]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[direction_int_not_bool]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[unknown_verdict]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[unknown_control]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[control_not_string]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_identity]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_runner]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_namespace]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_purpose]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_split_hash]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[split_hash_not_string]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_n_train]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[n_train_float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[n_eval_float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[n_eval_bool]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_seed]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[seed_bool]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[seed_float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[block_length_mismatch]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[block_length_float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[block_missing_key]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[secondary_missing_key]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[secondary_extra_key]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[missing_field]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[extra_field]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[sd_zero]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[acf_out_of_range]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[utc_string]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[court_hash_wrong]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[court_hash_not_hex]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n=None]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n+1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N=None]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N+1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max=None]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max+1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available=None]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available+1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read=None]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read+1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat=None]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat+1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M=None]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M+1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band=NaN]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band=inf]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band*1.01]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat=NaN]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat=inf]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat*1.01]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat=NaN]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat=inf]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat*1.01]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt=NaN]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt=inf]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt*1.01]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.lower=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.lower=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.lower=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.upper=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.upper=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.upper=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.proposed=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.proposed=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.proposed=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.block_length=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.block_length=float]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.block_length=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.clamped=unknown]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.clamped=None]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.rule=other]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.selector=other]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.variant=stationary]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.hac_t=NaN]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.hac_t=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.non_overlap_z=NaN]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.non_overlap_z=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.non_overlap_z=True]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.legacy_iid_z=NaN]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.legacy_iid_z=str]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.hac_verdict=other]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.non_overlap_verdict=int]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_one_world_cell_with_a_companion_seed_is_refused",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_selector_relationships_are_the_producers_own",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_signal_detected_cell_with_p_raised_above_alpha_is_contradictory",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_t_obs_versus_bootstrap_quantile_versus_p_relationship",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-companion_seed0]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-companion_seed1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-not an int0]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-not an int1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-not an int2]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-world roles]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-identical world hashes]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-sha256 hex]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_mini_court_audit_is_clean_and_recount_matches_stored",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_missing_cell_is_refused",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_unexpected_and_misnamed_cells_are_refused",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_duplicate_cell_content_under_another_name_is_refused",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_duplicate_cell_id_inside_aggregate_is_refused",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_individual_versus_aggregate_disagreement_is_refused",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_manifest_disagreement_is_refused",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_commitment_is_deterministic_and_order_independent[V1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_commitment_is_deterministic_and_order_independent[V1.1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_commitment_binds_every_adjudication_field_but_not_the_clock[V1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_commitment_binds_every_adjudication_field_but_not_the_clock[V1.1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_v1_and_v11_roots_differ_by_version_but_both_are_stable",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_v1_serialisation_is_strict",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_v11_tagged_representation_is_unambiguous",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_legitimate_infinity_diagnostic_validates_commits_and_verifies_under_v11",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_infinity_in_a_finite_by_contract_field_is_refused_by_both_layers",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_coherent_alteration_passes_validation_but_fails_the_trusted_commitment[V1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_coherent_alteration_passes_validation_but_fails_the_trusted_commitment[V1.1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_commitment_refuses_to_trust_a_root_stored_next_to_the_payload[V1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_commitment_refuses_to_trust_a_root_stored_next_to_the_payload[V1.1]",
+   "file": "tests/test_result_validator.py"
+  },
+  {
+   "nodeid": "tests/test_result_validator.py::test_commitment_refuses_duplicates_and_names_missing_trusted_entries",
+   "file": "tests/test_result_validator.py"
+  }
+ ],
+ "collected_count": 164,
+ "collect_errors": [],
+ "results": {
+  "tests/test_result_validator.py::test_frozen_reader_and_surface_are_untouched": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_original_reader_accepts_altered_result_field_but_validator_refuses[verdict-SIGNAL_DETECTED-contradicts]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_original_reader_accepts_altered_result_field_but_validator_refuses[p-nan-not a finite]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_original_reader_accepts_altered_result_field_but_validator_refuses[positive-True-contradicts]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_valid_no_signal_and_signal_detected_cells_pass": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_every_development_cell_validates_and_identity_helpers_are_the_real_ones": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_load_and_validate_runs_the_frozen_reader_first": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[contradictory_verdict]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_nan]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_inf]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[t_obs_nan]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[mean_d_inf]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[t_star_nan]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_above_one]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_zero]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_off_lattice]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_bool]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[p_string]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[index_bool]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[index_float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[direction_flipped]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[direction_int_not_bool]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[unknown_verdict]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[unknown_control]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[control_not_string]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_identity]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_runner]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_namespace]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_purpose]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_split_hash]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[split_hash_not_string]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_n_train]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[n_train_float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[n_eval_float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[n_eval_bool]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[wrong_seed]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[seed_bool]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[seed_float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[block_length_mismatch]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[block_length_float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[block_missing_key]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[secondary_missing_key]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[secondary_extra_key]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[missing_field]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[extra_field]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[sd_zero]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[acf_out_of_range]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[utc_string]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[court_hash_wrong]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_cell_alteration[court_hash_not_hex]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n=None]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.n+1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N=None]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.K_N+1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max=None]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_max+1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available=None]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.autocov_lags_available+1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read=None]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.max_lag_read+1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat=None]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.m_hat+1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M=None]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.M+1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band=NaN]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band=inf]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.band*1.01]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat=NaN]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat=inf]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.G_hat*1.01]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat=NaN]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat=inf]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.D_hat*1.01]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt=NaN]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt=inf]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.b_opt*1.01]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.lower=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.lower=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.lower=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.upper=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.upper=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.upper=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.proposed=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.proposed=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.proposed=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.block_length=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.block_length=float]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.block_length=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.clamped=unknown]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.clamped=None]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[block.rule=other]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.selector=other]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[selector.variant=stationary]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.hac_t=NaN]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.hac_t=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.non_overlap_z=NaN]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.non_overlap_z=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.non_overlap_z=True]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.legacy_iid_z=NaN]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.legacy_iid_z=str]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.hac_verdict=other]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_each_nested_field_alteration[secondary.non_overlap_verdict=int]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_one_world_cell_with_a_companion_seed_is_refused": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_selector_relationships_are_the_producers_own": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_signal_detected_cell_with_p_raised_above_alpha_is_contradictory": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_t_obs_versus_bootstrap_quantile_versus_p_relationship": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-companion_seed0]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-companion_seed1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-not an int0]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-not an int1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-not an int2]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-world roles]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-identical world hashes]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_validator_refuses_wrong_companion_or_world_role_provenance[<lambda>-sha256 hex]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_mini_court_audit_is_clean_and_recount_matches_stored": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_missing_cell_is_refused": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_unexpected_and_misnamed_cells_are_refused": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_duplicate_cell_content_under_another_name_is_refused": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_duplicate_cell_id_inside_aggregate_is_refused": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_individual_versus_aggregate_disagreement_is_refused": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_manifest_disagreement_is_refused": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_commitment_is_deterministic_and_order_independent[V1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_commitment_is_deterministic_and_order_independent[V1.1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_commitment_binds_every_adjudication_field_but_not_the_clock[V1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_commitment_binds_every_adjudication_field_but_not_the_clock[V1.1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_v1_and_v11_roots_differ_by_version_but_both_are_stable": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_v1_serialisation_is_strict": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_v11_tagged_representation_is_unambiguous": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_legitimate_infinity_diagnostic_validates_commits_and_verifies_under_v11": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_infinity_in_a_finite_by_contract_field_is_refused_by_both_layers": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_coherent_alteration_passes_validation_but_fails_the_trusted_commitment[V1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_coherent_alteration_passes_validation_but_fails_the_trusted_commitment[V1.1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_commitment_refuses_to_trust_a_root_stored_next_to_the_payload[V1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_commitment_refuses_to_trust_a_root_stored_next_to_the_payload[V1.1]": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_result_validator.py::test_commitment_refuses_duplicates_and_names_missing_trusted_entries": {
+   "file": "tests/test_result_validator.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 164,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_result_validator.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 294.6,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36979.service",
+   "memory_max": "1468006400",
+   "memory_peak": "257548288",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 34.06
+ }
+}

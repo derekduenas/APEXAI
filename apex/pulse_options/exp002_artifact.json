@@ -1,0 +1,84 @@
+{
+ "arm_used_by_pilot": "L",
+ "artifact": "EXP-002 fitted parameters (fit.params) copied verbatim from the sealed result record",
+ "experiment_status": "INVALID_NULL_CONTROL",
+ "no_validated_edge_claim": true,
+ "params": {
+  "C": {
+   "beta": [
+    4.921237507430839e-06,
+    -3.861016120588038e-06,
+    -1.4938059391608568e-05,
+    -2.3647073254412455e-06,
+    2.663719199753575e-05,
+    8.57566012223421e-07
+   ],
+   "mean": [
+    2.9589793014807476e-07,
+    1.78067379766927e-06,
+    1.0434887551489636e-07,
+    4.962897900672546e-07,
+    1.0009659565603722e-07
+   ],
+   "quadratic": true,
+   "rank": 6,
+   "rcond": 1e-12,
+   "sd": [
+    0.00032303063006360017,
+    0.0007044761310846813,
+    4.986216498687218e-07,
+    1.9542454578560787e-06,
+    6.37773461934837e-07
+   ],
+   "solver": "numpy.linalg.lstsq(SVD)"
+  },
+  "L": {
+   "beta": [
+    4.9212375074308384e-06,
+    -4.385065701348263e-06,
+    -1.4744925314289624e-05
+   ],
+   "mean": [
+    2.9589793014807476e-07,
+    1.78067379766927e-06
+   ],
+   "quadratic": false,
+   "rank": 3,
+   "rcond": 1e-12,
+   "sd": [
+    0.00032303063006360017,
+    0.0007044761310846813
+   ],
+   "solver": "numpy.linalg.lstsq(SVD)"
+  },
+  "base": {
+   "a": 4.962524361985471e-06,
+   "b1": -0.013574767508842438,
+   "b5": -0.020930340523513388,
+   "k": 2.932453397662227,
+   "n_train": 247692,
+   "params_hash": "eb1ac599b503496b"
+  },
+  "fits_performed": 5,
+  "n_train": 247692,
+  "params_hash": "ca04fc6e713e1a5c",
+  "t": {
+   "converged": true,
+   "init": {
+    "nu0": 6.0,
+    "s0": 3.266879810350951
+   },
+   "iterations": 55,
+   "n": 247692,
+   "nll": 686423.9230567191,
+   "nu": 6.384478029123821,
+   "nu_at_lower_bound": false,
+   "nu_at_upper_bound": false,
+   "s": 3.287952250006828
+  }
+ },
+ "params_hash_recipe": "sha256(json.dumps({k:v for k,v in params.items() if k != 'params_hash'}, sort_keys=True, default=float))[:16]",
+ "source_commit": "2a09d1ed",
+ "source_record": "/apex-data/research-exp002/out/ALPHA-EXP-002/runs/20260909T193814Z-exp002-ca450243/_RESULT.json",
+ "source_record_sha256": "0c397d703a83fcb915fef47b96fd6a75c1822ab21dd80bcbe27d90f1cdf9ad3f"
+}

@@ -1,0 +1,443 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_half_days_are_not_four_oclock",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_holidays_and_weekends_are_not_trading_days",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_holiday_never_reaches_a_trading_phase",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_the_lifecycle_walks_in_order_on_a_normal_day",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_required_check_that_fails_refuses_the_arm",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_optional_failures_do_not_block_the_arm",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_alive_is_not_started",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_the_sentinel_waits_its_declared_grace",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_first_work_confirms_the_start",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_both_failure_directions_are_critical",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_the_mac_holds_no_runtime_authority",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_no_cloud_service_references_a_mac_path",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_every_service_declares_how_to_start_itself",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_edgeforge_is_an_always_on_sidecar_not_a_session_job",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_options_paper_is_required_for_arm",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_the_roster_does_not_invent_dependencies",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_the_calendar_owns_triggering_and_systemd_owns_supervision",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_an_observation_without_lineage_is_refused",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_the_consumer_catches_up_after_an_outage",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_failed_record_is_retried_never_skipped",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_committing_the_same_record_twice_is_a_noop",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_two_consumers_cannot_share_one_cursor",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_stalled_consumer_during_a_session_is_critical",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_records_keep_their_source_lineage",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_dirty_dev_tree_can_never_block_the_gate",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_release_with_no_manifest_is_blocked",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_release_outside_canonical_history_is_blocked",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_failing_suite_cannot_be_built_into_a_manifest",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_an_incomplete_manifest_is_refused",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_ping_timeout_none_no_longer_kills_the_reconnect_writer",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_the_recency_window_is_computed_safely_in_source",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_every_spec_name_matches_a_real_heartbeat_identity",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_recent_incidents_respect_the_lookback_window",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_degraded_host_is_safe_blocked_not_failed",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_an_unready_fabric_blocks_the_session",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_all_four_operator_named_gates_are_required",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_intentional_ineligibility_is_never_missed_work",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_genuinely_skipped_eligible_symbol_is_missed_work",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_et_naive_card_times_convert_correctly",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_dst_is_handled_by_construction_not_by_memory",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_an_undeclared_source_is_refused_not_defaulted",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_the_causal_window_excludes_both_failure_modes",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_a_backwards_window_is_refused",
+   "file": "tests/test_runtime_autonomy.py"
+  },
+  {
+   "nodeid": "tests/test_runtime_autonomy.py::test_kill_restart_loses_no_observation_and_duplicates_none",
+   "file": "tests/test_runtime_autonomy.py"
+  }
+ ],
+ "collected_count": 44,
+ "collect_errors": [],
+ "results": {
+  "tests/test_runtime_autonomy.py::test_half_days_are_not_four_oclock": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_holidays_and_weekends_are_not_trading_days": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_holiday_never_reaches_a_trading_phase": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_the_lifecycle_walks_in_order_on_a_normal_day": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_required_check_that_fails_refuses_the_arm": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_optional_failures_do_not_block_the_arm": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_alive_is_not_started": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_the_sentinel_waits_its_declared_grace": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_first_work_confirms_the_start": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_both_failure_directions_are_critical": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_the_mac_holds_no_runtime_authority": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_no_cloud_service_references_a_mac_path": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_every_service_declares_how_to_start_itself": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_edgeforge_is_an_always_on_sidecar_not_a_session_job": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_options_paper_is_required_for_arm": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_the_roster_does_not_invent_dependencies": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_the_calendar_owns_triggering_and_systemd_owns_supervision": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_an_observation_without_lineage_is_refused": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_the_consumer_catches_up_after_an_outage": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_failed_record_is_retried_never_skipped": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_committing_the_same_record_twice_is_a_noop": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_two_consumers_cannot_share_one_cursor": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_stalled_consumer_during_a_session_is_critical": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_records_keep_their_source_lineage": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_dirty_dev_tree_can_never_block_the_gate": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_release_with_no_manifest_is_blocked": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_release_outside_canonical_history_is_blocked": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_failing_suite_cannot_be_built_into_a_manifest": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_an_incomplete_manifest_is_refused": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_ping_timeout_none_no_longer_kills_the_reconnect_writer": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_the_recency_window_is_computed_safely_in_source": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_every_spec_name_matches_a_real_heartbeat_identity": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_recent_incidents_respect_the_lookback_window": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_degraded_host_is_safe_blocked_not_failed": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_an_unready_fabric_blocks_the_session": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_all_four_operator_named_gates_are_required": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_intentional_ineligibility_is_never_missed_work": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_genuinely_skipped_eligible_symbol_is_missed_work": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_et_naive_card_times_convert_correctly": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_dst_is_handled_by_construction_not_by_memory": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_an_undeclared_source_is_refused_not_defaulted": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_the_causal_window_excludes_both_failure_modes": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_a_backwards_window_is_refused": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_runtime_autonomy.py::test_kill_restart_loses_no_observation_and_duplicates_none": {
+   "file": "tests/test_runtime_autonomy.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 44,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_runtime_autonomy.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.5,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36370.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116543488",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.81
+ }
+}

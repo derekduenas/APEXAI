@@ -1,0 +1,110 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_intraday_treasury_rate_source.py::test_source_name_is_never_assumed",
+   "file": "tests/test_intraday_treasury_rate_source.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_treasury_rate_source.py::test_no_hardcoded_yield_in_module",
+   "file": "tests/test_intraday_treasury_rate_source.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_treasury_rate_source.py::test_interpolation_method_is_named",
+   "file": "tests/test_intraday_treasury_rate_source.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_treasury_rate_source.py::test_provenance_carries_every_required_field",
+   "file": "tests/test_intraday_treasury_rate_source.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_treasury_rate_source.py::test_unreachable_source_raises_rather_than_substituting",
+   "file": "tests/test_intraday_treasury_rate_source.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_treasury_rate_source.py::test_sub_front_tenor_returns_none_not_extrapolation",
+   "file": "tests/test_intraday_treasury_rate_source.py"
+  },
+  {
+   "nodeid": "tests/test_intraday_treasury_rate_source.py::test_tenor_fields_cover_the_published_curve",
+   "file": "tests/test_intraday_treasury_rate_source.py"
+  }
+ ],
+ "collected_count": 7,
+ "collect_errors": [],
+ "results": {
+  "tests/test_intraday_treasury_rate_source.py::test_source_name_is_never_assumed": {
+   "file": "tests/test_intraday_treasury_rate_source.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_treasury_rate_source.py::test_no_hardcoded_yield_in_module": {
+   "file": "tests/test_intraday_treasury_rate_source.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_treasury_rate_source.py::test_interpolation_method_is_named": {
+   "file": "tests/test_intraday_treasury_rate_source.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_treasury_rate_source.py::test_provenance_carries_every_required_field": {
+   "file": "tests/test_intraday_treasury_rate_source.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_treasury_rate_source.py::test_unreachable_source_raises_rather_than_substituting": {
+   "file": "tests/test_intraday_treasury_rate_source.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_treasury_rate_source.py::test_sub_front_tenor_returns_none_not_extrapolation": {
+   "file": "tests/test_intraday_treasury_rate_source.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_intraday_treasury_rate_source.py::test_tenor_fields_cover_the_published_curve": {
+   "file": "tests/test_intraday_treasury_rate_source.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 7,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_intraday_treasury_rate_source.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 159.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36596.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115474432",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.42
+ }
+}

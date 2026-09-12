@@ -1,0 +1,8 @@
+2026-09-05T19:02:06Z R7.1 chain start commit=31a586606 dirty=0 surface=f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d
+2026-09-05T19:02:06Z STEP 1: pre-court bounded regression on exact commit (contained shards)
+master inventory: 4012 nodeids in 222 files, errors 0, hash 4a3b9b28f95c6444, ok True
+shard 219/222 tests/test_world_model_r71_qualification.py          rc=1   31.8s rss= 292.0MiB peak=243 oom=0 PASS=12/FAIL=1 PROBLEMS:FAIL:tests/test_world_model_r71_qualification.py::test_no_acceptance_namespace_exists_during_qualification
+totals {'PASS': 3992, 'FAIL': 1, 'ERROR': 0, 'SKIP': 19, 'XFAIL': 0, 'XPASS': 0, 'UNREPORTED': 0} | missing 0 unexpected 0 dup 0 unaccounted 0 | shards failed ['tests/test_world_model_r71_qualification.py'] | surface changed False | max peak 699 MiB | oom 0
+BOUNDED_FULL_REGRESSION_V0: FAIL elapsed 1521s
+2026-09-05T19:27:27Z precourt regression: FAIL 31a586606 False 4012 {'PASS': 3992, 'FAIL': 1, 'ERROR': 0, 'SKIP': 19, 'XFAIL': 0, 'XPASS': 0, 'UNREPORTED': 0}
+2026-09-05T19:27:27Z PRECOURT REGRESSION NOT PASS -> COURT NOT OPENED

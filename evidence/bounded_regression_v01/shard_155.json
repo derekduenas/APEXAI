@@ -1,0 +1,1082 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_observatory_reaches_no_production_decision_module",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_runtime_script_reaches_no_production_decision_module",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_observatory_writes_only_under_its_own_root",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_observatory_write_root_is_its_own",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_no_module_grants_authority",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_every_state_carries_observatory_decision_power",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_damaged_inputs_never_corroborate_into_confidence",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_a_required_invalid_feature_makes_the_pattern_not_estimable",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_feature_sufficiency_differs_within_one_damaged_series",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_negative_freshness_is_a_clock_violation_not_freshness",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_feature_cannot_exceed_its_source_quality",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_observatory_features_must_carry_the_obs_prefix",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_obs_features_never_claim_to_be_canonical_or_hunter_equivalent",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_formula_hash_changes_when_the_formula_changes",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_rvol_without_a_baseline_is_not_estimable_never_a_number",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_defensive_rotation_is_recognised",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_tech_internal_divergence_suppresses_a_tech_leadership_label",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_too_few_sectors_is_unknown_not_a_guess",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_breadth_never_calls_the_universe_the_market",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_breadth_divergence_is_detected",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_a_value_cannot_be_supplied_for_an_unacquired_source",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_positioning_reports_unavailable_not_empty_optimism",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_crowding_without_data_is_unknown",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_forced_flow_distinguishes_unobservable_from_absent",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_negative_quote_age_suppresses_the_surface",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_five_price_derived_components_are_one_mechanism",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_percentile_refuses_a_single_session_denominator",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_rarity_never_implies_profitability",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_pattern_id_is_order_independent",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_conjunction_never_claims_edge",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_expected_next_step_never_points_backwards",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_out_of_order_observation_is_recorded_not_rejected",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_high_alignment_is_not_a_trade",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_probability_is_disabled_by_default",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_no_numeric_probability_appears_anywhere_in_the_package",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_assassin_does_not_reuse_the_production_curvature_wound",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_single_mechanism_is_lethal",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_unreachable_wounds_are_declared_not_silently_skipped",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_outcome_resolver_cannot_see_the_future",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_no_event_is_a_first_class_outcome",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_baseline_comparison_reports_no_p_value",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_backfilled_can_never_be_prospective",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_pre_birth_is_historical_context",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_birth_cannot_be_reminted",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_registry_has_no_violations",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_registry_has_no_hungry_consumers",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_live_active_requires_a_live_caller",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_a_live_active_orphan_output_is_a_violation",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_interface_only_must_declare_data_availability",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_a_component_cannot_declare_non_observatory_power",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_btc_perps_is_declared_but_not_available",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_sleeve_relevance_never_selects_an_expression",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_every_family_is_observational_with_no_authority",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_twelve_families_are_registered",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_supporting_and_contradicting_are_never_netted",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_no_organ_requires_a_downstream_state_to_compute_itself",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_probability_gate_is_closed_with_no_evidence",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_probability_gate_needs_every_dimension_not_just_n",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_ood_blocks_estimation_even_with_support",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_brier_refuses_small_samples_and_measures_skill_not_score",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_forward_distribution_forbids_narrative_probability",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_five_price_indicators_fuse_far_weaker_than_five_mechanisms",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_duplicated_evidence_can_never_sum_linearly",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_invalid_quality_contributes_nothing_to_fusion",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_fusion_is_not_a_probability",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_information_lead_uses_only_pre_observation_volatility",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_negative_lead_is_retained_as_the_finding",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_lead_summary_refuses_a_verdict_on_thin_support",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_cftc_contracts_are_full_string_matches_not_substrings",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_cftc_fetch_raises_rather_than_returning_empty",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_cftc_fact_is_never_labelled_live_or_smart_money",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_cftc_percentile_refuses_short_history",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_finra_is_short_volume_never_short_interest",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_finra_raises_on_a_holiday_rather_than_returning_empty",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_finra_thin_volume_is_not_estimable",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_external_sources_are_declared_not_inferred",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_positioning_is_no_longer_interface_only",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_known_from_may_never_precede_event_time",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_cftc_publication_time_is_the_friday_after_the_tuesday",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_visible_at_gates_historical_replay",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_cftc_facts_stamp_publication_not_report_date",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_every_lagged_source_declares_a_policy",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_undeclared_source_refuses_to_produce_a_publication_time",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_not_yet_published_is_expected_and_is_not_an_error",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_stale_within_policy_is_acceptable_not_an_error",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_stale_beyond_policy_is_degraded_but_still_not_a_failure",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_only_real_faults_are_errors",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_finra_mid_session_falls_back_instead_of_failing",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_a_genuine_outage_across_the_window_is_a_real_error",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_runtime_does_not_error_on_expected_finra_latency",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_support_was_never_wired_before_this_fix",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_prospective_n_is_permanently_zero_without_a_support_argument",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_future_known_from_is_excluded_the_known_from_safety_law",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_episodes_are_deduped_not_double_counted_per_cycle",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_historical_and_prospective_are_permanently_disjoint",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_historical_n_can_never_satisfy_the_probability_gate",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_backfilled_rows_never_count_toward_either_bucket",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_distinct_sessions_symbols_regimes_computed_correctly",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_a_different_family_id_never_contaminates_the_count",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_support_is_reusable_unchanged_for_future_historical_replay",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_registry_reflects_the_support_component",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_atm_is_computed_within_one_expiry_never_mixed",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_primary_expiry_is_front_month_deterministic",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_reobserving_identical_data_produces_no_false_repricing",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_iv_change_compares_the_same_expiry_never_a_different_one",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_expiry_roll_refuses_to_diff_across_a_maturity_change",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_term_structure_is_built_from_correct_per_expiry_atms",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_an_expiry_below_the_per_expiry_floor_is_excluded_not_averaged_in",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_options_surface_reproduces_the_real_2026_08_19_finding",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_two_families_same_conjunction_get_different_pattern_ids",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_same_family_same_episode_id_is_stable_across_cycles",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_family_pattern_id_uses_canonical_json_not_concatenation",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_pattern_id_schema_version_is_persisted",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_expire_produces_terminal_rows_with_episode_identity",
+   "file": "tests/test_pattern_observatory.py"
+  },
+  {
+   "nodeid": "tests/test_pattern_observatory.py::test_runtime_calls_expire_and_persists_terminal_rows",
+   "file": "tests/test_pattern_observatory.py"
+  }
+ ],
+ "collected_count": 115,
+ "collect_errors": [],
+ "results": {
+  "tests/test_pattern_observatory.py::test_observatory_reaches_no_production_decision_module": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_runtime_script_reaches_no_production_decision_module": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_observatory_writes_only_under_its_own_root": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_observatory_write_root_is_its_own": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_no_module_grants_authority": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_every_state_carries_observatory_decision_power": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_damaged_inputs_never_corroborate_into_confidence": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_a_required_invalid_feature_makes_the_pattern_not_estimable": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_feature_sufficiency_differs_within_one_damaged_series": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_negative_freshness_is_a_clock_violation_not_freshness": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_feature_cannot_exceed_its_source_quality": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_observatory_features_must_carry_the_obs_prefix": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_obs_features_never_claim_to_be_canonical_or_hunter_equivalent": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_formula_hash_changes_when_the_formula_changes": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_rvol_without_a_baseline_is_not_estimable_never_a_number": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_defensive_rotation_is_recognised": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_tech_internal_divergence_suppresses_a_tech_leadership_label": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_too_few_sectors_is_unknown_not_a_guess": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_breadth_never_calls_the_universe_the_market": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_breadth_divergence_is_detected": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_a_value_cannot_be_supplied_for_an_unacquired_source": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_positioning_reports_unavailable_not_empty_optimism": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_crowding_without_data_is_unknown": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_forced_flow_distinguishes_unobservable_from_absent": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_negative_quote_age_suppresses_the_surface": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_five_price_derived_components_are_one_mechanism": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_percentile_refuses_a_single_session_denominator": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_rarity_never_implies_profitability": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_pattern_id_is_order_independent": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_conjunction_never_claims_edge": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_expected_next_step_never_points_backwards": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_out_of_order_observation_is_recorded_not_rejected": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_high_alignment_is_not_a_trade": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_probability_is_disabled_by_default": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_no_numeric_probability_appears_anywhere_in_the_package": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_assassin_does_not_reuse_the_production_curvature_wound": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_single_mechanism_is_lethal": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_unreachable_wounds_are_declared_not_silently_skipped": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_outcome_resolver_cannot_see_the_future": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_no_event_is_a_first_class_outcome": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_baseline_comparison_reports_no_p_value": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_backfilled_can_never_be_prospective": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_pre_birth_is_historical_context": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_birth_cannot_be_reminted": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_registry_has_no_violations": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_registry_has_no_hungry_consumers": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_live_active_requires_a_live_caller": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_a_live_active_orphan_output_is_a_violation": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_interface_only_must_declare_data_availability": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_a_component_cannot_declare_non_observatory_power": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_btc_perps_is_declared_but_not_available": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_sleeve_relevance_never_selects_an_expression": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_every_family_is_observational_with_no_authority": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_twelve_families_are_registered": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_supporting_and_contradicting_are_never_netted": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_no_organ_requires_a_downstream_state_to_compute_itself": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_probability_gate_is_closed_with_no_evidence": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_probability_gate_needs_every_dimension_not_just_n": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_ood_blocks_estimation_even_with_support": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_brier_refuses_small_samples_and_measures_skill_not_score": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_forward_distribution_forbids_narrative_probability": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_five_price_indicators_fuse_far_weaker_than_five_mechanisms": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_duplicated_evidence_can_never_sum_linearly": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_invalid_quality_contributes_nothing_to_fusion": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_fusion_is_not_a_probability": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_information_lead_uses_only_pre_observation_volatility": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_negative_lead_is_retained_as_the_finding": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_lead_summary_refuses_a_verdict_on_thin_support": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_cftc_contracts_are_full_string_matches_not_substrings": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_cftc_fetch_raises_rather_than_returning_empty": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_cftc_fact_is_never_labelled_live_or_smart_money": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_cftc_percentile_refuses_short_history": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_finra_is_short_volume_never_short_interest": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_finra_raises_on_a_holiday_rather_than_returning_empty": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_finra_thin_volume_is_not_estimable": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_external_sources_are_declared_not_inferred": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_positioning_is_no_longer_interface_only": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_known_from_may_never_precede_event_time": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_cftc_publication_time_is_the_friday_after_the_tuesday": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_visible_at_gates_historical_replay": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_cftc_facts_stamp_publication_not_report_date": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_every_lagged_source_declares_a_policy": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_undeclared_source_refuses_to_produce_a_publication_time": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_not_yet_published_is_expected_and_is_not_an_error": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_stale_within_policy_is_acceptable_not_an_error": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_stale_beyond_policy_is_degraded_but_still_not_a_failure": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_only_real_faults_are_errors": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_finra_mid_session_falls_back_instead_of_failing": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_a_genuine_outage_across_the_window_is_a_real_error": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_runtime_does_not_error_on_expected_finra_latency": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_support_was_never_wired_before_this_fix": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_prospective_n_is_permanently_zero_without_a_support_argument": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_future_known_from_is_excluded_the_known_from_safety_law": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_episodes_are_deduped_not_double_counted_per_cycle": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_historical_and_prospective_are_permanently_disjoint": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_historical_n_can_never_satisfy_the_probability_gate": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_backfilled_rows_never_count_toward_either_bucket": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_distinct_sessions_symbols_regimes_computed_correctly": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_a_different_family_id_never_contaminates_the_count": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_support_is_reusable_unchanged_for_future_historical_replay": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_registry_reflects_the_support_component": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_atm_is_computed_within_one_expiry_never_mixed": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_primary_expiry_is_front_month_deterministic": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_reobserving_identical_data_produces_no_false_repricing": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_iv_change_compares_the_same_expiry_never_a_different_one": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_expiry_roll_refuses_to_diff_across_a_maturity_change": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_term_structure_is_built_from_correct_per_expiry_atms": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_an_expiry_below_the_per_expiry_floor_is_excluded_not_averaged_in": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_options_surface_reproduces_the_real_2026_08_19_finding": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "SKIP",
+   "detail": "Skipped: production options live capture absent in this environment (Mac-only data, not code)"
+  },
+  "tests/test_pattern_observatory.py::test_two_families_same_conjunction_get_different_pattern_ids": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_same_family_same_episode_id_is_stable_across_cycles": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_family_pattern_id_uses_canonical_json_not_concatenation": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_pattern_id_schema_version_is_persisted": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_expire_produces_terminal_rows_with_episode_identity": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_pattern_observatory.py::test_runtime_calls_expire_and_persists_terminal_rows": {
+   "file": "tests/test_pattern_observatory.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 114,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 1,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_pattern_observatory.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 165.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35096.service",
+   "memory_max": "1468006400",
+   "memory_peak": "120475648",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.79
+ }
+}

@@ -1,0 +1,12 @@
+2026-09-05T18:09:42Z R7 chain start commit=5b41c4715 dirty=0 surface=f6b87f2947e2bf62403a04dcaeda0805bc62e8ca1cfebacdc7b14ef10856439d
+2026-09-05T18:09:42Z STEP 1: pre-court bounded regression on exact commit (contained shards)
+master inventory: 3998 nodeids in 221 files, errors 0, hash 97cde417cfcc032a, ok True
+totals {'PASS': 3979, 'FAIL': 0, 'ERROR': 0, 'SKIP': 19, 'XFAIL': 0, 'XPASS': 0, 'UNREPORTED': 0} | missing 0 unexpected 0 dup 0 unaccounted 0 | shards failed [] | surface changed False | max peak 701 MiB | oom 0
+BOUNDED_FULL_REGRESSION_V0: PASS elapsed 1550s
+2026-09-05T18:35:33Z precourt regression: PASS 5b41c4715 False 3998 {'PASS': 3979, 'FAIL': 0, 'ERROR': 0, 'SKIP': 19, 'XFAIL': 0, 'XPASS': 0, 'UNREPORTED': 0}
+2026-09-05T18:35:33Z STEP 2: OPEN the court (one-way) and run 300 cells (contained)
+COURT OPENED COURT-FINAL-ae42a5e4fda7 cells expected 300
+overlap: None | pooled: None
+FINAL_SYNTHETIC_ACCEPTANCE_COURT_V0: RUN_INVALID | integrity: UNEXPECTED AttributeError: 'dict' object has no attribute 'config' | oom 4 -> 4 | elapsed 5s rss 170MiB
+2026-09-05T18:35:38Z court runner exit=0
+2026-09-05T18:35:38Z chain done

@@ -1,0 +1,200 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_aurelius.py::test_the_cio_has_a_name",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_the_identity_contract_is_sha_stamped",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_only_the_claude_subscription_transport_is_accepted",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_no_api_key_dependency_exists",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_missing_cli_is_visible_degradation_not_impersonation",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_the_conversation_has_nothing_to_press",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_the_cli_wrapper_is_equally_unarmed",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_the_contract_itself_refuses_authorization_language",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_an_exchange_is_chain_appended_and_forecasts_extracted",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_where_have_you_been_wrong_reads_the_durable_record",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_as_of_switches_to_causal_mode",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_the_prompt_carries_only_explicit_context",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_history_is_opt_in_and_bounded",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_the_review_gate_blocks_a_half_resolved_organism",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_the_review_gate_opens_when_everything_is_sealed",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_prose_about_forecasts_cannot_pollute_the_record",
+   "file": "tests/test_aurelius.py"
+  },
+  {
+   "nodeid": "tests/test_aurelius.py::test_governance_seals_reach_the_cio_with_their_content",
+   "file": "tests/test_aurelius.py"
+  }
+ ],
+ "collected_count": 17,
+ "collect_errors": [],
+ "results": {
+  "tests/test_aurelius.py::test_the_cio_has_a_name": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_the_identity_contract_is_sha_stamped": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_only_the_claude_subscription_transport_is_accepted": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_no_api_key_dependency_exists": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_missing_cli_is_visible_degradation_not_impersonation": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_the_conversation_has_nothing_to_press": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_the_cli_wrapper_is_equally_unarmed": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_the_contract_itself_refuses_authorization_language": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_an_exchange_is_chain_appended_and_forecasts_extracted": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_where_have_you_been_wrong_reads_the_durable_record": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_as_of_switches_to_causal_mode": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_the_prompt_carries_only_explicit_context": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_history_is_opt_in_and_bounded": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_the_review_gate_blocks_a_half_resolved_organism": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_the_review_gate_opens_when_everything_is_sealed": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_prose_about_forecasts_cannot_pollute_the_record": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_aurelius.py::test_governance_seals_reach_the_cio_with_their_content": {
+   "file": "tests/test_aurelius.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 17,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_aurelius.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35240.service",
+   "memory_max": "1468006400",
+   "memory_peak": "117018624",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.73
+ }
+}

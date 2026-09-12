@@ -1,0 +1,182 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_hac_reference.py::test_hac_tstat_with_no_lag_is_the_ordinary_t_statistic",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_hac_tstat_matches_the_pipeline_estimator",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_non_overlapping_windows_give_a_standard_normal_reference",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_overlapping_windows_make_bartlett_lag25_over_reject",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_truncating_at_the_true_ma_order_is_better_calibrated",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_the_bias_does_not_vanish_at_holdout_sample_length",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_reference_is_deterministic_given_its_seed",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_preregistered_threshold_is_looser_than_it_reads",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_family_wise_error_over_the_research_budget_is_reported",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_sample_drawn_from_the_reference_is_judged_consistent",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_inflated_tstats_are_caught",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_under_dispersed_tstats_are_caught",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_verdict_reports_its_own_power",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_reference_rejects_an_ic_series_whose_autocorrelation_is_wrong",
+   "file": "tests/test_hac_reference.py"
+  },
+  {
+   "nodeid": "tests/test_hac_reference.py::test_null_reference_is_a_frozen_value_object",
+   "file": "tests/test_hac_reference.py"
+  }
+ ],
+ "collected_count": 15,
+ "collect_errors": [],
+ "results": {
+  "tests/test_hac_reference.py::test_hac_tstat_with_no_lag_is_the_ordinary_t_statistic": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_hac_tstat_matches_the_pipeline_estimator": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_non_overlapping_windows_give_a_standard_normal_reference": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_overlapping_windows_make_bartlett_lag25_over_reject": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_truncating_at_the_true_ma_order_is_better_calibrated": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_the_bias_does_not_vanish_at_holdout_sample_length": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_reference_is_deterministic_given_its_seed": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_preregistered_threshold_is_looser_than_it_reads": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_family_wise_error_over_the_research_budget_is_reported": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_sample_drawn_from_the_reference_is_judged_consistent": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_inflated_tstats_are_caught": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_under_dispersed_tstats_are_caught": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_verdict_reports_its_own_power": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_reference_rejects_an_ic_series_whose_autocorrelation_is_wrong": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_hac_reference.py::test_null_reference_is_a_frozen_value_object": {
+   "file": "tests/test_hac_reference.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 15,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_hac_reference.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 264.5,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35026.service",
+   "memory_max": "1468006400",
+   "memory_peak": "225058816",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 7.84
+ }
+}

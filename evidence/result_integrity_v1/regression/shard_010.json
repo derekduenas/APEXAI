@@ -1,0 +1,236 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_mid_cascade_is_structurally_refused",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_exhaustion_is_the_moment_that_can_be_attacked",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_the_attack_is_the_other_side_of_the_forced_flow",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_forced_shorts_invert_the_direction",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_a_great_location_with_no_thesis_is_not_an_attack",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_an_unaskable_thesis_refuses_structurally",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_an_invalid_book_is_structurally_impossible",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_a_crossed_book_is_refused",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_no_book_at_all_refuses_rather_than_assuming",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_size_is_judged_against_the_actual_book",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_a_negligible_footprint_is_named_as_the_small_account_edge",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_a_wide_spread_downgrades_without_refusing",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_an_attack_without_an_invalidation_is_refused",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_a_distant_invalidation_is_flagged",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_an_unfavourable_tail_is_flagged",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_extended_chase_is_flagged_not_ignored",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_every_rule_is_classified",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_only_structural_wounds_can_refuse",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_geometry_holds_no_decision_power_and_no_calibration",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_execution_state_is_always_declared",
+   "file": "tests/test_btc_attack_geometry.py"
+  },
+  {
+   "nodeid": "tests/test_btc_attack_geometry.py::test_continuous_measurements_are_preserved_for_later_study",
+   "file": "tests/test_btc_attack_geometry.py"
+  }
+ ],
+ "collected_count": 21,
+ "collect_errors": [],
+ "results": {
+  "tests/test_btc_attack_geometry.py::test_mid_cascade_is_structurally_refused": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_exhaustion_is_the_moment_that_can_be_attacked": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_the_attack_is_the_other_side_of_the_forced_flow": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_forced_shorts_invert_the_direction": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_a_great_location_with_no_thesis_is_not_an_attack": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_an_unaskable_thesis_refuses_structurally": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_an_invalid_book_is_structurally_impossible": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_a_crossed_book_is_refused": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_no_book_at_all_refuses_rather_than_assuming": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_size_is_judged_against_the_actual_book": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_a_negligible_footprint_is_named_as_the_small_account_edge": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_a_wide_spread_downgrades_without_refusing": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_an_attack_without_an_invalidation_is_refused": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_a_distant_invalidation_is_flagged": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_an_unfavourable_tail_is_flagged": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_extended_chase_is_flagged_not_ignored": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_every_rule_is_classified": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_only_structural_wounds_can_refuse": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_geometry_holds_no_decision_power_and_no_calibration": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_execution_state_is_always_declared": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_attack_geometry.py::test_continuous_measurements_are_preserved_for_later_study": {
+   "file": "tests/test_btc_attack_geometry.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 21,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_btc_attack_geometry.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36196.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115507200",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.4
+ }
+}

@@ -1,0 +1,12 @@
+{
+ "evidence": "the first refusal (SCOPE_INVALID) had to be recovered by re-running the argv by hand because the wrapper had dropped it",
+ "finding": "WRAPPER_REPORTS_EXIT_0_FOR_A_FAILED_RUN",
+ "fix_available_without_new_signature": true,
+ "fixed_here": false,
+ "in_bound_source": false,
+ "mechanism": "run_launch catches ActivationRefused and records returncode=None rather than a failure flag; _cli then returns `0 if rec.get('ok', True) else 3`, and the launch plan carries no 'ok' key, so the default wins",
+ "observed": "the experiment was OOM-killed, and `research_activation.py launch --apply` still exited 0",
+ "second_effect": "on failure the inner process stdout is discarded, keeping only systemd's status text \u2014 the refusal or traceback that explains the failure is exactly what is thrown away",
+ "severity": "material \u2014 a command claiming success is not evidence",
+ "why_not": "not on the authorised path for this step; recorded for the authority"
+}

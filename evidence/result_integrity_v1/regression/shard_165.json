@@ -1,0 +1,245 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_reality_harness.py::test_chain_appends_and_verifies",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_counterexample_an_edited_entry_breaks_the_chain",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_counterexample_truncation_disagrees_with_the_anchor",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_the_resolution_rule_is_frozen_at_creation",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_certainty_is_rejected",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_brier_and_log_loss_match_hand_computation",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_calibration_curve_recovers_a_known_calibrated_generator",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_a_deliberately_overconfident_generator_is_exposed",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_a_base_rate_parrot_is_reliable_but_has_zero_resolution",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_every_rule_resolves_the_same_way_twice",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_a_prediction_before_data_reaches_the_horizon_is_not_resolvable",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_a_past_due_unresolved_prediction_scores_as_a_failure",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_counterexample_a_not_yet_due_prediction_is_simply_not_scored",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_the_blind_twin_signature_cannot_carry_market_data",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_the_blind_twin_inputs_hash_is_the_hash_of_nothing",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_counterexample_the_rank_producer_hash_reflects_its_market_input",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_momentum_rank_baseline_uses_the_same_frozen_mapping",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_the_stripped_prompt_contains_no_market_numbers",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_probability_parsing_rejects_garbage_and_clamps_certainty",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_an_llm_pair_is_all_or_nothing",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_parallel_models_are_distinct_producers_never_substitutes",
+   "file": "tests/test_reality_harness.py"
+  },
+  {
+   "nodeid": "tests/test_reality_harness.py::test_scores_are_stamped_preliminary_until_ten_effective_dates",
+   "file": "tests/test_reality_harness.py"
+  }
+ ],
+ "collected_count": 22,
+ "collect_errors": [],
+ "results": {
+  "tests/test_reality_harness.py::test_chain_appends_and_verifies": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_counterexample_an_edited_entry_breaks_the_chain": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_counterexample_truncation_disagrees_with_the_anchor": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_the_resolution_rule_is_frozen_at_creation": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_certainty_is_rejected": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_brier_and_log_loss_match_hand_computation": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_calibration_curve_recovers_a_known_calibrated_generator": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_a_deliberately_overconfident_generator_is_exposed": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_a_base_rate_parrot_is_reliable_but_has_zero_resolution": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_every_rule_resolves_the_same_way_twice": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_a_prediction_before_data_reaches_the_horizon_is_not_resolvable": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_a_past_due_unresolved_prediction_scores_as_a_failure": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_counterexample_a_not_yet_due_prediction_is_simply_not_scored": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_the_blind_twin_signature_cannot_carry_market_data": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_the_blind_twin_inputs_hash_is_the_hash_of_nothing": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_counterexample_the_rank_producer_hash_reflects_its_market_input": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_momentum_rank_baseline_uses_the_same_frozen_mapping": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_the_stripped_prompt_contains_no_market_numbers": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_probability_parsing_rejects_garbage_and_clamps_certainty": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_an_llm_pair_is_all_or_nothing": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_parallel_models_are_distinct_producers_never_substitutes": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_reality_harness.py::test_scores_are_stamped_preliminary_until_ten_effective_dates": {
+   "file": "tests/test_reality_harness.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 22,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_reality_harness.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 161.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36351.service",
+   "memory_max": "1468006400",
+   "memory_peak": "117440512",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.43
+ }
+}

@@ -1,0 +1,58 @@
+2026-09-04T15:03:50Z chain start -- waiting: observer inactive AND clock >= 20:11Z
+2026-09-04T19:03:32Z CHAIN SUPERSEDED: RESOURCE_ISOLATION_PRECONDITION_NOT_STRONG_ENOUGH -- apex-research.slice hosts production services; no compute step was reached; no acceptance seed executed
+2026-09-04T19:05:17Z chain v2 start (dedicated wmresearch.slice) -- waiting: observer inactive AND clock >= 20:11Z
+2026-09-04T20:11:18Z window closed: observer=inactive stop=inactive
+2026-09-04T20:11:18Z STEP 1: seal Gate-2 BLOCKED / NOT_RUN
+EQUITY-FABRIC-GATE2-RTH-2026-09-04-BLOCKED sealed; samples 420
+2026-09-04T20:11:18Z STEP 2: isolation proof -- production cgroup paths:
+  apex-btc-derivatives.service /apex.slice/apex-market.slice/apex-btc-derivatives.service
+  apex-btc-ws.service /apex.slice/apex-market.slice/apex-btc-ws.service
+  apex-catalyst.service /apex.slice/apex-background.slice/apex-catalyst.service
+  apex-edgeforge-observatory.service /apex.slice/apex-research.slice/apex-edgeforge-observatory.service
+  apex-equity-field.service /apex.slice/apex-research.slice/apex-equity-field.service
+  apex-equity-shadow.service /apex.slice/apex-background.slice/apex-equity-shadow.service
+  apex-orchestrator.service /apex.slice/apex-market.slice/apex-orchestrator.service
+  apex-organism.service /apex.slice/apex-market.slice/apex-organism.service
+  apex-thetaterminal.service /apex.slice/apex-market.slice/apex-thetaterminal.service
+  wmresearch.slice members: 0
+2026-09-04T20:11:18Z STEP 2b: containment negative control (expect SIGKILL on over-allocation)
+cgroup      : /wmresearch.slice/run-u34410.service
+memory.max  : 1468006400 (unit)
+slice max   : 1610612736 (wmresearch.slice)
+in dedicated WM slice: True
+PRODUCTION_SERVICES_IN_WM_SLICE = 0
+ALLOC_ATTEMPT: 100 MiB chunks up to 1800 MiB; the unit limit is 1400M, slice 1536M
+  allocated 100 MiB
+  allocated 200 MiB
+  allocated 300 MiB
+  allocated 400 MiB
+  allocated 500 MiB
+  allocated 600 MiB
+  allocated 700 MiB
+  allocated 800 MiB
+  allocated 900 MiB
+  allocated 1000 MiB
+  allocated 1100 MiB
+  allocated 1200 MiB
+  allocated 1300 MiB
+2026-09-04T20:11:21Z proof exit=1 (137/SIGKILL = contained; 4 = NOT contained)
+2026-09-04T20:11:21Z STEP 3: focused WM tests (contained)
+.................................................................        [100%]
+65 passed in 7.20s
+2026-09-04T20:11:32Z STEP 4: calibration exercise (contained)
+NULL_iid_n465                  rej=0.0350 CI=[0.021,0.058] p50=0.470 bl=15/15/23 clamp={'lower': 399, 'none': 1, 'upper': 0} t_sd=1.08 ok
+Traceback (most recent call last):
+  File "/opt/apex-research/world-model-shadow/evidence/wm0e_r2_calibrate_bootstrap.py", line 49, in <module>
+    r = BS.bootstrap_test(d, court_id="CALIBRATION", control=name, seed=rep)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/apex-research/world-model-shadow/apex/world_model/bootstrap.py", line 209, in bootstrap_test
+    bl = block_length(x)
+         ^^^^^^^^^^^^^^^
+  File "/opt/apex-research/world-model-shadow/apex/world_model/bootstrap.py", line 176, in block_length
+    pw = politis_white_block_length(d)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/apex-research/world-model-shadow/apex/world_model/bootstrap.py", line 157, in politis_white_block_length
+    Rk = R[np.abs(ks)]
+         ~^^^^^^^^^^^^
+IndexError: index 50 is out of bounds for axis 0 with size 33
+2026-09-04T20:12:17Z calibration script error -> abort

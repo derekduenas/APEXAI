@@ -1,0 +1,98 @@
+{
+ "registration": {
+  "EXPERIMENT_ID": "ALPHA-EXP-001",
+  "REGISTRATION_VERSION": "EXP001_REGISTRATION_V0",
+  "HYPOTHESIS": "Conditional on the last 1 and 5 one-minute returns and the trailing 30-bar realised volatility, the 15-minute forward log return of SPY during the regular session has a distribution that a volatility-scaled Gaussian with a fitted conditional mean predicts with higher out-of-sample log likelihood than the same Gaussian with zero mean.",
+  "MECHANISM_PLAUSIBLE": "Short-horizon serial dependence in index returns is weak and widely known; where it exists it is small relative to the spread. The plausible reason it is not fully priced is that it is not worth anyone's spread to price it -- which is also why it may not be worth ours. That is the point of the economic stage.",
+  "MECHANISM_IS_NOT_A_FACT": true,
+  "SOURCE": "history-b/etf_continuous (alpaca_sip_raw_1m)",
+  "CORPUS_VERSION": "5c0d768b7ee2ea14",
+  "INSTRUMENT": "SPY",
+  "SESSION_UTC": [
+   "13:30",
+   "20:00"
+  ],
+  "CUTOFF_CONVENTION": "bar CLOSE at time t; the forecast may use bars with event_time <= t",
+  "HORIZON": "H_15M",
+  "HORIZON_STEPS": 15,
+  "TARGET": "log(close[t+15] / close[t])",
+  "FEATURE_SET_VERSION": "EXP001_OBSERVABLE_FEATURES_V0",
+  "FEATURES": [
+   "ret_1",
+   "ret_5",
+   "rv_30"
+  ],
+  "WARMUP_BARS": 30,
+  "NOT_AVAILABLE_IN_CORPUS": [
+   "spread_bps",
+   "trade_count",
+   "bid",
+   "ask"
+  ],
+  "M0": {
+   "id": "M0_VOL_SCALED_GAUSSIAN",
+   "mean": "zero",
+   "sigma": "rv_30 * k, k fit on TRAIN as mean(|y|)/mean(rv_30)"
+  },
+  "M1": {
+   "id": "M1_CONDITIONAL_GAUSSIAN",
+   "mean": "a + b1*ret_1 + b5*ret_5, OLS on TRAIN",
+   "sigma": "same as M0"
+  },
+  "SEARCH_BUDGET": {
+   "model_families": 2,
+   "feature_sets": 1,
+   "hyperparameters_tuned": 0
+  },
+  "PERIODS": {
+   "train": [
+    "2016-01-04",
+    "2019-12-31"
+   ],
+   "validation": [
+    "2020-01-01",
+    "2021-12-31"
+   ],
+   "evaluation": [
+    "2022-01-01",
+    "2024-12-31"
+   ],
+   "reserve": [
+    "2025-01-01",
+    "2026-08-28"
+   ]
+  },
+  "EMBARGO_BARS": 15,
+  "OVERLAP": "adjacent targets share 14 of 15 increments; dependence-aware statistic",
+  "STATISTIC": "DEPENDENCE_AWARE_DM_HAC_V0",
+  "DM_THRESHOLD": 2.0,
+  "HAC_LAG": 14,
+  "MIN_SAMPLES": 60,
+  "NULL_CONTROL": "N0_BLOCK_PERMUTATION: outcomes permuted across 20-bar blocks; state kept",
+  "PRIMARY_METRIC": "out-of-sample log likelihood differential, M1 minus M0",
+  "SECONDARY_METRICS": [
+   "pinball loss at 0.05/0.5/0.95",
+   "PIT calibration"
+  ],
+  "EXECUTION_MODEL": "NEXT_BAR_OPEN_PLUS_MODELLED_SPREAD",
+  "MODELLED_SPREAD_BPS": 2.0,
+  "EXPRESSIONS": [
+   "CASH",
+   "LONG_15M",
+   "SHORT_15M"
+  ],
+  "STOP": "1.0 * rv_30 below/above entry; certified 1R = stop distance + full round-trip spread",
+  "ECONOMIC_TEST": "On EVALUATION only, after the statistical stage: mean after-cost return of the selected expression, with a dependence-aware standard error, versus CASH = 0.",
+  "MARKET_BENCHMARK": "Executable price range = last close +/- modelled half-spread. Option-implied distribution at 15 minutes: NOT_ESTIMABLE from the sources on box; not claimed.",
+  "FAIL_STATISTICAL": "DM-HAC z <= 2.0 on VALIDATION -> NO_SIGNAL. Evaluation is not opened.",
+  "FAIL_ECONOMIC": "mean after-cost return of the best non-cash expression <= 0 -> NO_OPPORTUNITY",
+  "PASS": "z > 2.0 on validation AND z > 2.0 on evaluation AND after-cost mean > 0 with z_econ > 2.0 on evaluation. Even then: 'historically evaluated', not 'validated'.",
+  "NULL_MUST": "N0 must produce NO_SIGNAL. If it does not, the harness is broken and nothing counts.",
+  "COMPUTE": {
+   "bars_train": "~390k",
+   "runtime": "minutes, single process",
+   "memory": "< 1 GiB"
+  }
+ },
+ "registration_hash": "1a3f55a522f7595f179033827ad10d87e873b7839f1cc08fb05624067c8f391c"
+}

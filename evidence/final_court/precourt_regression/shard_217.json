@@ -1,0 +1,137 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_engine_and_surface_frozen",
+   "file": "tests/test_world_model_r7.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_seed_derivation_deterministic_role_labelled_and_new",
+   "file": "tests/test_world_model_r7.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_collision_audit_is_exhaustive_and_zero",
+   "file": "tests/test_world_model_r7.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_definition_is_pure_and_commits_to_everything",
+   "file": "tests/test_world_model_r7.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_budget_snapshot_carries_the_whole_history_without_touching_the_surface",
+   "file": "tests/test_world_model_r7.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_write_once_refuses_overwrite",
+   "file": "tests/test_world_model_r7.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_run_cell_refuses_unexpected_control_or_index",
+   "file": "tests/test_world_model_r7.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_cell_id_binds_worlds_and_index",
+   "file": "tests/test_world_model_r7.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_two_world_integrity_for_every_N0_and_N3_seed_without_running_models",
+   "file": "tests/test_world_model_r7.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_r7.py::test_judge_rules_per_control_and_never_pools",
+   "file": "tests/test_world_model_r7.py"
+  }
+ ],
+ "collected_count": 10,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_r7.py::test_engine_and_surface_frozen": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r7.py::test_seed_derivation_deterministic_role_labelled_and_new": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r7.py::test_collision_audit_is_exhaustive_and_zero": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r7.py::test_definition_is_pure_and_commits_to_everything": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r7.py::test_budget_snapshot_carries_the_whole_history_without_touching_the_surface": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r7.py::test_write_once_refuses_overwrite": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r7.py::test_run_cell_refuses_unexpected_control_or_index": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r7.py::test_cell_id_binds_worlds_and_index": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r7.py::test_two_world_integrity_for_every_N0_and_N3_seed_without_running_models": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_r7.py::test_judge_rules_per_control_and_never_pools": {
+   "file": "tests/test_world_model_r7.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 10,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_r7.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 164.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35485.service",
+   "memory_max": "1468006400",
+   "memory_peak": "122015744",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 15.65
+ }
+}

@@ -1,0 +1,398 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_news_says_is_not_provenance",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_unknown_source_authority_is_refused",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_one_event_is_not_a_hundred_catalysts",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_new_sources_update_an_event_they_do_not_clone_it",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_known_from_may_not_precede_first_seen",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_reaction_is_measured_from_known_from_not_event_time",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_after_hours_prints_never_enter_the_reaction",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_the_brain_may_not_compute_a_surprise",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_the_brain_may_not_claim_authority_or_trade",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_a_scalar_confidence_is_forbidden_on_purpose",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_the_contract_is_a_whitelist_not_a_blocklist",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_a_summary_without_a_cited_source_is_refused",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_the_brain_cannot_cite_documents_it_was_never_given",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_a_valid_interpretation_carries_its_prompt_version",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_a_mechanism_without_a_falsifier_is_a_story",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_surprise_is_deterministic_and_refuses_invention",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_verification_requires_a_fact_bearing_source",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_good_news_that_cannot_rally_is_a_failed_positive_reaction",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_an_ordinary_confirming_move_is_not_flagged_as_interesting",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_every_reaction_label_is_explicitly_non_alpha",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_the_catalyst_day_walks_its_phases_in_order",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_a_holiday_never_reaches_a_catalyst_phase",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_the_brain_runs_only_when_something_new_appeared",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_a_brief_must_state_what_it_does_not_know",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_catalyst_environment_is_descriptive_only",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_three_tickers_can_be_one_bet",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_genuinely_independent_candidates_are_not_refused",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_cash_is_a_real_competitor",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_zero_candidates_is_not_a_failure",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_there_is_no_magic_capital_score",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_declared_risk_must_be_positive",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_stress_convergence_is_distinguished_from_calm_correlation",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_unknown_beta_family_is_unknown_not_independent",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_an_event_heavy_day_reserves_rather_than_stacks",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_a_shadow_decision_is_sealed_before_the_outcome",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_a_decision_without_reasons_cannot_be_studied",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_the_comparison_refuses_a_verdict_on_a_tiny_sample",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_neither_component_can_touch_v1",
+   "file": "tests/test_catalyst_capital.py"
+  },
+  {
+   "nodeid": "tests/test_catalyst_capital.py::test_neither_component_exposes_a_way_to_trade",
+   "file": "tests/test_catalyst_capital.py"
+  }
+ ],
+ "collected_count": 39,
+ "collect_errors": [],
+ "results": {
+  "tests/test_catalyst_capital.py::test_news_says_is_not_provenance": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_unknown_source_authority_is_refused": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_one_event_is_not_a_hundred_catalysts": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_new_sources_update_an_event_they_do_not_clone_it": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_known_from_may_not_precede_first_seen": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_reaction_is_measured_from_known_from_not_event_time": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_after_hours_prints_never_enter_the_reaction": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_the_brain_may_not_compute_a_surprise": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_the_brain_may_not_claim_authority_or_trade": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_a_scalar_confidence_is_forbidden_on_purpose": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_the_contract_is_a_whitelist_not_a_blocklist": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_a_summary_without_a_cited_source_is_refused": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_the_brain_cannot_cite_documents_it_was_never_given": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_a_valid_interpretation_carries_its_prompt_version": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_a_mechanism_without_a_falsifier_is_a_story": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_surprise_is_deterministic_and_refuses_invention": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_verification_requires_a_fact_bearing_source": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_good_news_that_cannot_rally_is_a_failed_positive_reaction": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_an_ordinary_confirming_move_is_not_flagged_as_interesting": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_every_reaction_label_is_explicitly_non_alpha": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_the_catalyst_day_walks_its_phases_in_order": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_a_holiday_never_reaches_a_catalyst_phase": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_the_brain_runs_only_when_something_new_appeared": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_a_brief_must_state_what_it_does_not_know": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_catalyst_environment_is_descriptive_only": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_three_tickers_can_be_one_bet": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_genuinely_independent_candidates_are_not_refused": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_cash_is_a_real_competitor": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_zero_candidates_is_not_a_failure": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_there_is_no_magic_capital_score": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_declared_risk_must_be_positive": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_stress_convergence_is_distinguished_from_calm_correlation": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_unknown_beta_family_is_unknown_not_independent": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_an_event_heavy_day_reserves_rather_than_stacks": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_a_shadow_decision_is_sealed_before_the_outcome": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_a_decision_without_reasons_cannot_be_studied": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_the_comparison_refuses_a_verdict_on_a_tiny_sample": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_neither_component_can_touch_v1": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_catalyst_capital.py::test_neither_component_exposes_a_way_to_trade": {
+   "file": "tests/test_catalyst_capital.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 39,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_catalyst_capital.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36514.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115965952",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.45
+ }
+}

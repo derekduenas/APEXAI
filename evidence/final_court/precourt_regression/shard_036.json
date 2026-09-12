@@ -1,0 +1,110 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_decile_orientation.py::test_top_label_1_and_top_label_10_give_opposite_spreads",
+   "file": "tests/test_decile_orientation.py"
+  },
+  {
+   "nodeid": "tests/test_decile_orientation.py::test_counterexample_the_inherited_convention_reproduces_the_old_behaviour",
+   "file": "tests/test_decile_orientation.py"
+  },
+  {
+   "nodeid": "tests/test_decile_orientation.py::test_under_the_002_convention_this_fixture_is_not_monotone_top_over_bottom",
+   "file": "tests/test_decile_orientation.py"
+  },
+  {
+   "nodeid": "tests/test_decile_orientation.py::test_each_scorer_states_its_own_convention",
+   "file": "tests/test_decile_orientation.py"
+  },
+  {
+   "nodeid": "tests/test_decile_orientation.py::test_counterexample_a_panel_cannot_omit_its_convention",
+   "file": "tests/test_decile_orientation.py"
+  },
+  {
+   "nodeid": "tests/test_decile_orientation.py::test_counterexample_a_nonsense_label_is_refused",
+   "file": "tests/test_decile_orientation.py"
+  },
+  {
+   "nodeid": "tests/test_decile_orientation.py::test_the_recorded_apex_002_artifact_is_sign_inverted_as_documented",
+   "file": "tests/test_decile_orientation.py"
+  }
+ ],
+ "collected_count": 7,
+ "collect_errors": [],
+ "results": {
+  "tests/test_decile_orientation.py::test_top_label_1_and_top_label_10_give_opposite_spreads": {
+   "file": "tests/test_decile_orientation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_decile_orientation.py::test_counterexample_the_inherited_convention_reproduces_the_old_behaviour": {
+   "file": "tests/test_decile_orientation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_decile_orientation.py::test_under_the_002_convention_this_fixture_is_not_monotone_top_over_bottom": {
+   "file": "tests/test_decile_orientation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_decile_orientation.py::test_each_scorer_states_its_own_convention": {
+   "file": "tests/test_decile_orientation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_decile_orientation.py::test_counterexample_a_panel_cannot_omit_its_convention": {
+   "file": "tests/test_decile_orientation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_decile_orientation.py::test_counterexample_a_nonsense_label_is_refused": {
+   "file": "tests/test_decile_orientation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_decile_orientation.py::test_the_recorded_apex_002_artifact_is_sign_inverted_as_documented": {
+   "file": "tests/test_decile_orientation.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 7,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_decile_orientation.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35268.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114941952",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.73
+ }
+}

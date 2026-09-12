@@ -1,0 +1,173 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_no_strikes_gives_none_skew_and_smile",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_skew_slope_from_two_strikes",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_smile_curvature_needs_at_least_three_points",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_term_structure_slope_from_two_tenors",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_forward_variance_computed_between_two_tenors",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_forward_variance_none_when_negative",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_duplicate_tenors_refused",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_implied_move_from_straddle_and_spot",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_implied_move_none_without_both_inputs",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_iv_uncertainty_averages_spreads",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_time_derivative_fields_none_without_prior_snapshot",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_surface_velocity_computed_from_real_prior_snapshot",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_realized_vs_implied_gap_computed_when_realized_move_supplied",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  },
+  {
+   "nodeid": "tests/test_option_analytics_surface_physics.py::test_decision_power_stamped",
+   "file": "tests/test_option_analytics_surface_physics.py"
+  }
+ ],
+ "collected_count": 14,
+ "collect_errors": [],
+ "results": {
+  "tests/test_option_analytics_surface_physics.py::test_no_strikes_gives_none_skew_and_smile": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_skew_slope_from_two_strikes": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_smile_curvature_needs_at_least_three_points": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_term_structure_slope_from_two_tenors": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_forward_variance_computed_between_two_tenors": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_forward_variance_none_when_negative": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_duplicate_tenors_refused": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_implied_move_from_straddle_and_spot": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_implied_move_none_without_both_inputs": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_iv_uncertainty_averages_spreads": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_time_derivative_fields_none_without_prior_snapshot": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_surface_velocity_computed_from_real_prior_snapshot": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_realized_vs_implied_gap_computed_when_realized_move_supplied": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_option_analytics_surface_physics.py::test_decision_power_stamped": {
+   "file": "tests/test_option_analytics_surface_physics.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 14,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_option_analytics_surface_physics.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.9,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35069.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114946048",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.63
+ }
+}

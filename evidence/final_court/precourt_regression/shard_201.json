@@ -1,0 +1,92 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_validation_observer.py::test_no_live_process_is_never_attributed",
+   "file": "tests/test_validation_observer.py"
+  },
+  {
+   "nodeid": "tests/test_validation_observer.py::test_artifact_from_a_different_pid_is_STALE",
+   "file": "tests/test_validation_observer.py"
+  },
+  {
+   "nodeid": "tests/test_validation_observer.py::test_matching_pid_IS_attributed",
+   "file": "tests/test_validation_observer.py"
+  },
+  {
+   "nodeid": "tests/test_validation_observer.py::test_unreadable_artifact_is_not_attributed",
+   "file": "tests/test_validation_observer.py"
+  },
+  {
+   "nodeid": "tests/test_validation_observer.py::test_observer_is_read_only_toward_the_fabric",
+   "file": "tests/test_validation_observer.py"
+  }
+ ],
+ "collected_count": 5,
+ "collect_errors": [],
+ "results": {
+  "tests/test_validation_observer.py::test_no_live_process_is_never_attributed": {
+   "file": "tests/test_validation_observer.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_observer.py::test_artifact_from_a_different_pid_is_STALE": {
+   "file": "tests/test_validation_observer.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_observer.py::test_matching_pid_IS_attributed": {
+   "file": "tests/test_validation_observer.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_observer.py::test_unreadable_artifact_is_not_attributed": {
+   "file": "tests/test_validation_observer.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_validation_observer.py::test_observer_is_read_only_toward_the_fabric": {
+   "file": "tests/test_validation_observer.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 5,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_validation_observer.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.2,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35469.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114831360",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.05
+ }
+}

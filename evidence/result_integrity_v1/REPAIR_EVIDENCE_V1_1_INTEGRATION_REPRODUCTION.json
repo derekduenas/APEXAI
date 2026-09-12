@@ -1,0 +1,63 @@
+{
+ "base_commit": "a27a1275d5645cd52d52f7e108e76dd97ad84d67",
+ "base_audit_version": "RESULT_AUDIT_REGISTRY_V1",
+ "repaired_audit_version": "RESULT_AUDIT_REGISTRY_V1.1",
+ "fixture": {
+  "namespace": "WM0E_R7_1_RUNNER_QUALIFICATION_DEV_V0",
+  "purpose": "RUNNER_QUALIFICATION_DEVELOPMENT_ONLY",
+  "control": "N2",
+  "index": 0,
+  "cell_id": "fadddc120434ca965792ff3a89740050ff4c6fc88bd5c871af607ab74f44ffce",
+  "diagnostic": "secondary.legacy_iid_z = -inf",
+  "validator_accepts": true,
+  "v11_commit_and_verify_direct": true,
+  "trusted_root_v11": "86101ec69aa9aa75a3ab46ad05b014e657493fb245a3ca5d43fc24f15be7c91b"
+ },
+ "call": "run_audit(court, ROOT, trusted_root_v1=None, trusted_root_v11=<correct V1.1 root>, expected_indices=[0])",
+ "before": {
+  "statuses": {
+   "COMMITMENT_AGREEMENT": "FAIL",
+   "COMMITMENT_MATCHES_TRUSTED_ROOT": "BLOCKED",
+   "CELL_VALIDATION": "PASS"
+  },
+  "commitment_reason": "$.secondary.legacy_iid_z is non-finite (-inf); a commitment over NaN is meaningless",
+  "reproduced": true
+ },
+ "after": {
+  "statuses": {
+   "COMMITMENT_AGREEMENT": "PASS",
+   "COMMITMENT_MATCHES_TRUSTED_ROOT": "PASS",
+   "CELL_VALIDATION": "PASS"
+  },
+  "contract": {
+   "required": [
+    "V1.1"
+   ],
+   "non_required": [
+    "V1"
+   ],
+   "selection": "derived_from_supplied_trusted_roots",
+   "supplied_roots": {
+    "V1": false,
+    "V1.1": true
+   },
+   "supplied_but_not_required": [],
+   "law": "only required versions are computed and judged; no fallback between versions; a required version without a root is BLOCKED"
+  },
+  "per_version": {
+   "V1": {
+    "required": false,
+    "status": "NOT_REQUIRED -- does not participate; never PASS",
+    "informational_error": "$.secondary.legacy_iid_z is non-finite (-inf); a commitment over NaN is meaningless"
+   },
+   "V1.1": {
+    "required": true,
+    "executed": true,
+    "agreement": "PASS",
+    "verification": "PASS"
+   }
+  },
+  "repaired": true
+ },
+ "elapsed_s": 4.8
+}

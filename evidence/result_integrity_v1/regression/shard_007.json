@@ -1,0 +1,146 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f01_chain_survives_torn_tail",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f02_single_symbol_cannot_be_ok_support",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f03_state_record_carries_regime",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f04_simulator_refuses_unknown_atr",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f05_ml_excludes_missing_features",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f06_memory_regime_flat_market",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f07_liquidity_constants_single_source",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f08_holiday_calendar",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f09_decision_ids_deterministic",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_f10_formed_after_but_resolved_before_refused",
+   "file": "tests/test_audit_remediation.py"
+  },
+  {
+   "nodeid": "tests/test_audit_remediation.py::test_lab01_empty_bars_symbol_cannot_kill_the_tick",
+   "file": "tests/test_audit_remediation.py"
+  }
+ ],
+ "collected_count": 11,
+ "collect_errors": [],
+ "results": {
+  "tests/test_audit_remediation.py::test_f01_chain_survives_torn_tail": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_f02_single_symbol_cannot_be_ok_support": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_f03_state_record_carries_regime": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_f04_simulator_refuses_unknown_atr": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_f05_ml_excludes_missing_features": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_f06_memory_regime_flat_market": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_f07_liquidity_constants_single_source": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_f08_holiday_calendar": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_f09_decision_ids_deterministic": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_f10_formed_after_but_resolved_before_refused": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_audit_remediation.py::test_lab01_empty_bars_symbol_cannot_kill_the_tick": {
+   "file": "tests/test_audit_remediation.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 11,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_audit_remediation.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 164.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36193.service",
+   "memory_max": "1468006400",
+   "memory_peak": "117174272",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.7
+ }
+}

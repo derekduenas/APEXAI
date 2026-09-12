@@ -1,0 +1,164 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_p_first_observed_bar_can_never_become_market_open",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_q_a_fake_opening_range_can_never_complete",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_r_partial_vwap_can_never_masquerade_as_session_vwap",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_s_gap_can_never_use_an_arbitrary_intraday_price",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_t_rvol_never_silently_compares_partial_volume_to_full_baseline",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_u_minutes_into_session_derives_from_exchange_calendar",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_v_trailing_features_remain_valid_during_partial_session",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_full_session_equivalence_vwap_or_gap_rvol_unchanged",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_2026_08_17_regression_fixture_matches_the_ratified_finding",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_forward_pass_refuses_insufficient_valid_state_not_no_match",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_universe_facets_never_crashes_on_all_invalid_states",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_world_state_observation_integrity_and_no_crash_on_invalid_anchor",
+   "file": "tests/test_chartstate_session_integrity.py"
+  },
+  {
+   "nodeid": "tests/test_chartstate_session_integrity.py::test_world_state_healthy_and_populated_on_full_session",
+   "file": "tests/test_chartstate_session_integrity.py"
+  }
+ ],
+ "collected_count": 13,
+ "collect_errors": [],
+ "results": {
+  "tests/test_chartstate_session_integrity.py::test_p_first_observed_bar_can_never_become_market_open": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_q_a_fake_opening_range_can_never_complete": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_r_partial_vwap_can_never_masquerade_as_session_vwap": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_s_gap_can_never_use_an_arbitrary_intraday_price": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_t_rvol_never_silently_compares_partial_volume_to_full_baseline": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_u_minutes_into_session_derives_from_exchange_calendar": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_v_trailing_features_remain_valid_during_partial_session": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_full_session_equivalence_vwap_or_gap_rvol_unchanged": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_2026_08_17_regression_fixture_matches_the_ratified_finding": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_forward_pass_refuses_insufficient_valid_state_not_no_match": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_universe_facets_never_crashes_on_all_invalid_states": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_world_state_observation_integrity_and_no_crash_on_invalid_anchor": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_chartstate_session_integrity.py::test_world_state_healthy_and_populated_on_full_session": {
+   "file": "tests/test_chartstate_session_integrity.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 13,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_chartstate_session_integrity.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 163.1,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35811.service",
+   "memory_max": "1468006400",
+   "memory_peak": "116039680",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.52
+ }
+}

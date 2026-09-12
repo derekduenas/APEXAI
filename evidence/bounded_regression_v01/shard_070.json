@@ -1,0 +1,227 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_all_ten_hypotheses_preregistered",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_CURVE_TRANSITION]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_CURVE_DIRECTION]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_CURVE_EXPRESSION]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_EXPECTATION_VIOLATION]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_PARTICIPANT_PRESSURE]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_PROPAGATION]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_LEADING_EDGE]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_MODEL_MARKET]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_ASSASSIN2]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_CAPTAIN_FRONTIER]",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_post_hoc_hypothesis_refused",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_below_min_n_is_not_yet_estimable",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_enough_n_but_too_few_dates_is_still_not_yet_estimable",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_sample_rule_met_raises_rather_than_computing",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_preregister_writes_the_file",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_preregister_is_idempotent",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_amending_a_registered_preregistration_is_a_lineage_break",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_decision_power_is_stamped_in_the_preregistration",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  },
+  {
+   "nodeid": "tests/test_frontier2_learning_registry2.py::test_no_confirmatory_status_value_exists_anywhere",
+   "file": "tests/test_frontier2_learning_registry2.py"
+  }
+ ],
+ "collected_count": 20,
+ "collect_errors": [],
+ "results": {
+  "tests/test_frontier2_learning_registry2.py::test_all_ten_hypotheses_preregistered": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_CURVE_TRANSITION]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_CURVE_DIRECTION]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_CURVE_EXPRESSION]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_EXPECTATION_VIOLATION]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_PARTICIPANT_PRESSURE]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_PROPAGATION]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_LEADING_EDGE]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_MODEL_MARKET]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_ASSASSIN2]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_every_hypothesis_starts_not_yet_estimable_with_zero_observations[H_CAPTAIN_FRONTIER]": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_post_hoc_hypothesis_refused": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_below_min_n_is_not_yet_estimable": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_enough_n_but_too_few_dates_is_still_not_yet_estimable": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_sample_rule_met_raises_rather_than_computing": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_preregister_writes_the_file": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_preregister_is_idempotent": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_amending_a_registered_preregistration_is_a_lineage_break": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_decision_power_is_stamped_in_the_preregistration": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_frontier2_learning_registry2.py::test_no_confirmatory_status_value_exists_anywhere": {
+   "file": "tests/test_frontier2_learning_registry2.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 20,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_frontier2_learning_registry2.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.0,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35011.service",
+   "memory_max": "1468006400",
+   "memory_peak": "114917376",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.62
+ }
+}

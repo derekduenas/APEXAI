@@ -1,0 +1,254 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_the_folk_law_is_never_stated_as_fact",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_every_supported_reading_carries_a_competing_explanation",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_long_and_short_build_are_never_both_asserted",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_no_calibrated_probability_is_ever_emitted",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_l3_holds_no_decision_power",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_daily_open_interest_cannot_support_an_intraday_claim",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_delayed_oi_is_usable_only_within_its_own_horizon",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_absent_open_interest_refuses_rather_than_guesses",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_an_invalid_book_cannot_measure_its_own_thinning",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_noise_is_not_a_signal",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_funding_corroborates_a_build_but_does_not_create_one",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_short_build_reads_from_aggressive_selling_into_new_contracts",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_a_trap_needs_both_a_build_and_a_move_against_it",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_a_trap_admits_that_underwater_is_not_forced",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_covering_admits_profit_taking_looks_identical",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_leadership_refuses_to_claim_causation_from_a_gap",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_cascade_requires_the_conjunction_not_either_half",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_cascade_susceptibility_is_not_prediction",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_exhaustion_admits_it_is_only_visible_afterwards",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_every_authorized_interpretation_is_emitted_every_time",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_no_unauthorized_interpretation_can_appear",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_the_record_carries_the_identification_law",
+   "file": "tests/test_btc_participant_state.py"
+  },
+  {
+   "nodeid": "tests/test_btc_participant_state.py::test_a_totally_empty_input_yields_insufficient_not_a_view",
+   "file": "tests/test_btc_participant_state.py"
+  }
+ ],
+ "collected_count": 23,
+ "collect_errors": [],
+ "results": {
+  "tests/test_btc_participant_state.py::test_the_folk_law_is_never_stated_as_fact": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_every_supported_reading_carries_a_competing_explanation": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_long_and_short_build_are_never_both_asserted": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_no_calibrated_probability_is_ever_emitted": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_l3_holds_no_decision_power": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_daily_open_interest_cannot_support_an_intraday_claim": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_delayed_oi_is_usable_only_within_its_own_horizon": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_absent_open_interest_refuses_rather_than_guesses": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_an_invalid_book_cannot_measure_its_own_thinning": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_noise_is_not_a_signal": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_funding_corroborates_a_build_but_does_not_create_one": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_short_build_reads_from_aggressive_selling_into_new_contracts": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_a_trap_needs_both_a_build_and_a_move_against_it": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_a_trap_admits_that_underwater_is_not_forced": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_covering_admits_profit_taking_looks_identical": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_leadership_refuses_to_claim_causation_from_a_gap": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_cascade_requires_the_conjunction_not_either_half": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_cascade_susceptibility_is_not_prediction": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_exhaustion_admits_it_is_only_visible_afterwards": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_every_authorized_interpretation_is_emitted_every_time": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_no_unauthorized_interpretation_can_appear": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_the_record_carries_the_identification_law": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_btc_participant_state.py::test_a_totally_empty_input_yields_insufficient_not_a_view": {
+   "file": "tests/test_btc_participant_state.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 23,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_btc_participant_state.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 158.5,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34660.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115081216",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.75
+ }
+}

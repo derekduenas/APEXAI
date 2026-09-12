@@ -1,0 +1,52 @@
+{
+ "contract": "RESEARCH_ACTIVATION_V1",
+ "status": "OK",
+ "action": "probe",
+ "executed": true,
+ "properties": [
+  "User=apexresearch4",
+  "Group=apexresearch4",
+  "MemoryMax=1400M",
+  "TasksMax=64",
+  "ProtectSystem=strict",
+  "ProtectHome=yes",
+  "PrivateTmp=yes",
+  "PrivateNetwork=yes",
+  "NoNewPrivileges=yes",
+  "RestrictSUIDSGID=yes",
+  "TemporaryFileSystem=/apex-data/history-b",
+  "BindReadOnlyPaths=/apex-data/research-exp004/dataset_view/etf_continuous/bars:/apex-data/history-b/etf_continuous/bars",
+  "InaccessiblePaths=/apex-data/core",
+  "InaccessiblePaths=/apex-data/history-a",
+  "InaccessiblePaths=/apex-data/runtime",
+  "ReadOnlyPaths=/apex-data/governance/admissions",
+  "ReadOnlyPaths=/etc/apex/admissions",
+  "ReadWritePaths=/apex-data/research-exp004/out"
+ ],
+ "observations": {
+  "admitted_readable": true,
+  "evaluation_readable": false,
+  "other_corpus_files_visible": false,
+  "core_readable": false,
+  "history_a_readable": false,
+  "secrets_readable": false,
+  "corpus_writable": false,
+  "manifest_readable": true,
+  "network_reachable": false
+ },
+ "expected": {
+  "admitted_readable": true,
+  "evaluation_readable": false,
+  "other_corpus_files_visible": false,
+  "core_readable": false,
+  "history_a_readable": false,
+  "secrets_readable": false,
+  "corpus_writable": false,
+  "manifest_readable": true,
+  "network_reachable": false
+ },
+ "deviations": {},
+ "admitted_example": "SPY_2016-01-04.json",
+ "denied_example": "SPY_2022-01-03.json",
+ "ok": true
+}

@@ -1,0 +1,263 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_running_inside_research_containment",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_orientation_positive_means_M0_better_and_is_invariant",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_bootstrap_studentiser_matches_R1_hac_statistic",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_block_law_floor_is_H_on_white_noise",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_block_law_grows_beyond_H_on_overlap_and_on_long_memory",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_block_law_upper_clamp_and_refusals",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_block_selector_is_blind_to_the_mean",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_circular_block_indices_wrap_and_cover",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_bootstrap_is_deterministic_per_identity_and_fixed_B_alpha",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_bootstrap_detects_a_strong_positive_mean_and_not_a_negative_one",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_envelope_predeclared_and_contract_hashable",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_court_v2_requires_a_passed_calibration_artifact",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_court_v2_commits_to_everything_before_sitting",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_error_control_v2_tails_predeclared",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_budget_records_R1_rejection_and_R2_as_methodology_search",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_no_rescue_logic_in_court_v2_and_bootstrap_source",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_holdout_executed_exactly_once_and_never_again",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_one_cell_each_on_a_DEVELOPMENT_seed",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_wm_impl_001_constants_and_history",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_wm_impl_001_regression_v0_raises_v01_runs[0.9-8100020]",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_wm_impl_001_regression_v0_raises_v01_runs[0.995-8100021]",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_wm_impl_001_boundary_m_hat_equals_m_max_and_zero",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_wm_impl_001_semantic_equivalence_where_v0_could_run",
+   "file": "tests/test_world_model_bootstrap.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_bootstrap.py::test_budget_r2_1_distinguishes_implementation_repair",
+   "file": "tests/test_world_model_bootstrap.py"
+  }
+ ],
+ "collected_count": 24,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_bootstrap.py::test_running_inside_research_containment": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_orientation_positive_means_M0_better_and_is_invariant": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_bootstrap_studentiser_matches_R1_hac_statistic": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_block_law_floor_is_H_on_white_noise": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_block_law_grows_beyond_H_on_overlap_and_on_long_memory": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_block_law_upper_clamp_and_refusals": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_block_selector_is_blind_to_the_mean": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_circular_block_indices_wrap_and_cover": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_bootstrap_is_deterministic_per_identity_and_fixed_B_alpha": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_bootstrap_detects_a_strong_positive_mean_and_not_a_negative_one": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_envelope_predeclared_and_contract_hashable": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_court_v2_requires_a_passed_calibration_artifact": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_court_v2_commits_to_everything_before_sitting": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_error_control_v2_tails_predeclared": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_budget_records_R1_rejection_and_R2_as_methodology_search": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_no_rescue_logic_in_court_v2_and_bootstrap_source": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_holdout_executed_exactly_once_and_never_again": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_one_cell_each_on_a_DEVELOPMENT_seed": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_wm_impl_001_constants_and_history": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_wm_impl_001_regression_v0_raises_v01_runs[0.9-8100020]": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_wm_impl_001_regression_v0_raises_v01_runs[0.995-8100021]": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_wm_impl_001_boundary_m_hat_equals_m_max_and_zero": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_wm_impl_001_semantic_equivalence_where_v0_could_run": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_bootstrap.py::test_budget_r2_1_distinguishes_implementation_repair": {
+   "file": "tests/test_world_model_bootstrap.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 24,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_bootstrap.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 194.7,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u36432.service",
+   "memory_max": "1468006400",
+   "memory_peak": "152264704",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 5.55
+ }
+}

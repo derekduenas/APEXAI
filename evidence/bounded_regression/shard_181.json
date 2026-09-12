@@ -1,0 +1,200 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_returns_timing.py::test_the_configured_timing_is_the_protocol_timing",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_forward_return_runs_from_the_formation_close_to_the_exit_close",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_the_return_is_indexed_by_signal_date_not_formation_date",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_the_entry_price_is_not_the_signal_day_close",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_a_truncated_forward_window_is_nan_not_short",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_performance_delisting_applies_the_shumway_haircut_to_terminal_value",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_the_haircut_is_not_applied_to_the_whole_window_return",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_a_merger_uses_the_final_traded_price_with_no_haircut",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_an_unidentifiable_delisting_is_treated_as_performance_related[None]",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_an_unidentifiable_delisting_is_treated_as_performance_related[]",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_an_unidentifiable_delisting_is_treated_as_performance_related[unknown]",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_an_unidentifiable_delisting_is_treated_as_performance_related[nan]",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_a_surviving_security_is_never_haircut",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_no_return_can_fall_below_minus_one_hundred_percent",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_excess_return_subtracts_the_eligible_universe_median",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_the_median_ignores_ineligible_securities",
+   "file": "tests/test_returns_timing.py"
+  },
+  {
+   "nodeid": "tests/test_returns_timing.py::test_excess_return_preserves_the_ranking_of_raw_return",
+   "file": "tests/test_returns_timing.py"
+  }
+ ],
+ "collected_count": 17,
+ "collect_errors": [],
+ "results": {
+  "tests/test_returns_timing.py::test_the_configured_timing_is_the_protocol_timing": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_forward_return_runs_from_the_formation_close_to_the_exit_close": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_the_return_is_indexed_by_signal_date_not_formation_date": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_the_entry_price_is_not_the_signal_day_close": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_a_truncated_forward_window_is_nan_not_short": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_performance_delisting_applies_the_shumway_haircut_to_terminal_value": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_the_haircut_is_not_applied_to_the_whole_window_return": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_a_merger_uses_the_final_traded_price_with_no_haircut": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_an_unidentifiable_delisting_is_treated_as_performance_related[None]": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_an_unidentifiable_delisting_is_treated_as_performance_related[]": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_an_unidentifiable_delisting_is_treated_as_performance_related[unknown]": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_an_unidentifiable_delisting_is_treated_as_performance_related[nan]": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_a_surviving_security_is_never_haircut": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_no_return_can_fall_below_minus_one_hundred_percent": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_excess_return_subtracts_the_eligible_universe_median": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_the_median_ignores_ineligible_securities": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_returns_timing.py::test_excess_return_preserves_the_ranking_of_raw_return": {
+   "file": "tests/test_returns_timing.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 17,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_returns_timing.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 160.8,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u34831.service",
+   "memory_max": "1468006400",
+   "memory_peak": "115105792",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 3.92
+ }
+}

@@ -1,0 +1,23 @@
+{
+ "cause": "The admission request I authored declared a source family label that does not exist in the dataset manifest. The boundary compared the decision's declared scope against the manifest and refused.",
+ "code_changed_to_make_it_pass": false,
+ "contract": "WORLD_MODEL_REAL_DATA_BOUNDARY_V1",
+ "corrected_document_validated": "end to end against the real boundary with a throwaway key in a temp trust root, which grants nothing in production; key and temp root deleted",
+ "data_changed": false,
+ "decision_edited_after_signing": false,
+ "event": "EXP001B_FIRST_EXECUTION_REFUSED",
+ "exit_code": 3,
+ "experiment": "ALPHA-EXP-001B",
+ "fault": "mine, in the decision content; not a code defect and not a data problem",
+ "further_errors_found_in_the_same_document": [
+  "availability was prose; the contract requires structured kinds matching the manifest",
+  "authority_classification was RESEARCH_EVIDENCE; the only accepted value is RESEARCH_HISTORICAL"
+ ],
+ "model_changed": false,
+ "process_outcome": "AUTHORIZATION_REFUSED",
+ "protocol_changed": false,
+ "refusal": "SCOPE_INVALID: source_families ['ETF_CONTINUOUS_INTRADAY_BARS'] not all in manifest ['alpaca_sip_raw_1m']",
+ "resolution": "a corrected decision must be re-authored and re-signed by the authority; the signed bytes cannot be edited",
+ "runtime_seconds": 0.694,
+ "utc": "2026-09-08T13:05:57Z"
+}

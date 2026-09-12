@@ -1,0 +1,848 @@
+{
+ "inventory_version": "FULL_REGRESSION_TEST_INVENTORY_V0",
+ "collected": [
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_same_seed_and_config_gives_an_identical_world",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_different_seed_gives_a_different_world",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw0]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw1]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw2]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw3]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw4]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw5]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw6]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_no_hidden_wallclock_or_global_rng_leakage",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_per_stream_prng_derivation_is_deterministic_and_independent",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_two_subjects_in_one_world_have_different_paths",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S0_plants_no_relationship_between_state_and_future",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S1_latent_state_genuinely_drives_subsequent_drift",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S1_with_zero_mu_is_refused_as_a_disguised_S0",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S2_obeys_its_stated_mean_reversion_equation",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S2_invalid_mean_reversion_parameters_refused[bad0]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S2_invalid_mean_reversion_parameters_refused[bad1]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S2_invalid_mean_reversion_parameters_refused[bad2]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S3_produces_both_regimes_and_jumps",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad0]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad1]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad2]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad3]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad4]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_shared_factor_creates_dependence_and_beta_zero_does_not",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_beta_outside_unit_interval_refused",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_betas_length_must_match_subjects",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_observable_state_has_no_attribute_path_to_the_answer_key",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_latent_truth_is_absent_from_a_generated_input_by_default",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_latent_becomes_visible_ONLY_when_the_world_declares_it",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[latent_regime]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[future_return]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[ground_truth_drift]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[mfe_60m]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[mae_60m]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[oracle_state]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[generator_state]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[realized_outcome]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[label_5m]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_forward_truth_available_mid_session[H_5M]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_forward_truth_available_mid_session[H_15M]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_forward_truth_available_mid_session[H_30M]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_forward_truth_available_mid_session[H_60M]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_horizon_beyond_the_session_is_NOT_AVAILABLE_not_shortened",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_session_close_truth_reaches_the_final_step",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_mfe_mae_bracket_the_forward_return",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_every_null_declares_what_it_destroys_and_preserves[N0_ASSOCIATION_DESTROYED_BLOCK_PRESERVED]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_every_null_declares_what_it_destroys_and_preserves[N1_TIME_SHIFTED_NONCAUSAL]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_every_null_declares_what_it_destroys_and_preserves[N2_PURE_NOISE_FEATURES]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_null_fixtures_carry_null_provenance[N0_ASSOCIATION_DESTROYED_BLOCK_PRESERVED]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_null_fixtures_carry_null_provenance[N1_TIME_SHIFTED_NONCAUSAL]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_null_fixtures_carry_null_provenance[N2_PURE_NOISE_FEATURES]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_nulls_are_reproducible_from_their_declared_inputs",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_N0_refuses_a_single_subject_rather_than_becoming_a_noop",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_N0_permutation_is_a_derangement",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_unknown_null_type_refused",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_null_parameters_refused[kw0-N1_TIME_SHIFTED_NONCAUSAL]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_null_parameters_refused[kw1-N1_TIME_SHIFTED_NONCAUSAL]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_null_parameters_refused[kw2-N0_ASSOCIATION_DESTROYED_BLOCK_PRESERVED]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_resource_bounds_are_refused_not_truncated[kw0-outside]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_resource_bounds_are_refused_not_truncated[kw1-outside]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_resource_bounds_are_refused_not_truncated[kw2-outside]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_resource_bounds_are_refused_not_truncated[kw3-MAX_TOTAL_POINTS]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_a_v0_world_is_small_enough_to_be_comfortable",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw0]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw1]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw2]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw3]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw4]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw5]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw6]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw7]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw8]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_invalid_seed_refused[-1]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_invalid_seed_refused[True]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_invalid_seed_refused[1.5]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_invalid_seed_refused[7]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_invalid_seed_refused[None]",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_unknown_world_type_refused",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_generated_prices_are_finite_and_positive",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_a_synthetic_A0_input_is_valid_and_hashable",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_synthetic_inputs_are_deterministic_across_regeneration",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_generated_input_respects_the_causal_timing_law",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_worlds_carry_no_trading_capital_or_order_authority",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_world_manifest_declares_its_fixture_class_and_equation",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_real_data_firewall_still_active_under_WM0C",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_world_modules_import_no_production_apex_and_define_no_placement",
+   "file": "tests/test_world_model_worlds.py"
+  },
+  {
+   "nodeid": "tests/test_world_model_worlds.py::test_no_real_market_identifiers_are_used",
+   "file": "tests/test_world_model_worlds.py"
+  }
+ ],
+ "collected_count": 89,
+ "collect_errors": [],
+ "results": {
+  "tests/test_world_model_worlds.py::test_same_seed_and_config_gives_an_identical_world": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_different_seed_gives_a_different_world": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw0]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw1]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw2]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw3]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw4]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw5]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_any_material_config_change_changes_world_identity[kw6]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_no_hidden_wallclock_or_global_rng_leakage": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_per_stream_prng_derivation_is_deterministic_and_independent": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_two_subjects_in_one_world_have_different_paths": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S0_plants_no_relationship_between_state_and_future": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S1_latent_state_genuinely_drives_subsequent_drift": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S1_with_zero_mu_is_refused_as_a_disguised_S0": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S2_obeys_its_stated_mean_reversion_equation": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S2_invalid_mean_reversion_parameters_refused[bad0]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S2_invalid_mean_reversion_parameters_refused[bad1]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S2_invalid_mean_reversion_parameters_refused[bad2]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S3_produces_both_regimes_and_jumps": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad0]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad1]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad2]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad3]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_S3_malformed_transition_or_intensity_refused[bad4]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_shared_factor_creates_dependence_and_beta_zero_does_not": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_beta_outside_unit_interval_refused": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_betas_length_must_match_subjects": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_observable_state_has_no_attribute_path_to_the_answer_key": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_latent_truth_is_absent_from_a_generated_input_by_default": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_latent_becomes_visible_ONLY_when_the_world_declares_it": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[latent_regime]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[future_return]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[ground_truth_drift]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[mfe_60m]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[mae_60m]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[oracle_state]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[generator_state]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[realized_outcome]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_injecting_answer_key_vocabulary_into_an_input_is_refused[label_5m]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_forward_truth_available_mid_session[H_5M]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_forward_truth_available_mid_session[H_15M]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_forward_truth_available_mid_session[H_30M]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_forward_truth_available_mid_session[H_60M]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_horizon_beyond_the_session_is_NOT_AVAILABLE_not_shortened": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_session_close_truth_reaches_the_final_step": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_mfe_mae_bracket_the_forward_return": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_every_null_declares_what_it_destroys_and_preserves[N0_ASSOCIATION_DESTROYED_BLOCK_PRESERVED]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_every_null_declares_what_it_destroys_and_preserves[N1_TIME_SHIFTED_NONCAUSAL]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_every_null_declares_what_it_destroys_and_preserves[N2_PURE_NOISE_FEATURES]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_null_fixtures_carry_null_provenance[N0_ASSOCIATION_DESTROYED_BLOCK_PRESERVED]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_null_fixtures_carry_null_provenance[N1_TIME_SHIFTED_NONCAUSAL]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_null_fixtures_carry_null_provenance[N2_PURE_NOISE_FEATURES]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_nulls_are_reproducible_from_their_declared_inputs": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_N0_refuses_a_single_subject_rather_than_becoming_a_noop": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_N0_permutation_is_a_derangement": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_unknown_null_type_refused": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_null_parameters_refused[kw0-N1_TIME_SHIFTED_NONCAUSAL]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_null_parameters_refused[kw1-N1_TIME_SHIFTED_NONCAUSAL]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_null_parameters_refused[kw2-N0_ASSOCIATION_DESTROYED_BLOCK_PRESERVED]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_resource_bounds_are_refused_not_truncated[kw0-outside]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_resource_bounds_are_refused_not_truncated[kw1-outside]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_resource_bounds_are_refused_not_truncated[kw2-outside]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_resource_bounds_are_refused_not_truncated[kw3-MAX_TOTAL_POINTS]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_a_v0_world_is_small_enough_to_be_comfortable": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw0]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw1]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw2]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw3]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw4]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw5]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw6]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw7]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_malformed_generator_config_refused_not_repaired[kw8]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_invalid_seed_refused[-1]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_invalid_seed_refused[True]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_invalid_seed_refused[1.5]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_invalid_seed_refused[7]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_invalid_seed_refused[None]": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_unknown_world_type_refused": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_generated_prices_are_finite_and_positive": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_a_synthetic_A0_input_is_valid_and_hashable": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_synthetic_inputs_are_deterministic_across_regeneration": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_generated_input_respects_the_causal_timing_law": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_worlds_carry_no_trading_capital_or_order_authority": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_world_manifest_declares_its_fixture_class_and_equation": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_real_data_firewall_still_active_under_WM0C": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_world_modules_import_no_production_apex_and_define_no_placement": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  },
+  "tests/test_world_model_worlds.py::test_no_real_market_identifiers_are_used": {
+   "file": "tests/test_world_model_worlds.py",
+   "outcome": "PASS",
+   "detail": null
+  }
+ },
+ "exitstatus": 0,
+ "totals": {
+  "PASS": 89,
+  "FAIL": 0,
+  "ERROR": 0,
+  "SKIP": 0,
+  "XFAIL": 0,
+  "XPASS": 0,
+  "UNREPORTED": 0
+ },
+ "env": {
+  "python": "3.12.3",
+  "pytest": "9.1.1",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "cwd": "/opt/apex-research/world-model-shadow",
+  "argv": [
+   "/opt/apex/shared/venv/lib/python3.12/site-packages/pytest/__main__.py",
+   "tests/test_world_model_worlds.py",
+   "-q",
+   "--rootdir",
+   "/opt/apex-research/world-model-shadow",
+   "-p",
+   "no:cacheprovider",
+   "-p",
+   "regression.plugin"
+  ],
+  "PYTHONHASHSEED": null
+ },
+ "resource": {
+  "ru_maxrss_MiB": 164.3,
+  "cgroup": {
+   "path": "/wmresearch.slice/run-u35196.service",
+   "memory_max": "1468006400",
+   "memory_peak": "121090048",
+   "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+  },
+  "elapsed_s": 4.6
+ }
+}
