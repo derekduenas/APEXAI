@@ -34,13 +34,27 @@ ages the chain with the quotes; the old one-stage freshness test was replaced.
   tests/test_defect_repair_001.py tests/test_decision_path_repair_001.py tests/test_funnel_engine.py tests/test_joint_wb.py \
   tests/test_joint_wb_repairs.py tests/test_backtest_wb.py tests/test_reality_harness.py
 ```
-Mac, Python 3.11.9, numpy 2.4.6, single process. Results are pasted in the delivery message with exit codes.
+Mac (Intel i5-5250U), Python 3.11.9, numpy 2.4.6, single process. Affected suites: 302 passed (exit 0). Full suite on the candidate: 5,197 passed / 15 failed (all pre-existing, listed above) / 9 skipped, exit 1 from those pre-existing failures.
 
 ## Combined-suite EXP-002 / EXP-004 failures
 
-Reproduction attempts: the two modules together → 25 passed. Every module alphabetically before and including
-`test_exp004` in the full run's order → result recorded in the delivery message. The claim "environmental" is not
-made unless the ordered run passes; if it fails, the shared state is named.
+Three reproduction attempts on this candidate, same environment (Mac, single process, `-p no:cacheprovider`, no
+random ordering plugin):
+
+| Attempt | Scope | Result |
+|---|---|---|
+| 1 | the two modules together | 25 passed |
+| 2 | every module alphabetically before and including `test_exp004` (the full run's order up to that point) | 1,355 passed; only the pre-existing `test_architecture_claims` failure |
+| 3 | the whole suite, `--durations=15` | 5,197 passed, 15 failed, 9 skipped; **no exp002/exp004 failure** |
+
+The 14 failures that remain in attempt 3 are the same 14 that fail on pre-repair `main` in a clean worktree
+(host-only paths, containment, sealed NKLA packets, research-board files, sticky `/tmp`, the null-rig memory guard)
+plus the provenance test that fails only because `.venv` sits inside this checkout. **The exp002/exp004 failures
+did not reproduce in three attempts, so no cause is named and they are not labelled environmental.** They are
+carried as unresolved: the one full run in which they failed (2026-09-11, the defect-repair branch, 31 minutes)
+has no recorded difference in ordering or concurrent process. The next occurrence should be captured with
+`--durations` and `-p no:randomly` state, and the failing tests' shared fixtures (`tmp_path` under `results/`,
+the sealed-results counter) inspected at that moment rather than afterwards.
 
 ## Unresolved
 
