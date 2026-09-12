@@ -357,6 +357,6 @@ def test_production_route_refuses_before_any_network_access(tmp_path, monkeypatc
     rep = json.loads((tmp_path / "out.json").read_text())
     d = rep["decisions"][0]
     assert d["decision"] == "REFUSE" and "LIVE_DATA_DISABLED" in d["why"] and d["refusal_persisted"] is True
-    assert rep["data_provenance"] == "LIVE_FEED" and rep["fee_schedule"]["provenance"] == "UNVERIFIED"
+    assert rep["data_provenance"] == "LIVE_FEED" and rep["fee_schedule"]["provenance"] == "PROVIDER_VERIFIED"
     rows = L.read_all(led)
     assert not any(r["kind"] in ("pilot_forecast", "pilot_intent", "pilot_fill") for r in rows)

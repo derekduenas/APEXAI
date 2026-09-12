@@ -1,5 +1,5 @@
 """Defect Repair and First Seal Block (2026-09-11): PILOT_RULE_V2, the registry-driven adverse block, the commissioned
-live chain/quote wiring (read-only, fees still UNVERIFIED), and the calendar-canonical clock."""
+live chain/quote wiring (read-only; fee default authorized 2026-09-12), and the calendar-canonical clock."""
 from __future__ import annotations
 
 import json
@@ -144,9 +144,16 @@ class TestLiveWiring:
         with pytest.raises(ProviderUnavailable, match="QUOTE_NOT_IN_SNAPSHOT"):
             src._quote_fn({"symbol": "SPY", "expiration": "2026-10-02", "strike": 780.0, "right": "CALL"})
 
-    def test_fees_stay_unverified_and_no_order_path_exists(self):
-        src = SRC.live_twin_sources(gate=self._gate(), expirations_fn=lambda s: ["20261002"], chain_snapshot_fn=_snapshot_rows)
-        assert src.fee_schedule is UNVERIFIED_FEES and not UNVERIFIED_FEES.known
+    def test_live_default_fee_schedule_is_the_authorized_broker_schedule_and_no_order_path_exists(self):
+        """2026-09-12: the operator authorized ROBINHOOD_RHF_2026 (broker PDF sha 7f9c86bf); it is the live default with its
+        authorization record sealed. UNVERIFIED remains selectable only by explicit choice. There is still no order path."""
+        from apex.options_pilot.fees import LIVE_DEFAULT_FEES, ROBINHOOD_RHF_2026
+        src = SRC.live_twin_sources(gate=self._gate(), expirations_fn=lambda s: ["20261002"], chain_snapshot_fn=_snapshot_rows, clock=_clock())
+        assert src.fee_schedule is LIVE_DEFAULT_FEES is ROBINHOOD_RHF_2026 and src.fee_schedule.known
+        va = src.fee_schedule.verified_against
+        assert va["document_sha256"].startswith("7f9c86bf") and va["authorization"]["authorized_by"] == "operator" and va["authorization"]["date"] == "2026-09-12"
+        explicit = SRC.live_twin_sources(gate=self._gate(), expirations_fn=lambda s: ["20261002"], chain_snapshot_fn=_snapshot_rows, clock=_clock(), fee_schedule=UNVERIFIED_FEES)
+        assert explicit.fee_schedule is UNVERIFIED_FEES
         import inspect
         text = inspect.getsource(SRC)
         for forbidden in ("place_order", "submit_order", "/orders", "order_id"):

@@ -95,7 +95,7 @@ def test_production_route_refuses_honestly_with_persisted_refusals(tmp_path, fen
         assert r["data_provenance"] == "LIVE_FEED" and r["synthetic"] is False
     rep = json.loads((tmp_path / "out.json").read_text())
     assert rep["risk_authority"] == "CertifiedRiskAuthority" and rep["data_provenance"] == "LIVE_FEED"
-    assert rep["fee_schedule"]["provenance"] == "UNVERIFIED"
+    assert rep["fee_schedule"]["provenance"] == "PROVIDER_VERIFIED"           # authorized 2026-09-12 (ROBINHOOD_RHF_2026)
     for d in rep["decisions"]:
         assert d["decision"] == "REFUSE" and "LIVE_DATA_DISABLED" in d["why"] and d["refusal_persisted"] is True
     assert not any(r["kind"] in ("pilot_forecast", "pilot_intent", "pilot_fill") for r in rows)

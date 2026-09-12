@@ -169,6 +169,16 @@ ROBINHOOD_RHF_2026_SOURCE = {
                     "SEC fee computed at the $5.00 per-share cap: 500 x 20.60 / 1,000,000 = $0.0103, rounded UP to $0.02 per the document's rounding rule"],
 }
 
+ROBINHOOD_RHF_2026_AUTHORIZATION = {
+    "authorized_by": "operator", "date": "2026-09-12",
+    "text": ("Operator authorization granted for the Robinhood schedule transcribed from the published PDF, digest 7f9c86bf, "
+             "including SEC $20.60/million of sale principal effective 2026-04-04. Promote it from candidate to PROVIDER_VERIFIED "
+             "with its provenance record and digest sealed."),
+    "document_sha256": "7f9c86bf297d078ce27505cbc53eecc068cf975fbfca5aada37b9af865d7e14a",
+    "scope": "the paper simulation's cost model for a Robinhood self-directed non-Gold non-Professional account trading ETF options; "
+             "not an order authorization; not paper capital",
+}
+
 ROBINHOOD_RHF_2026 = FeeSchedule(
     schedule_id="ROBINHOOD_RHF_2026", version="2026-09-12", provenance="PROVIDER_VERIFIED",
     commission_per_contract=0.0,
@@ -176,6 +186,9 @@ ROBINHOOD_RHF_2026 = FeeSchedule(
     regulatory_fee_per_contract_buy=0.0003,              # CAT fee
     regulatory_fee_per_contract_sell=round(0.0003 + 0.00329 + 0.02, 5),   # CAT + FINRA TAF + SEC fee at the cap (rounded up)
     verified_against={"provider": ROBINHOOD_RHF_2026_SOURCE["provider"], "document": ROBINHOOD_RHF_2026_SOURCE["document"],
-                      "date": ROBINHOOD_RHF_2026_SOURCE["date"], "document_sha256": ROBINHOOD_RHF_2026_SOURCE["document_sha256"]},
-    note=("candidate broker schedule transcribed from the published PDF; NOT the live default until the operator authorizes the document; "
+                      "date": ROBINHOOD_RHF_2026_SOURCE["date"], "document_sha256": ROBINHOOD_RHF_2026_SOURCE["document_sha256"],
+                      "authorization": ROBINHOOD_RHF_2026_AUTHORIZATION},
+    note=("broker schedule transcribed from the published PDF; AUTHORIZED by the operator 2026-09-12 and the LIVE default from that date; "
           "per-contract round trip ~ $0.06 (buy 0.0403, sell 0.0236 at the cap) vs the SYNTHETIC fixture's 1.02"))
+
+LIVE_DEFAULT_FEES = ROBINHOOD_RHF_2026          # the schedule the live boundary runs under (was UNVERIFIED_FEES until 2026-09-12)
