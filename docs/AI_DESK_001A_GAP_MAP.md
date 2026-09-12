@@ -16,7 +16,7 @@ of its code.** No provider activation, deployment, risk-limit change or trading 
 | replay views cannot appear as prospective evidence (A11) | **BUILT** by OPERATING-LOOP-001 |
 | missing fee or outcome yields unknown net, never zero (A6) | **BUILT** by OPERATING-LOOP-001 |
 | captain unavailable/slow does not delay a due exit (A10) | **BUILT** — exits are scheduler events, not UI or inference callbacks |
-| ordered stream sequence, dedup, gap detection (§3) | **BUILT, unused** — the ledger's `seq` + hash chain is exactly this |
+| ordered stream sequence, dedup, gap detection (§3) | **PARTLY BUILT** — the ledger's `seq` + hash chain give ordering and integrity, not a reconnectable stream. See GAP 9 |
 | chart tools cannot reach order capability (A7) | **BUILT** — the structural placement seal already exists |
 | one `snapshot_id` joining state, trace, candidates and inputs | **GAP 1** |
 | a queryable as-of bar/candle store | **GAP 2** |
@@ -144,11 +144,24 @@ No Flask, FastAPI, aiohttp or uvicorn anywhere in the repo; the only HTTP surfac
 `http.server` scripts above, and `apex/pulse_options/http_policy.py` is outbound only. There is no read API, no
 auth, no scope enforcement and no stream.
 
-The stream primitive, though, is already there and is better than what the draft asks for: the ledger's monotonic
-`seq` is an ordered sequence number, `entry_hash` chains every record to its predecessor, and `L.verify_chain`
-detects a gap or a tamper cryptographically. `L.verify_receipt` lets a client prove that a rendered marker matches
-the persisted record. **The cursor should be the ledger seq; nothing new needs inventing for §3's stream
-requirements.**
+**CORRECTED 2026-09-12.** An earlier version of this document claimed the ledger's sequence and hash chain were
+"better than what the draft asks for" and that "nothing new needs inventing for §3's stream requirements." That
+overstated it, and the overstatement is now GAP 9 below.
+
+What the ledger genuinely supplies: `seq` is a monotonic ordered sequence number, `entry_hash` chains every record
+to its predecessor so a gap or a tamper is detectable cryptographically, and `L.verify_receipt` lets a client prove
+a rendered marker matches the persisted record. That is **ordering and integrity**, and it is the right cursor to
+build on.
+
+### GAP 9 — ordering and integrity are not a reconnectable stream
+
+The draft's §3 asks for a stream that a disconnected client can rejoin: show the last-update time and `STALE` on
+disconnect, then reconnect via a consistent snapshot plus a sequence cursor, with no silently duplicated or
+reordered markers. The ledger gives none of that by itself. Missing: any push or long-poll transport; a consistent
+snapshot to rejoin at, which needs GAP 1's `snapshot_id`; a defined `STALE` presentation with a last-update time; a
+dedup rule for markers already rendered before the disconnect; and a bound on how far back a cursor may reach. A
+reader tailing a file is not a client that can rejoin a stream mid-session and know what it missed. **The seq
+cursor is the foundation, not the feature**, and the feature has to be built in item 5 of the change list.
 
 ### GAP 8 — no server-enforced scope, symbol, time bound or response budget
 
@@ -164,7 +177,7 @@ Seven new files, two touched, **no change to boundary, session, kernel, risk or 
 | 2 | `apex/desk/projection.py` — the eight read methods, over persisted records only. A field the base lacks is reported as a schema gap, never synthesized | new |
 | 3 | `apex/desk/model_state.py` — the closed vocabulary of GAP 5, mapping existing prose to an enum without replacing it | new |
 | 4 | `apex/desk/bar_store.py` — a persisted, as-of queryable bar view with revision history, reading the collector's records; `BarStore`'s existing visibility rules reused unchanged | new |
-| 5 | `apex/desk/server.py` — loopback read-only HTTP. **No write routes exist in the module at all**, enforced by a structural test like the placement seal. Scope, symbol, time bounds and response budget enforced server-side. Cursor is the ledger seq | new |
+| 5 | `apex/desk/server.py` — loopback read-only HTTP, **and the reconnectable stream of GAP 9**: last-update time and `STALE` on disconnect, rejoin by consistent snapshot plus ledger-seq cursor, dedup of already-rendered markers, a bounded cursor reach. **No write routes exist in the module at all**, enforced by a structural test like the placement seal. Scope, symbol, time bounds and response budget enforced server-side | new |
 | 6 | `apex/desk/page.html` — the views of §4, rendering APEX's own data with no third-party chart library, following `flight_deck.html`'s precedent and `apex_dashboard.py`'s explicit-absence pattern | new |
 | 7 | `tests/test_ai_desk_001a.py` — A1 to A12 as synthetic acceptance | new |
 | 8 | `apex/options_pilot/expression_rule.py` — the rule path emits its considered-and-rejected set so GAP 3 closes for the default policy. **This is the only change that touches the decision path**, and it is additive: the selection is unchanged and the emitted set is recorded, not consulted | modified |
