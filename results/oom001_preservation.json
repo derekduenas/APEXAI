@@ -1,0 +1,58 @@
+{
+ "kind": "oom001_preservation",
+ "base": "15ce57581757c80f2ec7df424fa29ae33a69d273",
+ "head": "02f94e596855ca868c972e301506aeac87778b38",
+ "changed_files": [
+  "tests/conftest.py",
+  "tests/test_null_rig_memory.py"
+ ],
+ "only_two_test_support_files": true,
+ "touched_outside_test_support": [],
+ "config_files_changed": [],
+ "apex_package_changed": [],
+ "existing_test_modules_changed": [],
+ "test_null_rig_unchanged": true,
+ "collection": {
+  "modules_base": 212,
+  "modules_head": 213,
+  "nodeids_base": 3820,
+  "nodeids_head": 3825,
+  "lost_nodeids": {},
+  "gained_nodeids": {
+   "tests/test_null_rig_memory.py": [
+    "tests/test_null_rig_memory.py::test_all_forty_seed_identities_and_assertions_still_active",
+    "tests/test_null_rig_memory.py::test_heavy_cache_bounded_and_sweep_does_not_populate_it",
+    "tests/test_null_rig_memory.py::test_memory_does_not_grow_linearly_with_completed_sweep_seeds",
+    "tests/test_null_rig_memory.py::test_null_rig_nodeid_set_unchanged_from_the_base_commit",
+    "tests/test_null_rig_memory.py::test_semantic_equivalence_old_vs_new_on_preregistered_seeds"
+   ]
+  },
+  "no_coverage_lost": true
+ },
+ "assertions": {
+  "assert_statements_base": 24,
+  "assert_statements_head": 24,
+  "skip_markers_base": 1,
+  "skip_markers_head": 1,
+  "identical": true
+ },
+ "null_rig_config_unchanged": true,
+ "seed_parameters": {
+  "n_seeds": "40",
+  "n_seeds_fast": "8",
+  "n_securities": "600",
+  "base_seed": "90210"
+ },
+ "computation_body_verbatim": true,
+ "containment": {
+  "wrapper_MemoryMax": [
+   "1536M,",
+   "1400M,",
+   "1400M"
+  ],
+  "slice_max": "1610612736",
+  "unit_cap_used_by_this_brick": "1400M",
+  "wrapper_sha256": "dfbb916b435ba0a4a0dde02ad34825c9eb924307989791b8241343426bd62699"
+ },
+ "all_preserved": true
+}

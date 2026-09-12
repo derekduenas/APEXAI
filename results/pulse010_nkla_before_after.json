@@ -1,0 +1,426 @@
+{
+ "kind": "pulse010_nkla_before_after",
+ "version": "NKLA_BEFORE_AFTER_V2",
+ "status": "DIAGNOSTIC ONLY -- the sealed packet was read, never modified",
+ "sealed_packet": {
+  "path": "results/pulse007_frozen_packets.jsonl",
+  "subject": "NKLA",
+  "state_id": "4f2fbb7a5ff48288be41fd959d972d37",
+  "scheduled_time": "2026-09-01T13:45:00+00:00",
+  "quote_as_of": "2025-02-26T00:59:59.255814551Z"
+ },
+ "composer_before": "PULSE_COMPOSE_V0 (the sealed packet, before PULSE-009 and PULSE-010)",
+ "composer_after": "PULSE_COMPOSE_V0.2",
+ "comparable_fields_that_changed": {
+  "cash_open_return_bps": {
+   "before_q": "VALID",
+   "before_v": -2039.13,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this va",
+   "declared_inputs": [
+    "mid",
+    "session_open"
+   ]
+  },
+  "catalyst_fact_status": {
+   "before_q": "VALID",
+   "before_v": "NO_RELEVANT_EVENT",
+   "after_q": "UNKNOWN",
+   "after_v": null,
+   "after_note": "CATALYST_NOT_QUERIED: this cycle never asked, which is materially different from asking and finding nothing",
+   "declared_inputs": []
+  },
+  "overnight_gap_bps": {
+   "before_q": "VALID",
+   "before_v": -1043.61,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "overnight_gap_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24 but the immediately preceding session is",
+   "declared_inputs": [
+    "session_open",
+    "prior_close"
+   ]
+  },
+  "prior_close": {
+   "before_q": "VALID",
+   "before_v": 0.2568,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "the anchor is from 2025-02-24 but the immediately preceding session is 2026-08-31: at least one regular session passed with no print from this instrument (a halt, a delisting, or a name that simply st",
+   "declared_inputs": []
+  },
+  "prior_close_return_bps": {
+   "before_q": "VALID",
+   "before_v": -2869.94,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "prior_close_return_bps: ingredient(s) ['mid', 'prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are ",
+   "declared_inputs": [
+    "mid",
+    "prior_close"
+   ]
+  },
+  "relative_volume": {
+   "before_q": "VALID",
+   "before_v": 0.788,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "relative_volume: ingredient(s) ['raw:prior_session.volume'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24 but the immediately preceding",
+   "declared_inputs": [
+    "session_volume",
+    "raw:prior_session.volume"
+   ]
+  },
+  "ret_10m_bps": {
+   "before_q": "VALID",
+   "before_v": 0.0,
+   "after_q": "UNKNOWN",
+   "after_v": null,
+   "after_note": "no rolling history for this subject yet",
+   "declared_inputs": [
+    "mid"
+   ]
+  },
+  "ret_15m_bps": {
+   "before_q": "VALID",
+   "before_v": 0.0,
+   "after_q": "UNKNOWN",
+   "after_v": null,
+   "after_note": "no rolling history for this subject yet",
+   "declared_inputs": [
+    "mid"
+   ]
+  },
+  "ret_1m_bps": {
+   "before_q": "NOT_ESTIMABLE",
+   "before_v": null,
+   "after_q": "UNKNOWN",
+   "after_v": null,
+   "after_note": "no rolling history for this subject yet",
+   "declared_inputs": [
+    "mid"
+   ]
+  },
+  "ret_30m_bps": {
+   "before_q": "VALID",
+   "before_v": 0.0,
+   "after_q": "UNKNOWN",
+   "after_v": null,
+   "after_note": "no rolling history for this subject yet",
+   "declared_inputs": [
+    "mid"
+   ]
+  },
+  "ret_5m_bps": {
+   "before_q": "VALID",
+   "before_v": 0.0,
+   "after_q": "UNKNOWN",
+   "after_v": null,
+   "after_note": "no rolling history for this subject yet",
+   "declared_inputs": [
+    "mid"
+   ]
+  },
+  "ret_60m_bps": {
+   "before_q": "VALID",
+   "before_v": 0.0,
+   "after_q": "UNKNOWN",
+   "after_v": null,
+   "after_note": "no rolling history for this subject yet",
+   "declared_inputs": [
+    "mid"
+   ]
+  },
+  "session_range_position": {
+   "before_q": "VALID",
+   "before_v": 0.108,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this ",
+   "declared_inputs": [
+    "mid",
+    "session_high",
+    "session_low"
+   ]
+  },
+  "vwap_distance_bps": {
+   "before_q": "VALID",
+   "before_v": -910.31,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this value",
+   "declared_inputs": [
+    "mid",
+    "session_vwap"
+   ]
+  }
+ },
+ "not_supplied_to_the_diagnostic_recomposition": {
+  "fields": [
+   "catalyst_fact_catalyst_state_hash",
+   "catalyst_fact_events_known",
+   "catalyst_fact_ledger_events_causally_visible",
+   "overnight_first_gap_bps",
+   "premarket_first",
+   "premarket_high",
+   "premarket_low",
+   "premarket_observations",
+   "premarket_range_bps",
+   "premarket_return_bps",
+   "premarket_travel_bps",
+   "xasset_btc_book_age_s",
+   "xasset_btc_book_quality",
+   "xasset_btc_derivatives_known_from",
+   "xasset_btc_price_unit",
+   "xasset_btc_symbol",
+   "xasset_btc_venue",
+   "xasset_commodities",
+   "xasset_fx",
+   "xasset_rates",
+   "xasset_state_hash"
+  ],
+  "why": "the rolling store, premarket path, catalyst and cross-asset blocks were not passed to this recomposition. Their absence is an artefact of the diagnostic, NOT an effect of the repair, and they are excluded from every count below."
+ },
+ "fields_that_were_VALID_and_are_now_refused": {
+  "cash_open_return_bps": {
+   "before_q": "VALID",
+   "before_v": -2039.13,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this va",
+   "declared_inputs": [
+    "mid",
+    "session_open"
+   ],
+   "refused_by": "PULSE-009 dependency propagation"
+  },
+  "overnight_gap_bps": {
+   "before_q": "VALID",
+   "before_v": -1043.61,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "overnight_gap_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24 but the immediately preceding session is",
+   "declared_inputs": [
+    "session_open",
+    "prior_close"
+   ],
+   "refused_by": "PULSE-009 dependency propagation"
+  },
+  "prior_close": {
+   "before_q": "VALID",
+   "before_v": 0.2568,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "the anchor is from 2025-02-24 but the immediately preceding session is 2026-08-31: at least one regular session passed with no print from this instrument (a halt, a delisting, or a name that simply st",
+   "declared_inputs": [],
+   "refused_by": "PULSE-010 anchor freshness"
+  },
+  "prior_close_return_bps": {
+   "before_q": "VALID",
+   "before_v": -2869.94,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "prior_close_return_bps: ingredient(s) ['mid', 'prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are ",
+   "declared_inputs": [
+    "mid",
+    "prior_close"
+   ],
+   "refused_by": "PULSE-009 dependency propagation"
+  },
+  "relative_volume": {
+   "before_q": "VALID",
+   "before_v": 0.788,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "relative_volume: ingredient(s) ['raw:prior_session.volume'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24 but the immediately preceding",
+   "declared_inputs": [
+    "session_volume",
+    "raw:prior_session.volume"
+   ],
+   "refused_by": "PULSE-009 dependency propagation"
+  },
+  "session_range_position": {
+   "before_q": "VALID",
+   "before_v": 0.108,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this ",
+   "declared_inputs": [
+    "mid",
+    "session_high",
+    "session_low"
+   ],
+   "refused_by": "PULSE-009 dependency propagation"
+  },
+  "vwap_distance_bps": {
+   "before_q": "VALID",
+   "before_v": -910.31,
+   "after_q": "STALE",
+   "after_v": null,
+   "after_note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this value",
+   "declared_inputs": [
+    "mid",
+    "session_vwap"
+   ],
+   "refused_by": "PULSE-009 dependency propagation"
+  }
+ },
+ "count_refused_by_the_repair": 7,
+ "changed_but_not_attributable_to_the_repair": {
+  "fields": {
+   "catalyst_fact_status": {
+    "before_q": "VALID",
+    "before_v": "NO_RELEVANT_EVENT",
+    "after_q": "UNKNOWN",
+    "after_v": null,
+    "after_note": "CATALYST_NOT_QUERIED: this cycle never asked, which is materially different from asking and finding nothing",
+    "declared_inputs": []
+   },
+   "ret_10m_bps": {
+    "before_q": "VALID",
+    "before_v": 0.0,
+    "after_q": "UNKNOWN",
+    "after_v": null,
+    "after_note": "no rolling history for this subject yet",
+    "declared_inputs": [
+     "mid"
+    ]
+   },
+   "ret_15m_bps": {
+    "before_q": "VALID",
+    "before_v": 0.0,
+    "after_q": "UNKNOWN",
+    "after_v": null,
+    "after_note": "no rolling history for this subject yet",
+    "declared_inputs": [
+     "mid"
+    ]
+   },
+   "ret_30m_bps": {
+    "before_q": "VALID",
+    "before_v": 0.0,
+    "after_q": "UNKNOWN",
+    "after_v": null,
+    "after_note": "no rolling history for this subject yet",
+    "declared_inputs": [
+     "mid"
+    ]
+   },
+   "ret_5m_bps": {
+    "before_q": "VALID",
+    "before_v": 0.0,
+    "after_q": "UNKNOWN",
+    "after_v": null,
+    "after_note": "no rolling history for this subject yet",
+    "declared_inputs": [
+     "mid"
+    ]
+   },
+   "ret_60m_bps": {
+    "before_q": "VALID",
+    "before_v": 0.0,
+    "after_q": "UNKNOWN",
+    "after_v": null,
+    "after_note": "no rolling history for this subject yet",
+    "declared_inputs": [
+     "mid"
+    ]
+   }
+  },
+  "why": "rolling=None and catalyst=None were passed to this diagnostic, so these fields are UNKNOWN for want of an input block rather than because of dependency propagation. Counted separately, never as a repair effect."
+ },
+ "quote_age_s_retained": {
+  "q": "VALID",
+  "v": 47738725.63,
+  "why": "this field measures HOW OLD the quote is. Marking it untrustworthy because the quote is old would delete the only number that says so. It depends on the quote's TIMESTAMP, not on its prices, and it is NOT_AVAILABLE when there is no quote at all."
+ },
+ "independent_fields_unaffected": {
+  "prior_close": {
+   "before": "VALID",
+   "after": "STALE"
+  },
+  "prior_close_session": {
+   "before": null,
+   "after": "VALID"
+  },
+  "session_open": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "session_high": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "session_low": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "session_vwap": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "session_volume": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "last_trade": {
+   "before": "STALE",
+   "after": "STALE"
+  },
+  "last_minute_volume": {
+   "before": "VALID",
+   "after": "VALID"
+  }
+ },
+ "valid_numbers_before": [
+  "cash_open_return_bps",
+  "catalyst_fact_catalyst_state_hash",
+  "catalyst_fact_events_known",
+  "catalyst_fact_ledger_events_causally_visible",
+  "catalyst_fact_status",
+  "last_minute_volume",
+  "overnight_first_gap_bps",
+  "overnight_gap_bps",
+  "premarket_first",
+  "premarket_high",
+  "premarket_low",
+  "premarket_observations",
+  "premarket_range_bps",
+  "premarket_return_bps",
+  "premarket_travel_bps",
+  "prior_close",
+  "prior_close_return_bps",
+  "quote_age_s",
+  "relative_volume",
+  "ret_10m_bps",
+  "ret_15m_bps",
+  "ret_30m_bps",
+  "ret_5m_bps",
+  "ret_60m_bps",
+  "session_high",
+  "session_low",
+  "session_open",
+  "session_range_position",
+  "session_volume",
+  "session_vwap",
+  "vwap_distance_bps",
+  "xasset_btc_book_age_s",
+  "xasset_btc_book_quality",
+  "xasset_btc_derivatives_known_from",
+  "xasset_btc_price_unit",
+  "xasset_btc_symbol",
+  "xasset_btc_venue",
+  "xasset_state_hash"
+ ],
+ "valid_numbers_after": [
+  "last_minute_volume",
+  "prior_close_session",
+  "quote_age_s",
+  "session_high",
+  "session_low",
+  "session_open",
+  "session_volume",
+  "session_vwap"
+ ]
+}

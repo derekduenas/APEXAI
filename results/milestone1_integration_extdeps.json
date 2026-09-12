@@ -1,0 +1,351 @@
+{
+ "kind": "external_test_input_inventory",
+ "candidate": "integration",
+ "tree": "/apex-data/tmp/m1_wt/integration",
+ "commit": "3b9a26f2c949e7e53063eea7948f0422f1e573c0",
+ "method": "AST scan for absolute string constants in test modules",
+ "limitation": "a source scan is a DISCOVERY AID, not proof that every runtime dependency was found. An interpreter resolved from PATH, a path built at runtime, or an import from site-packages leaves no literal to find. Runtime auditing is recorded separately.",
+ "modules_scanned": 215,
+ "findings": [
+  {
+   "module": "tests/test_architecture_claims.py",
+   "line": 239,
+   "literal": "/ exists but the audit classifies it ABSENT/planned; reconcile the audit before building further",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 8
+  },
+  {
+   "module": "tests/test_architecture_claims.py",
+   "line": 255,
+   "literal": "/ contains ",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 8
+  },
+  {
+   "module": "tests/test_btc_semantics.py",
+   "line": 50,
+   "literal": "/web/charts/price/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 9
+  },
+  {
+   "module": "tests/test_btc_semantics.py",
+   "line": 51,
+   "literal": "/product/data/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 9
+  },
+  {
+   "module": "tests/test_governor.py",
+   "line": 75,
+   "literal": "/old.jsonl",
+   "role": "fixture_or_data",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 24
+  },
+  {
+   "module": "tests/test_orchestrator_incident_history.py",
+   "line": 43,
+   "literal": "/bin/true",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": "8a63c98320173f79e263115e10cefc170155e47d1fd4b5a70e4429d2699cae28",
+   "candidate_copy": null,
+   "module_nodeids": 21
+  },
+  {
+   "module": "tests/test_pulse_anchor_freshness.py",
+   "line": 20,
+   "literal": "/opt/apex-repo/results/pulse007_frozen_packets.jsonl",
+   "role": "fixture_or_data",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+   "candidate_copy": {
+    "path": "/apex-data/tmp/m1_wt/integration/results/pulse007_frozen_packets.jsonl",
+    "sha256": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+    "matches_external": true
+   },
+   "module_nodeids": 46
+  },
+  {
+   "module": "tests/test_pulse_derived.py",
+   "line": 329,
+   "literal": "/opt/apex-repo/results/pulse007_frozen_packets.jsonl",
+   "role": "fixture_or_data",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+   "candidate_copy": {
+    "path": "/apex-data/tmp/m1_wt/integration/results/pulse007_frozen_packets.jsonl",
+    "sha256": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+    "matches_external": true
+   },
+   "module_nodeids": 55
+  },
+  {
+   "module": "tests/test_reality_harness.py",
+   "line": 249,
+   "literal": "/haiku/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 22
+  },
+  {
+   "module": "tests/test_research_board.py",
+   "line": 158,
+   "literal": "/opt/apex/shared/venv/bin/python",
+   "role": "interpreter",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": "1643dacd9feaedc58f3cc581e4d22577dfe25c09b10282936186ccf0f2e61118",
+   "candidate_copy": null,
+   "module_nodeids": 13
+  },
+  {
+   "module": "tests/test_runtime_autonomy.py",
+   "line": 160,
+   "literal": "/Users/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 44
+  },
+  {
+   "module": "tests/test_sac1_tier1.py",
+   "line": 275,
+   "literal": "/api/intraday/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 31
+  },
+  {
+   "module": "tests/test_unit_config.py",
+   "line": 18,
+   "literal": "/etc/systemd/system",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 3
+  },
+  {
+   "module": "tests/test_whole_ledger_guard.py",
+   "line": 43,
+   "literal": "/opt/apex-repo",
+   "role": "audit_subject_or_checkout",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 4
+  }
+ ],
+ "external_findings": [
+  {
+   "module": "tests/test_architecture_claims.py",
+   "line": 239,
+   "literal": "/ exists but the audit classifies it ABSENT/planned; reconcile the audit before building further",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 8
+  },
+  {
+   "module": "tests/test_architecture_claims.py",
+   "line": 255,
+   "literal": "/ contains ",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 8
+  },
+  {
+   "module": "tests/test_btc_semantics.py",
+   "line": 50,
+   "literal": "/web/charts/price/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 9
+  },
+  {
+   "module": "tests/test_btc_semantics.py",
+   "line": 51,
+   "literal": "/product/data/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 9
+  },
+  {
+   "module": "tests/test_governor.py",
+   "line": 75,
+   "literal": "/old.jsonl",
+   "role": "fixture_or_data",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 24
+  },
+  {
+   "module": "tests/test_orchestrator_incident_history.py",
+   "line": 43,
+   "literal": "/bin/true",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": "8a63c98320173f79e263115e10cefc170155e47d1fd4b5a70e4429d2699cae28",
+   "candidate_copy": null,
+   "module_nodeids": 21
+  },
+  {
+   "module": "tests/test_pulse_anchor_freshness.py",
+   "line": 20,
+   "literal": "/opt/apex-repo/results/pulse007_frozen_packets.jsonl",
+   "role": "fixture_or_data",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+   "candidate_copy": {
+    "path": "/apex-data/tmp/m1_wt/integration/results/pulse007_frozen_packets.jsonl",
+    "sha256": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+    "matches_external": true
+   },
+   "module_nodeids": 46
+  },
+  {
+   "module": "tests/test_pulse_derived.py",
+   "line": 329,
+   "literal": "/opt/apex-repo/results/pulse007_frozen_packets.jsonl",
+   "role": "fixture_or_data",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+   "candidate_copy": {
+    "path": "/apex-data/tmp/m1_wt/integration/results/pulse007_frozen_packets.jsonl",
+    "sha256": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+    "matches_external": true
+   },
+   "module_nodeids": 55
+  },
+  {
+   "module": "tests/test_reality_harness.py",
+   "line": 249,
+   "literal": "/haiku/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 22
+  },
+  {
+   "module": "tests/test_research_board.py",
+   "line": 158,
+   "literal": "/opt/apex/shared/venv/bin/python",
+   "role": "interpreter",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": "1643dacd9feaedc58f3cc581e4d22577dfe25c09b10282936186ccf0f2e61118",
+   "candidate_copy": null,
+   "module_nodeids": 13
+  },
+  {
+   "module": "tests/test_runtime_autonomy.py",
+   "line": 160,
+   "literal": "/Users/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 44
+  },
+  {
+   "module": "tests/test_sac1_tier1.py",
+   "line": 275,
+   "literal": "/api/intraday/",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": false,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 31
+  },
+  {
+   "module": "tests/test_unit_config.py",
+   "line": 18,
+   "literal": "/etc/systemd/system",
+   "role": "other_absolute_path",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 3
+  },
+  {
+   "module": "tests/test_whole_ledger_guard.py",
+   "line": 43,
+   "literal": "/opt/apex-repo",
+   "role": "audit_subject_or_checkout",
+   "inside_candidate": false,
+   "resolved_exists": true,
+   "resolved_sha256": null,
+   "candidate_copy": null,
+   "module_nodeids": 4
+  }
+ ],
+ "affected_modules": [
+  "tests/test_architecture_claims.py",
+  "tests/test_btc_semantics.py",
+  "tests/test_governor.py",
+  "tests/test_orchestrator_incident_history.py",
+  "tests/test_pulse_anchor_freshness.py",
+  "tests/test_pulse_derived.py",
+  "tests/test_reality_harness.py",
+  "tests/test_research_board.py",
+  "tests/test_runtime_autonomy.py",
+  "tests/test_sac1_tier1.py",
+  "tests/test_unit_config.py",
+  "tests/test_whole_ledger_guard.py"
+ ]
+}

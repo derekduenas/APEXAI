@@ -1,0 +1,419 @@
+{
+ "kind": "pulse009_summary",
+ "version": "PULSE009_SUMMARY_V1",
+ "base_commit": "7bf2f106e28bff2261028debbf54695b48106922",
+ "final_commit": "a9adf553ae99ef7dd145b96027ca6780826afdac",
+ "branch": "pulse-009-derived-staleness",
+ "worktree_clean": false,
+ "changed_files": [
+  "apex/pulse/compose.py",
+  "apex/pulse/derived.py",
+  "results/pulse009_consumer_audit.json",
+  "results/pulse009_nkla_before_after.json",
+  "scripts/pulse009_diagnostic.py",
+  "tests/test_pulse_derived.py"
+ ],
+ "defect": {
+  "id": "DERIVED-FIELD-STALENESS-001",
+  "cause": "the freshness verdict was applied where a value was READ and never travelled to what was BUILT from it",
+  "composer_before": "PULSE_COMPOSE_V0",
+  "composer_after": "PULSE_COMPOSE_V0.1",
+  "history": {
+   "V0": "the freshness verdict was applied where a value was READ and did not travel to what was BUILT from it. NKLA 2026-09-01: mid/spread_bps/nbbo_size_imbalance STALE on a 553-day-old quote, while prior_close_return_bps (-2869.94), cash_open_return_bps, vwap_distance_bps and session_range_position were computed from that same refused mid and marked VALID (DERIVED-FIELD-STALENESS-001)",
+   "V0.1": "PULSE-009: every derived field is built through apex.pulse.derived under a declared dependency map. A derived field is VALID only when every ingredient is VALID; otherwise it carries the ingredient's absence reason or STALE, with the culprit named, and no value. Independent fields are untouched: a stale quote does not reach prior_close. The rolling and premarket stores are only OBSERVED with a usable mid, so an untrusted price cannot enter PULSE's own memory."
+  }
+ },
+ "dependency_map": {
+  "contract": "DERIVED_FIELD_CONTRACT_V1",
+  "derived_fields": 26,
+  "independent_fields": [
+   "prior_close",
+   "session_open",
+   "session_high",
+   "session_low",
+   "session_vwap",
+   "session_volume",
+   "last_trade",
+   "last_minute_volume"
+  ],
+  "map": {
+   "cash_open_return_bps": {
+    "inputs": [
+     "mid",
+     "session_open"
+    ],
+    "formula": "(mid / session_open - 1) * 1e4",
+    "session_gated": [
+     "PREMARKET",
+     "CLOSED"
+    ]
+   },
+   "mid": {
+    "inputs": [
+     "raw:quote.bid",
+     "raw:quote.ask"
+    ],
+    "formula": "(bid + ask) / 2"
+   },
+   "nbbo_size_imbalance": {
+    "inputs": [
+     "raw:quote.bid_size",
+     "raw:quote.ask_size"
+    ],
+    "formula": "(bid_size - ask_size) / (bid_size + ask_size)"
+   },
+   "overnight_first_gap_bps": {
+    "inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "formula": "premarket path from observed mids"
+   },
+   "overnight_gap_bps": {
+    "inputs": [
+     "session_open",
+     "prior_close"
+    ],
+    "formula": "(session_open / prior_close - 1) * 1e4",
+    "session_gated": [
+     "PREMARKET",
+     "CLOSED"
+    ]
+   },
+   "premarket_first": {
+    "inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "formula": "premarket path from observed mids"
+   },
+   "premarket_high": {
+    "inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "formula": "premarket path from observed mids"
+   },
+   "premarket_low": {
+    "inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "formula": "premarket path from observed mids"
+   },
+   "premarket_observations": {
+    "inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "formula": "premarket path from observed mids"
+   },
+   "premarket_range_bps": {
+    "inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "formula": "premarket path from observed mids"
+   },
+   "premarket_return_bps": {
+    "inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "formula": "premarket path from observed mids"
+   },
+   "premarket_travel_bps": {
+    "inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "formula": "premarket path from observed mids"
+   },
+   "prior_close_return_bps": {
+    "inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "formula": "(mid / prior_close - 1) * 1e4"
+   },
+   "quote_age_s": {
+    "inputs": [
+     "raw:quote.timestamp"
+    ],
+    "formula": "now - quote.timestamp",
+    "exception": "STALENESS_IS_THE_MEASUREMENT",
+    "why": "this field measures HOW OLD the quote is. Marking it untrustworthy because the quote is old would delete the only number that says so. It depends on the quote's TIMESTAMP, not on its prices, and it is NOT_AVAILABLE when there is no quote at all."
+   },
+   "relative_volume": {
+    "inputs": [
+     "session_volume",
+     "raw:prior_session.volume"
+    ],
+    "formula": "session_volume / prior_session_volume"
+   },
+   "ret_10m_bps": {
+    "inputs": [
+     "mid"
+    ],
+    "formula": "rolling return over 10 observed minutes"
+   },
+   "ret_15m_bps": {
+    "inputs": [
+     "mid"
+    ],
+    "formula": "rolling return over 15 observed minutes"
+   },
+   "ret_1m_bps": {
+    "inputs": [
+     "mid"
+    ],
+    "formula": "rolling return over 1 observed minutes"
+   },
+   "ret_30m_bps": {
+    "inputs": [
+     "mid"
+    ],
+    "formula": "rolling return over 30 observed minutes"
+   },
+   "ret_5m_bps": {
+    "inputs": [
+     "mid"
+    ],
+    "formula": "rolling return over 5 observed minutes"
+   },
+   "ret_60m_bps": {
+    "inputs": [
+     "mid"
+    ],
+    "formula": "rolling return over 60 observed minutes"
+   },
+   "session_range_position": {
+    "inputs": [
+     "mid",
+     "session_high",
+     "session_low"
+    ],
+    "formula": "(mid - low) / (high - low)"
+   },
+   "spread_bps": {
+    "inputs": [
+     "raw:quote.bid",
+     "raw:quote.ask"
+    ],
+    "formula": "(ask - bid) / mid * 1e4"
+   },
+   "spread_rel": {
+    "inputs": [
+     "raw:quote.bid",
+     "raw:quote.ask"
+    ],
+    "formula": "(ask - bid) / mid"
+   },
+   "touch_size": {
+    "inputs": [
+     "raw:quote.bid_size",
+     "raw:quote.ask_size"
+    ],
+    "formula": "bid_size + ask_size"
+   },
+   "vwap_distance_bps": {
+    "inputs": [
+     "mid",
+     "session_vwap"
+    ],
+    "formula": "(mid / vwap - 1) * 1e4"
+   }
+  }
+ },
+ "propagation_rules": {
+  "VALID": "only when every declared ingredient is VALID",
+  "STALE": "every ingredient has a value and at least one is STALE; the value is omitted",
+  "ABSENT": "an ingredient has no value; the dependent takes the first matching reason in ['PROVIDER_ERROR', 'NOT_AVAILABLE', 'UNKNOWN', 'NOT_ESTIMABLE'] so an absence is never flattened into staleness",
+  "INVALID": "a raw ingredient that is not a finite real number is NOT_ESTIMABLE at the ingredient and propagates as an absence; bool is not a number",
+  "SESSION_INAPPLICABLE": "decided before ingredients and never overwritten",
+  "INDEPENDENT": "a field with no failing ingredient is untouched; a stale quote does not reach prior_close, the session aggregates, overnight_gap_bps or relative_volume",
+  "FORMULA_GUARD": "compute() is not called at all unless every ingredient is VALID, so no formula can see an untrusted number",
+  "REASON_CHAIN": "the ingredient's own note travels into the dependent, so the freshness tolerance that refused the quote stays legible on every field refused because of it"
+ },
+ "representation_decision": {
+  "chosen": "the value is OMITTED on any non-VALID quality",
+  "decided_by": "the existing schema, not preference: apex.pulse.twin.Field refuses a non-trustworthy field that carries a number",
+  "downstream_cannot_treat_as_VALID": [
+   "Field.__post_init__ raises TwinViolation on a non-VALID field with a number",
+   "Field.usable is False for every non-VALID quality",
+   "the serialised record carries v = null with its own q",
+   "the note names the failing ingredient, so the reason survives serialisation"
+  ]
+ },
+ "nkla_before_after": {
+  "refused_by_the_repair": {
+   "cash_open_return_bps": {
+    "before_q": "VALID",
+    "before_v": -2039.13,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this va",
+    "declared_inputs": [
+     "mid",
+     "session_open"
+    ]
+   },
+   "prior_close_return_bps": {
+    "before_q": "VALID",
+    "before_v": -2869.94,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "prior_close_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this ",
+    "declared_inputs": [
+     "mid",
+     "prior_close"
+    ]
+   },
+   "session_range_position": {
+    "before_q": "VALID",
+    "before_v": 0.108,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this ",
+    "declared_inputs": [
+     "mid",
+     "session_high",
+     "session_low"
+    ]
+   },
+   "vwap_distance_bps": {
+    "before_q": "VALID",
+    "before_v": -910.31,
+    "after_q": "STALE",
+    "after_v": null,
+    "after_note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote.bid'] are STALE, so this value",
+    "declared_inputs": [
+     "mid",
+     "session_vwap"
+    ]
+   }
+  },
+  "count": 4,
+  "changed_but_not_attributable": [
+   "catalyst_fact_status",
+   "ret_10m_bps",
+   "ret_15m_bps",
+   "ret_30m_bps",
+   "ret_5m_bps",
+   "ret_60m_bps"
+  ],
+  "quote_age_s_retained": {
+   "q": "VALID",
+   "v": 47738725.63,
+   "why": "this field measures HOW OLD the quote is. Marking it untrustworthy because the quote is old would delete the only number that says so. It depends on the quote's TIMESTAMP, not on its prices, and it is NOT_AVAILABLE when there is no quote at all."
+  },
+  "independent_fields_unaffected": {
+   "prior_close": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_open": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_high": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_low": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_vwap": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_volume": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "last_trade": {
+    "before": "STALE",
+    "after": "STALE"
+   },
+   "last_minute_volume": {
+    "before": "VALID",
+    "after": "VALID"
+   }
+  },
+  "sealed_packet_untouched": true
+ },
+ "consumer_audit": {
+  "modules_touching_features": 41,
+  "read_value_without_any_quality_check": [
+   "scripts/pulse007_quote_residual.py",
+   "scripts/pulse008_query_bound_probe.py",
+   "scripts/pulse008_tape_probe.py"
+  ],
+  "assessment": "the three are this session's own PULSE-007/008 diagnostic probes, which read FROZEN packets to measure them. No live or research consumer reads a feature value without consulting its quality.",
+  "structural_guarantee": "since PULSE-009 a non-VALID field carries v = null, enforced by apex.pulse.twin.Field. A consumer that ignores q now reads None instead of a plausible number -- it fails loudly rather than silently. The contract does not rely on every consumer being careful."
+ },
+ "bounded_regression": {
+  "commit": "a9adf553a",
+  "tree": "f64a3e81a8d6e0e53c6013bdbfe7a35f949ab47e",
+  "shards": 210,
+  "totals": {
+   "PASS": 3706,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 18,
+   "XFAIL": 0,
+   "XPASS": 0
+  },
+  "slice_oom_kill_before": 8,
+  "slice_oom_kill_after": 9,
+  "problem_shards": [
+   "tests/test_null_rig.py(rc=1)"
+  ],
+  "verdict": "FAIL",
+  "problem_shard_attribution": {
+   "finding": "tests/test_null_rig.py OOM-killed in its 1400M shard; slice oom_kill 8->9",
+   "pre_existing": true,
+   "control": "PULSE-007 ran the SAME module at the BASE commit 7969dbbd1 in a clean git worktree with none of this work present; it died identically and incremented the slice counter. The settled control is cited rather than repeated.",
+   "control_evidence": "results/pulse007_SUMMARY.json -> bounded_regression.problem_shard_attribution",
+   "touches_pulse009_code": "no -- the module imports nothing from apex.pulse",
+   "known_defect": "TEST-NULL-RIG-MEMORY-001, repaired on world-model-shadow-v0, not on main",
+   "disposition": "reported, not repaired; memory limits not raised; regression verdict retained as FAIL"
+  },
+  "tree_note": "the tested tree differs from the final commit only by the untracked runner script that executed it"
+ },
+ "preservation": {
+  "original_failed_mirror_evidence": "8d0211e77da9ab347cbedac917a81cd59b1872619d183d64ad19188a5d8698e1",
+  "pulse007_and_008_artifacts": {
+   "pulse007_frozen_packets.jsonl": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+   "pulse007_frozen_manifest.json": "3557bac4fc0a973558a08c60847e3d5c16a0737e7ad5a163a4b77bccbe4591c8",
+   "pulse007_mirror_run_v2_final.json": "f4e3b4b96dc3b60ecad13da3ba1c396db6354f9d761fa316f075b7f325f39f09",
+   "pulse007_SUMMARY.json": "52590b4edcee732b929da2121e6d6649dbdbea126bf9e2c7f01ac2dd337e09a1",
+   "pulse008_mirror_run_v2_1_observation_time_boundary_fixed.json": "eeb322b29dc63443a9240f30445a096a41085f5d245a3854af298f550b9464f3",
+   "pulse008_SUMMARY.json": "3c01e71c434c62f2bc768268121766f5e5b47d217b3282e0e577e870398ae99b"
+  },
+  "sealed_evidence_unchanged": true,
+  "declarations_tolerances_mirror_and_observation_unchanged": true,
+  "world_model_worktree": "d01e961b6",
+  "production_release": "/opt/apex/releases/5eff1cf5e00f21b02c537f25bcd74b1c1d317546"
+ },
+ "still_open_not_touched": {
+  "LIVE-ANCHOR-STALENESS-V1": "the composer still cannot mark an ANCHOR stale; NKLA's prior_close of 2025-02-24 is VALID. PULSE-009 makes the propagation ready for it and proves the rule at the boundary, but does not add anchor freshness.",
+  "ORCHESTRATOR-OOM-LOOP-001": "unchanged, untouched",
+  "NKLA mirror coverage": "unchanged, untouched"
+ },
+ "verdicts": {
+  "DERIVED_FIELD_DEPENDENCY_CONTRACT": "DEFINED",
+  "STALE_PROPAGATION": "ENFORCED",
+  "QUALITY_SEMANTICS": "PRESERVED",
+  "PULSE_COMPOSER_INTEGRITY": "REPAIRED_FOR_DERIVED_FIELDS",
+  "HISTORICAL_AS_KNOWN_AVAILABILITY": "NOT_PROVEN",
+  "PHASE_2": "OPEN",
+  "WORLD_MODEL_REAL_DATA_ADMISSION": "NOT_AUTHORIZED"
+ },
+ "verdict_notes": {
+  "PULSE_COMPOSER_INTEGRITY": "scoped deliberately. Every DERIVED field now inherits its ingredients' trustworthiness. The composer's remaining known gap is that an ANCHOR cannot yet be marked stale at all, which is LIVE-ANCHOR-STALENESS-V1 and outside this brick.",
+  "QUALITY_SEMANTICS": "STALE, NOT_AVAILABLE, NOT_ESTIMABLE, PROVIDER_ERROR, UNKNOWN and SESSION_INAPPLICABLE remain distinct and are tested to be.",
+  "HISTORICAL_AS_KNOWN_AVAILABILITY": "unchanged by this brick."
+ }
+}

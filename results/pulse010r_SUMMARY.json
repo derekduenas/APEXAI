@@ -1,0 +1,295 @@
+{
+ "kind": "pulse010_repair_summary",
+ "version": "PULSE010R_SUMMARY_V1",
+ "base_commit": "7c35027e706953ea164648bad9c51da4db763845",
+ "final_commit": "21ab39bc17785ddfcc45a0eb0421c64e094760f0",
+ "branch": "pulse-010-repair-dependency-wiring",
+ "worktree_clean": false,
+ "changed_files": [
+  "apex/pulse/compose.py",
+  "apex/pulse/derived.py",
+  "results/pulse010r_before_after.json",
+  "results/pulse010r_nkla_attributed.json",
+  "scripts/pulse010r_nkla.py",
+  "scripts/pulse010r_probe.py",
+  "tests/test_pulse_anchor_freshness.py",
+  "tests/test_pulse_dependency_wiring.py"
+ ],
+ "the_finding": {
+  "reported": "compose.py passed one shared dict containing prior_close into cash_open_return_bps, session_range_position and vwap_distance_bps, so a stale prior_close invalidated fields that do not depend on it",
+  "wiring_defect_confirmed": "SUPERSEDED BY THE RETRACTION. The shared dict was over-broad and therefore fragile; it was not a defect, because it changed no behaviour. Recorded as hardening.",
+  "inferred_consequence_measured": "DID NOT OCCUR -- resolve() iterates DEPENDENCIES[name]['inputs'] and ignores anything else in the dict",
+  "measurement": "results/pulse010r_before_after.json, four scenarios composed on the shipped code at 7c35027e7 and again after the repair",
+  "behaviour_changed_by_the_repair": false,
+  "field_level_differences": {
+   "fresh_quote_stale_anchor": {},
+   "stale_quote_fresh_anchor": {},
+   "stale_quote_stale_anchor": {},
+   "both_fresh": {}
+  },
+  "original_wording_kept_for_the_record": "the first version of this summary called the wiring 'the defect'. That overstates it: the measurement in this same file showed no behavioural difference in any of four scenarios."
+ },
+ "before_after_dependency_behaviour": {
+  "fresh_quote_stale_anchor": {
+   "prior_close": "STALE",
+   "prior_close_return_bps": "STALE",
+   "overnight_gap_bps": "STALE",
+   "relative_volume": "STALE",
+   "cash_open_return_bps": "VALID",
+   "session_range_position": "VALID",
+   "vwap_distance_bps": "VALID"
+  },
+  "stale_quote_fresh_anchor": {
+   "prior_close": "VALID",
+   "prior_close_return_bps": "STALE",
+   "overnight_gap_bps": "VALID",
+   "relative_volume": "VALID",
+   "cash_open_return_bps": "STALE",
+   "session_range_position": "STALE",
+   "vwap_distance_bps": "STALE"
+  },
+  "stale_quote_stale_anchor": {
+   "prior_close": "STALE",
+   "prior_close_return_bps": "STALE",
+   "overnight_gap_bps": "STALE",
+   "relative_volume": "STALE",
+   "cash_open_return_bps": "STALE",
+   "session_range_position": "STALE",
+   "vwap_distance_bps": "STALE"
+  },
+  "both_fresh": {
+   "prior_close": "VALID",
+   "prior_close_return_bps": "VALID",
+   "overnight_gap_bps": "VALID",
+   "relative_volume": "VALID",
+   "cash_open_return_bps": "VALID",
+   "session_range_position": "VALID",
+   "vwap_distance_bps": "VALID"
+  }
+ },
+ "the_repair": {
+  "call_sites": "every derived call builds its ingredient dict FROM derived.DEPENDENCIES[name]['inputs'], so the wiring is the map rather than merely compatible with it",
+  "guard": "derive() now REFUSES an undeclared ingredient, naming every offender, instead of ignoring it",
+  "map_untouched": true,
+  "composer": "PULSE_COMPOSE_V0.2.1",
+  "history": "PULSE-010 REPAIR: every derived call receives EXACTLY the ingredients it declares, read from DEPENDENCIES rather than restated, and derive() now REFUSES an undeclared ingredient. The previous shared dict was inert -- resolve() consulted only the declared list, and independence was measured to hold -- but it left the declaration as the single thing preventing accidental coupling between unrelated fields."
+ },
+ "nkla_attributed": {
+  "supersedes": "the PULSE-010 table, which listed refusals without naming the failing ingredient",
+  "anchor_caused": [
+   "overnight_gap_bps",
+   "prior_close",
+   "prior_close_return_bps"
+  ],
+  "quote_caused": [
+   "cash_open_return_bps",
+   "prior_close_return_bps",
+   "session_range_position",
+   "vwap_distance_bps"
+  ],
+  "rows": {
+   "cash_open_return_bps": {
+    "before_q": "VALID",
+    "before_v": -2039.13,
+    "after_q": "STALE",
+    "after_v": null,
+    "declared_inputs": [
+     "mid",
+     "session_open"
+    ],
+    "failing_ingredients": [
+     "mid"
+    ],
+    "refused_by": "PULSE-009 dependency propagation",
+    "note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quo"
+   },
+   "overnight_gap_bps": {
+    "before_q": "VALID",
+    "before_v": -1043.61,
+    "after_q": "STALE",
+    "after_v": null,
+    "declared_inputs": [
+     "session_open",
+     "prior_close"
+    ],
+    "failing_ingredients": [
+     "prior_close"
+    ],
+    "refused_by": "PULSE-009 dependency propagation",
+    "note": "overnight_gap_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24 but the im"
+   },
+   "prior_close": {
+    "before_q": "VALID",
+    "before_v": 0.2568,
+    "after_q": "STALE",
+    "after_v": null,
+    "declared_inputs": [],
+    "failing_ingredients": [
+     "prior_close"
+    ],
+    "refused_by": "PULSE-010 anchor freshness (the field IS the anchor)",
+    "note": "the anchor is from 2025-02-24 but the immediately preceding session is 2026-08-31: at least one regular session passed with no print from this instrument (a halt, a delis"
+   },
+   "prior_close_return_bps": {
+    "before_q": "VALID",
+    "before_v": -2869.94,
+    "after_q": "STALE",
+    "after_v": null,
+    "declared_inputs": [
+     "mid",
+     "prior_close"
+    ],
+    "failing_ingredients": [
+     "mid",
+     "prior_close"
+    ],
+    "refused_by": "PULSE-009 dependency propagation",
+    "note": "prior_close_return_bps: ingredient(s) ['mid', 'prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quo"
+   },
+   "relative_volume": {
+    "before_q": "VALID",
+    "before_v": 0.788,
+    "after_q": "STALE",
+    "after_v": null,
+    "declared_inputs": [
+     "session_volume",
+     "raw:prior_session.volume"
+    ],
+    "failing_ingredients": [
+     "raw:prior_session.volume"
+    ],
+    "refused_by": "PULSE-009 dependency propagation",
+    "note": "relative_volume: ingredient(s) ['raw:prior_session.volume'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24"
+   },
+   "session_range_position": {
+    "before_q": "VALID",
+    "before_v": 0.108,
+    "after_q": "STALE",
+    "after_v": null,
+    "declared_inputs": [
+     "mid",
+     "session_high",
+     "session_low"
+    ],
+    "failing_ingredients": [
+     "mid"
+    ],
+    "refused_by": "PULSE-009 dependency propagation",
+    "note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:q"
+   },
+   "vwap_distance_bps": {
+    "before_q": "VALID",
+    "before_v": -910.31,
+    "after_q": "STALE",
+    "after_v": null,
+    "declared_inputs": [
+     "mid",
+     "session_vwap"
+    ],
+    "failing_ingredients": [
+     "mid"
+    ],
+    "refused_by": "PULSE-009 dependency propagation",
+    "note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote."
+   }
+  },
+  "current_session_fields": {
+   "session_open": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_high": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_low": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_vwap": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "session_volume": {
+    "before": "VALID",
+    "after": "VALID"
+   },
+   "last_minute_volume": {
+    "before": "VALID",
+    "after": "VALID"
+   }
+  },
+  "note_on_independence": "NKLA cannot demonstrate the independence rule, because BOTH its quote and its anchor are stale. The synthetic fixture in results/pulse010r_before_after.json (fresh quote, stale anchor) is what actually tests it, and there cash_open_return_bps, session_range_position and vwap_distance_bps stay VALID."
+ },
+ "bounded_regression": {
+  "commit": "21ab39bc1",
+  "tree": "41918c1e46ae21b5bc52c456e6907d562981cf7a",
+  "shards": 212,
+  "totals": {
+   "PASS": 3790,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 18,
+   "XFAIL": 0,
+   "XPASS": 0
+  },
+  "slice_oom_kill_before": 10,
+  "slice_oom_kill_after": 11,
+  "problem_shards": [
+   "tests/test_null_rig.py(rc=1)"
+  ],
+  "verdict": "FAIL",
+  "problem_shard_attribution": {
+   "finding": "tests/test_null_rig.py OOM-killed in its 1400M shard; slice oom_kill 10->11",
+   "pre_existing": true,
+   "control": "PULSE-007 ran the SAME module at the BASE commit 7969dbbd1 in a clean worktree with none of this work present; it died identically. The settled control is cited rather than repeated.",
+   "control_evidence": "results/pulse007_SUMMARY.json -> bounded_regression.problem_shard_attribution",
+   "touches_this_repair": "no -- the module imports nothing from apex.pulse",
+   "known_defect": "TEST-NULL-RIG-MEMORY-001, repaired on world-model-shadow-v0, not on main",
+   "disposition": "reported, not repaired; limits not raised; verdict retained as FAIL"
+  }
+ },
+ "preservation": {
+  "original_failed_mirror_evidence": "8d0211e77da9ab347cbedac917a81cd59b1872619d183d64ad19188a5d8698e1",
+  "prior_artifacts": {
+   "pulse007_frozen_packets.jsonl": "8994d9191dd1fe187d2c770708b98a3cc78433bcd48a3d675bf8c0954de12f52",
+   "pulse007_frozen_manifest.json": "3557bac4fc0a973558a08c60847e3d5c16a0737e7ad5a163a4b77bccbe4591c8",
+   "pulse007_mirror_run_v2_final.json": "f4e3b4b96dc3b60ecad13da3ba1c396db6354f9d761fa316f075b7f325f39f09",
+   "pulse008_SUMMARY.json": "3c01e71c434c62f2bc768268121766f5e5b47d217b3282e0e577e870398ae99b",
+   "pulse009_SUMMARY.json": "4f55d25840689b45b02d949596a2d4ef72cf0296f151681216121811466603d3",
+   "pulse010_SUMMARY.json": "87d37b69ff7c222c253533c95d9e68e0e7344088f1b50870610a004d32af657f",
+   "pulse010_nkla_before_after.json": "6bdb1818950ed8f1c2572d33091759725401511ff0c83ad5c609991a99b280f6"
+  },
+  "frozen_and_prior_evidence_unchanged": true,
+  "policies_and_declarations_unchanged": true,
+  "dependency_map_unchanged": "DEPENDENCIES not modified; only resolve()'s guard and the module docstring changed in derived.py",
+  "world_model_worktree": "d01e961b6",
+  "production_release": "/opt/apex/releases/5eff1cf5e00f21b02c537f25bcd74b1c1d317546"
+ },
+ "verdicts": {
+  "DEPENDENCY_WIRING": "HARDENED_BEHAVIOUR_UNCHANGED",
+  "ANCHOR_FRESHNESS_ENFORCEMENT": "ENFORCED",
+  "DERIVED_FIELD_INDEPENDENCE": "ENFORCED_AND_MEASURED",
+  "PULSE_COMPOSER_INTEGRITY": "REPAIRED_FOR_DERIVED_AND_ANCHOR_FIELDS",
+  "HISTORICAL_AS_KNOWN_AVAILABILITY": "NOT_PROVEN",
+  "PHASE_2": "OPEN",
+  "WORLD_MODEL_REAL_DATA_ADMISSION": "NOT_AUTHORIZED"
+ },
+ "verdict_notes": {
+  "DEPENDENCY_WIRING": "The over-broad dict is gone and an undeclared ingredient is now an error. This is DEFENSIVE HARDENING: the before/after measurement in this file shows identical quality and value for every watched field in all four scenarios (behaviour_changed = false). No over-propagation was ever demonstrated, and the finding that claimed it has been retracted by the adjudicator. What the guard buys is that the declaration is no longer the only thing preventing unrelated fields from coupling.",
+  "DERIVED_FIELD_INDEPENDENCE": "measured on a synthetic fresh-quote/stale-anchor fixture, before and after, with identical results: cash_open_return_bps, session_range_position and vwap_distance_bps stay VALID while the three true anchor dependents are refused."
+ },
+ "adjudication": {
+  "by": "Astra",
+  "date": "2026-09-06",
+  "over_propagation_finding": "RETRACTED",
+  "retraction_text": "resolve() at the original commit iterated only the declared dependencies; the extra dictionary keys never caused the coupling claimed. NKLA's cash-open return was refused because its QUOTE was stale.",
+  "classification_of_this_change": "DEFENSIVE HARDENING WITH UNCHANGED BEHAVIOUR",
+  "not": "a correction of demonstrated over-propagation",
+  "guard_status": "confirmed in committed code",
+  "independence_tests_and_before_after_equivalence": "consistent with that code",
+  "regression": "still FAIL, with the reported pre-existing OOM",
+  "phase_2": "OPEN; real-data admission remains blocked",
+  "commissioning": "NOT declared -- Astra has not independently rerun the tests"
+ }
+}

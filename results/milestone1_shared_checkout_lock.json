@@ -1,0 +1,12 @@
+{
+ "purpose": "integration shards read /opt/apex-repo as an external input; it must not be switched or written until those checks finish",
+ "pinned_commit": "295d80e4243077ebd6b38875a45dd4cb6959f517",
+ "pinned_branch": "milestone1-r2",
+ "pinned_tree": "ede04a2eb2f88bdc0161e3dc372f0d8b13e4cff1",
+ "tracked_dirty": 0,
+ "locked_utc": "2026-09-07T14:59:26Z",
+ "released": true,
+ "released_utc": "2026-09-07T15:45:07Z",
+ "note": "released after integration3 and its supplemental both completed; the checkout stayed at 295d80e4 throughout",
+ "run": "integration3"
+}

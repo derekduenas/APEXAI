@@ -1,0 +1,34 @@
+=== OPTIONS-PAPER LAUNCH HOLD  2026-09-07T17:52:27Z  RTH opens 2026-09-08T13:30:00Z ===
+  apex-options-paper.service is inactive             ok
+  no marker yet                                      ok
+  no drop-in yet                                     ok
+  current release is 73fc712d (R3 preflight present) ok
+  convention reference (equity-fabric drop-in) intact ok
+
+--- marker that would be written: /apex-data/core/ops/MAINTENANCE_BLOCK_options_paper
+    OPTIONS_PAPER_STATUS = MAINTENANCE_BLOCKED_PENDING_LAUNCH_AUTHORIZATION
+    applied_utc = 2026-09-07T17:52:27Z
+    reason = the recovery deployment authorization excludes launches of inactive
+             services merely because the orchestrator deems them eligible. The
+             recovered orchestrator (73fc712d) would issue systemctl start for
+             this unit at the next RTH phase (demonstrated in dry-run, 2026-09-07).
+             This is NOT a defect in the service; it is a pending authorization.
+    evidence = docs/MILESTONE1_LAUNCH_RECONCILIATION.md
+    authority = launch requires an explicit reviewer decision
+    reversal = rm this file (or rm the drop-in and systemctl daemon-reload)
+--- drop-in that would be written: /etc/systemd/system/apex-options-paper.service.d/10-maintenance-block.conf
+    # OPTIONS_PAPER_STATUS = MAINTENANCE_BLOCKED_PENDING_LAUNCH_AUTHORIZATION
+    # Applied 2026-09-07T17:52:27Z. REVERSIBLE: delete the flag file, or delete this drop-in + daemon-reload.
+    # Blocks orchestrator starts, boot starts, AND systemd Restart=on-failure.
+    # Does NOT change MemoryMax. Does NOT delete the unit or any evidence.
+    [Unit]
+    ConditionPathExists=!/apex-data/core/ops/MAINTENANCE_BLOCK_options_paper
+  marker written                                     ok
+  drop-in written                                    ok
+  daemon-reload                                      ok
+  systemd refuses apex-options-paper.service start   ok
+  drop-in loaded by systemd                          ok
+  deployed R3 preflight says BLOCKED for options-paper ok
+
+APPLIED 2026-09-07T17:52:27Z. At 13:30Z the orchestrator will record MAINTENANCE_BLOCKED for options-paper and attempt nothing.
+Reversal: rm /apex-data/core/ops/MAINTENANCE_BLOCK_options_paper

@@ -15,7 +15,30 @@ import pytest
 from tests import conftest as CF
 
 EQUIV_SEEDS = (90210, 90211, 90212)          # preregistered; old path completes safely
-R6_MASTER = "evidence/bounded_regression/master_inventory.json"
+
+# The nodeid baseline. On world-model-shadow-v0 this guard read the R6 master
+# inventory; that evidence file does not exist on this branch, and a guard that
+# skips is not a guard. The set is therefore PINNED here, collected from
+# tests/test_null_rig.py at this branch's base commit -- BEFORE the repair --
+# so the test fails if the repair adds, drops or renames a single case.
+# tests/test_null_rig.py is byte-identical on both branches (sha256
+# cf0c5a0d2631abe4b4b9a89f2afd13bda40b5f08f5e124a08074558d1cbea931), so this is
+# the same 12 nodeids the R6 master recorded.
+BASE_COMMIT = "15ce57581757c80f2ec7df424fa29ae33a69d273"
+BASELINE_NODEIDS = tuple(sorted((
+    "tests/test_null_rig.py::test_random_walk_ic_is_not_significant",
+    "tests/test_null_rig.py::test_random_walk_decile_spread_is_not_significant",
+    "tests/test_null_rig.py::test_null_panel_produces_a_real_cross_section",
+    "tests/test_null_rig.py::test_null_ic_series_has_the_autocorrelation_the_overlap_implies",
+    "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_fast",
+    "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_full",
+    "tests/test_null_rig.py::test_the_fast_sweep_declares_itself_underpowered",
+    "tests/test_null_rig.py::test_null_decile_spread_is_centred_on_zero",
+    "tests/test_null_rig.py::test_shuffled_score_destroys_ic",
+    "tests/test_null_rig.py::test_shuffled_score_on_real_data",
+    "tests/test_null_rig.py::test_deferred_assertions_are_declared",
+    "tests/test_null_rig.py::test_positive_control_is_recovered_and_scales",
+)))
 
 
 def _old_run(seed: int, alpha: float):
@@ -96,15 +119,21 @@ def test_all_forty_seed_identities_and_assertions_still_active(config):
     assert list(rows["seed"]) == [base, base + 1, base + 2]
 
 
-@pytest.mark.skipif(not os.path.exists(R6_MASTER), reason="R6 master inventory not present")
-def test_null_rig_nodeid_set_unchanged_from_r6_master():
-    master = json.load(open(R6_MASTER))
-    r6 = sorted(it["nodeid"] for it in master["collected"] if it["file"] == "tests/test_null_rig.py")
-    assert len(r6) == 12
-    import subprocess, sys
-    out = subprocess.run([sys.executable, "-m", "pytest", "tests/test_null_rig.py", "--collect-only", "-q",
-                          "-p", "no:cacheprovider"], capture_output=True, text=True)
-    now = sorted(l.strip() for l in out.stdout.splitlines() if l.startswith("tests/test_null_rig.py::"))
-    assert now == r6, (set(now) ^ set(r6))
+def test_null_rig_nodeid_set_unchanged_from_the_base_commit():
+    """The repair must not change WHICH tests run -- only how the fixtures hold
+    memory. Unconditional: there is no evidence file here that could be absent."""
+    assert len(BASELINE_NODEIDS) == 12
+    import subprocess
+    import sys
+    out = subprocess.run([sys.executable, "-m", "pytest", "tests/test_null_rig.py",
+                          "--collect-only", "-q", "-p", "no:cacheprovider"],
+                         capture_output=True, text=True)
+    assert out.returncode == 0, (out.stdout[-2000:] + out.stderr[-2000:])
+    now = tuple(sorted(l.strip() for l in out.stdout.splitlines()
+                       if l.startswith("tests/test_null_rig.py::")))
+    assert now == BASELINE_NODEIDS, set(now) ^ set(BASELINE_NODEIDS)
     src = open("tests/test_null_rig.py").read()
-    assert src.count("@pytest.mark.skip(") == 1          # only the pre-existing DEFERRED skip
+    assert src.count("@pytest.mark.skip(") == 1        # only the pre-existing DEFERRED skip
+    # and this brick did not touch the module itself
+    assert subprocess.run(["git", "diff", "--quiet", BASE_COMMIT, "--",
+                           "tests/test_null_rig.py"]).returncode == 0

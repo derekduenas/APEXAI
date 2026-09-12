@@ -1,0 +1,602 @@
+{
+ "kind": "pulse007_summary",
+ "version": "PULSE007_SUMMARY_V1",
+ "base_commit": "7969dbbd1",
+ "final_commit": "273c368058f85f252dd5136fa47a16612a1ffde3",
+ "branch": "pulse-007-anchor-reconciliation",
+ "worktree_clean": false,
+ "root_causes": {
+  "ANCHOR-001": {
+   "field": "prior_close (and prior_close_return_bps, overnight_gap_bps through it)",
+   "cause": "the historical feeder admitted a daily bar by `stamp + 24h <= UTC midnight of t`. A daily bar is stamped at the session's ET midnight (04:00Z under EDT), so the most recent completed session failed the test and the one before it was returned.",
+   "evidence": {
+    "AAL": {
+     "daily_bars_offered": [
+      "2026-08-25T04:00:00Z",
+      "2026-08-26T04:00:00Z",
+      "2026-08-27T04:00:00Z",
+      "2026-08-28T04:00:00Z",
+      "2026-08-31T04:00:00Z"
+     ],
+     "dropped_by_the_width_filter": [
+      "2026-08-31T04:00:00Z"
+     ],
+     "live_session": "2026-08-31",
+     "replay_session_before_repair": "2026-08-28"
+    },
+    "AAOI": {
+     "daily_bars_offered": [
+      "2026-08-25T04:00:00Z",
+      "2026-08-26T04:00:00Z",
+      "2026-08-27T04:00:00Z",
+      "2026-08-28T04:00:00Z",
+      "2026-08-31T04:00:00Z"
+     ],
+     "dropped_by_the_width_filter": [
+      "2026-08-31T04:00:00Z"
+     ],
+     "live_session": "2026-08-31",
+     "replay_session_before_repair": "2026-08-28"
+    },
+    "AAPL": {
+     "daily_bars_offered": [
+      "2026-08-25T04:00:00Z",
+      "2026-08-26T04:00:00Z",
+      "2026-08-27T04:00:00Z",
+      "2026-08-28T04:00:00Z",
+      "2026-08-31T04:00:00Z"
+     ],
+     "dropped_by_the_width_filter": [
+      "2026-08-31T04:00:00Z"
+     ],
+     "live_session": "2026-08-31",
+     "replay_session_before_repair": "2026-08-28"
+    },
+    "NKLA": {
+     "daily_bars_offered": [],
+     "dropped_by_the_width_filter": [],
+     "live_session": "2025-02-24",
+     "replay_session_before_repair": null
+    },
+    "SPY": {
+     "daily_bars_offered": [
+      "2026-08-25T04:00:00Z",
+      "2026-08-26T04:00:00Z",
+      "2026-08-27T04:00:00Z",
+      "2026-08-28T04:00:00Z",
+      "2026-08-31T04:00:00Z"
+     ],
+     "dropped_by_the_width_filter": [
+      "2026-08-31T04:00:00Z"
+     ],
+     "live_session": "2026-08-31",
+     "replay_session_before_repair": "2026-08-28"
+    },
+    "TDOC": {
+     "daily_bars_offered": [
+      "2026-08-25T04:00:00Z",
+      "2026-08-26T04:00:00Z",
+      "2026-08-27T04:00:00Z",
+      "2026-08-28T04:00:00Z",
+      "2026-08-31T04:00:00Z"
+     ],
+     "dropped_by_the_width_filter": [
+      "2026-08-31T04:00:00Z"
+     ],
+     "live_session": "2026-08-31",
+     "replay_session_before_repair": "2026-08-28"
+    }
+   },
+   "repair": "select by SESSION DATE: the last session strictly before the session containing the as-of instant (apex.pulse.anchors.select_prior_daily)"
+  },
+  "ANCHOR-002": {
+   "field": "cash_open_return_bps (and overnight_gap_bps through dailyBar.o)",
+   "cause": "the intraday window began at UTC midnight, which is 20:00 ET on the PREVIOUS calendar day, so dailyBar.o was the first extended-hours print. Astra's correction is confirmed: cash_open_return_bps is mid/dailyBar.o and has nothing to do with prior_close.",
+   "evidence": {
+    "AAL": {
+     "replay_open_bar_session_class": "PREMARKET",
+     "replay_open_bar_local": "2026-09-01T04:00:00-04:00",
+     "bars_before_cash_open": 160,
+     "live_open": 13.203,
+     "replay_open_before_repair": 13.45,
+     "cash_open_bar_open": 13.2
+    },
+    "AAOI": {
+     "replay_open_bar_session_class": "PREMARKET",
+     "replay_open_bar_local": "2026-09-01T04:00:00-04:00",
+     "bars_before_cash_open": 178,
+     "live_open": 104.45,
+     "replay_open_before_repair": 106.11,
+     "cash_open_bar_open": 104.45
+    },
+    "AAPL": {
+     "replay_open_bar_session_class": "PREMARKET",
+     "replay_open_bar_local": "2026-09-01T04:00:00-04:00",
+     "bars_before_cash_open": 300,
+     "live_open": 316.98,
+     "replay_open_before_repair": 316.55,
+     "cash_open_bar_open": 316.98
+    },
+    "NKLA": {
+     "replay_open_bar_session_class": null,
+     "replay_open_bar_local": null,
+     "bars_before_cash_open": null,
+     "live_open": 0.23,
+     "replay_open_before_repair": null,
+     "cash_open_bar_open": null
+    },
+    "SPY": {
+     "replay_open_bar_session_class": "PREMARKET",
+     "replay_open_bar_local": "2026-09-01T04:00:00-04:00",
+     "bars_before_cash_open": 318,
+     "live_open": 762.01,
+     "replay_open_before_repair": 766.4,
+     "cash_open_bar_open": 762.03
+    },
+    "TDOC": {
+     "replay_open_bar_session_class": "PREMARKET",
+     "replay_open_bar_local": "2026-09-01T07:09:00-04:00",
+     "bars_before_cash_open": 7,
+     "live_open": 6.25,
+     "replay_open_before_repair": 6.32,
+     "cash_open_bar_open": 6.25
+    }
+   },
+   "repair": "the aggregate covers the REGULAR session only, and the opening price comes from the current session's daily bar through a field allow-list of exactly ('o',)"
+  }
+ },
+ "before_after_six_comparisons": {
+  "SPY": {
+   "subject_class": "SPY_index",
+   "before_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+   "after_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+   "before_violations": [
+    "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-1.18 replay=-58.13 (rel 48.26271186)",
+    "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=-0.5294 replay=-0.3333 (rel 0.37041934)",
+    "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=-65.71 replay=-38.34 (rel 0.41652716)",
+    "prior_close: declared SEMANTICALLY_EQUIVALENT but live=767.05 replay=769.35 (rel 0.0029985)",
+    "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-66.88 replay=-96.25 (rel 0.43914474)"
+   ],
+   "after_violations": [
+    "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=-0.5294 replay=-0.3333 (rel 0.37041934)"
+   ],
+   "anchors": {
+    "prior_close": {
+     "live": 767.05,
+     "replay_before": 769.35,
+     "replay_after": 767.05,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "prior_close_return_bps": {
+     "live": -66.88,
+     "replay_before": -96.25,
+     "replay_after": -66.55,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "cash_open_return_bps": {
+     "live": -1.18,
+     "replay_before": -58.13,
+     "replay_after": -0.85,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "overnight_gap_bps": {
+     "live": -65.71,
+     "replay_before": -38.34,
+     "replay_after": -65.71,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    }
+   }
+  },
+  "AAL": {
+   "subject_class": "degraded_subject",
+   "before_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+   "after_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+   "before_violations": [
+    "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=77.26 replay=-107.81 (rel 2.39541807)",
+    "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.5833 replay=0.2258 (rel 0.61289217)",
+    "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=-169.02 replay=-139.3 (rel 0.17583718)",
+    "prior_close: declared SEMANTICALLY_EQUIVALENT but live=13.43 replay=13.64 (rel 0.01563663)",
+    "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-93.08 replay=-245.6 (rel 1.63859046)"
+   ],
+   "after_violations": [
+    "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.5833 replay=0.2258 (rel 0.61289217)"
+   ],
+   "anchors": {
+    "prior_close": {
+     "live": 13.43,
+     "replay_before": 13.64,
+     "replay_after": 13.43,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "prior_close_return_bps": {
+     "live": -93.08,
+     "replay_before": -245.6,
+     "replay_after": -93.08,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "cash_open_return_bps": {
+     "live": 77.26,
+     "replay_before": -107.81,
+     "replay_after": 77.26,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "overnight_gap_bps": {
+     "live": -169.02,
+     "replay_before": -139.3,
+     "replay_after": -169.02,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    }
+   }
+  },
+  "NKLA": {
+   "subject_class": "elevated_mover",
+   "before_verdict": "MIRROR_CONSISTENT",
+   "after_verdict": "MIRROR_CONSISTENT",
+   "before_violations": [],
+   "after_violations": [],
+   "anchors": {
+    "prior_close": {
+     "live": 0.2568,
+     "replay_before": null,
+     "replay_after": null,
+     "observed_before": "LIVE_ONLY",
+     "observed_after": "LIVE_ONLY"
+    },
+    "prior_close_return_bps": {
+     "live": -2869.94,
+     "replay_before": null,
+     "replay_after": null,
+     "observed_before": "LIVE_ONLY",
+     "observed_after": "LIVE_ONLY"
+    },
+    "cash_open_return_bps": {
+     "live": -2039.13,
+     "replay_before": null,
+     "replay_after": null,
+     "observed_before": "LIVE_ONLY",
+     "observed_after": "LIVE_ONLY"
+    },
+    "overnight_gap_bps": {
+     "live": -1043.61,
+     "replay_before": null,
+     "replay_after": null,
+     "observed_before": "LIVE_ONLY",
+     "observed_after": "LIVE_ONLY"
+    }
+   }
+  },
+  "AAOI": {
+   "subject_class": "enriched_subject",
+   "before_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+   "after_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+   "before_violations": [
+    "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-246.53 replay=-392.05 (rel 0.59027299)",
+    "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.6 replay=-0.5 (rel 1.83333333)",
+    "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=-300.86 replay=-11.3 (rel 0.962441)",
+    "prior_close: declared SEMANTICALLY_EQUIVALENT but live=107.69 replay=106.23 (rel 0.01355743)",
+    "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-539.98 replay=-402.9 (rel 0.25386125)",
+    "spread_bps: declared SEMANTICALLY_EQUIVALENT but live=14.724 replay=9.809 (rel 0.33380875)"
+   ],
+   "after_violations": [
+    "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-246.53 replay=-239.35 (rel 0.02912424)",
+    "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.6 replay=-0.5 (rel 1.83333333)",
+    "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-539.98 replay=-533.01 (rel 0.01290789)",
+    "spread_bps: declared SEMANTICALLY_EQUIVALENT but live=14.724 replay=9.809 (rel 0.33380875)"
+   ],
+   "anchors": {
+    "prior_close": {
+     "live": 107.69,
+     "replay_before": 106.23,
+     "replay_after": 107.69,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "prior_close_return_bps": {
+     "live": -539.98,
+     "replay_before": -402.9,
+     "replay_after": -533.01,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "APPROXIMATE"
+    },
+    "cash_open_return_bps": {
+     "live": -246.53,
+     "replay_before": -392.05,
+     "replay_after": -239.35,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "APPROXIMATE"
+    },
+    "overnight_gap_bps": {
+     "live": -300.86,
+     "replay_before": -11.3,
+     "replay_after": -300.86,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    }
+   }
+  },
+  "AAPL": {
+   "subject_class": "liquid_megacap",
+   "before_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+   "after_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+   "before_violations": [
+    "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=68.46 replay=82.14 (rel 0.19982472)",
+    "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.0 replay=-0.3333 (rel 333299999.99999994)",
+    "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=4.1 replay=-98.53 (rel 25.03170732)",
+    "prior_close: declared SEMANTICALLY_EQUIVALENT but live=316.85 replay=319.7 (rel 0.00899479)",
+    "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=72.59 replay=-17.2 (rel 1.23694724)"
+   ],
+   "after_violations": [
+    "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.0 replay=-0.3333 (rel 333299999.99999994)"
+   ],
+   "anchors": {
+    "prior_close": {
+     "live": 316.85,
+     "replay_before": 319.7,
+     "replay_after": 316.85,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "prior_close_return_bps": {
+     "live": 72.59,
+     "replay_before": -17.2,
+     "replay_after": 72.59,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "cash_open_return_bps": {
+     "live": 68.46,
+     "replay_before": 82.14,
+     "replay_after": 68.46,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "overnight_gap_bps": {
+     "live": 4.1,
+     "replay_before": -98.53,
+     "replay_after": 4.1,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    }
+   }
+  },
+  "TDOC": {
+   "subject_class": "ordinary_subject",
+   "before_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+   "after_verdict": "MIRROR_CONSISTENT",
+   "before_violations": [
+    "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=120.0 replay=7.91 (rel 0.93408333)",
+    "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=-141.96 replay=-276.92 (rel 0.95069034)",
+    "prior_close: declared SEMANTICALLY_EQUIVALENT but live=6.34 replay=6.5 (rel 0.02523659)",
+    "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-23.66 replay=-269.23 (rel 10.37912088)"
+   ],
+   "after_violations": [],
+   "anchors": {
+    "prior_close": {
+     "live": 6.34,
+     "replay_before": 6.5,
+     "replay_after": 6.34,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "prior_close_return_bps": {
+     "live": -23.66,
+     "replay_before": -269.23,
+     "replay_after": -23.66,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "cash_open_return_bps": {
+     "live": 120.0,
+     "replay_before": 7.91,
+     "replay_after": 120.0,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    },
+    "overnight_gap_bps": {
+     "live": -141.96,
+     "replay_before": -276.92,
+     "replay_after": -141.96,
+     "observed_before": "APPROXIMATE",
+     "observed_after": "SEMANTICALLY_EQUIVALENT"
+    }
+   }
+  }
+ },
+ "anchor_fields_all_semantically_equivalent_after_repair": false,
+ "anchor_decomposition": {
+  "buckets": "semantically_equivalent = both feeders produced a value and they agree; disagreed = both produced a value and they do not; not_compared = history produced nothing, which is a COVERAGE question, not a value question",
+  "pure_anchor_quantities": {
+   "fields": [
+    "prior_close",
+    "overnight_gap_bps"
+   ],
+   "semantically_equivalent": {
+    "SPY": [
+     "prior_close",
+     "overnight_gap_bps"
+    ],
+    "AAL": [
+     "prior_close",
+     "overnight_gap_bps"
+    ],
+    "AAOI": [
+     "prior_close",
+     "overnight_gap_bps"
+    ],
+    "AAPL": [
+     "prior_close",
+     "overnight_gap_bps"
+    ],
+    "TDOC": [
+     "prior_close",
+     "overnight_gap_bps"
+    ]
+   },
+   "disagreed": {},
+   "not_compared": {
+    "NKLA": [
+     "prior_close",
+     "overnight_gap_bps"
+    ]
+   },
+   "result": "EXACT on every subject where history reconstructed anything (5 of 6 subjects); the only gap is NKLA, where history reconstructs nothing at all. ANCHOR-001 and ANCHOR-002 no longer produce a wrong value anywhere."
+  },
+  "anchor_over_live_mid": {
+   "fields": [
+    "prior_close_return_bps",
+    "cash_open_return_bps"
+   ],
+   "semantically_equivalent": {
+    "SPY": [
+     "prior_close_return_bps",
+     "cash_open_return_bps"
+    ],
+    "AAL": [
+     "prior_close_return_bps",
+     "cash_open_return_bps"
+    ],
+    "AAPL": [
+     "prior_close_return_bps",
+     "cash_open_return_bps"
+    ],
+    "TDOC": [
+     "prior_close_return_bps",
+     "cash_open_return_bps"
+    ]
+   },
+   "disagreed": {
+    "AAOI": [
+     "prior_close_return_bps",
+     "cash_open_return_bps"
+    ]
+   },
+   "not_compared": {
+    "NKLA": [
+     "prior_close_return_bps",
+     "cash_open_return_bps"
+    ]
+   },
+   "note": "these embed the LIVE MID as well as an anchor, so a quote-timing difference surfaces here even when the anchor itself is exact. On AAOI the two pure anchor quantities match EXACTLY while these two do not, which localises the residual to the mid rather than to the anchor."
+  },
+  "why_the_overall_verdict_is_not_PASS": "ANCHOR_REPAIR is computed under the strict rule fixed before the run -- all four anchor-related fields SEMANTICALLY_EQUIVALENT on every subject. AAOI disagrees on the two mid-bearing features and NKLA compares nothing at all, so the rule is not met. The rule was NOT relaxed after seeing the result; the decomposition is offered so the residual can be judged rather than assumed."
+ },
+ "residual_after_repair": {
+  "classification": {
+   "AAL": {
+    "category": "a",
+    "finding": "both feeders read the same SIP NBBO with the same convention; they select DIFFERENT events because the live packet's quote is the one current when PULSE captured (1.405s after the scheduled slot) while the replay reconstructs at the scheduled slot exactly. 7 NBBO updates fall between them."
+   },
+   "AAOI": {
+    "category": "a",
+    "finding": "both feeders read the same SIP NBBO with the same convention; they select DIFFERENT events because the live packet's quote is the one current when PULSE captured (1.275s after the scheduled slot) while the replay reconstructs at the scheduled slot exactly. 36 NBBO updates fall between them."
+   },
+   "AAPL": {
+    "category": "a",
+    "finding": "both feeders read the same SIP NBBO with the same convention; they select DIFFERENT events because the live packet's quote is the one current when PULSE captured (1.298s after the scheduled slot) while the replay reconstructs at the scheduled slot exactly. 30 NBBO updates fall between them."
+   },
+   "NKLA": {
+    "category": "c",
+    "finding": "the live packet carries no two-sided NBBO at all; nothing to compare. Coverage question, not a value question."
+   },
+   "SPY": {
+    "category": "a",
+    "finding": "both feeders read the same SIP NBBO with the same convention; they select DIFFERENT events because the live packet's quote is the one current when PULSE captured (1.669s after the scheduled slot) while the replay reconstructs at the scheduled slot exactly. 473 NBBO updates fall between them."
+   },
+   "TDOC": {
+    "category": "a",
+    "finding": "same event, same values; no residual from the quote path"
+   }
+  },
+  "conclusion": "category (a) on every subject that had a quote: same source, same convention, DIFFERENT selected event. The live packet's mid, spread_bps, nbbo_size_imbalance and touch_size reproduce EXACTLY from the tape at the packet's own as_of, on 5 of 5. No quote-engine defect was found and none was rebuilt.",
+  "natural_control": "TDOC has 0 NBBO updates between the scheduled slot and its own as_of, and TDOC is the only subject whose full mirror passes."
+ },
+ "coverage": {
+  "MIRROR_COVERAGE": "INCOMPLETE",
+  "reasons": [
+   "['elevated_mover'] reconstructed nothing comparable -- an all-LIVE_ONLY comparison is a coverage hole, not a consistency result"
+  ],
+  "empty_comparisons": [
+   "elevated_mover"
+  ],
+  "v0_would_have_said": "MIRROR_CONSISTENT for NKLA -- zero fields compared, zero violations raised"
+ },
+ "bounded_regression": {
+  "commit": "273c36805",
+  "tree": "226c480f5408c2f0bce9c4576f6e10074c4cfbf3",
+  "shards": 208,
+  "totals": {
+   "PASS": 3624,
+   "FAIL": 0,
+   "ERROR": 0,
+   "SKIP": 18,
+   "XFAIL": 0,
+   "XPASS": 0
+  },
+  "slice_oom_kill_before": 5,
+  "slice_oom_kill_after": 6,
+  "problem_shards": [
+   "tests/test_null_rig.py(rc=1)"
+  ],
+  "verdict": "FAIL",
+  "acceptance_surface_on_this_branch": "NONE (no apex/world_model, no courts/, no seed machinery)",
+  "problem_shard_attribution": {
+   "finding": "tests/test_null_rig.py OOM-killed in its 1400M shard (5 dots, no summary, slice oom_kill 5->6)",
+   "pre_existing": true,
+   "control": "the SAME module in an identical 1400M container at the BASE commit 7969dbbd1, in a clean git worktree with no anchors.py present, died identically and incremented slice oom_kill 6->7",
+   "touches_pulse007_code": "no -- 0 references to pulse/anchors/historical/mirror in the module",
+   "known_defect": "TEST-NULL-RIG-MEMORY-001, found and repaired on branch world-model-shadow-v0 (conftest lru_cache retention); that repair does not exist on main",
+   "disposition": "reported, not repaired -- outside this brick"
+  }
+ },
+ "preservation": {
+  "original_failed_mirror_evidence": {
+   "path": "results/pulse/mirror_tests.jsonl",
+   "sha256": "8d0211e77da9ab347cbedac917a81cd59b1872619d183d64ad19188a5d8698e1",
+   "note": "untouched by this brick; the V2 runner writes to a separate versioned path"
+  },
+  "declarations_and_tolerances_unchanged": true,
+  "files_changed": [
+   "apex/pulse/anchors.py",
+   "apex/pulse/historical.py",
+   "results/pulse007_anchor_trace.json",
+   "results/pulse007_declaration_proposals.json",
+   "results/pulse007_frozen_manifest.json",
+   "results/pulse007_frozen_packets.jsonl",
+   "results/pulse007_mirror_run_v2_post_repair.json",
+   "results/pulse007_orchestrator_incident.json",
+   "results/pulse007_quote_residual.json",
+   "scripts/mirror_run_v2.py",
+   "scripts/pulse007_incident.py",
+   "scripts/pulse007_proposals.py",
+   "scripts/pulse007_quote_residual.py",
+   "scripts/pulse007_shard_regression.sh",
+   "tests/test_pulse_anchors.py"
+  ],
+  "world_model_worktree": "d01e961b6",
+  "world_model_worktree_clean": true,
+  "production_release": "/opt/apex/releases/5eff1cf5e00f21b02c537f25bcd74b1c1d317546"
+ },
+ "verdicts": {
+  "ANCHOR_CONTRACT": "DEFINED",
+  "ANCHOR_REPAIR": "FAIL",
+  "MIRROR_COVERAGE": "INCOMPLETE",
+  "MIRROR_UNDER_ORIGINAL_DECLARATIONS": "BLOCKED",
+  "HISTORICAL_AS_KNOWN_AVAILABILITY": "NOT_PROVEN",
+  "PHASE_2": "OPEN",
+  "WORLD_MODEL_REAL_DATA_ADMISSION": "NOT_AUTHORIZED"
+ },
+ "verdict_notes": {
+  "ANCHOR_REPAIR": "FAIL under the strict rule fixed before the run: all four anchor-related fields SEMANTICALLY_EQUIVALENT on every subject. The two PURE anchor quantities -- prior_close and overnight_gap_bps -- are now EXACT on 5 of 5, so ANCHOR-001 and ANCHOR-002 are closed. The two features that combine an anchor with the LIVE MID remain APPROXIMATE on AAOI, for the quote-timing reason measured in the residual classification. The rule was not relaxed to convert this into a PASS; see anchor_decomposition.",
+  "MIRROR_COVERAGE": "INCOMPLETE because NKLA reconstructs nothing. That is the honest answer, not a regression: the V0 runner called the same situation MIRROR_CONSISTENT.",
+  "MIRROR_UNDER_ORIGINAL_DECLARATIONS": "BLOCKED, not PASS. No declaration was relaxed to reach a green result.",
+  "HISTORICAL_AS_KNOWN_AVAILABILITY": "the vendor history endpoint returns records as they stand at retrieval; nothing establishes when a value became available. Corpus admission stays blocked."
+ }
+}

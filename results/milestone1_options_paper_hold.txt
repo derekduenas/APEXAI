@@ -1,0 +1,9 @@
+applied_utc=2026-09-07T17:52:27Z
+verified_utc=2026-09-07T17:53:13Z
+marker=/apex-data/core/ops/MAINTENANCE_BLOCK_options_paper sha256=fafdcb7d00133d70067ba8816d53b49c831abfc412116a047cdb426657fe324f
+dropin=/etc/systemd/system/apex-options-paper.service.d/10-maintenance-block.conf sha256=df7af29b16f65221c3b5f0d6c8837493ba4edea714fcfd0ecbe5cca53a07e50d
+dropins_before=slice.conf
+dropins_after=10-maintenance-block.conf,slice.conf,
+unit_state=inactive,no,
+removal=requires explicit activation authorization; never automatic
+correction_utc=2026-09-07T17:54:07Z: the hold commit message said the unit had one journal line since deploy (a reload notice). The journal shows NO entries for apex-options-paper since 2026-09-07T15:46Z; the earlier count of 1 was the placeholder line. No launch, no reload notice, nothing.

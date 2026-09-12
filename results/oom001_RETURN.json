@@ -1,0 +1,230 @@
+{
+ "kind": "oom001_return",
+ "version": "REGRESSION_OOM_001_V1",
+ "defect": "TEST-NULL-RIG-MEMORY-001",
+ "base_commit": "15ce57581757c80f2ec7df424fa29ae33a69d273",
+ "repair_commit": "02f94e596855ca868c972e301506aeac87778b38",
+ "source_repair": {
+  "branch": "world-model-shadow-v0",
+  "commit": "dcc541c14",
+  "title": "WM-0E-R6.1 test-support repair"
+ },
+ "reconciliation": {
+  "previous": {
+   "commit": "21ab39bc1",
+   "shards": 212,
+   "totals": {
+    "PASS": 3790,
+    "FAIL": 0,
+    "ERROR": 0,
+    "SKIP": 18,
+    "XFAIL": 0,
+    "XPASS": 0
+   },
+   "problem_shards": [
+    "tests/test_null_rig.py(rc=1)"
+   ],
+   "verdict": "FAIL"
+  },
+  "this_run": {
+   "commit": "02f94e596855ca868c972e301506aeac87778b38",
+   "shards": 213,
+   "totals": {
+    "PASS": 3806,
+    "SKIP": 19
+   },
+   "problem_shards": [],
+   "verdict": "PASS"
+  },
+  "shard_delta": 1,
+  "shard_delta_explained": "tests/test_null_rig_memory.py, the new equivalence module",
+  "pass_delta": 16,
+  "pass_delta_explained": {
+   "recovered_from_the_previously_OOM_killed_module": 11,
+   "new_equivalence_guards": 5,
+   "expected_total": 3806,
+   "observed_total": 3806,
+   "reconciles": true
+  },
+  "skip_delta": 1,
+  "skip_delta_explained": {
+   "recovered_pre_existing_DEFERRED_skip_in_test_null_rig": 1,
+   "newly_introduced_skips": 0,
+   "expected_total": 19,
+   "observed_total": 19,
+   "reconciles": true
+  },
+  "fail_error": {
+   "FAIL": 0,
+   "ERROR": 0
+  },
+  "accounting": {
+   "collected": 3825,
+   "executed": 3825,
+   "every_collected_test_accounted_for": true
+  },
+  "oom": {
+   "slice_oom_kill_before": 11,
+   "slice_oom_kill_after": 11,
+   "new_oom_kills": 0,
+   "shards_with_a_unit_oom": []
+  }
+ },
+ "failing_module_verification": {
+  "module": "tests/test_null_rig.py",
+  "collected": 12,
+  "executed": 12,
+  "counts": {
+   "PASS": 11,
+   "SKIP": 1
+  },
+  "peak_mib": 699.4,
+  "cap_mib": 1400,
+  "unit_oom_kill": "0",
+  "seconds": 181.8,
+  "collected_ids": [
+   "tests/test_null_rig.py::test_random_walk_ic_is_not_significant",
+   "tests/test_null_rig.py::test_random_walk_decile_spread_is_not_significant",
+   "tests/test_null_rig.py::test_null_panel_produces_a_real_cross_section",
+   "tests/test_null_rig.py::test_null_ic_series_has_the_autocorrelation_the_overlap_implies",
+   "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_fast",
+   "tests/test_null_rig.py::test_newey_west_matches_its_null_reference_full",
+   "tests/test_null_rig.py::test_the_fast_sweep_declares_itself_underpowered",
+   "tests/test_null_rig.py::test_null_decile_spread_is_centred_on_zero",
+   "tests/test_null_rig.py::test_shuffled_score_destroys_ic",
+   "tests/test_null_rig.py::test_shuffled_score_on_real_data",
+   "tests/test_null_rig.py::test_deferred_assertions_are_declared",
+   "tests/test_null_rig.py::test_positive_control_is_recovered_and_scales"
+  ],
+  "skip_reasons": [
+   "SKIPPED [1] ../apex/tests/test_null_rig.py:293: DEFERRED until a real vendor is wired (Stage 4): shuffled APEX Score produces IC ~ 0 on REAL data (kickoff Stage 2, item 3)"
+  ]
+ },
+ "new_module": {
+  "module": "tests/test_null_rig_memory.py",
+  "collected": 5,
+  "counts": {
+   "PASS": 5
+  },
+  "peak_mib": 531.3,
+  "collected_ids": [
+   "tests/test_null_rig_memory.py::test_semantic_equivalence_old_vs_new_on_preregistered_seeds",
+   "tests/test_null_rig_memory.py::test_heavy_cache_bounded_and_sweep_does_not_populate_it",
+   "tests/test_null_rig_memory.py::test_memory_does_not_grow_linearly_with_completed_sweep_seeds",
+   "tests/test_null_rig_memory.py::test_all_forty_seed_identities_and_assertions_still_active",
+   "tests/test_null_rig_memory.py::test_null_rig_nodeid_set_unchanged_from_the_base_commit"
+  ]
+ },
+ "preservation": {
+  "kind": "oom001_preservation",
+  "base": "15ce57581757c80f2ec7df424fa29ae33a69d273",
+  "head": "02f94e596855ca868c972e301506aeac87778b38",
+  "changed_files": [
+   "tests/conftest.py",
+   "tests/test_null_rig_memory.py"
+  ],
+  "only_two_test_support_files": true,
+  "touched_outside_test_support": [],
+  "config_files_changed": [],
+  "apex_package_changed": [],
+  "existing_test_modules_changed": [],
+  "test_null_rig_unchanged": true,
+  "collection": {
+   "modules_base": 212,
+   "modules_head": 213,
+   "nodeids_base": 3820,
+   "nodeids_head": 3825,
+   "lost_nodeids": {},
+   "gained_nodeids": {
+    "tests/test_null_rig_memory.py": [
+     "tests/test_null_rig_memory.py::test_all_forty_seed_identities_and_assertions_still_active",
+     "tests/test_null_rig_memory.py::test_heavy_cache_bounded_and_sweep_does_not_populate_it",
+     "tests/test_null_rig_memory.py::test_memory_does_not_grow_linearly_with_completed_sweep_seeds",
+     "tests/test_null_rig_memory.py::test_null_rig_nodeid_set_unchanged_from_the_base_commit",
+     "tests/test_null_rig_memory.py::test_semantic_equivalence_old_vs_new_on_preregistered_seeds"
+    ]
+   },
+   "no_coverage_lost": true
+  },
+  "assertions": {
+   "assert_statements_base": 24,
+   "assert_statements_head": 24,
+   "skip_markers_base": 1,
+   "skip_markers_head": 1,
+   "identical": true
+  },
+  "null_rig_config_unchanged": true,
+  "seed_parameters": {
+   "n_seeds": "40",
+   "n_seeds_fast": "8",
+   "n_securities": "600",
+   "base_seed": "90210"
+  },
+  "computation_body_verbatim": true,
+  "containment": {
+   "wrapper_MemoryMax": [
+    "1536M,",
+    "1400M,",
+    "1400M"
+   ],
+   "slice_max": "1610612736",
+   "unit_cap_used_by_this_brick": "1400M",
+   "wrapper_sha256": "dfbb916b435ba0a4a0dde02ad34825c9eb924307989791b8241343426bd62699"
+  },
+  "all_preserved": true
+ },
+ "memory": {
+  "cap_mib_per_shard": 1400,
+  "slice_ceiling": "1610612736",
+  "highest_peak": {
+   "mib": 699.4,
+   "module": "tests/test_null_rig.py"
+  },
+  "top_five_peaks": [
+   {
+    "module": "tests/test_null_rig.py",
+    "peak_mib": 699.4
+   },
+   {
+    "module": "tests/test_null_rig_memory.py",
+    "peak_mib": 531.3
+   },
+   {
+    "module": "tests/test_research_ledger.py",
+    "peak_mib": 215.3
+   },
+   {
+    "module": "tests/test_hac_reference.py",
+    "peak_mib": 214.9
+   },
+   {
+    "module": "tests/test_verdict.py",
+    "peak_mib": 214.7
+   }
+  ],
+  "headroom_mib_at_the_worst_shard": 700.6
+ },
+ "all_skips": [
+  "SKIPPED [1] ../apex/tests/test_btc_semantics.py:114: no live ledger",
+  "SKIPPED [1] ../apex/tests/test_btc_semantics.py:84: no live ledger in this environment",
+  "SKIPPED [1] ../apex/tests/test_commissioning_foundation.py:120: no real Friday session file",
+  "SKIPPED [1] ../apex/tests/test_commissioning_foundation.py:146: acceptance record not present in this environment",
+  "SKIPPED [1] ../apex/tests/test_commissioning_foundation.py:187: no reconciliation record in this environment",
+  "SKIPPED [1] ../apex/tests/test_commissioning_foundation.py:40: sentinel not yet started in this environment",
+  "SKIPPED [1] ../apex/tests/test_curve_v2.py:237: no live bar data in this environment",
+  "SKIPPED [1] ../apex/tests/test_decision_organism_v1.py:155: no live bar data in this environment",
+  "SKIPPED [1] ../apex/tests/test_integrity_museum.py:53: ATTEMPT_1_LAB02_hollow fixture absent on this machine",
+  "SKIPPED [1] ../apex/tests/test_integrity_museum.py:53: ATTEMPT_2_LAB04_blindfold fixture absent on this machine",
+  "SKIPPED [1] ../apex/tests/test_living_organism_2026_08_21.py:431: no outcome ledger in this environment",
+  "SKIPPED [1] ../apex/tests/test_null_rig.py:293: DEFERRED until a real vendor is wired (Stage 4): shuffled APEX Score produces IC ~ 0 on REAL data (kickoff Stage 2, item 3)",
+  "SKIPPED [1] ../apex/tests/test_pattern_observatory.py:1228: production options live capture absent in this environment (Mac-only data, not code)",
+  "SKIPPED [1] ../apex/tests/test_snapshot_corrections.py:77: production snapshot not present",
+  "SKIPPED [1] ../apex/tests/test_unattended_closure.py:409: verifies the Mac host launchd/ops installation -- Darwin-only by nature; cloud uses systemd (C6)",
+  "SKIPPED [1] tests/test_btc_l2_redteam.py:316: no real ledger in this environment",
+  "SKIPPED [1] tests/test_btc_l2_redteam.py:396: no real WS ledgers in this environment",
+  "SKIPPED [1] tests/test_sac1_tier1.py:286: verifies the Mac host launchd/ops installation -- Darwin-only by nature; cloud uses systemd (C6)",
+  "SKIPPED [1] tests/test_sac1_tier1.py:311: daemon has not written health in this environment"
+ ],
+ "elapsed_s": 2427.9,
+ "verdict": "PASS"
+}

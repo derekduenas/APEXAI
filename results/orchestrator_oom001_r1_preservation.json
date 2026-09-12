@@ -1,0 +1,85 @@
+{
+ "kind": "oom001_r1_preservation",
+ "base": "9e8f416bafca76f7e21031522812323e63883638",
+ "repair": "810b72c8dc8b9422ba96f41d900cfd361f5ff1da",
+ "changed_files": [
+  "apex/governance/chain_ledger.py",
+  "tests/test_chain_tail_bounded.py"
+ ],
+ "only_the_primitive_and_its_new_test": true,
+ "existing_test_modules_changed": [],
+ "config_or_unit_files_changed": [],
+ "other_apex_modules_changed": [],
+ "collection": {
+  "modules_base": 213,
+  "modules_head": 214,
+  "nodeids_base": 3825,
+  "nodeids_head": 3846,
+  "lost_nodeids": {},
+  "gained_nodeids": {
+   "tests/test_chain_tail_bounded.py": [
+    "tests/test_chain_tail_bounded.py::test_a_file_of_only_garbage_is_genesis_because_the_whole_file_was_read",
+    "tests/test_chain_tail_bounded.py::test_a_valid_final_record_larger_than_the_ceiling_refuses",
+    "tests/test_chain_tail_bounded.py::test_an_empty_file_is_genesis_not_an_error",
+    "tests/test_chain_tail_bounded.py::test_chain_append_itself_only_ever_writes_ascii",
+    "tests/test_chain_tail_bounded.py::test_complete_malformed_trailing_record_is_treated_as_damage",
+    "tests/test_chain_tail_bounded.py::test_final_record_of_262275_bytes_is_still_found",
+    "tests/test_chain_tail_bounded.py::test_first_ever_append_is_genesis",
+    "tests/test_chain_tail_bounded.py::test_multibyte_character_split_by_the_window_edge",
+    "tests/test_chain_tail_bounded.py::test_multiprocess_appends_do_not_lose_records",
+    "tests/test_chain_tail_bounded.py::test_ordinary_valid_ledger_links_to_the_last_record",
+    "tests/test_chain_tail_bounded.py::test_reads_are_bounded_by_a_constant_not_by_the_file",
+    "tests/test_chain_tail_bounded.py::test_record_beyond_the_ceiling_raises_and_writes_nothing",
+    "tests/test_chain_tail_bounded.py::test_serialisation_and_hash_semantics_are_unchanged",
+    "tests/test_chain_tail_bounded.py::test_the_declared_ceiling_is_what_the_module_says",
+    "tests/test_chain_tail_bounded.py::test_the_flock_sidecar_is_still_used",
+    "tests/test_chain_tail_bounded.py::test_the_refusal_is_never_downgraded_to_genesis",
+    "tests/test_chain_tail_bounded.py::test_the_search_widens_only_as_far_as_it_must",
+    "tests/test_chain_tail_bounded.py::test_thread_race_still_produces_an_unbroken_chain",
+    "tests/test_chain_tail_bounded.py::test_torn_fragment_larger_than_one_window",
+    "tests/test_chain_tail_bounded.py::test_torn_trailing_record_links_past_the_fragment",
+    "tests/test_chain_tail_bounded.py::test_window_starting_exactly_on_a_record_boundary_keeps_that_record"
+   ]
+  },
+  "no_coverage_lost": true
+ },
+ "semantics_preserved": {
+  "serialisation_line": true,
+  "sha256_over_the_same_body": true,
+  "torn_flag_still_recorded": true,
+  "trailing_newline_repair_kept": true,
+  "thread_lock_kept": true,
+  "flock_kept": true,
+  "whole_file_read_removed": true,
+  "ceiling_declared": true,
+  "initial_window_unchanged": true,
+  "whole_file_read_removed_FIRST_CHECK_WAS_WRONG": {
+   "original_check": "\"read_text()\" not in source",
+   "original_result": false,
+   "why_it_was_wrong": "a substring match over the whole file, which matched the module docstring where the removed defect is described. Prose is not code.",
+   "corrected_check": "ast: is read_text called anywhere in executable code, and does any .read() call lack a size argument",
+   "read_text_called_in_code": false,
+   "unbounded_read_calls": [],
+   "bounded_read_call_lines": [
+    130,
+    132,
+    172
+   ],
+   "result": true
+  }
+ },
+ "containment_unchanged": {
+  "wrapper_sha256": "dfbb916b435ba0a4a0dde02ad34825c9eb924307989791b8241343426bd62699",
+  "expected": "dfbb916b435ba0a4a0dde02ad34825c9eb924307989791b8241343426bd62699",
+  "slice_max": "1610612736",
+  "matches": true
+ },
+ "production_untouched": {
+  "orchestrator_unit_MemoryMax": "536870912",
+  "expected": "536870912",
+  "release_symlink": "/opt/apex/releases/5eff1cf5e00f21b02c537f25bcd74b1c1d317546",
+  "production_ledger_mtime": "2026-09-06 04:50:03.172832846 +0000",
+  "production_ledger_size": "438867453"
+ },
+ "all_preserved": true
+}

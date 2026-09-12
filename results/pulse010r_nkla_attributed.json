@@ -1,0 +1,163 @@
+{
+ "kind": "pulse010_repair_nkla_diagnostic",
+ "version": "NKLA_ATTRIBUTED_V3",
+ "status": "DIAGNOSTIC ONLY -- the sealed packet was read, never modified",
+ "why_this_supersedes_the_pulse010_table": "the earlier table listed cash_open_return_bps among the refusals without saying WHY. NKLA's quote is ALSO 553 days old, so that field was refused for its MID, not for the anchor. Reading it as anchor contamination is what made the return look self-contradictory. Every row now names the failing ingredient.",
+ "composer_after": "PULSE_COMPOSE_V0.2.1",
+ "refused_with_attribution": {
+  "cash_open_return_bps": {
+   "before_q": "VALID",
+   "before_v": -2039.13,
+   "after_q": "STALE",
+   "after_v": null,
+   "declared_inputs": [
+    "mid",
+    "session_open"
+   ],
+   "failing_ingredients": [
+    "mid"
+   ],
+   "refused_by": "PULSE-009 dependency propagation",
+   "note": "cash_open_return_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quo"
+  },
+  "overnight_gap_bps": {
+   "before_q": "VALID",
+   "before_v": -1043.61,
+   "after_q": "STALE",
+   "after_v": null,
+   "declared_inputs": [
+    "session_open",
+    "prior_close"
+   ],
+   "failing_ingredients": [
+    "prior_close"
+   ],
+   "refused_by": "PULSE-009 dependency propagation",
+   "note": "overnight_gap_bps: ingredient(s) ['prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24 but the im"
+  },
+  "prior_close": {
+   "before_q": "VALID",
+   "before_v": 0.2568,
+   "after_q": "STALE",
+   "after_v": null,
+   "declared_inputs": [],
+   "failing_ingredients": [
+    "prior_close"
+   ],
+   "refused_by": "PULSE-010 anchor freshness (the field IS the anchor)",
+   "note": "the anchor is from 2025-02-24 but the immediately preceding session is 2026-08-31: at least one regular session passed with no print from this instrument (a halt, a delis"
+  },
+  "prior_close_return_bps": {
+   "before_q": "VALID",
+   "before_v": -2869.94,
+   "after_q": "STALE",
+   "after_v": null,
+   "declared_inputs": [
+    "mid",
+    "prior_close"
+   ],
+   "failing_ingredients": [
+    "mid",
+    "prior_close"
+   ],
+   "refused_by": "PULSE-009 dependency propagation",
+   "note": "prior_close_return_bps: ingredient(s) ['mid', 'prior_close'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quo"
+  },
+  "relative_volume": {
+   "before_q": "VALID",
+   "before_v": 0.788,
+   "after_q": "STALE",
+   "after_v": null,
+   "declared_inputs": [
+    "session_volume",
+    "raw:prior_session.volume"
+   ],
+   "failing_ingredients": [
+    "raw:prior_session.volume"
+   ],
+   "refused_by": "PULSE-009 dependency propagation",
+   "note": "relative_volume: ingredient(s) ['raw:prior_session.volume'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (the anchor is from 2025-02-24"
+  },
+  "session_range_position": {
+   "before_q": "VALID",
+   "before_v": 0.108,
+   "after_q": "STALE",
+   "after_v": null,
+   "declared_inputs": [
+    "mid",
+    "session_high",
+    "session_low"
+   ],
+   "failing_ingredients": [
+    "mid"
+   ],
+   "refused_by": "PULSE-009 dependency propagation",
+   "note": "session_range_position: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:q"
+  },
+  "vwap_distance_bps": {
+   "before_q": "VALID",
+   "before_v": -910.31,
+   "after_q": "STALE",
+   "after_v": null,
+   "declared_inputs": [
+    "mid",
+    "session_vwap"
+   ],
+   "failing_ingredients": [
+    "mid"
+   ],
+   "refused_by": "PULSE-009 dependency propagation",
+   "note": "vwap_distance_bps: ingredient(s) ['mid'] are STALE, so this value cannot be trusted either [DERIVED-FIELD-STALENESS-001] (mid: ingredient(s) ['raw:quote.ask', 'raw:quote."
+  }
+ },
+ "refused_because_the_ANCHOR_failed": [
+  "overnight_gap_bps",
+  "prior_close",
+  "prior_close_return_bps"
+ ],
+ "refused_because_the_QUOTE_failed": [
+  "cash_open_return_bps",
+  "prior_close_return_bps",
+  "session_range_position",
+  "vwap_distance_bps"
+ ],
+ "changed_but_not_attributable": [
+  "catalyst_fact_status",
+  "ret_10m_bps",
+  "ret_15m_bps",
+  "ret_30m_bps",
+  "ret_5m_bps",
+  "ret_60m_bps"
+ ],
+ "quote_age_s": {
+  "q": "VALID",
+  "v": 47738725.63
+ },
+ "current_session_fields": {
+  "session_open": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "session_high": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "session_low": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "session_vwap": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "session_volume": {
+   "before": "VALID",
+   "after": "VALID"
+  },
+  "last_minute_volume": {
+   "before": "VALID",
+   "after": "VALID"
+  }
+ },
+ "note_on_independence": "NKLA cannot demonstrate the independence rule, because BOTH its quote and its anchor are stale. The synthetic fixture in results/pulse010r_before_after.json (fresh quote, stale anchor) is what actually tests it, and there cash_open_return_bps, session_range_position and vwap_distance_bps stay VALID."
+}

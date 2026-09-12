@@ -1,0 +1,444 @@
+{
+ "kind": "pulse008_tape_reach_probe",
+ "version": "TAPE_REACH_PROBE_V1",
+ "question": "can quotes_as_of reach the instant the live packet recorded, and at which (lookback_s, max_pages)?",
+ "current_defaults": {
+  "lookback_s": 60,
+  "max_pages": 2
+ },
+ "subjects": {
+  "AAL": {
+   "live": {
+    "imbalance": 0.5833,
+    "touch": 2400,
+    "mid": 13.305,
+    "as_of": "2026-09-01T13:45:01.405159959Z"
+   },
+   "requested": "2026-09-01T13:45:01.405159959Z",
+   "configs": [
+    {
+     "lookback_s": 60,
+     "max_pages": 2,
+     "quotes_returned": 671,
+     "usable": 671,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.232179785Z",
+     "gap_to_requested_ms": 172.98,
+     "selected_imbalance": 0.6,
+     "selected_touch": 2500,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "70e55e28b91efbea846ec9eaae3a30a0d3f5a277dcae35c8ffa78b1298d9fe77"
+    },
+    {
+     "lookback_s": 60,
+     "max_pages": 10,
+     "quotes_returned": 671,
+     "usable": 671,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.232179785Z",
+     "gap_to_requested_ms": 172.98,
+     "selected_imbalance": 0.6,
+     "selected_touch": 2500,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "70e55e28b91efbea846ec9eaae3a30a0d3f5a277dcae35c8ffa78b1298d9fe77"
+    },
+    {
+     "lookback_s": 20,
+     "max_pages": 3,
+     "quotes_returned": 201,
+     "usable": 201,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.232179785Z",
+     "gap_to_requested_ms": 172.98,
+     "selected_imbalance": 0.6,
+     "selected_touch": 2500,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "832e02ab063610c2ae3f8a5f41b746a4fa13fb953c497bdbc83a7f6601bf8b71"
+    },
+    {
+     "lookback_s": 5,
+     "max_pages": 2,
+     "quotes_returned": 29,
+     "usable": 29,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.232179785Z",
+     "gap_to_requested_ms": 172.98,
+     "selected_imbalance": 0.6,
+     "selected_touch": 2500,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "3e2a9188f222463d9103634be30a02203479b1e27f0fb0738b69560419066b86"
+    },
+    {
+     "lookback_s": 2,
+     "max_pages": 2,
+     "quotes_returned": 10,
+     "usable": 10,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.232179785Z",
+     "gap_to_requested_ms": 172.98,
+     "selected_imbalance": 0.6,
+     "selected_touch": 2500,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "0dab4772a29820fc759567216df7ad51a4cb5b19d1cc87e6c08c6eff833b249a"
+    }
+   ]
+  },
+  "AAOI": {
+   "live": {
+    "imbalance": 0.6,
+    "touch": 1500,
+    "mid": 101.875,
+    "as_of": "2026-09-01T13:45:01.275217469Z"
+   },
+   "requested": "2026-09-01T13:45:01.275217469Z",
+   "configs": [
+    {
+     "lookback_s": 60,
+     "max_pages": 2,
+     "quotes_returned": 494,
+     "usable": 494,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.274669122Z",
+     "gap_to_requested_ms": 0.548,
+     "selected_imbalance": 0.7143,
+     "selected_touch": 1400,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "f6edfd135d8149ddf354d882a687b7445f750ab5bbd5e43d7e0b06c1d4262431"
+    },
+    {
+     "lookback_s": 60,
+     "max_pages": 10,
+     "quotes_returned": 494,
+     "usable": 494,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.274669122Z",
+     "gap_to_requested_ms": 0.548,
+     "selected_imbalance": 0.7143,
+     "selected_touch": 1400,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "f6edfd135d8149ddf354d882a687b7445f750ab5bbd5e43d7e0b06c1d4262431"
+    },
+    {
+     "lookback_s": 20,
+     "max_pages": 3,
+     "quotes_returned": 125,
+     "usable": 125,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.274669122Z",
+     "gap_to_requested_ms": 0.548,
+     "selected_imbalance": 0.7143,
+     "selected_touch": 1400,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "ee248511b42d5e2701cb6afdb579eb48459b577d20a311f8c49cc8108836256b"
+    },
+    {
+     "lookback_s": 5,
+     "max_pages": 2,
+     "quotes_returned": 88,
+     "usable": 88,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.274669122Z",
+     "gap_to_requested_ms": 0.548,
+     "selected_imbalance": 0.7143,
+     "selected_touch": 1400,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "b276b2f10457bf6f7acb7d7e6a20fc88357b173d09c370593780424bf09da4fc"
+    },
+    {
+     "lookback_s": 2,
+     "max_pages": 2,
+     "quotes_returned": 54,
+     "usable": 54,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.274669122Z",
+     "gap_to_requested_ms": 0.548,
+     "selected_imbalance": 0.7143,
+     "selected_touch": 1400,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "5046039c71e4244122e8d8e4511b0efd00c4aa6e1193668a52d543cb377c826a"
+    }
+   ]
+  },
+  "AAPL": {
+   "live": {
+    "imbalance": 0.0,
+    "touch": 160,
+    "mid": 319.15,
+    "as_of": "2026-09-01T13:45:01.298268834Z"
+   },
+   "requested": "2026-09-01T13:45:01.298268834Z",
+   "configs": [
+    {
+     "lookback_s": 60,
+     "max_pages": 2,
+     "quotes_returned": 3770,
+     "usable": 3751,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.190392079Z",
+     "gap_to_requested_ms": 107.876,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 120,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "ca92a62039d74c1350619a1d07fbd6705d0a2ccee0a374ac989abf5bc20ee16e"
+    },
+    {
+     "lookback_s": 60,
+     "max_pages": 10,
+     "quotes_returned": 3770,
+     "usable": 3751,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.190392079Z",
+     "gap_to_requested_ms": 107.876,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 120,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "ca92a62039d74c1350619a1d07fbd6705d0a2ccee0a374ac989abf5bc20ee16e"
+    },
+    {
+     "lookback_s": 20,
+     "max_pages": 3,
+     "quotes_returned": 1038,
+     "usable": 1030,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.190392079Z",
+     "gap_to_requested_ms": 107.876,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 120,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "7eb993605742a4ef32924b88e1f9366e480fa6e7484aeac8a147ed716fa968b0"
+    },
+    {
+     "lookback_s": 5,
+     "max_pages": 2,
+     "quotes_returned": 207,
+     "usable": 207,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.190392079Z",
+     "gap_to_requested_ms": 107.876,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 120,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "6ac7ddee8d58a6c5d48c161eeb2c48c9a8371ecef3afc4b7831cc862c810159c"
+    },
+    {
+     "lookback_s": 2,
+     "max_pages": 2,
+     "quotes_returned": 46,
+     "usable": 46,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.190392079Z",
+     "gap_to_requested_ms": 107.876,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 120,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "ec17fa4fa2b756eb736b35fa8a927e7fe1df0b07eeb433a3febc07a9e5f4813f"
+    }
+   ]
+  },
+  "NKLA": {
+   "skipped": "STALE_BEYOND_POLICY"
+  },
+  "SPY": {
+   "live": {
+    "imbalance": -0.5294,
+    "touch": 680,
+    "mid": 761.92,
+    "as_of": "2026-09-01T13:45:01.669149633Z"
+   },
+   "requested": "2026-09-01T13:45:01.669149633Z",
+   "configs": [
+    {
+     "lookback_s": 60,
+     "max_pages": 2,
+     "quotes_returned": 6407,
+     "usable": 6398,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.667545802Z",
+     "gap_to_requested_ms": 1.604,
+     "selected_imbalance": -0.625,
+     "selected_touch": 640,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "30253055246a75837cce5516c854031a6df43577b4daca1ce37c09115f4381e2"
+    },
+    {
+     "lookback_s": 60,
+     "max_pages": 10,
+     "quotes_returned": 6407,
+     "usable": 6398,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.667545802Z",
+     "gap_to_requested_ms": 1.604,
+     "selected_imbalance": -0.625,
+     "selected_touch": 640,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "30253055246a75837cce5516c854031a6df43577b4daca1ce37c09115f4381e2"
+    },
+    {
+     "lookback_s": 20,
+     "max_pages": 3,
+     "quotes_returned": 2073,
+     "usable": 2068,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.667545802Z",
+     "gap_to_requested_ms": 1.604,
+     "selected_imbalance": -0.625,
+     "selected_touch": 640,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "f2010d3477a9667bcb116b5a4ba285b9b6e74ef6a5fc07c59c757891112d9d58"
+    },
+    {
+     "lookback_s": 5,
+     "max_pages": 2,
+     "quotes_returned": 769,
+     "usable": 766,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.667545802Z",
+     "gap_to_requested_ms": 1.604,
+     "selected_imbalance": -0.625,
+     "selected_touch": 640,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "2b6034b9343d861bca2aff173eced697e0dd1c40b118b01a17ca1510eebca0df"
+    },
+    {
+     "lookback_s": 2,
+     "max_pages": 2,
+     "quotes_returned": 480,
+     "usable": 480,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:45:01.667545802Z",
+     "gap_to_requested_ms": 1.604,
+     "selected_imbalance": -0.625,
+     "selected_touch": 640,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": false,
+     "response_sha256": "2fcdcdf1987a5f62c6ef37a12337e44987e00c8a0e7dfb30b8433f811ae19b0f"
+    }
+   ]
+  },
+  "TDOC": {
+   "live": {
+    "imbalance": -0.3333,
+    "touch": 600,
+    "mid": 6.325,
+    "as_of": "2026-09-01T13:44:59.993460487Z"
+   },
+   "requested": "2026-09-01T13:44:59.993460487Z",
+   "configs": [
+    {
+     "lookback_s": 60,
+     "max_pages": 2,
+     "quotes_returned": 156,
+     "usable": 156,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:44:59.326580815Z",
+     "gap_to_requested_ms": 666.88,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 600,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": true,
+     "response_sha256": "db0cf69988396962d8b40d1e3986f14f09a500bd4baded5a7e1f15c2c7b6642c"
+    },
+    {
+     "lookback_s": 60,
+     "max_pages": 10,
+     "quotes_returned": 156,
+     "usable": 156,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:44:59.326580815Z",
+     "gap_to_requested_ms": 666.88,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 600,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": true,
+     "response_sha256": "db0cf69988396962d8b40d1e3986f14f09a500bd4baded5a7e1f15c2c7b6642c"
+    },
+    {
+     "lookback_s": 20,
+     "max_pages": 3,
+     "quotes_returned": 13,
+     "usable": 13,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:44:59.326580815Z",
+     "gap_to_requested_ms": 666.88,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 600,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": true,
+     "response_sha256": "b2da62075530217af5c7fb5132951224acee9db48c7fd5cf85c826031218ac8b"
+    },
+    {
+     "lookback_s": 5,
+     "max_pages": 2,
+     "quotes_returned": 3,
+     "usable": 3,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:44:59.326580815Z",
+     "gap_to_requested_ms": 666.88,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 600,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": true,
+     "response_sha256": "576585a04bc23747692b445ba85688743c6e322019839cdcbe8f6fb93e9970c6"
+    },
+    {
+     "lookback_s": 2,
+     "max_pages": 2,
+     "quotes_returned": 3,
+     "usable": 3,
+     "truncated": false,
+     "selected_t": "2026-09-01T13:44:59.326580815Z",
+     "gap_to_requested_ms": 666.88,
+     "selected_imbalance": -0.3333,
+     "selected_touch": 600,
+     "exact_event_present": false,
+     "exact_event_imbalance": null,
+     "matches_live_imbalance": true,
+     "response_sha256": "576585a04bc23747692b445ba85688743c6e322019839cdcbe8f6fb93e9970c6"
+    }
+   ]
+  }
+ }
+}

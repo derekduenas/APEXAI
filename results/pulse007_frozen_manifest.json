@@ -1,0 +1,116 @@
+[
+ {
+  "subject": "AAL",
+  "scheduled_time": "2026-09-01T13:45:00+00:00",
+  "subject_class": "degraded_subject",
+  "state_id": "e1810b8437d519ac0a7f112a149c6098",
+  "packet_hash": "e21cb773b1a9bacb75a59ba8bca47a08380afebefe50f9a6421990272bf1d79d",
+  "market_session": "REGULAR",
+  "evidence_class": "LIVE_PROSPECTIVE",
+  "capture_start": "2026-09-01T13:45:00.995494+00:00",
+  "state_complete_time": "2026-09-01T13:45:17.100852+00:00",
+  "line_sha256": "6a5ba386e55dc882cfccc78b53883f7eb4d9ec88aa6285dd6442edaf767b086a",
+  "original_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+  "original_violations": [
+   "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=77.26 replay=-107.81 (rel 2.39541807)",
+   "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.5833 replay=0.2258 (rel 0.61289217)",
+   "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=-169.02 replay=-139.3 (rel 0.17583718)",
+   "prior_close: declared SEMANTICALLY_EQUIVALENT but live=13.43 replay=13.64 (rel 0.01563663)",
+   "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-93.08 replay=-245.6 (rel 1.63859046)"
+  ]
+ },
+ {
+  "subject": "AAOI",
+  "scheduled_time": "2026-09-01T13:45:00+00:00",
+  "subject_class": "enriched_subject",
+  "state_id": "befd933272a9c8a6632d6864c91e81db",
+  "packet_hash": "a3180c6e741410cdb800a3262818941097632af845ebc3571f35bdfc320dee1f",
+  "market_session": "REGULAR",
+  "evidence_class": "LIVE_PROSPECTIVE",
+  "capture_start": "2026-09-01T13:45:00.995494+00:00",
+  "state_complete_time": "2026-09-01T13:45:17.449279+00:00",
+  "line_sha256": "bb7b909caeab7a15e9d530ec1a394a4ec3194a2c365db943b6c0bb22d17474bb",
+  "original_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+  "original_violations": [
+   "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-246.53 replay=-392.05 (rel 0.59027299)",
+   "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.6 replay=-0.5 (rel 1.83333333)",
+   "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=-300.86 replay=-11.3 (rel 0.962441)",
+   "prior_close: declared SEMANTICALLY_EQUIVALENT but live=107.69 replay=106.23 (rel 0.01355743)",
+   "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-539.98 replay=-402.9 (rel 0.25386125)",
+   "spread_bps: declared SEMANTICALLY_EQUIVALENT but live=14.724 replay=9.809 (rel 0.33380875)"
+  ]
+ },
+ {
+  "subject": "AAPL",
+  "scheduled_time": "2026-09-01T13:45:00+00:00",
+  "subject_class": "liquid_megacap",
+  "state_id": "54b4e073a0cb3a1b8143374d463d4217",
+  "packet_hash": "2470f7cc6ea5b1861f39264c085286201eb79c4c3f4a1bb4659d426e21e59d55",
+  "market_session": "REGULAR",
+  "evidence_class": "LIVE_PROSPECTIVE",
+  "capture_start": "2026-09-01T13:45:00.995494+00:00",
+  "state_complete_time": "2026-09-01T13:45:19.457430+00:00",
+  "line_sha256": "0cfb3e76fe1a27c2bd74ed6ca5deb3e5c82c7b0d731e8e893c17f262d9d31667",
+  "original_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+  "original_violations": [
+   "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=68.46 replay=82.14 (rel 0.19982472)",
+   "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=0.0 replay=-0.3333 (rel 333299999.99999994)",
+   "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=4.1 replay=-98.53 (rel 25.03170732)",
+   "prior_close: declared SEMANTICALLY_EQUIVALENT but live=316.85 replay=319.7 (rel 0.00899479)",
+   "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=72.59 replay=-17.2 (rel 1.23694724)"
+  ]
+ },
+ {
+  "subject": "NKLA",
+  "scheduled_time": "2026-09-01T13:45:00+00:00",
+  "subject_class": "elevated_mover",
+  "state_id": "4f2fbb7a5ff48288be41fd959d972d37",
+  "packet_hash": "f43f559769f2198bc181aa056d9232151fc5b84625eb73c7204fbca668db3fed",
+  "market_session": "REGULAR",
+  "evidence_class": "LIVE_PROSPECTIVE",
+  "capture_start": "2026-09-01T13:45:00.995494+00:00",
+  "state_complete_time": "2026-09-01T13:45:24.889034+00:00",
+  "line_sha256": "f0afb66ac35f19916b9edbfc24ccce0cd94cc8ce83731eac32e5052620b25c38",
+  "original_verdict": "MIRROR_CONSISTENT",
+  "original_violations": []
+ },
+ {
+  "subject": "SPY",
+  "scheduled_time": "2026-09-01T13:45:00+00:00",
+  "subject_class": "SPY_index",
+  "state_id": "104c28bf4fbbb0ca74db5ed1e9922368",
+  "packet_hash": "780a7d3d6a9435c490bee15ede86384656eda1d085eebd88a170d45f02e1f0a2",
+  "market_session": "REGULAR",
+  "evidence_class": "LIVE_PROSPECTIVE",
+  "capture_start": "2026-09-01T13:45:00.995494+00:00",
+  "state_complete_time": "2026-09-01T13:45:30.958344+00:00",
+  "line_sha256": "6630b8562e621327be3614c58f10458287a2259f01427aa30f1059a4ef02dc11",
+  "original_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+  "original_violations": [
+   "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-1.18 replay=-58.13 (rel 48.26271186)",
+   "nbbo_size_imbalance: declared SEMANTICALLY_EQUIVALENT but live=-0.5294 replay=-0.3333 (rel 0.37041934)",
+   "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=-65.71 replay=-38.34 (rel 0.41652716)",
+   "prior_close: declared SEMANTICALLY_EQUIVALENT but live=767.05 replay=769.35 (rel 0.0029985)",
+   "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-66.88 replay=-96.25 (rel 0.43914474)"
+  ]
+ },
+ {
+  "subject": "TDOC",
+  "scheduled_time": "2026-09-01T13:45:00+00:00",
+  "subject_class": "ordinary_subject",
+  "state_id": "567d494baf4fd251458576f11605b7d1",
+  "packet_hash": "7e87db5f62c79a4016c0809f231bc66dab197a2c58cb2c923fe8a86c93ae241b",
+  "market_session": "REGULAR",
+  "evidence_class": "LIVE_PROSPECTIVE",
+  "capture_start": "2026-09-01T13:45:00.995494+00:00",
+  "state_complete_time": "2026-09-01T13:45:30.982203+00:00",
+  "line_sha256": "43b9c9799e6eb7a971619765db0b9d3309f8410bf8af6b014382027d3c085d08",
+  "original_verdict": "DECLARATION_CONTRADICTED_BY_REALITY",
+  "original_violations": [
+   "cash_open_return_bps: declared SEMANTICALLY_EQUIVALENT but live=120.0 replay=7.91 (rel 0.93408333)",
+   "overnight_gap_bps: declared SEMANTICALLY_EQUIVALENT but live=-141.96 replay=-276.92 (rel 0.95069034)",
+   "prior_close: declared SEMANTICALLY_EQUIVALENT but live=6.34 replay=6.5 (rel 0.02523659)",
+   "prior_close_return_bps: declared SEMANTICALLY_EQUIVALENT but live=-23.66 replay=-269.23 (rel 10.37912088)"
+  ]
+ }
+]

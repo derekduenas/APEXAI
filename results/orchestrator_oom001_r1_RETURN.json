@@ -1,0 +1,223 @@
+{
+ "kind": "orchestrator_oom001_r1_return",
+ "version": "OOM001_R1_V1",
+ "base_commit": "9e8f416bafca76f7e21031522812323e63883638",
+ "repair_commit": "810b72c8dc8b9422ba96f41d900cfd361f5ff1da",
+ "branch": "orchestrator-oom-001-r1",
+ "changed_files": [
+  "apex/governance/chain_ledger.py",
+  "tests/test_chain_tail_bounded.py"
+ ],
+ "chain_continuity": {
+  "how_verified": "every appended prev_hash was checked against a hash recomputed independently from the bytes on disk, never taken from the writer's own return value",
+  "production_shape_fixture": {
+   "fixture_bytes": 438837276,
+   "records": 11790,
+   "final_record_bytes": 262275,
+   "reproduces_the_fault": true,
+   "expected_prev_hash": "99b4787dddf1cbe28d35512a10cdc3d9608f1b0b53510d724d98520d4ce9d5c1",
+   "observed_prev_hash": "99b4787dddf1cbe28d35512a10cdc3d9608f1b0b53510d724d98520d4ce9d5c1",
+   "match": true,
+   "torn_flag": null,
+   "bytes_appended": 220
+  },
+  "ceiling_fixture": {
+   "fixture_bytes": 8433005,
+   "expected_prev_hash": "4df57285108b116922045aebe4130d8e2d5cb67207df803acc903bdc0be71c0a",
+   "observed_prev_hash": "4df57285108b116922045aebe4130d8e2d5cb67207df803acc903bdc0be71c0a",
+   "match": true,
+   "torn_flag": true,
+   "bytes_appended": 255
+  },
+  "unit_tests": "21 in tests/test_chain_tail_bounded.py, all passing, each driving the real append path on disposable fixtures"
+ },
+ "refusal_evidence": {
+  "fixture_bytes": 9547117,
+  "last_valid_record_distance_bytes": 9437184,
+  "ceiling_bytes": 8388608,
+  "raised": "ChainTailUnresolved",
+  "message_head": "no parseable entry_hash within the last 8388608 bytes of a 9547117 byte ledger. Nothing was written.",
+  "file_bytes_unchanged": true,
+  "genesis_written": false,
+  "measured_under_cap_mib": 512
+ },
+ "memory_measurements": {
+  "caveat": "these are MEASURED peaks on three specific fixtures, not a universal bound. What the repair GUARANTEES is the read: no single read exceeds 8388608 bytes, the total across the geometric widening is under twice that, and neither depends on ledger size. Process memory additionally depends on record sizes, line counts and interpreter behaviour, which these three fixtures do not exhaust.",
+  "cap_mib": 512,
+  "cases": [
+   {
+    "case": "old fallback, production-shape fixture",
+    "result": "oom-kill",
+    "exec_status": "9/KILL",
+    "peak": "hit the 512 MiB cap"
+   },
+   {
+    "case": "repaired, production-shape fixture",
+    "result": "success",
+    "maxrss_mib": 16.7,
+    "cgroup_peak_mib": 7.6,
+    "windows_used": "one widening"
+   },
+   {
+    "case": "repaired, widening to the full ceiling",
+    "result": "success",
+    "maxrss_mib": 39.2,
+    "cgroup_peak_mib": 30.0
+   },
+   {
+    "case": "refusal beyond the ceiling",
+    "result": "ChainTailUnresolved",
+    "maxrss_mib": 40.4
+   }
+  ],
+  "highest_measured_peak_mib": 40.4,
+  "production_ledger_read_or_written": false
+ },
+ "regression": {
+  "commit_tested": "810b72c8dc8b9422ba96f41d900cfd361f5ff1da",
+  "tree": "ed35f98801adf8c6d123a96c908aa4d77b688e33",
+  "shards": 214,
+  "totals": {
+   "PASS": 3827,
+   "SKIP": 19
+  },
+  "collected": 3846,
+  "executed": 3846,
+  "every_collected_test_accounted_for": true,
+  "slice_oom_kill_before": 11,
+  "slice_oom_kill_after": 11,
+  "new_oom_kills": 0,
+  "problem_shards": [],
+  "elapsed_s": 2449.8,
+  "verdict": "PASS",
+  "previous_run": {
+   "commit": "02f94e596855ca868c972e301506aeac87778b38",
+   "shards": 213,
+   "totals": {
+    "PASS": 3806,
+    "SKIP": 19
+   },
+   "verdict": "PASS"
+  },
+  "reconciliation": {
+   "shard_delta": 1,
+   "shard_delta_explained": "tests/test_chain_tail_bounded.py",
+   "pass_delta": 21,
+   "pass_delta_explained": "the 21 new bounded-lookup tests",
+   "expected_pass": 3827,
+   "observed_pass": 3827,
+   "pass_reconciles": true,
+   "skip_delta": 0,
+   "new_skips": 0,
+   "skip_reconciles": true,
+   "fail": 0,
+   "error": 0
+  },
+  "new_module_shard": {
+   "n": 22,
+   "collected": 21,
+   "executed": 21,
+   "peak_mib": 313.5,
+   "rc": 0
+  }
+ },
+ "preservation": {
+  "kind": "oom001_r1_preservation",
+  "base": "9e8f416bafca76f7e21031522812323e63883638",
+  "repair": "810b72c8dc8b9422ba96f41d900cfd361f5ff1da",
+  "changed_files": [
+   "apex/governance/chain_ledger.py",
+   "tests/test_chain_tail_bounded.py"
+  ],
+  "only_the_primitive_and_its_new_test": true,
+  "existing_test_modules_changed": [],
+  "config_or_unit_files_changed": [],
+  "other_apex_modules_changed": [],
+  "collection": {
+   "modules_base": 213,
+   "modules_head": 214,
+   "nodeids_base": 3825,
+   "nodeids_head": 3846,
+   "lost_nodeids": {},
+   "gained_nodeids": {
+    "tests/test_chain_tail_bounded.py": [
+     "tests/test_chain_tail_bounded.py::test_a_file_of_only_garbage_is_genesis_because_the_whole_file_was_read",
+     "tests/test_chain_tail_bounded.py::test_a_valid_final_record_larger_than_the_ceiling_refuses",
+     "tests/test_chain_tail_bounded.py::test_an_empty_file_is_genesis_not_an_error",
+     "tests/test_chain_tail_bounded.py::test_chain_append_itself_only_ever_writes_ascii",
+     "tests/test_chain_tail_bounded.py::test_complete_malformed_trailing_record_is_treated_as_damage",
+     "tests/test_chain_tail_bounded.py::test_final_record_of_262275_bytes_is_still_found",
+     "tests/test_chain_tail_bounded.py::test_first_ever_append_is_genesis",
+     "tests/test_chain_tail_bounded.py::test_multibyte_character_split_by_the_window_edge",
+     "tests/test_chain_tail_bounded.py::test_multiprocess_appends_do_not_lose_records",
+     "tests/test_chain_tail_bounded.py::test_ordinary_valid_ledger_links_to_the_last_record",
+     "tests/test_chain_tail_bounded.py::test_reads_are_bounded_by_a_constant_not_by_the_file",
+     "tests/test_chain_tail_bounded.py::test_record_beyond_the_ceiling_raises_and_writes_nothing",
+     "tests/test_chain_tail_bounded.py::test_serialisation_and_hash_semantics_are_unchanged",
+     "tests/test_chain_tail_bounded.py::test_the_declared_ceiling_is_what_the_module_says",
+     "tests/test_chain_tail_bounded.py::test_the_flock_sidecar_is_still_used",
+     "tests/test_chain_tail_bounded.py::test_the_refusal_is_never_downgraded_to_genesis",
+     "tests/test_chain_tail_bounded.py::test_the_search_widens_only_as_far_as_it_must",
+     "tests/test_chain_tail_bounded.py::test_thread_race_still_produces_an_unbroken_chain",
+     "tests/test_chain_tail_bounded.py::test_torn_fragment_larger_than_one_window",
+     "tests/test_chain_tail_bounded.py::test_torn_trailing_record_links_past_the_fragment",
+     "tests/test_chain_tail_bounded.py::test_window_starting_exactly_on_a_record_boundary_keeps_that_record"
+    ]
+   },
+   "no_coverage_lost": true
+  },
+  "semantics_preserved": {
+   "serialisation_line": true,
+   "sha256_over_the_same_body": true,
+   "torn_flag_still_recorded": true,
+   "trailing_newline_repair_kept": true,
+   "thread_lock_kept": true,
+   "flock_kept": true,
+   "whole_file_read_removed": true,
+   "ceiling_declared": true,
+   "initial_window_unchanged": true,
+   "whole_file_read_removed_FIRST_CHECK_WAS_WRONG": {
+    "original_check": "\"read_text()\" not in source",
+    "original_result": false,
+    "why_it_was_wrong": "a substring match over the whole file, which matched the module docstring where the removed defect is described. Prose is not code.",
+    "corrected_check": "ast: is read_text called anywhere in executable code, and does any .read() call lack a size argument",
+    "read_text_called_in_code": false,
+    "unbounded_read_calls": [],
+    "bounded_read_call_lines": [
+     130,
+     132,
+     172
+    ],
+    "result": true
+   }
+  },
+  "containment_unchanged": {
+   "wrapper_sha256": "dfbb916b435ba0a4a0dde02ad34825c9eb924307989791b8241343426bd62699",
+   "expected": "dfbb916b435ba0a4a0dde02ad34825c9eb924307989791b8241343426bd62699",
+   "slice_max": "1610612736",
+   "matches": true
+  },
+  "production_untouched": {
+   "orchestrator_unit_MemoryMax": "536870912",
+   "expected": "536870912",
+   "release_symlink": "/opt/apex/releases/5eff1cf5e00f21b02c537f25bcd74b1c1d317546",
+   "production_ledger_mtime": "2026-09-06 04:50:03.172832846 +0000",
+   "production_ledger_size": "438867453"
+  },
+  "all_preserved": true
+ },
+ "not_done": [
+  "R2 is not implemented",
+  "no service changed, restarted or stopped",
+  "no limit raised",
+  "nothing deployed",
+  "not merged to main",
+  "no commissioning run",
+  "no real data admitted",
+  "no order placed"
+ ],
+ "production_recovery": "UNVERIFIED -- the loop is still running; verification requires a separately authorized deploy-and-observe step",
+ "phase_2": "OPEN",
+ "real_data_admission": "NOT_AUTHORIZED",
+ "verdict": "PASS"
+}
