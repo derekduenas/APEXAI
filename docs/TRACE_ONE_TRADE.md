@@ -1,5 +1,12 @@
 # TRACE_ONE_TRADE — one trade, full lineage, through the real path (2026-09-12)
 
+> **CORRECTION NOTICE (2026-09-12, added later; this document is otherwise unchanged).** The −36.10 figure below is
+> what the burned run recorded. Under the repaired fee arithmetic the same quotes give **−36.09**, which belongs to
+> the CORRECTED FIXTURE in `docs/evidence/trace_replay/part1_correction.json`, **not** to this burned trade. The
+> burned ledger and this trace are unchanged. Findings A and B below were repaired in
+> `docs/PART1_REPAIR_BRICK.md`; finding C (the boundary cannot label a replay) and the cross-release stranding
+> finding remain **OPEN**.
+
 **Mechanism validation, NOT a backtest.** One entry, one exit, on the recorded 2026-09-11 SPY session. No parameter
 tuned, no threshold touched, HOLDOUT and CREDIT 5 untouched. Nothing here may inform a parameter choice; two
 temptations that arose are recorded in §11 instead of acted on.

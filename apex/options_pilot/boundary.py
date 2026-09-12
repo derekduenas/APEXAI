@@ -206,8 +206,7 @@ class Boundary:
         envelope = envelope_for(reference_ask=intent.get("reference_ask"), quantity=1)
         if not envelope["feasible"]:
             self.refuse("intent", envelope["why_infeasible"], scan_id=scan_id)
-        fees = {"schedule_id": self.fee_schedule.schedule_id, "schedule_hash": self.fee_schedule.schedule_hash,
-                "provenance": self.fee_schedule.provenance, "known": self.fee_schedule.known}
+        fees = self.fee_schedule.identity()          # COMPLETE canonical identity; the envelope binding commits to all of it
         # the intent-time exit fee needs a sale principal that does not exist yet; TOLL_FORMULA_V1 already declares an
         # assumption for the exit side, so the REFERENCE BID is used as the assumed principal and is recorded as such
         _rq = intent.get("reference_quote") or {}
@@ -275,8 +274,15 @@ class Boundary:
         f = it.get("fees")
         if not isinstance(f, dict):
             return "FEE_IDENTITY_MISSING_ON_INTENT: %r" % (it.get("intent_id"),)
-        mine = {"schedule_id": self.fee_schedule.schedule_id, "schedule_hash": self.fee_schedule.schedule_hash,
-                "provenance": self.fee_schedule.provenance, "known": self.fee_schedule.known}
+        mine = self.fee_schedule.identity()
+        extra = [k for k in f if k not in mine]
+        if extra:
+            return ("FEE_IDENTITY_HAS_UNDECLARED_FIELDS: the persisted intent's fee block carries %s, which the canonical "
+                    "identity does not define; a fee block is exactly the identity and nothing else" % sorted(extra))
+        missing = [k for k in mine if k not in f]
+        if missing:
+            return ("FEE_IDENTITY_INCOMPLETE_ON_INTENT: the persisted intent lacks %s; a filled intent must carry the "
+                    "complete fee identity and there is no fallback" % missing)
         for k, v in mine.items():
             if f.get(k) != v:
                 return ("FEE_IDENTITY_CHANGED_SINCE_INTENT: intent sealed %s=%r, this boundary runs %r" % (k, f.get(k), v))
@@ -702,12 +708,17 @@ class Boundary:
                         % (fl.get("data_provenance"), self.labels["data_provenance"]), scan_id=scan_id)
         # ONE FEE SCHEDULE IDENTITY at RECOVERY: the exit is priced by THIS boundary's schedule, so it must be the
         # schedule the entry was priced under. A changed schedule is a refusal, never a silent re-pricing of an exit.
-        fe = fl.get("fees_entry") or {}
-        if fl.get("status") == "FILLED" and (fe.get("schedule_id") != self.fee_schedule.schedule_id
-                                             or (fe.get("schedule_hash") and fe["schedule_hash"] != self.fee_schedule.schedule_hash)):
-            self.refuse("outcome", "FEE_IDENTITY_CHANGED_SINCE_FILL: entry priced under %r/%s, this boundary runs %r/%s"
-                        % (fe.get("schedule_id"), str(fe.get("schedule_hash"))[:12], self.fee_schedule.schedule_id,
-                           self.fee_schedule.schedule_hash[:12]), scan_id=scan_id)
+        if fl.get("status") == "FILLED":
+            fe = fl.get("fees_entry") or {}
+            fid = fe.get("fee_identity")
+            mine = self.fee_schedule.identity()
+            if not isinstance(fid, dict):
+                self.refuse("outcome", "FEE_IDENTITY_MISSING_ON_FILL: the persisted fill carries no complete fee identity; "
+                                       "an exit is never priced against an unknown entry identity", scan_id=scan_id)
+            for k, v in mine.items():
+                if fid.get(k) != v:
+                    self.refuse("outcome", "FEE_IDENTITY_CHANGED_SINCE_FILL: entry priced under %s=%r, this boundary runs %r"
+                                % (k, fid.get(k), v), scan_id=scan_id)
         done = self.discharging_outcomes(rows, fill_receipt["seq"])
         if done:
             return self._reconcile_outcome(done[0][0], done[0][1], fill_receipt=fill_receipt, rows=rows, scan_id=scan_id)

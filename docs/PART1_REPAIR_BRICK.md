@@ -92,8 +92,11 @@ The burned ledger is unchanged. `docs/evidence/trace_replay/part1_correction.jso
 |---|---|
 | gross | **−36.00** |
 | entry fee / exit fee (exact) | 0.04 / **0.05** (sale principal 454.00, SEC component 0.01) |
-| **corrected realized** | **−36.09** |
+| **corrected realized** | **−36.09** (of the CORRECTED FIXTURE, not of the burned trade) |
 | basis | **NET_ESTIMABLE**, both sides known |
+
+**−36.09 belongs to the corrected fixture, not to the burned trade.** The burned record still reads −36.10 and is
+unchanged; −36.09 is what the same quotes produce under the repaired arithmetic, computed on a separate fixture.
 
 **Root cause of the −36.00 / −36.10 discrepancy, not just the figure:** the two runs used *different fee schedules*,
 not different arithmetic. Run 1's boundary defaulted to `UNVERIFIED` because the driver passed the authorized
@@ -137,6 +140,46 @@ have a test in which they differ. Proposed, not built.
 
 Both were caught by existing tests, which is worth recording: the suite does catch changes to behaviour it already
 pins. What it does not catch is behaviour nobody ever pinned.
+
+## Residual gap closed in the same brick: the identity is now CRYPTOGRAPHICALLY complete
+
+The first pass compared the identity the authority holds against the identity the intent carries **at approval
+time**. It did not make the identity part of the persisted binding, so an identity altered *after* approval still
+verified while `schedule_id` was unchanged. Reproduced on a clean checkout, 7 of 9 alterations undetected
+(`docs/evidence/fee_identity_reproductions.json`); **0 of 9 after** (`fee_identity_after.json`).
+
+**The complete canonical fee identity** (`FeeSchedule.identity()`), committed to by `envelope_binding_hash`:
+
+| Field | Meaning |
+|---|---|
+| `schedule_id` | the schedule's name |
+| `schedule_hash` | digest of the full described schedule |
+| `provenance` | SYNTHETIC_FIXTURE / PROVIDER_VERIFIED / UNVERIFIED |
+| `known` | whether the cost is knowable at all |
+| `version` | the schedule's version string |
+| `effective_date` | the date the published terms take effect |
+| `terms_digest` | digest of the **fee terms alone** — no ids, no provenance — so two schedules with the same id and different arithmetic differ here |
+
+`envelope_binding_hash` now commits to `binding_hash(intent) + max_entry_price + envelope_debit + the complete
+identity`, with a missing field represented as `__ABSENT__` and any undeclared key gathered under `__EXTRA__`, so
+adding, removing or altering **any** of them changes the binding and a persisted approval stops verifying.
+`verify_approval` additionally compares the approval's **own** recorded identity field by field against the
+intent's. `CertifiedRiskAuthority.accepts()` compares all seven fields, so an authority with the same `schedule_id`
+and different terms no longer honours a stored approval. The boundary seals `identity()` on the intent, refuses an
+incomplete block by name (`FEE_IDENTITY_INCOMPLETE_ON_INTENT`, listing the missing fields) and refuses an
+over-complete one (`FEE_IDENTITY_HAS_UNDECLARED_FIELDS`), re-reading the persisted intent from disk rather than
+trusting a caller object. Recovery compares the complete identity carried on the persisted **fill**.
+
+**Decimal-cent arithmetic** replaces binary floats. Each component is computed in `Decimal` and rounded under its
+own published rule *before* the total: commission and ORF/OCC exact per contract; CAT per contract with a sub-cent
+charge rounding **down to zero**; FINRA TAF to the **nearest** cent; SEC on the **actual sale principal** rounded
+**up**. Every component, its raw value and its rounding decision are persisted (`component_basis`,
+`rounding_rules`, `arithmetic: DECIMAL_CENTS`) so a total is reconstructable. A schedule that prices on principal
+without declaring its per-contract sell components returns `SELL_COMPONENTS_UNDECLARED` rather than defaulting.
+
+Verified against the published schedule (PDF sha `7f9c86bf…`): ORF+OCC $0.04/contract both sides; CAT $0.0003 →
+$0.00 at 1 contract and $0.03 at 100; TAF $0.00329 → $0.00 at 1, $0.01 at 2, $0.03 at 10; SEC at $2.00/$4.54/$5.00/
+$10.00 → $0.01/$0.01/$0.02/$0.03.
 
 ## Testing and identities
 

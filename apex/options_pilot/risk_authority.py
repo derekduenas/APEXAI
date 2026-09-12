@@ -74,8 +74,14 @@ class CertifiedRiskAuthority(RiskAuthority):
         if approval.get("risk_provenance") != CERTIFIED_PROVENANCE or approval.get("authority_id") != self.authority_id:
             return "certified authority honours only %s/%s approvals, got %r/%r" % (
                 CERTIFIED_PROVENANCE, self.authority_id, approval.get("risk_provenance"), approval.get("authority_id"))
-        if approval.get("fee_schedule_id") != self.fee_schedule.schedule_id:
-            return "approval was issued under fee schedule %r, active is %r" % (approval.get("fee_schedule_id"), self.fee_schedule.schedule_id)
+        # COMPLETE identity, not schedule_id: an authority whose terms differ must not honour a stored approval
+        mine, theirs = self.fee_schedule.identity(), approval.get("fee_identity")
+        if not isinstance(theirs, dict):
+            return ("approval carries no complete fee identity (got %r); the active authority honours only approvals "
+                    "that name the full schedule identity" % type(theirs).__name__)
+        for k in ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date", "terms_digest"):
+            if theirs.get(k) != mine[k]:
+                return "approval was issued under fee %s=%r, active authority runs %r" % (k, theirs.get(k), mine[k])
         return None
 
     # -------------------------------------------------- certificate + kernel
@@ -102,10 +108,9 @@ class CertifiedRiskAuthority(RiskAuthority):
         return "LONG" if intent["expression"] == "LONG_CALL" else "SHORT"
 
     def fee_identity(self) -> dict:
-        """The full identity of the schedule THIS authority gates on. Sealed on every approval."""
-        return {"schedule_id": self.fee_schedule.schedule_id, "schedule_hash": self.fee_schedule.schedule_hash,
-                "provenance": self.fee_schedule.provenance, "known": self.fee_schedule.known,
-                "policy": self.fee_schedule.describe()}
+        """The COMPLETE canonical identity of the schedule THIS authority gates on. Sealed on every approval and
+        committed to by the envelope binding."""
+        return self.fee_schedule.identity()
 
     def fee_identity_problem(self, intent: dict) -> str | None:
         """The intent must CARRY the fee identity the boundary will seal, and it must be this authority's schedule,
@@ -115,7 +120,7 @@ class CertifiedRiskAuthority(RiskAuthority):
             return ("FEE_IDENTITY_MISSING: the intent carries no fee block; the authority will not approve against a "
                     "schedule it cannot see (authority holds %s)" % self.fee_schedule.schedule_id)
         mine = self.fee_identity()
-        for k in ("schedule_id", "schedule_hash", "provenance", "known"):
+        for k in ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date", "terms_digest"):
             if k not in f:
                 return "FEE_IDENTITY_INCOMPLETE: the intent's fee block lacks %r" % k
             if f[k] != mine[k]:

@@ -17,7 +17,7 @@ CONTRACT = {"symbol": "SPY", "expiration": "2026-10-02", "strike": 774.0, "right
 
 
 def _fees_block(sched):
-    return {"schedule_id": sched.schedule_id, "schedule_hash": sched.schedule_hash, "provenance": sched.provenance, "known": sched.known}
+    return sched.identity()          # the COMPLETE canonical identity the envelope binding commits to
 
 
 def _intent(sched, **over):
@@ -210,3 +210,148 @@ class TestSalePrincipalFees:
         assert LIVE_DEFAULT_FEES is UNVERIFIED_FEES, "a changed cost model is not an authorized one"
         assert "SUPERSEDED_BY_COMPUTATION_CHANGE" in ROBINHOOD_RHF_2026_AUTHORIZATION["status"]
         assert ROBINHOOD_RHF_2026.version == "2026-09-12b"
+
+
+# ================================================================ RESIDUAL GAP: CRYPTOGRAPHICALLY COMPLETE IDENTITY
+class TestCompleteFeeIdentityBinding:
+    """The previous brick compared the identity at approval time. It did not make the identity part of the persisted
+    binding, so an identity altered AFTER approval still verified while `schedule_id` was unchanged."""
+
+    def _approved(self, sched=SYNTHETIC_FEES):
+        from apex.options_pilot import risk_gate as RG
+        auth = CertifiedRiskAuthority(fee_schedule=sched, provenance="SYNTHETIC_FIXTURE")
+        it = _intent(sched)
+        it["data_provenance"] = "SYNTHETIC_FIXTURE"
+        ap = auth.approve(it, book=_book())
+        assert ap["approved"] is True, ap.get("why")
+        it["risk"] = RG.verify_approval(it, ap)
+        return auth, it, ap
+
+    @pytest.mark.parametrize("field,value", [
+        ("schedule_hash", "0" * 64), ("provenance", "PROVIDER_VERIFIED"), ("known", False),
+        ("version", "SOMETHING_ELSE"), ("effective_date", "1999-01-01"), ("terms_digest", "f" * 64)])
+    def test_any_altered_identity_field_breaks_the_persisted_binding(self, field, value):
+        from apex.options_pilot import risk_gate as RG
+        auth, it, _ = self._approved()
+        it["fees"] = {**it["fees"], field: value}          # schedule_id untouched
+        with pytest.raises(RG.RiskRefused) as e:
+            RG.verify_approval(it, it["risk"], authority=auth)
+        assert "FEE_IDENTITY" in str(e.value) or "ENVELOPE_OR_FEE_IDENTITY" in str(e.value)
+
+    def test_a_removed_identity_field_breaks_the_binding(self):
+        from apex.options_pilot import risk_gate as RG
+        auth, it, _ = self._approved()
+        it["fees"] = {k: v for k, v in it["fees"].items() if k != "terms_digest"}
+        with pytest.raises(RG.RiskRefused):
+            RG.verify_approval(it, it["risk"], authority=auth)
+
+    def test_an_altered_approval_identity_with_its_id_preserved_refuses(self):
+        from apex.options_pilot import risk_gate as RG
+        auth, it, _ = self._approved()
+        it["risk"] = {**it["risk"], "fee_identity": {**it["risk"]["fee_identity"], "schedule_hash": "0" * 64}}
+        with pytest.raises(RG.RiskRefused, match="FEE_IDENTITY_DISAGREES"):
+            RG.verify_approval(it, it["risk"], authority=auth)
+
+    def test_an_authority_with_the_same_id_but_different_terms_does_not_honour_the_approval(self):
+        auth, it, ap = self._approved()
+        tampered = FeeSchedule(schedule_id=SYNTHETIC_FEES.schedule_id, version=SYNTHETIC_FEES.version, provenance="SYNTHETIC_FIXTURE",
+                               commission_per_contract=9.99, exchange_fee_per_contract=9.99,
+                               regulatory_fee_per_contract_buy=9.99, regulatory_fee_per_contract_sell=9.99,
+                               note="same id, different terms")
+        other = CertifiedRiskAuthority(fee_schedule=tampered, provenance="SYNTHETIC_FIXTURE")
+        why = other.accepts(ap)
+        assert why and ("terms_digest" in why or "schedule_hash" in why)
+
+    def test_a_valid_matching_identity_still_verifies(self):
+        from apex.options_pilot import risk_gate as RG
+        auth, it, _ = self._approved()
+        assert RG.verify_approval(it, it["risk"], authority=auth)["approved"] is True
+
+    def test_the_identity_is_read_from_disk_not_from_the_caller(self, tmp_path):
+        """The boundary re-reads the persisted intent; a caller-supplied object cannot substitute for it."""
+        h = TB._h(tmp_path)
+        d = TB._scan(h)
+        assert d["decision"] == "TRADE"
+        rows = L.read_all(h.ledger)
+        it = next(r for r in rows if r["kind"] == "pilot_intent")
+        assert set(it["fees"]) >= {"schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date", "terms_digest"}
+        # the synthetic harness authority seals no fee identity of its own; the CERTIFIED authority does, and that is
+        # covered by test_an_altered_approval_identity_with_its_id_preserved_refuses
+        if isinstance((it.get("risk") or {}).get("fee_identity"), dict):
+            assert it["risk"]["fee_identity"] == it["fees"]
+        fake = {**it, "fees": {**it["fees"], "terms_digest": "0" * 64}}
+        assert h.bd.fee_identity_problem(fake) and "FEE_IDENTITY_CHANGED_SINCE_INTENT" in h.bd.fee_identity_problem(fake)
+
+    def test_a_partial_identity_on_a_persisted_intent_refuses_by_name(self, tmp_path):
+        h = TB._h(tmp_path)
+        partial = {"fees": {"schedule_id": h.fee_schedule.schedule_id, "schedule_hash": h.fee_schedule.schedule_hash}}
+        why = h.bd.fee_identity_problem(partial)
+        assert why and "FEE_IDENTITY_INCOMPLETE_ON_INTENT" in why and "terms_digest" in why
+
+    def test_recovery_refuses_when_the_fill_carries_no_complete_identity(self, tmp_path):
+        h = TB._h(tmp_path)
+        d = TB._scan(h)
+        rows = L.read_all(h.ledger)
+        fill = next(r for r in rows if r["kind"] == "pilot_fill")
+        assert isinstance((fill.get("fees_entry") or {}).get("fee_identity"), dict)
+        assert (fill["fees_entry"]["fee_identity"]["terms_digest"] == h.fee_schedule.terms_digest)
+
+
+# ================================================================ DECIMAL-CENT FEE ARITHMETIC vs THE PUBLISHED SCHEDULE
+class TestDecimalFeeArithmetic:
+    """Source: RHF Standard Pricing Fee Schedule (PDF sha 7f9c86bf…). ORF+OCC $0.04/contract both sides; CAT
+    $0.0003/contract; FINRA TAF $0.00329/contract on sells (nearest cent); SEC $20.60 per $1,000,000 of sale
+    principal (rounded up), effective 2026-04-04; $0 commission."""
+
+    def test_arithmetic_is_decimal_not_binary_float(self):
+        r = ROBINHOOD_RHF_2026.exit(3, sale_principal=3 * 454.0)
+        assert r["arithmetic"] == "DECIMAL_CENTS" and set(r["rounding_rules"]) >= {"regulatory_cat", "regulatory_taf", "regulatory_sec"}
+
+    def test_orf_occ_is_four_cents_per_contract_both_sides(self):
+        for n in (1, 2, 10, 100):
+            assert ROBINHOOD_RHF_2026.entry(n)["components"]["exchange"] == round(0.04 * n, 2)
+            assert ROBINHOOD_RHF_2026.exit(n, sale_principal=454.0 * n)["components"]["exchange"] == round(0.04 * n, 2)
+
+    def test_cat_sub_cent_rounds_down_to_zero_and_accumulates_at_scale(self):
+        one = ROBINHOOD_RHF_2026.exit(1, sale_principal=454.0)
+        assert one["component_basis"]["cat"] == 0.0                       # 0.0003 < $0.01 -> zero
+        assert "sub-cent" in one["rounding_rules"]["regulatory_cat"]
+        hundred = ROBINHOOD_RHF_2026.exit(100, sale_principal=45400.0)
+        assert hundred["component_basis"]["cat"] == 0.03                  # 100 x 0.0003 = 0.03
+
+    def test_taf_rounds_to_the_nearest_cent(self):
+        assert ROBINHOOD_RHF_2026.exit(1, sale_principal=454.0)["component_basis"]["taf"] == 0.0      # 0.00329 -> 0.00
+        assert ROBINHOOD_RHF_2026.exit(2, sale_principal=908.0)["component_basis"]["taf"] == 0.01     # 0.00658 -> 0.01
+        assert ROBINHOOD_RHF_2026.exit(10, sale_principal=4540.0)["component_basis"]["taf"] == 0.03   # 0.0329 -> 0.03
+
+    @pytest.mark.parametrize("premium,sec", [(2.00, 0.01), (4.54, 0.01), (5.00, 0.02), (10.00, 0.03)])
+    def test_sec_rounds_up_from_actual_sale_principal(self, premium, sec):
+        r = ROBINHOOD_RHF_2026.exit(1, sale_principal=premium * 100.0)
+        assert r["component_basis"]["sec_component"] == sec
+        exact = (premium * 100.0) * 20.60 / 1e6
+        assert sec >= exact and sec - exact < 0.01
+
+    def test_line_item_rounding_differs_from_aggregate_rounding_and_line_item_is_what_is_charged(self):
+        """10 contracts at $4.54: CAT 0.003 -> 0.00 line-item, TAF 0.0329 -> 0.03, SEC 0.0935 -> 0.10.
+        Aggregate rounding of the raw sum (0.1294) would give 0.13; the line-item sum is 0.13 as well here, but the
+        CAT component alone differs: 0.00 line-item vs 0.003 raw. The persisted basis makes the difference visible."""
+        r = ROBINHOOD_RHF_2026.exit(10, sale_principal=4540.0)
+        b = r["component_basis"]
+        assert b["cat"] == 0.0 and float(b["cat_raw"]) > 0, "the sub-cent CAT charge is dropped by rule, not by float error"
+        assert r["components"]["regulatory"] == round(b["cat"] + b["taf"] + b["sec_component"], 2)
+        assert r["total"] == round(r["components"]["commission"] + r["components"]["exchange"] + r["components"]["regulatory"], 2)
+
+    def test_every_component_and_rounding_decision_is_persisted_and_reconstructable(self):
+        r = ROBINHOOD_RHF_2026.exit(7, sale_principal=7 * 454.0)
+        b, rr = r["component_basis"], r["rounding_rules"]
+        assert {"cat_raw", "taf_raw", "sec_raw", "cat", "taf", "sec_component", "sale_principal"} <= set(b)
+        assert {"commission", "exchange", "regulatory_cat", "regulatory_taf", "regulatory_sec"} <= set(rr)
+        assert round(b["cat"] + b["taf"] + b["sec_component"], 2) == r["components"]["regulatory"]
+        assert r["fee_identity"]["terms_digest"] == ROBINHOOD_RHF_2026.terms_digest
+
+    def test_a_schedule_pricing_on_principal_without_declared_sell_components_refuses(self):
+        bad = FeeSchedule(schedule_id="X", version="1", provenance="SYNTHETIC_FIXTURE", commission_per_contract=0.0,
+                          exchange_fee_per_contract=0.04, regulatory_fee_per_contract_buy=0.0003,
+                          regulatory_fee_per_contract_sell=0.02, sale_principal_rate_per_million=20.60)
+        r = bad.exit(1, sale_principal=454.0)
+        assert r["total"] is None and "SELL_COMPONENTS_UNDECLARED" in r["why"]

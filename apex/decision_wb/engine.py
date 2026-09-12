@@ -282,7 +282,23 @@ class FunnelEngine:
                 cands.append({"label": label, "instrument": instrument(symbol=symbol, expiration=exp, strike=k, right=right, exercise="AMERICAN", settlement="PHYSICAL"),
                               "quote": {"bid": q["bid"], "ask": q["ask"], "bid_size": q["bid_size"], "ask_size": q["ask_size"], "timestamp_epoch": q["timestamp_epoch"]}})
                 T_by[label] = T_entry; key_by_label[label] = (exp, k, right)
-        fe, fx = fee_schedule.entry(1)["total"], fee_schedule.exit(1)["total"]
+        # EXIT FEE ASSUMPTION, DECLARED. A schedule that prices on sale principal cannot price an exit before the exit
+        # exists, and the funnel's exits are MODELLED bids that differ per path. The declared assumption is the same one
+        # TOLL_FORMULA_V1 already makes: the exit principal is the ENTRY principal (a flat exit). It is an assumption,
+        # not an estimate, and it is recorded on the trace. A per-path exit fee is a pricing-model change, not this brick.
+        fe = fee_schedule.entry(1)["total"]
+        _entry_asks = [c["quote"]["ask"] for c in cands if (c.get("quote") or {}).get("ask")]
+        _assumed_principal = (round(max(_entry_asks) * 100.0, 2) if _entry_asks else None)
+        _fx_block = fee_schedule.exit(1, sale_principal=_assumed_principal)
+        fx = _fx_block.get("total")
+        fee_assumption = {"entry_fee": fe, "exit_fee": fx, "exit_principal_assumed": _assumed_principal,
+                          "assumption": ("EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry "
+                                         "principal because a modelled exit bid is path-dependent; declared, not estimated"),
+                          "schedule": fee_schedule.identity() if hasattr(fee_schedule, "identity") else fee_schedule.schedule_id,
+                          "status": _fx_block.get("status"), "why": _fx_block.get("why")}
+        tr["fees"] = fee_assumption
+        if fe is None or fx is None:
+            return wait("FEES_NOT_ESTIMABLE: %s" % (_fx_block.get("why") or "entry or exit fee unknown; an unknown cost is not zero"))
 
         def compare(p):
             return EW.compare(paths=p, candidates=cands, T_years_by_contract=T_by, horizon_years=HORIZON_15M_CALENDAR_YEARS, r=0.0, fees_entry=fe, fees_exit=fx,

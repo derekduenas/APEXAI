@@ -21,6 +21,7 @@ authorized" means the operator said so on the record. A row is not done until ev
 | Release pinned from `main` at a reviewed commit and installed on the host | **no** | no | no | no — `DEPLOYMENT_DIVERGENCE_001` OPEN, nothing deploys until it closes |
 | Maintenance block lifted, `APEX_PILOT_LIVE_DATA=ENABLED` for the pilot process only | no | n/a | no | no |
 | Paper capital authorized | n/a | n/a | n/a | **no** |
+| **Cross-release recovery (stranding)** | **NOT REPAIRED — OPEN** (`FINDING_RELEASE_CHANGE_STRANDS_POSITION.md`) | no | no | **BLOCKS any deploy or rollback while a position may exist** (A-012 is the procedural mitigation) |
 | Collector restarted (for the exit-spread record, not for the pilot) | n/a | n/a | stopped | no |
 | Nightly Sharadar pull | armed on the Mac (`com.apex.nightly-pull` launchd, ran 2026-09-12 14:07Z) | n/a | yes | **was already armed; operator to confirm this is intended** |
 

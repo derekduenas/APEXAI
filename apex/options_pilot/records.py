@@ -25,8 +25,16 @@ DECISION_POWER = "NONE_PAPER"
 FORBIDDEN_CLASSES = ("HISTORICAL_DEVELOPMENT_REPLAY", "NONE_REPLAY")
 PROVENANCE = ("SYNTHETIC_FIXTURE", "LIVE_FEED")
 EXECUTION_MODES = ("PROSPECTIVE_ORCHESTRATION",)
+SIGNAL_STATUS_REF = {
+    "document": "SIGNAL_STATUS_001.md",
+    "statement": ("there is no validated directional signal on the options path; HEURISTIC_DIRECTION_V1 is a placeholder "
+                  "that exists so the pipeline has an input; no P&L produced under it is evidence about anything except "
+                  "the pipeline; a negative result under it is the EXPECTED result, not a finding about the system"),
+    "hurdle": "docs/SIGNAL_HURDLE_001.md"}
 LABELS = {"evidence_class": EVIDENCE_CLASS, "decision_power": DECISION_POWER,
-          "live_capital": "LOCKED", "live_promotion_eligible": False}
+          "live_capital": "LOCKED", "live_promotion_eligible": False,
+          # sealed on EVERY record so a placeholder cannot become a strategy by accumulation
+          "signal_status": SIGNAL_STATUS_REF}
 
 FORECAST_TARGET = "log(close[bar at t+15min] / close[bar at t])"
 FORECAST_UNITS = "log return, dimensionless"

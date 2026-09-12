@@ -47,12 +47,29 @@ def _binding_view(intent: dict) -> dict:
     return v
 
 
+FEE_IDENTITY_FIELDS = ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date", "terms_digest")
+
+
+def fee_identity_of(intent: dict) -> dict:
+    """The COMPLETE fee identity as carried on the intent. Every field appears; a missing one is explicitly absent
+    (not defaulted) so the binding differs from an intent that carries it. UNEXPECTED keys are included under
+    `__EXTRA__` so a term smuggled into the fee block changes the binding instead of sitting there unread."""
+    f = intent.get("fees") or {}
+    out = {k: (f[k] if k in f else "__ABSENT__") for k in FEE_IDENTITY_FIELDS}
+    extra = {k: f[k] for k in sorted(f) if k not in FEE_IDENTITY_FIELDS}
+    if extra:
+        out["__EXTRA__"] = extra
+    return out
+
+
 def envelope_binding_hash(intent: dict) -> str:
-    """Binds an approval to the risk ENVELOPE and fee schedule as well as the intent identity."""
+    """Binds an approval to the risk ENVELOPE and the COMPLETE FEE IDENTITY as well as the intent identity.
+    Previously this committed to `fee_schedule_id` alone, so an altered hash, provenance, known status, effective
+    date or fee term left the binding unchanged and a persisted approval kept verifying."""
     env = intent.get("risk_envelope") or {}
     return canonical_hash({"binding": binding_hash(_binding_view(intent)),
                            "max_entry_price": env.get("max_entry_price"), "envelope_debit": env.get("envelope_debit"),
-                           "fee_schedule_id": (intent.get("fees") or {}).get("schedule_id")})
+                           "fee_identity": fee_identity_of(intent)})
 
 
 def verify_approval(intent: dict, approval, *, authority=None) -> dict:
@@ -76,7 +93,18 @@ def verify_approval(intent: dict, approval, *, authority=None) -> dict:
     if not is_real(approval.get("certified_max_loss")) or approval["certified_max_loss"] <= 0:
         raise RiskRefused("RISK_MAX_LOSS_INVALID: %r" % (approval.get("certified_max_loss"),))
     if "envelope_binding_hash" in approval and approval["envelope_binding_hash"] != envelope_binding_hash(intent):
-        raise RiskRefused("RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE")
+        raise RiskRefused("RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different "
+                          "envelope or fee identity than the intent now carries")
+    # the approval's OWN recorded identity must equal the intent's, field by field: an approval whose identity block
+    # was altered while its id was preserved is refused by name
+    a_id, i_id = approval.get("fee_identity"), fee_identity_of(intent)
+    if a_id is not None:
+        if not isinstance(a_id, dict):
+            raise RiskRefused("RISK_APPROVAL_FEE_IDENTITY_MALFORMED: %r" % type(a_id).__name__)
+        for k in FEE_IDENTITY_FIELDS:
+            if a_id.get(k, "__ABSENT__") != i_id[k]:
+                raise RiskRefused("RISK_APPROVAL_FEE_IDENTITY_DISAGREES: %s approval=%r intent=%r"
+                                  % (k, a_id.get(k, "__ABSENT__"), i_id[k]))
     if authority is not None:
         why = authority.accepts(approval)
         if why:

@@ -1,0 +1,92 @@
+{
+ "kind": "FEE_IDENTITY_REPRODUCTIONS",
+ "at": "residual gap after 4e8164c",
+ "head": "4e8164cdef9e4605638dcb64386a74b6b5734f4c",
+ "findings": {
+  "A1_schedule_hash_altered_id_unchanged": {
+   "reproduced": true,
+   "detail": {
+    "altered": {
+     "schedule_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "refusal": null,
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A2_provenance_altered_id_and_hash_unchanged": {
+   "reproduced": true,
+   "detail": {
+    "altered": {
+     "provenance": "PROVIDER_VERIFIED"
+    },
+    "refusal": null,
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A3_known_status_altered": {
+   "reproduced": true,
+   "detail": {
+    "altered": {
+     "known": false
+    },
+    "refusal": null,
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A4_effective_date_or_version_altered": {
+   "reproduced": true,
+   "detail": {
+    "altered": {
+     "version": "SOMETHING_ELSE",
+     "effective_date": "1999-01-01"
+    },
+    "refusal": null,
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A5_fee_terms_altered": {
+   "reproduced": true,
+   "detail": {
+    "altered": {
+     "commission_per_contract": 99.0,
+     "exchange_fee_per_contract": 99.0
+    },
+    "refusal": null,
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A6_approval_identity_fields_altered_id_preserved": {
+   "reproduced": true,
+   "detail": {
+    "altered": "approval.fee_schedule_hash and approval.fee_identity",
+    "refusal": null,
+    "note": "verify_approval never reads the approval's own fee identity"
+   }
+  },
+  "A7_active_authority_same_id_different_terms_accepts_the_approval": {
+   "reproduced": true,
+   "detail": {
+    "accepts_returned": null,
+    "authority_compares": "approval['fee_schedule_id'] == self.fee_schedule.schedule_id ONLY",
+    "consequence": "a persisted approval is honoured by an authority whose fee terms differ entirely"
+   }
+  },
+  "A8_filled_intent_with_a_partial_fee_identity_is_not_refused": {
+   "reproduced": false,
+   "detail": {
+    "integrity_problems": [
+     "seq 2: FEE_SCHEDULE_IDENTITY_DISAGREES: record 'SYNTHETIC_FEES_V1'/'None' vs 'SYNTHETIC_FEES_V1'/'58c4252b8a8a'"
+    ],
+    "expected": "a named integrity refusal naming the incomplete identity"
+   }
+  },
+  "A9_fee_arithmetic_uses_binary_floating_point": {
+   "reproduced": false,
+   "detail": {
+    "three_taf_contracts_float": "0.00987",
+    "exact_cents_would_be": "0.00987 -> 0.01",
+    "note": "components are summed in binary floats before rounding; line-item vs aggregate rounding can differ by a cent"
+   }
+  }
+ }
+}

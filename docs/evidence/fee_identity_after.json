@@ -1,0 +1,99 @@
+{
+ "kind": "FEE_IDENTITY_REPRODUCTIONS",
+ "at": "residual gap after 4e8164c",
+ "head": "4e8164cdef9e4605638dcb64386a74b6b5734f4c",
+ "findings": {
+  "A1_schedule_hash_altered_id_unchanged": {
+   "reproduced": false,
+   "detail": {
+    "altered": {
+     "schedule_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "refusal": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity than the intent now c",
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A2_provenance_altered_id_and_hash_unchanged": {
+   "reproduced": false,
+   "detail": {
+    "altered": {
+     "provenance": "PROVIDER_VERIFIED"
+    },
+    "refusal": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity than the intent now c",
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A3_known_status_altered": {
+   "reproduced": false,
+   "detail": {
+    "altered": {
+     "known": false
+    },
+    "refusal": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity than the intent now c",
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A4_effective_date_or_version_altered": {
+   "reproduced": false,
+   "detail": {
+    "altered": {
+     "version": "SOMETHING_ELSE",
+     "effective_date": "1999-01-01"
+    },
+    "refusal": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity than the intent now c",
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A5_fee_terms_altered": {
+   "reproduced": false,
+   "detail": {
+    "altered": {
+     "commission_per_contract": 99.0,
+     "exchange_fee_per_contract": 99.0
+    },
+    "refusal": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity than the intent now c",
+    "binding_commits_to": "binding_hash(intent) + max_entry_price + envelope_debit + fee_schedule_id ONLY"
+   }
+  },
+  "A6_approval_identity_fields_altered_id_preserved": {
+   "reproduced": false,
+   "detail": {
+    "altered": "approval.fee_schedule_hash and approval.fee_identity",
+    "refusal": "RISK_APPROVAL_FEE_IDENTITY_DISAGREES: schedule_hash approval='0000000000000000000000000000000000000000000000000000000000000000' intent='58c4",
+    "note": "verify_approval never reads the approval's own fee identity"
+   }
+  },
+  "A7_active_authority_same_id_different_terms_accepts_the_approval": {
+   "reproduced": false,
+   "detail": {
+    "accepts_returned": "approval was issued under fee schedule_hash='58c4252b8a8ad6ab2f3e84b591e05ee8b6d9ef8257cc38fa7814da38c3f71ca5', active authority runs '5ddf1e25d98dcbae6c81b4e4669256aa09219f0094440edc6d199bd0c0a7b3de'",
+    "authority_compares": "approval['fee_schedule_id'] == self.fee_schedule.schedule_id ONLY",
+    "consequence": "a persisted approval is honoured by an authority whose fee terms differ entirely"
+   }
+  },
+  "A8_filled_intent_with_a_partial_fee_identity_is_not_refused": {
+   "reproduced": false,
+   "detail": {
+    "boundary_refusal": "FEE_IDENTITY_INCOMPLETE_ON_INTENT: the persisted intent lacks ['schedule_hash', 'provenance', 'known', 'version', 'effective_date', 'terms_digest']; a filled intent must carry the complete fee identity and there is no fallback",
+    "book_integrity_problems": [
+     "seq 2: FEE_SCHEDULE_IDENTITY_DISAGREES: record 'SYNTHETIC_FEES_V1'/'None' vs 'SYNTHETIC_FEES_V1'/'58c4252b8a8a'"
+    ],
+    "expected": "a named integrity refusal at the BOUNDARY naming the incomplete identity, never a fallback"
+   }
+  },
+  "A9_fee_arithmetic_is_not_declared_decimal_with_per_component_rounding": {
+   "reproduced": false,
+   "detail": {
+    "arithmetic": "DECIMAL_CENTS",
+    "rounding_rules": {
+     "commission": "exact per contract, to the cent",
+     "exchange": "ORF + OCC per contract, to the cent",
+     "regulatory_cat": "sub-cent charge rounds DOWN to zero (published rule)",
+     "regulatory_taf": "FINRA TAF, NEAREST cent",
+     "regulatory_sec": "SEC, rounded UP to the cent"
+    },
+    "requirement": "explicit decimal/integer-cent arithmetic with each component rounded under its own published rule before totalling"
+   }
+  }
+ }
+}

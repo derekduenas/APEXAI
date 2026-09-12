@@ -1,0 +1,235 @@
+{
+ "kind": "FUNNEL_FIRST_RUN",
+ "preregistration": "docs/FUNNEL_FIRST_RUN_PREREGISTRATION.md",
+ "excluded_from": [
+  "expectancy",
+  "calibration",
+  "alpha"
+ ],
+ "quarantined": "REPLAY",
+ "scans": [
+  {
+   "i": 0,
+   "t_utc": "2026-09-11T13:30:23.096973Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.50 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 749.0,
+    "right": "PUT"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 15,
+   "t_utc": "2026-09-11T13:45:22.389474Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 12.04 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 774.0,
+    "right": "CALL"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 30,
+   "t_utc": "2026-09-11T14:00:22.956769Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.69 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 775.0,
+    "right": "CALL"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 45,
+   "t_utc": "2026-09-11T14:15:22.793569Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.72 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 750.0,
+    "right": "PUT"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 60,
+   "t_utc": "2026-09-11T14:30:23.428577Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.26 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 774.0,
+    "right": "CALL"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 75,
+   "t_utc": "2026-09-11T14:45:23.217055Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.74 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 748.0,
+    "right": "PUT"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 90,
+   "t_utc": "2026-09-11T15:00:23.565820Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.67 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 749.0,
+    "right": "PUT"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 105,
+   "t_utc": "2026-09-11T15:15:23.639687Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.57 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 773.0,
+    "right": "CALL"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 120,
+   "t_utc": "2026-09-11T15:30:24.010899Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.48 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 774.0,
+    "right": "CALL"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 135,
+   "t_utc": "2026-09-11T15:45:24.137967Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.52 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 774.0,
+    "right": "CALL"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 150,
+   "t_utc": "2026-09-11T16:00:24.599869Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.41 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 752.0,
+    "right": "PUT"
+   },
+   "selections_differ": null
+  },
+  {
+   "i": 165,
+   "t_utc": "2026-09-11T16:15:24.606100Z",
+   "decision": "WAIT",
+   "why": "NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.21 > ",
+   "fit_status": "READY",
+   "n_candidates": 0,
+   "n_eligible": 0,
+   "prime": null,
+   "selected": null,
+   "rule_path_would_pick": {
+    "symbol": "SPY",
+    "expiration": "2026-10-02",
+    "strike": 752.0,
+    "right": "PUT"
+   },
+   "selections_differ": null
+  }
+ ],
+ "totals": {
+  "funnel_WAIT": 12,
+  "fit_READY": 12
+ },
+ "fit_info": {
+  "status": "READY"
+ }
+}

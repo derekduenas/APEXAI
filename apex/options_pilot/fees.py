@@ -15,6 +15,7 @@ simulated fill says it is simulated."""
 from __future__ import annotations
 
 import math
+from decimal import ROUND_CEILING, ROUND_HALF_UP, Decimal
 
 from dataclasses import dataclass, field
 
@@ -41,6 +42,9 @@ class FeeSchedule:
     note: str = ""
     sale_principal_rate_per_million: float | None = None   # e.g. SEC $20.60 per $1,000,000 of SALE principal
     sell_per_contract_components: float = 0.0              # the sell-side components that ARE per contract (CAT + FINRA TAF)
+    effective_date: str = "UNDECLARED"                     # the date the published terms take effect
+    cat_per_contract: float | None = None                  # CAT, both sides, rounded to the cent with sub-cent -> 0
+    taf_per_contract_sell: float | None = None             # FINRA TAF, sells, rounded to the NEAREST cent
 
     def __post_init__(self):
         if self.provenance not in FEE_PROVENANCE:
@@ -63,6 +67,34 @@ class FeeSchedule:
     def schedule_hash(self) -> str:
         return canonical_hash(self.describe())
 
+    # ---------------------------------------------------------------- COMPLETE CANONICAL FEE IDENTITY
+    # The binding commits to ALL of this, not to schedule_id alone: an altered hash, provenance, known status,
+    # effective date or term changes the identity and therefore the binding, and a persisted approval stops verifying.
+    IDENTITY_FIELDS = ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date", "terms_digest")
+
+    @property
+    def terms_digest(self) -> str:
+        """A digest of the CANONICAL FEE TERMS alone (no ids, no provenance): two schedules with the same id but
+        different arithmetic have different terms digests."""
+        return canonical_hash({"commission_per_contract": self.commission_per_contract,
+                               "exchange_fee_per_contract": self.exchange_fee_per_contract,
+                               "regulatory_fee_per_contract_buy": self.regulatory_fee_per_contract_buy,
+                               "regulatory_fee_per_contract_sell": self.regulatory_fee_per_contract_sell,
+                               "sale_principal_rate_per_million": self.sale_principal_rate_per_million,
+                               "sell_per_contract_components": self.sell_per_contract_components,
+                               "cat_per_contract": self.cat_per_contract,
+                               "taf_per_contract_sell": self.taf_per_contract_sell})
+
+    def identity(self) -> dict:
+        """The complete canonical fee identity. Every field is compared exactly, everywhere."""
+        return {"schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "provenance": self.provenance,
+                "known": self.known, "version": self.version, "effective_date": self.effective_date,
+                "terms_digest": self.terms_digest}
+
+    @property
+    def identity_hash(self) -> str:
+        return canonical_hash(self.identity())
+
     def describe(self) -> dict:
         return {"schedule_id": self.schedule_id, "version": self.version, "provenance": self.provenance,
                 "sale_principal_rate_per_million": self.sale_principal_rate_per_million,
@@ -79,42 +111,78 @@ class FeeSchedule:
     PRINCIPAL_COMPONENTS = ("sec_regulatory_fee",)
 
     def _side(self, contracts: int, side: str, *, sale_principal: float | None = None) -> dict:
+        """DECIMAL-CENT arithmetic. Every component is computed in Decimal and rounded under ITS OWN published rule
+        BEFORE the total is taken, so line-item rounding is what is charged and the aggregate is their sum:
+            commission, ORF/OCC   per contract, exact
+            CAT                   per contract, rounded to the cent, and a sub-cent charge rounds DOWN TO ZERO
+            FINRA TAF (sells)     per contract, rounded to the NEAREST cent
+            SEC (sells)           on ACTUAL sale principal, rounded UP to the cent
+        The rounding decision for each component is persisted so the total is reconstructable."""
         if type(contracts) is not int or contracts < 0:
             raise FeePolicyRefused("CONTRACTS_INVALID: %r" % (contracts,))
         if not self.known:
             return {"total": None, "status": "UNKNOWN", "why": "fee schedule %s is UNVERIFIED; an unknown cost is not zero"
-                    % self.schedule_id, "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "side": side}
-        comps = {"commission": round(self.commission_per_contract * contracts, 4),
-                 "exchange": round(self.exchange_fee_per_contract * contracts, 4)}
+                    % self.schedule_id, "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "side": side,
+                    "fee_identity": self.identity()}
+        n = Decimal(contracts)
+        cent = Decimal("0.01")
+        comps, rounding = {}, {}
+
+        def _cent(x, rule, name, *, sub_cent_to_zero=False):
+            v = Decimal(x).quantize(cent, rounding=rule)
+            if sub_cent_to_zero and Decimal(x) < cent:
+                v = Decimal("0.00")
+                rounding[name] = "sub-cent charge rounds DOWN to zero (published rule)"
+            else:
+                rounding[name] = ("rounded UP to the cent" if rule is ROUND_CEILING else "rounded to the NEAREST cent")
+            return v
+
+        comms = (Decimal(str(self.commission_per_contract)) * n).quantize(cent, rounding=ROUND_HALF_UP)
+        comps["commission"] = comms; rounding["commission"] = "exact per contract, to the cent"
+        exch = (Decimal(str(self.exchange_fee_per_contract)) * n).quantize(cent, rounding=ROUND_HALF_UP)
+        comps["exchange"] = exch; rounding["exchange"] = "ORF + OCC per contract, to the cent"
         basis = {}
         if side == "BUY":
-            comps["regulatory"] = round(self.regulatory_fee_per_contract_buy * contracts, 4)
-            basis["regulatory"] = "per contract (CAT); no sale principal on a buy"
+            _buy_cat = self.cat_per_contract if self.cat_per_contract is not None else self.regulatory_fee_per_contract_buy   # UNKNOWN_TO_ZERO_EXEMPT: not a zero default; falls back to the schedule's declared buy-side regulatory rate, which is validated non-None for a known schedule
+            raw_cat = Decimal(str(_buy_cat)) * n
+            comps["regulatory"] = _cent(raw_cat, ROUND_HALF_UP, "regulatory_cat", sub_cent_to_zero=True)
+            basis["regulatory"] = "CAT per contract (%s x %d = %s)" % (_buy_cat, contracts, raw_cat)
         elif self.sale_principal_rate_per_million is None:
-            comps["regulatory"] = round(self.regulatory_fee_per_contract_sell * contracts, 4)
-            basis["regulatory"] = "per contract (schedule declares no sale-principal rate)"
+            comps["regulatory"] = (Decimal(str(self.regulatory_fee_per_contract_sell)) * n).quantize(cent, rounding=ROUND_HALF_UP)
+            rounding["regulatory"] = "per contract (schedule declares no sale-principal rate), to the cent"
         else:
-            # per-contract sell components (CAT + FINRA TAF), then the SEC fee from the ACTUAL sale principal
-            per_contract = round(self.sell_per_contract_components * contracts, 6)
             if sale_principal is None:
                 return {"total": None, "status": "NOT_ESTIMABLE", "side": side, "contracts": contracts,
-                        "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash,
+                        "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "fee_identity": self.identity(),
                         "why": ("SALE_PRINCIPAL_REQUIRED: %s prices its regulatory fee at %.2f per $1,000,000 of sale principal; "
                                 "an unknown principal is not zero" % (self.schedule_id, self.sale_principal_rate_per_million))}
             if isinstance(sale_principal, bool) or not isinstance(sale_principal, (int, float)) or not math.isfinite(sale_principal) or sale_principal < 0:
                 return {"total": None, "status": "REFUSED", "side": side, "contracts": contracts,
-                        "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash,
+                        "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "fee_identity": self.identity(),
                         "why": "SALE_PRINCIPAL_INVALID: %r" % (sale_principal,)}
-            sec = math.ceil(sale_principal * self.sale_principal_rate_per_million / 1e6 * 100.0) / 100.0   # rounded UP to the cent
-            comps["regulatory"] = round(per_contract + sec, 6)
-            basis["regulatory"] = ("CAT+TAF %.6f per contract x %d, plus SEC %.2f per $1,000,000 of sale principal %.2f = %.2f, "
-                                   "rounded UP to the cent" % (self.sell_per_contract_components, contracts,
-                                                               self.sale_principal_rate_per_million, sale_principal, sec))
-            basis["sale_principal"] = sale_principal
-            basis["sec_component"] = sec
-        return {"total": round(sum(comps.values()), 2), "components": comps, "component_basis": basis,
+            # a schedule that prices on sale principal must DECLARE its per-contract sell components; an undeclared
+            # component is unknown, and an unknown cost is not zero
+            if self.cat_per_contract is None or self.taf_per_contract_sell is None:
+                return {"total": None, "status": "NOT_ESTIMABLE", "side": side, "contracts": contracts,
+                        "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "fee_identity": self.identity(),
+                        "why": ("SELL_COMPONENTS_UNDECLARED: %s prices on sale principal but does not declare cat_per_contract=%r "
+                                "and taf_per_contract_sell=%r" % (self.schedule_id, self.cat_per_contract, self.taf_per_contract_sell))}
+            raw_cat = Decimal(str(self.cat_per_contract)) * n
+            cat = _cent(raw_cat, ROUND_HALF_UP, "regulatory_cat", sub_cent_to_zero=True)
+            raw_taf = Decimal(str(self.taf_per_contract_sell)) * n
+            taf = raw_taf.quantize(cent, rounding=ROUND_HALF_UP); rounding["regulatory_taf"] = "FINRA TAF, NEAREST cent"
+            raw_sec = Decimal(str(sale_principal)) * Decimal(str(self.sale_principal_rate_per_million)) / Decimal("1000000")
+            sec = raw_sec.quantize(cent, rounding=ROUND_CEILING); rounding["regulatory_sec"] = "SEC, rounded UP to the cent"
+            comps["regulatory"] = cat + taf + sec
+            basis.update({"sale_principal": float(sale_principal), "cat_raw": str(raw_cat), "cat": float(cat),
+                          "taf_raw": str(raw_taf), "taf": float(taf), "sec_raw": str(raw_sec), "sec_component": float(sec),
+                          "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"})
+        total = sum(comps.values(), Decimal("0.00")).quantize(cent, rounding=ROUND_HALF_UP)
+        return {"total": float(total), "components": {k: float(v) for k, v in comps.items()},
+                "component_basis": basis, "rounding_rules": rounding, "arithmetic": "DECIMAL_CENTS",
                 "status": "CHARGED" if contracts else "NONE", "sale_principal": sale_principal,
-                "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "side": side, "contracts": contracts}
+                "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "fee_identity": self.identity(),
+                "side": side, "contracts": contracts}
 
     def entry(self, contracts: int) -> dict:
         return self._side(contracts, "BUY")
@@ -228,7 +296,10 @@ ROBINHOOD_RHF_2026 = FeeSchedule(
     regulatory_fee_per_contract_buy=0.0003,              # CAT fee
     regulatory_fee_per_contract_sell=round(0.0003 + 0.00329 + 0.02, 5),   # SUPERSEDED by the sale-principal computation; kept for schedules that declare no rate
     sale_principal_rate_per_million=20.60,               # SEC regulatory fee, effective 2026-04-04, on SALE principal
-    sell_per_contract_components=round(0.0003 + 0.00329, 5),   # CAT + FINRA TAF, per contract, sells
+    sell_per_contract_components=round(0.0003 + 0.00329, 5),   # CAT + FINRA TAF, per contract, sells (superseded by the components below)
+    cat_per_contract=0.0003,                             # CAT, both sides; sub-cent rounds to zero
+    taf_per_contract_sell=0.00329,                       # FINRA TAF, sells, nearest cent, effective 2026-01-01
+    effective_date="2026-04-04",                         # the latest published effective date among the components
     verified_against={"provider": ROBINHOOD_RHF_2026_SOURCE["provider"], "document": ROBINHOOD_RHF_2026_SOURCE["document"],
                       "date": ROBINHOOD_RHF_2026_SOURCE["date"], "document_sha256": ROBINHOOD_RHF_2026_SOURCE["document_sha256"],
                       "authorization": ROBINHOOD_RHF_2026_AUTHORIZATION},
