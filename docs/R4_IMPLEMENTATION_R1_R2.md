@@ -178,3 +178,25 @@ No historical data, no collector read, no fitting on real data, no backtest, no 
 activation, no deployment, no risk-limit change, no broker call, no paper order. The collector remains stopped and
 its retry/backoff policy is deliberately NOT changed here: that is an operational change and does not belong in a
 model repair.
+
+## Latency budget: dated declaration (Clock Start Block item 4, 2026-09-11)
+
+**Declared, not enforced.** Operator decision recorded 2026-09-11. Enforcement is capability and the build is
+frozen; a breach today is invisible, and this section says so rather than implying otherwise.
+
+| Quantity | Value | Source |
+|---|---|---|
+| Binding constraint | `EXECUTION_MAX_AGE_S` = 15 s: the quote behind an intent must be ≤ 15 s old at the boundary | `apex/joint_wb/state.py` |
+| Declared `decide()` deadline | **2.0 s** (13 % of the window) | this declaration |
+| Declared per-scan deadline | **5.0 s** (leaves 10 s for the execution quote) | this declaration |
+| Measured `decide()` at 4,000 paths, 35 decisions, tracer OFF | median **0.111 s**, p95 0.127 s, max **0.129 s** | `docs/evidence/r4_latency_budget.json`, generator `scripts/r4_latency_measure.py` |
+| Adverse block inside each decision (timed by wrapping `_adverse`) | median 0.064 s, 58 % of the decision | same |
+| Margin at the measured worst case | **1.87 s** vs the 2.0 s deadline (15.5x headroom); 14.87 s vs the raw constraint | same |
+| Tracer-ON control, same code, 5 samples | median 0.27–0.30 s, inflation factor 2.5–2.7x | same |
+
+Corrections to the r2 text above: the "0.105 s median / 0.062 s adverse cost" figures came from an uncommitted
+session script and are replaced by the committed generator's numbers, which agree within noise. The r1 and r2
+scale files (`r4_scale_synthetic*.json`) are superseded in place with their measurement conditions added
+retroactively and a `superseded_by` pointer; they were not deleted. `docs/evidence/EVIDENCE_CONDITIONS_AUDIT_2026-09-11.json`
+classifies every file under `docs/evidence/`: two uncontrolled and superseded, one partially recorded and flagged
+(`scale_check_10_sessions_OUTPUT.json`), the rest either controlled or not measurements.

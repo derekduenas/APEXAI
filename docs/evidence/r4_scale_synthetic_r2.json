@@ -12,5 +12,20 @@
  "adverse_scenarios_evaluated": 6,
  "note": "r2 repair: each decision now also evaluates 6 adverse scenarios (4 of them redraw or rebuild the state paths)",
  "decision": "TRADE",
- "attribution": "builder-reported, synthetic inputs, single process on the Mac venv"
+ "attribution": "builder-reported, synthetic inputs, single process on the Mac venv",
+ "superseded_by": "docs/evidence/r4_latency_budget.json",
+ "superseded_on": "2026-09-11",
+ "superseded_reason": "KNOWN_FALSE_TIMING: decision_seconds were measured with tracemalloc ACTIVE (the harness observed itself; ~2.4x inflation on this allocation-heavy path) over 5 samples. The memory figures (python_traced_peak_mib, process_max_rss_mib) are not affected. Kept in place as a superseded record.",
+ "measurement_conditions": {
+  "host": "Dereks-MacBook-Air.local (Intel Core i5-5250U @ 1.60GHz, macOS 12.7.6)",
+  "python": "3.11.9 (../apex-equities/.venv)",
+  "process": "single process on the Mac venv; inline session script, NOT committed (unverifiable by re-run)",
+  "inputs": "SYNTHETIC (tests.test_joint_wb fixtures); no market data",
+  "tracer_active_during_timed_decisions": true,
+  "sample_count": 5,
+  "warmup_excluded": "not recorded",
+  "git_commit_of_measurement": "ae12641",
+  "generator": "inline session script, not committed",
+  "conditions_recorded": "RETROACTIVELY on 2026-09-11 from the session transcript, not at measurement time"
+ }
 }

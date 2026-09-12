@@ -1,25 +1,57 @@
 {
- "measurement": {
-  "n_decisions": 35,
+ "kind": "R4_LATENCY_BUDGET",
+ "generated_at_utc": "2026-09-12T03:56:42+00:00",
+ "measurement_conditions": {
+  "tracer_active_during_timed_decisions": false,
+  "sample_count": 35,
+  "warmup_excluded": 3,
   "n_paths": 4000,
-  "tracer_active": false,
-  "with_adverse_scenarios": {
-   "median": 0.1054,
-   "p95": 0.1217,
-   "max": 0.1239
-  },
-  "adverse_scenarios_disabled": {
-   "median": 0.0436,
-   "p95": 0.0467,
-   "max": 0.0498
-  },
-  "cost_of_the_six_scenarios_median_s": 0.0618
+  "inputs": "SYNTHETIC (tests.test_joint_wb fixtures); no market data",
+  "host": "Dereks-MacBook-Air.local",
+  "cpu": "i386",
+  "platform": "macOS-12.7.6-x86_64-i386-64bit",
+  "python": "3.11.9",
+  "numpy": "2.4.6",
+  "process": "single process, pid 18156, this generator only; no other apex service running on the host",
+  "max_rss_mib": 96.3,
+  "generator": "scripts/r4_latency_measure.py",
+  "git_commit": "9b4dd5d",
+  "attribution": "builder-reported; reproducible by re-running the generator"
  },
+ "measurement": {
+  "decide_total": {
+   "median": 0.1108,
+   "p95": 0.1265,
+   "max": 0.1288,
+   "min": 0.0961,
+   "n": 35
+  },
+  "adverse_block_inside_decide": {
+   "median": 0.0637,
+   "p95": 0.0719,
+   "max": 0.0752,
+   "min": 0.0546,
+   "n": 35
+  },
+  "adverse_share_of_median": 0.575,
+  "note": "the adverse block is timed by wrapping JointEngine._adverse (the scenarios are hard-coded there; the ADVERSE_SCENARIOS tuple is the registry the gate checks, not a switch, so they cannot be disabled from outside). An earlier uncommitted measurement reported 0.062 s for the block by a method that cannot be reproduced; the direct measurement here replaces it",
+  "control_tracer_on_5_samples": {
+   "median": 0.2729,
+   "p95": 0.2934,
+   "max": 0.3194,
+   "min": 0.2653,
+   "n": 5
+  },
+  "tracer_inflation_factor": 2.46
+ },
+ "supersedes": [
+  "docs/evidence/r4_scale_synthetic.json",
+  "docs/evidence/r4_scale_synthetic_r2.json"
+ ],
  "correction_to_earlier_reports": {
-  "r1_reported": "median 0.121 s over 5 decisions",
-  "r2_reported": "median 0.447 s over 5 decisions",
-  "defect": "both were measured with tracemalloc active, which inflates this allocation-heavy path about 2.5x, and 5 samples is too few to be stable. Re-measured here with the tracer OFF and 35 samples.",
-  "verified": "same code, 5 decisions WITH tracer = 0.290 s median vs WITHOUT = 0.113 s median",
+  "r1_reported": "median 0.121 s over 5 decisions (tracer ON)",
+  "r2_reported": "median 0.447 s over 5 decisions (tracer ON)",
+  "defect": "both measured with tracemalloc active; the harness observed itself. 5 samples is too few to be stable.",
   "conclusion": "the r1 -> r2 slowdown claim was not a clean comparison and is withdrawn"
  },
  "declared_deadline_before_this_record": null,
@@ -28,13 +60,19 @@
   "value_s": 15.0,
   "why": "the quote that produces an intent must be <= 15 s old at the decision boundary; decision time consumes that budget"
  },
- "proposed": {
+ "declaration": {
+  "status": "DECLARED_NOT_ENFORCED",
+  "declared_on": "2026-09-11",
+  "declared_by": "operator (Clock Start Block item 4)",
   "decide_deadline_s": 2.0,
   "per_scan_deadline_s": 5.0,
-  "reasoning": "decide() <= 2.0 s is 13% of the 15 s execution-freshness window, leaving >= 13 s for state assembly, ledger writes, the kernel check and the fill round trip; the per-scan 5.0 s budget leaves 10 s of that window for the execution quote itself",
-  "margin_at_worst_case_s": 1.8761,
-  "headroom_vs_proposed": 16.1,
-  "headroom_vs_raw_constraint": 121.1,
-  "enforcement": "NOT BUILT \u2014 declaring a deadline is a record; enforcing it is new capability and is out of scope for this block"
+  "measured_margin_s": {
+   "decide_worst_case": 1.8712,
+   "per_scan_worst_case_assuming_one_decision": 4.8712,
+   "raw_constraint_worst_case": 14.8712
+  },
+  "headroom_factor_vs_decide_deadline": 15.5,
+  "reasoning": "decide() <= 2.0 s is 13% of the 15 s freshness window, leaving >= 13 s for state assembly, ledger writes, the kernel check and the fill round trip; the 5.0 s per-scan budget leaves 10 s for the execution quote itself",
+  "enforcement": "NOT BUILT: enforcing a deadline is capability and the build is frozen; a breach today is invisible"
  }
 }
