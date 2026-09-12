@@ -153,11 +153,22 @@ def test_trade_wait_refuse_in_one_cycle_with_stable_ids(tmp_path, fenced):
     decs = [r for r in rows if r["kind"] == "pilot_decision"]
     assert [d["decision"] for d in decs] == ["TRADE", "WAIT", "REFUSE"]
     assert len({d["scan_id"] for d in decs}) == 3
-    assert rep["outcomes"] == [{"fill_seq": 4, "recovery": False, "final": "RESOLVED",
-                                "attempts": [{"seq": 12, "status": "RESOLVED", "attempt": 1, "reconciled": False}]}]
+    out = rep["outcomes"]
+    assert len(out) == 1 and out[0]["fill_seq"] == 4 and out[0]["recovery"] is False and out[0]["final"] == "RESOLVED"
+    assert [{k: a[k] for k in ("status", "attempt", "reconciled")} for a in out[0]["attempts"]] == \
+        [{"status": "RESOLVED", "attempt": 1, "reconciled": False}]
     kinds = [r["kind"] for r in rows]
-    assert kinds[-2:] == ["pilot_intent_cancelled", "pilot_session_close"]           # the QQQ WAIT intent is cancelled at close
-    assert [r for r in rows if r["kind"] == "pilot_intent_cancelled"][0]["why"].startswith("SESSION_CLOSE")
+    # OPERATING-LOOP-001 changed WHEN these happen, and the new order is the point. The QQQ WAIT intent is retired at
+    # its own TTL -- an INTENT_EXPIRY event in the chronological stream -- not held to session close; and the SPY exit
+    # is valued at its deadline, which is later than that TTL. Previously the single-cycle loop did no housekeeping at
+    # all, so the intent survived until close.
+    i_cancel = kinds.index("pilot_intent_cancelled")
+    i_outcome = kinds.index("pilot_outcome")
+    assert i_cancel < i_outcome < kinds.index("pilot_session_close")
+    assert kinds[-2:] == ["pilot_outcome", "pilot_session_close"]
+    cancel = [r for r in rows if r["kind"] == "pilot_intent_cancelled"][0]
+    assert cancel["why"].startswith("FORECAST_STALE_BEFORE_EXECUTION"), \
+        "the reservation is released at the TTL with a NAMED reason, not swept up at close"
 
 
 def test_restart_resumes_without_re_executing_and_continues_the_sequence(tmp_path, fenced):

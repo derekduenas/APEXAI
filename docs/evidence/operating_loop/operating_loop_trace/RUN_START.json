@@ -1,0 +1,45 @@
+{
+ "code_pin": {
+  "branch": "operating-loop-001",
+  "commit": "1b86541ebb03bcdd362d2230e9728f7d97a10050",
+  "dirty": true,
+  "dirty_paths": [
+   "M apex/options_pilot/boundary.py",
+   " M apex/options_pilot/entrypoint.py",
+   " M apex/options_pilot/records.py",
+   " M apex/options_pilot/session.py",
+   " M tests/test_loop_lifecycle_and_precision.py",
+   "?? apex/options_pilot/accounting.py",
+   "?? apex/options_pilot/instant.py",
+   "?? apex/options_pilot/lifecycle.py",
+   "?? apex/options_pilot/replay.py",
+   "?? apex/options_pilot/run_dir.py",
+   "?? scripts/operating_loop_trace.py",
+   "?? tests/test_operating_loop_001.py"
+  ],
+  "status": "PINNED"
+ },
+ "config": {
+  "fee_schedule": "SYNTHETIC_FEES",
+  "hold_s": 900.0,
+  "limits": "UNCHANGED (kernel defaults)",
+  "note": "orchestration only",
+  "policy": "PILOT_RULE_V2",
+  "provenance": "SYNTHETIC_FIXTURE",
+  "scans": [
+   "t0",
+   "t0+930s"
+  ]
+ },
+ "config_digest": "c6275f2dd6b035b656228b38a025f92e326638370b1ded66d81eb6adfbdb3fd7",
+ "inputs": {},
+ "kind": "RUN_START",
+ "note": "OPERATING-LOOP-001 synthetic event trace; no provider request, no fitting, no authorization",
+ "preservation_policy": "RUN_DIR_V1: one evaluation, one directory, claimed by creation. A directory that already exists is a COLLISION and is refused; an artifact name claimed twice is refused. Nothing in this module unlinks, truncates or overwrites. A failed run keeps its partial artifacts and gains a RUN_FAILED marker.",
+ "run_id": "operating_loop_trace",
+ "started_canonical_us": 1789000020000000,
+ "started_epoch": 1789000020.0,
+ "started_utc": "2026-09-10T00:27:00.000000Z",
+ "status": "STARTED",
+ "timestamp_rule": "CANONICAL_INSTANT_V1: an instant is an exact integer of microseconds since 1970-01-01T00:00:00Z. A float epoch is converted with datetime.fromtimestamp(epoch, tz=UTC) -- nearest microsecond, ties to even -- which is the same conversion the record serializer performs, so the canonical integer is exactly the microsecond written to disk and read back. Instants are compared as integers; no epsilon is added, so the next representable future instant (+1 microsecond) is in the future and is refused. Source timestamps are preserved verbatim, separately."
+}

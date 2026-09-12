@@ -27,7 +27,7 @@ from .book import intent_finished
 from .clock import to_utc_string
 from .expression_rule import DEFAULT_RULE, POLICY_TO_RULE, RULE_IDS, RuleRefused, choose
 from .risk_authority import entry_cap_price
-from .records import INTENT_TTL_S, assert_prospective, canonical_hash
+from .records import INTENT_TTL_S, assert_record_labels, canonical_hash
 
 PROTOCOL_ID = "OPTIONS-PILOT-001"
 
@@ -41,7 +41,7 @@ def open_session(bd: B.Boundary, *, symbols: list) -> dict:
            "symbols": list(symbols), "release": bd.release, "protocol": PROTOCOL_ID,
            "runtime_identity": getattr(bd, "runtime_identity", None),         # measured at process start (Brick 1)
            "opened_utc": bd.clock.now_utc(), "opened_epoch": bd.clock.now(), **bd.labels}
-    assert_prospective(rec)
+    assert_record_labels(rec)
     receipt, _ = L.commit_once(bd.ledger, txn_id=rec["txn_id"], build=lambda rows: rec, kind="pilot_session_open")
     return receipt
 
@@ -141,7 +141,7 @@ def _decision(bd: B.Boundary, *, scan_id: str, symbol: str, decision: str, why, 
            "forecast_id": ids.get("forecast_id"), "intent_id": ids.get("intent_id"), "fill_id": ids.get("fill_id"),
            "funnel_trace": funnel_trace(bd, ids=ids, decision=decision, why=why),
            "refusal_persisted": persisted_refusal, "decided_utc": bd.clock.now_utc(), **bd.labels}
-    assert_prospective(rec)
+    assert_record_labels(rec)
     out = {"scan_id": scan_id, "symbol": symbol, "decision": decision, "why": why, **ids, "receipts": ids.get("receipts", {}),
            "reconciled": False}
     try:
@@ -183,7 +183,7 @@ def _duplicate_delivery(bd: B.Boundary, *, scan_id: str, symbol: str, prior: lis
             "release": bd.release, "decision_ref": {"seq": seq, "entry_hash": rec.get("entry_hash")},
             "note": "a second delivery of this scan_id; the persisted decision stands and was returned unchanged",
             "at_utc": bd.clock.now_utc(), **bd.labels}
-    assert_prospective(diag)
+    assert_record_labels(diag)
     out = _payload_of(rec, {**receipt, "kind": "pilot_decision", "receipt": "RECONCILED: persisted decision returned"}, reconciled=True)
     out["duplicate_delivery"] = True
     try:
@@ -274,7 +274,7 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
                     "forecast_ref": {"seq": f_receipt["seq"], "forecast_hash": f_receipt.get("forecast_hash")}, "rule_id": res.get("rule_id"),
                     "decision": res["decision"], "why": res.get("why"), "proposal": res.get("proposal"), "trace": res["trace"],
                     "engine": res.get("engine"), "at_utc": bd.clock.now_utc(), **bd.labels}
-            assert_prospective(frec)
+            assert_record_labels(frec)
             try:
                 fr_receipt = L.append_with_receipt(bd.ledger, frec)
             except L.LedgerRefused as e:
@@ -510,6 +510,6 @@ def close_session(bd: B.Boundary) -> dict:
            "outstanding_obligations": len(open_) + len(positions),
            "completion": "CLOSED_CLEAN" if not open_ and not positions else "CLOSED_WITH_OUTSTANDING_OBLIGATIONS",
            "closed_utc": bd.clock.now_utc(), **bd.labels}
-    assert_prospective(rec)
+    assert_record_labels(rec)
     receipt, _ = L.commit_once(bd.ledger, txn_id=rec["txn_id"], build=lambda rows: rec, kind="pilot_session_close")
     return receipt

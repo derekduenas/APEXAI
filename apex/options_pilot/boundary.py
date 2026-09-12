@@ -36,7 +36,7 @@ from .book import Book, load_book
 from .clock import Clock, ClockRefused, check_reading, to_utc_string
 from .exit_policy import EXIT_POLICY_V1, ExitPolicy
 from .fees import EXECUTION_POLICY_V1, UNVERIFIED_FEES, ExecutionPolicy, FeeSchedule
-from .records import (TOLL_FORMULA_V1, FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_prospective, canonical_hash, is_real, labels_for,
+from .records import (TOLL_FORMULA_V1, FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_record_labels, canonical_hash, is_real, labels_for,
                       validate_forecast, validate_intent, validate_quote)
 
 MAX_SELECTED_QUOTE_AGE_S = 15.0
@@ -86,12 +86,35 @@ class Boundary:
         self.ledger = ledger
         self.clock = clock
         self.labels = labels_for(provenance)
+        # HONEST EVIDENCE CLASSES (OPERATING-LOOP-001 item 5). A boundary belongs to exactly one route for its whole
+        # life, and a ledger belongs to exactly one route. A replay boundary may not append to a ledger that holds
+        # prospective records, and a prospective boundary may not append to a replay ledger: the two evidence classes
+        # are never mixed in one file, so nothing downstream has to separate them after the fact.
+        self.replay = bool(self.labels.get("replay"))
+        self._assert_ledger_route()
         self.risk = risk_authority
         self.session_id = session_id
         self.release = release
         self.fee_schedule = fee_schedule
         self.execution_policy = execution_policy
         self.exit_policy = exit_policy
+
+    def _assert_ledger_route(self) -> None:
+        """One ledger, one evidence route. Checked against what is already on disk, before anything is written."""
+        try:
+            rows = L.read_all(self.ledger)
+        except Exception:                                          # noqa: BLE001 - an unreadable/absent ledger is not a route conflict
+            return
+        for r in rows:
+            cls = r.get("evidence_class")
+            if cls is None:
+                continue
+            mine = self.labels["evidence_class"]
+            if cls != mine:
+                raise RecordRefused("EVIDENCE_ROUTE_MIXED: ledger %s already holds %r records; this boundary is %r. "
+                                    "Replay and prospective evidence are never written to one ledger."
+                                    % (self.ledger, cls, mine))
+            return
 
     def book(self, rows: list | None = None) -> Book:
         return load_book(self.ledger, session_id=self.session_id, rows=rows,
@@ -121,7 +144,7 @@ class Boundary:
         body["persisted_epoch"] = self.clock.now()
         body["release"] = self.release
         body["txn_id"] = "forecast:" + body["forecast_id"]
-        assert_prospective(body)
+        assert_record_labels(body)
         try:
             receipt, _ = L.commit_once(self.ledger, txn_id=body["txn_id"], build=lambda rows: body, kind="pilot_forecast")
         except L.LedgerRefused as e:
@@ -238,7 +261,7 @@ class Boundary:
             self.refuse("intent", str(e), refs={"intent_id": body["intent_id"]}, scan_id=scan_id)
         body["txn_id"] = "intent:" + body["intent_id"]
         body.update(self.labels)
-        assert_prospective(body)
+        assert_record_labels(body)
 
         def build(rows):
             consumed = L.find(self.ledger, kind="pilot_intent", rows=rows,
@@ -593,7 +616,7 @@ class Boundary:
             fill["committed_epoch"] = t_commit
             if fill["status"] == "FILLED":
                 fill["exit_schedule"] = self.exit_policy.schedule(t_commit)
-            assert_prospective(fill)
+            assert_record_labels(fill)
             return fill
 
         try:
@@ -620,7 +643,7 @@ class Boundary:
                "scan_id": it.get("scan_id"), "session_id": it.get("session_id"), "release": it.get("release"),
                "terminated_by_session": self.session_id, "why": why,
                "at_utc": self.clock.now_utc(), "at_epoch": self.clock.now(), **self.labels}
-        assert_prospective(rec)
+        assert_record_labels(rec)
 
         def build(rows):
             try:
@@ -677,7 +700,7 @@ class Boundary:
                "session_id": self.session_id, "release": self.release, "attempts": len(self.valuation_attempts(rows, fill_receipt["seq"])),
                "exit_policy": self.exit_policy.describe(), "obligation": "POSITION REMAINS UNRESOLVED; P&L UNKNOWN; exposure open",
                "at_utc": self.clock.now_utc(), **self.labels}
-        assert_prospective(rec)
+        assert_record_labels(rec)
 
         def build(rows):
             if self.discharging_outcomes(rows, fill_receipt["seq"]):
@@ -792,7 +815,7 @@ class Boundary:
                                    "quoted sides and is not subtracted again; fees charged exactly once per side",
                            discharges_position=True)
         out["resolved_utc"] = self.clock.now_utc()
-        assert_prospective(out)
+        assert_record_labels(out)
 
         def build(rows):
             if self.discharging_outcomes(rows, fill_receipt["seq"]):

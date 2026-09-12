@@ -18,13 +18,23 @@ from __future__ import annotations
 import hashlib
 import json
 
+from . import instant as I
 from .clock import ClockRefused, is_exact_int, is_real, parse_utc, to_utc_string
 
 EVIDENCE_CLASS = "PROSPECTIVE_PAPER"
 DECISION_POWER = "NONE_PAPER"
 FORBIDDEN_CLASSES = ("HISTORICAL_DEVELOPMENT_REPLAY", "NONE_REPLAY")
 PROVENANCE = ("SYNTHETIC_FIXTURE", "LIVE_FEED")
-EXECUTION_MODES = ("PROSPECTIVE_ORCHESTRATION",)
+EXECUTION_MODES = ("PROSPECTIVE_ORCHESTRATION", "RECORDED_REPLAY_ORCHESTRATION")
+
+# ---------------------------------------------------------------- honest evidence classes (OPERATING-LOOP-001 item 5)
+# A run over RECORDED data is not prospective evidence and must never be able to say it is. The prospective route is
+# unchanged and unweakened; the replay route is a SEPARATE, EXPLICITLY SELECTED, FAIL-CLOSED route whose records carry
+# labels that every promotion, live-authorization and prospective-aggregation surface is tested to exclude.
+REPLAY_EVIDENCE_CLASS = "HISTORICAL_DEVELOPMENT_REPLAY"
+REPLAY_DECISION_POWER = "NONE_REPLAY"
+REPLAY_PROVENANCE = ("RECORDED_REPLAY",)
+ALL_PROVENANCE = PROVENANCE + REPLAY_PROVENANCE
 SIGNAL_STATUS_REF = {
     "document": "SIGNAL_STATUS_001.md",
     "statement": ("there is no validated directional signal on the options path; HEURISTIC_DIRECTION_V1 is a placeholder "
@@ -35,8 +45,17 @@ LABELS = {"evidence_class": EVIDENCE_CLASS, "decision_power": DECISION_POWER,
           "live_capital": "LOCKED", "live_promotion_eligible": False,
           # sealed on EVERY record so a placeholder cannot become a strategy by accumulation
           "signal_status": SIGNAL_STATUS_REF}
+REPLAY_LABELS = {"evidence_class": REPLAY_EVIDENCE_CLASS, "decision_power": REPLAY_DECISION_POWER,
+                 "live_capital": "LOCKED", "live_promotion_eligible": False,
+                 # the three exclusions the replay route exists to make unmistakable, sealed on every replay record
+                 "prospective_results_eligible": False, "live_authorization_eligible": False, "replay": True,
+                 "signal_status": SIGNAL_STATUS_REF}
 
-TIMESTAMP_GRANULARITY_S = 1e-6      # records serialize epochs as microsecond strings; comparisons honour that
+# The canonical instant is an exact integer of microseconds (apex.options_pilot.instant). This constant names the
+# SERIALIZATION granularity; it is NOT a comparison tolerance. Instants are compared as canonical integers and no
+# epsilon is added anywhere -- an instant one microsecond ahead of the clock is in the future and is refused.
+TIMESTAMP_GRANULARITY_S = I.GRANULARITY_S
+TIMESTAMP_CONVERSION_RULE = I.CONVERSION_RULE
 FORECAST_TARGET = "log(close[bar at t+15min] / close[bar at t])"
 FORECAST_UNITS = "log return, dimensionless"
 FORECAST_HORIZON_MINUTES = 15
@@ -106,16 +125,26 @@ def _ts(rec: dict, field: str) -> float:
         raise RecordRefused(str(e)) from e
 
 
-def labels_for(provenance: str, execution_mode: str = "PROSPECTIVE_ORCHESTRATION") -> dict:
+def labels_for(provenance: str, execution_mode: str | None = None) -> dict:
+    """The label block for a route. The PROSPECTIVE route is unchanged. RECORDED_REPLAY is a separate route and gets
+    the replay labels; it cannot be reached by accident because the provenance string must be asked for by name."""
+    if provenance in REPLAY_PROVENANCE:
+        mode = execution_mode or "RECORDED_REPLAY_ORCHESTRATION"
+        if mode != "RECORDED_REPLAY_ORCHESTRATION":
+            raise RecordRefused("REPLAY_EXECUTION_MODE_REQUIRED: provenance %r may not run mode %r" % (provenance, mode))
+        return {**REPLAY_LABELS, "data_provenance": provenance, "execution_mode": mode, "synthetic": False}
     if provenance not in PROVENANCE:
         raise RecordRefused("PROVENANCE_UNKNOWN: %r" % provenance)
-    if execution_mode not in EXECUTION_MODES:
-        raise RecordRefused("EXECUTION_MODE_UNKNOWN: %r" % execution_mode)
-    return {**LABELS, "data_provenance": provenance, "execution_mode": execution_mode,
+    mode = execution_mode or "PROSPECTIVE_ORCHESTRATION"
+    if mode != "PROSPECTIVE_ORCHESTRATION":
+        raise RecordRefused("EXECUTION_MODE_NOT_PROSPECTIVE: provenance %r may not run mode %r" % (provenance, mode))
+    return {**LABELS, "data_provenance": provenance, "execution_mode": mode,
             "synthetic": provenance == "SYNTHETIC_FIXTURE"}
 
 
 def assert_prospective(rec: dict) -> None:
+    """UNCHANGED AND UNWEAKENED. A record that claims the prospective class must satisfy every prospective rule, and a
+    replay label anywhere in it is refused. Nothing about the replay route relaxes this function."""
     for k in ("evidence_class", "decision_power", "law"):
         v = rec.get(k)
         if isinstance(v, str) and any(bad in v for bad in FORBIDDEN_CLASSES):
@@ -125,6 +154,53 @@ def assert_prospective(rec: dict) -> None:
     if rec.get("data_provenance") not in PROVENANCE:
         raise RecordRefused("PROVENANCE_MISSING")
     strict_serializable(rec, what=str(rec.get("kind")))
+
+
+def assert_replay(rec: dict) -> None:
+    """A replay record must SAY it is replay, on every one of the fields the exclusions are keyed on. Fail closed: a
+    missing or true-ish exclusion flag is a refusal, never a default."""
+    if rec.get("evidence_class") != REPLAY_EVIDENCE_CLASS or rec.get("decision_power") != REPLAY_DECISION_POWER:
+        raise RecordRefused("LABELS_NOT_REPLAY: %r/%r" % (rec.get("evidence_class"), rec.get("decision_power")))
+    if rec.get("data_provenance") not in REPLAY_PROVENANCE:
+        raise RecordRefused("REPLAY_PROVENANCE_MISSING: %r" % (rec.get("data_provenance"),))
+    if rec.get("execution_mode") != "RECORDED_REPLAY_ORCHESTRATION":
+        raise RecordRefused("REPLAY_EXECUTION_MODE_MISSING: %r" % (rec.get("execution_mode"),))
+    for k in ("live_promotion_eligible", "prospective_results_eligible", "live_authorization_eligible", "synthetic"):
+        if rec.get(k) is not False:
+            raise RecordRefused("REPLAY_EXCLUSION_NOT_SEALED: %s=%r must be exactly False" % (k, rec.get(k)))
+    if rec.get("replay") is not True:
+        raise RecordRefused("REPLAY_FLAG_NOT_SEALED: replay=%r" % (rec.get("replay"),))
+    if rec.get("live_capital") != "LOCKED":
+        raise RecordRefused("REPLAY_CAPITAL_NOT_LOCKED: %r" % (rec.get("live_capital"),))
+    strict_serializable(rec, what=str(rec.get("kind")))
+
+
+def assert_record_labels(rec: dict) -> None:
+    """THE ONE CHECK EVERY PERSISTED RECORD PASSES. It dispatches on the class the record claims and applies that
+    route's full rule set. A record claiming neither class is refused, so a route cannot be invented by omission."""
+    cls = rec.get("evidence_class")
+    if cls == REPLAY_EVIDENCE_CLASS:
+        return assert_replay(rec)
+    if cls == EVIDENCE_CLASS:
+        return assert_prospective(rec)
+    raise RecordRefused("EVIDENCE_CLASS_UNKNOWN: %r (known: %r, %r)" % (cls, EVIDENCE_CLASS, REPLAY_EVIDENCE_CLASS))
+
+
+def is_replay(rec: dict) -> bool:
+    return rec.get("evidence_class") == REPLAY_EVIDENCE_CLASS or rec.get("data_provenance") in REPLAY_PROVENANCE
+
+
+def prospective_only(rows: list) -> list:
+    """The rows that may enter a prospective-results aggregate. Replay rows are excluded, by class AND by provenance,
+    so a row that carries only one of the two markers is still excluded."""
+    return [r for r in rows if not is_replay(r)]
+
+
+def assert_live_authorizable(labels: dict, *, what: str = "operation") -> None:
+    """Refuse anything that would give a replay-labelled run live authorization or promotion standing."""
+    if is_replay(labels):
+        raise RecordRefused("REPLAY_NOT_LIVE_AUTHORIZABLE: %s refused for evidence class %r / provenance %r"
+                            % (what, labels.get("evidence_class"), labels.get("data_provenance")))
 
 
 # ---------------------------------------------------------------- forecast
@@ -178,14 +254,16 @@ def validate_forecast(f: dict, *, now_epoch: float, provenance: str, session_id:
         raise RecordRefused("FORECAST_INPUT_NOT_AVAILABLE_BY_CUTOFF: available %.3f > cutoff %.3f" % (av, cut))
     if cre < cut:
         raise RecordRefused("FORECAST_CREATED_BEFORE_INPUT_CUTOFF")
-    # SERIALIZATION GRANULARITY. `created_utc` is written as a microsecond string and parsed back, which can return a
-    # value up to half a microsecond LARGER than the epoch it was written from. Comparing that against a
-    # full-precision clock read refused forecasts created at exactly the current instant. Live running masks it (the
-    # clock advances between creation and this check); every controlled-clock path — replay, backtest, tests — hit it
-    # about half the time and silently lost the scan. The comparison is now made at the record's own granularity.
-    if cre > now_epoch + TIMESTAMP_GRANULARITY_S:
-        raise RecordRefused("FORECAST_FROM_THE_FUTURE: created %.6f > clock %.6f (granularity %.0e s)"
-                            % (cre, now_epoch, TIMESTAMP_GRANULARITY_S))
+    # CANONICAL INSTANT COMPARISON (apex.options_pilot.instant, OPERATING-LOOP-001 item 2). `created_utc` is written
+    # as a microsecond string; a float epoch does not survive that round trip, and comparing the re-parsed string
+    # against a full-precision clock reading refused forecasts created at exactly the current instant -- the defect
+    # that silently discarded 7 of 12 scans of the loop demonstration. BOTH SIDES ARE NOW CANONICALIZED TO WHOLE
+    # MICROSECONDS AND COMPARED AS INTEGERS. No epsilon: the previous repair added +1e-6, which accepted an instant one
+    # full microsecond in the future (the next representable instant). That is a future timestamp and is refused here.
+    if I.is_after(cre, now_epoch, field="created_utc"):
+        raise RecordRefused("FORECAST_FROM_THE_FUTURE: created %s (%d us) > clock %s (%d us); canonical unit %s, no epsilon"
+                            % (to_utc_string(cre), I.canonical_micros(cre), to_utc_string(now_epoch),
+                               I.canonical_micros(now_epoch), I.CANONICAL_UNIT))
     if now_epoch >= end:
         raise RecordRefused("FORECAST_TARGET_ALREADY_ENDED: target_end %s is not after clock %s"
                             % (to_utc_string(end), to_utc_string(now_epoch)))

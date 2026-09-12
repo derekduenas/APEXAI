@@ -58,13 +58,19 @@ class TestHousekeepingReleasesTheBlock:
         d2 = self._scan(h, 2)
         assert d2["decision"] == "TRADE", d2.get("why")     # capacity released; the next opportunity is admitted
 
-    def test_the_real_entry_point_runs_housekeeping_between_cycles(self):
+    def test_the_real_entry_point_services_obligations_before_new_risk(self):
+        """SUPERSEDED FORM. This test used to grep run_pilot for `S.resume(` + `S.attempt_exits(` and assert the
+        housekeeping block preceded the scans. OPERATING-LOOP-001 replaced the cycle loop with the shared lifecycle
+        scheduler, so the guarantee is now the scheduler's ORDER, which is a stronger and directly checkable fact: at
+        any one instant every obligation event outranks SCAN. The behavioural proofs live in
+        tests/test_operating_loop_001.py; this one pins the structure that makes them hold."""
         import inspect
-        from apex.options_pilot import entrypoint as PEP
+        from apex.options_pilot import entrypoint as PEP, lifecycle as LC
         src = inspect.getsource(PEP.run_pilot)
-        assert "S.resume(" in src and "S.attempt_exits(" in src and "housekeeping" in src
-        i_hk, i_scan = src.index("housekeeping"), src.index("S.scan(")
-        assert i_hk < i_scan, "housekeeping must precede the cycle's scans"
+        assert "LifecycleRunner(" in src, "the entry point must drive the shared scheduler, not its own cycle loop"
+        for kind in LC.OBLIGATION_EVENTS:
+            assert LC.RANK[kind] < LC.RANK[LC.SCAN], "%s must be processed before new risk at the same instant" % kind
+        assert LC.RANK[LC.SCAN] < LC.RANK[LC.SESSION_CLOSE]
 
     def test_a_scan_before_the_exit_is_due_is_correctly_refused(self, tmp_path):
         """Scan 2 of the demonstration fired 0.7 s BEFORE the exit was due. That refusal was correct and stands."""
@@ -108,18 +114,22 @@ class TestTimestampPrecisionAtTheDeclaredGranularity:
         h = SyntheticHarness(tmp_path / "l.jsonl", t0=T)
         R.validate_forecast(self._fc(h, h.now()), now_epoch=h.now() + 1e-6, provenance="SYNTHETIC_FIXTURE", session_id="S", scan_id="X")
 
-    @pytest.mark.parametrize("ahead", [1e-5, 1e-4, 0.001, 1.0, 60.0])
+    @pytest.mark.parametrize("ahead", [1e-6, 1e-5, 1e-4, 0.001, 1.0, 60.0])
     def test_a_genuinely_future_forecast_is_still_refused(self, tmp_path, ahead):
-        """The tolerance must not hide a real future timestamp. One microsecond is the granularity; ten is a future."""
+        """No tolerance may hide a future timestamp. ONE MICROSECOND AHEAD IS AHEAD: the next representable instant is
+        in the future and is refused (OPERATING-LOOP-001 item 2, tightening the earlier +1e-6 epsilon)."""
         h = SyntheticHarness(tmp_path / "l.jsonl", t0=T)
         with pytest.raises(R.RecordRefused, match="FORECAST_FROM_THE_FUTURE"):
             R.validate_forecast(self._fc(h, h.now() + ahead), now_epoch=h.now(), provenance="SYNTHETIC_FIXTURE", session_id="S", scan_id="X")
 
-    def test_the_tolerance_is_exactly_one_granularity_and_no_more(self, tmp_path):
+    def test_there_is_no_epsilon_only_canonical_equality(self, tmp_path):
+        """SUPERSEDES `test_the_tolerance_is_exactly_one_granularity_and_no_more`. The repair for the demonstration's
+        defect is canonical EQUALITY, not a tolerance: the same canonical microsecond is accepted, the next one is
+        refused, and nothing in between exists."""
         h = SyntheticHarness(tmp_path / "l.jsonl", t0=T)
-        R.validate_forecast(self._fc(h, h.now() + 1e-6), now_epoch=h.now(), provenance="SYNTHETIC_FIXTURE", session_id="S", scan_id="X")
+        R.validate_forecast(self._fc(h, h.now()), now_epoch=h.now(), provenance="SYNTHETIC_FIXTURE", session_id="S", scan_id="X")
         with pytest.raises(R.RecordRefused, match="FORECAST_FROM_THE_FUTURE"):
-            R.validate_forecast(self._fc(h, h.now() + 1e-5), now_epoch=h.now(), provenance="SYNTHETIC_FIXTURE", session_id="S", scan_id="X")
+            R.validate_forecast(self._fc(h, h.now() + 1e-6), now_epoch=h.now(), provenance="SYNTHETIC_FIXTURE", session_id="S", scan_id="X")
 
     def test_timezone_equivalent_instants_compare_equal(self, tmp_path):
         from apex.options_pilot.clock import parse_utc

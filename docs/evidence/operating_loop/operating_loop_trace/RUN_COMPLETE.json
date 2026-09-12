@@ -1,0 +1,24 @@
+{
+ "artifacts": [
+  "RUN_START.json",
+  "ledger.jsonl",
+  "ledger.jsonl.lock",
+  "ledger.jsonl.txn.lock",
+  "lifecycle_report.json",
+  "trace.json"
+ ],
+ "completed_utc": "2026-09-10T00:57:30.000000Z",
+ "kind": "RUN_COMPLETE",
+ "run_id": "operating_loop_trace",
+ "started_utc": "2026-09-10T00:27:00.000000Z",
+ "status": "COMPLETED",
+ "summary": {
+  "completion": "CLOSED_CLEAN",
+  "decisions": [
+   "TRADE",
+   "TRADE"
+  ],
+  "n_events": 4,
+  "total_net_status": "NET"
+ }
+}

@@ -24,8 +24,11 @@ import json
 import time
 from pathlib import Path
 
+from . import instant as I
 from . import ledger as L
+from . import lifecycle as LC
 from . import session as S
+from .accounting import net_result
 from .boundary import Boundary
 from .clock import Clock
 from .fees import UNVERIFIED_FEES
@@ -125,10 +128,45 @@ def build_boundary(ledger, *, provider, session_id: str, release: str) -> Bounda
                     fee_schedule=getattr(provider, "fee_schedule", UNVERIFIED_FEES))
 
 
+class AdaptedClock(LC.MonotonicClock):
+    """The provider's own clock, driven through the lifecycle's monotonic guard.
+
+    A controlled harness clock advances when its `sleep_fn` is called; the wall clock advances by itself and
+    `time.sleep` waits for it. Both are the same thing to the scheduler: `now()` reads the provider's clock and
+    `advance_to()` asks the provider to move to an instant. Neither can go backwards."""
+
+    def __init__(self, clock, sleep_fn):
+        self._clock, self._sleep = clock, sleep_fn
+        self.KIND = "PROVIDER"
+        super().__init__(clock.now())
+
+    def now(self) -> float:
+        t = self._clock.now()
+        if I.canonical_micros(t, field="provider.now") > I.canonical_micros(self._t, field="provider.last"):
+            self._t = t
+        return self._t
+
+    def _wait(self, target_epoch: float) -> None:
+        remaining = target_epoch - self._clock.now()
+        n = 0
+        while remaining > 0 and n < 1000:
+            self._sleep(remaining)
+            after = self._clock.now()
+            if after <= target_epoch - remaining:                # a sleep_fn that does not move time
+                break
+            remaining = target_epoch - after
+            n += 1
+
+
 def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release: str, cycles: int = 1,
               interval_s: float = 0.0, sleep_fn=time.sleep) -> dict:
-    """Open (idempotent) -> resume unfinished intents -> scan each symbol
-    per cycle -> resolve fills -> close. Returns and writes the report."""
+    """Open (idempotent) -> resume unfinished intents -> scan each symbol per cycle -> service every obligation at its
+    own deadline -> close. Returns and writes the report.
+
+    THE ORDERING IS THE SHARED LIFECYCLE SCHEDULER's (apex.options_pilot.lifecycle), not a cycle loop's. Scans,
+    exit deadlines, retries, intent expiry and session closure are one chronological event stream: an obligation that
+    falls due between two scans is serviced when it falls due, and every due obligation at an instant is processed
+    before new risk is admitted at that instant. The clock never rewinds."""
     ledger = Path(ledger)
     bd = build_boundary(ledger, provider=provider, session_id=session_id, release=release)
     from .runtime_identity import runtime_identity
@@ -150,55 +188,42 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
               "evidence_class": bd.labels["evidence_class"], "decision_power": bd.labels["decision_power"],
               "synthetic": bd.labels["synthetic"], "legacy_geometry_path_called": False,
               "risk_authority": type(provider.risk_authority).__name__, "resumed": [], "decisions": [], "outcomes": []}
-    report["session_open"] = S.open_session(bd, symbols=symbols)
-    report["resumed"] = S.resume(bd, quote_fn=src["quote_fn"])
-    # LIFECYCLE RECOVERY: every unresolved POSITION on disk (including ones a resume just created, and ones left
-    # by an earlier process of this session) is an obligation this run must try to resolve and must report.
-    recovered = S.recover_positions(bd)
-    fills = list(recovered["own"])
-    report["recovered_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id",
-                                                               "valuation_attempts", "last_attempt_why")} for r in fills]
-    report["foreign_unresolved_positions"] = recovered["foreign"]
     # A session that is already CLOSED on disk is not reopened for new scans: this run is recovery-only. New intents
     # would be refused at the boundary (SESSION_CLOSED) and would then sit as unfinished obligations of their own.
     already_closed = session_id in S.closed_sessions(S.L.read_all(ledger))
     report["mode"] = "RECOVERY_ONLY" if already_closed else "SCAN_AND_RESOLVE"
-    report["housekeeping"] = []
-    for cycle in range(0 if already_closed else max(1, cycles)):
-        if cycle:
-            # each cycle starts with housekeeping: expire/re-quote open intents (terminal records for expired ones)
-            # and value positions that are DUE now, without waiting for the ones that are not
-            report["housekeeping"].append({"cycle": cycle, "resumed": S.resume(bd, quote_fn=src["quote_fn"]),
-                                           "exits": S.attempt_exits(bd, exit_quote_fn=src["exit_quote_fn"], sleep_fn=sleep, wait_for_due=False)})
-        for sym in symbols:
-            seq = S.next_seq(ledger, session_id=session_id)
-            d = S.scan(bd, symbol=sym, seq=seq, forecast_fn=src["forecast_fn"], signal_fn=src["signal_fn"],
-                       chain_fn=src["chain_fn"], spot_fn=src["spot_fn"], quote_fn=src["quote_fn"], funnel_fn=src.get("funnel_fn"),
-                       selection_policy=policy, event_context_fn=src.get("event_context_fn"))
-            report["decisions"].append({k: d.get(k) for k in ("scan_id", "symbol", "decision", "why", "forecast_id",
-                                                              "intent_id", "fill_id", "decision_persisted",
-                                                              "refusal_persisted")})
-            if d["decision"] == "TRADE" and d.get("receipts", {}).get("fill"):
-                fills.append(d["receipts"]["fill"])
-        if cycle + 1 < cycles and interval_s > 0:
-            sleep(interval_s)
-    # RECOVERED positions (from earlier processes) get one labelled recovery attempt each; positions this run created are
-    # driven through the frozen exit policy (wait until due, value, retry inside the window, record exhaustion).
-    recovered_seqs = {r["seq"] for r in recovered["own"]}
-    for entry in S.attempt_exits(bd, exit_quote_fn=src["exit_quote_fn"], sleep_fn=sleep, recovery=True, positions=recovered["own"]):
-        report["outcomes"].append({"fill_seq": entry["fill_seq"], "recovery": True, "final": entry["final"], "attempts": entry["attempts"]})
-    # every position of THIS session still unresolved (including ones opened mid-run) is driven to a terminal exit state
-    remaining = [p for p in S.recover_positions(bd)["own"] if p["seq"] not in recovered_seqs]
-    for entry in S.attempt_exits(bd, exit_quote_fn=src["exit_quote_fn"], sleep_fn=sleep, recovery=False, positions=remaining):
-        report["outcomes"].append({"fill_seq": entry["fill_seq"], "recovery": False, "final": entry["final"], "attempts": entry["attempts"]})
-    still_open = S.recover_positions(bd)
-    report["unresolved_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id", "contract_id",
-                                                                "valuation_attempts", "last_attempt_why")} for r in still_open["own"]]
-    report["session_close"] = S.close_session(bd)
+    recovered_before = {r["seq"] for r in S.recover_positions(bd)["own"]}
+    lclock = AdaptedClock(bd.clock, sleep)
+    bd.clock = lclock.clock()                                  # the boundary reads the lifecycle clock, and only it
+    t0 = lclock.now()
+    n_cycles = 0 if already_closed else max(1, int(cycles))
+    step = 0.0                                                  # a cadence, not an economic quantity
+    if I.is_real(interval_s) and interval_s > 0:
+        step = float(interval_s)
+    scan_epochs = [t0 + i * step for i in range(n_cycles)]
+    runner = LC.LifecycleRunner(boundary=bd, sources=src, clock=lclock, symbols=symbols, selection_policy=policy,
+                                scan_epochs=scan_epochs)
+    lrep = runner.run()
+    report["lifecycle"] = {k: lrep[k] for k in ("ordering_policy", "clock_kind", "n_events", "final_clock_utc",
+                                                "data_available", "clock_advances")}
+    report["event_trace"] = LC.event_trace(lrep)
+    report["session_open"] = lrep["session_open"]
+    report["resumed"] = lrep["resumed"]
+    report["recovered_positions"] = lrep["recovered_positions"]
+    report["foreign_unresolved_positions"] = lrep["foreign_unresolved_positions"]
+    report["decisions"] = lrep["decisions"]
+    report["housekeeping"] = lrep["expiries"]
+    # ONE ENTRY PER POSITION, however many attempts it took, in the shape the operator report has always used.
+    report["outcomes"] = list(lrep["exit_entries"])
+    report["unresolved_positions"] = lrep["unresolved_positions"]
+    report["session_close"] = lrep["session_close"]
     close_rec = S.L.read_all(ledger)[report["session_close"]["seq"] - 1]
     report["completion"] = close_rec.get("completion")
     report["outstanding_obligations"] = close_rec.get("outstanding_obligations")
     report["book"] = close_rec.get("book")
+    # PRESERVED UNKNOWN ACCOUNTING: the aggregate never drops an unresolved position or an unknown fee, and never
+    # presents a partial account as a total.
+    report["net_result"] = net_result(bd.book())
     report["fee_schedule"] = bd.fee_schedule.describe()
     report["exit_policy"] = bd.exit_policy.describe()
     report["execution_policy"] = bd.execution_policy.describe()

@@ -1,0 +1,196 @@
+{
+ "book": {
+  "cash": 9952.06,
+  "cash_identity": {
+   "formula": "cash == start - open_cost - open_entry_fees + total_realized_pnl (realized already net of both fees)",
+   "holds": true,
+   "lhs_cash": 9952.06,
+   "rhs": 9952.06
+  },
+  "fees_unknown": false,
+  "integrity_problems": [],
+  "n_closed": 2,
+  "n_positions": 0,
+  "n_reservations": 0,
+  "open_cost": 0,
+  "outstanding": {
+   "exit_exhausted_positions": [],
+   "unfinished_intents": [],
+   "unresolved_positions": []
+  },
+  "reserved": 0,
+  "session_id": "OPLOOP-TRACE",
+  "session_realized_pnl": -47.94,
+  "total_realized_pnl": -47.94
+ },
+ "clock_advances": [
+  {
+   "delta_s": 900.0,
+   "to_us": 1789000920000000,
+   "to_utc": "2026-09-10T00:42:00.000000Z",
+   "why": "next scheduled event"
+  },
+  {
+   "delta_s": 30.0,
+   "to_us": 1789000950000000,
+   "to_utc": "2026-09-10T00:42:30.000000Z",
+   "why": "next scheduled event"
+  },
+  {
+   "delta_s": 900.0,
+   "to_us": 1789001850000000,
+   "to_utc": "2026-09-10T00:57:30.000000Z",
+   "why": "next scheduled event"
+  }
+ ],
+ "clock_kind": "CONTROLLED",
+ "completion": "CLOSED_CLEAN",
+ "data_available": [],
+ "decisions": [
+  {
+   "at_utc": "2026-09-10T00:27:00.000000Z",
+   "decision": "TRADE",
+   "decision_persisted": true,
+   "exit_due_utc": "2026-09-10T00:42:00.000000Z",
+   "fill_id": "5fae9ddc7cac4fa04e3fff4c",
+   "forecast_id": "47296fd91c95f8fef4f3613a",
+   "intent_id": "a45c6caf93af16dae62f344e",
+   "refusal_persisted": null,
+   "scan_id": "OPLOOP-TRACE:0001:SPY",
+   "symbol": "SPY",
+   "why": null
+  },
+  {
+   "at_utc": "2026-09-10T00:42:30.000000Z",
+   "decision": "TRADE",
+   "decision_persisted": true,
+   "exit_due_utc": "2026-09-10T00:57:30.000000Z",
+   "fill_id": "923b6a5f2d9e6160f2b3a5eb",
+   "forecast_id": "6b3e49d24da4130c2b7a1aba",
+   "intent_id": "a836eb8b5bf08556d7fd1014",
+   "refusal_persisted": null,
+   "scan_id": "OPLOOP-TRACE:0002:SPY",
+   "symbol": "SPY",
+   "why": null
+  }
+ ],
+ "events": [
+  {
+   "at_us": 1789000020000000,
+   "at_utc": "2026-09-10T00:27:00.000000Z",
+   "key": [
+    "SPY",
+    1789000020.0
+   ],
+   "kind": "SCAN",
+   "ordinal": 1,
+   "outcome": {
+    "at_utc": "2026-09-10T00:27:00.000000Z",
+    "decision": "TRADE",
+    "decision_persisted": true,
+    "exit_due_utc": "2026-09-10T00:42:00.000000Z",
+    "fill_id": "5fae9ddc7cac4fa04e3fff4c",
+    "forecast_id": "47296fd91c95f8fef4f3613a",
+    "intent_id": "a45c6caf93af16dae62f344e",
+    "refusal_persisted": null,
+    "scan_id": "OPLOOP-TRACE:0001:SPY",
+    "symbol": "SPY",
+    "why": null
+   }
+  },
+  {
+   "at_us": 1789000920000000,
+   "at_utc": "2026-09-10T00:42:00.000000Z",
+   "key": 4,
+   "kind": "EXIT_DUE",
+   "ordinal": 3,
+   "outcome": {
+    "attempt": 1,
+    "capacity_released": true,
+    "fill_seq": 4,
+    "outcome_seq": 6,
+    "state": "RESOLVED"
+   }
+  },
+  {
+   "at_us": 1789000950000000,
+   "at_utc": "2026-09-10T00:42:30.000000Z",
+   "key": [
+    "SPY",
+    1789000950.0
+   ],
+   "kind": "SCAN",
+   "ordinal": 2,
+   "outcome": {
+    "at_utc": "2026-09-10T00:42:30.000000Z",
+    "decision": "TRADE",
+    "decision_persisted": true,
+    "exit_due_utc": "2026-09-10T00:57:30.000000Z",
+    "fill_id": "923b6a5f2d9e6160f2b3a5eb",
+    "forecast_id": "6b3e49d24da4130c2b7a1aba",
+    "intent_id": "a836eb8b5bf08556d7fd1014",
+    "refusal_persisted": null,
+    "scan_id": "OPLOOP-TRACE:0002:SPY",
+    "symbol": "SPY",
+    "why": null
+   }
+  },
+  {
+   "at_us": 1789001850000000,
+   "at_utc": "2026-09-10T00:57:30.000000Z",
+   "key": 9,
+   "kind": "EXIT_DUE",
+   "ordinal": 4,
+   "outcome": {
+    "attempt": 1,
+    "capacity_released": true,
+    "fill_seq": 9,
+    "outcome_seq": 11,
+    "state": "RESOLVED"
+   }
+  }
+ ],
+ "exits": [
+  {
+   "at_utc": "2026-09-10T00:42:00.000000Z",
+   "attempt": 1,
+   "capacity_released": true,
+   "event": "EXIT_DUE",
+   "fill_seq": 4,
+   "outcome_seq": 6,
+   "state": "RESOLVED"
+  },
+  {
+   "at_utc": "2026-09-10T00:57:30.000000Z",
+   "attempt": 1,
+   "capacity_released": true,
+   "event": "EXIT_DUE",
+   "fill_seq": 9,
+   "outcome_seq": 11,
+   "state": "RESOLVED"
+  }
+ ],
+ "expiries": [],
+ "final_clock_utc": "2026-09-10T00:57:30.000000Z",
+ "foreign_unresolved_positions": [],
+ "n_events": 4,
+ "ordering_policy": "LIFECYCLE_ORDER_V1: events are totally ordered by (canonical microsecond, event rank, scheduling ordinal). The rank order is DATA_AVAILABLE < INTENT_EXPIRY < EXIT_DUE < EXIT_RETRY < EXIT_WINDOW_CLOSE < SCAN < SESSION_CLOSE, so every existing due obligation is processed before new risk is admitted at the same instant. Ties within one rank break by scheduling order. The clock never rewinds and advances only to the next scheduled event.",
+ "outstanding_obligations": 0,
+ "recovered_positions": [],
+ "resumed": [],
+ "session_close": {
+  "entry_hash": "7e50233bc9266262f0d552857c5c9b3b985a619c3a2012d5152359aedc27b981",
+  "kind": "pilot_session_close",
+  "path": "docs/evidence/operating_loop/operating_loop_trace/ledger.jsonl",
+  "receipt": "RE-READ from disk after append; seq is the 1-indexed line number; link to predecessor verified",
+  "seq": 12
+ },
+ "session_open": {
+  "entry_hash": "be2465c6b82653b88655a8c1b3c2fadf3e15a598626a40220ab28d37e0702b2c",
+  "kind": "pilot_session_open",
+  "path": "docs/evidence/operating_loop/operating_loop_trace/ledger.jsonl",
+  "receipt": "RE-READ from disk after append; seq is the 1-indexed line number; link to predecessor verified",
+  "seq": 1
+ },
+ "unresolved_positions": []
+}
