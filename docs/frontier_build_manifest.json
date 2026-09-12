@@ -203,9 +203,9 @@
    }
   },
   "R4": {
-   "state": "SPECIFICATION_DRAFT_3 (for review; nothing implemented, nothing fitted)",
+   "state": "SPECIFICATION_DRAFT_3_1 (bounded amendment; for review; nothing implemented, nothing fitted)",
    "spec": "docs/R4_JOINT_MARKET_STATE_SPEC.md",
-   "supersedes": "DRAFT_2_1 f848163 <- DRAFT_2 65834d0 <- DRAFT_1 cf4155f, after independent review of each",
+   "supersedes": "DRAFT_3 4d84548 <- f848163 <- 65834d0 <- cf4155f; Draft 3's accepted corrections stand unchanged",
    "objective": "joint 15-minute forecast of underlying, ATM IV, skew, spread and size; expressions vs WAIT on after-cost economics",
    "operational_default": "PILOT_RULE_V1 (verified in code at 2011f03)",
    "baselines": [
@@ -241,7 +241,7 @@
     "no statistical quantity gates acceptance; coverage band removed; deviations are findings",
     "predictor-domain refusals (q, v-hat) and deterministic endpoint lookup rules"
    ],
-   "outstanding": "reviewer acceptance of DRAFT 3; no implementation, fitting, historical access or admission request before that",
+   "outstanding": "reviewer acceptance of DRAFT 3.1; no implementation, fitting, historical access or admission request before that",
    "draft3_corrections": [
     "pricing map anchored at the frozen strike K_atm (iv at K_atm reproduces exp(x_iv) exactly); log-IV sign claim replaced by range guards",
     "ENDPOINT_SELECTION_V1: one jointly-coherent endpoint instant shared by training, simulation target and scoring; timing error delta <= 60 s recorded",
@@ -254,8 +254,15 @@
     "WILD_CLUSTER_BOOTSTRAP_T_V1 fully specified; cross-session dependence limitation stated; inference-resampling budget separated from the 8-run production estimation budget (T31)",
     "every R4 dataset read requires explicit R4 authorization (nothing inherited from EXP-001B); role approval separated from run authorization; prospective collection is not out-of-sample status"
    ],
-   "tests_declared": "T1-T31 identities and fixtures (acceptance) plus reported frequencies (gating nothing)",
-   "checklist": "docs/R4_JOINT_MARKET_STATE_SPEC.md section 10 (equation-to-test)"
+   "tests_declared": "T1-T36 identities and fixtures (acceptance) plus reported frequencies (gating nothing)",
+   "checklist": "docs/R4_JOINT_MARKET_STATE_SPEC.md section 10 (equation-to-test)",
+   "amendment_A": {
+    "A1": "C_PERM is SYNTHETIC-ONLY with a stated invariance argument (i.i.d. sessions, session-level permutation unit, independent evaluation sample, expectation averaged over training+permutation+evaluation); removed from the historical comparator table; JOINT-C_DIAG retained for cross-block dependence",
+    "A2": "per-quote signed offsets |o_j| <= 60 s, receipt lags and slice dispersion recorded; symmetric window closes the delta=0-with-stale-quote hole; tighter sensitivity uses actual offsets; estimand renamed TARGET_PROXY_V1 (delayed/stale quote proxy)",
+    "A3": "one construction: confidence interval by TEST INVERSION with the algorithm specified (bracket, 25-point scan, bisection, 3 widenings, CI_UNBOUNDED, CI_NONCONVEX_ACCEPTANCE); exactly one coefficient in one equation restricted, other equations untouched; same-seed rerun labelled reproducibility not correctness",
+    "A4": "paired per-path scenario samples retained; WAIT gate requires simultaneous lower limits > 0 for BOTH scenarios over the candidate x scenario family; runner-up check labelled HEURISTIC_SCREEN_NO_CONFIDENCE_CLAIM; E[min(S1,S2)] forbidden as a substitute",
+    "A5": "TRUNCATION_BLOCK_SEQUENTIAL_V1 so shared coordinate blocks are bitwise identical across comparators (a shared 4-D radius coupled the blocks); SIZE_PROXY_V2 SELECT_THEN_VETO (rank under ASSUME_AVAILABLE, veto c* only, no substitution); spread proxy's ranking influence disclosed"
+   }
   }
  },
  "preserved": [
