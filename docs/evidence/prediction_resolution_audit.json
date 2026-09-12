@@ -1,0 +1,96 @@
+{
+ "as_of": "2026-09-11",
+ "ledger": "results/reality/predictions.jsonl",
+ "chain_entries": 2762,
+ "prediction_entries": 1836,
+ "resolution_entries": 926,
+ "horizon_convention": "trading days from trade_date, excluding weekends and 2026-09-07",
+ "per_producer": {
+  "baseline_base_rate": {
+   "total": 2,
+   "resolved": 1,
+   "unresolved_past_due": 1,
+   "unresolved_not_yet_due": 0,
+   "distinct_trade_dates": [
+    "2026-07-06",
+    "2026-08-03"
+   ],
+   "earliest_unresolved_due_date": "2026-08-31"
+  },
+  "baseline_momentum": {
+   "total": 2,
+   "resolved": 1,
+   "unresolved_past_due": 1,
+   "unresolved_not_yet_due": 0,
+   "distinct_trade_dates": [
+    "2026-07-06",
+    "2026-08-03"
+   ],
+   "earliest_unresolved_due_date": "2026-08-31"
+  },
+  "baseline_momentum_rank": {
+   "total": 458,
+   "resolved": 231,
+   "unresolved_past_due": 227,
+   "unresolved_not_yet_due": 0,
+   "distinct_trade_dates": [
+    "2026-07-06",
+    "2026-08-03"
+   ],
+   "earliest_unresolved_due_date": "2026-08-03"
+  },
+  "blind_twin": {
+   "total": 458,
+   "resolved": 231,
+   "unresolved_past_due": 227,
+   "unresolved_not_yet_due": 0,
+   "distinct_trade_dates": [
+    "2026-07-06",
+    "2026-08-03"
+   ],
+   "earliest_unresolved_due_date": "2026-08-03"
+  },
+  "gp_rank": {
+   "total": 458,
+   "resolved": 231,
+   "unresolved_past_due": 227,
+   "unresolved_not_yet_due": 0,
+   "distinct_trade_dates": [
+    "2026-07-06",
+    "2026-08-03"
+   ],
+   "earliest_unresolved_due_date": "2026-08-03"
+  },
+  "h3_rank": {
+   "total": 458,
+   "resolved": 231,
+   "unresolved_past_due": 227,
+   "unresolved_not_yet_due": 0,
+   "distinct_trade_dates": [
+    "2026-07-06",
+    "2026-08-03"
+   ],
+   "earliest_unresolved_due_date": "2026-08-03"
+  }
+ },
+ "totals": {
+  "unresolved_past_due": 910,
+  "resolved": 926,
+  "unresolved_not_yet_due": 0
+ },
+ "calibration_report_reflects_the_rule": {
+  "rule": "unresolved-past-due scores as failure (SWARM-GRADUATION-CRITERION.md:19; apex/governance/component_registry.py:241)",
+  "implemented": true,
+  "implementation": "apex/reality/harness.py:294-305 \u2014 scoreable(preds, resolutions, data_through) marks past-due unresolved rows penalised; the count surfaces as n_penalised_unresolved per producer",
+  "currently_reflected": false,
+  "why": "the report was generated 2026-08-24 with data_through/lake_through 2026-08-21. The 2026-08-03 batch (20 trading days) came due 2026-08-31, AFTER generation, so it was correctly not-yet-due at the time and n_penalised_unresolved reads 0 or 1. It has not been regenerated in the 18 days since.",
+  "defect_class": "STALE_REPORT, not a mis-implemented rule",
+  "effect_if_regenerated_today": "908 further predictions (227 x 4 producers) would move from not-yet-due to past-due and score as failure; totals would be 910 penalised against 926 resolved",
+  "action_taken": "RECORDED ONLY \u2014 the block forbids fixing it here; regenerating the report is not done"
+ },
+ "due_dates": {
+  "2026-07-06": "due 2026-08-03 (resolved)",
+  "2026-08-03": "due 2026-08-31 (unresolved)"
+ },
+ "reading": "Every producer holds exactly two trade dates. The first resolved; the second came due on 2026-08-31 and has sat unresolved for 8 market days. The calibration report predates that due date, so the single effective date it reports is the only date that had matured when it ran."
+}
