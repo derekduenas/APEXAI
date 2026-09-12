@@ -1,0 +1,142 @@
+{
+ "kind": "TRACE_RECONSTRUCTION_PROOF",
+ "ledger": "/private/tmp/claude-501/-Users-derekduenas/83f91d89-d01b-4fea-8a39-caf39e74e23f/scratchpad/trace_out2/REPLAY_QUARANTINED_ledger.jsonl",
+ "records": 61,
+ "reconstructed_from": "the ledger file alone, in a separate process; no driver state, no collection files",
+ "checks": [
+  {
+   "check": "chain_verify_entry_count",
+   "ok": true,
+   "derived": 61,
+   "asserted": 61,
+   "note": ""
+  },
+  {
+   "check": "every_entry_hash_recomputes_from_its_own_content",
+   "ok": true,
+   "derived": 61,
+   "asserted": 61
+  },
+  {
+   "check": "contract_id",
+   "ok": true,
+   "derived": "SPY|2026-10-02|774.0|CALL",
+   "asserted": "SPY|2026-10-02|774.0|CALL",
+   "note": ""
+  },
+  {
+   "check": "intent_id",
+   "ok": true,
+   "derived": "1eb0412e49a88559b67f89ec",
+   "asserted": "1eb0412e49a88559b67f89ec",
+   "note": ""
+  },
+  {
+   "check": "forecast_ref_hash_matches_the_forecast_record",
+   "ok": true,
+   "derived": "9266de4b4b9460712a8a8a2a8de7477485e2e0c4211b4f23f7b217040c2445f4",
+   "asserted": "9266de4b4b9460712a8a8a2a8de7477485e2e0c4211b4f23f7b217040c2445f4",
+   "note": ""
+  },
+  {
+   "check": "fill_binds_the_intent",
+   "ok": true,
+   "derived": "1eb0412e49a88559b67f89ec",
+   "asserted": "1eb0412e49a88559b67f89ec",
+   "note": ""
+  },
+  {
+   "check": "canonical_proposal_digest",
+   "ok": true,
+   "derived": "9a7188009f9cae08eec0933fe28aabeee3e84a07d9cc81dbc10219514fdb4fe6",
+   "asserted": "9a7188009f9cae08eec0933fe28aabeee3e84a07d9cc81dbc10219514fdb4fe6",
+   "note": "the intent's canonical proposal equals the proposal rebuilt from its own sealed terms"
+  },
+  {
+   "check": "fee_schedule_hash_matches_the_named_schedule",
+   "ok": true,
+   "derived": "9a39ad1e440925b6cdcb0ca3f1e2a9555fbdcee69d6fecad49e1cff37888df76",
+   "asserted": "9a39ad1e440925b6cdcb0ca3f1e2a9555fbdcee69d6fecad49e1cff37888df76",
+   "note": ""
+  },
+  {
+   "check": "fill_price_is_the_sealed_ask",
+   "ok": true,
+   "derived": 4.9,
+   "asserted": 4.9,
+   "note": ""
+  },
+  {
+   "check": "net_debit",
+   "ok": true,
+   "derived": 490.0,
+   "asserted": 490.0,
+   "note": ""
+  },
+  {
+   "check": "entry_fees",
+   "ok": true,
+   "derived": 0.04,
+   "asserted": 0.04,
+   "note": ""
+  },
+  {
+   "check": "exit_fees",
+   "ok": true,
+   "derived": 0.06,
+   "asserted": 0.06,
+   "note": ""
+  },
+  {
+   "check": "realized_pnl",
+   "ok": true,
+   "derived": -36.1,
+   "asserted": -36.1,
+   "note": ""
+  },
+  {
+   "check": "book_closed_positions",
+   "ok": true,
+   "derived": 1,
+   "asserted": 1,
+   "note": ""
+  },
+  {
+   "check": "book_open_positions",
+   "ok": true,
+   "derived": 0,
+   "asserted": 0,
+   "note": ""
+  },
+  {
+   "check": "book_realized_pnl",
+   "ok": true,
+   "derived": -36.1,
+   "asserted": -36.1,
+   "note": ""
+  },
+  {
+   "check": "book_integrity_problems",
+   "ok": true,
+   "derived": [],
+   "asserted": [],
+   "note": ""
+  },
+  {
+   "check": "book_fees_unknown_flag",
+   "ok": true,
+   "derived": false,
+   "asserted": false,
+   "note": ""
+  },
+  {
+   "check": "expected_toll_recomputes",
+   "ok": true,
+   "derived": 4.1,
+   "asserted": 4.1,
+   "note": ""
+  }
+ ],
+ "mismatches": [],
+ "clean": true
+}

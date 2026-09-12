@@ -1,0 +1,53 @@
+{
+ "kind": "EVIDENCE_REGISTER",
+ "updated_utc": "2026-09-12T17:53:10+00:00",
+ "datasets": [
+  {
+   "id": "PILOT-COLLECTION/2026-09-11",
+   "path": "/apex-data/pilot_collection/2026-09-11/",
+   "role": "PROSPECTIVE_OBSERVATION",
+   "status": "BURNED",
+   "burned_on": "2026-09-12",
+   "never_clean": "first read 2026-09-12 for the Stage 0 census; it was never used before that date and is not clean after it",
+   "uses": [
+    {
+     "date": "2026-09-12",
+     "use": "STAGE0_CENSUS",
+     "artifact": "docs/evidence/stage0_census_2026-09-11.json"
+    },
+    {
+     "date": "2026-09-12",
+     "use": "STAGE0_CENSUS_FEES_AUTHORIZED",
+     "artifact": "docs/evidence/stage0_census_2026-09-11_fees_authorized.json"
+    },
+    {
+     "date": "2026-09-12",
+     "use": "TRACE_REPLAY_PART1",
+     "artifact": "docs/TRACE_ONE_TRADE.md"
+    }
+   ],
+   "may_support": "mechanism validation only",
+   "may_never_support": "any claim about edge, expectancy, or calibration"
+  },
+  {
+   "id": "HIST-A-OPTIONS/2022-2024",
+   "role": "EVALUATION_SEALED",
+   "status": "SEALED",
+   "note": "untouched by this block"
+  },
+  {
+   "id": "HIST-A-OPTIONS/2025-2026-08-28",
+   "role": "RESERVE_SEALED",
+   "status": "SEALED",
+   "note": "untouched by this block"
+  }
+ ],
+ "quarantined_ledgers": [
+  {
+   "path": "docs/evidence/trace_replay/REPLAY_QUARANTINED_ledger.jsonl",
+   "sha256": "d7e1f000574dc2da4e3d1dce29819f9ff2ca466b7b14ebb9fb923dc0c80bcd7f",
+   "records": 61,
+   "why": "records written by a REPLAY through the real boundary; they carry execution_mode PROSPECTIVE_ORCHESTRATION and evidence_class PROSPECTIVE_PAPER, which are FALSE for a replay (finding C). Never merge into a pilot ledger; never score as prospective evidence."
+  }
+ ]
+}

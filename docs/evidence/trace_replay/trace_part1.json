@@ -1,0 +1,3495 @@
+{
+ "kind": "TRACE_REPLAY_PART1",
+ "session": "2026-09-11",
+ "ledger": "/private/tmp/claude-501/-Users-derekduenas/83f91d89-d01b-4fea-8a39-caf39e74e23f/scratchpad/trace_out2/REPLAY_QUARANTINED_ledger.jsonl",
+ "attempts": [
+  {
+   "index": 0,
+   "t_utc": "2026-09-11T13:30:23.096973Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+  },
+  {
+   "index": 1,
+   "t_utc": "2026-09-11T13:31:22.160285Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+  },
+  {
+   "index": 2,
+   "t_utc": "2026-09-11T13:32:22.196581Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 3,
+   "t_utc": "2026-09-11T13:33:22.180495Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 4,
+   "t_utc": "2026-09-11T13:34:22.198233Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 5,
+   "t_utc": "2026-09-11T13:35:22.176453Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 6,
+   "t_utc": "2026-09-11T13:36:22.204327Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 7,
+   "t_utc": "2026-09-11T13:37:22.432226Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 8,
+   "t_utc": "2026-09-11T13:38:22.256554Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 9,
+   "t_utc": "2026-09-11T13:39:22.417189Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 10,
+   "t_utc": "2026-09-11T13:40:22.382004Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 11,
+   "t_utc": "2026-09-11T13:41:22.318532Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 12,
+   "t_utc": "2026-09-11T13:42:22.308399Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 13,
+   "t_utc": "2026-09-11T13:43:22.293569Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 14,
+   "t_utc": "2026-09-11T13:44:22.303112Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 15,
+   "t_utc": "2026-09-11T13:45:22.389474Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 16,
+   "t_utc": "2026-09-11T13:46:22.399218Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 17,
+   "t_utc": "2026-09-11T13:47:22.594073Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 18,
+   "t_utc": "2026-09-11T13:48:22.381308Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 19,
+   "t_utc": "2026-09-11T13:49:22.378301Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 20,
+   "t_utc": "2026-09-11T13:50:22.416023Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 21,
+   "t_utc": "2026-09-11T13:51:22.397404Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 22,
+   "t_utc": "2026-09-11T13:52:22.427353Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 23,
+   "t_utc": "2026-09-11T13:53:22.432222Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 24,
+   "t_utc": "2026-09-11T13:54:22.493913Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 25,
+   "t_utc": "2026-09-11T13:55:22.645732Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 26,
+   "t_utc": "2026-09-11T13:56:22.476648Z",
+   "decision": "REFUSE",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "index": 27,
+   "t_utc": "2026-09-11T13:57:22.510073Z",
+   "decision": "TRADE",
+   "why": ""
+  }
+ ],
+ "entry_index": 27,
+ "entry_t_utc": "2026-09-11T13:57:22.510073Z",
+ "exit_t_utc": "2026-09-11T14:12:22.510073Z",
+ "chain_reads": [
+  {
+   "read": "bars",
+   "t": 1789135042.5100732,
+   "n": 31
+  },
+  {
+   "read": "nbbo",
+   "t": 1789135042.5100732,
+   "as_of": 1789135042.266493
+  },
+  {
+   "read": "chain",
+   "t": 1789135042.5100732,
+   "snapshot_receipt": 1789135042.5100732,
+   "n_quotes": 331
+  },
+  {
+   "read": "quote",
+   "t": 1789135042.5100732,
+   "snapshot_receipt": 1789135042.5100732,
+   "contract": "('2026-10-02', 774.0, 'CALL')",
+   "bid": 4.86,
+   "ask": 4.9
+  }
+ ],
+ "exit_reads": [
+  {
+   "read": "quote",
+   "t": 1789135942.5100732,
+   "snapshot_receipt": 1789135882.8516345,
+   "contract": "('2026-10-02', 774.0, 'CALL')",
+   "bid": 4.65,
+   "ask": 4.69
+  },
+  {
+   "read": "quote",
+   "t": 1789135957.5100732,
+   "snapshot_receipt": 1789135942.8125246,
+   "contract": "('2026-10-02', 774.0, 'CALL')",
+   "bid": 4.54,
+   "ask": 4.58
+  }
+ ],
+ "exits": [
+  {
+   "fill_seq": 58,
+   "intent_id": "1eb0412e49a88559b67f89ec",
+   "attempts": [
+    {
+     "seq": 60,
+     "status": "NOT_ESTIMABLE",
+     "attempt": 1,
+     "reconciled": false
+    },
+    {
+     "seq": 61,
+     "status": "RESOLVED",
+     "attempt": 2,
+     "reconciled": false
+    }
+   ],
+   "final": "RESOLVED"
+  }
+ ],
+ "records": [
+  {
+   "seq": 1,
+   "kind": "pilot_session_open",
+   "entry_hash": "e6f84e9817826c16f85b2ae356131b89d5946e5714df88d278c90729099fdec9",
+   "txn_id": "session_open:TRACE-REPLAY-2026-09-11"
+  },
+  {
+   "seq": 2,
+   "kind": "pilot_refusal",
+   "entry_hash": "89d0ca3ec448e9882a6fc2acea63fc4644cb280cbfa8c8cc07471552cad91b1c",
+   "txn_id": null
+  },
+  {
+   "seq": 3,
+   "kind": "pilot_decision",
+   "entry_hash": "767968d034f2c80f056175b96111e0d990ac3589fbc92fa9bf04de69b3186c9b",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0001:SPY"
+  },
+  {
+   "seq": 4,
+   "kind": "pilot_refusal",
+   "entry_hash": "cbf1929cfe54dd9b8f143d79d7f834f12c527c3252dc93897f5f4182a0a73da8",
+   "txn_id": null
+  },
+  {
+   "seq": 5,
+   "kind": "pilot_decision",
+   "entry_hash": "1e977cf16374e452e3a4898eeb401ad59c2306138c285e0e8d9480ab9d449de2",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0002:SPY"
+  },
+  {
+   "seq": 6,
+   "kind": "pilot_refusal",
+   "entry_hash": "54bae66f28fca9529d8ddf812534a11f9bd9e23e918a5457236848b0c9ef00e1",
+   "txn_id": null
+  },
+  {
+   "seq": 7,
+   "kind": "pilot_decision",
+   "entry_hash": "c58eeced0a4a4efb6eeb7988ba732cd1837a736b745f05bbee41c1156a3be687",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0003:SPY"
+  },
+  {
+   "seq": 8,
+   "kind": "pilot_refusal",
+   "entry_hash": "f3f817ae4c84a6530ee13603367802aad047ce0d90625bcd3063a7f8831fcd7d",
+   "txn_id": null
+  },
+  {
+   "seq": 9,
+   "kind": "pilot_decision",
+   "entry_hash": "19057ad86609e07454f154facd47d5423c658f390012ad3c8e3b6ee5a8010f7e",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0004:SPY"
+  },
+  {
+   "seq": 10,
+   "kind": "pilot_refusal",
+   "entry_hash": "bda943c235af0130a3026734f263b190d8e7ed0bdb31ebd3f87012e1588b43ba",
+   "txn_id": null
+  },
+  {
+   "seq": 11,
+   "kind": "pilot_decision",
+   "entry_hash": "6e52d9840a7c3df36d9da63e88a8a3415f1f4b177ea5c70fbfcb23c840b0b92e",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0005:SPY"
+  },
+  {
+   "seq": 12,
+   "kind": "pilot_refusal",
+   "entry_hash": "780c2c056e95bb5c2aaa42951ca376f9ef999a7455f1060249a22059302fb77f",
+   "txn_id": null
+  },
+  {
+   "seq": 13,
+   "kind": "pilot_decision",
+   "entry_hash": "9a7317a44cc79a6201b864ae86d2d571c32b84786b66942eb7eb67eed8e7098c",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0006:SPY"
+  },
+  {
+   "seq": 14,
+   "kind": "pilot_refusal",
+   "entry_hash": "aa3d360bd9d6d61d8efb25efcf1a3edf216cc4258f0a13574ae0f211eed0da39",
+   "txn_id": null
+  },
+  {
+   "seq": 15,
+   "kind": "pilot_decision",
+   "entry_hash": "7815667bc7ba583f0ede966053d987e921968e2e38cf00747094a922340f59bd",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0007:SPY"
+  },
+  {
+   "seq": 16,
+   "kind": "pilot_refusal",
+   "entry_hash": "0b5cc81c94c620931f431e9c51848cec8a6f9592c1a8b682f890522520a76985",
+   "txn_id": null
+  },
+  {
+   "seq": 17,
+   "kind": "pilot_decision",
+   "entry_hash": "55917a4c01fdc88a279a0c5b5516ba00559236a2d15d17b59e30452b19685f99",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0008:SPY"
+  },
+  {
+   "seq": 18,
+   "kind": "pilot_refusal",
+   "entry_hash": "2bee4a17bbf6ef949a66c10c8bd58ce1938c2717d44450f96e9f8ee4882ecdfd",
+   "txn_id": null
+  },
+  {
+   "seq": 19,
+   "kind": "pilot_decision",
+   "entry_hash": "e0f5810a56290a19f1912a81a0664aa71d57492c9d22cb325702d58342363647",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0009:SPY"
+  },
+  {
+   "seq": 20,
+   "kind": "pilot_refusal",
+   "entry_hash": "bffd2082a434b0e86e975a758f09fb121af72c1183724beb800e456f53226816",
+   "txn_id": null
+  },
+  {
+   "seq": 21,
+   "kind": "pilot_decision",
+   "entry_hash": "e6b16a295bd9981eb9e43cc21783628ba0bdd2dd693cbf9154b5dca14106b4ee",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0010:SPY"
+  },
+  {
+   "seq": 22,
+   "kind": "pilot_refusal",
+   "entry_hash": "31284e99471486f983b4960d6142e6a000460e136c893ad07c0db6e6a206cc78",
+   "txn_id": null
+  },
+  {
+   "seq": 23,
+   "kind": "pilot_decision",
+   "entry_hash": "1ccf17d96b6d6729c2811507a22ff1c7cc9e95dd80caa381a9a0f08e730bd720",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0011:SPY"
+  },
+  {
+   "seq": 24,
+   "kind": "pilot_refusal",
+   "entry_hash": "961af304055ecedebb1124ce390b1350f7a913ec17b2f7540fb13b0cf05bddcb",
+   "txn_id": null
+  },
+  {
+   "seq": 25,
+   "kind": "pilot_decision",
+   "entry_hash": "dbf79381683d6e95cb9073c58b0db3d84b3b7859f508c301f3580b96e59e83c1",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0012:SPY"
+  },
+  {
+   "seq": 26,
+   "kind": "pilot_refusal",
+   "entry_hash": "aeb59d1b3bf9650d8a7242208e0b2a27fcff85deb15ee02fec857407daf48247",
+   "txn_id": null
+  },
+  {
+   "seq": 27,
+   "kind": "pilot_decision",
+   "entry_hash": "a622227685a00c53957870fdfaca132ff845df0f85e9116846143e70aae5d948",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0013:SPY"
+  },
+  {
+   "seq": 28,
+   "kind": "pilot_refusal",
+   "entry_hash": "e8c8f32d652e8f8713ccc8d39c1464491caf4af641a5b413e978e8c49b030741",
+   "txn_id": null
+  },
+  {
+   "seq": 29,
+   "kind": "pilot_decision",
+   "entry_hash": "f71728afc7865e9acb393ae9d5bb5d871c7fc1a53cb9b4a67d040c9a5b3ec68b",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0014:SPY"
+  },
+  {
+   "seq": 30,
+   "kind": "pilot_refusal",
+   "entry_hash": "288a74a0f4606d7c1f25e488975d53119d6a889d96dae6c1649588e87aa061a7",
+   "txn_id": null
+  },
+  {
+   "seq": 31,
+   "kind": "pilot_decision",
+   "entry_hash": "7b7112a60f946d20b5b403d15bc64f69cc4a117952ebf4a91171939cd1707340",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0015:SPY"
+  },
+  {
+   "seq": 32,
+   "kind": "pilot_refusal",
+   "entry_hash": "c29f466a765a1f39bd0f95c4499fe600e34056d8996bb4a3e34e70e798de2f0d",
+   "txn_id": null
+  },
+  {
+   "seq": 33,
+   "kind": "pilot_decision",
+   "entry_hash": "c69076b1834f2744bfcde9396950f7d61052a508527f037e9c02f9a68452f4c3",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0016:SPY"
+  },
+  {
+   "seq": 34,
+   "kind": "pilot_refusal",
+   "entry_hash": "5e0bef29b3fb5197f1e2a2999abf9066a4a4030c20a600e28cfa6ef60557661a",
+   "txn_id": null
+  },
+  {
+   "seq": 35,
+   "kind": "pilot_decision",
+   "entry_hash": "5ea932d449f96613541129d55f1660bd7df9ca19f4626ef0fd9fb3c3b0f595ba",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0017:SPY"
+  },
+  {
+   "seq": 36,
+   "kind": "pilot_refusal",
+   "entry_hash": "a259c0e89c50fd6f8ba1d746ae511ab5e7cdd36c6ab01422aa98827d8a94a490",
+   "txn_id": null
+  },
+  {
+   "seq": 37,
+   "kind": "pilot_decision",
+   "entry_hash": "1749ff3defe10e571f15a21f3d289018d3f0cf629351180a2f3b99e2c0f0d017",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0018:SPY"
+  },
+  {
+   "seq": 38,
+   "kind": "pilot_refusal",
+   "entry_hash": "b92a5dac16f853b56022c44596334db4a43de19a4b85df286c30ea35d4cf5ad8",
+   "txn_id": null
+  },
+  {
+   "seq": 39,
+   "kind": "pilot_decision",
+   "entry_hash": "2942cd665138e518692415a04970232c598a620fc0a192a5292d0556c63797a9",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0019:SPY"
+  },
+  {
+   "seq": 40,
+   "kind": "pilot_refusal",
+   "entry_hash": "0ffa230231dee283799b6be5250f975b93b3504ac940eb590b3a0b1885a13a81",
+   "txn_id": null
+  },
+  {
+   "seq": 41,
+   "kind": "pilot_decision",
+   "entry_hash": "77970be9af54efd860e7f307cd5dbf0de99b8343771f2dba4a8b0abeb7e203c4",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0020:SPY"
+  },
+  {
+   "seq": 42,
+   "kind": "pilot_refusal",
+   "entry_hash": "277d82b664deaaaa3fa60c532c1f7d6d664af9ed6ea69f8801ca0b003c879164",
+   "txn_id": null
+  },
+  {
+   "seq": 43,
+   "kind": "pilot_decision",
+   "entry_hash": "fe9b71b06cc0dff10c460400666b50280c5d497151416ed33efb6f651b7c2d63",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0021:SPY"
+  },
+  {
+   "seq": 44,
+   "kind": "pilot_refusal",
+   "entry_hash": "8517f3b48fa84147e1cd5e4cf39c6e8bde841777b7fc2f745874da933fab8cb0",
+   "txn_id": null
+  },
+  {
+   "seq": 45,
+   "kind": "pilot_decision",
+   "entry_hash": "a12a49c9b10a7ec575ee3981427baa84cd25e82d8d2d5fb7ca3a25e4de2476a7",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0022:SPY"
+  },
+  {
+   "seq": 46,
+   "kind": "pilot_refusal",
+   "entry_hash": "375a9574e672bbcc752e3e3847fed1b6dcdc8e7d83a8c97d62796ba29bf255e4",
+   "txn_id": null
+  },
+  {
+   "seq": 47,
+   "kind": "pilot_decision",
+   "entry_hash": "7ca1f0ca914a20dce4d45b4e79f136934327d66dd8caa547acdd5eaa6ab33432",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0023:SPY"
+  },
+  {
+   "seq": 48,
+   "kind": "pilot_refusal",
+   "entry_hash": "14be2737703d12aa0e1c05579e4553be298657f4c9b330ee15a8246903514a93",
+   "txn_id": null
+  },
+  {
+   "seq": 49,
+   "kind": "pilot_decision",
+   "entry_hash": "60086b2d01e39afdb2ace1b018fe51e251e1ce50f9f43658200cd130d0421a1c",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0024:SPY"
+  },
+  {
+   "seq": 50,
+   "kind": "pilot_refusal",
+   "entry_hash": "1f6f507ee9d7e6cf773d98b9197d3ab144e69c706ff70352ed7266180b4a018a",
+   "txn_id": null
+  },
+  {
+   "seq": 51,
+   "kind": "pilot_decision",
+   "entry_hash": "e00ba64f2a1b24992c4c8eef69f1a1722fd66d3138efd3d85e68c4ad1cebf8ab",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0025:SPY"
+  },
+  {
+   "seq": 52,
+   "kind": "pilot_refusal",
+   "entry_hash": "d8e42221efa1d9981a751ffdbb7e10820a1a2836039743364ab09cf3765480fd",
+   "txn_id": null
+  },
+  {
+   "seq": 53,
+   "kind": "pilot_decision",
+   "entry_hash": "84a3e858c7c9baaadc243fe5eb6fd8f9a8af7251c360284aeef3929d8fb4af5c",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0026:SPY"
+  },
+  {
+   "seq": 54,
+   "kind": "pilot_refusal",
+   "entry_hash": "8ac5e9994e432b9e97713344035a3798891fc016b33b8943105ebebdf3d0b087",
+   "txn_id": null
+  },
+  {
+   "seq": 55,
+   "kind": "pilot_decision",
+   "entry_hash": "a047ccafb943de7b7984aff8a8e54b2ca37a10b1c685074f65a6f267438403e3",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0027:SPY"
+  },
+  {
+   "seq": 56,
+   "kind": "pilot_forecast",
+   "entry_hash": "9266de4b4b9460712a8a8a2a8de7477485e2e0c4211b4f23f7b217040c2445f4",
+   "txn_id": "forecast:0c3e634d1dcf60ac3d6b9384"
+  },
+  {
+   "seq": 57,
+   "kind": "pilot_intent",
+   "entry_hash": "ff237373213a5c2a3570fbf84443526f1bfbb6879bfb6f4b23c5e4aed9ecedf3",
+   "txn_id": "intent:1eb0412e49a88559b67f89ec"
+  },
+  {
+   "seq": 58,
+   "kind": "pilot_fill",
+   "entry_hash": "1e700a6960747821432199ba773e41099ac4247c0768d3ea0ee983fd372f187a",
+   "txn_id": "fill:1eb0412e49a88559b67f89ec:1"
+  },
+  {
+   "seq": 59,
+   "kind": "pilot_decision",
+   "entry_hash": "f5a3b15a1c519223564d85c9241e4d87d5ea47d8b39952b237220f60fdc13ce3",
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0028:SPY"
+  },
+  {
+   "seq": 60,
+   "kind": "pilot_outcome",
+   "entry_hash": "f59e448f611a1c2d94158a66fb547d76ff68c8e25eb8c8c15c9afc673bd06426",
+   "txn_id": "outcome:1eb0412e49a88559b67f89ec:1"
+  },
+  {
+   "seq": 61,
+   "kind": "pilot_outcome",
+   "entry_hash": "b04cdc0d63f67bb42c16bc46ea358037167d7501ea867f2df2bf2a77bf94bfef",
+   "txn_id": "outcome:1eb0412e49a88559b67f89ec:2"
+  }
+ ],
+ "book": {
+  "positions": 0,
+  "closed": 1,
+  "session_realized_pnl": -36.1,
+  "integrity_problems": []
+ },
+ "chain_verified": [
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "e6f84e9817826c16f85b2ae356131b89d5946e5714df88d278c90729099fdec9",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_session_open",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "opened_epoch": 1789133423.0969734,
+   "opened_utc": "2026-09-11T13:30:23.096973Z",
+   "prev_hash": "GENESIS",
+   "protocol": "OPTIONS-PILOT-001",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "runtime_identity": {
+    "artifacts": {},
+    "code_root": "/Users/derekduenas/apex-equities",
+    "decision_path_module_digests": {
+     "apex.decision_wb.engine": "f6bb43dba59f96b2abb2b9ac27b940e3cd05a6d4de249bb570710139155f4adf",
+     "apex.decision_wb.supervision": "651a9126d2ace96389b7b6aabd19f82a60f41ea8e09b004b327d507382c8c34c",
+     "apex.joint_wb.engine": "a67ec9edb868dea3147f0fe7291a18eaa06274628eaa945a0ba587c055a8312f",
+     "apex.joint_wb.state": "f1824c44a8fdb18da988947685a4d902c61d2f982dfc9036b31b225993f9b701",
+     "apex.options_pilot.boundary": "a0dab9ca4c2355885c9a96aa1725dc67068402bcdc677be28df61264fc7e9de6",
+     "apex.options_pilot.entrypoint": "ac967cf13c20aacd3c469543fe9f60a20cfd6797d86f2587ee0b94626a10fd7f",
+     "apex.options_pilot.exit_policy": "b7a2e07868187827c5271b1a93167fab8945fab43cd7011a99db4767426bb800",
+     "apex.options_pilot.expression_rule": "92fc868a92f41467c3bc341b3b2b3b7e83ba885e6096c3483f2b2102f8f8a9ee",
+     "apex.options_pilot.fees": "e1eaf05f7c051c7be34755bee229e4f19576235832b11e31ca0849056fcc8b88",
+     "apex.options_pilot.records": "96b7f682952059d0e012dab1765532e0fc1ab2f3a5bcf6ff59b42b6542e3836f",
+     "apex.options_pilot.risk_authority": "d760de698eaa12391a6793e7d0a0a5f7c2cf788341d6e2cab1692891b2a451e3",
+     "apex.options_pilot.session": "8e85740624a13c01912162c4a73a860d51eee8d97d64c708a5bc7d10533d96e9",
+     "apex.organism.risk_certificate": "abfaa1b109baa09c69ff2d1e87648d7632d3b9a56f44ab9185c99eee433c333b",
+     "apex.organism.risk_kernel": "75890d513793f90b21b6d6e351b79c567e395027c6907145683710d169643b48",
+     "apex.pulse_options.providers": "cb2e0b3f01835403071cf348f3f0453950b752078f2de91cf777b7c5673dd00f",
+     "apex.pulse_options.sources": "223a07da876e1254db8f43d2f019806617dffb8a797ac52b8dcfe939700380f6"
+    },
+    "decision_path_tree_digest": "e57c98f41866007623ad04bac3b40eef70f6287362e640f75720b48110ff19e1",
+    "dependencies": {
+     "numpy": "2.4.6",
+     "pandas": "3.0.5",
+     "scipy": "1.17.1"
+    },
+    "git_branch": "trace-replay-001",
+    "git_commit": "37782cb79f9ffe22160b0b104b58fd065e139757",
+    "git_dirty": true,
+    "host": "Dereks-MacBook-Air.local",
+    "interpreter": {
+     "executable": "/Users/derekduenas/apex-equities/.venv/bin/python",
+     "platform": "macOS-12.7.6-x86_64-i386-64bit",
+     "python": "3.11.9"
+    },
+    "kind": "RUNTIME_IDENTITY",
+    "pid": 75725,
+    "scope": "identity of the code tree and artifacts THIS process loaded at start, measured by the process; it does not prove the host installed them from a reviewed release, and modules outside DECISION_PATH_MODULES are not digested"
+   },
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbols": [
+    "SPY"
+   ],
+   "synthetic": false,
+   "txn_id": "session_open:TRACE-REPLAY-2026-09-11"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "89d0ca3ec448e9882a6fc2acea63fc4644cb280cbfa8c8cc07471552cad91b1c",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "e6f84e9817826c16f85b2ae356131b89d5946e5714df88d278c90729099fdec9",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133423.0969734,
+   "refused_utc": "2026-09-11T13:30:23.096973Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0001:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:30:23.096973Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "767968d034f2c80f056175b96111e0d990ac3589fbc92fa9bf04de69b3186c9b",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "89d0ca3ec448e9882a6fc2acea63fc4644cb280cbfa8c8cc07471552cad91b1c",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0001:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0001:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "cbf1929cfe54dd9b8f143d79d7f834f12c527c3252dc93897f5f4182a0a73da8",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "767968d034f2c80f056175b96111e0d990ac3589fbc92fa9bf04de69b3186c9b",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133482.1602852,
+   "refused_utc": "2026-09-11T13:31:22.160285Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0002:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:31:22.160285Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "1e977cf16374e452e3a4898eeb401ad59c2306138c285e0e8d9480ab9d449de2",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "cbf1929cfe54dd9b8f143d79d7f834f12c527c3252dc93897f5f4182a0a73da8",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0002:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0002:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "54bae66f28fca9529d8ddf812534a11f9bd9e23e918a5457236848b0c9ef00e1",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "1e977cf16374e452e3a4898eeb401ad59c2306138c285e0e8d9480ab9d449de2",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133542.196581,
+   "refused_utc": "2026-09-11T13:32:22.196581Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0003:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:32:22.196581Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "c58eeced0a4a4efb6eeb7988ba732cd1837a736b745f05bbee41c1156a3be687",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "54bae66f28fca9529d8ddf812534a11f9bd9e23e918a5457236848b0c9ef00e1",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0003:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0003:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "f3f817ae4c84a6530ee13603367802aad047ce0d90625bcd3063a7f8831fcd7d",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "c58eeced0a4a4efb6eeb7988ba732cd1837a736b745f05bbee41c1156a3be687",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133602.1804945,
+   "refused_utc": "2026-09-11T13:33:22.180495Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0004:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:33:22.180495Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "19057ad86609e07454f154facd47d5423c658f390012ad3c8e3b6ee5a8010f7e",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "f3f817ae4c84a6530ee13603367802aad047ce0d90625bcd3063a7f8831fcd7d",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0004:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0004:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "bda943c235af0130a3026734f263b190d8e7ed0bdb31ebd3f87012e1588b43ba",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "19057ad86609e07454f154facd47d5423c658f390012ad3c8e3b6ee5a8010f7e",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133662.1982327,
+   "refused_utc": "2026-09-11T13:34:22.198233Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0005:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:34:22.198233Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "6e52d9840a7c3df36d9da63e88a8a3415f1f4b177ea5c70fbfcb23c840b0b92e",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "bda943c235af0130a3026734f263b190d8e7ed0bdb31ebd3f87012e1588b43ba",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0005:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0005:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "780c2c056e95bb5c2aaa42951ca376f9ef999a7455f1060249a22059302fb77f",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "6e52d9840a7c3df36d9da63e88a8a3415f1f4b177ea5c70fbfcb23c840b0b92e",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133722.176453,
+   "refused_utc": "2026-09-11T13:35:22.176453Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0006:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:35:22.176453Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "9a7317a44cc79a6201b864ae86d2d571c32b84786b66942eb7eb67eed8e7098c",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "780c2c056e95bb5c2aaa42951ca376f9ef999a7455f1060249a22059302fb77f",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0006:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0006:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "aa3d360bd9d6d61d8efb25efcf1a3edf216cc4258f0a13574ae0f211eed0da39",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "9a7317a44cc79a6201b864ae86d2d571c32b84786b66942eb7eb67eed8e7098c",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133782.2043273,
+   "refused_utc": "2026-09-11T13:36:22.204327Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0007:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:36:22.204327Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "7815667bc7ba583f0ede966053d987e921968e2e38cf00747094a922340f59bd",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "aa3d360bd9d6d61d8efb25efcf1a3edf216cc4258f0a13574ae0f211eed0da39",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0007:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0007:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "0b5cc81c94c620931f431e9c51848cec8a6f9592c1a8b682f890522520a76985",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "7815667bc7ba583f0ede966053d987e921968e2e38cf00747094a922340f59bd",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133842.4322264,
+   "refused_utc": "2026-09-11T13:37:22.432226Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0008:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:37:22.432226Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "55917a4c01fdc88a279a0c5b5516ba00559236a2d15d17b59e30452b19685f99",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "0b5cc81c94c620931f431e9c51848cec8a6f9592c1a8b682f890522520a76985",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0008:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0008:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "2bee4a17bbf6ef949a66c10c8bd58ce1938c2717d44450f96e9f8ee4882ecdfd",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "55917a4c01fdc88a279a0c5b5516ba00559236a2d15d17b59e30452b19685f99",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133902.2565536,
+   "refused_utc": "2026-09-11T13:38:22.256554Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0009:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:38:22.256554Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "e0f5810a56290a19f1912a81a0664aa71d57492c9d22cb325702d58342363647",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "2bee4a17bbf6ef949a66c10c8bd58ce1938c2717d44450f96e9f8ee4882ecdfd",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0009:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0009:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "bffd2082a434b0e86e975a758f09fb121af72c1183724beb800e456f53226816",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "e0f5810a56290a19f1912a81a0664aa71d57492c9d22cb325702d58342363647",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789133962.417189,
+   "refused_utc": "2026-09-11T13:39:22.417189Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0010:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:39:22.417189Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "e6b16a295bd9981eb9e43cc21783628ba0bdd2dd693cbf9154b5dca14106b4ee",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "bffd2082a434b0e86e975a758f09fb121af72c1183724beb800e456f53226816",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0010:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0010:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "31284e99471486f983b4960d6142e6a000460e136c893ad07c0db6e6a206cc78",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "e6b16a295bd9981eb9e43cc21783628ba0bdd2dd693cbf9154b5dca14106b4ee",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134022.382004,
+   "refused_utc": "2026-09-11T13:40:22.382004Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0011:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:40:22.382004Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "1ccf17d96b6d6729c2811507a22ff1c7cc9e95dd80caa381a9a0f08e730bd720",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "31284e99471486f983b4960d6142e6a000460e136c893ad07c0db6e6a206cc78",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0011:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0011:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "961af304055ecedebb1124ce390b1350f7a913ec17b2f7540fb13b0cf05bddcb",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "1ccf17d96b6d6729c2811507a22ff1c7cc9e95dd80caa381a9a0f08e730bd720",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134082.3185315,
+   "refused_utc": "2026-09-11T13:41:22.318532Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0012:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:41:22.318532Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "dbf79381683d6e95cb9073c58b0db3d84b3b7859f508c301f3580b96e59e83c1",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "961af304055ecedebb1124ce390b1350f7a913ec17b2f7540fb13b0cf05bddcb",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0012:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0012:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "aeb59d1b3bf9650d8a7242208e0b2a27fcff85deb15ee02fec857407daf48247",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "dbf79381683d6e95cb9073c58b0db3d84b3b7859f508c301f3580b96e59e83c1",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134142.3083992,
+   "refused_utc": "2026-09-11T13:42:22.308399Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0013:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:42:22.308399Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "a622227685a00c53957870fdfaca132ff845df0f85e9116846143e70aae5d948",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "aeb59d1b3bf9650d8a7242208e0b2a27fcff85deb15ee02fec857407daf48247",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0013:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0013:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "e8c8f32d652e8f8713ccc8d39c1464491caf4af641a5b413e978e8c49b030741",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "a622227685a00c53957870fdfaca132ff845df0f85e9116846143e70aae5d948",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134202.2935686,
+   "refused_utc": "2026-09-11T13:43:22.293569Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0014:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:43:22.293569Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "f71728afc7865e9acb393ae9d5bb5d871c7fc1a53cb9b4a67d040c9a5b3ec68b",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "e8c8f32d652e8f8713ccc8d39c1464491caf4af641a5b413e978e8c49b030741",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0014:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0014:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "288a74a0f4606d7c1f25e488975d53119d6a889d96dae6c1649588e87aa061a7",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "f71728afc7865e9acb393ae9d5bb5d871c7fc1a53cb9b4a67d040c9a5b3ec68b",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134262.303112,
+   "refused_utc": "2026-09-11T13:44:22.303112Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0015:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:44:22.303112Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "7b7112a60f946d20b5b403d15bc64f69cc4a117952ebf4a91171939cd1707340",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "288a74a0f4606d7c1f25e488975d53119d6a889d96dae6c1649588e87aa061a7",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0015:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0015:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "c29f466a765a1f39bd0f95c4499fe600e34056d8996bb4a3e34e70e798de2f0d",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "7b7112a60f946d20b5b403d15bc64f69cc4a117952ebf4a91171939cd1707340",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134322.3894737,
+   "refused_utc": "2026-09-11T13:45:22.389474Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0016:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:45:22.389474Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "c69076b1834f2744bfcde9396950f7d61052a508527f037e9c02f9a68452f4c3",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "c29f466a765a1f39bd0f95c4499fe600e34056d8996bb4a3e34e70e798de2f0d",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0016:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0016:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "5e0bef29b3fb5197f1e2a2999abf9066a4a4030c20a600e28cfa6ef60557661a",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "c69076b1834f2744bfcde9396950f7d61052a508527f037e9c02f9a68452f4c3",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134382.399218,
+   "refused_utc": "2026-09-11T13:46:22.399218Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0017:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:46:22.399218Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "5ea932d449f96613541129d55f1660bd7df9ca19f4626ef0fd9fb3c3b0f595ba",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "5e0bef29b3fb5197f1e2a2999abf9066a4a4030c20a600e28cfa6ef60557661a",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0017:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0017:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "a259c0e89c50fd6f8ba1d746ae511ab5e7cdd36c6ab01422aa98827d8a94a490",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "5ea932d449f96613541129d55f1660bd7df9ca19f4626ef0fd9fb3c3b0f595ba",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134442.594073,
+   "refused_utc": "2026-09-11T13:47:22.594073Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0018:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:47:22.594073Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "1749ff3defe10e571f15a21f3d289018d3f0cf629351180a2f3b99e2c0f0d017",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "a259c0e89c50fd6f8ba1d746ae511ab5e7cdd36c6ab01422aa98827d8a94a490",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0018:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0018:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "b92a5dac16f853b56022c44596334db4a43de19a4b85df286c30ea35d4cf5ad8",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "1749ff3defe10e571f15a21f3d289018d3f0cf629351180a2f3b99e2c0f0d017",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134502.3813083,
+   "refused_utc": "2026-09-11T13:48:22.381308Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0019:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:48:22.381308Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "2942cd665138e518692415a04970232c598a620fc0a192a5292d0556c63797a9",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "b92a5dac16f853b56022c44596334db4a43de19a4b85df286c30ea35d4cf5ad8",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0019:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0019:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "0ffa230231dee283799b6be5250f975b93b3504ac940eb590b3a0b1885a13a81",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "2942cd665138e518692415a04970232c598a620fc0a192a5292d0556c63797a9",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134562.3783014,
+   "refused_utc": "2026-09-11T13:49:22.378301Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0020:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:49:22.378301Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "77970be9af54efd860e7f307cd5dbf0de99b8343771f2dba4a8b0abeb7e203c4",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "0ffa230231dee283799b6be5250f975b93b3504ac940eb590b3a0b1885a13a81",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0020:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0020:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "277d82b664deaaaa3fa60c532c1f7d6d664af9ed6ea69f8801ca0b003c879164",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "77970be9af54efd860e7f307cd5dbf0de99b8343771f2dba4a8b0abeb7e203c4",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134622.4160233,
+   "refused_utc": "2026-09-11T13:50:22.416023Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0021:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:50:22.416023Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "fe9b71b06cc0dff10c460400666b50280c5d497151416ed33efb6f651b7c2d63",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "277d82b664deaaaa3fa60c532c1f7d6d664af9ed6ea69f8801ca0b003c879164",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0021:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0021:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "8517f3b48fa84147e1cd5e4cf39c6e8bde841777b7fc2f745874da933fab8cb0",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "fe9b71b06cc0dff10c460400666b50280c5d497151416ed33efb6f651b7c2d63",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134682.3974037,
+   "refused_utc": "2026-09-11T13:51:22.397404Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0022:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:51:22.397404Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "a12a49c9b10a7ec575ee3981427baa84cd25e82d8d2d5fb7ca3a25e4de2476a7",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "8517f3b48fa84147e1cd5e4cf39c6e8bde841777b7fc2f745874da933fab8cb0",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0022:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0022:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "375a9574e672bbcc752e3e3847fed1b6dcdc8e7d83a8c97d62796ba29bf255e4",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "a12a49c9b10a7ec575ee3981427baa84cd25e82d8d2d5fb7ca3a25e4de2476a7",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134742.427353,
+   "refused_utc": "2026-09-11T13:52:22.427353Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0023:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:52:22.427353Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "7ca1f0ca914a20dce4d45b4e79f136934327d66dd8caa547acdd5eaa6ab33432",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "375a9574e672bbcc752e3e3847fed1b6dcdc8e7d83a8c97d62796ba29bf255e4",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0023:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0023:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "14be2737703d12aa0e1c05579e4553be298657f4c9b330ee15a8246903514a93",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "7ca1f0ca914a20dce4d45b4e79f136934327d66dd8caa547acdd5eaa6ab33432",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134802.4322224,
+   "refused_utc": "2026-09-11T13:53:22.432222Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0024:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:53:22.432222Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "60086b2d01e39afdb2ace1b018fe51e251e1ce50f9f43658200cd130d0421a1c",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "14be2737703d12aa0e1c05579e4553be298657f4c9b330ee15a8246903514a93",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0024:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0024:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "1f6f507ee9d7e6cf773d98b9197d3ab144e69c706ff70352ed7266180b4a018a",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "60086b2d01e39afdb2ace1b018fe51e251e1ce50f9f43658200cd130d0421a1c",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134862.4939132,
+   "refused_utc": "2026-09-11T13:54:22.493913Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0025:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:54:22.493913Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "e00ba64f2a1b24992c4c8eef69f1a1722fd66d3138efd3d85e68c4ad1cebf8ab",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "1f6f507ee9d7e6cf773d98b9197d3ab144e69c706ff70352ed7266180b4a018a",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0025:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0025:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "d8e42221efa1d9981a751ffdbb7e10820a1a2836039743364ab09cf3765480fd",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "e00ba64f2a1b24992c4c8eef69f1a1722fd66d3138efd3d85e68c4ad1cebf8ab",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134922.6457324,
+   "refused_utc": "2026-09-11T13:55:22.645732Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0026:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:55:22.645732Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "84a3e858c7c9baaadc243fe5eb6fd8f9a8af7251c360284aeef3929d8fb4af5c",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "d8e42221efa1d9981a751ffdbb7e10820a1a2836039743364ab09cf3765480fd",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0026:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0026:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "8ac5e9994e432b9e97713344035a3798891fc016b33b8943105ebebdf3d0b087",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "kind": "pilot_refusal",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "84a3e858c7c9baaadc243fe5eb6fd8f9a8af7251c360284aeef3929d8fb4af5c",
+   "reason": "FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)",
+   "refs": {},
+   "refused_epoch": 1789134982.4766479,
+   "refused_utc": "2026-09-11T13:56:22.476648Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0027:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "stage": "forecast",
+   "synthetic": false
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:56:22.476648Z",
+   "decision": "REFUSE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "a047ccafb943de7b7984aff8a8e54b2ca37a10b1c685074f65a6f267438403e3",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": null,
+   "forecast_id": null,
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "missing": "NO_INTENT: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "REFUSE",
+     "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    },
+    "model_bundle": {
+     "missing": "NO_FORECAST"
+    },
+    "risk_decision": {
+     "missing": "NO_INTENT"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": null,
+     "event_context": {
+      "missing": "EVENT_STREAM_NOT_WIRED"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "missing": "NO_FORECAST: forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+    }
+   },
+   "intent_id": null,
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "8ac5e9994e432b9e97713344035a3798891fc016b33b8943105ebebdf3d0b087",
+   "refusal_persisted": true,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0027:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0027:SPY",
+   "why": "forecast: FORECAST_PROVIDER_FAILED: FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully available)"
+  },
+  {
+   "artifact_digest": "0d001c7e9bb372455a9c3a8bca5bad6e103fbe1fbde51b012155df91a91b9d3f",
+   "created_utc": "2026-09-11T13:57:22.510073Z",
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "direction_signal": "LONG",
+   "direction_signal_meaning": "HEURISTIC trend label; not part of the forecast distribution",
+   "drives_expression_selection": false,
+   "eligibility_policy": "FORECAST_ELIGIBILITY_V1: created <= clock; clock < target_end (the target is still in the future -- a forecast about a completed target is not prospective decision evidence); clock - input_cutoff <= 120s; re-checked at intent creation and at fill commit",
+   "entry_hash": "9266de4b4b9460712a8a8a2a8de7477485e2e0c4211b4f23f7b217040c2445f4",
+   "epoch": {
+    "created": 1789135042.510073,
+    "input_available": 1789135042.481479,
+    "input_cutoff": 1789135042.481479,
+    "input_event": 1789134960.0,
+    "reference": 1789134960.0,
+    "target_end": 1789135860.0
+   },
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "family": "STUDENT_T",
+   "forecast_hash": "d70a564932fdab1fc4b3e73d2dd790f3d91afe6febc2ce64ef2133459249b74a",
+   "forecast_id": "0c3e634d1dcf60ac3d6b9384",
+   "forecast_meaning": "a predictive DISTRIBUTION for the registered 15-minute log return at the native horizon of the identified parameter artifact; NOT an expected directional move, NOT a hold-to-close forecast",
+   "horizon_minutes": 15,
+   "horizon_relationship": "the forecast horizon is 15 minutes; the pilot holds a filled contract to the regular-session close. These are DIFFERENT horizons. The forecast is recorded and is NOT extrapolated to the hold horizon; any request to use it as a hold-horizon expectation is refused",
+   "input_available_utc": "2026-09-11T13:57:22.481479Z",
+   "input_cutoff_utc": "2026-09-11T13:57:22.481479Z",
+   "input_event_time_utc": "2026-09-11T13:56:00.000000Z",
+   "inputs": {
+    "event_context": {
+     "as_of_epoch": 1789135042.5100732,
+     "authority": "FACTUAL_CONTEXT_ONLY",
+     "gate": {
+      "affects_exits": false,
+      "authority": "SHADOW",
+      "gate": "EVENT_GATE_V0",
+      "reasons": [
+       "R2: unscheduled stream UNAVAILABLE"
+      ],
+      "spec": [
+       "R1 NEW_ENTRY veto while a CRITICAL scheduled event for the symbol's market is in its declared window",
+       "R2 NEW_ENTRY veto when the unscheduled stream is UNAVAILABLE or STALE (a dead sense is not a quiet world)",
+       "R3 NEW_ENTRY veto when a relevant unscheduled event is CONFLICTING or flagged hostile-text",
+       "R4 never applies to exits: an existing position follows its exit obligation regardless",
+       "R5 a WAIT caused by this gate is recorded with the rule id; no position-management action is taken"
+      ],
+      "stage": "intent (before proposal construction) on the rule path; candidate eligibility on the funnel path",
+      "vetoes_new_entry": false,
+      "would_veto_new_entry": true
+     },
+     "kind": "EVENT_SNAPSHOT_V1",
+     "scheduled": {
+      "events": [],
+      "status": "UNAVAILABLE",
+      "why": "event stream NOT_WIRED on this twin"
+     },
+     "symbol": "SPY",
+     "unscheduled": {
+      "events": [],
+      "status": "UNAVAILABLE",
+      "why": "event stream NOT_WIRED on this twin"
+     },
+     "wired": false
+    },
+    "ret_1": 0.00038075426769251043,
+    "ret_5": 0.0008771933825233186,
+    "rv_30": 0.00037817074941404617,
+    "state_hash": "c6518c38d08d7efc2ad0b6e60c035bc1bbb8551a47a19a20d04ba5f32976310e"
+   },
+   "kind": "pilot_forecast",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "location": -1.856608250112551e-05,
+   "model_hash": "4b176a1ef5536c618e81e6e530664ccbf29ba77281adcc03f2d4f5c3bb632988",
+   "model_id": "EXP002_L",
+   "nu": 6.384478029123821,
+   "params_hash": "ca04fc6e713e1a5c",
+   "persisted_epoch": 1789135042.5100732,
+   "persisted_utc": "2026-09-11T13:57:22.510073Z",
+   "prev_hash": "a047ccafb943de7b7984aff8a8e54b2ca37a10b1c685074f65a6f267438403e3",
+   "reference_time_utc": "2026-09-11T13:56:00.000000Z",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scale": 0.0012434073664226815,
+   "scan_id": "TRACE-REPLAY-2026-09-11:0028:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "specification_note": "a fully specified distribution is not proof of statistical specification correctness",
+   "symbol": "SPY",
+   "synthetic": false,
+   "target": "log(close[bar at t+15min] / close[bar at t])",
+   "target_end_utc": "2026-09-11T14:11:00.000000Z",
+   "txn_id": "forecast:0c3e634d1dcf60ac3d6b9384",
+   "units": "log return, dimensionless",
+   "validation_status": "NOT_VALIDATED: EXP-002 development result INVALID_NULL_CONTROL; parameters retained for engineering continuity only; no edge claim"
+  },
+  {
+   "action": "BUY",
+   "contract": {
+    "expiration": "2026-10-02",
+    "right": "CALL",
+    "strike": 774.0,
+    "symbol": "SPY"
+   },
+   "contract_id": "SPY|2026-10-02|774.0|CALL",
+   "created_epoch": 1789135042.5100732,
+   "created_utc": "2026-09-11T13:57:22.510073Z",
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "doctrine": {
+    "definition_source": "SMALL_CAPITAL_ADVANTAGE_DOCTRINE.md (opportunity characteristics)",
+    "fields": {
+     "capacity_suitability": {
+      "source": "no measurement contract activated for the pilot",
+      "value": "NOT_MEASURED"
+     },
+     "crowding": {
+      "source": "no measurement contract activated for the pilot",
+      "value": "NOT_MEASURED"
+     },
+     "forced_participant_strength": {
+      "source": "no measurement contract activated for the pilot",
+      "value": "NOT_MEASURED"
+     },
+     "giant_competition_risk": {
+      "source": "no measurement contract activated for the pilot",
+      "value": "NOT_MEASURED"
+     },
+     "our_expected_footprint": {
+      "definition": "fraction of the displayed ask size our order would consume",
+      "source": "1 contract / indicative ask_size 50",
+      "value": 0.02
+     },
+     "signal_half_life": {
+      "source": "no measurement contract activated for the pilot",
+      "value": "NOT_MEASURED"
+     },
+     "tail_asymmetry": {
+      "source": "apex/options_research/forward_distribution.py default; never measured",
+      "value": "UNKNOWN"
+     }
+    }
+   },
+   "entry_hash": "ff237373213a5c2a3570fbf84443526f1bfbb6879bfb6f4b23c5e4aed9ecedf3",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "execution_policy": {
+    "max_fill_attempts": 3,
+    "policy_hash": "a3d80ad83c35a3bdf5a6a93aaa443dce43bdd4c8cbfb2babcfd842ddc78008ae",
+    "policy_id": "EXECUTION_POLICY_V1"
+   },
+   "expected_toll": {
+    "formula": "TOLL_FORMULA_V1",
+    "formula_hash": "17060e97b87708e7ea9203d404ff3a94d22c14f72940f6e79249a8ca6b0e4e9b",
+    "inputs": {
+     "ask_ref": 4.9,
+     "bid_ref": 4.86,
+     "fee_in": 0.04,
+     "fee_out": 0.06,
+     "reference_timestamp_epoch": 1789135042.471
+    },
+    "status": "ESTIMATED_AT_INTENT_TIME",
+    "value": 4.1
+   },
+   "expiry_epoch": 1789135162.5100732,
+   "expiry_utc": "2026-09-11T13:59:22.510073Z",
+   "expression": "LONG_CALL",
+   "expression_rule": "PILOT_RULE_V2: signal->right, nearest expiry >= 21 DTE, nearest strike on the signal's side with indicative ask <= max_entry_price, 1 contract",
+   "fees": {
+    "known": true,
+    "provenance": "PROVIDER_VERIFIED",
+    "schedule_hash": "9a39ad1e440925b6cdcb0ca3f1e2a9555fbdcee69d6fecad49e1cff37888df76",
+    "schedule_id": "ROBINHOOD_RHF_2026"
+   },
+   "forecast_ref": {
+    "entry_hash": "9266de4b4b9460712a8a8a2a8de7477485e2e0c4211b4f23f7b217040c2445f4",
+    "forecast_hash": "d70a564932fdab1fc4b3e73d2dd790f3d91afe6febc2ce64ef2133459249b74a",
+    "forecast_id": "0c3e634d1dcf60ac3d6b9384",
+    "seq": 56
+   },
+   "funnel_ref": null,
+   "horizon_relationship": "the forecast horizon is 15 minutes; the pilot holds a filled contract to the regular-session close. These are DIFFERENT horizons. The forecast is recorded and is NOT extrapolated to the hold horizon; any request to use it as a hold-horizon expectation is refused",
+   "intent_id": "1eb0412e49a88559b67f89ec",
+   "kind": "pilot_intent",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "no_best_option_claim": true,
+   "persisted_epoch": 1789135042.5100732,
+   "persisted_utc": "2026-09-11T13:57:22.510073Z",
+   "pins": {
+    "contract_pin": null,
+    "execution_policy_hash": "a3d80ad83c35a3bdf5a6a93aaa443dce43bdd4c8cbfb2babcfd842ddc78008ae",
+    "exit_policy_hash": "9f9784f7af5b9c198e9bad69432488cb86c58a482a4d83e62dc18dcb9eb1e5af",
+    "exit_policy_id": "EXIT_AT_HORIZON_15M_V1",
+    "expression_rule": "PILOT_RULE_V2: signal->right, nearest expiry >= 21 DTE, nearest strike on the signal's side with indicative ask <= max_entry_price, 1 contract",
+    "fee_schedule_hash": "9a39ad1e440925b6cdcb0ca3f1e2a9555fbdcee69d6fecad49e1cff37888df76",
+    "fee_schedule_id": "ROBINHOOD_RHF_2026",
+    "git_commit": "NOT_AVAILABLE_IN_PROCESS: the release id above is the deployment pin",
+    "release": "TRACE_REPLAY_NOT_A_RELEASE",
+    "risk_authority_id": "RISK_CERTIFICATE_V0+ORGANISM_PAPER_V1",
+    "toll_formula": "TOLL_FORMULA_V1",
+    "toll_formula_hash": "17060e97b87708e7ea9203d404ff3a94d22c14f72940f6e79249a8ca6b0e4e9b"
+   },
+   "prev_hash": "9266de4b4b9460712a8a8a2a8de7477485e2e0c4211b4f23f7b217040c2445f4",
+   "quantity": 1,
+   "reference_ask": 4.9,
+   "reference_quote": {
+    "ask": 4.9,
+    "ask_size": 50,
+    "bid": 4.86,
+    "bid_size": 59,
+    "timestamp_epoch": 1789135042.471
+   },
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "risk": {
+    "approved": true,
+    "authority_id": "RISK_CERTIFICATE_V0+ORGANISM_PAPER_V1",
+    "binding_hash": "35e12c25a160df512e890ecc128b84893500854dcef11aed992a97d3c092da5e",
+    "book_state_hash": "07cfcd70e8cf78cb38c674f894c4a21eaff4f4f2d6e1bcffdc0a1dc22ba41627",
+    "book_state_hash_at_commit": "07cfcd70e8cf78cb38c674f894c4a21eaff4f4f2d6e1bcffdc0a1dc22ba41627",
+    "book_summary": {
+     "cash": 10000.0,
+     "cash_identity": {
+      "formula": "cash == start - open_cost - open_entry_fees + total_realized_pnl (realized already net of both fees)",
+      "holds": true,
+      "lhs_cash": 10000.0,
+      "rhs": 10000.0
+     },
+     "fees_unknown": false,
+     "integrity_problems": [],
+     "n_closed": 0,
+     "n_positions": 0,
+     "n_reservations": 0,
+     "open_cost": 0,
+     "outstanding": {
+      "exit_exhausted_positions": [],
+      "unfinished_intents": [],
+      "unresolved_positions": []
+     },
+     "reserved": 0,
+     "session_id": "TRACE-REPLAY-2026-09-11",
+     "session_realized_pnl": 0,
+     "total_realized_pnl": 0
+    },
+    "book_summary_at_commit": {
+     "cash": 10000.0,
+     "cash_identity": {
+      "formula": "cash == start - open_cost - open_entry_fees + total_realized_pnl (realized already net of both fees)",
+      "holds": true,
+      "lhs_cash": 10000.0,
+      "rhs": 10000.0
+     },
+     "fees_unknown": false,
+     "integrity_problems": [],
+     "n_closed": 0,
+     "n_positions": 0,
+     "n_reservations": 0,
+     "open_cost": 0,
+     "outstanding": {
+      "exit_exhausted_positions": [],
+      "unfinished_intents": [],
+      "unresolved_positions": []
+     },
+     "reserved": 0,
+     "session_id": "TRACE-REPLAY-2026-09-11",
+     "session_realized_pnl": 0,
+     "total_realized_pnl": 0
+    },
+    "certificate": {
+     "certificate_hash": "11ea81d2f67c837d0be81c83d5291e99b4785aa44a363cd7788e5ee98f9d80ba",
+     "certificate_version": "RISK_CERTIFICATE_V0",
+     "certification_completeness": "PRE_FEE",
+     "certified_basis": "a long single option's maximum loss is the net debit paid. The holder owns a right, carries no assignment obligation, and an early close sells at a bid that cannot be negative -- so no market path and no exit rule takes more than the premium.",
+     "certified_max_loss": 500.0,
+     "certified_risk_authority": true,
+     "decision_power": "MEASUREMENT_ONLY",
+     "derivation": {
+      "contracts": 1.0,
+      "contracts_basis": "RECORDED",
+      "derived_net_debit": 500.0,
+      "formula": "sum(+price if BUY else -price) x multiplier x contracts",
+      "leg_count": 1,
+      "multiplier": 100.0,
+      "ok": true,
+      "per_contract_net": 5.0
+     },
+     "direction": "LONG",
+     "expression": "LONG_CALL",
+     "fee_treatment": {
+      "consequence": "certified_max_loss is PRE-FEE. It is a bound on the option payoff loss, NOT total economic max loss. No fee buffer is invented.",
+      "entry_fees": "NOT_RECORDED_IN_ANY_APEX_ARTIFACT",
+      "exercise_assignment_fees": "NOT_APPLICABLE -- the pre-declared exit rule closes BEFORE expiry (15 min after fill in the pilot; session close in the legacy protocol), so no position is carried to exercise",
+      "exit_fees": "NOT_RECORDED_IN_ANY_APEX_ARTIFACT",
+      "fees_on_the_max_loss_path": "AN EXIT TRADE OCCURS on the max-loss path under any close-before-expiry exit rule, so entry AND exit fees both necessarily occur"
+     },
+     "gap_exposed": false,
+     "gap_loss": null,
+     "gross_notional": 500.0,
+     "inputs": {
+      "contracts": 1,
+      "declared_risk": 500.0,
+      "entry_cost_per_share": null,
+      "entry_fill": null,
+      "expiration": "2026-10-02",
+      "legs": [
+       [
+        "BUY",
+        "CALL",
+        774.0,
+        5.0
+       ]
+      ],
+      "multiplier": 100.0,
+      "net_debit_claimed": 500.0,
+      "quantity": null,
+      "stop": null,
+      "stop_exit_cost_per_share": null
+     },
+     "kind": "risk_certificate",
+     "label_equals_bound": true,
+     "law": "the bound is derived from the contract's own legs, never accepted from an upstream total",
+     "planned_risk_amount": 500.0,
+     "planned_risk_basis": "for a long option the planned loss and the structural bound are the same number: the debit derived from legs",
+     "planned_risk_components": {
+      "contracts": 1.0,
+      "contracts_basis": "RECORDED",
+      "derived_net_debit": 500.0,
+      "fees": {
+       "consequence": "certified_max_loss is PRE-FEE. It is a bound on the option payoff loss, NOT total economic max loss. No fee buffer is invented.",
+       "entry_fees": "NOT_RECORDED_IN_ANY_APEX_ARTIFACT",
+       "exercise_assignment_fees": "NOT_APPLICABLE -- the pre-declared exit rule closes BEFORE expiry (15 min after fill in the pilot; session close in the legacy protocol), so no position is carried to exercise",
+       "exit_fees": "NOT_RECORDED_IN_ANY_APEX_ARTIFACT",
+       "fees_on_the_max_loss_path": "AN EXIT TRADE OCCURS on the max-loss path under any close-before-expiry exit rule, so entry AND exit fees both necessarily occur"
+      },
+      "multiplier": 100.0,
+      "per_contract_net": 5.0
+     },
+     "prime_v0_eligible": true,
+     "refusals": [],
+     "research_observation_only": false,
+     "risk_class": "DEFINED_MAX_LOSS",
+     "semantics_version": "ECONOMIC_RISK_SEMANTICS_V1",
+     "structural_worst_case": 500.0,
+     "upstream_declared_risk": 500.0
+    },
+    "certified_max_loss": 500.0,
+    "envelope_binding_hash": "10c13004edf26be01e6d5f5e644eb87f96a2ddb4d0ab2badeac5b57f83803140",
+    "fee_schedule_hash": "9a39ad1e440925b6cdcb0ca3f1e2a9555fbdcee69d6fecad49e1cff37888df76",
+    "fee_schedule_id": "ROBINHOOD_RHF_2026",
+    "kernel_check": {
+     "approved": true,
+     "certified_aggregate_basis": "SUM_OF_VERIFIED_CERTIFIED_MAX_LOSS",
+     "decision_power": "STRUCTURAL_VETO_ONLY",
+     "economic_risk": {
+      "certificate_hash": "11ea81d2f67c837d0be81c83d5291e99b4785aa44a363cd7788e5ee98f9d80ba",
+      "certificate_version": "RISK_CERTIFICATE_V0",
+      "certified_max_loss": 500.0,
+      "certified_risk_authority": true,
+      "gap_exposed": false,
+      "gross_notional": 500.0,
+      "label_equals_bound": true,
+      "planned_risk_amount": 500.0,
+      "planned_risk_basis": "for a long option the planned loss and the structural bound are the same number: the debit derived from legs",
+      "prime_v0_eligible": true,
+      "research_observation_only": false,
+      "risk_class": "DEFINED_MAX_LOSS",
+      "upstream_declared_risk": 500.0
+     },
+     "kind": "risk_kernel_check",
+     "law": "the kernel only says no; allocation intelligence lives above it and cannot override it",
+     "limit_denomination": "PLANNED_RISK_DECLARED_1R",
+     "refusals": [],
+     "threshold_set": "ORGANISM_PAPER_V1",
+     "warnings": []
+    },
+    "kernel_check_at_commit": {
+     "approved": true,
+     "certified_aggregate_basis": "SUM_OF_VERIFIED_CERTIFIED_MAX_LOSS",
+     "decision_power": "STRUCTURAL_VETO_ONLY",
+     "economic_risk": {
+      "certificate_hash": "11ea81d2f67c837d0be81c83d5291e99b4785aa44a363cd7788e5ee98f9d80ba",
+      "certificate_version": "RISK_CERTIFICATE_V0",
+      "certified_max_loss": 500.0,
+      "certified_risk_authority": true,
+      "gap_exposed": false,
+      "gross_notional": 500.0,
+      "label_equals_bound": true,
+      "planned_risk_amount": 500.0,
+      "planned_risk_basis": "for a long option the planned loss and the structural bound are the same number: the debit derived from legs",
+      "prime_v0_eligible": true,
+      "research_observation_only": false,
+      "risk_class": "DEFINED_MAX_LOSS",
+      "upstream_declared_risk": 500.0
+     },
+     "kind": "risk_kernel_check",
+     "law": "the kernel only says no; allocation intelligence lives above it and cannot override it",
+     "limit_denomination": "PLANNED_RISK_DECLARED_1R",
+     "refusals": [],
+     "threshold_set": "ORGANISM_PAPER_V1",
+     "warnings": []
+    },
+    "limits": {
+     "max_aggregate_open_risk": 1500.0,
+     "max_risk_per_trade": 500.0,
+     "max_same_family_risk": 1000.0,
+     "max_same_underlying_risk": 600.0,
+     "session_drawdown_halt": 1000.0
+    },
+    "note": "certificate recomputed from legs; kernel checked against the Book at approval and re-checked against the FRESH Book inside the intent commit",
+    "risk_provenance": "CERTIFIED_KERNEL"
+   },
+   "risk_envelope": {
+    "basis": "KERNEL_CAP",
+    "envelope_debit": 500.0,
+    "feasible": true,
+    "max_entry_price": 5.0,
+    "policy": "RISK_ENVELOPE_V1: max_entry_price = min(reference_ask x (1 + 10%) when an indicative reference ask is present, kernel max_risk_per_trade / multiplier); envelope_debit = max_entry_price x multiplier x quantity; the executable ASK must be <= max_entry_price or the attempt is WAIT",
+    "reference_ask": 4.9,
+    "reference_note": "an indicative reference ask is NOT executable and is never a fill price",
+    "why_infeasible": null
+   },
+   "scan_id": "TRACE-REPLAY-2026-09-11:0028:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "signal_used": "LONG",
+   "strike_selection": {
+    "cap_consulted": true,
+    "census": {
+     "atm_ask": 8.94,
+     "atm_strike": 766.0,
+     "excluded_provider": 0,
+     "excluded_selector": 0,
+     "feasible": 62,
+     "max_entry_price": 5.0,
+     "on_signal_side": 70,
+     "strikes": 160,
+     "with_indicative_ask": 70
+    },
+    "distance": 8.2686,
+    "distance_pct": 1.0798,
+    "exclusions": {
+     "n_provider": 0,
+     "n_selector": 0,
+     "provider": [],
+     "selector": []
+    },
+    "reference_ask": 4.9,
+    "rule": "PILOT_RULE_V2",
+    "spot": 765.7314,
+    "strike": 774.0,
+    "strikes_from_atm": 8,
+    "what_v1_could_not_express": "V1 would have chosen K=766.0 (ask 8.94), which the envelope refuses when ask > 5.00; V2 states the nearest feasible strike is 8 strikes / 1.08% from spot"
+   },
+   "synthetic": false,
+   "ttl_s": 120.0,
+   "txn_id": "intent:1eb0412e49a88559b67f89ec"
+  },
+  {
+   "attempt": 1,
+   "cashflow_entry": -490.04,
+   "cashflow_law": "cashflow_entry = -(ask x multiplier x quantity + entry fees); fees charged exactly once here",
+   "commit_checks": "inside the fill transaction, from one snapshot: no existing fill; no expiry/cancellation record; session not closed; intent + forecast history re-verified; authorization re-verified against the active authority and provenance; forecast eligible NOW (target in the future, cutoff within 120s); clock <= intent expiry; whole chain verifies. A time-based failure here persists the terminal transition",
+   "committed_epoch": 1789135042.5100732,
+   "committed_utc": "2026-09-11T13:57:22.510073Z",
+   "contract": {
+    "expiration": "2026-10-02",
+    "right": "CALL",
+    "strike": 774.0,
+    "symbol": "SPY"
+   },
+   "contract_id": "SPY|2026-10-02|774.0|CALL",
+   "data_provenance": "LIVE_FEED",
+   "decision": "TRADE",
+   "decision_power": "NONE_PAPER",
+   "eligibility_policy": "QUOTE_ELIGIBILITY_V2: age at receipt in [0, 15s] (receipt >= intent persisted, so provider ts is within 15s before the intent); selected contract+side finite, uncrossed, exact-int size >= 1; intent unexpired (TTL 120s)",
+   "entry_cost_update": {
+    "entry_half_spread_$": 2.0,
+    "formula": "TOLL_FORMULA_V1",
+    "formula_hash": "17060e97b87708e7ea9203d404ff3a94d22c14f72940f6e79249a8ca6b0e4e9b",
+    "intent_expected_toll_ref": {
+     "status": "ESTIMATED_AT_INTENT_TIME",
+     "value": 4.1
+    },
+    "quote_timestamp_epoch": 1789135042.471
+   },
+   "entry_hash": "1e700a6960747821432199ba773e41099ac4247c0768d3ea0ee983fd372f187a",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "execution_policy": {
+    "policy_hash": "a3d80ad83c35a3bdf5a6a93aaa443dce43bdd4c8cbfb2babcfd842ddc78008ae",
+    "policy_id": "EXECUTION_POLICY_V1"
+   },
+   "exit_schedule": {
+    "exit_due_epoch": 1789135942.5100732,
+    "max_attempts": 5,
+    "policy_hash": "9f9784f7af5b9c198e9bad69432488cb86c58a482a4d83e62dc18dcb9eb1e5af",
+    "policy_id": "EXIT_AT_HORIZON_15M_V1",
+    "window_close_epoch": 1789136062.5100732
+   },
+   "fees_entry": {
+    "components": {
+     "commission": 0.0,
+     "exchange": 0.04,
+     "regulatory": 0.0003
+    },
+    "contracts": 1,
+    "schedule_hash": "9a39ad1e440925b6cdcb0ca3f1e2a9555fbdcee69d6fecad49e1cff37888df76",
+    "schedule_id": "ROBINHOOD_RHF_2026",
+    "side": "BUY",
+    "status": "CHARGED",
+    "total": 0.04
+   },
+   "fill_id": "f60e631d66718735d246865e",
+   "fill_label": "SIMULATED: no order was sent; the fill is the quoted ASK at the simulated execution instant",
+   "fill_law": "long leg pays THAT contract's ASK; no midpoint, no model price",
+   "history_verified": "intent + referenced forecast re-read, chain-verified, content-agreed, authorization checked against the ACTIVE authority and provenance -- before the quote AND again inside the commit transaction",
+   "intent_id": "1eb0412e49a88559b67f89ec",
+   "intent_ref": {
+    "entry_hash": "ff237373213a5c2a3570fbf84443526f1bfbb6879bfb6f4b23c5e4aed9ecedf3",
+    "intent_id": "1eb0412e49a88559b67f89ec",
+    "seq": 57
+   },
+   "kind": "pilot_fill",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "net_debit": 490.0,
+   "order_proof": "ledger seq proves intent persisted BEFORE the quote was requested; it does NOT prove the provider generated the quote after the intent -- the provider timestamp is recorded as asserted",
+   "prev_hash": "ff237373213a5c2a3570fbf84443526f1bfbb6879bfb6f4b23c5e4aed9ecedf3",
+   "price": 4.9,
+   "provider_latency_s": 0.0,
+   "quantity_filled": 1,
+   "quantity_intended": 1,
+   "quote_age_at_receipt_s": 0.03907322883605957,
+   "quote_observed": {
+    "ask": 4.9,
+    "ask_size": 50,
+    "bid": 4.86,
+    "bid_size": 59,
+    "timestamp_epoch": 1789135042.471,
+    "timestamp_meaning": "PROVIDER_SNAPSHOT: one asserted timestamp for both sides; side update times are NOT inferred",
+    "timestamp_utc": "2026-09-11T13:57:22.471000Z"
+   },
+   "quote_receipt_epoch": 1789135042.5100732,
+   "quote_receipt_utc": "2026-09-11T13:57:22.510073Z",
+   "quote_request_epoch": 1789135042.5100732,
+   "quote_request_utc": "2026-09-11T13:57:22.510073Z",
+   "quote_ts_minus_intent_persisted_s": -0.03907322883605957,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "risk_envelope": {
+    "basis": "KERNEL_CAP",
+    "envelope_debit": 500.0,
+    "feasible": true,
+    "max_entry_price": 5.0,
+    "policy": "RISK_ENVELOPE_V1: max_entry_price = min(reference_ask x (1 + 10%) when an indicative reference ask is present, kernel max_risk_per_trade / multiplier); envelope_debit = max_entry_price x multiplier x quantity; the executable ASK must be <= max_entry_price or the attempt is WAIT",
+    "reference_ask": 4.9,
+    "reference_note": "an indicative reference ask is NOT executable and is never a fill price",
+    "why_infeasible": null
+   },
+   "scan_id": "TRACE-REPLAY-2026-09-11:0028:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "side_crossed": "ASK",
+   "simulated": true,
+   "simulated_execution_epoch": 1789135042.7600732,
+   "simulated_latency_s": 0.25,
+   "status": "FILLED",
+   "synthetic": false,
+   "txn_id": "fill:1eb0412e49a88559b67f89ec:1"
+  },
+  {
+   "data_provenance": "LIVE_FEED",
+   "decided_utc": "2026-09-11T13:57:22.510073Z",
+   "decision": "TRADE",
+   "decision_power": "NONE_PAPER",
+   "entry_hash": "f5a3b15a1c519223564d85c9241e4d87d5ea47d8b39952b237220f60fdc13ce3",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "fill_id": "f60e631d66718735d246865e",
+   "forecast_id": "0c3e634d1dcf60ac3d6b9384",
+   "funnel_trace": {
+    "contract": "FUNNEL_TRACE_V1: every stage is present with a value or a named reason for its absence",
+    "eligible_expressions": {
+     "chosen": "LONG_CALL",
+     "contract_id": "SPY|2026-10-02|774.0|CALL",
+     "no_best_option_claim": true,
+     "rule": "PILOT_RULE_V2: signal->right, nearest expiry >= 21 DTE, nearest strike on the signal's side with indicative ask <= max_entry_price, 1 contract",
+     "set": [
+      "WAIT",
+      "LONG_CALL"
+     ]
+    },
+    "expected_economics": {
+     "missing": "UNESTABLISHED: no future-IV process is credibly modeled; the M4 comparison is recorded outside the decision path"
+    },
+    "final": {
+     "decision": "TRADE",
+     "why": null
+    },
+    "model_bundle": {
+     "family": "STUDENT_T",
+     "model_id": "EXP002_L",
+     "params_hash": "ca04fc6e713e1a5c",
+     "validation": "NOT_VALIDATED: EXP-002 development result INVALID_NULL_CONTROL; parameters retained for engineering continuity only; no edge claim"
+    },
+    "risk_decision": {
+     "authority_id": "RISK_CERTIFICATE_V0+ORGANISM_PAPER_V1",
+     "certified_max_loss": 500.0,
+     "kernel_approved_at_commit": true,
+     "provenance": "CERTIFIED_KERNEL"
+    },
+    "simulation_bundle": {
+     "missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"
+    },
+    "situation_regime": {
+     "direction_signal": "LONG",
+     "event_context": {
+      "gate": {
+       "affects_exits": false,
+       "authority": "SHADOW",
+       "gate": "EVENT_GATE_V0",
+       "reasons": [
+        "R2: unscheduled stream UNAVAILABLE"
+       ],
+       "spec": [
+        "R1 NEW_ENTRY veto while a CRITICAL scheduled event for the symbol's market is in its declared window",
+        "R2 NEW_ENTRY veto when the unscheduled stream is UNAVAILABLE or STALE (a dead sense is not a quiet world)",
+        "R3 NEW_ENTRY veto when a relevant unscheduled event is CONFLICTING or flagged hostile-text",
+        "R4 never applies to exits: an existing position follows its exit obligation regardless",
+        "R5 a WAIT caused by this gate is recorded with the rule id; no position-management action is taken"
+       ],
+       "stage": "intent (before proposal construction) on the rule path; candidate eligibility on the funnel path",
+       "vetoes_new_entry": false,
+       "would_veto_new_entry": true
+      },
+      "n_scheduled": 0,
+      "n_unscheduled": 0,
+      "scheduled_status": "UNAVAILABLE",
+      "unscheduled_status": "UNAVAILABLE"
+     },
+     "missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast"
+    },
+    "state_snapshot": {
+     "state_hash": "c6518c38d08d7efc2ad0b6e60c035bc1bbb8551a47a19a20d04ba5f32976310e"
+    }
+   },
+   "intent_id": "1eb0412e49a88559b67f89ec",
+   "kind": "pilot_decision",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "prev_hash": "1e700a6960747821432199ba773e41099ac4247c0768d3ea0ee983fd372f187a",
+   "refusal_persisted": null,
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0028:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "symbol": "SPY",
+   "synthetic": false,
+   "txn_id": "decision:TRACE-REPLAY-2026-09-11:0028:SPY",
+   "why": null
+  },
+  {
+   "attempt": 1,
+   "contract_id": "SPY|2026-10-02|774.0|CALL",
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "discharges_position": false,
+   "entry_hash": "f59e448f611a1c2d94158a66fb547d76ff68c8e25eb8c8c15c9afc673bd06426",
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "exit_law": "a long leg exits at THAT contract's BID; missing/stale -> NOT_ESTIMABLE, never imputed; the position REMAINS an unresolved obligation until a later attempt discharges it",
+   "exit_policy": {
+    "policy_hash": "9f9784f7af5b9c198e9bad69432488cb86c58a482a4d83e62dc18dcb9eb1e5af",
+    "policy_id": "EXIT_AT_HORIZON_15M_V1"
+   },
+   "exit_policy_status": "DUE",
+   "exit_quote_observed": {
+    "ask": 4.69,
+    "ask_size": 72,
+    "bid": 4.65,
+    "bid_size": 142,
+    "timestamp_epoch": 1789135882.816
+   },
+   "exit_quote_receipt_epoch": 1789135942.5100732,
+   "exit_quote_request_epoch": 1789135942.5100732,
+   "fill_id": "f60e631d66718735d246865e",
+   "fill_ref": {
+    "entry_hash": "1e700a6960747821432199ba773e41099ac4247c0768d3ea0ee983fd372f187a",
+    "seq": 58
+   },
+   "intent_id": "1eb0412e49a88559b67f89ec",
+   "kind": "pilot_outcome",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "pnl": null,
+   "prev_hash": "f5a3b15a1c519223564d85c9241e4d87d5ea47d8b39952b237220f60fdc13ce3",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "resolved_utc": "2026-09-11T14:12:22.510073Z",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0028:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "status": "NOT_ESTIMABLE",
+   "synthetic": false,
+   "txn_id": "outcome:1eb0412e49a88559b67f89ec:1",
+   "why": "STALE_SELECTED_CONTRACT: BID side 59.694s old at receipt"
+  },
+  {
+   "attempt": 2,
+   "cashflow_exit": 453.94,
+   "contract_id": "SPY|2026-10-02|774.0|CALL",
+   "data_provenance": "LIVE_FEED",
+   "decision_power": "NONE_PAPER",
+   "discharges_position": true,
+   "entry_hash": "b04cdc0d63f67bb42c16bc46ea358037167d7501ea867f2df2bf2a77bf94bfef",
+   "entry_price": 4.9,
+   "evidence_class": "PROSPECTIVE_PAPER",
+   "execution_mode": "PROSPECTIVE_ORCHESTRATION",
+   "exit_policy": {
+    "policy_hash": "9f9784f7af5b9c198e9bad69432488cb86c58a482a4d83e62dc18dcb9eb1e5af",
+    "policy_id": "EXIT_AT_HORIZON_15M_V1"
+   },
+   "exit_policy_status": "DUE",
+   "exit_price": 4.54,
+   "exit_quote_observed": {
+    "ask": 4.58,
+    "ask_size": 60,
+    "bid": 4.54,
+    "bid_size": 58,
+    "timestamp_epoch": 1789135942.726
+   },
+   "exit_quote_receipt_epoch": 1789135957.5100732,
+   "exit_quote_request_epoch": 1789135957.5100732,
+   "exit_side": "BID",
+   "fees_entry_ref": 0.04,
+   "fees_exit": {
+    "components": {
+     "commission": 0.0,
+     "exchange": 0.04,
+     "regulatory": 0.0236
+    },
+    "contracts": 1,
+    "schedule_hash": "9a39ad1e440925b6cdcb0ca3f1e2a9555fbdcee69d6fecad49e1cff37888df76",
+    "schedule_id": "ROBINHOOD_RHF_2026",
+    "side": "SELL",
+    "status": "CHARGED",
+    "total": 0.06
+   },
+   "fill_id": "f60e631d66718735d246865e",
+   "fill_ref": {
+    "entry_hash": "1e700a6960747821432199ba773e41099ac4247c0768d3ea0ee983fd372f187a",
+    "seq": 58
+   },
+   "gross_pnl": -36.0,
+   "intent_id": "1eb0412e49a88559b67f89ec",
+   "kind": "pilot_outcome",
+   "live_capital": "LOCKED",
+   "live_promotion_eligible": false,
+   "pnl": -36.1,
+   "pnl_law": "pnl = q x M x (exit bid - entry ask) - entry fees - exit fees; spread crossing is already in the quoted sides and is not subtracted again; fees charged exactly once per side",
+   "pnl_status": "NET_OF_FEES",
+   "prev_hash": "f59e448f611a1c2d94158a66fb547d76ff68c8e25eb8c8c15c9afc673bd06426",
+   "release": "TRACE_REPLAY_NOT_A_RELEASE",
+   "resolved_utc": "2026-09-11T14:12:37.510073Z",
+   "scan_id": "TRACE-REPLAY-2026-09-11:0028:SPY",
+   "session_id": "TRACE-REPLAY-2026-09-11",
+   "status": "RESOLVED",
+   "synthetic": false,
+   "txn_id": "outcome:1eb0412e49a88559b67f89ec:2"
+  }
+ ]
+}
