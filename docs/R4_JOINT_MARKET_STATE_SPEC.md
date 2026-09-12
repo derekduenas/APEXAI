@@ -1,7 +1,7 @@
-# R4 — Joint market-state forecasting: executable specification, DRAFT 2 (FOR REVIEW; nothing implemented, nothing fitted)
+# R4 — Joint market-state forecasting: executable specification, DRAFT 2.1 (FOR REVIEW; nothing implemented, nothing fitted)
 
-Status: `SPECIFICATION_DRAFT_2` on branch `frontier-build`. Supersedes Draft 1 (`cf4155f`) after the independent
-review of that draft. This document authorizes NOTHING: no code under `apex/` changes with it, no historical data is
+Status: `SPECIFICATION_DRAFT_2_1` on branch `frontier-build`. Supersedes Draft 2 (`65834d0`), which superseded
+Draft 1 (`cf4155f`), after the independent reviews of each. This document authorizes NOTHING: no code under `apex/` changes with it, no historical data is
 opened, no model is fitted, no service, limit, maintenance block, backtest hold, promotion rule or real-money
 authority changes. Implementation begins only after review of THIS text; historical fitting only under a separately
 authorized study contract.
@@ -17,7 +17,22 @@ and remains the operational default. Draft 1 §0 misstated this by calling the f
 `docs/FUNNEL_INTEGRATION.md` line 5 already states the setting correctly and needed no change. `FULL_FUNNEL_V1` is
 selection-by-name, and `JOINT_FUNNEL_V1` will be too.
 
-**Changes from Draft 1** (each is the reviewer's numbered point): §2.2/§2.3 one coherent estimator with no
+**Operator decisions recorded (review of Draft 2).** APPROVED: the objective and state family (§2.1) with the two
+clarifications required (predictor-domain refusals §2.2, endpoint lookup determinism §1.5); the decision constants as
+PROVISIONAL ENGINEERING CONSTANTS, not validated thresholds, with a sensitivity record and a no-retune rule (§5.4);
+`PILOT-COLLECTION` as a fitting source after 20 completed sessions under the strict walk-forward conditions of §1.6;
+the eight-run fit budget with retries counted exactly and no time-of-day variants (§7); selection-by-name with no
+promotion rule. `HIST-A-OPTIONS` remains separately gated by `R4-FIT-001`.
+
+**Changes from Draft 2** (each is a required correction from that review): §2.3 inference by session-cluster-robust
+covariance with a wild cluster bootstrap-t as the primary interval, HC1 demoted to descriptive, overlap acknowledged;
+§5.3 rule 0 defines `m = 0`; §4.4 defines attribution when a comparator refuses a candidate as unpriceable; §3.2
+specifies the exit-window extension exactly (generation, scaling, both endpoints unpriceable, extension undefined);
+§5.1 defines missing and unexecutable realized exit bids for CRPS and for the economic estimand, and adds a separate
+Brier score for executability; §7 requires the forecast-versus-pricing separation block in every record, pinned by
+T21; §6.2 removes the coverage acceptance band so every statistical quantity is a reported frequency, never a gate.
+
+**Changes from Draft 1** (carried forward, each was a required correction from that review): §2.2/§2.3 one coherent estimator with no
 contemporaneous endogeneity and an exactly specified truncation; §1.4 three separated clocks and frozen contract
 identity, plus dataset-and-role permissions; §3 complete path accounting with two bounds and candidate refusal;
 §4 two distinct baselines, explicit size policy, `C_DIAG` renamed and narrowed, an exactly additive decomposition;
@@ -121,6 +136,39 @@ counted. The exclusion census is part of the fit record. If the exclusion rate e
 `ENDPOINT_MISSINGNESS_EXCESSIVE`: at that level the missingness is plausibly informative (illiquid or fast states)
 and a complete-case fit would be biased. No imputation in V1.
 
+### 1.5 Endpoint contract lookup: deterministic tie-breaking and missing data
+
+The endpoint measures the SAME contracts the start froze (§1.4). Lookup is by EXACT key `(E*, K, right)`; no
+nearest-strike or nearest-expiry substitution is permitted at the endpoint, because a substitution measures
+contract re-selection rather than market evolution.
+
+| Situation | Rule | Record |
+|---|---|---|
+| Key absent from every snapshot in the window | that quantity is MISSING | `ENDPOINT_KEY_ABSENT:<key>` |
+| Exactly one quote for the key in the window | use it | — |
+| Several quotes for the key in the window | take the earliest `event_time`; ties → earliest `available_time`; ties → lowest `source` id (lexicographic); still tied → `ENDPOINT_AMBIGUOUS:<key>` and the row is INCOMPLETE | census |
+| Quote present but fails `sanitize_quote` | MISSING with the validator's reason (never silently used) | census |
+| `K_atm` missing but skew strikes present | `x_iv`, `x_sp`, `x_sz` MISSING → row INCOMPLETE (the ATM leg defines three of four coordinates) | census |
+| One skew strike missing | skew MISSING; the row is retained for the other three coordinates and labelled `SKEW_DEGRADED` | census |
+| `iv_source` differs from the start | row INCOMPLETE (`IV_SOURCE_CHANGED`, §1.4) | census |
+
+Start-side tie-breaks, restated as one rule: `K_atm` minimizes `|K − S_0|`, ties → LOWER strike; `K_∓` are nearest
+to `S_0·e^{∓0.02}`, ties → LOWER strike; `K_−` and `K_+` must be distinct, else skew MISSING. Every tie-break is
+deterministic and total: no lookup depends on dictionary or file ordering. Test T6 covers the frozen identity; test
+T22 covers each row of this table on fixtures.
+
+### 1.6 Walk-forward conditions on any fitting source (operator condition, §8.3)
+
+1. A decision at `t_d` may use only parameters whose `fit_cutoff` precedes the start of that session day and whose
+   every training row satisfies `availability deadline ≤ fit_cutoff` (§1.4).
+2. No observation may appear in both the fitting set and the evaluation set of the same decision. The attribution
+   population (§4) is checked against every contributing fit's row index; an intersection refuses
+   `FIT_EVAL_OVERLAP` with the offending row ids.
+3. A recorded forecast is immutable. A later fit produces parameters for FUTURE decisions only; it never revises,
+   re-scores or re-labels a forecast already on disk. The append-only ledger enforces this; test T23 attempts a
+   revision and asserts refusal.
+4. These conditions apply identically to `PILOT-COLLECTION` and, when separately authorized, to `HIST-A-OPTIONS`.
+
 ---
 
 ## 2. State, dynamics and estimator
@@ -169,6 +217,14 @@ contemporaneous option-state regressor. The co-movement those terms were meant t
 which is exactly what a residual covariance is for. No recursive contemporaneous effects are claimed in V1; if a
 later version wants them, it must state an identification argument and an estimator that matches it (§9).
 
+**Predictor domain (required refusals, checked BEFORE any `log` or `sqrt`).** `v̂` is a single `t_d`-measurable
+scalar: if `v̂ ≤ 0` or non-finite, the whole decision refuses `SCALE_VARIANCE_INVALID` → WAIT (no path is simulated).
+`q` is per path: if `q ≤ 0` or non-finite on any path, the predictor vector cannot be formed for that path, the path
+is `PREDICTOR_INVALID`, and — by the no-silent-dropping rule of §3 — the CANDIDATE is refused
+`REJECTED: PREDICTOR_INVALID_PATH_PRESENT` with the count and the first offending path index recorded. In TRAINING,
+a row with `q ≤ 0`, `v̂ ≤ 0` or a non-finite value in `z` or `Δx` is EXCLUDED, counted in the exclusion census, and
+subject to the same 10 % ceiling as missing endpoints (§1.4). The same check covers `log q`, `log v̂` and `sqrt(v̂)`.
+
 **Declared assumptions, each with a recorded diagnostic:** (a) `E[ε | r, q] = 0` — conditional mean independence of
 the option-state innovation from the same-window underlying statistics; diagnostic: correlation of each residual with
 `r`, `|r|`, `r²`, reported with HC-robust SEs, RECORDED (a flag, not a refusal, in V1). (b) Linearity in `z`.
@@ -188,9 +244,20 @@ Multivariate linear regression with a COMMON design matrix `Z` (n×4) and four o
 Σ̂ = Ê'Ê / (n − k)                       k = 4 (columns of Z); Σ̂ is the residual covariance across equations
 ```
 
-Reported per coefficient: HC1-robust standard errors (heteroskedasticity only; no cross-equation correction needed
-because the estimator is equation-wise consistent under the common design). Reported for `Σ̂`: the correlation
-matrix, its eigenvalues, and its condition number. Refusals: `COVARIANCE_NOT_PD` (min eigenvalue ≤ 0 — no shrinkage
+**Inference (Draft 2's HC1 was not sufficient).** Training rows are serially dependent: volatility and liquidity
+cluster within a session, and with the 15-minute grid the endpoint window's 120 s tail can overlap the next row's
+start state (`ACKNOWLEDGED_OVERLAP`; on any finer scan grid the rows overlap by construction). HC1 corrects
+heteroskedasticity only and is therefore DEMOTED to a descriptive diagnostic, labelled as such wherever it appears.
+
+| Quantity | Estimator | Use |
+|---|---|---|
+| Coefficient covariance | CR1 cluster-robust with the CALENDAR SESSION as the cluster (arbitrary within-session dependence, including the overlap, is absorbed) | default reported SE |
+| Coefficient interval (primary) | wild cluster bootstrap-t, Rademacher weights, 2,000 draws, seed 11, clusters = sessions | every interval quoted in a report or used in a finding |
+| Small-cluster caveat | `G` = number of sessions (≈ 20 at the V1 window); reference distribution `t_{G−1}`; `G` is recorded beside every interval | stated wherever `G < 30` |
+| HC1 | as computed | DESCRIPTIVE ONLY, never an interval that supports a claim |
+| Attribution statistics (§4, §5) | session-block bootstrap (§5.1) | all reported contrasts |
+
+Reported for `Σ̂`: the correlation matrix, its eigenvalues, and its condition number. Refusals: `COVARIANCE_NOT_PD` (min eigenvalue ≤ 0 — no shrinkage
 repair in V1), `DESIGN_RANK_DEFICIENT` (`Z'Z` condition number > 1e10), `INSUFFICIENT_HISTORY` (n < 200),
 `DEGENERATE_STATE` (any outcome column constant), `COEFFICIENT_OUT_OF_BOUNDS` (declared sanity bounds; refused, never
 clipped), `NONFINITE_INPUT`.
@@ -238,10 +305,11 @@ analytic BSM value to 1e-10, with no forecast involved.
 
 ## 3. Complete path accounting (every path gets a defined number, or the candidate is refused)
 
+### 3.1 Cases
+
 Policy `PATH_ACCOUNTING_V1`. For one candidate, one path, entry at the validated ask `a` (100 multiplier, fees
-`f_in + f_out`), the exit is evaluated at `t_d + H`; if not achievable there, the state is advanced by the declared
-exit window (`W_end = 120 s`, one additional simulation step block under the same dynamics, recorded) and evaluated
-once more. Then exactly one of:
+`f_in + f_out`), the exit is evaluated at `t_d + H` (the PRIMARY endpoint) and, if not achievable there, once more
+at `t_d + H + W_end` (the EXTENSION endpoint, §3.2). Then exactly one of:
 
 | Case | Condition | Net on that path |
 |---|---|---|
@@ -260,6 +328,40 @@ removed: a distribution that cannot be constructed is not a distribution.
 
 `NOT_ACHIEVABLE` frequency is reported as `MODEL_CONDITIONAL_AVAILABILITY`, explicitly not a fill probability, and
 its only authority is to reduce `E_lower` and to trigger the §5.3 gate.
+
+### 3.2 Exit-window mechanics (exact)
+
+`H = 900 s` = 15 one-minute bars; `W_end = 120 s` = 2 further one-minute bars, matching
+`EXIT_AT_HORIZON_15M_V1.window_s`.
+
+**Generation of the extension block.** The extension is a continuation of the SAME path, not a new draw: the GARCH
+variance recursion continues from bar 15, the path keeps its regime multiplier, and the innovations come from the
+SAME continuing RNG stream (so the whole 17-bar path is deterministic given the one recorded seed). The option state
+is extended with the SAME fitted parameters under a declared horizon rescaling, because the model is fitted at one
+horizon only:
+
+```
+EXTENSION_SCALING_V1:   v̂_ext = v̂ · (2/15)
+                        z_ext = ( 1 , r_ext , |r_ext| / sqrt(v̂_ext) , log q_ext − log v̂_ext )
+                        Δx_ext = (2/15) · A z_ext  +  sqrt(2/15) · ε_ext ,   ε_ext ~ TMVN(0, Σ̂; c)
+```
+
+Linear-in-time drift and square-root-of-time innovation scaling are ASSUMPTIONS, not estimates; they are recorded on
+every simulation and the innovation scale ×1.5 is in the adverse-scenario set (§5.3 rule 3).
+
+**Resolution order, exhaustive:**
+
+| Situation | Outcome |
+|---|---|
+| PRIMARY priceable and achievable | ACHIEVED at the primary endpoint; no extension is generated (recorded) |
+| PRIMARY priceable, not achievable; EXTENSION priceable and achievable | ACHIEVED at the extension endpoint; the delay is recorded |
+| PRIMARY priceable, not achievable; EXTENSION priceable, not achievable | NOT_ACHIEVABLE; the bounds use the LAST successfully priced evaluation (the extension), recorded as `bounds_from: EXTENSION` |
+| PRIMARY priceable, not achievable; EXTENSION predictor invalid (`q_ext ≤ 0` or non-finite) | NOT_ACHIEVABLE; bounds use the PRIMARY evaluation, `bounds_from: PRIMARY`, `extension_undefined_n` incremented. The path is valued, never dropped |
+| PRIMARY UNPRICEABLE | candidate `REJECTED: UNPRICEABLE_PATH_PRESENT` (no extension is attempted) |
+| EXTENSION UNPRICEABLE | candidate `REJECTED: UNPRICEABLE_PATH_PRESENT`, `stage: EXTENSION` |
+
+Every counter above (`achieved_primary_n`, `achieved_extension_n`, `not_achievable_n`, `extension_undefined_n`,
+`unpriceable_n` with stage) is on the `joint_forecast` record. Tests T13 and T24 cover the six rows on fixtures.
 
 ---
 
@@ -309,6 +411,26 @@ IDENTITY:  J  ≡  Sh(F1) + Sh(F2) + D                 (exact, order-independent
 of the decomposition, so no double counting arises. Draft 1's "subtract the components" residual is replaced by this
 identity. Every term is reported with its session-block bootstrap interval (§5.2).
 
+### 4.4 When a comparator refuses a candidate
+
+A refusal (`UNPRICEABLE_PATH_PRESENT`, `PREDICTOR_INVALID_PATH_PRESENT`) removes a CANDIDATE for one comparator. It
+must never silently remove a row from the common population.
+
+- **Decision-economics estimand.** A refusal is a decision: that comparator does not select the refused candidate
+  and chooses among its remaining eligible candidates, or WAITs (value 0, §5.3 rule 0) if none remain. The SCAN
+  therefore stays in the common population for every comparator, and the refusal's economic consequence is measured
+  rather than excluded. The refusal census by (comparator, reason) is reported.
+- **Forecast-quality (CRPS/PIT) estimand.** A comparator that refuses a candidate produced no distribution for that
+  contract, so no score exists for it. The CONTRACT — not the scan — is excluded from the per-contract comparison
+  for ALL comparators, keeping the scored population common. The exclusion census by (comparator, reason) is
+  reported. If the excluded fraction exceeds 5 %, the comparison is labelled `POPULATION_RESTRICTED` and is reported
+  together with a worst-case bound in which every excluded contract is assigned, for the refusing comparator, the
+  worst score that comparator achieved on the scored population.
+
+Neither device is allowed to improve a comparator's headline: refusal costs it the trade in the economic estimand
+and restricts (never flatters) the scored population in the forecast-quality estimand. Test T25 pins both on a
+fixture where exactly one comparator refuses exactly one candidate.
+
 ---
 
 ## 5. Scoring, uncertainty and the decision rule (all constants frozen here)
@@ -321,6 +443,16 @@ identity. Every term is reported with its session-block bootstrap interval (§5.
 - **PIT.** `u = (1/N)·#{x_i < y} + U·(1/N)·#{x_i = y}`, `U ~ Uniform(0,1)` from a recorded seed (mid-rank
   randomization for ties). PIT is reported as a histogram, a KS statistic and a rejection FREQUENCY over seeds
   (§6.2), never as a single pass/fail gate.
+- **Realized endpoint: missing.** No coherent, validated quote for the contract inside the endpoint window → the
+  contract is CENSORED from CRPS and PIT and counted in the censoring census (no imputed target: a score against an
+  invented number is not a score). The SCAN remains in the economic population, where a comparator that traded that
+  contract takes the unresolved-trade value below.
+- **Realized endpoint: present but unexecutable** (`bid = 0`, or `size < 1` at a positive bid) → the CRPS/PIT target
+  is the OBSERVED bid as quoted (0 when there is no bid), carrying an `executable: false` flag; a sensitivity with
+  these rows excluded is reported beside the headline. CRPS therefore scores the PRICE forecast only.
+- **Executability, scored separately.** Brier score of the model's `MODEL_CONDITIONAL_AVAILABILITY` against the
+  realized executability indicator (a valid bid ≥ 1 size inside the window), with the same weighting and bootstrap.
+  It is reported as a forecast score; it does not become a fill probability (§7).
 - **Weighting.** Contract-level scores are averaged with equal weight WITHIN a scan; scans are then equally weighted;
   the bootstrap block is the calendar session. Stated once, applied everywhere.
 - **Bootstrap.** Session-block, 2,000 draws, seed 11, percentile interval, sessions resampled with replacement to the
@@ -340,6 +472,9 @@ candidate: `E_lower`, `SE_mc = sd/√N`. Per pair on COMMON paths: paired SE. Re
 
 Let `m` = number of ELIGIBLE, envelope-feasible candidates; `c*` = argmax `E_lower`; `c₂` = runner-up.
 
+0. **No candidate.** `m = 0` → WAIT with `NO_ELIGIBLE_CANDIDATE` and the per-reason census of why each contract was
+   not eligible (envelope, quote validation, refusal, absent key). The scan is recorded and stays in the common
+   population at value 0; no rule below is evaluated.
 1. **Versus WAIT, with multiplicity.** `E_lower(c*) − z_{1−α/(2m)} · SE_paired(c* − WAIT) > 0`, `α = 0.05`,
    Bonferroni over the `m` candidates that competed. The naive 2-SE number is ALSO recorded, labelled
    non-simultaneous. Failure → `MC_NOT_DISTINGUISHED_FROM_WAIT`. Draft 1's plain 2 SE is replaced because the maximum
@@ -360,6 +495,20 @@ Let `m` = number of ELIGIBLE, envelope-feasible candidates; `c*` = argmax `E_low
 
 Carried on every trace: passing this rule establishes that the MODEL-CONDITIONAL ranking is decision-relevant under
 the declared uncertainty. It does not establish positive expectancy, calibration, or an executable fill.
+
+### 5.4 Constants sensitivity and the no-retune rule (operator condition, §8.2)
+
+Every constant in §5.2–5.3 is a PROVISIONAL ENGINEERING CONSTANT, not a validated threshold, and each record says so.
+
+- **Sensitivity record.** `constants_sensitivity` reports the decision census (TRADE / WAIT by reason) and the
+  attribution contrasts under `N ∈ {1,000, 4,000, 16,000}` and under each of the four gate constants moved one
+  declared step in each direction (rank separation 0.5 / 1 / 2 SE; accounting uncertainty 15 / 25 / 40 %;
+  availability failure 2 / 5 / 10 %; multiplicity naive / Bonferroni). Monte Carlo sensitivity is computed on
+  SYNTHETIC worlds before any historical or prospective outcome is seen.
+- **No-retune rule.** The constants are frozen in the study-contract hash before the first evaluated population.
+  Changing any of them after seeing outcomes requires a NEW contract, is recorded as a new trial in the registry
+  against the search budget, and the prior result stands in the record beside it. Tuning a constant and reporting
+  only the tuned result is a contract violation, not a judgement call.
 
 ---
 
@@ -390,15 +539,22 @@ All worlds come from a declared generator with a known mechanism. Every test is 
 | T17 | deterministic reconstruction: same `market_state` + parameters + seed → byte-identical trace digest and proposal |
 | T18 | decision-rule cases: `m = 1` → `SOLE_CANDIDATE` recorded and rule 2 vacuous; exact tie → `RANK_TIED` → WAIT; Bonferroni number differs from the naive number when `m > 1` and both are recorded |
 | T19 | unconditional boundary path: `JOINT_FUNNEL_V1` FULL mode → real joint engine selects → persisted `market_state` + funnel → digest-bound intent with certified reservation → FILLED → RESOLVED exit → book closed clean (the r3 acceptance pattern) |
-| T20 | mandatory WAIT: one fixture per §5.3 failure mode, each producing WAIT with its named reason and no intent |
+| T20 | mandatory WAIT: one fixture per §5.3 failure mode (including rule 0, `m = 0`), each producing WAIT with its named reason and no intent |
+| T21 | every `joint_forecast` and every funnel `joint` block carries the separation entry of §7 with BOTH digests present and distinct; a record missing either is refused |
+| T22 | endpoint lookup (§1.5): each row of the table on a fixture, including two quotes for one key (earliest wins) and an unbreakable tie (`ENDPOINT_AMBIGUOUS`); no lookup depends on container ordering (shuffled input → identical result) |
+| T23 | immutability (§1.6): an attempt to revise or re-score a persisted forecast after a later fit is refused; a new fit writes new records only |
+| T24 | exit-window mechanics (§3.2): all six resolution rows on fixtures, plus `extension_undefined` valuing the path from the PRIMARY evaluation rather than dropping it |
+| T25 | refusal attribution (§4.4): one comparator refuses one candidate — the scan stays in the economic population at that comparator's next-best or WAIT value, the contract leaves the CRPS population for ALL comparators, and both censuses are written |
+| T26 | predictor domain (§2.2): `v̂ ≤ 0` refuses the decision before any path is simulated; a single path with `q ≤ 0` refuses the candidate with its index recorded; a training row with non-finite `z` is excluded and counted |
 
 ### 6.2 Statistical behaviour: frequencies with uncertainty (reported, never a single-sample gate)
 
 Over `S = 200` seeds per world, each reported with a binomial CI:
 
-- **Recovery coverage.** True `A` and `Σ` known; report the coverage frequency of each coefficient's 95 % CI at
-  `n ∈ {200, 480, 2000}`. Acceptance is a coverage band `[0.90, 0.98]` at `S = 200`, stated as a frequency claim.
-  Draft 1's "within 3 SE" single-sample assertion is removed.
+- **Recovery coverage.** True `A` and `Σ` known; report the coverage frequency of each coefficient's 95 % wild
+  cluster bootstrap-t interval at `n ∈ {200, 480, 2000}`, with its binomial CI. NOT A GATE: Draft 2's `[0.90, 0.98]`
+  acceptance band is removed. A coverage CI that excludes the nominal level is a FINDING for review, recorded with
+  the seeds that produced it. Draft 1's "within 3 SE" single-sample assertion stays removed.
 - **False-positive frequency (null world).** `A ≡ 0`, `Σ > 0` — note this world legitimately produces `JOINT ≠
   MATCHED_FROZEN` paths, so Draft 1's "forecasts agree on every row" assertion was wrong and is deleted. Report
   instead: the frequency with which each attribution interval excludes 0, expected ≈ α.
@@ -414,7 +570,10 @@ Over `S = 200` seeds per world, each reported with a binomial CI:
   seed may legitimately change the ranking, and rule 2 (§5.3) is the control for that. Draft 1's "a changed seed
   changes only the simulation section" assertion is deleted.
 
-None of §6.2 transfers to markets. Market calibration and expectancy remain prospective evidence classes.
+**No quantity in §6.2 gates acceptance.** Acceptance is §6.1 alone: exact identities and deterministic fixtures.
+Every §6.2 number is a repeated-seed frequency reported with its uncertainty; a deviation from nominal is a finding
+to be reviewed, never an automatic pass or fail. None of §6.2 transfers to markets: market calibration and
+expectancy remain prospective evidence classes.
 
 ---
 
@@ -434,28 +593,53 @@ Budget: `FIT_BUDGET_PER_SESSION_DAY = 8` estimation runs, enumerated above; exce
 unspecified branch count. Window: trailing 20 completed sessions (provisional engineering setting, not validated
 sufficiency), minimum 200 rows.
 
-**Records.** `market_state` (§1); `joint_fit` (design summary, `Â`, HC1 SEs, `Σ̂`, eigenvalues, exclusion census,
-floor counts, diagnostics, refusals, dataset ids and roles, `fit_cutoff`); `joint_forecast` (parameters digest,
+**Records.** `market_state` (§1); `joint_fit` (design summary, `Â`, CR1 cluster-robust SEs with `G`, wild cluster
+bootstrap-t intervals, HC1 marked DESCRIPTIVE, `Σ̂`, eigenvalues, exclusion and censoring censuses, floor counts,
+diagnostics, refusals, dataset ids and roles, `fit_cutoff`, training row ids for the §1.6 overlap check); `joint_forecast` (parameters digest,
 seed, `N`, truncation `c`/`κ`/rejections, per-comparator moments, availability failure rates, `E_lower`/`E_upper`);
 the funnel trace gains `joint` (comparator table, the five decision-rule checks with their numbers, adverse-scenario
 table, ablation table, degraded labels). The r3 canonical proposal and its binding are unchanged.
+
+**Forecast-versus-pricing separation, required in every record.** `joint_forecast`, and the funnel trace's `joint`
+block, each carry:
+
+```
+separation = { forecast_model:  {id, parameters_digest, fit_cutoff, what_it_produces: "future STATES"},
+               pricing_model:   {id, digest, what_it_produces: "price of a contract GIVEN a state"},
+               statement: "a model-conditioned value ranking is not a calibrated probability, not a fill
+                           probability, and not evidence of positive expectancy" }
+```
+
+The two digests must be present and distinct (T21). No record may report an expected value without it.
+
+**Retries count exactly** (operator condition §8.4): each call to a fitting routine is one estimation run, including
+the GARCH Nelder–Mead polish and the second start; the joint fit has no retries (a refusal is a refusal); a run that
+refuses still counts against the budget; no time-of-day variants exist in V1.
 
 **The four attribution checks stay separate** (ordering/integrity via the funnel binding; availability via §1;
 leakage-free fitting via §1.4 and the firewall; reconstruction via T17). None implies calibration or expectancy.
 
 ---
 
-## 8. Operator decisions still needed before implementation
+## 8. Operator decisions — recorded (review of Draft 2)
 
-1. **State representation** (§2.1): log-IV slope skew, ATM-proxy size with gate-only authority, spread floor 1e-4.
-   (Reviewer holds approval pending this draft.)
-2. **Decision constants** (§5.3): Bonferroni over eligible candidates at α = 0.05; 1 SE rank separation; accounting
-   uncertainty ≤ 25 %; availability failure ≤ 5 %. Provisional: `N = 4,000`, 20-session window.
-3. **Fitting data path** (§1.3): confirm `PILOT-COLLECTION` is fittable as a PROSPECTIVE_OBSERVATION dataset once
-   ≥ 20 sessions exist; `HIST-A-OPTIONS` TRAIN/VALIDATION only under `R4-FIT-001`; sealed roles untouched.
-4. **Fit budget** (§7): 8 enumerated estimation runs per session day.
-5. **Selection by name, no promotion** (already approved): `JOINT_FUNNEL_V1` is selected explicitly;
-   `PILOT_RULE_V1` remains the operational default; no automatic activation or promotion is created.
+1. **State representation** — APPROVED with two required clarifications, both now specified: predictor-domain
+   refusals for `q ≤ 0`, `v̂ ≤ 0` and non-finite values before any `log`/`sqrt` (§2.2, T26), and deterministic
+   tie-breaking and missing-data behaviour for every endpoint contract lookup (§1.5, T22).
+2. **Decision constants** — APPROVED as PROVISIONAL ENGINEERING CONSTANTS: `N = 4,000`, Bonferroni multiplicity,
+   1 SE rank separation, 25 % accounting uncertainty, 5 % modelled availability risk. They are not validated
+   performance thresholds; §5.4 adds the sensitivity record and the no-retune rule.
+3. **Collector fitting** — APPROVED CONDITIONALLY: `PILOT-COLLECTION` becomes a fitting source after 20 completed
+   sessions, under the strict walk-forward conditions of §1.6 (parameters from sessions completed before the fit
+   cutoff; no observation in both fitting and evaluation for one decision; a recorded forecast is never revised).
+   `HIST-A-OPTIONS` remains separately gated by `R4-FIT-001`.
+4. **Fit budget** — APPROVED: 8 enumerated estimation runs per session day, retries counted exactly as specified in
+   §7, time-of-day variants excluded.
+5. **Selection by name, no promotion** — APPROVED: `JOINT_FUNNEL_V1` is selected explicitly; `PILOT_RULE_V1` remains
+   the operational default; no automatic activation or promotion rule is created by this brick.
+
+Outstanding for the reviewer: acceptance of this Draft 2.1 revision. No implementation, fitting, historical access
+or admission request proceeds before that.
 
 ## 9. Named for later, not V1
 

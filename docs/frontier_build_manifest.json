@@ -203,9 +203,9 @@
    }
   },
   "R4": {
-   "state": "SPECIFICATION_DRAFT_2 (for review; nothing implemented, nothing fitted)",
+   "state": "SPECIFICATION_DRAFT_2_1 (for review; nothing implemented, nothing fitted)",
    "spec": "docs/R4_JOINT_MARKET_STATE_SPEC.md",
-   "supersedes": "DRAFT_1 at cf4155f, after independent review",
+   "supersedes": "DRAFT_2 at 65834d0 (which superseded DRAFT_1 at cf4155f), after independent review of each",
    "objective": "joint 15-minute forecast of underlying, ATM IV, skew, spread and size; expressions vs WAIT on after-cost economics",
    "operational_default": "PILOT_RULE_V1 (verified in code at 2011f03)",
    "baselines": [
@@ -224,13 +224,24 @@
     "fit accounting enumerated (8 runs); time-of-day buckets removed"
    ],
    "authorizes": "nothing: no historical access, no backtest, no fitting, no activation, no promotion",
-   "operator_decisions_open": [
-    "state representation",
-    "decision constants",
-    "fitting data path (PILOT-COLLECTION role)",
-    "fit budget",
-    "(approved) selection-by-name, no promotion"
-   ]
+   "operator_decisions_recorded": {
+    "state_representation": "APPROVED with two clarifications (predictor-domain refusals; endpoint lookup determinism)",
+    "decision_constants": "APPROVED as provisional engineering constants, not validated thresholds; sensitivity record + no-retune rule",
+    "collector_fitting": "APPROVED CONDITIONALLY: PILOT-COLLECTION after 20 completed sessions under strict walk-forward conditions; HIST-A-OPTIONS still gated by R4-FIT-001",
+    "fit_budget": "APPROVED: 8 estimation runs per session day, retries counted exactly, no time-of-day variants",
+    "selection_by_name": "APPROVED: JOINT_FUNNEL_V1 by name; PILOT_RULE_V1 remains the operational default; no promotion rule"
+   },
+   "draft2_1_changes": [
+    "session-cluster-robust CR1 + wild cluster bootstrap-t as the primary interval; HC1 demoted to descriptive; overlap acknowledged",
+    "decision rule 0: m = 0 -> WAIT / NO_ELIGIBLE_CANDIDATE with the per-reason census",
+    "attribution when a comparator refuses a candidate: scan stays in the economic population, contract leaves the CRPS population for all comparators, censuses reported",
+    "exit-window mechanics exact: extension generation and scaling, both-endpoint cases, extension-undefined valued from the primary evaluation",
+    "endpoint scoring: missing realized bid censored and counted; unexecutable scored at the observed bid with a flag; executability scored separately by Brier",
+    "forecast-vs-pricing separation block required in every record (T21)",
+    "no statistical quantity gates acceptance; coverage band removed; deviations are findings",
+    "predictor-domain refusals (q, v-hat) and deterministic endpoint lookup rules"
+   ],
+   "outstanding": "reviewer acceptance of DRAFT 2.1; no implementation, fitting, historical access or admission request before that"
   }
  },
  "preserved": [
