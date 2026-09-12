@@ -1,6 +1,6 @@
 # R4 — Joint market-state forecasting: executable specification, DRAFT 3.1 (FOR REVIEW; nothing implemented, nothing fitted)
 
-Status: `SPECIFICATION_DRAFT_3_1` on branch `frontier-build`. Draft 3.1 is a BOUNDED AMENDMENT to Draft 3
+Status: `SPECIFICATION_DRAFT_3_1_REVIEW_PATCH` on branch `frontier-build`. Draft 3.1 is a BOUNDED AMENDMENT to Draft 3
 (`4d84548`) covering five issues and adding no capability; everything the Draft 3 review recorded as corrected
 stands unchanged and is not revisited. Chain: `4d84548` ← `f848163` ← `65834d0` ← `cf4155f`. This document authorizes NOTHING: no code under `apex/`
 changes with it, no dataset is opened, no model is fitted, no service, limit, maintenance block, backtest hold,
@@ -28,7 +28,7 @@ selection-by-name with no promotion rule. Implementation and fitting remain HELD
 | A2 | The endpoint is an approximate measurement, not the minute-15 state; and `A(t)` admitted quotes from BEFORE the target, so `δ = 0` could coexist with a nearly 120 s-stale quote | per-quote SIGNED offset from the target, receipt lag and slice dispersion recorded; a symmetric permissible-offset window replaces the one-sided delay; the tighter sensitivity uses the ACTUAL offsets; the estimand is renamed and labelled a delayed/stale-quote PROXY | §1.4 | **T32** |
 | A3 | Restricted residuals define a TEST of zero, not a confidence interval for a possibly non-zero coefficient; and restricting every equation imposes more than the hypothesis under test | one construction only: confidence interval BY TEST INVERSION, with the inversion algorithm specified; exactly ONE coefficient in ONE equation is restricted and the other equations are untouched; same-seed reproduction is labelled reproducibility, not inferential correctness | §2.3 | **T33** |
 | A4 | `E_sel = min(E[S1], E[S2])` is a minimum of two ESTIMATED means with no stated standard error, and near-ties carry selection uncertainty | paired path-level samples retained for both scenarios; the WAIT gate requires SIMULTANEOUS lower confidence limits above zero for BOTH scenarios over the candidate × scenario family; the runner-up comparison is explicitly a HEURISTIC SCREEN with no confidence claim; `E[min(S1,S2)]` is forbidden as a substitute | §3.1, §5.3 | **T34** |
-| A5 | A shared 4-D radial acceptance couples blocks even when `Σ` is block-diagonal, so a contrast could change marginal tail shape as well as correlation; and a size-driven value reduction can re-rank, which contradicts "never promotes" | truncation becomes BLOCK-SEQUENTIAL so the shared coordinates' marginals are identical across comparators by construction; the size proxy becomes `SELECT_THEN_VETO` — ranking is computed under `ASSUME_AVAILABLE` and size can only veto to WAIT, never substitute; the spread proxy's ranking influence is disclosed rather than claimed away | §2.4, §2.1, §5.3 | **T35, T36** |
+| A5 | The block-sequential construction changes execution-block marginal tails as well as coupling; size penalties must not rerank | Retain the sampler, label its contrast COMPOUND_COUPLING_LAW_CONTRAST, preserve IV-block draws, and select without size before a selected-only risk/economic veto; spread ranking influence disclosed | §2.4, §2.1, §5.3 | **T35, T36** |
 
 **Corrections in Draft 3** (each from the Draft 2.1 review; all are corrections to the existing design, no new
 capability): §2.5 the pricing map is anchored at the frozen strike `K_atm` so it reproduces the stored ATM IV
@@ -46,6 +46,16 @@ separated from the production estimation budget; §1.3 every R4 read requires ex
 nothing from EXP-001B, with role approval separated from run authorization.
 
 ---
+
+## Proposed review patch to e8c6a53
+
+This specification-only patch retains the sampler's equations and corrects its marginal-preservation claim.
+The coupling contrast is compound; isolated dependence attribution remains unestablished.
+It reconciles per-scenario uncertainty, no-size ranking and selected-only veto accounting, bootstrap null
+construction and numerical search limits, and the synthetic averaged-null report.
+The economic veto is an explicit proposed conservative policy choice requiring review. The matrix transpose
+corrects the documented orientation, not the intended regression. Applying this patch authorizes no implementation,
+data access, fitting or deployment. Return its resulting commit for review.
 
 ## 0. Objective, horizon, non-goals
 
@@ -234,8 +244,10 @@ because lowering one candidate's value can hand the top rank to another. V1 reso
 2. **Veto the selected candidate only.** The size model is then applied to `c*` alone: if its
    `MODEL_CONDITIONAL_AVAILABILITY` failure rate exceeds the §5.3 rule-4 threshold, the decision is WAIT. There is
    NO substitution with the runner-up — a veto ends the scan's trade, it does not choose a different trade.
-3. **Disclose.** The size-modelled `E_sel` is recorded as a disclosure figure beside the ranking value and is never
-   used for selection.
+3. **Selected-only economic veto.** Retain the selected identity and no-size ranking. Re-evaluate c* under
+   modelled size on the SAME paths and apply §5.3 rule 4. These values can veto to WAIT, never choose a substitute.
+   Numerical failure or unavailable size also yields WAIT. Report ranking and veto values separately.
+   This additional economic veto is a proposed conservative policy choice, not a validated threshold.
 
 The alternative — permitting re-ranking and disclosing that the proxy carries selection authority — remains
 available but is NOT adopted in V1. `MODEL_CONDITIONAL_AVAILABILITY` is a model-conditional figure, not a fill
@@ -255,7 +267,7 @@ variable on any right-hand side:
 Δx = A z + ε
 z  = ( 1 , r , |r| / sqrt(v̂) , log q − log v̂ )'     v̂ = E[q] at t_d (GARCH integrated variance), t_d-measurable
 Δx = ( Δx_iv , Δx_sk , Δx_sp , Δx_sz )'             A is 4×4
-ε  ~ TMVN(0, Σ; c)                                  elliptically truncated, renormalized (§2.4)
+ε  ~ BLOCK_SEQUENTIAL_V1(Σ, c)                     §2.4; not a single four-dimensional TMVN
 ```
 
 **Predictor domain (checked BEFORE any `log` or `sqrt`).** `v̂ ≤ 0` or non-finite → the whole decision refuses
@@ -280,8 +292,11 @@ from option state to the underlying within the horizon.
 **Estimator.** Common design `Z` (n×4), complete outcomes `Y` (n×4):
 
 ```
-Â = (Z'Z)^{-1} Z'Y        Ê = Y − Z Â        Σ̂ = Ê'Ê / (n − k),  k = 4
+B̂ = (Z'Z)^{-1} Z'Y        Â = B̂'        Ê = Y − Z B̂        Σ̂ = Ê'Ê / (n − k),  k = 4
 ```
+
+Rows of B̂ index predictors and columns index outcomes; Â = B̂' has outcome rows for Δx = Â z + ε.
+The transpose matters even though both matrices happen to be 4×4.
 
 With identical regressors in every equation, SUR collapses to equation-wise OLS (Zellner), which is why a common
 design is chosen. **Only COMPLETE four-output rows enter the fit**: a row missing skew (or any coordinate) cannot
@@ -316,20 +331,26 @@ statistics — that is the only reason weight sharing would be needed.)
 
 *The test at a candidate value.* For `H₀: a_ij = a₀`, impose the SINGLE restriction in equation `i` only: regress
 the offset outcome `y_i − a₀ · z_j` on the remaining regressors of `z`, take the restricted residuals `ẽ_i`, and
-form `B = 2,000` replicates `y*_{i,g} = fitted_{i,g} + w_g · ẽ_{i,g}` with Rademacher `w_g` drawn once per cluster
+add back the offset to define mu0_i = a₀ z_j + Z_{-j} beta0_{-j}, set ẽ_i = y_i − mu0_i, and
+form B = 2,000 replicates y*_{i,g} = mu0_{i,g} + w_g · ẽ_{i,g} with Rademacher `w_g` drawn once per cluster
 `g` (seed 11). Each replicate's statistic is `(â*_ij − a₀)` studentized by the CR1 cluster-robust SE computed
-within that replicate. The bootstrap p-value is the two-sided proportion of replicate statistics at least as
-extreme as the observed one.
+within that replicate. The bootstrap p-value is (1+k)/(1+B_valid), with k valid absolute statistics at least as large as the
+observed one. Generate and retain one B-by-G weight array per equation/fit and reuse it at every a₀.
+Fixed-design rank is checked before resampling; a replicate cannot change Z's rank.
 
-*The inversion algorithm (declared, so two implementations agree).* (1) Bracket: the CR1 Wald interval ±4 SE.
-(2) Coarse scan: 25 equally spaced `a₀` in the bracket. (3) Bisection on each side to locate where the p-value
-crosses `α = 0.05`, to a tolerance of `1e-4 · SE`. (4) If the p-value still exceeds `α` at a bracket end, widen
-that side up to 3 times; if it still does, report `CI_UNBOUNDED` on that side with the bracket examined.
-(5) Monotonicity of the p-value in `a₀` is NOT assumed: the reported interval is the convex hull of the accepted
-set, and any gap inside it is recorded as `CI_NONCONVEX_ACCEPTANCE`. Every evaluated `a₀` and its p-value is kept.
+*Numerical inversion and its limits.* Let b be the unrestricted estimate and se its positive finite CR1
+standard error; otherwise refuse the interval. Evaluate 25 equally spaced points on [b−4se,b+4se].
+Accept a tested value when p(a₀)>0.05. If an endpoint is accepted, double its distance from b at most three
+times and evaluate 25 equally spaced points in each newly added segment. Cache every evaluation.
+Bisect every adjacent tested accepted/rejected pair until width <=1e-4 se, at most 30 iterations per pair.
+Return sampled acceptance components and their convex hull, with all tested points and p-values.
+Detected separated components receive CI_NONCONVEX_ACCEPTANCE. An accepted outer endpoint after the search
+cap or unresolved bisection receives INVERSION_SEARCH_UNRESOLVED; do not issue a finite endpoint on that side.
+A finite search cannot prove unboundedness or exclude unsampled acceptance islands. Even a finite returned
+hull is labelled NUMERIC_TEST_INVERSION_APPROXIMATION. No exact acceptance-set claim is made.
 
 *Stability and honesty.* `G` = session clusters is recorded beside every interval, with the `t_{G−1}` reference
-noted when `G < 30`. A replicate whose `Z'Z` is singular or whose cluster-robust variance is not PD is DISCARDED
+noted when `G < 30`. A replicate with non-finite or non-positive coefficient-specific CR1 variance is DISCARDED
 and counted; above 1 % discarded the interval refuses `BOOTSTRAP_UNSTABLE`. A same-seed reproduction test (T33)
 establishes REPRODUCIBILITY only — not inferential correctness, whose only evidence here is the coverage FREQUENCY
 report of §6.2, which gates nothing.
@@ -338,33 +359,39 @@ report of §6.2, which gates nothing.
 clusters. Dependence BETWEEN sessions (multi-day volatility regimes, weekly effects) is NOT addressed by either.
 Every interval is valid only under that assumption, which is stated wherever it is reported; §9 names the remedy.
 
-### 2.4 Truncation of correlated innovations (exact, testable)
+### 2.4 Block-sequential law: retained construction, corrected attribution
 
-Coordinate-wise clipping distorts dependence untrackably. Draft 3 used one 4-dimensional elliptical acceptance
-region, but as the review notes, a SHARED radial condition couples the blocks even when `Σ̂` is block-diagonal (a
-large IV-block draw makes an exec-block draw likelier to be rejected), so `C_DIAG` would have differed from `JOINT`
-in marginal tail shape as well as in correlation — contaminating exactly the contrast it exists to measure.
+Retain Draft 3.1's sampler. This amendment corrects its interpretation and does not introduce a new copula.
+Partition Σ̂ into IV/skew block 1 and spread/size block 2, each dimension 2:
+M = Σ̂₂₁ Σ̂₁₁⁻¹; C = Σ̂₂₂ − M Σ̂₁₂. Require positive definiteness before Cholesky operations.
 
-**`TRUNCATION_BLOCK_SEQUENTIAL_V1` (A5).** Draw block by block, with the truncation applied WITHIN each block, so
-that every comparator sharing a coordinate block draws that block from the identical law:
+Independently generate standard two-dimensional vectors w1,w2 by radial rejection of N(0,I2) at
+c²=chi2_quantile(2,0.9999), dividing accepted draws by sqrt(kappa).
+kappa=F_chi2_4(c²)/F_chi2_2(c²); their population covariances are I2.
+Pre-generate named base vectors per path, block and horizon before candidate evaluation.
 
-```
-block 1 = (Δx_iv, Δx_sk)   block 2 = (Δx_sp, Δx_sz)      d_b = 2 for each block
-ε₁ :  u₁ ~ N(0, Σ̂₁₁);  accept iff u₁' Σ̂₁₁^{-1} u₁ ≤ c²(d₁);   ε₁ = u₁ / sqrt(κ(c, d₁))
-ε₂ :  m₂ = Σ̂₂₁ Σ̂₁₁^{-1} ε₁            (zero for C_DIAG and for any comparator without block 1)
-      C₂ = Σ̂₂₂ − Σ̂₂₁ Σ̂₁₁^{-1} Σ̂₁₂    (Σ̂₂₂ for C_DIAG)
-      u₂ ~ N(0, C₂);  accept iff u₂' C₂^{-1} u₂ ≤ c²(d₂);       ε₂ = m₂ + u₂ / sqrt(κ(c, d₂))
-c²(d) = χ²_{d, 0.9999} quantile;   κ(c, d) = P(χ²_{d+2} ≤ c²) / P(χ²_d ≤ c²)
-```
+    e1       = chol(Σ̂₁₁) w1
+    e2_joint = M e1 + chol(C) w2
+    e2_diag  = chol(Σ̂₂₂) w2
 
-Consequences, each recorded or tested: the block-1 draw is BITWISE IDENTICAL across `JOINT`, `C_DIAG`, `C_IVSK`
-(and `C_IV` on its first coordinate) for a given seed, so no contrast among them can be attributed to a changed
-IV-block marginal (T35); the block-2 acceptance region and its deflation are identical in shape across
-comparators, the ONLY difference being the conditional-mean shift `m₂`, which is exactly the cross-block
-dependence under test; a one-block comparator (`C_IV`, `C_IVSK`, `C_EXEC`) uses the same per-block construction on
-its active coordinates. `Cov(ε_b)` equals the intended block covariance exactly by the same `κ` identity. The
-realized unconditional covariance of `ε₂` under `JOINT` (a mixture over `ε₁`) is REPORTED beside `C_DIAG`'s rather
-than asserted equal. Accepted mass, `c²(d)`, `κ(c, d)` and rejection counts are recorded per block.
+JOINT uses (e1,e2_joint); C_DIAG uses (e1,e2_diag); C_IVSK uses e1;
+C_IV takes e1's FIRST COORDINATE, never a separately truncated 1-D draw;
+C_EXEC uses e2_diag. Inactive state changes are zero. Independent extension base vectors use the same law.
+
+Exact POPULATION moment identities:
+Cov(e2_joint)=M Σ̂₁₁ M' + C=Σ̂₂₂; Cov(e1,e2_joint)=Σ̂₁₂;
+Cov(e2_diag)=Σ̂₂₂ and Cov(e1,e2_diag)=0.
+These identities do not assert exact sample covariance.
+
+The entire execution-block marginal law generally DIFFERS: JOINT sums two bounded random vectors;
+C_DIAG transforms one. BOTH the conditional mean and conditional residual covariance change.
+Equal covariance does not guarantee equal tail shape.
+JOINT − C_DIAG is therefore COMPOUND_COUPLING_LAW_CONTRAST, never an isolated correlation effect.
+Carry that scope on each reported contrast and trace. Marginal-preserving dependence attribution is outside V1.
+
+T35 verifies shared block-1 draws, the C_IV projection, the matrix moment identities and different conditional
+covariances for nonzero M. A bounded scalar fourth-moment fixture demonstrates unequal marginal laws despite
+equal variance. Empirical covariance and tail measurements are statistical reports only.
 
 ### 2.5 Pricing model inside a simulated state (anchored at the frozen strike)
 
@@ -432,8 +459,9 @@ were the standard error of the minimum; §5.3 rule 1 instead requires a SIMULTAN
 **`E[min(S1, S2)]` — the path-by-path minimum — is FORBIDDEN as a substitute: it is a different economic quantity,
 and T34 asserts the two differ on a fixture so the substitution cannot creep in.**
 
-`NOT_ACHIEVABLE` frequency is reported as `MODEL_CONDITIONAL_AVAILABILITY`, not a fill probability; its only
-authority is to lower `E_sel` and to trigger the §5.3 gate.
+PATH_ACCOUNTING_V1 takes an explicit size_policy. ASSUME_AVAILABLE ignores size in the achievable predicate;
+MODELLED_SIZE requires sz>=1. Retain separate scenario arrays, means and U values for ranking and selected-only
+veto. The model-conditional availability failure rate never changes the recorded ranking.
 
 ### 3.2 Execution extension (exact)
 
@@ -487,20 +515,19 @@ Counters (`achieved_primary_n`, `achieved_extension_n`, `not_achievable_n`, `ext
 | Id | IV block | Exec block | Residual covariance | Size policy |
 |---|---|---|---|---|
 | `MATCHED_FROZEN` | 0 | 0 | — | `ASSUME_AVAILABLE` |
-| `C_IV` | `Δx_iv` only | 0 | 1×1 | `ASSUME_AVAILABLE` |
+| `C_IV` | `Δx_iv` only | 0 | first coordinate of shared e1 | `ASSUME_AVAILABLE` |
 | `C_IVSK` | both | 0 | 2×2 | `ASSUME_AVAILABLE` |
-| `C_EXEC` | 0 | both | 2×2 | `MODELLED` (gate only) |
-| `C_DIAG` | both | both | block-diagonal (cross-block correlation removed) | `MODELLED` |
-| `JOINT` | both | both | full `Σ̂` | `MODELLED` |
+| `C_EXEC` | 0 | both | e2_diag | rank without size; selected-only veto |
+| `C_DIAG` | both | both | e1,e2_diag | rank without size; selected-only veto |
+| `JOINT` | both | both | e1,e2_joint | rank without size; selected-only veto |
 
 `C_PERM` is NOT in this table (A1): it is a SYNTHETIC-ONLY diagnostic defined in §6.2 and is never run on
 historical or prospective data, never enters an attribution report, and never appears in a decision path.
-`JOINT − C_DIAG` is retained as the cross-block dependence contrast, because permuting predictors does not remove
-residual cross-block correlation — the two answer different questions and neither replaces the other.
+`JOINT − C_DIAG` is retained as COMPOUND_COUPLING_LAW_CONTRAST (§2.4). The synthetic predictor-permutation
+diagnostic answers a separate question; neither isolates residual dependence in this version.
 
-`C_DIAG` is not an independence model: every comparator shares the pre-generated underlying paths and every
-equation conditions on `(r, q)`, so coordinates stay dependent through the underlying. It isolates CROSS-BLOCK
-RESIDUAL correlation only.
+C_DIAG has independent residual blocks conditional on the underlying path. Output coordinates can still be
+dependent through that path. Contrasting JOINT also changes execution-block marginal tails, as §2.4 states.
 
 ### 4.3 Exactly additive decomposition
 
@@ -509,7 +536,7 @@ With `V(·)` a functional on one fixed population:
 ```
 Sh(F1) = ½[V(C_IVSK) − V(MATCHED_FROZEN)] + ½[V(C_DIAG) − V(C_EXEC)]     F1 = IV block
 Sh(F2) = ½[V(C_EXEC) − V(MATCHED_FROZEN)] + ½[V(C_DIAG) − V(C_IVSK)]     F2 = exec block
-D      = V(JOINT) − V(C_DIAG)                                            cross-block residual correlation
+D      = V(JOINT) − V(C_DIAG)                                            compound coupling-law change (§2.4)
 J      = V(JOINT) − V(MATCHED_FROZEN)
 IDENTITY:  J ≡ Sh(F1) + Sh(F2) + D      (exact, order-independent; T10 asserts to 1e-12)
 ```
@@ -566,12 +593,17 @@ A refusal removes a CANDIDATE for one comparator; it must never silently remove 
 
 ### 5.2 Monte Carlo uncertainty
 
-`N = 4,000` paths (provisional). Per candidate: `E_sel`, `SE_mc = sd/√N`. Per pair on the SHARED pre-generated
-paths: paired SE. Reported with every decision.
+N=4,000 (provisional). Retain S1,S2 arrays under each named size policy. Report each scenario's mean and
+SE=sample_sd(ddof=1)/sqrt(N). Paired comparisons use the sample SD of pathwise differences.
+E_sel=min(mean(S1),mean(S2)) has NO single sd/sqrt(N) standard error.
+Normal-quantile lower limits are approximate Monte Carlo intervals conditional on fitted parameters and the
+simulator. Bonferroni controls multiplicity only to the extent individual coverage assumptions hold; it supplies
+neither finite-sample exactness nor model/parameter uncertainty.
 
 ### 5.3 Decision rule `JOINT_DECISION_RULE_V1`
 
-`m` = eligible, envelope-feasible candidates; `c*` = argmax `E_sel`; `c₂` = runner-up.
+m counts all eligible, envelope-feasible candidates entering the no-size ranking; keep it fixed for the veto.
+c* and c2 are selected using ASSUME_AVAILABLE E_sel. No veto-stage re-ranking is permitted.
 
 0. **`m = 0`** → WAIT, `NO_ELIGIBLE_CANDIDATE`, with the per-reason census (envelope, quote validation, refusal,
    absent key). The scan is recorded at value 0; no rule below is evaluated.
@@ -579,8 +611,7 @@ paths: paired SE. Reported with every decision.
    for EACH scenario `s ∈ {S1, S2}`:
    `Ê[S_s](c*) − z_{1−α/(2·2m)} · SE_paired(S_s(c*) − WAIT) > 0`, `α = 0.05`, the Bonferroni family being the
    `m` competing candidates × 2 scenarios. BOTH lower limits must exceed zero; this avoids needing the sampling
-   distribution of a minimum and is conservative when the two scenario means are close. The naive 2-SE figure on
-   `E_sel` alone is also recorded and labelled non-simultaneous. Failure →
+   distribution of a minimum and is conservative when the two scenario means are close. Any naive 2-SE figures are recorded per SCENARIO, never attached to E_sel. Failure →
    `MC_NOT_DISTINGUISHED_FROM_WAIT:<scenario>`.
 2. **Versus runner-up — a HEURISTIC SCREEN, no confidence claim (A4).** `m = 1` → VACUOUS, recorded
    `SOLE_CANDIDATE`. Else require, in BOTH scenarios, `Ê[S_s](c*) − Ê[S_s](c₂) > 1 · SE_paired` on the shared
@@ -589,11 +620,18 @@ paths: paired SE. Reported with every decision.
    never reported as a confidence statement.
 3. **Adverse-scenario robustness (ablations are NOT gates).** `E_sel > 0` must survive: truncation `c²` at the
    0.999 and 0.99999 quantiles; spread innovations ×1.5; extension innovation scale ×1.5; `a_iv` shifted by −1
-   cluster-robust SE against the position; size floor removed. Failure → `NOT_ROBUST_TO_ASSUMPTIONS:<scenario>`.
+   cluster-robust SE against the position; selected-only size-veto sensitivity with the floor removed (negative implied size means unavailable, never
+   negative executable size). Failure → `NOT_ROBUST_TO_ASSUMPTIONS:<scenario>`.
    Component ablations (`Δx_iv ≡ 0`, `Δx_sk ≡ 0`, diagonal `Σ`) are RECORDED for attribution, never gates.
-4. **Accounting-scenario spread, and the size VETO.** `U ≤ 0.25 · |E_sel|`, else `EXIT_ACCOUNTING_UNCERTAIN`.
-   Then the `SIZE_PROXY_V2` veto is applied to `c*` ALONE: `MODEL_CONDITIONAL_AVAILABILITY` failure rate ≤ 0.05,
-   else `EXIT_LIQUIDITY_RISK` → WAIT, with NO substitution of the runner-up (§2.1).
+4. **Accounting and selected-only veto.** Require U_rank<=0.25|E_sel_rank|.
+   For C_EXEC, C_DIAG and JOINT only, evaluate c* under MODELLED_SIZE using the same paths.
+   Require BOTH scenario lower limits >0 with the same quantile and original 2m family as rule 1;
+   U_veto<=0.25|E_sel_veto|; and availability-failure rate<=0.05.
+   Failures are respectively SIZE_VETO_NOT_DISTINGUISHED_FROM_WAIT:<scenario>,
+   EXIT_ACCOUNTING_UNCERTAIN, and EXIT_LIQUIDITY_RISK. Each yields WAIT without substitution.
+   A numerical failure or undefined selected-only result also yields WAIT, not candidate removal/re-ranking.
+   Record rank and veto numbers separately. Other comparators retain ASSUME_AVAILABLE.
+   The selected-only economic recheck is an explicit proposed conservative policy choice, not a validated threshold.
 5. **PRIME supervision ACT** (unchanged r3 policy).
 
 Carried on every trace: passing this rule establishes that the MODEL-CONDITIONAL ranking is decision-relevant under
@@ -621,7 +659,7 @@ one afterwards requires a NEW contract, counts against the search budget, and th
 | T4 | IV uses the contemporaneous underlying; a 30 s-old reference → `NO_CONTEMPORANEOUS_UNDERLYING` |
 | T5 | `ENDPOINT_SELECTION_V1`: `t_e` is the earliest instant with a JOINTLY coherent ATM key set; a fixture whose per-key earliest quotes never coexist selects a later `t_e` or excludes the row — never a set that did not coexist |
 | T6 | frozen identity: when "first expiry ≥ 21 DTE" changes between `t_d` and `t_e`, the endpoint still measures `E*` chosen at `t_d` |
-| T7 | estimator identity: `Â = (Z'Z)^{-1}Z'Y`, `Σ̂ = Ê'Ê/(n−k)` to 1e-12; rows lacking any outcome are absent from `Z`, `Y` and present in the census |
+| T7 | estimator identity: `B̂ = (Z'Z)^{-1}Z'Y`, `Â = B̂'`, `Σ̂ = Ê'Ê/(n−k)` to 1e-12; rows lacking any outcome are absent from `Z`, `Y` and present in the census |
 | T8 | truncation identity: `κ = P(χ²_{d+2} ≤ c²)/P(χ²_d ≤ c²)` to 1e-12 |
 | T9 | pricing identity: a KNOWN state reproduces analytic BSM to 1e-10; `T(t_eval)` matches timestamp arithmetic exactly at BOTH endpoints; range guards fire for `log iv_K` outside `[log 1e-4, log 50]`, `T ≤ 0`, non-finite `S_H` |
 | **T27** | **anchor identity**: with `x_sk ≠ 0` and `S_H ≠ K_atm`, pricing at `K = K_atm` returns exactly `exp(x_iv)`; the Draft 2.1 form fails this fixture |
@@ -637,7 +675,7 @@ one afterwards requires a NEW contract, counts against the search budget, and th
 | T25 | refusal attribution: the scan stays in the economic population at the comparator's next-best or WAIT value; the contract leaves the scored population for ALL comparators; both censuses written; the result carries `SCORED_POPULATION_CONDITIONAL` |
 | T26 | predictor domain: `v̂ ≤ 0` refuses before any path is simulated; one path with `q ≤ 0` refuses the candidate with its index; a training row with non-finite `z` is EXCLUDED and counted, while a non-finite in the ASSEMBLED matrices refuses `NONFINITE_INPUT` |
 | T15 | numerical refusals: non-PD `Σ̂`, rank-deficient `Z`, constant outcome column, out-of-bounds coefficient, > 10 % missing endpoints, > 5 % floored spreads — each named, no parameters written |
-| **T30** | **bootstrap mechanics**: restricted residuals; one Rademacher draw per cluster shared across all four equations; singular replicates discarded and counted; > 1 % discarded → `BOOTSTRAP_UNSTABLE`; `G` recorded; a fixture with known clusters reproduces the interval bit-for-bit from the seed |
+| **T30** | One coefficient in one equation restricted; fitted null adds the offset back; other equations untouched; reused weight matrix; fixed rank checked once; invalid coefficient-SE replicates counted; >1% discarded refuses. Reproducibility is separate from statistical coverage. |
 | T16 | firewall: one training row with `available > cutoff` → `FIREWALL`, no fallback |
 | T23 | immutability: revising or re-scoring a persisted forecast after a later fit is refused |
 | T17 | deterministic reconstruction: same `market_state` + parameters + seed → byte-identical trace digest and proposal |
@@ -648,10 +686,10 @@ one afterwards requires a NEW contract, counts against the search budget, and th
 | T22 | per-key lookup (§1.5): each table row, including an unbreakable tie; shuffled input → identical result |
 | **T31** | **budget separation**: a production decision performs zero bootstrap solves; the production counter and the inference-resampling counter are distinct and both written |
 | **T32** | **endpoint offsets (A2)**: a fixture with `δ = 0` but a 119 s-stale ATM quote is REFUSED by the `|o_j| ≤ o_max` rule (Draft 3 would have accepted it); every row records per-quote signed offsets, receipt lags and slice dispersion; the tighter sensitivity selects on `max_j|o_j| ≤ 15 s`, not on `δ`; every artefact carries the `TARGET_PROXY_V1` label |
-| **T33** | **CI by inversion (A3)**: only equation `i` is restricted and the other three coefficient matrices are bit-identical to the unrestricted fit; the inversion reproduces a hand-computed bracket, scan and bisection on a fixture; `CI_UNBOUNDED` fires when the p-value stays above α after three widenings; a planted non-monotone acceptance set records `CI_NONCONVEX_ACCEPTANCE` and reports the convex hull; a same-seed rerun is bit-identical and is labelled REPRODUCIBILITY, not correctness |
+| **T33** | Specified grid/widening/bisection reproduced; capped accepted endpoint gives INVERSION_SEARCH_UNRESOLVED, not proof of unboundedness; detected gaps recorded; a narrow unsampled island demonstrates finite-grid limitations. |
 | **T34** | **scenario inference (A4)**: paired per-path samples for `S1` and `S2` are retained and identical on ACHIEVED paths; the WAIT gate uses simultaneous lower limits over the `2m` family and a near-tie fixture where one scenario's limit is ≤ 0 produces WAIT even though `E_sel > 0`; the runner-up check carries `HEURISTIC_SCREEN_NO_CONFIDENCE_CLAIM`; a fixture asserts `E[min(S1,S2)] ≠ min(E[S1], E[S2])` and that the pathwise minimum is never used |
-| **T35** | **block-sequential truncation (A5)**: for one seed the block-1 draws are BITWISE identical across `JOINT`, `C_DIAG`, `C_IVSK`; per-block `κ(c, d)` matches the chi-square ratio to 1e-12; `Cov(ε_b)` matches the intended block covariance within stated MC error; `C_DIAG` and `JOINT` differ ONLY by the conditional-mean shift `m₂`; the realized unconditional `Cov(ε₂)` under `JOINT` is reported rather than asserted equal |
-| **T36** | **size veto (A5)**: the candidate ranking is invariant to every size state (two fixtures differing only in `x_sz` produce the identical ranking); a vetoed `c*` yields WAIT with `EXIT_LIQUIDITY_RISK` and NO substitution of the runner-up; the size-modelled `E_sel` appears as a disclosure figure only; a fixture confirms the spread state CAN re-rank and that the trace discloses it |
+| **T35** | Shared e1 draws and C_IV coordinate projection; Schur-complement moment identities; conditional covariance difference; scalar fourth-moment counterexample; required COMPOUND_COUPLING_LAW_CONTRAST label. Empirical moments are diagnostics. |
+| **T36** | Ranking invariant to size; selected candidate can veto only to WAIT, never substitute. Positive no-size value with <5% catastrophic illiquidity and negative size-modelled mean must WAIT. Spread influence on ranking disclosed. |
 
 ### 6.2 Statistical behaviour: reported frequencies, gating nothing
 
@@ -677,18 +715,21 @@ nominal is a FINDING for review, recorded with the seeds that produced it.
      individually, which is what would destroy within-session time structure.
   3. **Independent evaluation sample.** Fit on a training draw, permute, and score on a SEPARATE evaluation draw
      from the same generator, so no score comparison is contaminated by in-sample fitting.
-  4. **Exactly which expectation is zero.** `E_{training, permutation, evaluation}[ S(JOINT) − S(C_PERM) ] = 0`
-     under (1). This is equality AVERAGED over training samples and permutations. It is NOT the claim that two
-     PARTICULAR fitted models have equal expected scores, and a score interval from one fitted pair is therefore
-     NOT a nominal false-positive test — the reported quantity is the frequency, over `S` seeds each redrawing
-     training, permutation and evaluation, with which the interval for that averaged contrast excludes zero.
+  4. **Averaged expectation and its uncertainty.** Under (1), use fixed equal-length synthetic sessions
+     with identical row grids and fitting/evaluation rules. No output-dependent filtering or model-dependent
+     evaluation censoring is permitted. A refusal is reported and makes this null report unavailable rather
+     than selecting a successful subset.
+     E_training,permutation,evaluation[score(JOINT)-score(C_PERM)]=0 under this generator.
+     Produce S=200 independent training/permutation/evaluation triples, one paired mean difference D_s each.
+     Report ONE grand mean, across-triple SE and a 95% t_(S-1) interval as Monte Carlo uncertainty.
+     Individual fitted-pair intervals are descriptive; their rejection fraction is not a nominal false-positive
+     rate. A rejection frequency of grand-mean intervals requires another outer repetition budget, absent in V1.
   5. **Scope.** `C_PERM` never touches historical or prospective data, never enters the comparator table (§4.2),
-     never enters an attribution report and never appears in a decision path. It answers conditional-mean
-     predictability only; cross-block residual dependence is answered by `JOINT − C_DIAG`, which permutation
+     never enters an attribution report and never appears in a decision path. Its conclusion is limited to this synthetic generator and fitted model class; cross-block residual dependence is answered by `JOINT − C_DIAG`, which permutation
      cannot address because permuting predictors does not remove residual cross-block correlation.
-- **Detection frequency (power).** Planted `b_iv ∈ {−0.2, −0.6}`: frequency the `JOINT` vs `C_PERM` averaged
-  contrast excludes zero, by `n` (synthetic only). Planted cross-block correlation `∈ {0.3, 0.6}`: frequency the
-  `JOINT` vs `C_DIAG` interval excludes zero — the correlation question belongs to that contrast, not to `C_PERM`.
+- **Planted effects.** For b_iv in {-0.2,-0.6}, report the same 200-triple grand-mean contrast and interval,
+  not an undefined rejection frequency of one grand mean. Coupling settings {0.3,0.6} are reported as compound
+  JOINT-versus-C_DIAG sensitivity, not isolated correlation detection. Recovery/calibration reports stay separate.
 - **Calibration frequency.** Well-specified world: rejection frequency of the rank chi-square against the DISCRETE
   uniform reference (§5.1), expected ≈ α. Misspecified world (jumps): DETECTION frequency of the rank test and of
   `RESIDUAL_NONGAUSSIAN_FLAG`; no claim that either fires in every sample.
@@ -741,7 +782,7 @@ and §1.5); constants as provisional engineering settings (§5.4); the collector
 into role approval versus run authorization (§1.3); the eight-run PRODUCTION estimation budget, now distinguished
 from the inference-resampling budget (§7); selection-by-name with no promotion rule.
 
-Outstanding: acceptance of this Draft 3. No implementation, fitting, historical access or admission request
+Outstanding: acceptance of this review patch to Draft 3.1. No implementation, fitting, historical access or admission request
 proceeds before that.
 
 ## 9. Named for later, not V1
@@ -760,9 +801,9 @@ process for the pricing model's own uncertainty.
 | # | Equation / rule | Where | Test |
 |---|---|---|---|
 | 1 | `Δx = A z + ε`, `z = (1, r, |r|/√v̂, log q − log v̂)` | §2.2 | T7, T26 |
-| 2 | `Â = (Z'Z)^{-1}Z'Y`, `Σ̂ = Ê'Ê/(n−k)`, complete rows only | §2.3 | T7 |
+| 2 | `B̂ = (Z'Z)^{-1}Z'Y`, `Â = B̂'`, `Σ̂ = Ê'Ê/(n−k)`, complete rows only | §2.3 | T7 |
 | 3 | CR1 clustering; CI by test inversion, single restricted equation | §2.3 | T30, **T33** |
-| 4 | `TRUNCATION_BLOCK_SEQUENTIAL_V1`; per-block `κ` | §2.4 | T8, **T35** |
+| 4 | Block-sequential law; kappa; compound marginal/coupling scope | §2.4 | T8, **T35** |
 | 5 | `log iv_K = x_iv + x_sk·log(K/K_atm)` (anchor) | §2.5 | **T27** |
 | 6 | `T(t_eval)` recomputed at each endpoint | §2.5, §3.2 | T9, T24 |
 | 7 | Range guards on `log iv_K`, `T`, `S_H` | §2.5 | T9 |
@@ -776,7 +817,7 @@ process for the pricing model's own uncertainty.
 | 15 | CRPS; discrete-uniform rank reference; censoring; Brier | §5.1 | T13 (values), §6.2 (frequencies) |
 | 16 | Decision rule 0–5; simultaneous scenario gate; size veto | §5.3 | T18, T20, **T34, T36** |
 | 17 | Zero-dynamics identities (compatible states; matched policy) | §6.1 | **T11a, T11b** |
-| 18 | `C_PERM` invariance argument, session permutation unit, averaged expectation (SYNTHETIC ONLY) | §6.2 | reported frequency |
+| 18 | Synthetic permutation invariance; 200 independent triples; one grand-mean interval | §6.2 | reported frequency |
 | 19 | Walk-forward, immutability, overlap check | §1.6 | T16, T23 |
 | 20 | Separation record in every artefact | §7 | T21 |
 | 21 | Budget separation, two counters | §7 | **T31** |
