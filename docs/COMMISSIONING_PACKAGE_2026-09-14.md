@@ -68,6 +68,7 @@ checkout on `main`. Full inventory in the deployment package.
 | Maintenance block lifted, live switch set for the pilot process only | not done | **yes** | yes |
 | Paper capital authorized | not done | no | **yes** |
 | Stopping rule | proposed: 10 regular sessions or any stop rule in the commissioning package §5 | — | — |
+| **Release change with an open position** | `FINDING_RELEASE_CHANGE_STRANDS_POSITION.md`: a restart under a different release strands the previous release's open position; operational rule in the finding; repair proposed, not applied | no | **yes** (no deploy/rollback while a position is open) |
 
 **Observation mode for Monday 2026-09-14: NO-GO as of this package**, for three reasons that are each one operator
 action plus one host step: the release is not installed with its identity check, the market-data smoke is not
