@@ -66,7 +66,7 @@ class LiveWiring:
     def describe(self) -> dict:
         return {"attach_market_data_http": self.attach_market_data_http,
                 "bars_nbbo_client": ("apex.pulse_options.http_policy.guarded_get over apex.intraday.options_feed (HTTP_POLICY_V1, gated)" if self.attach_market_data_http else "_no_http (NOT ATTACHED)"),
-                "fee_schedule": (self.fee_schedule.describe() if self.fee_schedule is not None else "UNVERIFIED_FEES (live default; no fee document authorized)"),
+                "fee_schedule": (self.fee_schedule.describe() if self.fee_schedule is not None else "LIVE_DEFAULT (see provider.fee_schedule: the authorized schedule unless overridden)"),
                 "event_stream": ("wired: %s" % getattr(self.event_snapshot_fn, "__name__", "callable") if self.event_snapshot_fn is not None else "NOT_WIRED"),
                 "event_gate_authority": self.event_gate_authority,
                 "chain_quote_client": "apex.intraday.options_feed.option_expirations/option_chain_snapshot (gated; injectable)",
@@ -205,6 +205,7 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     report["selection_policy"] = policy
     report["runtime_identity"] = identity
     report["wiring"] = (provider.describe() if hasattr(provider, "describe") else {"provider": type(provider).__name__})
+    report["provider_health"] = (provider.health.summary() if getattr(provider, "health", None) is not None else "NO_HTTP_CLIENT_ATTACHED")
     # IDENTITY CHECK: every persisted intent of this session must name the rule of the policy that was run
     if policy in RULE_IDS:
         expected_rule = RULE_IDS[policy]
