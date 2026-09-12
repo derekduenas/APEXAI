@@ -41,6 +41,14 @@ full regression**, against 0 in 3 attempts run alone.
 Within a single pytest process the two are sequential and cannot collide, which is why the full suite does not fail
 every time either: it depends on whether anything else is touching the tree during those two files' execution.
 
+## Confirmed a second time, by accident, on the same day
+
+The full regression run immediately after this diagnosis returned **26 failed / 5,273 passed**, against a
+pre-existing baseline of 15. The 11 extra were all `test_exp002_historical_path` / `test_exp004_activation_path` —
+because the EXP hunt was still running concurrently in the same checkout. Re-run alone in a quiet tree minutes
+later: **25 passed**. The defect reproduced, unprompted, in exactly the circumstances this document predicts, and
+the prediction was made before that run finished.
+
 ## Classification
 
 A **test-isolation defect with a real-world trigger**, not an environmental flake:
