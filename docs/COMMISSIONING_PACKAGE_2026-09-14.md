@@ -1,7 +1,6 @@
 # Commissioning package — Monday 2026-09-14 (prepared 2026-09-12/13, weekend commissioning)
 
-Candidate branch `weekend-commissioning-001` (from review candidate `778a5c9`); exact commit, tarball digest and
-decision-path tree digest in `out/release/RELEASE_MANIFEST.json` once built. Contract blob `a0228fac…` unchanged.
+Candidate branch `weekend-commissioning-001` (from review candidate `778a5c9`). **Package commit `ba4a8654341f3e184034e368c4f5a55619a43e87`**, tarball sha256 `b2e65343b25c7a7c38eefb94bc7d12b3aa24d418cbc410c998be23e49040851a`, decision-path tree digest `1d5aa7d2…` (`docs/evidence/release/RELEASE_MANIFEST.json`; `startup_identity_check.py` exit 0 against the build tree). Contract blob `a0228fac…` unchanged.
 
 ## 1. Identities
 

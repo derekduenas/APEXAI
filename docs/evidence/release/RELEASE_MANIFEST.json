@@ -1,0 +1,36 @@
+{
+ "kind": "RELEASE_MANIFEST",
+ "commit": "ba4a8654341f3e184034e368c4f5a55619a43e87",
+ "tarball": "apex-ba4a8654341f3e184034e368c4f5a55619a43e87.tar.gz",
+ "tarball_sha256": "b2e65343b25c7a7c38eefb94bc7d12b3aa24d418cbc410c998be23e49040851a",
+ "decision_path_module_digests": {
+  "apex.options_pilot.session": "8e85740624a13c01912162c4a73a860d51eee8d97d64c708a5bc7d10533d96e9",
+  "apex.options_pilot.boundary": "a0dab9ca4c2355885c9a96aa1725dc67068402bcdc677be28df61264fc7e9de6",
+  "apex.options_pilot.records": "96b7f682952059d0e012dab1765532e0fc1ab2f3a5bcf6ff59b42b6542e3836f",
+  "apex.options_pilot.expression_rule": "92fc868a92f41467c3bc341b3b2b3b7e83ba885e6096c3483f2b2102f8f8a9ee",
+  "apex.options_pilot.risk_authority": "d760de698eaa12391a6793e7d0a0a5f7c2cf788341d6e2cab1692891b2a451e3",
+  "apex.options_pilot.fees": "c6442db042aba191721015e7c8b8c5612f1d2a682488d7d6096413f66037d49c",
+  "apex.options_pilot.exit_policy": "b7a2e07868187827c5271b1a93167fab8945fab43cd7011a99db4767426bb800",
+  "apex.options_pilot.entrypoint": "e76e6859ab4aa1d16b22bb033f9e1c10e593a49ead923aef2096f570e9371934",
+  "apex.pulse_options.sources": "efe91898ce6ee71ec6f304d086b31aab182912bda3b626a8f386ad3a694feb37",
+  "apex.pulse_options.providers": "cb2e0b3f01835403071cf348f3f0453950b752078f2de91cf777b7c5673dd00f",
+  "apex.decision_wb.engine": "f6bb43dba59f96b2abb2b9ac27b940e3cd05a6d4de249bb570710139155f4adf",
+  "apex.decision_wb.supervision": "651a9126d2ace96389b7b6aabd19f82a60f41ea8e09b004b327d507382c8c34c",
+  "apex.joint_wb.engine": "a67ec9edb868dea3147f0fe7291a18eaa06274628eaa945a0ba587c055a8312f",
+  "apex.joint_wb.state": "f1824c44a8fdb18da988947685a4d902c61d2f982dfc9036b31b225993f9b701",
+  "apex.organism.risk_certificate": "abfaa1b109baa09c69ff2d1e87648d7632d3b9a56f44ab9185c99eee433c333b",
+  "apex.organism.risk_kernel": "75890d513793f90b21b6d6e351b79c567e395027c6907145683710d169643b48"
+ },
+ "decision_path_tree_digest": "1d5aa7d248c9634e9ec3714b9713f9a28af01ecc4249f42619d1bffa063fa322",
+ "expected_dependencies": [
+  "numpy",
+  "scipy",
+  "pandas"
+ ],
+ "python_expected": "3.12 on the host (/opt/apex/shared/venv); 3.11.9 on the build Mac",
+ "install_path": "/opt/apex/releases/ba4a8654341f3e184034e368c4f5a55619a43e87",
+ "current_link": "/opt/apex/current",
+ "service_command_pin": "/opt/apex/shared/venv/bin/python -u /opt/apex/releases/ba4a8654341f3e184034e368c4f5a55619a43e87/scripts/options_paper_session.py --pilot-boundary --pilot-selection-policy PILOT_RULE_V2 --ledger /apex-data/core/options_pilot_ledger.jsonl --out /apex-data/history-a/pilot_$(date +%F).json --symbols SPY --minutes 390 --interval-min 15",
+ "activation_boundary": "NOT ACTIVATED BY THIS PACKAGE: install, re-point /opt/apex/current, lift the maintenance block and enable APEX_PILOT_LIVE_DATA are separate operator actions against this exact package",
+ "scope": "content of the archive and its decision-path digests; host installation is verified by startup_identity_check.py at process start"
+}

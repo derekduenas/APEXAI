@@ -1,0 +1,6 @@
+{
+ "kind": "ROLLBACK",
+ "current_release_before_install": "UNKNOWN_NOT_MEASURED (record `readlink -f /opt/apex/current` on the host before installing)",
+ "rollback_command": "ln -sfn <previous release path> /opt/apex/current && systemctl restart apex-options-paper.service",
+ "note": "rollback re-points the link; it never deletes a release directory"
+}
