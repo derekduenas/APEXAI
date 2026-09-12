@@ -9,7 +9,7 @@ Base surveyed: `operating-loop-001` at `e8ebbee`, which is `trace-replay-001` `1
 That brick's evidence is `docs/OPERATING_LOOP_001.md`. **That branch is not merged here and this branch changes none
 of its code.** No provider activation, deployment, risk-limit change or trading authorization is implied.
 
-## Summary: three of the draft's requirements are already built, five are real gaps
+## Summary: four of the draft's requirements are already built, one is partly built, nine are real gaps
 
 | draft requirement | status |
 |---|---|
