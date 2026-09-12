@@ -203,12 +203,34 @@
    }
   },
   "R4": {
-   "state": "SPECIFICATION_DRAFT_1 (for review; nothing implemented, nothing fitted)",
+   "state": "SPECIFICATION_DRAFT_2 (for review; nothing implemented, nothing fitted)",
    "spec": "docs/R4_JOINT_MARKET_STATE_SPEC.md",
+   "supersedes": "DRAFT_1 at cf4155f, after independent review",
    "objective": "joint 15-minute forecast of underlying, ATM IV, skew, spread and size; expressions vs WAIT on after-cost economics",
-   "baseline_preserved": "FULL_FUNNEL_V1 (IV_FIXED, SPREAD_FIXED)",
-   "selection_policy_added": "JOINT_FUNNEL_V1 (by name only)",
-   "authorizes": "nothing: no historical access, no backtest, no fitting, no activation, no promotion"
+   "operational_default": "PILOT_RULE_V1 (verified in code at 2011f03)",
+   "baselines": [
+    "OPERATIONAL_REFERENCE (frozen r3 FULL_FUNNEL_V1 at 525340c)",
+    "MATCHED_FROZEN (R4 machinery, frozen state)"
+   ],
+   "selection_policy_added": "JOINT_FUNNEL_V1 (by name only; no promotion rule)",
+   "draft2_changes": [
+    "multivariate regression on common predictors; no contemporaneous option-state regressors",
+    "elliptical truncation with analytic renormalization kappa",
+    "three clocks + frozen contract identity + dataset-and-role permissions",
+    "complete path accounting with conservative/optimistic bounds; UNPRICEABLE refuses the candidate",
+    "two distinct baselines; C_DIAG renamed and narrowed; exact Shapley+dependence identity",
+    "identity-based acceptance; frequencies reported separately with CIs",
+    "CRPS instead of KDE log score; unresolved outcomes valued conservatively in the primary estimand; Bonferroni multiplicity; delta-IV ablation moved out of the gate",
+    "fit accounting enumerated (8 runs); time-of-day buckets removed"
+   ],
+   "authorizes": "nothing: no historical access, no backtest, no fitting, no activation, no promotion",
+   "operator_decisions_open": [
+    "state representation",
+    "decision constants",
+    "fitting data path (PILOT-COLLECTION role)",
+    "fit budget",
+    "(approved) selection-by-name, no promotion"
+   ]
   }
  },
  "preserved": [
