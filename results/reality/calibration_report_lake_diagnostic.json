@@ -1,0 +1,154 @@
+{
+  "chain_entries": 2762,
+  "clock": "LAKE_DIAGNOSTIC",
+  "data_through": "2026-08-21",
+  "generated_at": "2026-09-12T05:06:02.706635+00:00",
+  "label": "DIAGNOSTIC ONLY, NOT A SCORING RECORD: scored against the lake clock, which the system controls. It shows what the producers look like on the data actually held; it cannot be cited for standing.",
+  "lake_through": "2026-08-21",
+  "producers": {
+    "baseline_base_rate": {
+      "base_rate": 1.0,
+      "brier": 0.2209,
+      "calibration": [
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 1,
+          "realized_freq": 1.0,
+          "stated_mean": 0.53
+        }
+      ],
+      "log_loss": 0.634878,
+      "n": 1,
+      "n_effective_dates": 1,
+      "n_penalised_unresolved": 0,
+      "n_scored": 1,
+      "reliability": 0.2209,
+      "resolution": 0.0,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
+      "uncertainty": 0.0
+    },
+    "baseline_momentum": {
+      "base_rate": 1.0,
+      "brier": 0.16,
+      "calibration": [
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 1,
+          "realized_freq": 1.0,
+          "stated_mean": 0.6
+        }
+      ],
+      "log_loss": 0.510826,
+      "n": 1,
+      "n_effective_dates": 1,
+      "n_penalised_unresolved": 0,
+      "n_scored": 1,
+      "reliability": 0.16,
+      "resolution": 0.0,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
+      "uncertainty": 0.0
+    },
+    "baseline_momentum_rank": {
+      "base_rate": 0.4483,
+      "brier": 0.260022,
+      "calibration": [
+        {
+          "bucket": "[0.4,0.5)",
+          "n": 66,
+          "realized_freq": 0.4394,
+          "stated_mean": 0.407
+        },
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 166,
+          "realized_freq": 0.4518,
+          "stated_mean": 0.5823
+        }
+      ],
+      "log_loss": 0.713469,
+      "n": 232,
+      "n_effective_dates": 1,
+      "n_penalised_unresolved": 1,
+      "n_scored": 232,
+      "reliability": 0.012484,
+      "resolution": 3.1e-05,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
+      "uncertainty": 0.247325
+    },
+    "blind_twin": {
+      "base_rate": 0.4483,
+      "brier": 0.25,
+      "calibration": [
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 232,
+          "realized_freq": 0.4483,
+          "stated_mean": 0.5
+        }
+      ],
+      "log_loss": 0.693147,
+      "n": 232,
+      "n_effective_dates": 1,
+      "n_penalised_unresolved": 1,
+      "n_scored": 232,
+      "reliability": 0.002673,
+      "resolution": 0.0,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
+      "uncertainty": 0.247325
+    },
+    "gp_rank": {
+      "base_rate": 0.4526,
+      "brier": 0.238975,
+      "calibration": [
+        {
+          "bucket": "[0.4,0.5)",
+          "n": 117,
+          "realized_freq": 0.3419,
+          "stated_mean": 0.4101
+        },
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 115,
+          "realized_freq": 0.5652,
+          "stated_mean": 0.5901
+        }
+      ],
+      "log_loss": 0.670989,
+      "n": 232,
+      "n_effective_dates": 1,
+      "n_penalised_unresolved": 1,
+      "n_scored": 232,
+      "reliability": 0.002653,
+      "resolution": 0.012465,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
+      "uncertainty": 0.247752
+    },
+    "h3_rank": {
+      "base_rate": 0.4526,
+      "brier": 0.241784,
+      "calibration": [
+        {
+          "bucket": "[0.4,0.5)",
+          "n": 124,
+          "realized_freq": 0.3548,
+          "stated_mean": 0.4478
+        },
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 108,
+          "realized_freq": 0.5648,
+          "stated_mean": 0.5371
+        }
+      ],
+      "log_loss": 0.676666,
+      "n": 232,
+      "n_effective_dates": 1,
+      "n_penalised_unresolved": 1,
+      "n_scored": 232,
+      "reliability": 0.00498,
+      "resolution": 0.010973,
+      "status": "PRELIMINARY -- effective n is the date count, 1 < 10",
+      "uncertainty": 0.247752
+    }
+  }
+}
