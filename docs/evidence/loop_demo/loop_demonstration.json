@@ -1,0 +1,1000 @@
+{
+ "kind": "LOOP_DEMONSTRATION",
+ "contract": "docs/LOOP_EVALUATION_CONTRACT.md",
+ "data": "burned 2026-09-11 SPY collection + retained prior bars (SCOPE_DEVIATION_001.md); no provider request",
+ "quarantined": "REPLAY; ledgers never merged",
+ "scan_instants": [
+  "2026-09-11T13:30:23.096973Z",
+  "2026-09-11T13:45:22.389474Z",
+  "2026-09-11T14:00:22.956769Z",
+  "2026-09-11T14:15:22.793569Z",
+  "2026-09-11T14:30:23.428577Z",
+  "2026-09-11T14:45:23.217055Z",
+  "2026-09-11T15:00:23.565820Z",
+  "2026-09-11T15:15:23.639687Z",
+  "2026-09-11T15:30:24.010899Z",
+  "2026-09-11T15:45:24.137967Z",
+  "2026-09-11T16:00:24.599869Z",
+  "2026-09-11T16:15:24.606100Z"
+ ],
+ "policies": {
+  "WAIT": {
+   "policy": "WAIT",
+   "ledger": "docs/evidence/loop_demo/REPLAY_QUARANTINED_WAIT.jsonl",
+   "scans": [
+    {
+     "scan": 1,
+     "t_utc": "2026-09-11T13:30:23.096973Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 2,
+     "t_utc": "2026-09-11T13:45:22.389474Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 3,
+     "t_utc": "2026-09-11T14:00:22.956769Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 4,
+     "t_utc": "2026-09-11T14:15:22.793569Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 5,
+     "t_utc": "2026-09-11T14:30:23.428577Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 6,
+     "t_utc": "2026-09-11T14:45:23.217055Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 7,
+     "t_utc": "2026-09-11T15:00:23.565820Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 8,
+     "t_utc": "2026-09-11T15:15:23.639687Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 9,
+     "t_utc": "2026-09-11T15:30:24.010899Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 10,
+     "t_utc": "2026-09-11T15:45:24.137967Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 11,
+     "t_utc": "2026-09-11T16:00:24.599869Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    },
+    {
+     "scan": 12,
+     "t_utc": "2026-09-11T16:15:24.606100Z",
+     "decision": "WAIT",
+     "why": "POLICY_WAIT: this policy never trades; it is the null",
+     "stage": "POLICY"
+    }
+   ],
+   "model_identity": {
+    "signal": {
+     "model": "HEURISTIC_DIRECTION_V1: LONG if ret_15 > 0, SHORT if ret_15 < 0, None otherwise; not a forecast",
+     "kind": "HEURISTIC_PLACEHOLDER",
+     "status": "PLACEHOLDER_NOT_A_SIGNAL (SIGNAL_STATUS_001.md)"
+    },
+    "forecast": {
+     "model": "EXP002_L",
+     "validation": "NOT_VALIDATED: INVALID_NULL_CONTROL",
+     "drives_selection": false
+    },
+    "variance": {
+     "model": null,
+     "status": "UNAVAILABLE",
+     "why": "the rule path runs no variance model by design"
+    },
+    "regime": {
+     "model": null,
+     "status": "UNAVAILABLE",
+     "why": "the rule path runs no regime model by design"
+    },
+    "simulation": {
+     "model": null,
+     "status": "UNAVAILABLE",
+     "why": "the rule path consults no simulator by design"
+    },
+    "ranking": {
+     "model": "PILOT_RULE_V2: signal->right, nearest expiry >= 21 DTE, near",
+     "kind": "DETERMINISTIC_RULE"
+    },
+    "joint_engine": {
+     "model": "JOINT_FUNNEL_V1 (R4)",
+     "status": "UNAVAILABLE",
+     "why": "no authorized R4 fit (R4-FIT-001/002 not granted); the constructor refuses without one"
+    },
+    "risk": {
+     "certificate": "RISK_CERTIFICATE_V0",
+     "kernel": "ORGANISM_PAPER_V1",
+     "envelope": "RISK_ENVELOPE_V1",
+     "fees": {
+      "schedule_id": "ROBINHOOD_RHF_2026",
+      "schedule_hash": "09dd9cbeeb644b309d1f43da23dc65e08729202cdc9343ea540f312ec5606fd0",
+      "provenance": "PROVIDER_VERIFIED",
+      "known": true,
+      "version": "2026-09-12b",
+      "effective_date": "2026-04-04",
+      "terms_digest": "8cf58b1a6201dd33bc6fa03535c8c5481cbea6886304f41c0f259686bb45daeb"
+     }
+    },
+    "exit": {
+     "policy": "EXIT_AT_HORIZON_15M_V1",
+     "hash": "9f9784f7af5b9c198e9bad69432488cb86c58a482a4d83e62dc18dcb9eb1e5af"
+    }
+   },
+   "exits": [],
+   "book": {
+    "closed": 0,
+    "open": 0,
+    "integrity_problems": [],
+    "session_realized_pnl": 0,
+    "positions_detail": []
+   },
+   "totals": {
+    "scans": 12,
+    "by_decision": {
+     "WAIT": 12
+    },
+    "wait_and_refusal_reasons": {
+     "POLICY_WAIT: this policy never trades; it is the null": 12
+    },
+    "trades": 0,
+    "unresolved_exits": 0,
+    "gross_pnl": 0,
+    "fees": 0,
+    "net_pnl": 0.0,
+    "per_trade_net": null,
+    "worst": null,
+    "best": null,
+    "wins": 0,
+    "exposure_usd": 0,
+    "scans_blocked_by_unavailable_stage": 0
+   }
+  },
+  "PILOT_RULE_V2": {
+   "policy": "PILOT_RULE_V2",
+   "ledger": "docs/evidence/loop_demo/REPLAY_QUARANTINED_PILOT_RULE_V2.jsonl",
+   "scans": [
+    {
+     "scan": 1,
+     "t_utc": "2026-09-11T13:30:23.096973Z",
+     "decision": "TRADE",
+     "why": "",
+     "intent_id": "b926a71eba24e01b9f573da6",
+     "fill_id": "1ffa5b0f8b4f343671f77e5a",
+     "chose": "SPY|2026-10-02|749.0|PUT",
+     "entry_ask": 4.95,
+     "expected_toll": 7.1,
+     "strike_selection": {
+      "rule": "PILOT_RULE_V2",
+      "strike": 749.0,
+      "distance_pct": -2.0595,
+      "strikes_from_atm": 16
+     }
+    },
+    {
+     "scan": 2,
+     "t_utc": "2026-09-11T13:45:22.389474Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 3,
+     "t_utc": "2026-09-11T14:00:22.956769Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 4,
+     "t_utc": "2026-09-11T14:15:22.793569Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 5,
+     "t_utc": "2026-09-11T14:30:23.428577Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 6,
+     "t_utc": "2026-09-11T14:45:23.217055Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 7,
+     "t_utc": "2026-09-11T15:00:23.565820Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 8,
+     "t_utc": "2026-09-11T15:15:23.639687Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 9,
+     "t_utc": "2026-09-11T15:30:24.010899Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 10,
+     "t_utc": "2026-09-11T15:45:24.137967Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 11,
+     "t_utc": "2026-09-11T16:00:24.599869Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    },
+    {
+     "scan": 12,
+     "t_utc": "2026-09-11T16:15:24.606100Z",
+     "decision": "REFUSE",
+     "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.00 > 600.00'",
+     "intent_id": null,
+     "fill_id": null
+    }
+   ],
+   "model_identity": {
+    "signal": {
+     "model": "HEURISTIC_DIRECTION_V1: LONG if ret_15 > 0, SHORT if ret_15 < 0, None otherwise; not a forecast",
+     "kind": "HEURISTIC_PLACEHOLDER",
+     "status": "PLACEHOLDER_NOT_A_SIGNAL (SIGNAL_STATUS_001.md)"
+    },
+    "forecast": {
+     "model": "EXP002_L",
+     "validation": "NOT_VALIDATED: INVALID_NULL_CONTROL",
+     "drives_selection": false
+    },
+    "variance": {
+     "model": null,
+     "status": "UNAVAILABLE",
+     "why": "the rule path runs no variance model by design"
+    },
+    "regime": {
+     "model": null,
+     "status": "UNAVAILABLE",
+     "why": "the rule path runs no regime model by design"
+    },
+    "simulation": {
+     "model": null,
+     "status": "UNAVAILABLE",
+     "why": "the rule path consults no simulator by design"
+    },
+    "ranking": {
+     "model": "PILOT_RULE_V2: signal->right, nearest expiry >= 21 DTE, near",
+     "kind": "DETERMINISTIC_RULE"
+    },
+    "joint_engine": {
+     "model": "JOINT_FUNNEL_V1 (R4)",
+     "status": "UNAVAILABLE",
+     "why": "no authorized R4 fit (R4-FIT-001/002 not granted); the constructor refuses without one"
+    },
+    "risk": {
+     "certificate": "RISK_CERTIFICATE_V0",
+     "kernel": "ORGANISM_PAPER_V1",
+     "envelope": "RISK_ENVELOPE_V1",
+     "fees": {
+      "schedule_id": "ROBINHOOD_RHF_2026",
+      "schedule_hash": "09dd9cbeeb644b309d1f43da23dc65e08729202cdc9343ea540f312ec5606fd0",
+      "provenance": "PROVIDER_VERIFIED",
+      "known": true,
+      "version": "2026-09-12b",
+      "effective_date": "2026-04-04",
+      "terms_digest": "8cf58b1a6201dd33bc6fa03535c8c5481cbea6886304f41c0f259686bb45daeb"
+     }
+    },
+    "exit": {
+     "policy": "EXIT_AT_HORIZON_15M_V1",
+     "hash": "9f9784f7af5b9c198e9bad69432488cb86c58a482a4d83e62dc18dcb9eb1e5af"
+    }
+   },
+   "exits": [
+    {
+     "at": "2026-09-11T13:45:23.096973Z",
+     "result": [
+      {
+       "fill_seq": 4,
+       "intent_id": "b926a71eba24e01b9f573da6",
+       "attempts": [
+        {
+         "seq": 39,
+         "status": "RESOLVED",
+         "attempt": 1,
+         "reconciled": false
+        }
+       ],
+       "final": "RESOLVED"
+      }
+     ]
+    }
+   ],
+   "book": {
+    "closed": 1,
+    "open": 0,
+    "integrity_problems": [],
+    "session_realized_pnl": -22.09,
+    "positions_detail": [
+     {
+      "intent_id": "b926a71eba24e01b9f573da6",
+      "debit": 495.0,
+      "credit": 473.0,
+      "fees_entry": 0.04,
+      "fees_exit": 0.05,
+      "gross_pnl": -22.0,
+      "realized_pnl": -22.09,
+      "net_status": "NET"
+     }
+    ]
+   },
+   "totals": {
+    "scans": 12,
+    "by_decision": {
+     "TRADE": 1,
+     "REFUSE": 11
+    },
+    "wait_and_refusal_reasons": {
+     "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would r": 11
+    },
+    "trades": 1,
+    "unresolved_exits": 0,
+    "gross_pnl": -22.0,
+    "fees": 0.09,
+    "net_pnl": -22.09,
+    "per_trade_net": -22.09,
+    "worst": -22.09,
+    "best": -22.09,
+    "wins": 0,
+    "exposure_usd": 495.0,
+    "scans_blocked_by_unavailable_stage": 0
+   }
+  },
+  "FULL_FUNNEL_V1": {
+   "policy": "FULL_FUNNEL_V1",
+   "ledger": "docs/evidence/loop_demo/REPLAY_QUARANTINED_FULL_FUNNEL_V1.jsonl",
+   "scans": [
+    {
+     "scan": 1,
+     "t_utc": "2026-09-11T13:30:23.096973Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.50 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 2,
+     "t_utc": "2026-09-11T13:45:22.389474Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 12.04 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 3,
+     "t_utc": "2026-09-11T14:00:22.956769Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.69 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 4,
+     "t_utc": "2026-09-11T14:15:22.793569Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.72 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 5,
+     "t_utc": "2026-09-11T14:30:23.428577Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.26 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 6,
+     "t_utc": "2026-09-11T14:45:23.217055Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.74 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 7,
+     "t_utc": "2026-09-11T15:00:23.565820Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.67 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 8,
+     "t_utc": "2026-09-11T15:15:23.639687Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.57 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 9,
+     "t_utc": "2026-09-11T15:30:24.010899Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.48 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 10,
+     "t_utc": "2026-09-11T15:45:24.137967Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.52 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 11,
+     "t_utc": "2026-09-11T16:00:24.599869Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.41 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    },
+    {
+     "scan": 12,
+     "t_utc": "2026-09-11T16:15:24.606100Z",
+     "decision": "WAIT",
+     "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the risk envelope): ['RISK_ENVELOPE: RISK_ENVELOPE_INFEASIBLE: indicative ask 11.21 > kernel cap 5.00 per contract (max_risk_per_trade 500 / multiplier 1",
+     "intent_id": null,
+     "fill_id": null,
+     "funnel": {
+      "fit": "READY",
+      "n_candidates": 0,
+      "n_eligible": 0,
+      "prime": null,
+      "fees_assumption": "EXIT_PRINCIPAL_EQUALS_ENTRY: the exit fee is priced at the most expensive candidate's entry principal because a modelled exit bid is path-dependent; declared, not estimated"
+     }
+    }
+   ],
+   "model_identity": {
+    "signal": {
+     "model": "HEURISTIC_DIRECTION_V1: LONG if ret_15 > 0, SHORT if ret_15 < 0, None otherwise; not a forecast",
+     "kind": "HEURISTIC_PLACEHOLDER",
+     "status": "PLACEHOLDER_NOT_A_SIGNAL (SIGNAL_STATUS_001.md)"
+    },
+    "forecast": {
+     "model": "EXP002_L",
+     "validation": "NOT_VALIDATED: INVALID_NULL_CONTROL",
+     "drives_selection": false
+    },
+    "variance": {
+     "model": "GARCH-t/EWMA (decision_wb)",
+     "status": "NOT_FITTED",
+     "why": null
+    },
+    "regime": {
+     "model": "CAUSAL_REGIME_FILTER_V1",
+     "status": "NOT_REACHED"
+    },
+    "simulation": {
+     "model": "ConditionalSimulator",
+     "paths": 2000
+    },
+    "ranking": {
+     "model": "FULL_FUNNEL_V1: artifact location + walk-forward GARCH-t var"
+    },
+    "joint_engine": {
+     "model": "JOINT_FUNNEL_V1 (R4)",
+     "status": "UNAVAILABLE",
+     "why": "no authorized R4 fit (R4-FIT-001/002 not granted); the constructor refuses without one"
+    },
+    "risk": {
+     "certificate": "RISK_CERTIFICATE_V0",
+     "kernel": "ORGANISM_PAPER_V1",
+     "envelope": "RISK_ENVELOPE_V1",
+     "fees": {
+      "schedule_id": "ROBINHOOD_RHF_2026",
+      "schedule_hash": "09dd9cbeeb644b309d1f43da23dc65e08729202cdc9343ea540f312ec5606fd0",
+      "provenance": "PROVIDER_VERIFIED",
+      "known": true,
+      "version": "2026-09-12b",
+      "effective_date": "2026-04-04",
+      "terms_digest": "8cf58b1a6201dd33bc6fa03535c8c5481cbea6886304f41c0f259686bb45daeb"
+     }
+    },
+    "exit": {
+     "policy": "EXIT_AT_HORIZON_15M_V1",
+     "hash": "9f9784f7af5b9c198e9bad69432488cb86c58a482a4d83e62dc18dcb9eb1e5af"
+    }
+   },
+   "exits": [],
+   "book": {
+    "closed": 0,
+    "open": 0,
+    "integrity_problems": [],
+    "session_realized_pnl": 0,
+    "positions_detail": []
+   },
+   "totals": {
+    "scans": 12,
+    "by_decision": {
+     "WAIT": 12
+    },
+    "wait_and_refusal_reasons": {
+     "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected ": 12
+    },
+    "trades": 0,
+    "unresolved_exits": 0,
+    "gross_pnl": 0,
+    "fees": 0,
+    "net_pnl": 0.0,
+    "per_trade_net": null,
+    "worst": null,
+    "best": null,
+    "wins": 0,
+    "exposure_usd": 0,
+    "scans_blocked_by_unavailable_stage": 0
+   }
+  }
+ },
+ "head_to_head": [
+  {
+   "scan": 1,
+   "t_utc": "2026-09-11T13:30:23.096973Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "TRADE",
+    "chose": "SPY|2026-10-02|749.0|PUT",
+    "why": ""
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": false
+  },
+  {
+   "scan": 2,
+   "t_utc": "2026-09-11T13:45:22.389474Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 3,
+   "t_utc": "2026-09-11T14:00:22.956769Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 4,
+   "t_utc": "2026-09-11T14:15:22.793569Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 5,
+   "t_utc": "2026-09-11T14:30:23.428577Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 6,
+   "t_utc": "2026-09-11T14:45:23.217055Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 7,
+   "t_utc": "2026-09-11T15:00:23.565820Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 8,
+   "t_utc": "2026-09-11T15:15:23.639687Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 9,
+   "t_utc": "2026-09-11T15:30:24.010899Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 10,
+   "t_utc": "2026-09-11T15:45:24.137967Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 11,
+   "t_utc": "2026-09-11T16:00:24.599869Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  },
+  {
+   "scan": 12,
+   "t_utc": "2026-09-11T16:15:24.606100Z",
+   "WAIT": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "POLICY_WAIT: this policy never trades; it is the null"
+   },
+   "PILOT_RULE_V2": {
+    "decision": "REFUSE",
+    "chose": null,
+    "why": "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would reach 995.0"
+   },
+   "FULL_FUNNEL_V1": {
+    "decision": "WAIT",
+    "chose": null,
+    "why": "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected (18 by the"
+   },
+   "agree": false,
+   "same_contract": true
+  }
+ ],
+ "summary": {
+  "WAIT": {
+   "scans": 12,
+   "by_decision": {
+    "WAIT": 12
+   },
+   "wait_and_refusal_reasons": {
+    "POLICY_WAIT: this policy never trades; it is the null": 12
+   },
+   "trades": 0,
+   "unresolved_exits": 0,
+   "gross_pnl": 0,
+   "fees": 0,
+   "net_pnl": 0.0,
+   "per_trade_net": null,
+   "worst": null,
+   "best": null,
+   "wins": 0,
+   "exposure_usd": 0,
+   "scans_blocked_by_unavailable_stage": 0
+  },
+  "PILOT_RULE_V2": {
+   "scans": 12,
+   "by_decision": {
+    "TRADE": 1,
+    "REFUSE": 11
+   },
+   "wait_and_refusal_reasons": {
+    "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would r": 11
+   },
+   "trades": 1,
+   "unresolved_exits": 0,
+   "gross_pnl": -22.0,
+   "fees": 0.09,
+   "net_pnl": -22.09,
+   "per_trade_net": -22.09,
+   "worst": -22.09,
+   "best": -22.09,
+   "wins": 0,
+   "exposure_usd": 495.0,
+   "scans_blocked_by_unavailable_stage": 0
+  },
+  "FULL_FUNNEL_V1": {
+   "scans": 12,
+   "by_decision": {
+    "WAIT": 12
+   },
+   "wait_and_refusal_reasons": {
+    "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected ": 12
+   },
+   "trades": 0,
+   "unresolved_exits": 0,
+   "gross_pnl": 0,
+   "fees": 0,
+   "net_pnl": 0.0,
+   "per_trade_net": null,
+   "worst": null,
+   "best": null,
+   "wins": 0,
+   "exposure_usd": 0,
+   "scans_blocked_by_unavailable_stage": 0
+  }
+ }
+}

@@ -36,6 +36,7 @@ LABELS = {"evidence_class": EVIDENCE_CLASS, "decision_power": DECISION_POWER,
           # sealed on EVERY record so a placeholder cannot become a strategy by accumulation
           "signal_status": SIGNAL_STATUS_REF}
 
+TIMESTAMP_GRANULARITY_S = 1e-6      # records serialize epochs as microsecond strings; comparisons honour that
 FORECAST_TARGET = "log(close[bar at t+15min] / close[bar at t])"
 FORECAST_UNITS = "log return, dimensionless"
 FORECAST_HORIZON_MINUTES = 15
@@ -177,8 +178,14 @@ def validate_forecast(f: dict, *, now_epoch: float, provenance: str, session_id:
         raise RecordRefused("FORECAST_INPUT_NOT_AVAILABLE_BY_CUTOFF: available %.3f > cutoff %.3f" % (av, cut))
     if cre < cut:
         raise RecordRefused("FORECAST_CREATED_BEFORE_INPUT_CUTOFF")
-    if cre > now_epoch:
-        raise RecordRefused("FORECAST_FROM_THE_FUTURE: created %.3f > clock %.3f" % (cre, now_epoch))
+    # SERIALIZATION GRANULARITY. `created_utc` is written as a microsecond string and parsed back, which can return a
+    # value up to half a microsecond LARGER than the epoch it was written from. Comparing that against a
+    # full-precision clock read refused forecasts created at exactly the current instant. Live running masks it (the
+    # clock advances between creation and this check); every controlled-clock path — replay, backtest, tests — hit it
+    # about half the time and silently lost the scan. The comparison is now made at the record's own granularity.
+    if cre > now_epoch + TIMESTAMP_GRANULARITY_S:
+        raise RecordRefused("FORECAST_FROM_THE_FUTURE: created %.6f > clock %.6f (granularity %.0e s)"
+                            % (cre, now_epoch, TIMESTAMP_GRANULARITY_S))
     if now_epoch >= end:
         raise RecordRefused("FORECAST_TARGET_ALREADY_ENDED: target_end %s is not after clock %s"
                             % (to_utc_string(end), to_utc_string(now_epoch)))
