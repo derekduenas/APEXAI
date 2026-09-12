@@ -1,0 +1,124 @@
+{
+ "kind": "DEPLOYMENT_DIVERGENCE_CLASSIFICATION",
+ "deployed": "73fc712d355032e0a66b41675ba114491b04799d",
+ "main": "b9998d02",
+ "total_diff_entries": 2577,
+ "by_status": {
+  "M": 28,
+  "A": 2549
+ },
+ "by_status_and_class": {
+  "A:DOC": 107,
+  "A:EVIDENCE": 2085,
+  "A:GUARD": 4,
+  "A:MODULE": 158,
+  "A:OTHER": 7,
+  "A:SCRIPT": 109,
+  "A:TEST": 75,
+  "A:VALIDATOR": 4,
+  "M:DOC": 1,
+  "M:EVIDENCE": 1,
+  "M:GUARD": 1,
+  "M:MODULE": 11,
+  "M:OTHER": 1,
+  "M:SCRIPT": 3,
+  "M:TEST": 10
+ },
+ "examples": {
+  "A:DOC": [
+   "BRANCH_REALITY_AUDIT.md",
+   "CONVENTIONS-AMENDMENT-A-011.md",
+   "DEFECT_STRIKE_RULE_001.md",
+   "ECONOMIC_THROUGHPUT_FAILURE_001.md",
+   "INSTRUMENT_FEASIBILITY_OPTIONS.md",
+   "apex/world_model/N1_INVESTIGATION.md"
+  ],
+  "A:EVIDENCE": [
+   "evidence/WM-STAT-001.json",
+   "evidence/bounded_regression/BOUNDED_FULL_REGRESSION_V0.json",
+   "evidence/bounded_regression/master_inventory.json",
+   "evidence/bounded_regression/run_log.txt",
+   "evidence/bounded_regression/shard_000.json",
+   "evidence/bounded_regression/shard_001.json"
+  ],
+  "A:GUARD": [
+   "apex/joint_wb/permissions.py",
+   "apex/options_pilot/risk_authority.py",
+   "apex/options_pilot/risk_gate.py",
+   "apex/organism/risk_certificate.py"
+  ],
+  "A:MODULE": [
+   "apex/backtest_wb/__init__.py",
+   "apex/backtest_wb/contract.py",
+   "apex/backtest_wb/contract2.py",
+   "apex/backtest_wb/evaluate.py",
+   "apex/backtest_wb/funnel.py",
+   "apex/backtest_wb/replay.py"
+  ],
+  "A:OTHER": [
+   "courts/__init__.py",
+   "courts/final_court.py",
+   "courts/result_audit.py",
+   "courts/result_validator.py",
+   "regression/__init__.py",
+   "regression/plugin.py"
+  ],
+  "A:SCRIPT": [
+   "scripts/alpha_exp_real_execute.py",
+   "scripts/apex_dashboard.py",
+   "scripts/combat_report.py",
+   "scripts/daily_closes_cache.py",
+   "scripts/edgar_timing.py",
+   "scripts/edge_sensor.py"
+  ],
+  "A:TEST": [
+   "tests/exp004_fixtures.py",
+   "tests/fixtures/bls/PROVENANCE.json",
+   "tests/fixtures/bls/captured_CUUR0000SA0_REQUEST_SUCCEEDED.json",
+   "tests/fixtures/bls/constructed_REQUEST_NOT_PROCESSED_quota.json",
+   "tests/fixtures/exp001b/run_pre_bounded_memory.py",
+   "tests/test_activation_verifier_review.py"
+  ],
+  "A:VALIDATOR": [
+   "apex/options_pilot/boundary.py",
+   "apex/options_pilot/ledger.py",
+   "apex/options_pilot/records.py",
+   "apex/world_model/real_data/boundary.py"
+  ],
+  "M:DOC": [
+   "CONVENTIONS.md"
+  ],
+  "M:EVIDENCE": [
+   "results/reality/calibration_report.json"
+  ],
+  "M:GUARD": [
+   "apex/organism/risk_kernel.py"
+  ],
+  "M:MODULE": [
+   "apex/capital/consumer.py",
+   "apex/catalyst/sources.py",
+   "apex/intraday/alpaca_fabric.py",
+   "apex/intraday/equity_fabric.py",
+   "apex/intraday/provider_interface.py",
+   "apex/organism/allocator.py"
+  ],
+  "M:OTHER": [
+   ".gitignore"
+  ],
+  "M:SCRIPT": [
+   "scripts/equity_fabric_daemon.py",
+   "scripts/options_paper_session.py",
+   "scripts/reality_run.py"
+  ],
+  "M:TEST": [
+   "tests/conftest.py",
+   "tests/test_architecture_claims.py",
+   "tests/test_aurelius.py",
+   "tests/test_catalyst_eyes.py",
+   "tests/test_equity_shadow.py",
+   "tests/test_eyes1_sensory.py"
+  ]
+ },
+ "reading": "A = present on main, absent from the deployed release; M = modified; D = on the deployed release only (unique code candidates)",
+ "deployed_only_files": []
+}
