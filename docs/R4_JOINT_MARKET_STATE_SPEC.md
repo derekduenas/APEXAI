@@ -1,11 +1,21 @@
-# R4 — Joint market-state forecasting: executable specification, DRAFT 3.1 (FOR REVIEW; nothing implemented, nothing fitted)
+# R4 — Joint market-state forecasting: the CLOSED implementation contract (nothing implemented, nothing fitted)
 
-Status: `SPECIFICATION_DRAFT_3_1_REVIEW_PATCH` on branch `frontier-build`. Draft 3.1 is a BOUNDED AMENDMENT to Draft 3
-(`4d84548`) covering five issues and adding no capability; everything the Draft 3 review recorded as corrected
-stands unchanged and is not revisited. Chain: `4d84548` ← `f848163` ← `65834d0` ← `cf4155f`. This document authorizes NOTHING: no code under `apex/`
-changes with it, no dataset is opened, no model is fitted, no service, limit, maintenance block, backtest hold,
-promotion rule or real-money authority changes. Implementation begins only after review of THIS text; any fitting
-run requires its own authorization (§1.3).
+Status: `SPECIFICATION_CLOSED_V1` on branch `frontier-build`. The reviewer accepted the Draft 3.1 review patch
+(applied at `24b055e`, file blob `a11a0cee…` by SHA-256) and the two design choices it settles: the retained
+block-sequential sampler with its COMPOUND attribution scope, and the selected-only economic veto. This closeout
+commit fixes the four documentation findings that survived the patch, reconciles the per-block record fields and
+synchronizes the status table and manifest. Chain: `24b055e` ← `e8c6a53` ← `4d84548` ← `f848163` ← `65834d0` ←
+`cf4155f`.
+
+**What "closed" means.** This file, at the blob recorded as `r4.spec_pin.blob` in `docs/frontier_build_manifest.json`,
+is the IMPLEMENTATION CONTRACT for R4. Implementation may now proceed against it under the holds below. Any later
+change to the contract is a numbered amendment with its own review; code may not silently diverge from this text,
+and a divergence found during implementation is reported as a finding against the contract rather than fixed by
+editing the contract after the fact.
+
+**What closing does NOT authorize.** No dataset is opened, no model is fitted, no service starts, no maintenance
+block is lifted, no limit or admission changes, no backtest runs, no order is placed. A fitting run still requires
+its own authorization (§1.3); prospective paper trading still requires live-feed and fee commissioning.
 
 "Executable" means every requirement names the record it produces, the refusal code it raises, or the test that
 pins it. Acceptance is exact identities and deterministic fixtures (§6.1) ONLY. Every statistical quantity is a
@@ -47,15 +57,21 @@ nothing from EXP-001B, with role approval separated from run authorization.
 
 ---
 
-## Proposed review patch to e8c6a53
+## Review patch to e8c6a53 — APPLIED AND ACCEPTED (`24b055e`)
 
-This specification-only patch retains the sampler's equations and corrects its marginal-preservation claim.
-The coupling contrast is compound; isolated dependence attribution remains unestablished.
-It reconciles per-scenario uncertainty, no-size ranking and selected-only veto accounting, bootstrap null
-construction and numerical search limits, and the synthetic averaged-null report.
-The economic veto is an explicit proposed conservative policy choice requiring review. The matrix transpose
-corrects the documented orientation, not the intended regression. Applying this patch authorizes no implementation,
-data access, fitting or deployment. Return its resulting commit for review.
+The specification-only patch retained the sampler's equations and corrected its marginal-preservation claim: the
+coupling contrast is COMPOUND and isolated dependence attribution remains unestablished. It reconciled
+per-scenario uncertainty, no-size ranking and selected-only veto accounting, the bootstrap null construction and
+its numerical search limits, and the synthetic averaged-null report. The matrix transpose corrected the documented
+orientation, not the intended regression. The reviewer verified that the commit changes only this file and that
+its blob matches the supplied revision, and accepted both the compound-attribution scope and the selected-only
+economic veto as design choices.
+
+**Closeout after acceptance (this commit).** Four documentation findings survived the patch and are fixed here,
+none of them a model change: the stale claim in §6.2 that `JOINT − C_DIAG` answers cross-block residual dependence
+(it does not — §2.4 makes that contrast compound); the status line's branch and lifecycle wording (above); the
+per-block truncation fields in the §7 record schema (§7); and the disclosure that the execution-block attribution
+term now bundles the size-veto policy (§4.3). The repeated-gate coverage disclosure is added at §5.3.
 
 ## 0. Objective, horizon, non-goals
 
@@ -543,6 +559,14 @@ IDENTITY:  J ≡ Sh(F1) + Sh(F2) + D      (exact, order-independent; T10 asserts
 
 `C_IV` is a descriptive contrast only and is not part of the decomposition.
 
+**Scope disclosure on the execution-block term.** `C_EXEC`, `C_DIAG` and `JOINT` carry the selected-only economic
+veto of §5.3 rule 4, while `MATCHED_FROZEN`, `C_IV` and `C_IVSK` do not. On the DECISION-ECONOMICS functional the
+`Sh(F2)` term therefore bundles two things — the spread and size DYNAMICS and the VETO POLICY that only the
+size-modelling comparators face — and `D` inherits the same bundling. `Sh(F2)` on the FORECAST-QUALITY functional
+is unaffected, because scoring a predictive distribution does not invoke the decision rule. Every reported
+economic `Sh(F2)` and `D` carries the label `INCLUDES_SIZE_VETO_POLICY`; separating the policy from the dynamics
+would need a veto-free size-modelling comparator, which is named in §9 and is not in V1.
+
 ### 4.4 When a comparator refuses a candidate
 
 A refusal removes a CANDIDATE for one comparator; it must never silently remove a row from the population.
@@ -633,6 +657,13 @@ c* and c2 are selected using ASSUME_AVAILABLE E_sel. No veto-stage re-ranking is
    Record rank and veto numbers separately. Other comparators retain ASSUME_AVAILABLE.
    The selected-only economic recheck is an explicit proposed conservative policy choice, not a validated threshold.
 5. **PRIME supervision ACT** (unchanged r3 policy).
+
+**Repeated-gate disclosure.** Rules 1 and 4 apply Bonferroni-adjusted lower limits over the same `2m` family to
+the same simulated paths, under two different size policies. Because every gate must pass, the rules form an
+INTERSECTION: adding rule 4 can only shrink the set of scans that trade, so the procedure is conservative for the
+TRADE decision. It does NOT deliver simultaneous interval coverage across both gate families — the collection of
+intervals reported is not a calibrated simultaneous confidence set over their union, and no coverage statement
+about the pair is made or implied. Every trace carries `GATES_INTERSECTION_NOT_SIMULTANEOUS_COVERAGE`.
 
 Carried on every trace: passing this rule establishes that the MODEL-CONDITIONAL ranking is decision-relevant under
 the declared uncertainty. It establishes neither calibration, nor fill probability, nor positive expectancy.
@@ -725,8 +756,13 @@ nominal is a FINDING for review, recorded with the seeds that produced it.
      Individual fitted-pair intervals are descriptive; their rejection fraction is not a nominal false-positive
      rate. A rejection frequency of grand-mean intervals requires another outer repetition budget, absent in V1.
   5. **Scope.** `C_PERM` never touches historical or prospective data, never enters the comparator table (§4.2),
-     never enters an attribution report and never appears in a decision path. Its conclusion is limited to this synthetic generator and fitted model class; cross-block residual dependence is answered by `JOINT − C_DIAG`, which permutation
-     cannot address because permuting predictors does not remove residual cross-block correlation.
+     never enters an attribution report and never appears in a decision path. Its conclusion is limited to this
+     synthetic generator and fitted model class. **Cross-block residual dependence is NOT isolated by any V1
+     contrast.** `JOINT − C_DIAG` is the `COMPOUND_COUPLING_LAW_CONTRAST` of §2.4 — it moves the conditional mean,
+     the conditional residual covariance and the execution-block marginal law together — and permutation cannot
+     isolate it either, because permuting predictors does not remove residual cross-block correlation. The two
+     diagnostics answer different questions and NEITHER is an isolated dependence estimate; a
+     marginal-preserving dependence contrast is named in §9 as outside V1.
 - **Planted effects.** For b_iv in {-0.2,-0.6}, report the same 200-triple grand-mean contrast and interval,
   not an undefined rejection frequency of one grand mean. Coupling settings {0.3,0.6} are reported as compound
   JOINT-versus-C_DIAG sensitivity, not isolated correlation detection. Recovery/calibration reports stay separate.
@@ -747,8 +783,11 @@ None of §6.2 transfers to markets.
 with the discarded-replicate count, HC1 marked DESCRIPTIVE, `Σ̂` with eigenvalues, exclusion and censoring censuses,
 the `δ` distribution, floor counts, diagnostics, refusals, dataset ids and roles, authorization artefact id,
 `fit_cutoff`, training row ids for the §1.6 overlap check); `joint_forecast` (parameter digest, seed, `N`,
-truncation `c`/`κ`/rejections, pre-generation block digest, per-comparator moments, availability rates, `E[S1]`,
-`E[S2]`, `E_sel`, `U`, all §3.2 counters); the funnel trace's `joint` block (comparator table, the six
+PER-BLOCK truncation fields — for block 1, block 2 and the extension draws separately: `c²(d_b)`, `κ(c, d_b)`,
+accepted mass and rejection count, matching the block-sequential law of §2.4 rather than a single four-dimensional
+figure — plus the pre-generation block digest, the Schur-complement matrices `M` and `C` with their positive-definiteness
+checks, per-comparator moments, availability rates, `E[S1]`, `E[S2]`, `E_sel`, `U`, the separate RANKING and
+selected-only VETO values of §5.3 rule 4, and all §3.2 counters); the funnel trace's `joint` block (comparator table, the six
 decision-rule checks with their numbers, adverse-scenario table, ablation table, degraded labels, censuses).
 
 **Forecast-versus-pricing separation, required in every record** (T21):
@@ -782,12 +821,17 @@ and §1.5); constants as provisional engineering settings (§5.4); the collector
 into role approval versus run authorization (§1.3); the eight-run PRODUCTION estimation budget, now distinguished
 from the inference-resampling budget (§7); selection-by-name with no promotion rule.
 
-Outstanding: acceptance of this review patch to Draft 3.1. No implementation, fitting, historical access or admission request
-proceeds before that.
+**Status of this contract: CLOSED.** The reviewer accepted the patch application at `24b055e` and the two design
+choices it settles. Implementation against this contract may proceed. Still outstanding and NOT authorized by the
+closeout: any fitting run (§1.3, `R4-FIT-001` / `R4-FIT-002`), historical access, live-feed and fee commissioning,
+service activation, admission request and prospective paper trading. Each is a separate authorization.
 
 ## 9. Named for later, not V1
 
-An OBSERVATION MODEL resolving the `TARGET_PROXY_V1` discrepancy (the per-quote offsets `o_j` enter the
+A MARGINAL-PRESERVING dependence contrast, which is what would turn `JOINT − C_DIAG` from a compound coupling-law
+change into an isolated residual-dependence estimate; a VETO-FREE size-modelling comparator, which is what would
+separate the size-veto policy from the spread/size dynamics in the economic `Sh(F2)` term; an OBSERVATION MODEL
+resolving the `TARGET_PROXY_V1` discrepancy (the per-quote offsets `o_j` enter the
 measurement equation rather than being tolerated), which is what would let a result be stated about the state at
 exactly `t_d + H`; cross-equation joint hypotheses with shared per-cluster weights; contract-specific spreads to
 replace the ATM spread proxy that currently influences ranking;

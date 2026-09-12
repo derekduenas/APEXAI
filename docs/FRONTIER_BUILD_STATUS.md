@@ -28,7 +28,7 @@ Branch: `frontier-build` (worktree `~/apex-frontier-wt`), created from
 | M5 — fusion, supervision, learning | `SYNTHETIC_VERIFIED` | `ceb7e7f` | `apex/decision_wb/{fusion,supervision,experience,enrichment}.py`; `tests/test_decision_wb.py` (4) |
 | M6 — operator view + commissioning package | `SYNTHETIC_VERIFIED` (package PREPARED; activation NOT authorized) | `9cfb70f` | `apex/options_pilot/operator_view.py`; `scripts/options_pilot_scale_check.py` + `docs/evidence/scale_check_10_sessions_OUTPUT.json`; `docs/OPTIONS_PILOT_COMMISSIONING_PACKAGE.md`; funnel trace on every decision |
 | M7 — THE FUNNEL in one decision path (`FULL_FUNNEL_V1`); r2 (8 findings) + r3 (4 findings) repairs | `SYNTHETIC_VERIFIED`; r3 INDEPENDENTLY ACCEPTED within its bounded scope (the four repairs at `525340c`); live commissioning and profitability UNESTABLISHED; default policy stays `PILOT_RULE_V1`; backtest hold kept | `f0daac2` → `3cc65b0` → `525340c` |
-| R4 — joint market-state forecasting | `SPECIFICATION_DRAFT_3_1` for review — bounded Amendment A over `4d84548` (five issues: permutation-control invariance, endpoint measurement proxy, CI by test inversion, scenario-minimum inference, block-sequential truncation + size veto): `docs/R4_JOINT_MARKET_STATE_SPEC.md`, equation-to-test checklist §10, tests T1–T36. Operator decisions approved in principle; acceptance outstanding. Nothing implemented, nothing fitted | this commit | `apex/decision_wb/engine.py`; `TwinSources.funnel_fn`; `session.scan(funnel_fn=)` + `FUNNEL_TRACE_V2`; `--pilot-selection-policy`; replay variant `apex/backtest_wb/funnel.py` + PILOT-REPLAY-002 contract (declared, not run); `tests/test_funnel_engine.py` (17) + replay planted-drift test; `docs/FUNNEL_INTEGRATION.md` |
+| R4 — joint market-state forecasting | `SPECIFICATION_CLOSED_V1` — the pinned IMPLEMENTATION CONTRACT: `docs/R4_JOINT_MARKET_STATE_SPEC.md`, blob `902256e3`, equation-to-test checklist §10, tests T1–T36. Review patch `24b055e` applied and ACCEPTED; the compound-attribution scope and the selected-only economic veto are accepted design choices; the four surviving documentation findings are closed out here. Nothing implemented, nothing fitted; fitting, commissioning, activation and paper trading each need their own authorization | this commit |
 
 ## M0 — closed at `360536cb` (reconciled against the mandate's four items)
 
@@ -266,6 +266,24 @@ a separate mandatory-WAIT case. Table in `docs/FUNNEL_INTEGRATION.md`.
 - SHARADAR-DAILYVOL-001 COMPLETED: `docs/SHARADAR_DAILYVOL_001_RESULT.md`.
 - PILOT-REPLAY-002 (FULL_FUNNEL vs POLICY vs WAIT on common rows) DECLARED, NOT RUN — held by the operator until
   the funnel is complete.
+
+## Where the system actually stands (operator's table, 2026-09-11)
+
+| Part | Where it stands |
+|---|---|
+| Existing full funnel | Implemented; synthetic end-to-end evidence; r3 repairs accepted within their bounded scope |
+| R4 joint IV / spread / liquidity forecasting | Contract CLOSED and pinned (blob `902256e3`); NOT implemented, NOT fitted |
+| Automated paper service | Inactive; maintenance block remains |
+| Data collector | Stopped itself 2026-09-11T16:16Z after three consecutive provider timeouts (2,982 observations, session 2026-09-11); diagnosis is read-only and separate from restarting |
+| Visual command center | Concept only; no implementation |
+| Profitable trading edge | UNESTABLISHED |
+
+**Agreed sequence.** (1) Close and pin the R4 specification — DONE at this commit. (2) Implement and independently
+test R4 on synthetic inputs against the pinned contract. (3) Diagnose the collector stop READ-ONLY, preserve its
+observations and verify coverage; restarting is a separate decision. (4) Complete live-feed and fee commissioning,
+then run authorized prospective paper trading. The dashboard follows as a read-only view of real records and does
+not gate the paper engine. The milestone to aim at is one unattended paper session with current data, recorded
+forecasts, realistic accounting and fully reconciled positions — not another test count.
 
 ## Evidence index
 
