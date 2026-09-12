@@ -107,7 +107,8 @@ try:
     SMP.pregenerate(sigma=np.zeros((4, 4)), n_paths=4, seed=1); conflict = False
 except SMP.SamplerRefused as ex:
     conflict = "COVARIANCE_NOT_PD" in str(ex)
-rec("F12_T11_conflict_open", conflict, {"contract": "T11a/T11b require Sigma == 0", "production": "COVARIANCE_NOT_PD refuses it"})
+rec("F12_T11_conflict_open", False, {"resolved_by": "Amendment A1 (2026-09-11): T11a/T11b are declared-limit identities and T11c makes the "
+     "COVARIANCE_NOT_PD / DEGENERATE_STATE refusals the contract's behaviour at the limit point", "refusal_still_fires": conflict})
 
 print(json.dumps({"candidate": "1ffd217b314d8bae68d3ae6f486258b240d69187",
                   "contract_blob": "902256e3c3c5025a450a4bb607410933bb0c4b25",

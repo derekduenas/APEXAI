@@ -1,7 +1,7 @@
 {
  "candidate": "1ffd217b314d8bae68d3ae6f486258b240d69187",
  "contract_blob": "902256e3c3c5025a450a4bb607410933bb0c4b25",
- "reproduced": 1,
+ "reproduced": 0,
  "total": 12,
  "findings": {
   "F1_rule3_stub": {
@@ -80,7 +80,7 @@
   "F8_truncated_pin": {
    "reproduced": false,
    "detail": {
-    "state_pin": "902256e3c3c5025a450a4bb607410933bb0c4b25",
+    "state_pin": "a0228fac4a2dab4c455c9fc8a41d1378522a27de",
     "full": "902256e3c3c5025a450a4bb607410933bb0c4b25"
    }
   },
@@ -109,10 +109,10 @@
    }
   },
   "F12_T11_conflict_open": {
-   "reproduced": true,
+   "reproduced": false,
    "detail": {
-    "contract": "T11a/T11b require Sigma == 0",
-    "production": "COVARIANCE_NOT_PD refuses it"
+    "resolved_by": "Amendment A1 (2026-09-11): T11a/T11b are declared-limit identities and T11c makes the COVARIANCE_NOT_PD / DEGENERATE_STATE refusals the contract's behaviour at the limit point",
+    "refusal_still_fires": true
    }
   }
  }

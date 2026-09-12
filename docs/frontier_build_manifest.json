@@ -264,11 +264,21 @@
    },
    "spec_pin": {
     "file": "docs/R4_JOINT_MARKET_STATE_SPEC.md",
-    "blob": "902256e3c3c5025a450a4bb607410933bb0c4b25",
-    "sha256": "66cba7095bce903d0b3cd474631b90ea962fda97325d70d1abf9670cee49ce50",
+    "blob": "a0228fac4a2dab4c455c9fc8a41d1378522a27de",
+    "sha256": "355d71bd7c9d39f2974d602c2512a30c9bf9682f1ec058699a6b679a9878b596",
     "meaning": "the R4 implementation contract is this file at this blob; code may not silently diverge from it; any later change is a numbered amendment with its own review",
     "accepted_patch_commit": "24b055ebc34ad214ceeae3059b1f0de7f054bbb5",
-    "patched_blob_sha256": "a11a0cee408cfc64ecfea415ef79ef6e643107adad3f99bbec592ffd15e1682c"
+    "patched_blob_sha256": "a11a0cee408cfc64ecfea415ef79ef6e643107adad3f99bbec592ffd15e1682c",
+    "amendments": [
+     {
+      "id": "A1",
+      "date": "2026-09-11",
+      "change": "T11a/T11b declared-limit form + T11c degeneracy refusal",
+      "accepted_by": "operator (Defect Repair and First Seal Block)",
+      "previous_blob": "902256e3c3c5025a450a4bb607410933bb0c4b25",
+      "previous_sha256": "66cba7095bce903d0b3cd474631b90ea962fda97325d70d1abf9670cee49ce50"
+     }
+    ]
    },
    "accepted_design_choices": [
     "retained block-sequential sampler with COMPOUND_COUPLING_LAW_CONTRAST scope (isolated dependence attribution unavailable in V1)",

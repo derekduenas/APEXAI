@@ -48,7 +48,7 @@ class TwinSources:
         # JOINT_FUNNEL_V1 (R4) is selection-BY-NAME and needs its engine and its market-state context supplied
         self.joint_engine, self.joint_context_fn = joint_engine, joint_context_fn
         if selection_policy == "JOINT_FUNNEL_V1" and (joint_engine is None or joint_context_fn is None):
-            raise ValueError("JOINT_FUNNEL_V1 requires joint_engine and joint_context_fn (R4 contract 902256e3)")
+            raise ValueError("JOINT_FUNNEL_V1 requires joint_engine and joint_context_fn (R4 contract a0228fac, Amendment A1)")
         self._funnel_fitted_day: dict = {}
         self.provenance = provenance
         self.clock = clock
@@ -215,10 +215,60 @@ class _LiveBars:
         return self.adapter.bars(symbol, start_epoch=start_epoch, end_epoch=end_epoch)
 
 
-def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn=None, selection_policy: str = "PILOT_RULE_V1") -> TwinSources:
+def _f(x):
+    try:
+        v = float(x)
+    except (TypeError, ValueError):
+        return None
+    return v if v == v else None
+
+
+def _i(x):
+    try:
+        return int(float(x))
+    except (TypeError, ValueError):
+        return None
+
+
+def _norm_exp(e: str) -> str:
+    e = str(e)
+    return "%s-%s-%s" % (e[:4], e[4:6], e[6:8]) if len(e) == 8 and e.isdigit() else e
+
+
+def live_chain_rows(rows: list, *, symbol: str, receipt_time: float) -> list:
+    """Normalise options-feed snapshot rows (strings, as the vendor sends them) into the shapes the pilot's
+    validators accept: float strike/bid/ask, int sizes, provider timestamp as epoch (ET-naive localized), plus
+    the receipt clock. Nothing is invented: a row missing a field keeps it missing and the validator refuses it."""
+    out = []
+    for r in rows:
+        k = _f(r.get("strike"))
+        if k is None:
+            continue
+        ts = r.get("timestamp")
+        try:
+            ts_epoch = ThetaChainAdapter.et_naive_to_epoch(str(ts)) if ts else None
+        except ValueError:
+            ts_epoch = None
+        out.append({"symbol": symbol, "expiration": _norm_exp(r.get("expiration")), "strike": k,
+                    "right": "CALL" if str(r.get("right", "")).upper().startswith("C") else "PUT",
+                    "bid": _f(r.get("bid")), "ask": _f(r.get("ask")), "bid_size": _i(r.get("bid_size")), "ask_size": _i(r.get("ask_size")),
+                    "timestamp_epoch": ts_epoch, "timestamp_raw": ts, "receipt_time": receipt_time,
+                    "provider": "THETADATA_V3", "indicative": True})
+    return out
+
+
+def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn=None, selection_policy: str = "PILOT_RULE_V1",
+                      expirations_fn=None, chain_snapshot_fn=None, clock=None) -> TwinSources:
     """LIVE_FEED sources. Connectivity is gated: with the default environment every provider call raises
-    ProviderUnavailable before any network access, and the boundary persists the refusal."""
+    ProviderUnavailable before any network access, and the boundary persists the refusal.
+
+    COMMISSIONED 2026-09-11 (operator-authorized, read-only): `chain_fn` and `quote_fn` are wired to the same
+    options-feed adapters the pilot collector used on 2026-09-11 (`apex.intraday.options_feed.option_expirations` /
+    `option_chain_snapshot`), injectable for tests. There is NO order path here. The fee schedule stays
+    UNVERIFIED_FEES, so the certified authority keeps refusing every LIVE_FEED intent until the operator authorizes
+    the broker's published fee document; nothing here stubs, mocks or defaults a fee number."""
     gate = gate or LiveGate()
+    clock = clock or Clock(time.time)
 
     def _no_http(url, headers=None):
         raise ProviderUnavailable("HTTP_CLIENT_NOT_WIRED: no live HTTP client is attached in this build; %s not contacted" % url.split("?")[0])
@@ -226,16 +276,45 @@ def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn
     http_get = http_get or _no_http
     headers_fn = headers_fn or (lambda: {})
     alpaca = AlpacaBarsAdapter(gate=gate, http_get=http_get, headers_fn=headers_fn)
-    theta = ThetaChainAdapter(gate=gate, http_get=http_get)
+
+    def _default_expirations(symbol):
+        from apex.intraday import options_feed as OF
+        return OF.option_expirations(symbol)
+
+    def _default_snapshot(symbol, expiration):
+        from apex.intraday import options_feed as OF
+        return OF.option_chain_snapshot(symbol, expiration)
+
+    expirations_fn = expirations_fn or _default_expirations
+    chain_snapshot_fn = chain_snapshot_fn or _default_snapshot
+
+    def _first_eligible_expiry(symbol, as_of):
+        from apex.options_pilot.expression_rule import DTE_MIN_DAYS
+        from datetime import date
+        today = date.fromisoformat(to_utc_string(as_of)[:10])
+        exps = sorted(_norm_exp(e) for e in expirations_fn(symbol))
+        for e in exps:
+            if (date.fromisoformat(e) - today).days >= DTE_MIN_DAYS:
+                return e
+        raise ProviderUnavailable("NO_ELIGIBLE_EXPIRY_LISTED: none with DTE >= %d among %s" % (DTE_MIN_DAYS, exps[:4]))
 
     def chain_fn(symbol, as_of):
         gate.require("ThetaData chain")
-        raise ProviderUnavailable("CHAIN_ADAPTER_NOT_COMMISSIONED: expiration listing + chain snapshot parsing exist; the read-only smoke is not authorized yet")
+        exp = _first_eligible_expiry(symbol, as_of)
+        rows = live_chain_rows(chain_snapshot_fn(symbol, exp), symbol=symbol, receipt_time=clock.now())
+        if not rows:
+            raise ProviderUnavailable("CHAIN_EMPTY: %s %s returned no priced rows" % (symbol, exp))
+        return rows
 
     def quote_fn(contract):
         gate.require("ThetaData quote")
-        raise ProviderUnavailable("QUOTE_ADAPTER_NOT_COMMISSIONED")
+        rows = live_chain_rows(chain_snapshot_fn(contract["symbol"], contract["expiration"]), symbol=contract["symbol"], receipt_time=clock.now())
+        want = (_norm_exp(contract["expiration"]), float(contract["strike"]), contract["right"])
+        for r in rows:
+            if (r["expiration"], r["strike"], r["right"]) == want:
+                return r
+        raise ProviderUnavailable("QUOTE_NOT_IN_SNAPSHOT: %s %s %s %s" % (contract["symbol"], *want))
 
-    return TwinSources(provenance="LIVE_FEED", clock=Clock(time.time), bar_source=_LiveBars(alpaca), chain_fn=chain_fn,
+    return TwinSources(provenance="LIVE_FEED", clock=clock, bar_source=_LiveBars(alpaca), chain_fn=chain_fn,
                        quote_fn=quote_fn, exit_quote_fn=quote_fn, fee_schedule=UNVERIFIED_FEES, sleep_fn=time.sleep,
                        book_fn=lambda s, t: alpaca.nbbo(s), selection_policy=selection_policy)

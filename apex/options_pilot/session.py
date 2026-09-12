@@ -25,7 +25,8 @@ from . import boundary as B
 from . import ledger as L
 from .book import intent_finished
 from .clock import to_utc_string
-from .expression_rule import RuleRefused, choose
+from .expression_rule import DEFAULT_RULE, RuleRefused, choose
+from .risk_authority import entry_cap_price
 from .records import INTENT_TTL_S, assert_prospective, canonical_hash
 
 PROTOCOL_ID = "OPTIONS-PILOT-001"
@@ -269,7 +270,8 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
             try:
                 signal = signal_fn(symbol, as_of)
                 proposal = choose(symbol=symbol, direction_signal=signal, spot=spot_fn(symbol, as_of),
-                                  as_of=to_utc_string(as_of), available=chain_fn(symbol, as_of))
+                                  as_of=to_utc_string(as_of), available=chain_fn(symbol, as_of),
+                                  rule=getattr(bd, "expression_rule_version", DEFAULT_RULE), max_entry_price=entry_cap_price())
             except RuleRefused as e:
                 bd.refuse("rule", str(e), refs={"forecast_seq": f_receipt["seq"]}, scan_id=scan_id)
             except Exception as e:                                         # noqa: BLE001

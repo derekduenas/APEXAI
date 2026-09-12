@@ -23,7 +23,7 @@ BAR_MAX_AGE_S = 120.0
 NBBO_MAX_AGE_S = 15.0
 QUOTE_MAX_AGE_S = 120.0              # INDICATIVE age (ranking, reporting)
 EXECUTION_MAX_AGE_S = 15.0           # EXECUTABLE age at the decision boundary: only these may produce an intent
-CONTRACT_PIN = "902256e3c3c5025a450a4bb607410933bb0c4b25"
+CONTRACT_PIN = "a0228fac4a2dab4c455c9fc8a41d1378522a27de"
 
 
 class StateRefused(ValueError):

@@ -1,6 +1,6 @@
 # R4 amendment DRAFT — T11a / T11b as a declared limit identity (PROPOSAL ONLY, NOT APPLIED)
 
-Status: `AMENDMENT_DRAFT_FOR_REVIEW`. **This document changes nothing.** The closed contract remains
+Status: **APPLIED 2026-09-11 as Amendment A1** on operator acceptance ("T11: ACCEPTED. Apply the amendment as drafted."). The contract now pins blob `a0228fac4a2dab4c455c9fc8a41d1378522a27de`, sha256 `355d71bd7c9d39f2974d602c2512a30c9bf9682f1ec058699a6b679a9878b596`; see the spec's §12 amendment log. The text below is the draft as reviewed. Original status line: `AMENDMENT_DRAFT_FOR_REVIEW`. **This document changes nothing.** The closed contract remains
 `docs/R4_JOINT_MARKET_STATE_SPEC.md` at commit `0ce431afe4ac9e3873397b25832a372f3ff22373`, blob
 `902256e3c3c5025a450a4bb607410933bb0c4b25`, sha256
 `66cba7095bce903d0b3cd474631b90ea962fda97325d70d1abf9670cee49ce50`. The repair branch does not touch the contract

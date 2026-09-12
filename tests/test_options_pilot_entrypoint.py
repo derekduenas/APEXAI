@@ -180,7 +180,7 @@ def test_restart_resumes_without_re_executing_and_continues_the_sequence(tmp_pat
     resumed_seq = rep["resumed"][0]["receipt"]["seq"]
     assert rep["recovered_positions"] == [{"seq": resumed_seq, "intent_id": rep["resumed"][0]["intent_id"],
                                            "scan_id": "RS-1:0001:SPY", "fill_id": rep["resumed"][0]["receipt"]["fill_id"],
-                                           "contract_id": "SPY|2026-10-09|645.0|CALL", "valuation_attempts": 0,
+                                           "contract_id": "SPY|2026-10-09|650.0|CALL", "valuation_attempts": 0,
                                            "last_attempt_why": None}]
     assert rep["decisions"][0]["scan_id"] == "RS-1:0002:SPY" and rep["decisions"][0]["decision"] == "TRADE"
     new_fill_seq = [i + 1 for i, r in enumerate(L.read_all(led)) if r.get("fill_id") == rep["decisions"][0]["fill_id"]][0]

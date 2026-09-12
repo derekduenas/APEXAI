@@ -37,6 +37,11 @@ ENVELOPE_POLICY = ("RISK_ENVELOPE_V1: max_entry_price = min(reference_ask x (1 +
 ENVELOPE_BUFFER = 0.10
 
 
+def entry_cap_price() -> float:
+    """The kernel's per-trade cap expressed per share: the ONLY capital fact the expression rule may consult."""
+    return RK.MAX_RISK_PER_TRADE / CONTRACT_MULTIPLIER
+
+
 def envelope_for(*, reference_ask, quantity: int = 1) -> dict:
     cap_price = RK.MAX_RISK_PER_TRADE / CONTRACT_MULTIPLIER
     feasible, why = True, None

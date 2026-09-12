@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 
 from apex.governance.chain_ledger import chain_append
 from apex.options_pilot.expression_rule import DTE_MIN_DAYS, RuleRefused, choose
+from apex.options_pilot.risk_authority import entry_cap_price
 from apex.options_pilot.fees import EXECUTION_POLICY_V1, SYNTHETIC_FEES
 from apex.options_pilot.risk_authority import envelope_for
 from apex.pulse_options.features import FeaturesRefused
@@ -107,7 +108,7 @@ def fill_and_exit(q: dict, xq: dict | None, fee_schedule=SYNTHETIC_FEES) -> dict
 
 
 def replay_session(root: Path, symbol: str, day: str, *, artifact: FrozenArtifact, fee_schedule=SYNTHETIC_FEES, seed: int = 11,
-                   out_path: Path | None = None, funnel=None) -> list:
+                   out_path: Path | None = None, funnel=None, expression_rule: str = "PILOT_RULE_V1") -> list:
     bars = load_bars(root, symbol, day)
     if len(bars) < 60:
         return [{"kind": "replay_session_refused", "day": day, "why": "TOO_FEW_REGULAR_BARS: %d" % len(bars)}]
@@ -154,8 +155,10 @@ def replay_session(root: Path, symbol: str, day: str, *, artifact: FrozenArtifac
                 v.update(decision="REFUSE", why="NO_DIRECTION_SIGNAL")
                 rec["variants"][name] = v; continue
             try:
+                # the replay evaluates the rule it is ASKED to evaluate; PILOT-REPLAY-001 was sealed under PILOT_RULE_V1 (whose
+                # cap-blindness is DEFECT_STRIKE_RULE_001) and stays reproducible; pass expression_rule="PILOT_RULE_V2" to replay the repair
                 prop = choose(symbol=symbol, direction_signal=d, spot=spot, as_of=datetime.fromtimestamp(m, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                              available=available)
+                              available=available, rule=expression_rule, max_entry_price=entry_cap_price())
             except RuleRefused as e:
                 v.update(decision="REFUSE", why=str(e)[:120]); rec["variants"][name] = v; continue
             c = prop["contract"]; key = (c["expiration"], float(c["strike"]), c["right"])
