@@ -270,11 +270,17 @@ def runtime_status() -> dict:
     """A. Claude Code's interactive access versus B. an APEX service's unattended access."""
     return {
         "interactive_claude_code": {
-            "status": "CONFIGURED_PENDING_AUTHORIZATION",
+            "status": "NOT_PROBED_BY_THIS_CODE",
             "how": "claude mcp add --transport http mcp-tradingview https://mcp.tradingview.com/mcp, then /mcp",
             "auth": "OAuth 2.1 in the operator's browser, against their own TradingView account",
             "credential_owner": "the operator, held by the Claude Code client",
-            "note": "this is a person's session, not a service account"},
+            "last_recorded_observation": {
+                "at_utc": "2026-09-12",
+                "source": "`claude mcp list`, read out of band by a person or an agent, NOT by this module",
+                "value": "Connected (the operator completed the browser authorization)"},
+            "note": ("this module cannot and does not probe the client's authorization state; the observation above "
+                     "is recorded, not verified here. It is a person's session, not a service account, and a "
+                     "connected client is not a runtime route -- see unattended_apex_runtime.")},
         "unattended_apex_runtime": {
             "status": "NOT_CONNECTED",
             "why": ("no runtime route exists. A working Claude connector does not prove a Python service can "

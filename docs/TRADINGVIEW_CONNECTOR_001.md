@@ -7,8 +7,24 @@ promotion was changed, nothing was deployed and no order exists.
 
 ## Status in one line
 
-**The connector is configured and NOT YET AUTHENTICATED. The offline adapter and its acceptance tests are complete
-and passing. The bounded smoke test has not run, because it cannot until you authorize in a browser.**
+**Authorized and connected at the account level; the offline adapter and its 45 acceptance tests pass. The bounded
+smoke test has NOT run, because the session that built this could not see the tools.**
+
+### Authorization: done. Tool access from this session: not available.
+
+The operator completed the browser authorization on 2026-09-12. `claude mcp list` now reports:
+
+```
+mcp-tradingview: https://mcp.tradingview.com/mcp (HTTP) - ✔ Connected
+```
+
+**No `mcp__mcp-tradingview__*` tool is exposed to the session that wrote this file.** A Claude Code session builds
+its tool registry at start; this one started while the server still needed authorization, and it does not pick up a
+newly authorized server mid-session. Two searches of the deferred-tool registry returned nothing from this
+provider, so the smoke test could not be attempted and no partial result is being reported as one.
+
+**A fresh session picks the tools up.** The smoke test is nine allowed tools and a ten-call budget away, and the
+adapter is ready to receive them as its injected transport.
 
 ## 1. The integration
 
@@ -24,37 +40,24 @@ It added one server to the local config for `/Users/derekduenas` and **changed n
 connector is intact: Context7, Higgsfield, Google Drive, Google Calendar, Gmail, Apollo GraphOS, ruflo and
 robinhood-trading all still report as before. No unofficial bridge was installed.
 
-`claude mcp list` now reports:
+At the time it was added the server reported `! Needs authentication`; after the operator's browser sign-in the
+same command reports `✔ Connected`.
 
-```
-mcp-tradingview: https://mcp.tradingview.com/mcp (HTTP) - ! Needs authentication
-```
+### Authorization
 
-### What is blocked, and what you need to do
-
-Authorization is OAuth 2.1 in your browser against your own TradingView account. **I cannot complete it.** This is a
-Claude Code desktop session, where `/mcp` opens an interactive terminal panel that is not available here, and the
-sign-in is yours to perform in any case.
-
-To finish it, in an interactive `claude` terminal:
-
-```bash
-claude
-```
-
-then run `/mcp`, select `mcp-tradingview`, and complete the TradingView sign-in in the browser window it opens. I
-have not asked for and will not accept your password, and no OAuth token will be copied into the repository, a log,
-a fixture or a prompt.
+OAuth 2.1 in the operator's browser, against their own TradingView account. **Completed by the operator on
+2026-09-12.** No password was requested and no OAuth token was copied into the repository, a log, a fixture or a
+prompt. What remains is not authorization but tool visibility in a running session, described above.
 
 TradingView documents MCP access as **included in Essential and above, with trial plans excluded**. This adapter
 does not check your plan and makes no claim about it.
 
 ## 2. Discovered capabilities
 
-Tool discovery against the live server is **not possible until authorization completes**, so the capability list
-below is from the documentation at the retrieval date, not from an enumeration. **When you authorize, the first
-thing to do is enumerate the real tool list and reconcile it with this file** — a documented list is not a
-discovered one, and the discrepancy in the next paragraph is exactly why that matters.
+**The capability list below is DOCUMENTED, not DISCOVERED.** Live enumeration needs the tools loaded in a session,
+and the session that wrote this file does not have them. **The first thing to do in a fresh session is enumerate the
+real tool list and reconcile it with this file** — a documented list is not a discovered one, and the discrepancy in
+the next paragraph is exactly why that matters.
 
 **Documented: 35 tools.** Watchlists (8), market data (3), symbol search (1), screener (5), news (2), fundamentals
 and forecasts (3), documents (2), calendars (3), alerts (8).
@@ -166,8 +169,9 @@ Ten non-mutating calls are budgeted and specified: resolve SPY's qualified symbo
 small samples of `get_technicals_rating`, `get_news` and `get_earnings_calendar` / `get_economic_calendar`. **No
 historical OHLCV retrieval** is in this brick; the bars adapter is tested on synthetic payloads only.
 
-**It has not run: the server is not authorized.** Nothing was persisted, no call was made, and no partial result is
-being presented as one. When you authorize, it is nine allowed tools and a ten-call budget away.
+**It has not run.** The server is authorized, but the session that built this connector cannot see its tools: the
+tool registry is fixed at session start and this session started before the authorization. Nothing was persisted,
+no call was made, and no partial result is being presented as one. A fresh session can run it immediately.
 
 Not done and not attempted: backtesting, fitting, any paid upgrade or subscription purchase, collector activation,
 recurring polling.
@@ -195,8 +199,9 @@ of doing a substring scan. That is recorded because the first version would have
 
 ## 7. What remains
 
-- **Authentication.** Yours to do, in a browser, from an interactive terminal. Everything else waits on it.
-- **Tool enumeration.** The capability list here is documented, not discovered. Reconcile it after authorizing.
+- **The smoke test.** Blocked only by session tool visibility, not by authorization. Run it from a new session.
+- **Tool enumeration.** The capability list here is documented, not discovered. Enumerate the live tool list in the
+  new session and reconcile it with this file before trusting the allowlist's coverage.
 - **The `get_active_watchlist` discrepancy** is unresolved and the tool stays excluded.
 - **Unattended APEX runtime access: NOT_CONNECTED**, and it needs its own reviewed credential design.
 - **Production Twin wiring: NOT_CONNECTED**, pending the read-only snapshot interface.
