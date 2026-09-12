@@ -369,10 +369,18 @@ def canonical_planned_risk(*, entry_fill, stop, quantity,
     # UNKNOWN IS NEVER ZERO (risk path): an unknown exit friction previously read as FRICTIONLESS and UNDERSTATED the
     # planned loss at the stop. An unknown friction now returns NOT_ESTIMABLE; a declared zero must be passed as 0.0.
     if exit_cost_per_share is None:
-        return {"planned_risk_amount": None, "status": "NOT_ESTIMABLE",
-                "why": ("EXIT_FRICTION_UNKNOWN: the planned loss at the stop includes the exit crossing; an unknown exit "
-                        "cost is not a zero exit cost. Pass 0.0 explicitly to declare a frictionless exit."),
-                "stop_distance": stop_distance, "quantity": quantity, "multiplier": multiplier}
+        # SAME SHAPE as the normal return so no caller crashes on a missing key; the AMOUNT is None, which is what
+        # "not estimable" means, and the basis says so by name.
+        return {
+            "planned_risk_amount": None, "status": "NOT_ESTIMABLE",
+            "components": {"stop_distance_per_share": round(stop_distance, 6), "exit_friction_per_share": None,
+                           "quantity": quantity, "multiplier": multiplier,
+                           "entry_slippage_already_inside_entry_fill": (None if entry_cost_per_share is None else
+                                                                        round(entry_cost_per_share * quantity * multiplier, 2)),
+                           "entry_fees": "NOT_MODELLED_IN_THIS_MONEY_PATH", "exit_fees": "NOT_MODELLED_IN_THIS_MONEY_PATH"},
+            "basis": ("EXIT_FRICTION_UNKNOWN: the planned loss at the stop includes the exit crossing; an unknown exit cost "
+                      "is not a zero exit cost, so no planned-risk amount is produced. Pass exit_cost_per_share=0.0 "
+                      "explicitly to declare a frictionless exit.")}
     exit_friction = float(exit_cost_per_share)
     per_share = stop_distance + exit_friction
     entry_slip = (None if entry_cost_per_share is None
@@ -434,6 +442,7 @@ def _certify_stock(expression, direction, declared_risk, payload,
         "derivation": None,
         "planned_risk_amount": (declared_risk if planned is None
                                 else planned["planned_risk_amount"]),
+        "planned_risk_estimable": (planned is None or planned.get("planned_risk_amount") is not None),
         "planned_risk_basis": ("UNVERIFIED_UPSTREAM_LABEL"
                                if planned is None else planned["basis"]),
         "planned_risk_components": (None if planned is None
