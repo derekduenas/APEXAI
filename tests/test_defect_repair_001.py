@@ -144,16 +144,19 @@ class TestLiveWiring:
         with pytest.raises(ProviderUnavailable, match="QUOTE_NOT_IN_SNAPSHOT"):
             src._quote_fn({"symbol": "SPY", "expiration": "2026-10-02", "strike": 780.0, "right": "CALL"})
 
-    def test_live_default_fee_schedule_is_the_authorized_broker_schedule_and_no_order_path_exists(self):
-        """2026-09-12: the operator authorized ROBINHOOD_RHF_2026 (broker PDF sha 7f9c86bf); it is the live default with its
-        authorization record sealed. UNVERIFIED remains selectable only by explicit choice. There is still no order path."""
-        from apex.options_pilot.fees import LIVE_DEFAULT_FEES, ROBINHOOD_RHF_2026
+    def test_live_default_reverted_to_unverified_when_the_fee_computation_changed(self):
+        """2026-09-12 morning: the operator authorized ROBINHOOD_RHF_2026 (broker PDF sha 7f9c86bf) and it became the live
+        default. 2026-09-12 afternoon: the Part 1 repair brick changed its SEC component to the exact sale-principal
+        computation, so the schedule returned to CANDIDATE (v2026-09-12b) and the live default REVERTED to UNVERIFIED
+        pending review. A changed cost model is not an authorized one. There is still no order path."""
+        from apex.options_pilot.fees import LIVE_DEFAULT_FEES, ROBINHOOD_RHF_2026, ROBINHOOD_RHF_2026_AUTHORIZATION
         src = SRC.live_twin_sources(gate=self._gate(), expirations_fn=lambda s: ["20261002"], chain_snapshot_fn=_snapshot_rows, clock=_clock())
-        assert src.fee_schedule is LIVE_DEFAULT_FEES is ROBINHOOD_RHF_2026 and src.fee_schedule.known
-        va = src.fee_schedule.verified_against
-        assert va["document_sha256"].startswith("7f9c86bf") and va["authorization"]["authorized_by"] == "operator" and va["authorization"]["date"] == "2026-09-12"
-        explicit = SRC.live_twin_sources(gate=self._gate(), expirations_fn=lambda s: ["20261002"], chain_snapshot_fn=_snapshot_rows, clock=_clock(), fee_schedule=UNVERIFIED_FEES)
-        assert explicit.fee_schedule is UNVERIFIED_FEES
+        assert src.fee_schedule is LIVE_DEFAULT_FEES is UNVERIFIED_FEES and not src.fee_schedule.known
+        va = ROBINHOOD_RHF_2026.verified_against
+        assert va["document_sha256"].startswith("7f9c86bf") and va["authorization"]["authorized_by"] == "operator"
+        assert "SUPERSEDED_BY_COMPUTATION_CHANGE" in ROBINHOOD_RHF_2026_AUTHORIZATION["status"] and ROBINHOOD_RHF_2026.version == "2026-09-12b"
+        explicit = SRC.live_twin_sources(gate=self._gate(), expirations_fn=lambda s: ["20261002"], chain_snapshot_fn=_snapshot_rows, clock=_clock(), fee_schedule=ROBINHOOD_RHF_2026)
+        assert explicit.fee_schedule is ROBINHOOD_RHF_2026
         import inspect
         text = inspect.getsource(SRC)
         for forbidden in ("place_order", "submit_order", "/orders", "order_id"):

@@ -1,0 +1,116 @@
+{
+ "kind": "PART1_REPAIR_REPRODUCTIONS",
+ "trade": "SPY 2026-10-02 774 CALL, entry ask 4.90, exit bid 4.54, 1 contract",
+ "head": "a195bcd2549fcb3a2e7aaff4a07e211397ae4952",
+ "findings": {
+  "F1_authority_approves_against_a_different_fee_schedule_than_the_record": {
+   "reproduced": false,
+   "magnitude_on_part1_trade_usd": 0.1,
+   "worst_case_at_500_cap_usd": 0.1,
+   "detail": {
+    "authority_schedule": "ROBINHOOD_RHF_2026",
+    "intent_record_schedule": "UNVERIFIED",
+    "approved": false,
+    "why": "FEE_IDENTITY_MISMATCH: the intent will be sealed with schedule_id='UNVERIFIED' while this authority gates on 'ROBINHOOD_",
+    "magnitude_note": "the approval itself is not a dollar error; the consequence is that an intent whose own record says the cost is UNKNOWN is admitted, after which every downstream figure is computed with unknown costs (F2/F3). Dollar figure = the fees the record could not state (0.0403 + 0.0636 on the Part 1 trade)."
+   }
+  },
+  "F2_book_computes_net_pnl_with_unknown_fees_as_zero": {
+   "reproduced": false,
+   "magnitude_on_part1_trade_usd": 0,
+   "worst_case_at_500_cap_usd": 0.1,
+   "detail": {
+    "pnl_with_unknown_fees": null,
+    "pnl_with_known_fees": null,
+    "fees_unknown_flag": true,
+    "book_line": "book.py:110 pnl = credit - debit - (fee_total or 0.0) - (fx or 0.0)",
+    "sharp_point": "book.py:94 records fees_known=False for the same cashflow and line 91/110 discard it",
+    "worst_case_note": "bounded by the true fee total, ~$0.10 per round trip at 1 contract under ROBINHOOD_RHF_2026"
+   }
+  },
+  "F3_reserved_capital_counts_an_unknown_envelope_debit_as_zero": {
+   "reproduced": false,
+   "magnitude_on_part1_trade_usd": 500.0,
+   "worst_case_at_500_cap_usd": 1500.0,
+   "detail": {
+    "reservations": 1,
+    "reserved": null,
+    "risk_inputs_open_risk": null,
+    "book_lines": [
+     "book.py:122 self.reserved = sum(float(x['envelope_debit'] or 0.0) ...)",
+     "book.py:143 risk_inputs planned() uses the SAME idiom per symbol/family (NOT named in the review)"
+    ],
+    "why_it_outranks_f2": "these feed risk_inputs -> risk_kernel open_planned_risk / same_underlying / family caps; an unknown reservation reads as FREE CAPACITY, so the kernel may admit a position it should refuse",
+    "worst_case_note": "one unreserved position = up to the $500 per-trade cap of hidden exposure; at the $1,500 aggregate cap, up to 3 positions could be admitted against an apparent 0 reserved"
+   }
+  },
+  "F4_sec_fee_is_a_fixed_per_contract_constant_not_sale_principal": {
+   "reproduced": false,
+   "magnitude_on_part1_trade_usd": 0.0,
+   "worst_case_at_500_cap_usd": 0.0,
+   "detail": {
+    "per_exit_premium": {
+     "2.00": {
+      "schedule_total": 0.05,
+      "exact_sec": 0.01,
+      "schedule_sec_component": 0.01
+     },
+     "4.54": {
+      "schedule_total": 0.05,
+      "exact_sec": 0.01,
+      "schedule_sec_component": 0.01
+     },
+     "5.00": {
+      "schedule_total": 0.06,
+      "exact_sec": 0.02,
+      "schedule_sec_component": 0.02
+     },
+     "10.00": {
+      "schedule_total": 0.07,
+      "exact_sec": 0.03,
+      "schedule_sec_component": 0.03
+     }
+    },
+    "error_usd_schedule_minus_exact": {
+     "2.00": 0.0,
+     "4.54": 0.0,
+     "5.00": 0.0,
+     "10.00": 0.0
+    },
+    "declared": "fees.py sec_fee_principal_dependence already declares this, bounds it at $0.01 and OVERSTATES cost",
+    "direction": "CONSERVATIVE (overstates) for every premium at or below $5.00; at $10.00 the fixed 0.02 UNDERSTATES the exact 0.03 by $0.01 \u2014 outside the pilot's cap but not outside the schedule's reach"
+   }
+  },
+  "F5_part1_report_inconsistency_36_00_vs_36_10": {
+   "reproduced": false,
+   "magnitude_on_part1_trade_usd": 0,
+   "worst_case_at_500_cap_usd": 0.1,
+   "detail": {
+    "first_run_pnl": 0,
+    "second_run_pnl": 0,
+    "root_cause": "NOT a rounding or reporting bug: the two runs used DIFFERENT fee schedules. Run 1's boundary defaulted to UNVERIFIED (driver defect) so both fee totals were None and F2 turned them into 0.00 -> -36.00 = gross. Run 2's boundary carried ROBINHOOD_RHF_2026 -> -36.10 = gross - 0.0403 - 0.0636 rounded. The difference IS the fees, and run 1 only produced a number at all because of F2.",
+    "correct_figure": "-36.10 net under ROBINHOOD_RHF_2026; -36.00 is the GROSS figure and must never be labelled net"
+   }
+  },
+  "F6_unknown_to_zero_idiom_is_a_class_not_instances": {
+   "reproduced": false,
+   "magnitude_on_part1_trade_usd": null,
+   "worst_case_at_500_cap_usd": null,
+   "detail": {
+    "n_occurrences": 0,
+    "occurrences": [],
+    "not_named_in_the_review": []
+   }
+  },
+  "F7_strict_json_accepts_nan_and_infinity": {
+   "reproduced": false,
+   "magnitude_on_part1_trade_usd": null,
+   "worst_case_at_500_cap_usd": null,
+   "detail": {
+    "probe": "the RECORD serializer records.canonical_json, not the stdlib default",
+    "detail": "canonical_json already used allow_nan=False before this brick; the defect as stated does not exist on the record path",
+    "stdlib_note": "bare json.dumps still emits NaN, which is why every record goes through canonical_json"
+   }
+  }
+ }
+}

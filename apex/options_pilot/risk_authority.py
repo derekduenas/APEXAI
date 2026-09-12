@@ -101,17 +101,48 @@ class CertifiedRiskAuthority(RiskAuthority):
     def _direction(intent: dict) -> str:
         return "LONG" if intent["expression"] == "LONG_CALL" else "SHORT"
 
+    def fee_identity(self) -> dict:
+        """The full identity of the schedule THIS authority gates on. Sealed on every approval."""
+        return {"schedule_id": self.fee_schedule.schedule_id, "schedule_hash": self.fee_schedule.schedule_hash,
+                "provenance": self.fee_schedule.provenance, "known": self.fee_schedule.known,
+                "policy": self.fee_schedule.describe()}
+
+    def fee_identity_problem(self, intent: dict) -> str | None:
+        """The intent must CARRY the fee identity the boundary will seal, and it must be this authority's schedule,
+        matched on id, hash, provenance and known-ness. Missing or mismatched REFUSES."""
+        f = intent.get("fees")
+        if not isinstance(f, dict):
+            return ("FEE_IDENTITY_MISSING: the intent carries no fee block; the authority will not approve against a "
+                    "schedule it cannot see (authority holds %s)" % self.fee_schedule.schedule_id)
+        mine = self.fee_identity()
+        for k in ("schedule_id", "schedule_hash", "provenance", "known"):
+            if k not in f:
+                return "FEE_IDENTITY_INCOMPLETE: the intent's fee block lacks %r" % k
+            if f[k] != mine[k]:
+                return ("FEE_IDENTITY_MISMATCH: the intent will be sealed with %s=%r while this authority gates on %r; "
+                        "one run has exactly one fee schedule" % (k, f[k], mine[k]))
+        return None
+
     def approve(self, intent: dict, *, book: Book | None = None) -> dict:
         if book is None:
             raise RiskRefused("BOOK_STATE_REQUIRED: the certified authority approves only against a Book")
+        # ONE FEE SCHEDULE IDENTITY (Part 1 finding A). The authority used to gate on ITS OWN schedule while the
+        # boundary sealed a different one on the very intent being approved, and nothing compared them: an intent
+        # whose record said the cost was UNKNOWN could be APPROVED as LIVE_FEED. The identity carried on the intent
+        # is now verified against this authority's schedule BY HASH before anything else.
+        problem = self.fee_identity_problem(intent)
+        if problem:
+            return {"approved": False, "risk_provenance": CERTIFIED_PROVENANCE, "authority_id": self.authority_id,
+                    "why": problem, "fee_identity": self.fee_identity()}
         if self.provenance == "LIVE_FEED" and self.fee_schedule.provenance != "PROVIDER_VERIFIED":
             return {"approved": False, "risk_provenance": CERTIFIED_PROVENANCE, "authority_id": self.authority_id,
                     "why": "FEE_SCHEDULE_UNVERIFIED: %s (%s); an unknown cost is not zero, so no LIVE_FEED intent is approved"
                            % (self.fee_schedule.schedule_id, self.fee_schedule.provenance)}
         if not self.fee_schedule.known:
             return {"approved": False, "risk_provenance": CERTIFIED_PROVENANCE, "authority_id": self.authority_id,
-                    "why": "FEE_SCHEDULE_UNKNOWN: %s" % self.fee_schedule.schedule_id}
+                    "why": "FEE_SCHEDULE_UNKNOWN: %s" % self.fee_schedule.schedule_id, "fee_identity": self.fee_identity()}
         env = intent.get("risk_envelope") or {}
+        _fee_identity = self.fee_identity()
         if not is_real(env.get("max_entry_price")) or env["max_entry_price"] <= 0:
             return {"approved": False, "risk_provenance": CERTIFIED_PROVENANCE, "authority_id": self.authority_id,
                     "why": "RISK_ENVELOPE_MISSING"}
@@ -126,6 +157,7 @@ class CertifiedRiskAuthority(RiskAuthority):
                "certified_max_loss": cert["certified_max_loss"], "certificate": cert, "kernel_check": kc,
                "book_state_hash": book.state_hash(), "book_summary": book.summary(),
                "fee_schedule_id": self.fee_schedule.schedule_id, "fee_schedule_hash": self.fee_schedule.schedule_hash,
+               "fee_identity": _fee_identity, "fee_identity_verified_against_intent": True,
                "limits": dict(RK.LIMITS), "note": ("certificate recomputed from legs; kernel checked against the Book at approval "
                                                     "and re-checked against the FRESH Book inside the intent commit")}
         if not out["approved"]:

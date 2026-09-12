@@ -95,7 +95,7 @@ class BarStore:
         if prev is not None:
             bar["revision_count"] = prev["revision_count"] + 1
             bar["revised_at"] = bar["last_receipt"]
-            self.counters["revisions"] += 1 if prev.get("built_from") == "PROVIDER" or prev["trades"] == bar["trades"] else 0
+            self.counters["revisions"] += 1 if prev.get("built_from") == "PROVIDER" or prev["trades"] == bar["trades"] else 0   # UNKNOWN_TO_ZERO_EXEMPT: a counter increment, not an unknown value
         self._bars[start] = bar
         self._history.setdefault(start, []).append(bar)
 

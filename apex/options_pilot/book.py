@@ -20,7 +20,7 @@ from apex.organism.risk_kernel import STARTING_PAPER_CAPITAL
 
 from . import ledger as L
 from .fees import FeeSchedule, recompute_fees
-from .records import canonical_hash
+from .records import is_real, canonical_hash
 
 CONTRACT_MULTIPLIER = 100.0
 BETA_FAMILY = {"SPY": "US_EQUITY_INDEX", "QQQ": "US_EQUITY_INDEX", "IWM": "US_EQUITY_INDEX", "DIA": "US_EQUITY_INDEX"}
@@ -88,10 +88,13 @@ class Book:
                 fee = r.get("fees_entry") or {}
                 self._check_fee(seq, fee, r.get("quantity_filled", 1), "BUY")
                 fee_total = fee.get("total")
-                cash = -(debit + (fee_total or 0.0))
-                if r.get("cashflow_entry") is not None and round(r["cashflow_entry"], 2) != round(cash, 2):
+                # B2: line 94 below already records fees_known; the arithmetic must not discard it. An unknown entry
+                # fee makes the cashflow amount UNKNOWN rather than "debit only".
+                cash = (None if fee_total is None else -(debit + fee_total))
+                if cash is not None and r.get("cashflow_entry") is not None and round(r["cashflow_entry"], 2) != round(cash, 2):
                     self.problems.append("FILL_CASHFLOW_DISAGREES seq %d" % seq)
-                self.cashflows.append({"seq": seq, "kind": "ENTRY", "amount": round(cash, 2), "fees_known": fee_total is not None})
+                self.cashflows.append({"seq": seq, "kind": "ENTRY", "amount": (None if cash is None else round(cash, 2)),
+                                       "gross_amount": round(-debit, 2), "fees_known": fee_total is not None})
                 pos = {"fill_seq": seq, "intent_id": r.get("intent_id"), "fill_id": r.get("fill_id"), "symbol": r["contract"]["symbol"],
                        "session_id": r.get("session_id"), "release": r.get("release"), "data_provenance": r.get("data_provenance"),
                        "debit": debit, "fees_entry": fee_total, "committed_epoch": r.get("committed_epoch"),
@@ -106,12 +109,24 @@ class Book:
                         fee_x = o.get("fees_exit") or {}
                         self._check_fee(oseq, fee_x, pos["quantity"], "SELL")
                         fx = fee_x.get("total")
-                        cash_x = credit - (fx or 0.0)
-                        pnl = round(credit - debit - (fee_total or 0.0) - (fx or 0.0), 2)
-                        if o.get("pnl") is not None and round(o["pnl"], 2) != pnl:
+                        # B4: a closed position whose fees are unknown NEVER presents a valid net result. Gross debit
+                        # and credit are retained; the net is null and the status names the missing input.
+                        fees_known = (fee_total is not None and fx is not None)
+                        cash_x = (None if fx is None else credit - fx)
+                        gross_pnl = round(credit - debit, 2)
+                        pnl = (round(credit - debit - fee_total - fx, 2) if fees_known else None)
+                        if fees_known and o.get("pnl") is not None and round(o["pnl"], 2) != pnl:
                             self.problems.append("OUTCOME_PNL_DISAGREES seq %d: stored %r vs recomputed %r" % (oseq, o.get("pnl"), pnl))
-                        self.cashflows.append({"seq": oseq, "kind": "EXIT", "amount": round(cash_x, 2), "fees_known": fx is not None})
-                        pos.update(credit=credit, fees_exit=fx, realized_pnl=pnl)
+                        if not fees_known and o.get("pnl") is not None:
+                            self.problems.append("OUTCOME_PNL_WITH_UNKNOWN_FEES seq %d: the record states a net %r while a fee is unknown"
+                                                 % (oseq, o.get("pnl")))
+                        self.cashflows.append({"seq": oseq, "kind": "EXIT", "amount": (None if cash_x is None else round(cash_x, 2)),
+                                               "gross_amount": round(credit, 2), "fees_known": fx is not None})
+                        pos.update(credit=credit, fees_exit=fx, realized_pnl=pnl, gross_pnl=gross_pnl,
+                                   net_status=("NET" if fees_known else "NOT_ESTIMABLE_FEES"),
+                                   missing_fee_reason=(None if fees_known else
+                                                       {"entry": (None if fee_total is not None else (fee.get("why") or "entry fee unknown")),
+                                                        "exit": (None if fx is not None else ((fee_x or {}).get("why") or "exit fee unknown"))}))
                     self.closed.append(pos)
                 else:
                     self.positions.append(pos)
@@ -119,9 +134,21 @@ class Book:
                                               if p.get("realized_pnl") is not None and p.get("session_id") == self.session_id), 2)
         self.total_realized_pnl = round(sum(p["realized_pnl"] for p in self.closed if p.get("realized_pnl") is not None), 2)
         self.open_cost = round(sum(p["debit"] for p in self.positions), 2)
-        self.reserved = round(sum(float(x["envelope_debit"] or 0.0) for x in self.reservations), 2)
-        self.cash = round(STARTING_PAPER_CAPITAL + sum(c["amount"] for c in self.cashflows), 2)
+        # UNKNOWN IS NEVER ZERO (risk path). An unknown envelope debit previously read as FREE CAPACITY here and in
+        # risk_inputs, so the kernel could admit a position against an apparent 0 reserved. Unknown now makes the
+        # reserved total UNKNOWN and is a named integrity problem; the kernel refuses on an unknown input.
+        unknown_res = [x for x in self.reservations if not is_real(x.get("envelope_debit"))]
+        for x in unknown_res:
+            self.problems.append("RESERVATION_ENVELOPE_UNKNOWN intent_seq %s: an unknown envelope debit is not zero reserved capital"
+                                 % x.get("intent_seq"))
+        self.reserved_unknown = bool(unknown_res)
+        self.reserved = (None if unknown_res else
+                         round(sum(float(x["envelope_debit"]) for x in self.reservations), 2))
+        # B5: cash is UNKNOWN when any cashflow is unknown; the GROSS cash line always reconciles and says so.
         self.fees_unknown = any(not c["fees_known"] for c in self.cashflows)
+        self.cash = (None if self.fees_unknown else
+                     round(STARTING_PAPER_CAPITAL + sum(c["amount"] for c in self.cashflows), 2))
+        self.gross_cash = round(STARTING_PAPER_CAPITAL + sum(c["gross_amount"] for c in self.cashflows), 2)
         self.outstanding = {"unfinished_intents": list(self.unfinished_intents),
                             "unresolved_positions": [p["fill_seq"] for p in self.positions],
                             "exit_exhausted_positions": [p["fill_seq"] for p in self.positions if p["exit_exhausted"]]}
@@ -139,14 +166,21 @@ class Book:
     def risk_inputs(self, *, symbol: str) -> dict:
         fam = beta_family(symbol)
         def planned(pred):
+            # UNKNOWN IS NEVER ZERO (risk path): a reservation whose envelope debit is unknown makes the planned-risk
+            # input UNKNOWN, and the kernel refuses an unknown input rather than sizing against a smaller number.
+            res = [x for x in self.reservations if pred(x["symbol"])]
+            if any(not is_real(x.get("envelope_debit")) for x in res):
+                return None
             return round(sum(p["debit"] for p in self.positions if pred(p["symbol"]))
-                         + sum(float(x["envelope_debit"] or 0.0) for x in self.reservations if pred(x["symbol"])), 2)
+                         + sum(float(x["envelope_debit"]) for x in res), 2)
         open_risk = planned(lambda s: True)
         return {"open_risk": open_risk,
                 "same_underlying_risk": planned(lambda s: s == symbol),
-                "same_family_risk": planned(lambda s: beta_family(s) == fam) if fam != "UNKNOWN" else 0.0,
+                # an UNKNOWN beta family is not an empty family: it is an unknown input, and the kernel refuses on one
+                "same_family_risk": (planned(lambda s: beta_family(s) == fam) if fam != "UNKNOWN" else None),
                 "session_realized_pnl": self.session_realized_pnl,
-                "available_capital": round(self.cash - self.reserved, 2),
+                # available capital is UNKNOWN when cash or reserved is unknown; it is never cash-minus-nothing
+                "available_capital": (None if (self.cash is None or self.reserved is None) else round(self.cash - self.reserved, 2)),
                 "open_certified_risk": open_risk,
                 "beta_family": fam}
 
@@ -166,10 +200,10 @@ class Book:
         """starting + sum(cashflows) == cash; and cash == starting - open_cost - fees_paid + realized_pnl_total (when fees known)."""
         fees_paid = 0.0
         for p in self.positions + self.closed:
-            fees_paid += (p.get("fees_entry") or 0.0)
+            fees_paid += (p["fees_entry"] if is_real(p.get("fees_entry")) else 0.0)   # UNKNOWN_TO_ZERO_EXEMPT: fees_unknown flags it; this line reports what IS known
         for p in self.closed:
-            fees_paid += (p.get("fees_exit") or 0.0)
-        open_positions_fees = sum((p.get("fees_entry") or 0.0) for p in self.positions)
+            fees_paid += (p["fees_exit"] if is_real(p.get("fees_exit")) else 0.0)   # UNKNOWN_TO_ZERO_EXEMPT: as above
+        open_positions_fees = sum((p["fees_entry"] if is_real(p.get("fees_entry")) else 0.0) for p in self.positions)   # UNKNOWN_TO_ZERO_EXEMPT: reporting only
         rhs = round(STARTING_PAPER_CAPITAL - self.open_cost - open_positions_fees + self.total_realized_pnl, 2)
         return {"lhs_cash": self.cash, "rhs": rhs, "holds": (not self.fees_unknown) and abs(self.cash - rhs) < 0.005,
                 "formula": "cash == start - open_cost - open_entry_fees + total_realized_pnl (realized already net of both fees)"}

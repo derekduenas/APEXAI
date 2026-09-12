@@ -17,6 +17,8 @@ Attribution classes, one primary per scan, AMBIGUOUS when the evidence does not 
 The diagnosis may PROPOSE a challenger (a record with a digest); it never edits history or tunes a policy."""
 from __future__ import annotations
 
+from apex.options_pilot.records import is_real
+
 import math
 
 from scipy import stats
@@ -59,7 +61,7 @@ def join_scan(rows: list, *, scan_id: str, realized_return: float | None = None,
             classes.append("FORECAST_TAIL_ERROR")
         elif pit < 0.05 or pit > 0.95:
             classes.append("FORECAST_SCALE_ERROR")
-        elif (pit < 0.25 or pit > 0.75) and ((realized_return - fc["location"]) * (fc.get("location") or 0.0) < 0):
+        elif (pit < 0.25 or pit > 0.75) and is_real(fc.get("location")) and ((realized_return - fc["location"]) * fc["location"] < 0):
             classes.append("FORECAST_LOCATION_ERROR")
     # IV scenario
     if exit_iv is not None and entry_iv is not None and entry_iv > 0 and filled:
@@ -73,9 +75,14 @@ def join_scan(rows: list, *, scan_id: str, realized_return: float | None = None,
         evidence.update(gross_pnl=gross, net_pnl=net)
         if gross is not None and net is not None and gross > 0 >= net:
             classes.append("SPREAD_LATENCY_FEES")
-    primary = "NO_ERROR" if not classes and outcome and (outcome.get("pnl") or 0) >= 0 else \
+    # an unknown P&L is NOT a non-negative outcome: it is UNSCORABLE and says so
+    _pnl = (outcome or {}).get("pnl")
+    if outcome is not None and not is_real(_pnl):
+        return {"primary": "UNSCORABLE_UNKNOWN_PNL", "classes": sorted(classes),
+                "why": "the outcome carries no usable net P&L (%r); an unknown result is not a non-negative one" % (_pnl,)}
+    primary = "NO_ERROR" if not classes and outcome and _pnl >= 0 else \
         classes[0] if len(set(classes)) == 1 else ("AMBIGUOUS" if classes else "AMBIGUOUS")
-    if not classes and not (outcome and (outcome.get("pnl") or 0) >= 0):
+    if not classes and not (outcome and _pnl >= 0):
         primary = "AMBIGUOUS"
     out.update(attribution={"primary": primary, "all": sorted(set(classes)), "evidence": evidence,
                             "note": "AMBIGUOUS is a legitimate result; no class is forced"})

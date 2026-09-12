@@ -14,6 +14,8 @@ rule, the displayed-size rule and the fill-quantity domain {0, 1}. Every
 simulated fill says it is simulated."""
 from __future__ import annotations
 
+import math
+
 from dataclasses import dataclass, field
 
 from .clock import is_real
@@ -37,6 +39,8 @@ class FeeSchedule:
     regulatory_fee_per_contract_sell: float | None
     verified_against: dict | None = None  # {"provider", "document", "date"} for PROVIDER_VERIFIED
     note: str = ""
+    sale_principal_rate_per_million: float | None = None   # e.g. SEC $20.60 per $1,000,000 of SALE principal
+    sell_per_contract_components: float = 0.0              # the sell-side components that ARE per contract (CAT + FINRA TAF)
 
     def __post_init__(self):
         if self.provenance not in FEE_PROVENANCE:
@@ -61,30 +65,64 @@ class FeeSchedule:
 
     def describe(self) -> dict:
         return {"schedule_id": self.schedule_id, "version": self.version, "provenance": self.provenance,
+                "sale_principal_rate_per_million": self.sale_principal_rate_per_million,
+                "sell_per_contract_components": self.sell_per_contract_components,
                 "commission_per_contract": self.commission_per_contract,
                 "exchange_fee_per_contract": self.exchange_fee_per_contract,
                 "regulatory_fee_per_contract_buy": self.regulatory_fee_per_contract_buy,
                 "regulatory_fee_per_contract_sell": self.regulatory_fee_per_contract_sell,
                 "verified_against": self.verified_against, "note": self.note}
 
-    def _side(self, contracts: int, side: str) -> dict:
+    # C: SALE-PRINCIPAL COMPONENTS. A component whose rate is denominated in sale principal (the SEC regulatory fee)
+    # is computed from the ACTUAL principal, under its own declared rounding rule, before totalling. The per-contract
+    # constant it replaces was declared, bounded at $0.01 and conservative, but an approximation is not an exactness.
+    PRINCIPAL_COMPONENTS = ("sec_regulatory_fee",)
+
+    def _side(self, contracts: int, side: str, *, sale_principal: float | None = None) -> dict:
         if type(contracts) is not int or contracts < 0:
             raise FeePolicyRefused("CONTRACTS_INVALID: %r" % (contracts,))
         if not self.known:
             return {"total": None, "status": "UNKNOWN", "why": "fee schedule %s is UNVERIFIED; an unknown cost is not zero"
                     % self.schedule_id, "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "side": side}
-        reg = self.regulatory_fee_per_contract_buy if side == "BUY" else self.regulatory_fee_per_contract_sell
         comps = {"commission": round(self.commission_per_contract * contracts, 4),
-                 "exchange": round(self.exchange_fee_per_contract * contracts, 4),
-                 "regulatory": round(reg * contracts, 4)}
-        return {"total": round(sum(comps.values()), 2), "components": comps, "status": "CHARGED" if contracts else "NONE",
+                 "exchange": round(self.exchange_fee_per_contract * contracts, 4)}
+        basis = {}
+        if side == "BUY":
+            comps["regulatory"] = round(self.regulatory_fee_per_contract_buy * contracts, 4)
+            basis["regulatory"] = "per contract (CAT); no sale principal on a buy"
+        elif self.sale_principal_rate_per_million is None:
+            comps["regulatory"] = round(self.regulatory_fee_per_contract_sell * contracts, 4)
+            basis["regulatory"] = "per contract (schedule declares no sale-principal rate)"
+        else:
+            # per-contract sell components (CAT + FINRA TAF), then the SEC fee from the ACTUAL sale principal
+            per_contract = round(self.sell_per_contract_components * contracts, 6)
+            if sale_principal is None:
+                return {"total": None, "status": "NOT_ESTIMABLE", "side": side, "contracts": contracts,
+                        "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash,
+                        "why": ("SALE_PRINCIPAL_REQUIRED: %s prices its regulatory fee at %.2f per $1,000,000 of sale principal; "
+                                "an unknown principal is not zero" % (self.schedule_id, self.sale_principal_rate_per_million))}
+            if isinstance(sale_principal, bool) or not isinstance(sale_principal, (int, float)) or not math.isfinite(sale_principal) or sale_principal < 0:
+                return {"total": None, "status": "REFUSED", "side": side, "contracts": contracts,
+                        "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash,
+                        "why": "SALE_PRINCIPAL_INVALID: %r" % (sale_principal,)}
+            sec = math.ceil(sale_principal * self.sale_principal_rate_per_million / 1e6 * 100.0) / 100.0   # rounded UP to the cent
+            comps["regulatory"] = round(per_contract + sec, 6)
+            basis["regulatory"] = ("CAT+TAF %.6f per contract x %d, plus SEC %.2f per $1,000,000 of sale principal %.2f = %.2f, "
+                                   "rounded UP to the cent" % (self.sell_per_contract_components, contracts,
+                                                               self.sale_principal_rate_per_million, sale_principal, sec))
+            basis["sale_principal"] = sale_principal
+            basis["sec_component"] = sec
+        return {"total": round(sum(comps.values()), 2), "components": comps, "component_basis": basis,
+                "status": "CHARGED" if contracts else "NONE", "sale_principal": sale_principal,
                 "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "side": side, "contracts": contracts}
 
     def entry(self, contracts: int) -> dict:
         return self._side(contracts, "BUY")
 
-    def exit(self, contracts: int) -> dict:
-        return self._side(contracts, "SELL")
+    def exit(self, contracts: int, *, sale_principal: float | None = None) -> dict:
+        """`sale_principal` = exit premium x multiplier x contracts. Required when the schedule prices a component
+        on sale principal; an unknown principal returns NOT_ESTIMABLE, never a default."""
+        return self._side(contracts, "SELL", sale_principal=sale_principal)
 
 
 SYNTHETIC_FEES = FeeSchedule(
@@ -109,7 +147,7 @@ def recompute_fees(record_fee_block: dict, schedule: FeeSchedule, *, contracts: 
         problems.append("FEE_SCHEDULE_IDENTITY_DISAGREES: record %r/%r vs %r/%r" % (
             record_fee_block.get("schedule_id"), str(record_fee_block.get("schedule_hash"))[:12],
             schedule.schedule_id, schedule.schedule_hash[:12]))
-    fresh = schedule._side(contracts, side)
+    fresh = schedule._side(contracts, side, sale_principal=record_fee_block.get("sale_principal"))
     if fresh.get("total") != record_fee_block.get("total"):
         problems.append("FEE_TOTAL_DISAGREES: record %r vs recomputed %r" % (record_fee_block.get("total"), fresh.get("total")))
     return problems
@@ -179,16 +217,29 @@ ROBINHOOD_RHF_2026_AUTHORIZATION = {
              "not an order authorization; not paper capital",
 }
 
+# v2026-09-12b: the SEC component is now computed from the ACTUAL sale principal under its own rounding rule instead
+# of a fixed per-contract constant taken at the $5.00 cap. THE COMPUTATION CHANGED, so this schedule RETURNS TO
+# CANDIDATE and needs operator review before it is authorized again (its v2026-09-12 authorization covered the
+# transcription, not this arithmetic).
 ROBINHOOD_RHF_2026 = FeeSchedule(
-    schedule_id="ROBINHOOD_RHF_2026", version="2026-09-12", provenance="PROVIDER_VERIFIED",
+    schedule_id="ROBINHOOD_RHF_2026", version="2026-09-12b", provenance="PROVIDER_VERIFIED",
     commission_per_contract=0.0,
     exchange_fee_per_contract=0.04,                      # ORF + OCC clearing, buys and sells
     regulatory_fee_per_contract_buy=0.0003,              # CAT fee
-    regulatory_fee_per_contract_sell=round(0.0003 + 0.00329 + 0.02, 5),   # CAT + FINRA TAF + SEC fee at the cap (rounded up)
+    regulatory_fee_per_contract_sell=round(0.0003 + 0.00329 + 0.02, 5),   # SUPERSEDED by the sale-principal computation; kept for schedules that declare no rate
+    sale_principal_rate_per_million=20.60,               # SEC regulatory fee, effective 2026-04-04, on SALE principal
+    sell_per_contract_components=round(0.0003 + 0.00329, 5),   # CAT + FINRA TAF, per contract, sells
     verified_against={"provider": ROBINHOOD_RHF_2026_SOURCE["provider"], "document": ROBINHOOD_RHF_2026_SOURCE["document"],
                       "date": ROBINHOOD_RHF_2026_SOURCE["date"], "document_sha256": ROBINHOOD_RHF_2026_SOURCE["document_sha256"],
                       "authorization": ROBINHOOD_RHF_2026_AUTHORIZATION},
     note=("broker schedule transcribed from the published PDF; AUTHORIZED by the operator 2026-09-12 and the LIVE default from that date; "
           "per-contract round trip ~ $0.06 (buy 0.0403, sell 0.0236 at the cap) vs the SYNTHETIC fixture's 1.02"))
 
-LIVE_DEFAULT_FEES = ROBINHOOD_RHF_2026          # the schedule the live boundary runs under (was UNVERIFIED_FEES until 2026-09-12)
+# THE COMPUTATION CHANGED (sale-principal SEC component), so the schedule is a CANDIDATE again and the live default
+# reverts to UNVERIFIED until the operator reviews the new arithmetic. An unknown cost is not zero, and a changed
+# cost model is not an authorized one.
+ROBINHOOD_RHF_2026_AUTHORIZATION["status"] = ("SUPERSEDED_BY_COMPUTATION_CHANGE: the 2026-09-12 authorization covered the "
+                                              "transcription of v2026-09-12; v2026-09-12b changes the SEC component from a "
+                                              "fixed per-contract constant to the exact sale-principal computation and needs "
+                                              "operator review")
+LIVE_DEFAULT_FEES = UNVERIFIED_FEES          # reverted 2026-09-12 pending review of v2026-09-12b

@@ -1,0 +1,47 @@
+{
+ "kind": "PART1_CORRECTION",
+ "burned_ledger": "docs/evidence/trace_replay/REPLAY_QUARANTINED_ledger.jsonl",
+ "burned_record_untouched": true,
+ "trade": {
+  "contract": "SPY|2026-10-02|774.0|CALL",
+  "entry_ask": 4.9,
+  "exit_bid": 4.54,
+  "contracts": 1
+ },
+ "as_burned": {
+  "figures_reported": [
+   "-36.00 (first run)",
+   "-36.10 (second run)"
+  ],
+  "root_cause": "the two runs used DIFFERENT fee schedules, not different arithmetic on the same one. Run 1's boundary defaulted to UNVERIFIED because the driver passed the authorized schedule only to the risk authority (finding A), so both fee totals were None and the Book's (fee or 0.0) turned them into 0.00 (finding B): -36.00 is the GROSS figure. Run 2's boundary carried the schedule, so the fees were real: -36.10. Under the repairs run 1 would produce NO net figure at all.",
+  "what_was_wrong_with_each": {
+   "-36.00": "a GROSS result labelled as a realized net; producible only because of finding B",
+   "-36.10": "net, but with the SEC component taken from a fixed per-contract constant (finding C)"
+  }
+ },
+ "corrected": {
+  "gross_pnl": -36.0,
+  "fees_entry": 0.04,
+  "fees_exit": 0.05,
+  "sale_principal": 454.0,
+  "sec_component": 0.01,
+  "realized_pnl": -36.09,
+  "net_status": "NET",
+  "is_gross_only_or_net_estimable": "NET_ESTIMABLE: both fee sides are known under ROBINHOOD_RHF_2026 v2026-09-12b"
+ },
+ "negative_test_unknown_fee_cannot_produce_a_net": {
+  "realized_pnl": null,
+  "net_status": "NOT_ESTIMABLE_FEES",
+  "gross_pnl": -36.0,
+  "passes": true
+ },
+ "status_of_the_run": [
+  "REPLAY",
+  "QUARANTINED",
+  "NOT_PROSPECTIVE_EVIDENCE",
+  "NOT_A_MODEL_PERFORMANCE_RESULT",
+  "NOT_ELIGIBLE_FOR_LEARNING_OR_PROMOTION",
+  "MECHANISM_VALIDATION_ONLY"
+ ],
+ "caveat": "the corrected figure is priced under a schedule that RETURNED TO CANDIDATE in this brick (its computation changed); it is an arithmetic correction, not an authorized economic result"
+}

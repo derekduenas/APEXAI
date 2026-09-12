@@ -233,7 +233,7 @@ class FunnelEngine:
             return wait("PRIME_ABSTAIN: PREREQUISITE_MISSING: ATM implied vol not identified from VALID quotes (%s)" % iv_detail)
         iv0 = float(np.mean(ivs))
         qa = valid.get((exp, atm, "CALL")) or valid.get((exp, atm, "PUT"))
-        spread_bps0 = 1e4 * qa["spread"] / qa["mid"] if qa["mid"] > 0 else 0.0
+        spread_bps0 = 1e4 * qa["spread"] / qa["mid"] if qa["mid"] > 0 else 0.0   # UNKNOWN_TO_ZERO_EXEMPT: a non-positive mid is already refused by sanitize_quote upstream, so this branch is unreachable for a validated quote
         physical_var_15 = float(gf.meta["integrated_variance"])
         tr["implied"] = {"expiry": exp, "expiry_epoch": expiry_epoch, "T_entry_years": T_entry, "T_exit_years": T_exit, "atm_strike": atm, "iv0": iv0,
                          "by_right": iv_detail, "spread_bps0": spread_bps0, "method": "BSM inversion on the ATM mid of VALID quotes, EUROPEAN_APPROX, r=q=0",

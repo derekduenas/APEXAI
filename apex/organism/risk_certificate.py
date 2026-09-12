@@ -366,7 +366,14 @@ def canonical_planned_risk(*, entry_fill, stop, quantity,
     the stop already contains the entry crossing. Only the EXIT
     crossing may be added."""
     stop_distance = abs(entry_fill - stop)
-    exit_friction = (exit_cost_per_share or 0.0)
+    # UNKNOWN IS NEVER ZERO (risk path): an unknown exit friction previously read as FRICTIONLESS and UNDERSTATED the
+    # planned loss at the stop. An unknown friction now returns NOT_ESTIMABLE; a declared zero must be passed as 0.0.
+    if exit_cost_per_share is None:
+        return {"planned_risk_amount": None, "status": "NOT_ESTIMABLE",
+                "why": ("EXIT_FRICTION_UNKNOWN: the planned loss at the stop includes the exit crossing; an unknown exit "
+                        "cost is not a zero exit cost. Pass 0.0 explicitly to declare a frictionless exit."),
+                "stop_distance": stop_distance, "quantity": quantity, "multiplier": multiplier}
+    exit_friction = float(exit_cost_per_share)
     per_share = stop_distance + exit_friction
     entry_slip = (None if entry_cost_per_share is None
                   else round(entry_cost_per_share * quantity

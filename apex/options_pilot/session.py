@@ -249,8 +249,12 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
                 from .risk_authority import CERTIFIED_PROVENANCE as _CP, envelope_for as _env
                 env = _env(reference_ask=proposal.get("reference_ask"), quantity=1)
                 c = proposal.get("contract") or {}
+                # ONE FEE SCHEDULE IDENTITY: the pre-selection body carries the SAME identity the boundary will seal
+                fs = bd.fee_schedule
                 body = {"expression": proposal.get("expression"), "contract": c, "quantity": proposal.get("quantity", 1),
                         "risk_envelope": env, "action": "BUY", "session_id": bd.session_id, "scan_id": scan_id,
+                        "fees": {"schedule_id": fs.schedule_id, "schedule_hash": fs.schedule_hash,
+                                 "provenance": fs.provenance, "known": fs.known},
                         "contract_id": _cid(c) if c else None,
                         "intent_id": "PRESELECTION:%s" % canonical_hash({"scan_id": scan_id, "contract": c})[:16],
                         "signal_used": ("LONG" if (proposal.get("expression") == "LONG_CALL") else "SHORT")}

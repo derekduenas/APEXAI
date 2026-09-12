@@ -36,7 +36,7 @@ from .book import Book, load_book
 from .clock import Clock, ClockRefused, check_reading, to_utc_string
 from .exit_policy import EXIT_POLICY_V1, ExitPolicy
 from .fees import EXECUTION_POLICY_V1, UNVERIFIED_FEES, ExecutionPolicy, FeeSchedule
-from .records import (TOLL_FORMULA_V1, FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_prospective, canonical_hash, labels_for,
+from .records import (TOLL_FORMULA_V1, FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_prospective, canonical_hash, is_real, labels_for,
                       validate_forecast, validate_intent, validate_quote)
 
 MAX_SELECTED_QUOTE_AGE_S = 15.0
@@ -208,7 +208,12 @@ class Boundary:
             self.refuse("intent", envelope["why_infeasible"], scan_id=scan_id)
         fees = {"schedule_id": self.fee_schedule.schedule_id, "schedule_hash": self.fee_schedule.schedule_hash,
                 "provenance": self.fee_schedule.provenance, "known": self.fee_schedule.known}
-        fee_totals = (self.fee_schedule.entry(1).get("total"), self.fee_schedule.exit(1).get("total"))
+        # the intent-time exit fee needs a sale principal that does not exist yet; TOLL_FORMULA_V1 already declares an
+        # assumption for the exit side, so the REFERENCE BID is used as the assumed principal and is recorded as such
+        _rq = intent.get("reference_quote") or {}
+        _assumed_principal = (round(float(_rq["bid"]) * 100.0, 2) if is_real(_rq.get("bid")) else None)
+        fee_totals = (self.fee_schedule.entry(1).get("total"),
+                      self.fee_schedule.exit(1, sale_principal=_assumed_principal).get("total"))
         pins = {"release": self.release, "expression_rule": intent.get("expression_rule"),
                 "exit_policy_id": self.exit_policy.policy_id, "exit_policy_hash": self.exit_policy.policy_hash,
                 "execution_policy_hash": self.execution_policy.policy_hash,
@@ -263,6 +268,20 @@ class Boundary:
         return receipt
 
     # ------------------------------------------------------------ authorization compatibility
+    def fee_identity_problem(self, it: dict) -> str | None:
+        """ONE FEE SCHEDULE IDENTITY, re-checked at fill and at recovery: the intent's sealed fee block must still be
+        this boundary's schedule. A release or configuration change that swaps the schedule under an open intent is a
+        refusal, not a silent re-pricing."""
+        f = it.get("fees")
+        if not isinstance(f, dict):
+            return "FEE_IDENTITY_MISSING_ON_INTENT: %r" % (it.get("intent_id"),)
+        mine = {"schedule_id": self.fee_schedule.schedule_id, "schedule_hash": self.fee_schedule.schedule_hash,
+                "provenance": self.fee_schedule.provenance, "known": self.fee_schedule.known}
+        for k, v in mine.items():
+            if f.get(k) != v:
+                return ("FEE_IDENTITY_CHANGED_SINCE_INTENT: intent sealed %s=%r, this boundary runs %r" % (k, f.get(k), v))
+        return None
+
     def authorization_problem(self, it: dict) -> str | None:
         """A stored approval is authorization only if (a) it binds to this
         intent, (b) the intent's provenance matches this boundary's, and
@@ -460,8 +479,12 @@ class Boundary:
             self.refuse("fill", why_x, scan_id=scan_id)
         attempt = len(attempts) + 1
         txn_id = "fill:%s:%d" % (intent_id, attempt)
-        # 2. ELIGIBILITY FOR A NEW FILL: active authority, intent unexpired, forecast eligible NOW.
+        # 2. ELIGIBILITY FOR A NEW FILL: active authority, intent unexpired, forecast eligible NOW, then ONE FEE
+        #    IDENTITY (checked last so the existing refusal precedence is unchanged, and still BEFORE the quote call).
         self._require_new_fill_eligibility(intent_receipt, it, rows=rows)
+        fp = self.fee_identity_problem(it)
+        if fp:
+            self.refuse("fill", fp, refs={"intent_id": intent_id}, scan_id=scan_id)
         t_request = self.clock.now()
         provider_error = None
         try:
@@ -677,6 +700,14 @@ class Boundary:
         if fl.get("data_provenance") != self.labels["data_provenance"]:
             self.refuse("outcome", "PROVENANCE_INCOMPATIBLE: fill %r vs boundary %r"
                         % (fl.get("data_provenance"), self.labels["data_provenance"]), scan_id=scan_id)
+        # ONE FEE SCHEDULE IDENTITY at RECOVERY: the exit is priced by THIS boundary's schedule, so it must be the
+        # schedule the entry was priced under. A changed schedule is a refusal, never a silent re-pricing of an exit.
+        fe = fl.get("fees_entry") or {}
+        if fl.get("status") == "FILLED" and (fe.get("schedule_id") != self.fee_schedule.schedule_id
+                                             or (fe.get("schedule_hash") and fe["schedule_hash"] != self.fee_schedule.schedule_hash)):
+            self.refuse("outcome", "FEE_IDENTITY_CHANGED_SINCE_FILL: entry priced under %r/%s, this boundary runs %r/%s"
+                        % (fe.get("schedule_id"), str(fe.get("schedule_hash"))[:12], self.fee_schedule.schedule_id,
+                           self.fee_schedule.schedule_hash[:12]), scan_id=scan_id)
         done = self.discharging_outcomes(rows, fill_receipt["seq"])
         if done:
             return self._reconcile_outcome(done[0][0], done[0][1], fill_receipt=fill_receipt, rows=rows, scan_id=scan_id)
@@ -736,7 +767,8 @@ class Boundary:
                                     "the position REMAINS an unresolved obligation until a later attempt discharges it")
             else:
                 q_n = int(fl.get("quantity_filled", 1))
-                fee_x = self.fee_schedule.exit(q_n)
+                sale_principal = round(q["bid"] * CONTRACT_MULTIPLIER * q_n, 2)   # C: the ACTUAL principal of this sale
+                fee_x = self.fee_schedule.exit(q_n, sale_principal=sale_principal)
                 fee_e = (fl.get("fees_entry") or {}).get("total")
                 credit = round(q["bid"] * CONTRACT_MULTIPLIER * q_n, 2)
                 fees_known = fee_x["total"] is not None and fee_e is not None
