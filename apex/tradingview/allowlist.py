@@ -4,10 +4,11 @@ FAIL CLOSED. A tool the adapter has not explicitly reviewed cannot be called, wh
 The allowlist is a literal tuple, not a filter over a pattern: a new tool appearing on the server is DENIED by
 default and must be reviewed into this file by a person.
 
-DISCREPANCY, RECORDED. The official documentation (retrieved 2026-09-12, https://www.tradingview.com/mcp/docs)
-labels `get_active_watchlist` READ-ONLY. The operator's brief states it has documented activation/creation side
-effects and must remain excluded. **The exclusion wins**: a disagreement about whether a call mutates state is
-resolved by not making the call. This note exists so the discrepancy is not lost if the documentation changes.
+AN INCONSISTENCY INSIDE THE DOCUMENTATION, NOT A DISPUTE WITH IT. The official documentation (retrieved 2026-09-12,
+https://www.tradingview.com/mcp/docs) carries `get_active_watchlist` under a READ-ONLY label AND describes
+activation/creation side effects for it. The label and the description contradict each other; the description is
+the operative fact, so the tool is excluded. A read-only label is a summary, and a summary does not override the
+behaviour the same document sets out.
 
 `monitor` on `create_alert` and the `webhook` parameter are the reason every alert tool is denied even though
 several of them read: an alert with a webhook is an outbound trigger, and this connector is observation only."""
@@ -44,8 +45,9 @@ DENIED_TOOLS = {
     "add_to_watchlist": "MUTATES_ACCOUNT_STATE: changes a watchlist",
     "remove_from_watchlist": "MUTATES_ACCOUNT_STATE: changes a watchlist",
     "update_watchlist": "MUTATES_ACCOUNT_STATE: renames a watchlist",
-    "get_active_watchlist": ("SIDE_EFFECTS_DISPUTED: the documentation labels this read-only; the operator's brief "
-                             "states it has activation/creation side effects. A disputed mutation is not called."),
+    "get_active_watchlist": ("DOCUMENTED_SIDE_EFFECTS: the official documentation describes activation/creation "
+                             "side effects for this tool while also carrying a read-only label. The described "
+                             "behaviour governs; the label does not make it safe to call."),
     "list_watchlists": "NOT_NEEDED: account state, outside symbol discovery / bars / context / news / calendars",
     "get_watchlist": "NOT_NEEDED: account state, outside this connector's purpose",
     # mutating or outbound: alerts

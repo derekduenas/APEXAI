@@ -61,13 +61,13 @@ class TestDisallowedToolsCannotBeCalled:
             assert env["state"] == A.STATE_DENIED, tool
         assert called == [], "not one disallowed call may reach the transport"
 
-    def test_the_disputed_active_watchlist_tool_stays_excluded(self):
-        """The documentation labels get_active_watchlist read-only; the operator's brief says it has activation
-        side effects. A disputed mutation is not called."""
+    def test_the_active_watchlist_tool_with_documented_side_effects_stays_excluded(self):
+        """The official documentation carries get_active_watchlist under a read-only label AND describes
+        activation/creation side effects for it. The described behaviour governs; the label does not."""
         called = []
         env = adapter(lambda n, a: called.append(n)).call("get_active_watchlist")
         assert env["state"] == A.STATE_DENIED and called == []
-        assert "active_watchlist" in AL.DENIED_TOOLS["get_active_watchlist"] or "DISPUTED" in AL.DENIED_TOOLS["get_active_watchlist"]
+        assert "DOCUMENTED_SIDE_EFFECTS" in AL.DENIED_TOOLS["get_active_watchlist"]
 
     def test_an_unknown_tool_is_denied_by_default(self):
         env = adapter(lambda n, a: {"x": 1}).call("some_new_tool_that_appeared")
@@ -454,3 +454,77 @@ class TestFixtureDemonstration:
         assert d["n_allowed"] == 9 and d["provider"] == "TRADINGVIEW_MCP"
         assert d["docs_retrieved_utc"] == "2026-09-12"
         assert "OBSERVATION_ONLY" in d["law"]
+
+
+# ---------------------------------------------------------------------------- the recorded-response smoke bridge
+
+
+class TestTheSmokeBridge:
+    """`scripts/tradingview_smoke.py` drives the REAL adapter over responses recorded by the authorized session, so
+    the live smoke test exercises the allowlist, budget and normalization without this process holding a credential."""
+
+    @staticmethod
+    def _mod():
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("tv_smoke", "scripts/tradingview_smoke.py")
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+
+    def _calls(self, n=2, **over):
+        base = [{"tool": "search_symbols", "args": {"query": "SPY"}, "request_start": T - 2.0,
+                 "response_receipt": T - 1.5, "payload": {"symbols": [{"full": "AMEX:SPY"}]}},
+                {"tool": "get_technicals_rating", "args": {"symbol": "AMEX:SPY"}, "request_start": T - 1.0,
+                 "response_receipt": T - 0.5, "payload": {"recommendation": "NEUTRAL"}}][:n]
+        if over:
+            base[-1].update(over)
+        return base
+
+    def test_recorded_calls_drive_the_real_adapter(self, tmp_path):
+        m = self._mod()
+        res = m.run(self._calls())
+        assert [r["state"] for r in res["results"]] == ["OK", "OK"]
+        obs = res["results"][0]["observation"]
+        assert obs["provider"] == "TRADINGVIEW_MCP" and obs["known_from_epoch"] == T - 1.5
+        assert obs["entitlement"] == "UNKNOWN" and obs["historical_availability"] == "NOT_ESTABLISHED"
+        assert res["report"]["budget"]["used"] == 2
+
+    def test_an_off_allowlist_recording_is_refused(self, tmp_path):
+        m = self._mod()
+        calls = self._calls(1)
+        calls[0]["tool"] = "create_alert"
+        p = tmp_path / "c.json"
+        p.write_text(json.dumps(calls))
+        with pytest.raises(AL.ToolNotAllowed):
+            m.load_calls(p, now=T)
+
+    def test_more_than_ten_recorded_calls_are_refused(self, tmp_path):
+        m = self._mod()
+        p = tmp_path / "c.json"
+        p.write_text(json.dumps(self._calls(1) * 11))
+        with pytest.raises(m.SmokeRefused, match="BUDGET_EXCEEDED_IN_THE_RECORDING"):
+            m.load_calls(p, now=T)
+
+    def test_a_fabricated_future_receipt_is_refused(self, tmp_path):
+        m = self._mod()
+        p = tmp_path / "c.json"
+        p.write_text(json.dumps(self._calls(1, response_receipt=T + 10_000.0)))
+        with pytest.raises(m.SmokeRefused, match="RECEIPT_IN_THE_FUTURE"):
+            m.load_calls(p, now=T)
+
+    def test_out_of_order_receipts_are_refused(self, tmp_path):
+        m = self._mod()
+        calls = self._calls(2)
+        calls[1]["request_start"] = T - 100.0
+        calls[1]["response_receipt"] = T - 99.0
+        p = tmp_path / "c.json"
+        p.write_text(json.dumps(calls))
+        with pytest.raises(m.SmokeRefused, match="OUT_OF_ORDER"):
+            m.load_calls(p, now=T)
+
+    def test_a_receipt_before_its_request_is_refused(self, tmp_path):
+        m = self._mod()
+        p = tmp_path / "c.json"
+        p.write_text(json.dumps(self._calls(1, request_start=T, response_receipt=T - 5.0)))
+        with pytest.raises(m.SmokeRefused, match="RECEIPT_BEFORE_REQUEST"):
+            m.load_calls(p, now=T)

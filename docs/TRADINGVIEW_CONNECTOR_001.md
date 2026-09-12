@@ -10,6 +10,19 @@ promotion was changed, nothing was deployed and no order exists.
 **Authorized and connected at the account level; the offline adapter and its 45 acceptance tests pass. The bounded
 smoke test has NOT run, because the session that built this could not see the tools.**
 
+## Capability matrix
+
+| capability | status |
+|---|---|
+| interactive Claude access (account) | **AUTHORIZED.** `claude mcp list` reports `✔ Connected` |
+| interactive Claude access (this session) | **NOT AVAILABLE.** No `mcp__mcp-tradingview__*` tool is exposed here |
+| normalized adapter | **BUILT AND TESTED.** 51 tests, synthetic payloads |
+| live smoke test | **NOT RUN.** Zero calls made to TradingView by any process |
+| production Twin wiring | **NOT_CONNECTED** |
+| chart rendering | **NOT AVAILABLE.** The server documents no chart image or screenshot tool |
+| unattended APEX service access | **NOT_CONNECTED.** No runtime route exists |
+| options execution data | **NOT AVAILABLE.** The server documents no options data and no execution capability |
+
 ### Authorization: done. Tool access from this session: not available.
 
 The operator completed the browser authorization on 2026-09-12. `claude mcp list` now reports:
@@ -23,8 +36,44 @@ its tool registry at start; this one started while the server still needed autho
 newly authorized server mid-session. Two searches of the deferred-tool registry returned nothing from this
 provider, so the smoke test could not be attempted and no partial result is being reported as one.
 
-**A fresh session picks the tools up.** The smoke test is nine allowed tools and a ten-call budget away, and the
-adapter is ready to receive them as its injected transport.
+### The reason a fresh session in this worktree would ALSO have failed
+
+`claude mcp get mcp-tradingview` reports **`Scope: Local config (private to you in this project)`**, and
+`~/.claude.json` confirms the entry lives under one project only:
+
+```
+project /Users/derekduenas               -> ['ruflo', 'robinhood-trading', 'mcp-tradingview']
+project /Users/derekduenas/apex-equities -> ['robinhood-trading']
+```
+
+There is no entry for `/Users/derekduenas/apex-tv-wt` at all. **A session started in this worktree would not see
+the server, authorized or not.** An earlier instruction in this brick's delivery to `cd ~/apex-tv-wt && claude` was
+therefore wrong, and is corrected here.
+
+Two ways to run the smoke test, both fine:
+
+- **Start the session from `/Users/derekduenas`**, where the server is already registered and authorized, and work
+  on `~/apex-tv-wt` from there. No configuration change, no re-authorization.
+- **Promote the server to user scope** so every directory sees it:
+  `claude mcp add --transport http --scope user mcp-tradingview https://mcp.tradingview.com/mcp`. This may require
+  authorizing the new entry once. Not done here, because it is the operator's configuration and the first option
+  costs nothing.
+
+### How the smoke test runs once the tools are visible
+
+`scripts/tradingview_smoke.py` closes the last gap. The session holding the authorized tools calls each allowed
+tool, records the request instant, the response instant and the verbatim payload into a JSON file, and runs:
+
+```bash
+python scripts/tradingview_smoke.py calls.json docs/evidence/tradingview/smoke_<date>.json
+```
+
+The script then drives the **real** adapter over those recordings, so the allowlist, the budget, the cache and the
+whole normalization contract are exercised on live data while this process never touches an OAuth session. It
+refuses more than ten calls, refuses any tool off the allowlist, refuses a receipt that precedes its request or
+sits in the future of the wall clock, refuses out-of-order receipts, and refuses to overwrite an existing output.
+The receipt instants must be the real ones: `known_from` is taken from them, and a fabricated receipt would
+manufacture exactly the hindsight the contract exists to prevent.
 
 ## 1. The integration
 
@@ -78,13 +127,16 @@ read-only account state outside this connector's purpose, 9 are read-only but un
 the disputed case below. A tool that is on neither list is **denied by default** — a new tool appearing on the
 server cannot be called until a person reviews it into the file.
 
-### A documentation discrepancy, recorded rather than resolved silently
+### `get_active_watchlist`: an inconsistency inside the documentation
 
-**The documentation labels `get_active_watchlist` READ-ONLY. Your brief states it has documented
-activation/creation side effects.** The two disagree. The adapter excludes it, and the reason string in the code
-says why: a disputed mutation is not called. If the documentation is right, the cost is one unavailable read; if
-your brief is right, silently trusting the label would have mutated your account. Worth resolving with TradingView
-support at some point, but not by testing it against your live account.
+**CORRECTED 2026-09-12.** An earlier version of this document framed this as a disagreement between TradingView's
+documentation and the operator's brief. That was wrong. **The official documentation itself describes
+activation/creation side effects for `get_active_watchlist` while also carrying it under a read-only label.** The
+label and the description contradict each other within the same document, and the described behaviour governs. A
+read-only label is a summary; a summary does not override the behaviour the same document sets out. The tool stays
+excluded, and the reason string in `allowlist.py` now says `DOCUMENTED_SIDE_EFFECTS` rather than `SIDE_EFFECTS_DISPUTED`.
+
+The general rule this leaves behind is the useful part: **a tool's own label is not evidence about what it does.**
 
 A second structural guard sits behind the allowlist: `FORBIDDEN_MARKERS` denies any tool name containing `create`,
 `delete`, `update`, `add_`, `remove`, `set_`, `stop_`, `restart`, `activate`, `order`, `buy`, `sell`, `submit`,
