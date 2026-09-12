@@ -148,7 +148,9 @@ def replay_session(root: Path, symbol: str, day: str, *, artifact: FrozenArtifac
         spot = usable_value(snap, "last_bar_close")
         q_now = quotes.get(_hhmm(m), {})
         q_exit = quotes.get(_hhmm(m + HOLD_MIN * 60), {})
-        available = [{"expiration": e, "strike": s, "right": r, "ask": q["ask"]} for (e, s, r), q in q_now.items() if q["ask"] > 0 and q["ask_size"] >= 1]
+        available = [{"expiration": e, "strike": s, "right": r, "ask": q["ask"], "bid": q.get("bid"), "bid_size": q.get("bid_size"),
+                      "ask_size": q.get("ask_size"), "timestamp_epoch": q.get("timestamp_epoch")}
+                     for (e, s, r), q in q_now.items() if q["ask"] > 0 and q["ask_size"] >= 1]
         for name, d in dirs.items():
             v = {"direction": d}
             if d is None:
@@ -158,7 +160,7 @@ def replay_session(root: Path, symbol: str, day: str, *, artifact: FrozenArtifac
                 # the replay evaluates the rule it is ASKED to evaluate; PILOT-REPLAY-001 was sealed under PILOT_RULE_V1 (whose
                 # cap-blindness is DEFECT_STRIKE_RULE_001) and stays reproducible; pass expression_rule="PILOT_RULE_V2" to replay the repair
                 prop = choose(symbol=symbol, direction_signal=d, spot=spot, as_of=datetime.fromtimestamp(m, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                              available=available, rule=expression_rule, max_entry_price=entry_cap_price())
+                              available=available, rule=expression_rule, max_entry_price=entry_cap_price(), as_of_epoch=float(m))
             except RuleRefused as e:
                 v.update(decision="REFUSE", why=str(e)[:120]); rec["variants"][name] = v; continue
             c = prop["contract"]; key = (c["expiration"], float(c["strike"]), c["right"])

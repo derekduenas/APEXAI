@@ -10,6 +10,7 @@ INSUFFICIENT_MARGIN, VALUE_UNESTABLISHED, RISK_LIMIT, PREREQUISITE_MISSING. "Con
 a universal percentage: the record carries p_return_gt_zero with its definition."""
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 
 from apex.worldmodel_wb.contracts import ForecastObject, UnsupportedOutput, digest
@@ -58,8 +59,12 @@ def supervise(*, forecast: ForecastObject | None, snapshot: dict | None, compari
         if cand.get("status") != "ELIGIBLE":
             reasons.append("QUOTE_UNCERTAINTY: candidate rejected (%s)" % cand.get("why"))
         else:
-            if (cand.get("entry_spread_rel") or 0) > policy.max_spread_rel:
-                reasons.append("QUOTE_UNCERTAINTY: relative spread %.3f > %.2f" % (cand["entry_spread_rel"], policy.max_spread_rel))
+            sr = cand.get("entry_spread_rel")
+            # a MISSING or INVALID spread is not zero: `x or 0` swallowed None AND a legitimately measured 0.0
+            if sr is None or isinstance(sr, bool) or not isinstance(sr, (int, float)) or not math.isfinite(sr) or sr < 0:
+                reasons.append("QUOTE_UNCERTAINTY: relative spread unknown or invalid (%r); a missing spread is not zero" % (sr,))
+            elif sr > policy.max_spread_rel:
+                reasons.append("QUOTE_UNCERTAINTY: relative spread %.3f > %.2f" % (sr, policy.max_spread_rel))
             if policy.require_value_established and not cand.get("expected_value_established"):
                 reasons.append("VALUE_UNESTABLISHED: %s" % comparison.get("expected_value_note"))
             elif cand.get("expected_net_pnl", 0.0) <= policy.min_expected_net_pnl:

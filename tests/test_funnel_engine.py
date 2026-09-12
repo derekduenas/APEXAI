@@ -491,6 +491,7 @@ def _full_mode_run(tmp_path, *, session_id, quote_age_s=1.0, n_paths=400, seed=3
     led = tmp_path / "led.jsonl"
     h = SyntheticHarness(led, session_id=session_id, t0=REG)
     h.quotes.age = quote_age_s
+    h.chain_age = quote_age_s                      # the chain rows carry indicative quotes of the same age
     engine = FunnelEngine(n_paths=n_paths, seed=seed, mode="FULL")
     twin = synthetic_twin_sources(clock=h.clock, quote_fn=h.quotes, exit_quote_fn=h.exit_quotes, chain_fn=h.chain_fn, sleep_fn=h.advance,
                                   selection_policy="FULL_FUNNEL_V1", funnel_engine=engine)

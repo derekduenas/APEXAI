@@ -98,6 +98,8 @@ class SyntheticHarness:
         self.chain = [{"expiration": "2026-10-09", "strike": k, "right": r, "ask": 2.45} for k in (640.0, 645.0, 650.0, 655.0)
                       for r in ("CALL", "PUT")] + [{"expiration": "2026-09-18", "strike": 645.0, "right": "CALL", "ask": 1.10}]
         self.forecast_override = None
+        self.chain_age = 1.0                                    # seconds; indicative rows are this old at the scan
+        self.selection_policy = "PILOT_RULE_V2"
         self.symbols = list(symbols)
 
     # controlled clock
@@ -133,7 +135,17 @@ class SyntheticHarness:
         return self.signal
 
     def chain_fn(self, symbol: str, as_of: float):
-        return self.chain
+        # indicative rows carry the quote they were observed with (bid, sizes, provider timestamp = now - chain_age)
+        out = []
+        for c in self.chain:
+            row = dict(c)
+            if "ask" in c and "bid" not in c:
+                row["bid"] = round(c["ask"] - 0.10, 2)
+            if "ask" in c:
+                row.setdefault("bid_size", 9); row.setdefault("ask_size", 12)
+                row.setdefault("timestamp_epoch", self.now() - self.chain_age)
+            out.append(row)
+        return out
 
     def spot_fn(self, symbol: str, as_of: float):
         return self.spot

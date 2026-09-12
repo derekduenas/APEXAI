@@ -1,0 +1,116 @@
+{
+ "review_base": "b9998d02b7c3dc8030e753277fd5fbd1bba9ff8f",
+ "head": "b9998d02b7c3dc8030e753277fd5fbd1bba9ff8f",
+ "findings": {
+  "F1_policy_identity": {
+   "reproduced": false,
+   "detail": {
+    "cli_default": "PILOT_RULE_V2",
+    "cli_choices": "\"PILOT_RULE_V1\", \"PILOT_RULE_V2\", \"FULL_FUNNEL_V1\", \"JOINT_FUNNEL_V1\"",
+    "session_default_rule": "PILOT_RULE_V2",
+    "SELECTION_POLICIES": [
+     "PILOT_RULE_V1",
+     "PILOT_RULE_V2",
+     "FULL_FUNNEL_V1",
+     "JOINT_FUNNEL_V1"
+    ]
+   }
+  },
+  "F2a_unknown_right_becomes_put": {
+   "reproduced": false,
+   "detail": {
+    "right_of_empty": null,
+    "bid_size_of_1.7": null,
+    "ask_size_of_True": null,
+    "ask_of_inf": null,
+    "n_rows_kept": 0
+   }
+  },
+  "F2b_fractional_or_bool_sizes_coerced": {
+   "reproduced": false,
+   "detail": {
+    "right_of_empty": null,
+    "bid_size_of_1.7": null,
+    "ask_size_of_True": null,
+    "ask_of_inf": null,
+    "n_rows_kept": 0
+   }
+  },
+  "F2c_infinity_survives": {
+   "reproduced": false,
+   "detail": {
+    "right_of_empty": null,
+    "bid_size_of_1.7": null,
+    "ask_size_of_True": null,
+    "ask_of_inf": null,
+    "n_rows_kept": 0
+   }
+  },
+  "F2d_zero_ask_enters_v2": {
+   "reproduced": false,
+   "detail": {
+    "chosen": 780.0,
+    "reference_ask": 3.0
+   }
+  },
+  "F2d_negative_ask_enters_v2": {
+   "reproduced": false,
+   "detail": {
+    "chosen": 780.0,
+    "reference_ask": 3.0
+   }
+  },
+  "F2d_inf_ask_enters_v2": {
+   "reproduced": false,
+   "detail": {
+    "chosen": 780.0,
+    "reference_ask": 3.0
+   }
+  },
+  "F2e_duplicate_order_dependence": {
+   "reproduced": false,
+   "detail": {
+    "forward": [
+     780.0,
+     3.0
+    ],
+    "reversed": [
+     780.0,
+     3.0
+    ]
+   }
+  },
+  "F3_prime_spread_bypassed": {
+   "reproduced": false,
+   "detail": {
+    "engine_passes_None": false,
+    "supervision_treats_missing_as_zero": false,
+    "prime_decision": "ACT"
+   }
+  },
+  "F4_put_iv_stress_is_favorable": {
+   "reproduced": false,
+   "detail": {
+    "mapping_in_source": false
+   }
+  },
+  "F5_30s_indicative_quote_excluded_from_ranking": {
+   "reproduced": false,
+   "detail": {
+    "n_eligible": 6,
+    "census": {
+     "RISK_ENVELOPE": 4,
+     "INDICATIVE_AGE_15_120S": 6
+    },
+    "decision": "TRADE"
+   }
+  },
+  "F6_toll_formula_references_fill_quote_at_intent_time": {
+   "reproduced": false,
+   "detail": {
+    "intent_time_formula_uses_fill": false,
+    "expected_toll_is_a_field": true
+   }
+  }
+ }
+}

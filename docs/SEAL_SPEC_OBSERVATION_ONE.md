@@ -1,6 +1,7 @@
 # Seal spec — observation one (OTM long single leg, paper)
 
-Date: 2026-09-11. One page. States exactly what the sealed BEFORE record contains, what may only be written
+Date: 2026-09-11; corrected 2026-09-12 (decision-path review, finding 6: the intent-time toll formula referenced a
+later fill quote, and the ordering statement omitted that indicative quotes exist before the forecast/funnel/intent). One page. States exactly what the sealed BEFORE record contains, what may only be written
 after, and why outcomes cannot modify the BEFORE record. Every field below is either already produced by the
 recording boundary today (marked ✓) or is named as pending with the change it needs.
 
@@ -22,22 +23,44 @@ simulated execution instant, the fill price, and the canonical proposal digest r
 A fill is part of BEFORE with respect to the outcome, and AFTER with respect to the intent. It cannot change the
 intent: the intent's `entry_hash` is already in the chain and the fill carries `intent_ref` to it.
 
-## 2. Fields the directive requires that the boundary does not yet seal
+## 2. Ordering, corrected
 
-| Field | Where it should live | Today | Change needed |
+Actual session order (`apex/options_pilot/session.py`): **indicative chain quotes exist first** (the chain snapshot
+the rule selects from, each row carrying its own provider timestamp) → `pilot_forecast` persisted → (funnel paths
+only) `pilot_funnel` persisted → `pilot_intent` persisted, sealing the indicative reference quote it was selected on
+→ fresh executable quote fetched → `pilot_fill` persisted → exit window → `pilot_outcome`. Three cost quantities
+are therefore distinct and are sealed at three different times:
+
+| Quantity | Time | Inputs | Where sealed |
 |---|---|---|---|
-| **pre-registered options toll formula + hash** | `pilot_intent.expected_toll` | not a field | one record field. Formula (frozen text, hash below): `expected_toll_$ = 100 × [ (ask_fill − bid_fill)/2 + (ask_ref − bid_ref)/2 ] + fee_in + fee_out`, where `ref` is the same contract's chain quote at decision time and `fill` the executed quote. Realised toll = `100 × [(ask_fill − mid_fill) + (mid_exit − bid_exit)] + fees` from the sealed fill and exit quotes. The formula is hashed, not the numbers, so it cannot be reshaped after outcomes land. |
-| **the six doctrine fields** (`capacity_suitability`, `giant_competition_risk`, `signal_half_life`, `our_expected_footprint`, `crowding`, `forced_participant_strength`) | `pilot_intent.doctrine` | not fields on the pilot record; each exists as a measurement contract elsewhere (`SMALL_CAPITAL_ADVANTAGE_DOCTRINE.md`) | one record field carrying each as `{value | "NOT_MEASURED", source}`. For observation one every one of the six will honestly read `NOT_MEASURED` except `our_expected_footprint` (1 contract vs quoted size, computable from the chain row). A field that says NOT_MEASURED is sealed; a missing field is not. |
-| **`tail_asymmetry`** | `pilot_intent.doctrine.tail_asymmetry` | exists as a string field in `options_research/forward_distribution.py`, always `"UNKNOWN"` | same field; `"UNKNOWN"` sealed |
-| **the full pin** | `pilot_intent.pins` | release id sealed; contract pin sealed only on funnel paths | one field: `{release, git_commit, expression_rule_version, exit_policy_hash, fee_schedule_id, risk_kernel_limits_hash, r4_contract_blob (if a funnel path), toll_formula_hash}` |
+| **intent-time expected toll** (`TOLL_FORMULA_V1`) | before any executable quote | the indicative reference quote's bid/ask + the fee schedule | `pilot_intent.expected_toll` |
+| **post-requote entry cost update** | after the fresh executable quote is received, in the same committed record as the fill decision | the executable quote | `pilot_fill.entry_cost_update` (references the intent's estimate; never rewrites it) |
+| **realised exit accounting** | inside the exit window | the sealed fill and exit quotes | `pilot_outcome` |
 
-These are four record fields on one validator plus the doctrine stamp. They are capability under the freeze and
-are **not built here**; the operator decides whether observation one waits for them or seals the formula by
-reference to this document's hash.
+`TOLL_FORMULA_V1` (text hashed in `apex/options_pilot/records.py`, hash sealed in every intent's `pins`):
 
-**Toll formula hash** (sha256 of the exact formula line above, ASCII, no trailing space):
-`TOLL_FORMULA_V1 = sha256("expected_toll_$ = 100 x [ (ask_fill - bid_fill)/2 + (ask_ref - bid_ref)/2 ] + fee_in + fee_out")`
-= see `docs/evidence/toll_formula_v1.sha256` (written beside this document so the hash is a file, not a claim).
+```
+expected_toll_$ = 100 x (ask_ref - bid_ref) + fee_in + fee_out
+```
+
+with `ask_ref`/`bid_ref` the indicative quote the selection was made on and the exit half-spread **assumed** equal
+to the entry half-spread. That assumption is declared, not estimated, and is the one unresolved estimator choice:
+see the amendment proposal below. If the fee schedule is unknown the field reads `NOT_ESTIMABLE` with the reason;
+nothing is fabricated.
+
+## 2a. BEFORE fields now implemented (2026-09-12)
+
+| Field | Content | State on observation one |
+|---|---|---|
+| `expected_toll` | formula id, formula hash, inputs, value or `NOT_ESTIMABLE` | `NOT_ESTIMABLE` on the live boundary until the fee schedule is verified; estimated on synthetic |
+| `doctrine.fields` | the six doctrine fields, each `{value, source}`; `tail_asymmetry` | five read `NOT_MEASURED` with the reason; `our_expected_footprint` = 1 / indicative ask size; `tail_asymmetry` = `UNKNOWN` |
+| `pins` | release, expression rule id, exit policy id + hash, execution policy hash, fee schedule id + hash, risk authority id, toll formula id + hash, contract pin (funnel paths) | complete; `git_commit` reads "not available in process" honestly, the release id is the deployment pin |
+| `reference_quote` | the indicative quote (bid, ask, sizes, timestamp) the selection used | sealed |
+| `strike_selection` | rule version, spot, strike, distance, census, exclusions (selector and provider) | sealed |
+
+**Amendment proposal for review, not applied:** replace the equal-half-spread assumption with the session's
+observed exit-spread distribution once `docs/CLOCK_START_ROUTE1_READINESS.md` §6 has ≥ 20 sessions; until then
+the assumption stands and is labelled.
 
 ## 3. What may only be written AFTER
 
@@ -56,5 +79,6 @@ reference to this document's hash.
 - The ledger is append-only and fsynced; there is no update path in `apex/options_pilot/ledger.py`.
 - The fill re-derives the canonical proposal from the intent and refuses on mismatch (`proposal_digest`), so an
   outcome cannot be attached to a reshaped intent.
-- The toll is a formula whose hash is sealed before the fill; the numbers that enter it come from entries sealed
-  before the exit. Nothing computed after the exit is an input to anything sealed before it.
+- The intent-time toll is a formula whose hash is sealed in the intent; its inputs are the indicative quote sealed in
+  the same record. The fill's cost update is a separate field on a later record and carries a reference to the
+  intent's value. Nothing computed after a record is an input to that record.

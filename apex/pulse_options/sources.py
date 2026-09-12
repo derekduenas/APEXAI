@@ -29,13 +29,14 @@ from .snapshot import compose, usable_value
 DIRECTION_RULE = "HEURISTIC_DIRECTION_V1: LONG if ret_15 > 0, SHORT if ret_15 < 0, None otherwise; not a forecast"
 
 
-SELECTION_POLICIES = ("PILOT_RULE_V1", "FULL_FUNNEL_V1", "JOINT_FUNNEL_V1")
+SELECTION_POLICIES = ("PILOT_RULE_V1", "PILOT_RULE_V2", "FULL_FUNNEL_V1", "JOINT_FUNNEL_V1")
+RULE_POLICIES = ("PILOT_RULE_V1", "PILOT_RULE_V2")            # deterministic expression rules; dispatched by name, never by default
 
 
 class TwinSources:
     def __init__(self, *, provenance: str, clock: Clock, bar_source, chain_fn, quote_fn, exit_quote_fn,
                  fee_schedule, sleep_fn=time.sleep, book_fn=None, warmup_minutes: int = 65, artifact=None,
-                 selection_policy: str = "PILOT_RULE_V1", funnel_engine=None, funnel_history_days: int = 7,
+                 selection_policy: str = "PILOT_RULE_V2", funnel_engine=None, funnel_history_days: int = 7,
                  joint_engine=None, joint_context_fn=None):
         if selection_policy not in SELECTION_POLICIES:
             raise ValueError("SELECTION_POLICY_UNKNOWN: %r" % (selection_policy,))
@@ -198,7 +199,7 @@ def returns_rows(bars: list) -> list:
     return rows
 
 
-def synthetic_twin_sources(*, clock: Clock, quote_fn, exit_quote_fn, chain_fn, sleep_fn, seed: int = 7, selection_policy: str = "PILOT_RULE_V1",
+def synthetic_twin_sources(*, clock: Clock, quote_fn, exit_quote_fn, chain_fn, sleep_fn, seed: int = 7, selection_policy: str = "PILOT_RULE_V2",
                            funnel_engine=None, joint_engine=None, joint_context_fn=None) -> TwinSources:
     return TwinSources(provenance="SYNTHETIC_FIXTURE", clock=clock, bar_source=SyntheticBarProvider(seed=seed), chain_fn=chain_fn,
                        quote_fn=quote_fn, exit_quote_fn=exit_quote_fn, fee_schedule=SYNTHETIC_FEES, sleep_fn=sleep_fn,
@@ -215,49 +216,98 @@ class _LiveBars:
         return self.adapter.bars(symbol, start_epoch=start_epoch, end_epoch=end_epoch)
 
 
-def _f(x):
+RIGHT_ENCODINGS = {"C": "CALL", "CALL": "CALL", "P": "PUT", "PUT": "PUT"}          # declared; anything else is REFUSED, never guessed
+INDICATIVE_MAX_AGE_S = 120.0                                                        # §1.1: indicative option quotes, 120 s
+
+
+class ChainRows(list):
+    """A list of VALID normalised chain rows plus the exclusions that produced it. Nothing is repaired: a row that
+    fails any check is excluded with a named reason and the reason is recorded (provider boundary)."""
+
+    def __init__(self, rows=(), exclusions=None):
+        super().__init__(rows)
+        self.exclusions = list(exclusions or [])
+
+
+def _finite_float(x):
+    """A finite float from a vendor string or number; bools, NaN, inf, and unparsable input are None."""
+    if isinstance(x, bool) or x is None:
+        return None
+    if isinstance(x, str):
+        t = x.strip().lower()
+        if t in ("", "nan", "inf", "+inf", "-inf", "infinity", "-infinity"):
+            return None
     try:
         v = float(x)
     except (TypeError, ValueError):
         return None
-    return v if v == v else None
+    return v if math.isfinite(v) else None
 
 
-def _i(x):
-    try:
-        return int(float(x))
-    except (TypeError, ValueError):
+def _size_int(x):
+    """A non-negative integer size. Digits only (a vendor sends "58"); bools, fractions, negatives, floats REFUSED."""
+    if isinstance(x, bool) or x is None:
         return None
+    if isinstance(x, int):
+        return x if x >= 0 else None
+    if isinstance(x, str) and x.strip().isdigit():
+        return int(x.strip())
+    return None
 
 
-def _norm_exp(e: str) -> str:
-    e = str(e)
-    return "%s-%s-%s" % (e[:4], e[4:6], e[6:8]) if len(e) == 8 and e.isdigit() else e
+def _norm_exp(e) -> str | None:
+    if e is None:
+        return None
+    e = str(e).strip()
+    if len(e) == 8 and e.isdigit():
+        e = "%s-%s-%s" % (e[:4], e[4:6], e[6:8])
+    try:
+        from datetime import date
+        date.fromisoformat(e)
+    except ValueError:
+        return None
+    return e
 
 
-def live_chain_rows(rows: list, *, symbol: str, receipt_time: float) -> list:
-    """Normalise options-feed snapshot rows (strings, as the vendor sends them) into the shapes the pilot's
-    validators accept: float strike/bid/ask, int sizes, provider timestamp as epoch (ET-naive localized), plus
-    the receipt clock. Nothing is invented: a row missing a field keeps it missing and the validator refuses it."""
-    out = []
-    for r in rows:
-        k = _f(r.get("strike"))
-        if k is None:
-            continue
+def live_chain_rows(rows: list, *, symbol: str, receipt_time: float) -> ChainRows:
+    """Normalise options-feed snapshot rows (strings, as the vendor sends them) into the shapes the pilot's validators
+    accept. PROVIDER BOUNDARY VALIDATION: only declared right encodings; finite positive strike and ask; finite
+    non-negative bid with ask >= bid; digit-only non-negative integer sizes; a parseable provider timestamp that is not
+    in the future of the receipt clock and not older than the indicative limit. A row failing any check is EXCLUDED
+    with a named reason, never repaired, and the exclusion is carried on the returned ChainRows."""
+    out, excl = [], []
+    for i, r in enumerate(rows):
+        why = None
+        right = RIGHT_ENCODINGS.get(str(r.get("right", "")).strip().upper()) if r.get("right") is not None else None
+        exp = _norm_exp(r.get("expiration"))
+        k = _finite_float(r.get("strike")); bid = _finite_float(r.get("bid")); ask = _finite_float(r.get("ask"))
+        bs = _size_int(r.get("bid_size")); as_ = _size_int(r.get("ask_size"))
         ts = r.get("timestamp")
-        try:
-            ts_epoch = ThetaChainAdapter.et_naive_to_epoch(str(ts)) if ts else None
-        except ValueError:
-            ts_epoch = None
-        out.append({"symbol": symbol, "expiration": _norm_exp(r.get("expiration")), "strike": k,
-                    "right": "CALL" if str(r.get("right", "")).upper().startswith("C") else "PUT",
-                    "bid": _f(r.get("bid")), "ask": _f(r.get("ask")), "bid_size": _i(r.get("bid_size")), "ask_size": _i(r.get("ask_size")),
-                    "timestamp_epoch": ts_epoch, "timestamp_raw": ts, "receipt_time": receipt_time,
-                    "provider": "THETADATA_V3", "indicative": True})
-    return out
+        ts_epoch = None
+        if ts is not None:
+            try:
+                ts_epoch = ThetaChainAdapter.et_naive_to_epoch(str(ts))
+            except (ValueError, TypeError):
+                ts_epoch = None
+        if right is None: why = "RIGHT_NOT_DECLARED: %r" % (r.get("right"),)
+        elif exp is None: why = "EXPIRATION_INVALID: %r" % (r.get("expiration"),)
+        elif k is None or k <= 0: why = "STRIKE_INVALID: %r" % (r.get("strike"),)
+        elif ask is None or ask <= 0: why = "ASK_INVALID: %r" % (r.get("ask"),)
+        elif bid is None or bid < 0: why = "BID_INVALID: %r" % (r.get("bid"),)
+        elif ask < bid: why = "QUOTE_CROSSED: bid %r > ask %r" % (bid, ask)
+        elif bs is None or as_ is None: why = "SIZE_INVALID: bid_size %r ask_size %r" % (r.get("bid_size"), r.get("ask_size"))
+        elif ts_epoch is None: why = "TIMESTAMP_INVALID: %r" % (ts,)
+        elif ts_epoch > receipt_time: why = "QUOTE_FROM_THE_FUTURE: %.3fs after receipt" % (ts_epoch - receipt_time)
+        elif receipt_time - ts_epoch > INDICATIVE_MAX_AGE_S: why = "INDICATIVE_STALE: %.1fs > %.0fs" % (receipt_time - ts_epoch, INDICATIVE_MAX_AGE_S)
+        if why:
+            excl.append({"row": i, "why": why, "strike": r.get("strike"), "right": r.get("right"), "expiration": r.get("expiration")})
+            continue
+        out.append({"symbol": symbol, "expiration": exp, "strike": k, "right": right, "bid": bid, "ask": ask, "bid_size": bs, "ask_size": as_,
+                    "timestamp_epoch": ts_epoch, "timestamp_raw": ts, "receipt_time": receipt_time, "provider": "THETADATA_V3", "indicative": True})
+    return ChainRows(out, excl)
 
 
-def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn=None, selection_policy: str = "PILOT_RULE_V1",
+def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn=None, selection_policy: str = "PILOT_RULE_V2",
                       expirations_fn=None, chain_snapshot_fn=None, clock=None) -> TwinSources:
     """LIVE_FEED sources. Connectivity is gated: with the default environment every provider call raises
     ProviderUnavailable before any network access, and the boundary persists the refusal.
@@ -303,7 +353,8 @@ def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn
         exp = _first_eligible_expiry(symbol, as_of)
         rows = live_chain_rows(chain_snapshot_fn(symbol, exp), symbol=symbol, receipt_time=clock.now())
         if not rows:
-            raise ProviderUnavailable("CHAIN_EMPTY: %s %s returned no priced rows" % (symbol, exp))
+            raise ProviderUnavailable("CHAIN_EMPTY: %s %s returned no valid rows (%d excluded: %s)"
+                                      % (symbol, exp, len(rows.exclusions), sorted({x["why"].split(":")[0] for x in rows.exclusions})[:4]))
         return rows
 
     def quote_fn(contract):
