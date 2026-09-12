@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-CONTRACT_PIN = "902256e3c3c5025a450a4bb607410933bb0c4b25"        # docs/R4_JOINT_MARKET_STATE_SPEC.md blob
+CONTRACT_PIN = "a0228fac4a2dab4c455c9fc8a41d1378522a27de"        # docs/R4_JOINT_MARKET_STATE_SPEC.md blob
 
 
 class PermissionRefused(PermissionError):

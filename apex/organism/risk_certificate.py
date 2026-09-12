@@ -24,8 +24,9 @@ notional cap converts one into the other.
 
 WHY A DEBIT VERTICAL IS NOT CERTIFIABLE HERE. A debit vertical's loss
 is bounded by its debit ONLY AT EXPIRY. Every card in this system
-carries the exit rule "hold to session close and resolve at quoted
-sides", so the short leg must be BOUGHT BACK: the close realises
+carries a pre-expiry exit rule (the options pilot's EXIT_AT_HORIZON_15M_V1
+exits 15 minutes after fill at quoted sides; the legacy protocol closed at
+session close), so the short leg must be BOUGHT BACK: the close realises
 (long bid - short ask), which can be negative, and the loss then
 exceeds the debit by an amount set by two bid/ask spreads that are not
 knowable at decision time. A long SINGLE option has no such exposure --
@@ -80,10 +81,12 @@ FEE_TREATMENT = {
     "entry_fees": "NOT_RECORDED_IN_ANY_APEX_ARTIFACT",
     "exit_fees": "NOT_RECORDED_IN_ANY_APEX_ARTIFACT",
     "exercise_assignment_fees": "NOT_APPLICABLE -- the pre-declared "
-                                "exit rule closes at session close, so "
-                                "no position is carried to exercise",
+                                "exit rule closes BEFORE expiry (15 min "
+                                "after fill in the pilot; session close "
+                                "in the legacy protocol), so no position "
+                                "is carried to exercise",
     "fees_on_the_max_loss_path": "AN EXIT TRADE OCCURS on the max-loss "
-                                 "path under the close-at-quoted-sides "
+                                 "path under any close-before-expiry "
                                  "exit rule, so entry AND exit fees "
                                  "both necessarily occur",
     "consequence": "certified_max_loss is PRE-FEE. It is a bound on "
@@ -112,7 +115,8 @@ LONG_OPTION_BASIS = (
 
 VERTICAL_NOT_CERTIFIABLE = (
     "a debit vertical is bounded by its debit ONLY AT EXPIRY. The "
-    "pre-declared exit rule closes at session close at quoted sides, "
+    "pre-declared exit rule closes BEFORE EXPIRY at quoted sides (the pilot "
+    "exits 15 minutes after fill; the legacy protocol at session close), "
     "which requires BUYING BACK the short leg: the close realises "
     "(long bid - short ask), which can be negative, and the loss then "
     "exceeds the debit by two bid/ask spreads that are NOT KNOWABLE "

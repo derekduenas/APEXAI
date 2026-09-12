@@ -695,8 +695,9 @@ one afterwards requires a NEW contract, counts against the search budget, and th
 | T9 | pricing identity: a KNOWN state reproduces analytic BSM to 1e-10; `T(t_eval)` matches timestamp arithmetic exactly at BOTH endpoints; range guards fire for `log iv_K` outside `[log 1e-4, log 50]`, `T ≤ 0`, non-finite `S_H` |
 | **T27** | **anchor identity**: with `x_sk ≠ 0` and `S_H ≠ K_atm`, pricing at `K = K_atm` returns exactly `exp(x_iv)`; the Draft 2.1 form fails this fixture |
 | T10 | decomposition identity `J ≡ Sh(F1) + Sh(F2) + D` to 1e-12 |
-| **T11a** | zero-dynamics identity, COMPATIBLE STATES: `A ≡ 0`, `Σ ≡ 0`, every eligible contract starting with `sz ≥ 1` → `JOINT` and `MATCHED_FROZEN` give bitwise-identical paths, candidate tables and proposals |
-| **T11b** | zero-dynamics identity, MATCHED POLICY: `A ≡ 0`, `Σ ≡ 0`, `JOINT` against a frozen comparator with the SAME `MODELLED` size policy → identical for ANY starting size including `sz < 1`. Draft 2.1's single identity conflated the two and would have failed correct code whenever `sz_0 < 1` |
+| **T11a** | zero-dynamics identity, COMPATIBLE STATES, DECLARED LIMIT (Amendment A1, 2026-09-11): with `A ≡ 0` and `Σ = ε I` for `ε ∈ {1e-10, 1e-14}`, every eligible contract starting with `sz ≥ 1`, and one fixed `scan_id`, the per-candidate `E_sel` of `JOINT` and `MATCHED_FROZEN` agree within `τ(ε)` and the gap is MONOTONE DECREASING in `ε`. Declared tolerance `τ(ε) = 1e-3` at `ε = 1e-14`. Exact bitwise equality at `Σ ≡ 0` is NOT required and NOT reachable: §2.3/§2.4 refuse a non-positive-definite covariance, and that refusal takes precedence (see T11c) |
+| **T11b** | zero-dynamics identity, MATCHED SIZE POLICY, DECLARED LIMIT (Amendment A1, 2026-09-11): the same construction comparing `JOINT` against a frozen comparator carrying the SAME `MODELLED` size policy agrees within `τ(ε)` for ANY starting size, including `sz < 1` — the case a cross-policy identity cannot cover. Draft 2.1's single identity conflated the two and would have failed correct code whenever `sz_0 < 1` |
+| **T11c** | degeneracy refusal (NEW, Amendment A1, 2026-09-11): `Σ = 0` raises `COVARIANCE_NOT_PD`, and a world whose outcomes never move raises `DEGENERATE_STATE`. The refusals are the contract's behaviour at the limit point; no fixture-only degenerate sampler path exists, because a test bypass next to a safety refusal is how safety refusals die |
 | T12 | shared randomness: all comparators on one scan use the identical pre-generated underlying paths |
 | **T29** | **candidate-order permutation**: permuting candidate order leaves every underlying path, every option-state draw and the whole candidate table bitwise unchanged |
 | T13 | accounting completeness: on a world producing `bid ≤ 0`, `sz < 1` and `sp ≥ 2`, every path receives both scenario values; `E_sel` matches a hand-computed 10-path fixture |
@@ -860,7 +861,7 @@ process for the pricing model's own uncertainty.
 | 14 | `J ≡ Sh(F1) + Sh(F2) + D` | §4.3 | T10 |
 | 15 | CRPS; discrete-uniform rank reference; censoring; Brier | §5.1 | T13 (values), §6.2 (frequencies) |
 | 16 | Decision rule 0–5; simultaneous scenario gate; size veto | §5.3 | T18, T20, **T34, T36** |
-| 17 | Zero-dynamics identities (compatible states; matched policy) | §6.1 | **T11a, T11b** |
+| 17 | Zero-dynamics identities (compatible states; matched policy) as declared limits; degeneracy refusal | §6.1 | **T11a, T11b, T11c** |
 | 18 | Synthetic permutation invariance; 200 independent triples; one grand-mean interval | §6.2 | reported frequency |
 | 19 | Walk-forward, immutability, overlap check | §1.6 | T16, T23 |
 | 20 | Separation record in every artefact | §7 | T21 |
@@ -874,3 +875,10 @@ synthetic_world}.py`; `JOINT_FUNNEL_V1` in `apex/decision_wb/engine.py` (by name
 `FULL_FUNNEL_V1` untouched); authorization artefacts `R4-FIT-001` / `R4-FIT-002` and pre-registration `R4-ATTR-001`
 declared and hashed before any read; the §6.1 tests; the §6.2 frequency reports as evidence files; this document
 promoted with the implemented state and the evidence table.
+
+## 12. Amendment log
+
+| Date | Id | Change | Reason | Accepted by |
+|---|---|---|---|---|
+| 2026-09-11 | A1 | §6.1 T11a/T11b restated as DECLARED LIMIT identities (`Σ = εI`, `τ(1e-14) = 1e-3`, monotone in `ε`); T11c added (degeneracy refusals are the behaviour at the limit point). Checklist row 17 updated. | The original T11a/T11b required `Σ ≡ 0`, which §2.3/§2.4 refuse (`COVARIANCE_NOT_PD`); both could not hold. The fixture-only degenerate sampler alternative was refused: a test bypass next to a safety refusal. Draft: `docs/R4_AMENDMENT_DRAFT_T11.md`. | operator, Defect Repair and First Seal Block ("T11: ACCEPTED. Apply the amendment as drafted.") |
+

@@ -288,7 +288,7 @@ def validate_intent(i: dict, *, forecast: dict, forecast_receipt: dict, signal_u
         raise RecordRefused("HORIZON_EXTRAPOLATION_REFUSED: " + HORIZON_RELATIONSHIP)
     body = {"kind": "pilot_intent", "expression": i["expression"], "action": "BUY", "contract": contract,
             "contract_id": contract_id(contract), "quantity": 1, "signal_used": signal_used,
-            "expression_rule": i.get("expression_rule"), "no_best_option_claim": True,
+            "expression_rule": i.get("expression_rule"), "strike_selection": i.get("strike_selection"), "no_best_option_claim": True,
             "session_id": session_id, "scan_id": scan_id, "release": release,
             "forecast_ref": {"seq": forecast_receipt["seq"], "entry_hash": forecast_receipt["entry_hash"],
                              "forecast_hash": forecast["forecast_hash"], "forecast_id": forecast["forecast_id"]},

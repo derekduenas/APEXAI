@@ -1,4 +1,4 @@
-"""JOINT_FUNNEL_V1 — the R4 engine against contract blob 902256e3 (§2–§5).
+"""JOINT_FUNNEL_V1 — the R4 engine against contract blob a0228fac (Amendment A1; §2–§5).
 
 Pure: no ledger, no network, no wall clock. One decision:
 
@@ -31,8 +31,8 @@ class AuthorizationRefused(PermissionError):
 
 JOINT_RULE_ID = ("FULL_FUNNEL_V1/JOINT_FUNNEL_V1: joint 15-minute forecast of underlying, ATM implied vol, skew, "
                  "spread and size; anchored slice pricing; two accounting scenarios; rank without size then a "
-                 "selected-only veto; contract blob 902256e3c3c5025a450a4bb607410933bb0c4b25")
-CONTRACT_PIN = "902256e3c3c5025a450a4bb607410933bb0c4b25"
+                 "selected-only veto; contract blob a0228fac4a2dab4c455c9fc8a41d1378522a27de")
+CONTRACT_PIN = "a0228fac4a2dab4c455c9fc8a41d1378522a27de"
 ADVERSE_SCENARIOS = ("truncation_q_0.999", "truncation_q_0.99999", "spread_innovation_x1.5",
                      "extension_innovation_x1.5", "a_iv_minus_1_cluster_robust_se", "size_floor_removed")
 JOINT_POLICY = SupervisionPolicy(max_bar_age_s=120.0, max_disagreement_ratio=1.0, max_spread_rel=0.15,
@@ -398,24 +398,44 @@ class JointEngine:
                 out["parameters"][name] = {**params, "refused": acct["refused"]}
 
         val("BASE", {"note": "the ranking value, recorded for comparison"})
-        for q in (0.999, 0.99999):
-            _, sh, sx = build(trunc_q=q)
-            val("truncation_q_%g" % q, {"trunc_q": q, "redraw": "a different acceptance region necessarily redraws; declared"},
-                states=(sh, sx))
-        _, sh, sx = build(spread_scale=1.5)
-        val("spread_innovation_x1.5", {"spread_innovation_scale": 1.5}, states=(sh, sx))
-        _, sh, sx = build(ext_scale=1.5)
-        val("extension_innovation_x1.5", {"extension_innovation_scale": 1.5}, states=(sh, sx))
-        if shift is None:
-            out["scenarios"]["a_iv_minus_1_cluster_robust_se"] = None
-            out["parameters"]["a_iv_minus_1_cluster_robust_se"] = {"unavailable": "no cluster-robust SE attached to the fit"}
-        else:
+
+        # THE REGISTRY DRIVES THE EVALUATION. Each name in ADVERSE_SCENARIOS maps to exactly one builder here;
+        # a registered name with no builder is a registry-integrity failure (never silently skipped), and a builder
+        # that is not registered is never run. One list, one edit site.
+        def _trunc(q):
+            def run(name):
+                _, sh, sx = build(trunc_q=q)
+                val(name, {"trunc_q": q, "redraw": "a different acceptance region necessarily redraws; declared"}, states=(sh, sx))
+            return run
+
+        def _spread(name):
+            _, sh, sx = build(spread_scale=1.5)
+            val(name, {"spread_innovation_scale": 1.5}, states=(sh, sx))
+
+        def _ext(name):
+            _, sh, sx = build(ext_scale=1.5)
+            val(name, {"extension_innovation_scale": 1.5}, states=(sh, sx))
+
+        def _a_iv(name):
+            if shift is None:
+                out["scenarios"][name] = None
+                out["parameters"][name] = {"unavailable": "no cluster-robust SE attached to the fit"}
+                return
             _, sh, sx = build(a_iv_shift=shift)
-            val("a_iv_minus_1_cluster_robust_se", {"cluster_robust_se": se_iv, "shift": shift, "direction": "against the position"},
-                states=(sh, sx))
-        val("size_floor_removed", {"size_policy": "MODELLED_SIZE", "size_floor": False,
-                                   "rule": "a negative implied size means UNAVAILABLE, never a negative executable size"},
-            policy="MODELLED_SIZE", size_floor=False)
+            val(name, {"cluster_robust_se": se_iv, "shift": shift, "direction": "against the position"}, states=(sh, sx))
+
+        def _size_floor(name):
+            val(name, {"size_policy": "MODELLED_SIZE", "size_floor": False,
+                       "rule": "a negative implied size means UNAVAILABLE, never a negative executable size"},
+                policy="MODELLED_SIZE", size_floor=False)
+
+        builders = {"truncation_q_0.999": _trunc(0.999), "truncation_q_0.99999": _trunc(0.99999),
+                    "spread_innovation_x1.5": _spread, "extension_innovation_x1.5": _ext,
+                    "a_iv_minus_1_cluster_robust_se": _a_iv, "size_floor_removed": _size_floor}
+        for name in ADVERSE_SCENARIOS:
+            if name not in builders:
+                raise RuntimeError("ADVERSE_REGISTRY_INTEGRITY: %r is registered but has no builder" % (name,))
+            builders[name](name)
         missing = [n for n in ADVERSE_SCENARIOS if n not in out["scenarios"]]
         out["registered"] = list(ADVERSE_SCENARIOS)
         out["complete"] = not missing

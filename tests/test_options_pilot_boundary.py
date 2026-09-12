@@ -20,7 +20,7 @@ import pytest
 
 from apex.options_pilot import boundary as B, ledger as L, records as R, risk_gate as RG, session as S
 from apex.options_pilot import clock as C
-from apex.options_pilot.expression_rule import DTE_MIN_DAYS, RULE_ID
+from apex.options_pilot.expression_rule import DTE_MIN_DAYS, RULE_ID, RULE_ID_V2
 from apex.options_pilot.synthetic_harness import SYNTHETIC_PARAMS, SyntheticHarness, T0, forecast_from_params
 
 SYM = "SPY"
@@ -116,8 +116,11 @@ def test_order_is_proven_by_ledger_sequence_and_history_is_chain_verified(tmp_pa
     assert fill["intent_ref"]["seq"] == i["seq"] and fill["intent_ref"]["intent_id"] == intent["intent_id"]
     assert fill["status"] == "FILLED" and fill["decision"] == "TRADE" and fill["side_crossed"] == "ASK"
     assert fill["price"] == 2.50 and fill["net_debit"] == 250.0
-    assert intent["expression"] == "LONG_CALL" and intent["contract"] == {"symbol": SYM, "expiration": "2026-10-09", "strike": 645.0, "right": "CALL"}
-    assert intent["expression_rule"] == RULE_ID and intent["no_best_option_claim"] is True
+    # PILOT_RULE_V2: spot 646.3, LONG -> the nearest strike on the CALL side (K >= spot) whose indicative ask fits the cap
+    assert intent["expression"] == "LONG_CALL" and intent["contract"] == {"symbol": SYM, "expiration": "2026-10-09", "strike": 650.0, "right": "CALL"}
+    assert intent["expression_rule"] == RULE_ID_V2 and intent["no_best_option_claim"] is True
+    assert intent["strike_selection"]["rule"] == "PILOT_RULE_V2" and intent["strike_selection"]["cap_consulted"] is True
+    assert intent["strike_selection"]["census"]["feasible"] >= 1 and "what_v1_could_not_express" in intent["strike_selection"]
     assert intent["signal_used"] == "LONG" and intent["risk"]["risk_provenance"] == "SYNTHETIC_FIXTURE"
     # stable ids: recomputable from content, and the decision record carries them
     assert intent["intent_id"] == R.canonical_hash({"forecast_id": f["forecast_id"], "contract_id": intent["contract_id"],
@@ -519,7 +522,7 @@ def test_risk_self_attestation_is_refused_and_production_authority_refuses(tmp_p
 def test_wrong_contract_at_execution_is_unfilled_and_recorded(tmp_path):
     h = _h(tmp_path)
     base = lambda c: {**c, "bid": 2.4, "ask": 2.5, "bid_size": 9, "ask_size": 12, "timestamp_epoch": h.now() - 1.0}
-    h.quotes.override = lambda c: base({**c, "strike": 650.0})
+    h.quotes.override = lambda c: base({**c, "strike": 655.0})           # the V2 intent is K=650; 655 is the wrong contract
     d = _scan(h)
     fill = _rec(h, d["receipts"]["fill"])
     assert d["decision"] == "REFUSE" and fill["status"] == "UNFILLED" and fill["why"].startswith("CONTRACT_MISMATCH")

@@ -1,6 +1,6 @@
 {
  "kind": "R4_LATENCY_BUDGET",
- "generated_at_utc": "2026-09-12T03:56:42+00:00",
+ "generated_at_utc": "2026-09-12T04:10:11+00:00",
  "measurement_conditions": {
   "tracer_active_during_timed_decisions": false,
   "sample_count": 35,
@@ -12,37 +12,37 @@
   "platform": "macOS-12.7.6-x86_64-i386-64bit",
   "python": "3.11.9",
   "numpy": "2.4.6",
-  "process": "single process, pid 18156, this generator only; no other apex service running on the host",
-  "max_rss_mib": 96.3,
+  "process": "single process, pid 21430, this generator only; no other apex service running on the host",
+  "max_rss_mib": 95.8,
   "generator": "scripts/r4_latency_measure.py",
-  "git_commit": "9b4dd5d",
+  "git_commit": "e1bff80",
   "attribution": "builder-reported; reproducible by re-running the generator"
  },
  "measurement": {
   "decide_total": {
-   "median": 0.1108,
-   "p95": 0.1265,
-   "max": 0.1288,
-   "min": 0.0961,
+   "median": 0.1085,
+   "p95": 0.1162,
+   "max": 0.1299,
+   "min": 0.097,
    "n": 35
   },
   "adverse_block_inside_decide": {
-   "median": 0.0637,
-   "p95": 0.0719,
-   "max": 0.0752,
-   "min": 0.0546,
+   "median": 0.0636,
+   "p95": 0.0668,
+   "max": 0.0756,
+   "min": 0.0552,
    "n": 35
   },
-  "adverse_share_of_median": 0.575,
+  "adverse_share_of_median": 0.586,
   "note": "the adverse block is timed by wrapping JointEngine._adverse (the scenarios are hard-coded there; the ADVERSE_SCENARIOS tuple is the registry the gate checks, not a switch, so they cannot be disabled from outside). An earlier uncommitted measurement reported 0.062 s for the block by a method that cannot be reproduced; the direct measurement here replaces it",
   "control_tracer_on_5_samples": {
-   "median": 0.2729,
-   "p95": 0.2934,
-   "max": 0.3194,
-   "min": 0.2653,
+   "median": 0.2904,
+   "p95": 0.2971,
+   "max": 0.2977,
+   "min": 0.2736,
    "n": 5
   },
-  "tracer_inflation_factor": 2.46
+  "tracer_inflation_factor": 2.68
  },
  "supersedes": [
   "docs/evidence/r4_scale_synthetic.json",
@@ -67,11 +67,11 @@
   "decide_deadline_s": 2.0,
   "per_scan_deadline_s": 5.0,
   "measured_margin_s": {
-   "decide_worst_case": 1.8712,
-   "per_scan_worst_case_assuming_one_decision": 4.8712,
-   "raw_constraint_worst_case": 14.8712
+   "decide_worst_case": 1.8701,
+   "per_scan_worst_case_assuming_one_decision": 4.8701,
+   "raw_constraint_worst_case": 14.8701
   },
-  "headroom_factor_vs_decide_deadline": 15.5,
+  "headroom_factor_vs_decide_deadline": 15.4,
   "reasoning": "decide() <= 2.0 s is 13% of the 15 s freshness window, leaving >= 13 s for state assembly, ledger writes, the kernel check and the fill round trip; the 5.0 s per-scan budget leaves 10 s for the execution quote itself",
   "enforcement": "NOT BUILT: enforcing a deadline is capability and the build is frozen; a breach today is invisible"
  }

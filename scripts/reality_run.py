@@ -43,7 +43,8 @@ from apex.reality import producers as P  # noqa: E402
 from apex.reality.harness import PredictionLedger, resolve  # noqa: E402
 
 LEDGER = PredictionLedger(Path("results/reality/predictions.jsonl"))
-REPORT = Path("results/reality/calibration_report.json")
+REPORT = Path("results/reality/calibration_report.json")                  # CALENDAR clock, canonical (A-011)
+REPORT_LAKE_DIAGNOSTIC = Path("results/reality/calibration_report_lake_diagnostic.json")   # lake clock, diagnostic only
 
 
 def progress(msg):
@@ -158,18 +159,32 @@ def main() -> int:
             resolved += 1
 
     from apex.reality.harness import score_by_producer
+    # CLOCK SEMANTICS (CONVENTIONS A-011, 2026-09-11): CALENDAR IS CANONICAL, LAKE IS DIAGNOSTIC. A due date must be
+    # measured by a clock the system cannot influence. The lake clock is system-controlled: under it a prediction never
+    # comes due if the pull stops, so the machine avoids every penalty by going quiet.
+    calendar_through = dt.datetime.now(dt.timezone.utc).date().isoformat()
+    chain_entries = LEDGER.verify()
     report = {
-        "generated_at": now, "lake_through": lake_through,
-        "chain_entries": LEDGER.verify(),
-        "producers": score_by_producer(
-            LEDGER.predictions(), LEDGER.resolutions(), lake_through),
+        "generated_at": now, "clock": "CALENDAR_CANONICAL", "data_through": calendar_through, "lake_through": lake_through,
+        "clock_rule": ("CONVENTIONS A-011: past-due unresolved predictions score as failure against the CALENDAR; the lake "
+                       "clock is reported separately as a diagnostic and never decides a penalty"),
+        "chain_entries": chain_entries,
+        "producers": score_by_producer(LEDGER.predictions(), LEDGER.resolutions(), calendar_through),
+    }
+    diagnostic = {
+        "generated_at": now, "clock": "LAKE_DIAGNOSTIC", "data_through": lake_through, "lake_through": lake_through,
+        "label": ("DIAGNOSTIC ONLY, NOT A SCORING RECORD: scored against the lake clock, which the system controls. It "
+                  "shows what the producers look like on the data actually held; it cannot be cited for standing."),
+        "chain_entries": chain_entries,
+        "producers": score_by_producer(LEDGER.predictions(), LEDGER.resolutions(), lake_through),
     }
     REPORT.parent.mkdir(parents=True, exist_ok=True)
     REPORT.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    REPORT_LAKE_DIAGNOSTIC.write_text(json.dumps(diagnostic, indent=2, sort_keys=True) + "\n")
     print(f"created {created} predictions, resolved {resolved}; "
-          f"chain {report['chain_entries']} entries verified")
+          f"chain {report['chain_entries']} entries verified; calendar {calendar_through}, lake {lake_through}")
     for name, s in report["producers"].items():
-        print(f"  {name:<22} n={s['n_scored']:<5} brier={s['brier']:.4f} "
+        print(f"  {name:<22} n={s['n_scored']:<5} dates={s['n_effective_dates']:<3} brier={s['brier']:.4f} "
               f"rel={s['reliability']:.4f} res={s['resolution']:.4f} "
               f"penalised={s['n_penalised_unresolved']}")
     return 0

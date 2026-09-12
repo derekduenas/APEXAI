@@ -18,7 +18,7 @@ from apex.joint_wb import model as MDL, sampler as SMP, state as ST, synthetic_w
 from apex.options_pilot.fees import SYNTHETIC_FEES
 from apex.options_pilot.risk_authority import AUTHORITY_ID, CERTIFIED_PROVENANCE
 
-FULL_PIN = "902256e3c3c5025a450a4bb607410933bb0c4b25"
+FULL_PIN = "a0228fac4a2dab4c455c9fc8a41d1378522a27de"
 
 
 def test_contract_unchanged_by_the_repair_branch():
@@ -226,7 +226,7 @@ def test_F8_full_pin_everywhere():
     assert e.describe()["contract_pin"] == FULL_PIN and ENG.JOINT_RULE_ID.endswith(FULL_PIN)
     blob = json.dumps({"state": ms["contract_pin"], "trace": r["trace"], "proposal": r["proposal"],
                        "engine": e.describe()}, default=str)
-    assert '"902256e3"' not in blob, "a truncated pin is still present somewhere"
+    assert '"a0228fac"' not in blob and '"902256e3"' not in blob, "a truncated pin is still present somewhere"
 
 
 # ---------------------------------------------------------------- F9 reproducibility

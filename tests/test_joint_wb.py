@@ -1,4 +1,4 @@
-"""R4 implementation tests against contract blob 902256e3 (docs/R4_JOINT_MARKET_STATE_SPEC.md).
+"""R4 implementation tests against contract blob a0228fac (Amendment A1; docs/R4_JOINT_MARKET_STATE_SPEC.md).
 
 Acceptance = the contract's identity and refusal tests (§6.1) ONLY. Ids below are the contract's T-numbers.
 SYNTHETIC INPUTS ONLY: no collector or historical data, no fitting on either, no backtest, no service, no order.
@@ -22,7 +22,7 @@ from apex.options_pilot import boundary as B, entrypoint as PEP, ledger as L, se
 from apex.options_pilot.fees import SYNTHETIC_FEES
 from apex.options_pilot.synthetic_harness import SyntheticHarness
 
-CONTRACT_BLOB = "902256e3c3c5025a450a4bb607410933bb0c4b25"
+CONTRACT_BLOB = "a0228fac4a2dab4c455c9fc8a41d1378522a27de"
 ET = ZoneInfo("America/New_York")
 T_D = datetime(2026, 9, 10, 15, 0, tzinfo=timezone.utc).timestamp()
 EXPIRY = "2026-10-09"
@@ -566,10 +566,9 @@ class TestEngineIdentities:
         tb = {c["label"]: c.get("E_sel_rank") for c in b["trace"]["candidates"]["table"]}
         assert ta == tb and a["trace"]["selected"] == b["trace"]["selected"] if a["decision"] == "TRADE" else ta == tb
 
-    def test_T11_contract_conflict_sigma_exactly_zero_is_unreachable(self):
-        """CONTRACT CONFLICT (recorded, not worked around). §6.1 T11a/T11b require `A = 0, Sigma = 0` to produce
-        bitwise-identical paths, but §2.3/§2.4 require Sigma positive definite (`COVARIANCE_NOT_PD`). Both cannot
-        hold. Smallest reproducing fixture:"""
+    def test_T11c_degeneracy_refusal_is_the_behaviour_at_the_limit_point(self):
+        """§6.1 T11c (Amendment A1): `Sigma = 0` raises `COVARIANCE_NOT_PD` and a world whose outcomes never move raises
+        `DEGENERATE_STATE`. No fixture-only degenerate sampler path exists."""
         with pytest.raises(SMP.SamplerRefused, match="COVARIANCE_NOT_PD:S11"):
             SMP.pregenerate(sigma=np.zeros((4, 4)), n_paths=4, seed=1)
         with pytest.raises(MDL.ModelRefusedR4, match="DEGENERATE_STATE"):        # a zero-variance world cannot be fitted either
@@ -579,8 +578,8 @@ class TestEngineIdentities:
             MDL.fit(MDL.build_rows(flat), cutoff_epoch=1e12)
 
     def test_T11a_zero_dynamics_compatible_states_converges(self):
-        """The achievable form: A = 0 and Sigma -> 0. With every eligible contract starting at size >= 1, JOINT and
-        MATCHED_FROZEN agree, and the gap SHRINKS with Sigma (it is exactly 0 only at the unreachable Sigma = 0)."""
+        """§6.1 T11a (Amendment A1, DECLARED LIMIT): A = 0 and Sigma = eps*I. With every eligible contract starting at
+        size >= 1, JOINT and MATCHED_FROZEN agree within tau(eps) = 1e-3 at eps = 1e-14 and the gap is monotone in eps."""
         f = _fitted()
         gaps = {}
         for eps in (1e-10, 1e-14):

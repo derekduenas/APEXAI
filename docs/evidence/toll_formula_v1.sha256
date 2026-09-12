@@ -1,0 +1,5 @@
+e7e01f38c83b33aad2ab5d8581927fe209005a65a68dae25d02c3869d0ac1c79
+formula: expected_toll_$ = 100 x [ (ask_fill - bid_fill)/2 + (ask_ref - bid_ref)/2 ] + fee_in + fee_out
+encoding: ASCII, no trailing newline
+id: TOLL_FORMULA_V1
+declared: 2026-09-11
