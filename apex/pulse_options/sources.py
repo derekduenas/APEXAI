@@ -37,7 +37,7 @@ class TwinSources:
     def __init__(self, *, provenance: str, clock: Clock, bar_source, chain_fn, quote_fn, exit_quote_fn,
                  fee_schedule, sleep_fn=time.sleep, book_fn=None, warmup_minutes: int = 65, artifact=None,
                  selection_policy: str = "PILOT_RULE_V2", funnel_engine=None, funnel_history_days: int = 7,
-                 joint_engine=None, joint_context_fn=None):
+                 joint_engine=None, joint_context_fn=None, event_snapshot_fn=None, event_gate_authority: str = "SHADOW"):
         if selection_policy not in SELECTION_POLICIES:
             raise ValueError("SELECTION_POLICY_UNKNOWN: %r" % (selection_policy,))
         self.selection_policy = selection_policy
@@ -51,6 +51,12 @@ class TwinSources:
         if selection_policy == "JOINT_FUNNEL_V1" and (joint_engine is None or joint_context_fn is None):
             raise ValueError("JOINT_FUNNEL_V1 requires joint_engine and joint_context_fn (R4 contract a0228fac, Amendment A1)")
         self._funnel_fitted_day: dict = {}
+        self.last_chain_report: dict = {}
+        # EVENT AWARENESS (Brick 2): factual context from the catalyst layer, joined into the same Twin the decision reads.
+        # None -> the twin records the stream as NOT_WIRED (never silently "no events").
+        self.event_snapshot_fn = event_snapshot_fn
+        self.event_gate_authority = event_gate_authority
+        self.last_event_context: dict = {}
         self.provenance = provenance
         self.clock = clock
         self.bar_source = bar_source
@@ -99,6 +105,26 @@ class TwinSources:
     def chain_fn(self, symbol: str, as_of: float):
         return self._chain_fn(symbol, as_of)
 
+    def event_context(self, symbol: str, as_of: float) -> dict:
+        """The event snapshot at as_of plus the EVENT_GATE_V0 evaluation (shadow unless configured ACTIVE)."""
+        from apex.catalyst.twin_snapshot import evaluate_gate
+        if self.event_snapshot_fn is None:
+            ctx = {"kind": "EVENT_SNAPSHOT_V1", "symbol": symbol, "as_of_epoch": as_of, "wired": False,
+                   "scheduled": {"status": "UNAVAILABLE", "why": "event stream NOT_WIRED on this twin", "events": []},
+                   "unscheduled": {"status": "UNAVAILABLE", "why": "event stream NOT_WIRED on this twin", "events": []},
+                   "authority": "FACTUAL_CONTEXT_ONLY"}
+        else:
+            try:
+                ctx = {**self.event_snapshot_fn(symbol=symbol, as_of=as_of), "wired": True}
+            except Exception as e:                                             # noqa: BLE001 - a failing sense is reported, never silent
+                ctx = {"kind": "EVENT_SNAPSHOT_V1", "symbol": symbol, "as_of_epoch": as_of, "wired": True,
+                       "scheduled": {"status": "UNAVAILABLE", "why": "%s: %s" % (type(e).__name__, str(e)[:160]), "events": []},
+                       "unscheduled": {"status": "UNAVAILABLE", "why": "%s: %s" % (type(e).__name__, str(e)[:160]), "events": []},
+                       "authority": "FACTUAL_CONTEXT_ONLY"}
+        ctx["gate"] = evaluate_gate(ctx, authority=self.event_gate_authority)
+        self.last_event_context[symbol] = ctx
+        return ctx
+
     # ------------------------------------------------------------ THE FUNNEL (FULL_FUNNEL_V1): every layer decides together
     def _fit_funnel_for_day(self, symbol: str, day_start: float, day: str) -> dict:
         st = self.store(symbol)
@@ -115,12 +141,18 @@ class TwinSources:
         from apex.decision_wb.engine import DTE_MIN_DAYS
         from datetime import date
         quotes = {}
-        for c in chain:
+        priced = [c for c in chain if _num_pos(c.get("bid")) is not None and _num_pos(c.get("ask")) is not None]
+        kept, conflicts = apply_duplicate_policy(priced)                    # the SAME policy the provider boundary applies
+        conflicted = set(conflicts) | set(getattr(chain, "conflicted", ()))
+        for c in kept:
             key = (c["expiration"], float(c["strike"]), c["right"])
-            if _num(c.get("bid")) and _num(c.get("ask")):
-                # fields are carried AS RECEIVED: a missing timestamp or size stays missing and the engine's validator rejects the quote
-                quotes[key] = {k2: c[k2] for k2 in ("bid", "ask", "bid_size", "ask_size", "timestamp_epoch") if k2 in c}
-                quotes[key].update(indicative=True, source="CHAIN")
+            # fields are carried AS RECEIVED: a missing timestamp or size stays missing and the engine's validator rejects the quote
+            quotes[key] = {k2: c[k2] for k2 in ("bid", "ask", "bid_size", "ask_size", "timestamp_epoch") if k2 in c}
+            quotes[key].update(indicative=True, source="CHAIN")
+        for key in conflicted:
+            quotes[key] = {"indicative": True, "source": "REJECTED: DUPLICATE_CONFLICT under %s" % DUPLICATE_POLICY_ID}   # no fields -> validator rejects it
+        self.last_chain_report[symbol] = {**(chain.report() if hasattr(chain, "report") else {"n_rows": len(chain)}),
+                                          "funnel_conflicts": sorted(map(str, conflicts))}
         today = date.fromisoformat(to_utc_string(as_of)[:10])
         exps = sorted({c["expiration"] for c in chain if (date.fromisoformat(c["expiration"]) - today).days >= DTE_MIN_DAYS})
         if not exps or not _num(spot):
@@ -131,7 +163,7 @@ class TwinSources:
         for k in strikes[max(0, i - k_side): i + k_side + 1]:
             for right in ("CALL", "PUT"):
                 key = (exp, k, right)
-                if key in quotes or not any(c["expiration"] == exp and float(c["strike"]) == k and c["right"] == right for c in chain):
+                if key in quotes or key in conflicted or not any(c["expiration"] == exp and float(c["strike"]) == k and c["right"] == right for c in chain):
                     continue
                 try:
                     q = self._quote_fn({"symbol": symbol, "expiration": exp, "strike": k, "right": right})
@@ -158,7 +190,9 @@ class TwinSources:
                                         prefix_returns=prefix, fee_schedule=self.fee_schedule, book_summary=book_summary,
                                         heuristic_direction=self.signal_fn(symbol, as_of, snap))
         res["trace"]["inputs"] = {"n_quotes": len(quotes), "quote_sources": sorted({q["source"] for q in quotes.values()}), "prefix_bars": len(prefix),
-                                  "history_days": self.funnel_history_days, "chain_size": len(chain)}
+                                  "history_days": self.funnel_history_days, "chain_size": len(chain),
+                                  "chain_report": self.last_chain_report.get(symbol),
+                                  "event_context": self.last_event_context.get(symbol) or self.event_context(symbol, as_of)}
         res["engine"] = self.funnel_engine.describe()
         return res
 
@@ -177,7 +211,8 @@ class TwinSources:
 
     def sources(self) -> dict:
         out = {"forecast_fn": self.forecast_fn, "signal_fn": lambda s, t: self.signal_fn(s, t),
-               "chain_fn": self.chain_fn, "spot_fn": self.spot_fn, "quote_fn": self._quote_fn, "exit_quote_fn": self._exit_quote_fn}
+               "chain_fn": self.chain_fn, "spot_fn": self.spot_fn, "quote_fn": self._quote_fn, "exit_quote_fn": self._exit_quote_fn,
+               "event_context_fn": self.event_context}
         if self.selection_policy == "FULL_FUNNEL_V1":
             out["funnel_fn"] = self.funnel_fn
         elif self.selection_policy == "JOINT_FUNNEL_V1":
@@ -187,6 +222,10 @@ class TwinSources:
 
 def _num(x) -> bool:
     return isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(x) and x > 0
+
+
+def _num_pos(x):
+    return x if (isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(x) and x >= 0) else None
 
 
 def returns_rows(bars: list) -> list:
@@ -222,11 +261,17 @@ INDICATIVE_MAX_AGE_S = 120.0                                                    
 
 class ChainRows(list):
     """A list of VALID normalised chain rows plus the exclusions that produced it. Nothing is repaired: a row that
-    fails any check is excluded with a named reason and the reason is recorded (provider boundary)."""
+    fails any check is excluded with a named reason and the reason is recorded (provider boundary). `conflicted`
+    holds the contract keys excluded under DUPLICATE_POLICY_V1 so no consumer can re-admit them from this snapshot."""
 
-    def __init__(self, rows=(), exclusions=None):
+    def __init__(self, rows=(), exclusions=None, conflicted=None):
         super().__init__(rows)
         self.exclusions = list(exclusions or [])
+        self.conflicted = set(conflicted or ())
+
+    def report(self) -> dict:
+        return {"n_rows": len(self), "n_excluded": len(self.exclusions), "n_conflicted_contracts": len(self.conflicted),
+                "exclusion_reasons": sorted({x["why"].split(":")[0] for x in self.exclusions}), "duplicate_policy": DUPLICATE_POLICY_ID}
 
 
 def _finite_float(x):
@@ -303,12 +348,50 @@ def live_chain_rows(rows: list, *, symbol: str, receipt_time: float) -> ChainRow
             excl.append({"row": i, "why": why, "strike": r.get("strike"), "right": r.get("right"), "expiration": r.get("expiration")})
             continue
         out.append({"symbol": symbol, "expiration": exp, "strike": k, "right": right, "bid": bid, "ask": ask, "bid_size": bs, "ask_size": as_,
-                    "timestamp_epoch": ts_epoch, "timestamp_raw": ts, "receipt_time": receipt_time, "provider": "THETADATA_V3", "indicative": True})
-    return ChainRows(out, excl)
+                    "timestamp_epoch": ts_epoch, "timestamp_raw": ts, "receipt_time": receipt_time, "provider": "THETADATA_V3", "indicative": True,
+                    "source_row": i})
+    rows_out, conflicts = apply_duplicate_policy(out)
+    for key in sorted(conflicts):
+        excl.append({"row": None, "why": "DUPLICATE_CONFLICT: contract %s|%s|%s observed with different quotes in one snapshot; excluded, "
+                                         "never resolved by arrival order or best price" % key,
+                     "strike": key[1], "right": key[2], "expiration": key[0], "observations": conflicts[key]})
+    return ChainRows(rows_out, excl, conflicted=set(conflicts))
+
+
+DUPLICATE_POLICY_ID = "DUPLICATE_POLICY_V1"
+DUPLICATE_POLICY = ("DUPLICATE_POLICY_V1: within one snapshot, rows with the same contract identity (expiration, strike, right) and "
+                    "identical observation (bid, ask, bid_size, ask_size, timestamp) collapse to one row; rows with the same identity "
+                    "and DIFFERENT observations are a CONFLICT: the contract is excluded from the snapshot with a named exclusion "
+                    "carrying every observation, and no consumer (selector, funnel pricing, entry/exit quote) may re-admit it from "
+                    "the same snapshot. Nothing chooses the best price and nothing chooses by order.")
+
+
+def contract_key(r: dict) -> tuple:
+    return (str(r.get("expiration")), float(r.get("strike")), str(r.get("right")))
+
+
+def apply_duplicate_policy(rows: list) -> tuple:
+    """Returns (rows_without_conflicts, {key: [observations...]}) under DUPLICATE_POLICY_V1. Order-independent."""
+    seen, obs_by = {}, {}
+    for r in rows:
+        key = contract_key(r)
+        obs = (r.get("bid"), r.get("ask"), r.get("bid_size"), r.get("ask_size"), r.get("timestamp_epoch"))
+        obs_by.setdefault(key, []).append({"bid": obs[0], "ask": obs[1], "bid_size": obs[2], "ask_size": obs[3], "timestamp_epoch": obs[4],
+                                           "source_row": r.get("source_row")})
+        seen.setdefault(key, set()).add(obs)
+    conflicts = {k: obs_by[k] for k, v in seen.items() if len(v) > 1}
+    kept, emitted = [], set()
+    for r in rows:
+        key = contract_key(r)
+        if key in conflicts or key in emitted:
+            continue
+        emitted.add(key); kept.append(r)
+    return kept, conflicts
 
 
 def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn=None, selection_policy: str = "PILOT_RULE_V2",
-                      expirations_fn=None, chain_snapshot_fn=None, clock=None) -> TwinSources:
+                      expirations_fn=None, chain_snapshot_fn=None, clock=None, joint_engine=None, joint_context_fn=None,
+                      funnel_engine=None, fee_schedule=None, event_snapshot_fn=None, event_gate_authority: str = "SHADOW") -> TwinSources:
     """LIVE_FEED sources. Connectivity is gated: with the default environment every provider call raises
     ProviderUnavailable before any network access, and the boundary persists the refusal.
 
@@ -361,11 +444,17 @@ def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn
         gate.require("ThetaData quote")
         rows = live_chain_rows(chain_snapshot_fn(contract["symbol"], contract["expiration"]), symbol=contract["symbol"], receipt_time=clock.now())
         want = (_norm_exp(contract["expiration"]), float(contract["strike"]), contract["right"])
-        for r in rows:
-            if (r["expiration"], r["strike"], r["right"]) == want:
-                return r
-        raise ProviderUnavailable("QUOTE_NOT_IN_SNAPSHOT: %s %s %s %s" % (contract["symbol"], *want))
+        if want in rows.conflicted:
+            raise ProviderUnavailable("QUOTE_CONFLICTED_IN_SNAPSHOT: %s %s %s %s excluded under %s; not re-admitted" % (contract["symbol"], *want, DUPLICATE_POLICY_ID))
+        matches = [r for r in rows if (r["expiration"], r["strike"], r["right"]) == want]
+        if len(matches) == 1:
+            return {**matches[0], "chain_report": rows.report()}
+        if not matches:
+            raise ProviderUnavailable("QUOTE_NOT_IN_SNAPSHOT: %s %s %s %s (%s)" % (contract["symbol"], *want, rows.report()))
+        raise ProviderUnavailable("QUOTE_AMBIGUOUS: %d rows for %s after the duplicate policy; refused" % (len(matches), want))
 
     return TwinSources(provenance="LIVE_FEED", clock=clock, bar_source=_LiveBars(alpaca), chain_fn=chain_fn,
-                       quote_fn=quote_fn, exit_quote_fn=quote_fn, fee_schedule=UNVERIFIED_FEES, sleep_fn=time.sleep,
-                       book_fn=lambda s, t: alpaca.nbbo(s), selection_policy=selection_policy)
+                       quote_fn=quote_fn, exit_quote_fn=quote_fn, fee_schedule=(fee_schedule or UNVERIFIED_FEES), sleep_fn=time.sleep,
+                       book_fn=lambda s, t: alpaca.nbbo(s), selection_policy=selection_policy,
+                       joint_engine=joint_engine, joint_context_fn=joint_context_fn, funnel_engine=funnel_engine,
+                       event_snapshot_fn=event_snapshot_fn, event_gate_authority=event_gate_authority)

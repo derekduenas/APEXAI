@@ -1,0 +1,8 @@
+E       assert (not [] and False)
+E        +  where False = any(<generator object TestRehearsal.test_changed_release_is_visible_on_every_record_and_identity_differs.<locals>.<genexpr> at 0x119f67060>)
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x119e8e3d0>('apex.intraday.options_feed')
+E        +    where <built-in method startswith of str object at 0x119e8e3d0> = 'apex.pulse_options.http_policy.guarded_get over apex.intraday.options_feed (HTTP_POLICY_V1, gated)'.startswith
+FAILED tests/test_weekend_brick5_rehearsal.py::TestRehearsal::test_changed_release_is_visible_on_every_record_and_identity_differs
+FAILED tests/test_weekend_brick1.py::TestLiveWiring::test_full_with_attached_client_still_refuses_before_any_network_without_the_gate
+2 failed, 273 passed in 89.48s (0:01:29)

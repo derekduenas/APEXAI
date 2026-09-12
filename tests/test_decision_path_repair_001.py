@@ -112,8 +112,10 @@ class TestQuoteNormalization:
                         max_entry_price=entry_cap_price(), as_of_epoch=RECEIPT)
         assert fwd["contract"]["strike"] == rev["contract"]["strike"] == 771.0 and fwd["reference_ask"] == rev["reference_ask"] == 4.2
         ex = fwd["strike_selection"]["exclusions"]
-        assert any(e["why"].startswith("DUPLICATE_CONFLICT") and e["strike"] == 770.0 for e in ex["selector"])
-        assert fwd["strike_selection"]["census"]["excluded_selector"] == 1
+        # Brick 1: the conflict is now excluded ONCE, at the provider boundary under DUPLICATE_POLICY_V1, and the
+        # selector sees the provider's exclusion (defence in depth: the selector would also refuse it if it arrived)
+        assert any(e["why"].startswith("DUPLICATE_CONFLICT") and e["strike"] == 770.0 for e in ex["provider"])
+        assert fwd["strike_selection"]["census"]["excluded_provider"] == 1 and fwd["strike_selection"]["census"]["excluded_selector"] == 0
 
     def test_selector_boundary_refuses_bad_values_even_when_the_provider_did_not(self):
         base = [{"expiration": "2026-10-02", "strike": 780.0, "right": "CALL", "ask": 3.0, "bid": 2.9, "bid_size": 5, "ask_size": 5, "timestamp_epoch": RECEIPT - 1}]
