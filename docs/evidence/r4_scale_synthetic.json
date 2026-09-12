@@ -1,0 +1,17 @@
+{
+ "n_paths": 4000,
+ "comparator": "JOINT",
+ "decisions_timed": 5,
+ "decision_seconds": {
+  "min": 0.119,
+  "median": 0.121,
+  "max": 0.133
+ },
+ "attach_plus_state_seconds": 0.098,
+ "python_traced_peak_mib": 5.6,
+ "process_max_rss_mib": 93.4,
+ "candidates_evaluated": 10,
+ "decision": "TRADE",
+ "why": "JOINT_SELECTED: SPY|2026-10-09|200.0|CALL E_sel 69.6704 (ranking, ASSUME_AVAILAB",
+ "note": "builder-reported, synthetic inputs only; single process on the Mac venv"
+}

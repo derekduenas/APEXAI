@@ -29,13 +29,14 @@ from .snapshot import compose, usable_value
 DIRECTION_RULE = "HEURISTIC_DIRECTION_V1: LONG if ret_15 > 0, SHORT if ret_15 < 0, None otherwise; not a forecast"
 
 
-SELECTION_POLICIES = ("PILOT_RULE_V1", "FULL_FUNNEL_V1")
+SELECTION_POLICIES = ("PILOT_RULE_V1", "FULL_FUNNEL_V1", "JOINT_FUNNEL_V1")
 
 
 class TwinSources:
     def __init__(self, *, provenance: str, clock: Clock, bar_source, chain_fn, quote_fn, exit_quote_fn,
                  fee_schedule, sleep_fn=time.sleep, book_fn=None, warmup_minutes: int = 65, artifact=None,
-                 selection_policy: str = "PILOT_RULE_V1", funnel_engine=None, funnel_history_days: int = 7):
+                 selection_policy: str = "PILOT_RULE_V1", funnel_engine=None, funnel_history_days: int = 7,
+                 joint_engine=None, joint_context_fn=None):
         if selection_policy not in SELECTION_POLICIES:
             raise ValueError("SELECTION_POLICY_UNKNOWN: %r" % (selection_policy,))
         self.selection_policy = selection_policy
@@ -44,6 +45,10 @@ class TwinSources:
             from apex.decision_wb.engine import FunnelEngine
             self.funnel_engine = FunnelEngine()
         self.funnel_history_days = funnel_history_days
+        # JOINT_FUNNEL_V1 (R4) is selection-BY-NAME and needs its engine and its market-state context supplied
+        self.joint_engine, self.joint_context_fn = joint_engine, joint_context_fn
+        if selection_policy == "JOINT_FUNNEL_V1" and (joint_engine is None or joint_context_fn is None):
+            raise ValueError("JOINT_FUNNEL_V1 requires joint_engine and joint_context_fn (R4 contract 902256e3)")
         self._funnel_fitted_day: dict = {}
         self.provenance = provenance
         self.clock = clock
@@ -75,8 +80,8 @@ class TwinSources:
     # ------------------------------------------------------------ the injected functions
     def forecast_fn(self, symbol: str, as_of: float) -> dict:
         snap = self.snapshot(symbol, as_of)
-        # under the funnel the heuristic label is NOT the selector: it is recorded on the funnel trace, not on the forecast
-        signal = None if self.selection_policy == "FULL_FUNNEL_V1" else self.signal_fn(symbol, as_of, snap)
+        # under either funnel the heuristic label is NOT the selector: it is recorded on the trace, not on the forecast
+        signal = None if self.selection_policy in ("FULL_FUNNEL_V1", "JOINT_FUNNEL_V1") else self.signal_fn(symbol, as_of, snap)
         return self.artifact.forecast(snap, created_epoch=self.clock.now(), direction_signal=signal)
 
     def signal_fn(self, symbol: str, as_of: float, snap: dict | None = None):
@@ -156,11 +161,23 @@ class TwinSources:
         res["engine"] = self.funnel_engine.describe()
         return res
 
+    def joint_fn(self, symbol: str, as_of: float, forecast: dict, book_summary: dict | None = None) -> dict:
+        """R4 selection policy. The context callable supplies the market state and the variance inputs the
+        contract requires; this object does not invent them."""
+        ctx = self.joint_context_fn(symbol, as_of, forecast)
+        res = self.joint_engine.decide(market_state=ctx["market_state"], variance_state=ctx["variance_state"],
+                                       v_hat=ctx["v_hat"], nu=ctx.get("nu"), drift_per_bar=ctx.get("drift_per_bar", 0.0),
+                                       fee_schedule=self.fee_schedule, book_summary=book_summary, forecast=forecast)
+        res["engine"] = self.joint_engine.describe()
+        return res
+
     def sources(self) -> dict:
         out = {"forecast_fn": self.forecast_fn, "signal_fn": lambda s, t: self.signal_fn(s, t),
                "chain_fn": self.chain_fn, "spot_fn": self.spot_fn, "quote_fn": self._quote_fn, "exit_quote_fn": self._exit_quote_fn}
         if self.selection_policy == "FULL_FUNNEL_V1":
             out["funnel_fn"] = self.funnel_fn
+        elif self.selection_policy == "JOINT_FUNNEL_V1":
+            out["funnel_fn"] = self.joint_fn
         return out
 
 
@@ -179,10 +196,11 @@ def returns_rows(bars: list) -> list:
 
 
 def synthetic_twin_sources(*, clock: Clock, quote_fn, exit_quote_fn, chain_fn, sleep_fn, seed: int = 7, selection_policy: str = "PILOT_RULE_V1",
-                           funnel_engine=None) -> TwinSources:
+                           funnel_engine=None, joint_engine=None, joint_context_fn=None) -> TwinSources:
     return TwinSources(provenance="SYNTHETIC_FIXTURE", clock=clock, bar_source=SyntheticBarProvider(seed=seed), chain_fn=chain_fn,
                        quote_fn=quote_fn, exit_quote_fn=exit_quote_fn, fee_schedule=SYNTHETIC_FEES, sleep_fn=sleep_fn,
-                       selection_policy=selection_policy, funnel_engine=funnel_engine)
+                       selection_policy=selection_policy, funnel_engine=funnel_engine,
+                       joint_engine=joint_engine, joint_context_fn=joint_context_fn)
 
 
 class _LiveBars:
