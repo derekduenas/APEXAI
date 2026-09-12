@@ -1,0 +1,325 @@
+{
+  "caveat": "the 906 penalised 2026-08-03 predictions cannot be resolved from held data because the lake lacks prices after 2026-08-21; the penalty here measures the PIPELINE's silence as much as the producers'. The harness doctrine says silence is not neutral, so it is reported, not softened. Arming the nightly pull would resolve them properly (an operator decision).",
+  "chain_entries": 2762,
+  "data_through_used": "2026-09-11 (calendar), versus the canonical report's lake_through 2026-08-21",
+  "full_calendar_report": {
+    "baseline_base_rate": {
+      "base_rate": 0.5,
+      "brier": 0.2509,
+      "calibration": [
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 2,
+          "realized_freq": 0.5,
+          "stated_mean": 0.53
+        }
+      ],
+      "log_loss": 0.69495,
+      "n": 2,
+      "n_effective_dates": 2,
+      "n_penalised_unresolved": 1,
+      "n_scored": 2,
+      "reliability": 0.0009,
+      "resolution": 0.0,
+      "status": "PRELIMINARY -- effective n is the date count, 2 < 10",
+      "uncertainty": 0.25
+    },
+    "baseline_momentum": {
+      "base_rate": 0.5,
+      "brier": 0.26,
+      "calibration": [
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 2,
+          "realized_freq": 0.5,
+          "stated_mean": 0.6
+        }
+      ],
+      "log_loss": 0.713558,
+      "n": 2,
+      "n_effective_dates": 2,
+      "n_penalised_unresolved": 1,
+      "n_scored": 2,
+      "reliability": 0.01,
+      "resolution": 0.0,
+      "status": "PRELIMINARY -- effective n is the date count, 2 < 10",
+      "uncertainty": 0.25
+    },
+    "baseline_momentum_rank": {
+      "base_rate": 0.4651,
+      "brier": 0.302766,
+      "calibration": [
+        {
+          "bucket": "[0.4,0.5)",
+          "n": 175,
+          "realized_freq": 0.7886,
+          "stated_mean": 0.4085
+        },
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 283,
+          "realized_freq": 0.265,
+          "stated_mean": 0.5842
+        }
+      ],
+      "log_loss": 0.799909,
+      "n": 458,
+      "n_effective_dates": 2,
+      "n_penalised_unresolved": 227,
+      "n_scored": 458,
+      "reliability": 0.118161,
+      "resolution": 0.064728,
+      "status": "PRELIMINARY -- effective n is the date count, 2 < 10",
+      "uncertainty": 0.24878
+    },
+    "blind_twin": {
+      "base_rate": 0.2271,
+      "brier": 0.25,
+      "calibration": [
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 458,
+          "realized_freq": 0.2271,
+          "stated_mean": 0.5
+        }
+      ],
+      "log_loss": 0.693147,
+      "n": 458,
+      "n_effective_dates": 2,
+      "n_penalised_unresolved": 227,
+      "n_scored": 458,
+      "reliability": 0.074474,
+      "resolution": 0.0,
+      "status": "PRELIMINARY -- effective n is the date count, 2 < 10",
+      "uncertainty": 0.175512
+    },
+    "gp_rank": {
+      "base_rate": 0.4782,
+      "brier": 0.292861,
+      "calibration": [
+        {
+          "bucket": "[0.4,0.5)",
+          "n": 231,
+          "realized_freq": 0.6667,
+          "stated_mean": 0.4101
+        },
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 227,
+          "realized_freq": 0.2863,
+          "stated_mean": 0.5901
+        }
+      ],
+      "log_loss": 0.779942,
+      "n": 458,
+      "n_effective_dates": 2,
+      "n_penalised_unresolved": 227,
+      "n_scored": 458,
+      "reliability": 0.078953,
+      "resolution": 0.036173,
+      "status": "PRELIMINARY -- effective n is the date count, 2 < 10",
+      "uncertainty": 0.249523
+    },
+    "h3_rank": {
+      "base_rate": 0.4913,
+      "brier": 0.26879,
+      "calibration": [
+        {
+          "bucket": "[0.4,0.5)",
+          "n": 244,
+          "realized_freq": 0.6721,
+          "stated_mean": 0.4486
+        },
+        {
+          "bucket": "[0.5,0.6)",
+          "n": 214,
+          "realized_freq": 0.285,
+          "stated_mean": 0.5368
+        }
+      ],
+      "log_loss": 0.730968,
+      "n": 458,
+      "n_effective_dates": 2,
+      "n_penalised_unresolved": 227,
+      "n_scored": 458,
+      "reliability": 0.056237,
+      "resolution": 0.037301,
+      "status": "PRELIMINARY -- effective n is the date count, 2 < 10",
+      "uncertainty": 0.249924
+    }
+  },
+  "generated_at": "2026-09-12T03:55:07+00:00",
+  "kind": "CALIBRATION_REPORT_CALENDAR_RESCORE",
+  "ledger": "results/reality/predictions.jsonl",
+  "producers": {
+    "baseline_base_rate": {
+      "before_2026-08-24_report": {
+        "brier": 0.2209,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 0,
+        "n_scored": 1,
+        "reliability": 0.2209,
+        "resolution": 0.0
+      },
+      "brier_change": 0.03,
+      "calendar_rescore_data_through_2026-09-11": {
+        "brier": 0.2509,
+        "n_effective_dates": 2,
+        "n_penalised_unresolved": 1,
+        "n_scored": 2,
+        "reliability": 0.0009,
+        "resolution": 0.0
+      },
+      "canonical_rerun_2026-09-11_lake_2026-08-21": {
+        "brier": 0.2209,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 0,
+        "n_scored": 1,
+        "reliability": 0.2209,
+        "resolution": 0.0
+      },
+      "standing": "WORSE"
+    },
+    "baseline_momentum": {
+      "before_2026-08-24_report": {
+        "brier": 0.16,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 0,
+        "n_scored": 1,
+        "reliability": 0.16,
+        "resolution": 0.0
+      },
+      "brier_change": 0.1,
+      "calendar_rescore_data_through_2026-09-11": {
+        "brier": 0.26,
+        "n_effective_dates": 2,
+        "n_penalised_unresolved": 1,
+        "n_scored": 2,
+        "reliability": 0.01,
+        "resolution": 0.0
+      },
+      "canonical_rerun_2026-09-11_lake_2026-08-21": {
+        "brier": 0.16,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 0,
+        "n_scored": 1,
+        "reliability": 0.16,
+        "resolution": 0.0
+      },
+      "standing": "WORSE"
+    },
+    "baseline_momentum_rank": {
+      "before_2026-08-24_report": {
+        "brier": 0.260022,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 1,
+        "n_scored": 232,
+        "reliability": 0.012484,
+        "resolution": 3.1e-05
+      },
+      "brier_change": 0.042744,
+      "calendar_rescore_data_through_2026-09-11": {
+        "brier": 0.302766,
+        "n_effective_dates": 2,
+        "n_penalised_unresolved": 227,
+        "n_scored": 458,
+        "reliability": 0.118161,
+        "resolution": 0.064728
+      },
+      "canonical_rerun_2026-09-11_lake_2026-08-21": {
+        "brier": 0.260022,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 1,
+        "n_scored": 232,
+        "reliability": 0.012484,
+        "resolution": 3.1e-05
+      },
+      "standing": "WORSE"
+    },
+    "blind_twin": {
+      "before_2026-08-24_report": {
+        "brier": 0.25,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 1,
+        "n_scored": 232,
+        "reliability": 0.002673,
+        "resolution": 0.0
+      },
+      "brier_change": 0.0,
+      "calendar_rescore_data_through_2026-09-11": {
+        "brier": 0.25,
+        "n_effective_dates": 2,
+        "n_penalised_unresolved": 227,
+        "n_scored": 458,
+        "reliability": 0.074474,
+        "resolution": 0.0
+      },
+      "canonical_rerun_2026-09-11_lake_2026-08-21": {
+        "brier": 0.25,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 1,
+        "n_scored": 232,
+        "reliability": 0.002673,
+        "resolution": 0.0
+      },
+      "standing": "SAME"
+    },
+    "gp_rank": {
+      "before_2026-08-24_report": {
+        "brier": 0.238975,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 1,
+        "n_scored": 232,
+        "reliability": 0.002653,
+        "resolution": 0.012465
+      },
+      "brier_change": 0.053886,
+      "calendar_rescore_data_through_2026-09-11": {
+        "brier": 0.292861,
+        "n_effective_dates": 2,
+        "n_penalised_unresolved": 227,
+        "n_scored": 458,
+        "reliability": 0.078953,
+        "resolution": 0.036173
+      },
+      "canonical_rerun_2026-09-11_lake_2026-08-21": {
+        "brier": 0.238975,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 1,
+        "n_scored": 232,
+        "reliability": 0.002653,
+        "resolution": 0.012465
+      },
+      "standing": "WORSE"
+    },
+    "h3_rank": {
+      "before_2026-08-24_report": {
+        "brier": 0.241784,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 1,
+        "n_scored": 232,
+        "reliability": 0.00498,
+        "resolution": 0.010973
+      },
+      "brier_change": 0.027006,
+      "calendar_rescore_data_through_2026-09-11": {
+        "brier": 0.26879,
+        "n_effective_dates": 2,
+        "n_penalised_unresolved": 227,
+        "n_scored": 458,
+        "reliability": 0.056237,
+        "resolution": 0.037301
+      },
+      "canonical_rerun_2026-09-11_lake_2026-08-21": {
+        "brier": 0.241784,
+        "n_effective_dates": 1,
+        "n_penalised_unresolved": 1,
+        "n_scored": 232,
+        "reliability": 0.00498,
+        "resolution": 0.010973
+      },
+      "standing": "WORSE"
+    }
+  },
+  "why_this_record_exists": "scripts/reality_run.py passes data_through = lake_through to score_by_producer. The live lake has not advanced since 2026-08-21 (nightly pull not armed), so the canonical regeneration on 2026-09-11 reproduced the 2026-08-24 numbers exactly: 910 past-due predictions (2026-08-03 batch, harness due date 2026-09-09 = trade_date + 1.6x20 + 5 calendar days) are still classed not-yet-due by the lake clock. This record scores the same ledger against the calendar so the penalty rule (apex/reality/harness.py scoreable) is visible. Nothing in the ledger or the code was changed."
+}
