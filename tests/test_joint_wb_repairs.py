@@ -41,7 +41,8 @@ class TestF1AdverseScenarios:
         assert adv["parameters"]["truncation_q_0.99999"]["trunc_q"] == 0.99999
         assert adv["parameters"]["spread_innovation_x1.5"]["spread_innovation_scale"] == 1.5
         assert adv["parameters"]["extension_innovation_x1.5"]["extension_innovation_scale"] == 1.5
-        assert adv["parameters"]["a_iv_minus_1_cluster_robust_se"]["direction"] == "against the position"
+        prm = adv["parameters"]["a_iv_minus_1_cluster_robust_se"]
+        assert prm["direction"].startswith("IV_DOWN") and prm["shift"] < 0            # adverse for ANY long option (vega > 0)
         assert adv["parameters"]["size_floor_removed"]["size_floor"] is False
         assert adv["complete"] is True and set(adv["registered"]) == set(ENG.ADVERSE_SCENARIOS)
 
@@ -176,21 +177,29 @@ class TestF6ExecutionFreshness:
         return ST.compose(symbol="SPY", t_d=T.T_D, bars=b, underlyings=u, chain=T._chain(),
                           raw_quotes=T._quotes(t=T.T_D - age_s))
 
-    def test_14_9s_is_executable_and_15_1s_is_indicative_only(self):
+    def test_two_stage_freshness_per_1_1_indicative_quotes_rank_and_propose_and_only_the_boundary_bars_stale_fills(self):
+        """§1.1: 'option quotes (indicative 120 s; execution 15 s at the boundary)'. A 30 s indicative quote ranks and
+        may propose; the freshness decision is recorded on the row; the 15 s executable check lives in
+        Boundary.execute_intent (tests/test_decision_path_repair_001.py proves the stale fill). Ruling:
+        docs/FRESHNESS_ADJUDICATION_2026-09-12.md."""
         fresh = self._state_with_age(14.9)
-        stale = self._state_with_age(15.1)
+        stale = self._state_with_age(30.0)
         assert all(q["executable"] for q in fresh["valid_quotes"].values())
         assert not any(q["executable"] for q in stale["valid_quotes"].values())
         assert all(q["indicative_ok"] for q in stale["valid_quotes"].values())
         e = T._engine(n_paths=200, seed=11)
         a = T._decide(e, ms=fresh, drift=0.0005, scan_id="F6-A")
         b = T._decide(e, ms=stale, drift=0.0005, scan_id="F6-B")
-        assert a["decision"] == "TRADE" and b["decision"] == "WAIT"
-        assert b["trace"]["candidates"]["census"]["EXECUTION_QUOTE_STALE"] > 0
-        assert b["why"] == "NO_ELIGIBLE_CANDIDATE"
-        rows = [t for t in b["trace"]["candidates"]["table"] if t["status"] == "INDICATIVE_ONLY"]
+        assert a["decision"] == "TRADE" and b["decision"] == "TRADE"
+        assert b["trace"]["candidates"]["n_eligible"] > 0 and b["trace"]["candidates"]["census"]["INDICATIVE_AGE_15_120S"] > 0
+        assert "EXECUTION_QUOTE_STALE" not in b["trace"]["candidates"]["census"]
+        rows = [t for t in b["trace"]["candidates"]["table"] if t["status"] == "ELIGIBLE"]
         assert rows and all(r["freshness"]["age_s"] > 15.0 and r["freshness"]["executable"] is False for r in rows)
         assert all({"event_time", "receipt_time", "age_s", "decision"} <= set(r["freshness"]) for r in rows)
+        assert "120" in b["trace"]["candidates"]["freshness_rule"] and "15" in b["trace"]["candidates"]["freshness_rule"]
+        # beyond the indicative limit the state itself refuses: nothing older than 120 s reaches ranking
+        with pytest.raises(ST.StateRefused, match="NO_VALID_QUOTE"):
+            self._state_with_age(121.0)
 
 
 # ---------------------------------------------------------------- F7 frozen IV source

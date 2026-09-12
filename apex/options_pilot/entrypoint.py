@@ -24,6 +24,7 @@ import json
 import time
 from pathlib import Path
 
+from . import ledger as L
 from . import session as S
 from .boundary import Boundary
 from .clock import Clock
@@ -43,25 +44,76 @@ def route(args) -> str:
     return ROUTE_PILOT if getattr(args, "pilot_boundary", False) else ROUTE_LEGACY
 
 
+class LiveWiring:
+    """EXPLICIT, REVIEWED live wiring for ProductionSources (Brick 1). Every dependency the live path needs is named
+    here and reported; nothing is attached by default that is not listed. `attach_market_data_http=True` attaches the
+    options-feed HTTP client and Alpaca headers to the bars/NBBO adapter and the ThetaData chain/quote functions;
+    every call still passes LiveGate (switch + credentials) first. JOINT needs a fitted engine and a context callable
+    built from an authorized fit; without them the TwinSources constructor refusal is PRESERVED and reported."""
+
+    def __init__(self, *, attach_market_data_http: bool = False, joint_engine=None, joint_context_fn=None,
+                 joint_fit_status: dict | None = None, funnel_engine=None, fee_schedule=None, event_snapshot_fn=None,
+                 event_gate_authority: str = "SHADOW"):
+        self.attach_market_data_http = attach_market_data_http
+        self.fee_schedule = fee_schedule                       # None -> UNVERIFIED_FEES (the live default); an explicit choice is reported
+        self.event_snapshot_fn = event_snapshot_fn
+        self.event_gate_authority = event_gate_authority
+        self.joint_engine, self.joint_context_fn = joint_engine, joint_context_fn
+        self.joint_fit_status = joint_fit_status or {"status": "NOT_SUPPLIED",
+                                                     "why": "no R4 fit authorized (R4-FIT-001 not granted); no completed training sessions supplied"}
+        self.funnel_engine = funnel_engine
+
+    def describe(self) -> dict:
+        return {"attach_market_data_http": self.attach_market_data_http,
+                "bars_nbbo_client": ("apex.pulse_options.http_policy.guarded_get over apex.intraday.options_feed (HTTP_POLICY_V1, gated)" if self.attach_market_data_http else "_no_http (NOT ATTACHED)"),
+                "fee_schedule": (self.fee_schedule.describe() if self.fee_schedule is not None else "UNVERIFIED_FEES (live default; no fee document authorized)"),
+                "event_stream": ("wired: %s" % getattr(self.event_snapshot_fn, "__name__", "callable") if self.event_snapshot_fn is not None else "NOT_WIRED"),
+                "event_gate_authority": self.event_gate_authority,
+                "chain_quote_client": "apex.intraday.options_feed.option_expirations/option_chain_snapshot (gated; injectable)",
+                "joint_engine": (type(self.joint_engine).__name__ if self.joint_engine is not None else None),
+                "joint_context_fn": (getattr(self.joint_context_fn, "__name__", "callable") if self.joint_context_fn is not None else None),
+                "joint_fit_status": self.joint_fit_status,
+                "funnel_engine": (self.funnel_engine.describe() if self.funnel_engine is not None and hasattr(self.funnel_engine, "describe") else None)}
+
+
 class ProductionSources:
-    """LIVE_FEED sources = the twin-backed sources behind LiveGate. With the default environment
-    every provider call raises ProviderUnavailable BEFORE any network access, so each scan ends
-    REFUSE with a persisted reason; and the fee schedule is UNVERIFIED, so no intent could be
-    approved even with data. Both are named refusals, not fallbacks."""
+    """LIVE_FEED sources = the twin-backed sources behind LiveGate. With the default environment every provider call
+    raises ProviderUnavailable BEFORE any network access, so each scan ends REFUSE with a persisted reason; and the
+    fee schedule is UNVERIFIED, so no intent could be approved even with data. Both are named refusals, not
+    fallbacks. The wiring is explicit (LiveWiring) and reported; the default is PILOT_RULE_V2 unless a separate
+    explicit selection is supplied; JOINT/FULL are never routed through V2."""
     provenance = "LIVE_FEED"
 
-    def __init__(self, selection_policy: str = "PILOT_RULE_V1"):
+    def __init__(self, selection_policy: str = "PILOT_RULE_V2", wiring: LiveWiring | None = None):
         from apex.pulse_options.sources import live_twin_sources
-        self._twin = live_twin_sources(selection_policy=selection_policy)
+        self.wiring = wiring or LiveWiring()
+        http_get = headers_fn = None
+        if self.wiring.attach_market_data_http:
+            from apex.intraday import options_feed as OF
+            from apex.pulse_options.http_policy import EndpointHealth, guarded_get
+            self.health = EndpointHealth()
+
+            def http_get(url, headers=None):
+                body, _ = guarded_get(url, headers=headers, endpoint=url.split("?")[0], health=self.health)
+                return body
+            headers_fn = OF._alpaca_headers
+        # a JOINT request without engine+context reaches the TwinSources guard and is refused there (preserved)
+        self._twin = live_twin_sources(selection_policy=selection_policy, http_get=http_get, headers_fn=headers_fn,
+                                       joint_engine=self.wiring.joint_engine, joint_context_fn=self.wiring.joint_context_fn,
+                                       funnel_engine=self.wiring.funnel_engine, fee_schedule=self.wiring.fee_schedule,
+                                       event_snapshot_fn=self.wiring.event_snapshot_fn, event_gate_authority=self.wiring.event_gate_authority)
         self.selection_policy = selection_policy
         self.funnel_engine = self._twin.funnel_engine
         self.clock = self._twin.clock
         self.risk_authority = self._twin.risk_authority
         self.fee_schedule = self._twin.fee_schedule
-        self.sleep_fn = time.sleep
 
     def sources(self) -> dict:
         return self._twin.sources()
+
+    def describe(self) -> dict:
+        return {"provenance": self.provenance, "selection_policy": self.selection_policy, "wiring": self.wiring.describe(),
+                "fee_schedule": {"id": self.fee_schedule.schedule_id, "provenance": self.fee_schedule.provenance}}
 
 
 def build_boundary(ledger, *, provider, session_id: str, release: str) -> Boundary:
@@ -76,7 +128,19 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     per cycle -> resolve fills -> close. Returns and writes the report."""
     ledger = Path(ledger)
     bd = build_boundary(ledger, provider=provider, session_id=session_id, release=release)
+    from .runtime_identity import runtime_identity
+    identity = runtime_identity(artifacts=getattr(provider, "artifacts", None))
+    bd.runtime_identity = identity
     src = provider.sources()
+    from apex.pulse_options.sources import SELECTION_POLICIES, RULE_POLICIES
+    from .expression_rule import RULE_IDS
+    policy = getattr(provider, "selection_policy", None) or "PILOT_RULE_V2"
+    if policy not in SELECTION_POLICIES:
+        raise ValueError("SELECTION_POLICY_UNKNOWN: %r (known: %s)" % (policy, SELECTION_POLICIES))
+    if policy in RULE_POLICIES and src.get("funnel_fn") is not None:
+        raise ValueError("SELECTION_POLICY_CONFLICT: %r is a deterministic rule but the provider supplies a funnel" % (policy,))
+    if policy not in RULE_POLICIES and src.get("funnel_fn") is None:
+        raise ValueError("SELECTION_POLICY_CONFLICT: %r needs a funnel_fn and the provider supplies none" % (policy,))
     sleep = getattr(provider, "sleep_fn", None) or sleep_fn        # a controlled clock 'sleeps' by advancing
     report = {"route": ROUTE_PILOT, "session_id": session_id, "release": release,
               "execution_mode": bd.labels["execution_mode"], "data_provenance": bd.labels["data_provenance"],
@@ -106,7 +170,8 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
         for sym in symbols:
             seq = S.next_seq(ledger, session_id=session_id)
             d = S.scan(bd, symbol=sym, seq=seq, forecast_fn=src["forecast_fn"], signal_fn=src["signal_fn"],
-                       chain_fn=src["chain_fn"], spot_fn=src["spot_fn"], quote_fn=src["quote_fn"], funnel_fn=src.get("funnel_fn"))
+                       chain_fn=src["chain_fn"], spot_fn=src["spot_fn"], quote_fn=src["quote_fn"], funnel_fn=src.get("funnel_fn"),
+                       selection_policy=policy, event_context_fn=src.get("event_context_fn"))
             report["decisions"].append({k: d.get(k) for k in ("scan_id", "symbol", "decision", "why", "forecast_id",
                                                               "intent_id", "fill_id", "decision_persisted",
                                                               "refusal_persisted")})
@@ -134,7 +199,26 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     report["fee_schedule"] = bd.fee_schedule.describe()
     report["exit_policy"] = bd.exit_policy.describe()
     report["execution_policy"] = bd.execution_policy.describe()
-    report["selection_policy"] = (getattr(provider, "selection_policy", None) or "PILOT_RULE_V1")
+    report["selection_policy"] = policy
+    report["runtime_identity"] = identity
+    report["wiring"] = (provider.describe() if hasattr(provider, "describe") else {"provider": type(provider).__name__})
+    # IDENTITY CHECK: every persisted intent of this session must name the rule of the policy that was run
+    if policy in RULE_IDS:
+        expected_rule = RULE_IDS[policy]
+    elif policy == "FULL_FUNNEL_V1":
+        from apex.decision_wb.engine import FUNNEL_RULE_ID as expected_rule
+    else:
+        from apex.joint_wb.engine import JOINT_RULE_ID as expected_rule
+    mism = []
+    for r in L.read_all(ledger):
+        if r.get("kind") == "pilot_intent" and r.get("session_id") == session_id:
+            got = r.get("expression_rule")
+            if got != expected_rule:
+                mism.append({"seq": r.get("seq"), "intent_id": r.get("intent_id"), "expression_rule": got})
+    report["policy_identity"] = {"policy": policy, "expected_rule_id": expected_rule, "intents_checked": sum(1 for r in L.read_all(ledger) if r.get("kind") == "pilot_intent" and r.get("session_id") == session_id),
+                                 "mismatches": mism, "consistent": not mism}
+    if mism:
+        raise RuntimeError("POLICY_IDENTITY_MISMATCH: %d intent(s) do not carry the rule of policy %r" % (len(mism), policy))
     if hasattr(provider, "funnel_engine") and provider.funnel_engine is not None:
         report["funnel_engine"] = provider.funnel_engine.describe()
     if out:
@@ -150,14 +234,14 @@ def run_from_args(a, *, pilot_sources=None) -> int:
     elif getattr(a, "pilot_synthetic_fixture", False):
         from .synthetic_harness import make_harness
         h = make_harness(Path(a.ledger), symbols=syms)
-        if getattr(a, "pilot_selection_policy", "PILOT_RULE_V1") == "FULL_FUNNEL_V1":
+        if getattr(a, "pilot_selection_policy", "PILOT_RULE_V2") == "FULL_FUNNEL_V1":
             from apex.pulse_options.sources import synthetic_twin_sources
             provider = TwinProvider(synthetic_twin_sources(clock=h.clock, quote_fn=h.quotes, exit_quote_fn=h.exit_quotes, chain_fn=h.chain_fn,
                                                            sleep_fn=h.advance, selection_policy="FULL_FUNNEL_V1"))
         else:
-            provider = _HarnessProvider(h)
+            provider = _HarnessProvider(h, selection_policy=getattr(a, "pilot_selection_policy", "PILOT_RULE_V2"))
     else:
-        provider = ProductionSources(selection_policy=getattr(a, "pilot_selection_policy", "PILOT_RULE_V1"))
+        provider = ProductionSources(selection_policy=getattr(a, "pilot_selection_policy", "PILOT_RULE_V2"))
     session_id = getattr(a, "pilot_session_id", None) or time.strftime("PILOT-%Y%m%dT%H%M%SZ", time.gmtime())
     release = getattr(a, "pilot_release", None) or "UNPINNED"
     cycles = 1 if a.dry_run else max(1, int(a.minutes // max(1, a.interval_min)))
@@ -189,8 +273,9 @@ class _HarnessProvider:
     """Adapts a SyntheticHarness to the provider interface used above."""
     provenance = "SYNTHETIC_FIXTURE"
 
-    def __init__(self, h):
+    def __init__(self, h, selection_policy: str = "PILOT_RULE_V2"):
         self.h = h
+        self.selection_policy = selection_policy
         self.clock = h.clock
         self.risk_authority = h.risk
         self.fee_schedule = h.fee_schedule

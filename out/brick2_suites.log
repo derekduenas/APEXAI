@@ -1,0 +1,19 @@
+E       AssertionError: assert ('OBSERVED' == 'NONE_OBSERVED'
+E         
+E         - NONE_OBSERVED
+E         ? -----
+E         + OBSERVED)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/p8/99lccb595clf3nv6nm57nptm0000gn/T/pytest-of-derekduenas/pytest-47/test_out_of_order_messages_do_0/a/events.jsonl'
+E           FileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/p8/99lccb595clf3nv6nm57nptm0000gn/T/pytest-of-derekduenas/pytest-47/test_scheduled_event_in_the_fu0/k/cal'
+E       FileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/p8/99lccb595clf3nv6nm57nptm0000gn/T/pytest-of-derekduenas/pytest-47/test_feed_failure_states_are_d0/q/events.jsonl'
+E       AssertionError: assert ('REFUSE' == 'REFUSE'
+E         
+E           REFUSE and False)
+E        +  where False = <built-in method startswith of str object at 0x11c160b30>('EVENT_GATE_VETO')
+E        +    where <built-in method startswith of str object at 0x11c160b30> = 'rule: EVENT_GATE_VETO: R1: FOMC-X in window (2026-09-10T00:36:40Z) (EVENT_GATE_V0, authority ACTIVE; exits unaffected)'.startswith
+FAILED tests/test_weekend_brick2_events.py::TestFixtures::test_ambiguous_entity_is_not_attached_to_the_symbol
+FAILED tests/test_weekend_brick2_events.py::TestFixtures::test_out_of_order_messages_do_not_change_the_snapshot
+FAILED tests/test_weekend_brick2_events.py::TestFixtures::test_scheduled_event_in_the_future_is_context_only_when_its_schedule_was_known
+FAILED tests/test_weekend_brick2_events.py::TestFixtures::test_feed_failure_states_are_distinct
+FAILED tests/test_weekend_brick2_events.py::TestWiredIntoTheDecision::test_active_gate_vetoes_a_new_entry_in_the_window_but_never_an_exit
+5 failed, 234 passed in 89.70s (0:01:29)

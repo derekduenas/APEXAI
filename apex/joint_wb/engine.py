@@ -23,7 +23,7 @@ from . import comparators as CMP
 from . import decision_rule as DR
 from . import sampler as SMP
 from . import permissions as PRM
-from .state import EXECUTION_MAX_AGE_S, StateRefused, predictor_vector
+from .state import EXECUTION_MAX_AGE_S, QUOTE_MAX_AGE_S, StateRefused, predictor_vector
 
 
 class AuthorizationRefused(PermissionError):
@@ -276,32 +276,41 @@ class JointEngine:
                 fresh = {"event_time": q_["timestamp_epoch"], "receipt_time": q_.get("available_time"),
                          "age_s": q_["age_s"], "executable": q_["executable"], "decision": q_["freshness_decision"],
                          "execution_limit_s": EXECUTION_MAX_AGE_S}
+                # the sanitized quote's relative spread ((ask - bid) / mid, the declared convention in sanitize_quote) and
+                # the identity of the quote it came from travel with the candidate to PRIME; None is never "zero"
+                qid = {"bid": q_["bid"], "ask": q_["ask"], "mid": q_["mid"], "spread_rel": q_.get("spread_rel"),
+                       "timestamp_epoch": q_["timestamp_epoch"], "age_s": q_["age_s"]}
                 env = envelope_for(reference_ask=q_["ask"], quantity=1)
                 if not env["feasible"] or q_["ask"] > env["max_entry_price"]:
                     census["RISK_ENVELOPE"] = census.get("RISK_ENVELOPE", 0) + 1
-                    table.append({"label": label, "status": "REJECTED", "why": "RISK_ENVELOPE", "entry_ask": q_["ask"], "freshness": fresh})
+                    table.append({"label": label, "status": "REJECTED", "why": "RISK_ENVELOPE", "entry_ask": q_["ask"], "freshness": fresh,
+                                  "entry_spread_rel": qid["spread_rel"], "quote_identity": qid})
                     continue
                 acct, why = evaluate(K, right, "ASSUME_AVAILABLE")
                 if acct is None or acct.get("refused"):
                     reason = why or acct.get("refused")
                     census[reason] = census.get(reason, 0) + 1
-                    table.append({"label": label, "status": "REJECTED", "why": reason, "entry_ask": q_["ask"], "freshness": fresh})
+                    table.append({"label": label, "status": "REJECTED", "why": reason, "entry_ask": q_["ask"], "freshness": fresh,
+                                  "entry_spread_rel": qid["spread_rel"], "quote_identity": qid})
                     continue
                 row = {"label": label, "status": "ELIGIBLE", "entry_ask": q_["ask"], "E_sel_rank": acct["E_sel"],
                        "mean_S1": acct["mean_S1"], "mean_S2": acct["mean_S2"], "U": acct["U"],
-                       "availability_failure_rate": acct["availability_failure_rate"], "freshness": fresh}
+                       "availability_failure_rate": acct["availability_failure_rate"], "freshness": fresh,
+                       "entry_spread_rel": qid["spread_rel"], "quote_identity": qid}
                 if not q_["executable"]:
-                    # an indicative quote may be RANKED and REPORTED; it may never produce an intent (§1.1 execution age)
-                    row["status"] = "INDICATIVE_ONLY"
-                    census["EXECUTION_QUOTE_STALE"] = census.get("EXECUTION_QUOTE_STALE", 0) + 1
-                    table.append(row); continue
-                ranked.append({"label": label, "K": K, "right": right, "quote": q_, "acct": acct})
+                    # §1.1: "option quotes (indicative 120 s; execution 15 s at the boundary)". A quote between 15 s and
+                    # 120 s old is a valid INDICATIVE input: it is ranked and may produce a PROPOSAL. The 15 s limit is
+                    # enforced at the boundary on the FRESH executable quote (Boundary.execute_intent), not here.
+                    # docs/FRESHNESS_ADJUDICATION_2026-09-12.md records the reading.
+                    census["INDICATIVE_AGE_15_120S"] = census.get("INDICATIVE_AGE_15_120S", 0) + 1
+                ranked.append({"label": label, "K": K, "right": right, "quote": q_, "acct": acct, "expression": "LONG_%s" % right})
                 table.append(row)
         ranked.sort(key=lambda c: (-c["acct"]["E_sel"], c["label"]))
         tr["candidates"] = {"n_eligible": len(ranked), "table": table, "census": census,
                             "ranking_policy": "ASSUME_AVAILABLE (size plays no part in ranking)",
-                            "execution_freshness_rule": "only a quote no older than %.0f s at the decision boundary may produce an intent"
-                                                        % EXECUTION_MAX_AGE_S,
+                            "freshness_rule": ("§1.1 two-stage: indicative quotes up to %.0f s rank and may propose; the FRESH executable "
+                                               "quote at the boundary must be <= %.0f s old to fill (enforced by Boundary.execute_intent)"
+                                               % (QUOTE_MAX_AGE_S, EXECUTION_MAX_AGE_S)),
                             "fees": {"entry": fe, "exit": fx}}
 
         def veto_eval(label):
@@ -340,7 +349,8 @@ class JointEngine:
                         "confidence": None, "risk": {k: risk.get(k) for k in ("risk_provenance", "authority_id", "why", "approved")}}
             comparison = {"candidates": [{"label": t["label"], "status": ("ELIGIBLE" if t["status"] == "ELIGIBLE" else "REJECTED"),
                                           "expected_net_pnl": t.get("E_sel_rank"), "entry_ask": t.get("entry_ask"),
-                                          "entry_spread_rel": None, "expected_value_established": False,
+                                          "entry_spread_rel": t.get("entry_spread_rel"), "quote_identity": t.get("quote_identity"),
+                                          "expected_value_established": False,
                                           "why": t.get("why")} for t in table],
                           "expected_value_note": "UNESTABLISHED: model-conditional under the declared state law"}
             sample = np.log(S[:, 15] / S[:, 0])
@@ -354,6 +364,9 @@ class JointEngine:
             snap = {"fields": {"last_bar_age_s": {"value": ms["S_0"]["age_s"], "quality": "VALID"}}}
             out_ = supervise(forecast=fo, snapshot=snap, comparison=comparison, risk_decision=risk,
                              book_summary=book_summary, regime=None, candidate_label=label, policy=self.policy)
+            cand_in = next((c for c in comparison["candidates"] if c["label"] == label), {})
+            tr["prime_input"] = {"candidate": label, "entry_spread_rel": cand_in.get("entry_spread_rel"),
+                                 "quote_identity": cand_in.get("quote_identity"), "max_spread_rel": self.policy.max_spread_rel}
             out_["risk"] = {k: risk.get(k) for k in ("risk_provenance", "authority_id", "approved")}
             return out_
 
@@ -387,7 +400,13 @@ class JointEngine:
         se_iv = self.fit_info.get("se_a_iv_intercept")
         shift = None
         if se_iv is not None:
-            shift = -se_iv if right == "CALL" else +se_iv          # against the position
+            # A LONG vanilla option (call OR put) has POSITIVE vega: the adverse IV perturbation is IV DOWN for both.
+            # The earlier CALL:-SE / PUT:+SE mapping applied a DIRECTIONAL sign to a VOLATILITY stress and made the
+            # long-put "adverse" scenario an IV-up benefit (decision-path review of b9998d02, finding 4).
+            if best.get("expression", "LONG_%s" % right) not in ("LONG_CALL", "LONG_PUT"):
+                raise RuntimeError("ADVERSE_IV_SIGN_UNDETERMINED: contract prescribes the perturbation for long vanilla "
+                                   "options only; got %r" % (best.get("expression"),))
+            shift = -se_iv
         out = {"scenarios": {}, "parameters": {}, "ablations": {"note": "recorded for attribution, never gates"}}
 
         def val(name, params, *, states=None, policy="ASSUME_AVAILABLE", size_floor=True):
@@ -422,7 +441,8 @@ class JointEngine:
                 out["parameters"][name] = {"unavailable": "no cluster-robust SE attached to the fit"}
                 return
             _, sh, sx = build(a_iv_shift=shift)
-            val(name, {"cluster_robust_se": se_iv, "shift": shift, "direction": "against the position"}, states=(sh, sx))
+            val(name, {"cluster_robust_se": se_iv, "shift": shift, "direction": "IV_DOWN: adverse for any LONG vanilla option (vega > 0); "
+                                                                          "independent of CALL/PUT", "expression": "LONG_%s" % right}, states=(sh, sx))
 
         def _size_floor(name):
             val(name, {"size_policy": "MODELLED_SIZE", "size_floor": False,

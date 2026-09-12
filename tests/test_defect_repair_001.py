@@ -93,6 +93,16 @@ class TestAdverseRegistry:
 
 
 # ------------------------------------------------------------------ item 4: commissioned live chain/quote (read-only)
+from apex.pulse_options.providers import ThetaChainAdapter
+from apex.options_pilot.clock import Clock
+SNAP_EPOCH = ThetaChainAdapter.et_naive_to_epoch("2026-09-11 10:53:23")
+RECEIPT = SNAP_EPOCH + 5.0                                       # the snapshot is 5 s old at receipt
+
+
+def _clock():
+    return Clock(lambda: RECEIPT)
+
+
 def _snapshot_rows(symbol, expiration):
     assert symbol == "SPY" and expiration == "2026-10-02"
     return [{"symbol": "SPY", "expiration": "2026-10-02", "strike": "773.000", "right": "C", "timestamp": "2026-09-11 10:53:23",
@@ -117,15 +127,16 @@ class TestLiveWiring:
 
     def test_chain_fn_returns_validator_shaped_rows_from_the_first_eligible_expiry(self):
         src = SRC.live_twin_sources(gate=self._gate(), expirations_fn=lambda s: ["20260918", "20261002", "20261016"],
-                                    chain_snapshot_fn=_snapshot_rows)
-        rows = src.chain_fn("SPY", 1_789_000_000.0)                     # 2026-09-11 UTC
+                                    chain_snapshot_fn=_snapshot_rows, clock=_clock())
+        rows = src.chain_fn("SPY", RECEIPT)                              # 2026-09-11
         assert [r["strike"] for r in rows] == [773.0, 764.0]             # the malformed row is dropped, nothing invented
+        assert len(rows.exclusions) == 1 and rows.exclusions[0]["why"].startswith("STRIKE_INVALID")
         r = rows[0]
         assert r["expiration"] == "2026-10-02" and r["right"] == "CALL" and r["ask"] == 4.63 and r["bid_size"] == 58
         assert isinstance(r["timestamp_epoch"], float) and r["indicative"] is True and r["provider"] == "THETADATA_V3"
 
     def test_quote_fn_returns_the_exact_contract_or_refuses(self):
-        src = SRC.live_twin_sources(gate=self._gate(), expirations_fn=lambda s: ["20261002"], chain_snapshot_fn=_snapshot_rows)
+        src = SRC.live_twin_sources(gate=self._gate(), expirations_fn=lambda s: ["20261002"], chain_snapshot_fn=_snapshot_rows, clock=_clock())
         q = src._quote_fn({"symbol": "SPY", "expiration": "2026-10-02", "strike": 773.0, "right": "CALL"})
         from apex.options_pilot.records import validate_quote
         v = validate_quote(q, contract={"symbol": "SPY", "expiration": "2026-10-02", "strike": 773.0, "right": "CALL"})

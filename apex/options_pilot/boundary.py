@@ -36,7 +36,7 @@ from .book import Book, load_book
 from .clock import Clock, ClockRefused, check_reading, to_utc_string
 from .exit_policy import EXIT_POLICY_V1, ExitPolicy
 from .fees import EXECUTION_POLICY_V1, UNVERIFIED_FEES, ExecutionPolicy, FeeSchedule
-from .records import (FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_prospective, canonical_hash, labels_for,
+from .records import (TOLL_FORMULA_V1, FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_prospective, canonical_hash, labels_for,
                       validate_forecast, validate_intent, validate_quote)
 
 MAX_SELECTED_QUOTE_AGE_S = 15.0
@@ -208,10 +208,19 @@ class Boundary:
             self.refuse("intent", envelope["why_infeasible"], scan_id=scan_id)
         fees = {"schedule_id": self.fee_schedule.schedule_id, "schedule_hash": self.fee_schedule.schedule_hash,
                 "provenance": self.fee_schedule.provenance, "known": self.fee_schedule.known}
+        fee_totals = (self.fee_schedule.entry(1).get("total"), self.fee_schedule.exit(1).get("total"))
+        pins = {"release": self.release, "expression_rule": intent.get("expression_rule"),
+                "exit_policy_id": self.exit_policy.policy_id, "exit_policy_hash": self.exit_policy.policy_hash,
+                "execution_policy_hash": self.execution_policy.policy_hash,
+                "fee_schedule_id": self.fee_schedule.schedule_id, "fee_schedule_hash": self.fee_schedule.schedule_hash,
+                "risk_authority_id": getattr(self.risk, "authority_id", None),
+                "toll_formula": TOLL_FORMULA_V1["id"], "toll_formula_hash": TOLL_FORMULA_V1["hash"],
+                "contract_pin": intent.get("contract_pin"),
+                "git_commit": "NOT_AVAILABLE_IN_PROCESS: the release id above is the deployment pin"}
         try:
             body = validate_intent(intent, forecast=fr, forecast_receipt=forecast_receipt, signal_used=signal_used,
                                    session_id=self.session_id, scan_id=scan_id, release=self.release, created_epoch=created,
-                                   risk_envelope=envelope, fees=fees,
+                                   risk_envelope=envelope, fees=fees, pins=pins, fee_totals=fee_totals,
                                    execution_policy={"policy_id": self.execution_policy.policy_id,
                                                      "policy_hash": self.execution_policy.policy_hash,
                                                      "max_fill_attempts": self.execution_policy.max_fill_attempts})
@@ -498,6 +507,14 @@ class Boundary:
                 "provider_latency_s": t_receipt - t_request,
                 "quote_observed": ({k: quote[k] for k in ("bid", "ask", "bid_size", "ask_size", "timestamp_epoch",
                                                           "timestamp_utc", "timestamp_meaning")} if quote else None),
+                # POST-REQUOTE ENTRY COST UPDATE: from the executable quote at receipt, under the same formula id; the
+                # intent's sealed expected_toll is referenced, never rewritten
+                "entry_cost_update": ({"formula": TOLL_FORMULA_V1["id"], "formula_hash": TOLL_FORMULA_V1["hash"],
+                                       "entry_half_spread_$": round(100.0 * (quote["ask"] - 0.5 * (quote["bid"] + quote["ask"])), 4),
+                                       "quote_timestamp_epoch": quote["timestamp_epoch"],
+                                       "intent_expected_toll_ref": {"value": (it.get("expected_toll") or {}).get("value"),
+                                                                    "status": (it.get("expected_toll") or {}).get("status")}}
+                                      if quote else None),
                 "quote_age_at_receipt_s": (t_receipt - quote["timestamp_epoch"]) if quote else None,
                 "quote_ts_minus_intent_persisted_s": (quote["timestamp_epoch"] - it["persisted_epoch"]) if quote else None,
                 "risk_envelope": env or None,

@@ -1,0 +1,171 @@
+{
+ "kind": "FULL_SUITE_NODE_COMPARISON",
+ "candidate": "778a5c94f15a636fa5e5a67dd9ab426f283b4287",
+ "candidate_totals": {
+  "passed": 5197,
+  "failed": 15,
+  "skipped": 9
+ },
+ "comparison": "e1bff80 baseline run covered only the 12 files that failed on the candidate (14 failed, 222 passed, 5 skipped there)",
+ "rows": [
+  {
+   "node_id": "tests/test_architecture_claims.py::test_no_execution_or_broker_dependency_exists",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "the merged research tree carries the string \"alpaca\" in a corpus label (\"corpus:alpaca_1m\") inside apex/backtest_wb; a textual guard, not an execution dependency",
+   "commissioning_relevance": "RELEVANT_TO_HOST: the guard runs on the host too; must be adjudicated (label vs dependency) before release",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_null_rig_memory.py::test_memory_does_not_grow_linearly_with_completed_sweep_seeds",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "memory-growth guard from lineage tip B; fails on this Mac (allocator behaviour); tip B chosen over tip A at merge",
+   "commissioning_relevance": "RELEVANT_TO_HOST: unknown until run on the host",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_pulse_anchor_freshness.py::test_NKLA_inputs_recomposed_refuse_the_anchor_and_everything_built_on_it",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "same sealed packet",
+   "commissioning_relevance": "HOST_ONLY_FIXTURE",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_pulse_anchor_freshness.py::test_NKLA_sealed_packet_still_shows_the_original_anchor_defect",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "reads a sealed NKLA packet under /apex-data (host path) absent on the Mac",
+   "commissioning_relevance": "HOST_ONLY_FIXTURE",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_pulse_derived.py::test_NKLA_frozen_packet_still_shows_the_original_defect",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "same sealed packet",
+   "commissioning_relevance": "HOST_ONLY_FIXTURE",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_real_data_boundary.py::test_a_sticky_world_writable_ancestor_is_accepted",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "expects a sticky world-writable component (/tmp) on the chain; the Mac scratch path differs",
+   "commissioning_relevance": "ENVIRONMENT: passes where /tmp is the ancestor",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_real_data_boundary.py::test_interpreter_and_third_party_provenance_is_recorded",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "PASSED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "fails ONLY when the interpreter lives inside the checkout (.venv under ~/apex-equities filters numpy as a checkout module); PASSES from a clean worktree with the interpreter outside it (reproduced 2026-09-12)",
+   "commissioning_relevance": "NOT_RELEVANT: on the host the venv is /opt/apex/shared/venv, outside the release",
+   "class": "CHECKOUT_LAYOUT"
+  },
+  {
+   "node_id": "tests/test_research_board.py::test_audit_script_passes",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "FileNotFoundError: audit script path absent",
+   "commissioning_relevance": "NOT_RELEVANT_TO_PILOT",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_research_board.py::test_reconciliation_root_changes_if_a_legacy_board_changes",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "same",
+   "commissioning_relevance": "NOT_RELEVANT_TO_PILOT",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_research_board.py::test_reconciliation_root_is_deterministic_and_order_independent",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "legacy research-board files absent from the checkout",
+   "commissioning_relevance": "NOT_RELEVANT_TO_PILOT",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_research_board.py::test_swapping_two_legacy_boards_changes_the_root",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "same",
+   "commissioning_relevance": "NOT_RELEVANT_TO_PILOT",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_whole_ledger_guard.py::test_checkpoint_module_declares_the_law",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "same registry",
+   "commissioning_relevance": "RELEVANT_TO_HOST",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_whole_ledger_guard.py::test_every_registered_offender_still_exists",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "registry of legacy offender modules refers to files not in the merged tree",
+   "commissioning_relevance": "RELEVANT_TO_HOST: guard must be reconciled before release",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_whole_ledger_guard.py::test_pulse_v1_minute_path_reads_no_ledger",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "same registry",
+   "commissioning_relevance": "RELEVANT_TO_HOST",
+   "class": "PRE_EXISTING_ON_MAIN"
+  },
+  {
+   "node_id": "tests/test_world_model_bootstrap.py::test_running_inside_research_containment",
+   "candidate_778a5c9_outcome": "FAILED",
+   "comparison_commit": "e1bff80 (pre-repair main, clean worktree)",
+   "comparison_outcome": "FAILED",
+   "environment": "Mac i5-5250U, Python 3.11.9, numpy 2.4.6, venv inside ~/apex-equities",
+   "reason": "asserts the process runs inside the host cgroup containment; Mac has none",
+   "commissioning_relevance": "HOST_ONLY: must PASS on the host under containment",
+   "class": "PRE_EXISTING_ON_MAIN"
+  }
+ ],
+ "host_relevant_open": [
+  "tests/test_architecture_claims.py::test_no_execution_or_broker_dependency_exists",
+  "tests/test_null_rig_memory.py::test_memory_does_not_grow_linearly_with_completed_sweep_seeds",
+  "tests/test_whole_ledger_guard.py::test_checkpoint_module_declares_the_law",
+  "tests/test_whole_ledger_guard.py::test_every_registered_offender_still_exists",
+  "tests/test_whole_ledger_guard.py::test_pulse_v1_minute_path_reads_no_ledger",
+  "tests/test_world_model_bootstrap.py::test_running_inside_research_containment"
+ ],
+ "exp002_exp004": "UNREPRODUCED / CAUSE_UNKNOWN (three attempts, none reproduce)"
+}

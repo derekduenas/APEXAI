@@ -258,9 +258,46 @@ def validate_quote(q, *, contract: dict) -> dict:
 
 # ---------------------------------------------------------------- intent
 
+TOLL_FORMULA_V1_TEXT = ("expected_toll_$ = 100 x (ask_ref - bid_ref) + fee_in + fee_out ; ask_ref/bid_ref = the INDICATIVE quote the "
+                        "selection was made on, at intent time; the exit half-spread is ASSUMED equal to the entry half-spread")
+TOLL_FORMULA_V1 = {"id": "TOLL_FORMULA_V1", "text": TOLL_FORMULA_V1_TEXT,
+                   "hash": hashlib.sha256(TOLL_FORMULA_V1_TEXT.encode("ascii")).hexdigest(),
+                   "assumption": "exit half-spread = entry half-spread (declared, not estimated); no fill quote exists at intent time",
+                   "realised_counterpart": "REALISED_TOLL_V1: 100 x [(ask_fill - mid_fill) + (mid_exit - bid_exit)] + fees, from sealed fill and exit quotes"}
+DOCTRINE_FIELDS = ("capacity_suitability", "giant_competition_risk", "signal_half_life", "our_expected_footprint", "crowding",
+                   "forced_participant_strength")
+
+
+def expected_toll(reference_quote: dict | None, fees_in, fees_out) -> dict:
+    """Intent-time toll under TOLL_FORMULA_V1 from the INDICATIVE reference quote only. Unavailable inputs give
+    NOT_ESTIMABLE with the reason; nothing is fabricated and no later quote is consulted."""
+    rq = reference_quote or {}
+    bid, ask = rq.get("bid"), rq.get("ask")
+    out = {"formula": TOLL_FORMULA_V1["id"], "formula_hash": TOLL_FORMULA_V1["hash"],
+           "inputs": {"ask_ref": ask, "bid_ref": bid, "fee_in": fees_in, "fee_out": fees_out, "reference_timestamp_epoch": rq.get("timestamp_epoch")}}
+    if not (is_real(ask) and is_real(bid)) or ask <= 0 or bid < 0 or ask < bid:
+        return {**out, "value": None, "status": "NOT_ESTIMABLE", "why": "reference quote lacks a valid bid/ask"}
+    if not (is_real(fees_in) and is_real(fees_out)):
+        return {**out, "value": None, "status": "NOT_ESTIMABLE", "why": "fee schedule unknown; an unknown cost is not zero"}
+    return {**out, "value": round(100.0 * (ask - bid) + float(fees_in) + float(fees_out), 4), "status": "ESTIMATED_AT_INTENT_TIME"}
+
+
+def doctrine_stamp(reference_quote: dict | None) -> dict:
+    """The six doctrine fields + tail_asymmetry, each sealed with a value or an explicit NOT_MEASURED and its source.
+    Only our_expected_footprint is computable at intent time (1 contract against the indicative ask size)."""
+    rq = reference_quote or {}
+    fields = {f: {"value": "NOT_MEASURED", "source": "no measurement contract activated for the pilot"} for f in DOCTRINE_FIELDS}
+    if isinstance(rq.get("ask_size"), int) and not isinstance(rq.get("ask_size"), bool) and rq["ask_size"] > 0:
+        fields["our_expected_footprint"] = {"value": round(1.0 / rq["ask_size"], 6), "source": "1 contract / indicative ask_size %d" % rq["ask_size"],
+                                            "definition": "fraction of the displayed ask size our order would consume"}
+    fields["tail_asymmetry"] = {"value": "UNKNOWN", "source": "apex/options_research/forward_distribution.py default; never measured"}
+    return {"fields": fields, "definition_source": "SMALL_CAPITAL_ADVANTAGE_DOCTRINE.md (opportunity characteristics)"}
+
+
 def validate_intent(i: dict, *, forecast: dict, forecast_receipt: dict, signal_used: str, session_id: str,
                     scan_id: str, release: str, created_epoch: float, risk_envelope: dict | None = None,
-                    fees: dict | None = None, execution_policy: dict | None = None) -> dict:
+                    fees: dict | None = None, execution_policy: dict | None = None, pins: dict | None = None,
+                    fee_totals: tuple | None = None) -> dict:
     for k in ("expression", "action", "contract", "quantity"):
         if k not in i:
             raise RecordRefused("INTENT_MISSING_FIELD: %s" % k)
@@ -297,7 +334,13 @@ def validate_intent(i: dict, *, forecast: dict, forecast_receipt: dict, signal_u
             "expiry_utc": to_utc_string(created_epoch + INTENT_TTL_S), "expiry_epoch": created_epoch + INTENT_TTL_S,
             "ttl_s": INTENT_TTL_S,
             "reference_ask": i.get("reference_ask") if is_real(i.get("reference_ask")) else None,
-            "risk_envelope": risk_envelope, "fees": fees, "execution_policy": execution_policy}
+            "reference_quote": (i.get("reference_quote") if isinstance(i.get("reference_quote"), dict) else None),
+            "risk_envelope": risk_envelope, "fees": fees, "execution_policy": execution_policy,
+            # BEFORE fields (decision-path review of b9998d02, finding 6): sealed at intent time from information that
+            # exists at intent time; a later requote or fill NEVER rewrites these
+            "expected_toll": expected_toll(i.get("reference_quote"), *(fee_totals or (None, None))),
+            "doctrine": doctrine_stamp(i.get("reference_quote")),
+            "pins": pins}
     body["intent_id"] = canonical_hash({"forecast_id": forecast["forecast_id"], "contract_id": body["contract_id"],
                                         "signal_used": signal_used, "session_id": session_id})[:24]
     return body

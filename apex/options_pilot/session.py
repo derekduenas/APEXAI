@@ -25,7 +25,7 @@ from . import boundary as B
 from . import ledger as L
 from .book import intent_finished
 from .clock import to_utc_string
-from .expression_rule import DEFAULT_RULE, RuleRefused, choose
+from .expression_rule import DEFAULT_RULE, POLICY_TO_RULE, RULE_IDS, RuleRefused, choose
 from .risk_authority import entry_cap_price
 from .records import INTENT_TTL_S, assert_prospective, canonical_hash
 
@@ -39,6 +39,7 @@ def scan_id_for(session_id: str, seq: int, symbol: str) -> str:
 def open_session(bd: B.Boundary, *, symbols: list) -> dict:
     rec = {"kind": "pilot_session_open", "txn_id": "session_open:" + bd.session_id, "session_id": bd.session_id,
            "symbols": list(symbols), "release": bd.release, "protocol": PROTOCOL_ID,
+           "runtime_identity": getattr(bd, "runtime_identity", None),         # measured at process start (Brick 1)
            "opened_utc": bd.clock.now_utc(), "opened_epoch": bd.clock.now(), **bd.labels}
     assert_prospective(rec)
     receipt, _ = L.commit_once(bd.ledger, txn_id=rec["txn_id"], build=lambda rows: rec, kind="pilot_session_open")
@@ -82,8 +83,12 @@ def funnel_trace(bd: B.Boundary, *, ids: dict, decision: str, why) -> dict:
     t = {}
     t["state_snapshot"] = {"state_hash": (fc.get("inputs") or {}).get("state_hash")} if fc and (fc.get("inputs") or {}).get("state_hash") else \
         {"missing": "NO_STATE_HASH: forecast provider did not attach a twin state" if fc else "NO_FORECAST: %s" % (why or "refused before a forecast")}
+    ec = ((fc.get("inputs") or {}).get("event_context")) if fc else None
     t["situation_regime"] = {"missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast",
-                             "direction_signal": fc.get("direction_signal") if fc else None}
+                             "direction_signal": fc.get("direction_signal") if fc else None,
+                             "event_context": ({"scheduled_status": ec["scheduled"]["status"], "unscheduled_status": ec["unscheduled"]["status"],
+                                                "n_scheduled": len(ec["scheduled"].get("events", [])), "n_unscheduled": len(ec["unscheduled"].get("events", [])),
+                                                "gate": ec.get("gate")} if ec else {"missing": "EVENT_STREAM_NOT_WIRED"})}
     t["model_bundle"] = ({"model_id": fc["model_id"], "params_hash": fc["params_hash"], "family": fc["family"], "validation": fc.get("validation_status")}
                          if fc else {"missing": "NO_FORECAST"})
     t["simulation_bundle"] = {"missing": "NOT_USED_IN_PILOT: the deterministic rule does not consult the Multiverse (selection authority NONE)"}
@@ -189,7 +194,8 @@ def _duplicate_delivery(bd: B.Boundary, *, scan_id: str, symbol: str, prior: lis
     return out
 
 
-def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain_fn, spot_fn, quote_fn, funnel_fn=None) -> dict:
+def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain_fn, spot_fn, quote_fn, funnel_fn=None,
+         selection_policy: str = DEFAULT_RULE, event_context_fn=None) -> dict:
     """One scan: forecast -> (funnel) -> intent -> fill, in that order, each a receipt;
     ends in exactly one decision: TRADE / WAIT / REFUSE. A BoundaryRefused
     becomes a REFUSE decision that says whether the refusal was persisted;
@@ -215,9 +221,21 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
                              persisted_refusal=e.persisted)
     as_of = bd.clock.now()
     try:
+        # 0. EVENT CONTEXT (Brick 2): the snapshot the decision will see, computed at as_of and sealed on the forecast
+        #    record BEFORE any quote or intent; NOT_WIRED is recorded as UNAVAILABLE, never as "no events"
+        event_ctx = None
+        if event_context_fn is not None:
+            try:
+                event_ctx = event_context_fn(symbol, as_of)
+            except Exception as e:                                         # noqa: BLE001
+                event_ctx = {"wired": True, "scheduled": {"status": "UNAVAILABLE", "why": str(e)[:160], "events": []},
+                             "unscheduled": {"status": "UNAVAILABLE", "why": str(e)[:160], "events": []},
+                             "gate": {"gate": "EVENT_GATE_V0", "authority": "SHADOW", "would_veto_new_entry": True, "reasons": ["R2: UNAVAILABLE"], "vetoes_new_entry": False}}
         # 1. forecast persisted first, before any quote is consulted
         try:
             forecast = forecast_fn(symbol, as_of)
+            if event_ctx is not None and isinstance(forecast, dict):
+                forecast = {**forecast, "inputs": {**(forecast.get("inputs") or {}), "event_context": event_ctx}}
         except Exception as e:                                             # noqa: BLE001
             bd.refuse("forecast", "FORECAST_PROVIDER_FAILED: %s: %s" % (type(e).__name__, str(e)[:300]), scan_id=scan_id)
         f_receipt = bd.record_forecast(forecast, scan_id=scan_id)
@@ -267,11 +285,20 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
         else:
             funnel_receipt = None
             # 2b. deterministic rule -> risk-bound intent persisted
+            gate = (event_ctx or {}).get("gate") or {}
+            if gate.get("vetoes_new_entry"):
+                bd.refuse("rule", "EVENT_GATE_VETO: %s (%s, authority %s; exits unaffected)" % ("; ".join(gate.get("reasons", []))[:200], gate.get("gate"), gate.get("authority")),
+                          refs={"forecast_seq": f_receipt["seq"]}, scan_id=scan_id)
             try:
                 signal = signal_fn(symbol, as_of)
+                # THE POLICY NAMED BY THE CALLER IS THE RULE INVOKED: no attribute lookup, no fallback default
+                if selection_policy not in POLICY_TO_RULE:
+                    raise RuleRefused("SELECTION_POLICY_NOT_A_RULE: %r is not a deterministic expression rule" % (selection_policy,))
                 proposal = choose(symbol=symbol, direction_signal=signal, spot=spot_fn(symbol, as_of),
                                   as_of=to_utc_string(as_of), available=chain_fn(symbol, as_of),
-                                  rule=getattr(bd, "expression_rule_version", DEFAULT_RULE), max_entry_price=entry_cap_price())
+                                  rule=POLICY_TO_RULE[selection_policy], max_entry_price=entry_cap_price(), as_of_epoch=as_of)
+                if proposal.get("expression_rule") != RULE_IDS[POLICY_TO_RULE[selection_policy]]:
+                    raise RuleRefused("POLICY_IDENTITY_MISMATCH: asked %r, rule produced %r" % (selection_policy, proposal.get("expression_rule")))
             except RuleRefused as e:
                 bd.refuse("rule", str(e), refs={"forecast_seq": f_receipt["seq"]}, scan_id=scan_id)
             except Exception as e:                                         # noqa: BLE001

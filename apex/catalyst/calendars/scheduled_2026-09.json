@@ -1,0 +1,113 @@
+{
+ "content_sha256": "9177755e3d336363211b5aeba875faf9f338e874057580b76aacbab15772e4d9",
+ "coverage": {
+  "earnings": "NOT_COVERED_IN_THIS_SNAPSHOT: SPY/QQQ/IWM are ETFs; single-name earnings calendars are not needed for the pilot symbols and no entitled calendar feed was polled",
+  "scheduled_macro": "FOMC (official calendar) + BLS (official schedule) for 2026-09-14..25",
+  "unscheduled_news": "NOT_COVERED_BY_A_CALENDAR: see apex/catalyst sources (official feeds); no entitled wire service exists \u2014 recorded as UNAVAILABLE, not bought"
+ },
+ "events": [
+  {
+   "affected_assets": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "INDEX",
+    "RATES"
+   ],
+   "event_id": "FOMC-2026-09-16",
+   "event_type": "CENTRAL_BANK",
+   "importance": "CRITICAL",
+   "notes": "asterisk on the page = associated with a Summary of Economic Projections; press conference expected by convention; page says 'details pending'",
+   "scheduled": true,
+   "scheduled_time_basis": "FOMC statements are released at 14:00 ET on the second day; the page lists the dates (Sep 15-16*) only; time is the standing convention, NOT read from the page",
+   "scheduled_time_utc": "2026-09-16T18:00:00Z",
+   "source": "FEDERAL_RESERVE_FOMC_CALENDAR",
+   "window_end_utc": "2026-09-16T20:00:00Z",
+   "window_start_utc": "2026-09-15T13:30:00Z"
+  },
+  {
+   "affected_assets": [
+    "INDEX"
+   ],
+   "event_id": "BLS-IMPORT-EXPORT-PRICES-2026-09-16",
+   "event_type": "MACRO_RELEASE",
+   "importance": "LOW",
+   "release": "U.S. Import and Export Price Indexes, August 2026",
+   "scheduled": true,
+   "scheduled_time_basis": "08:30 ET as shown on the page",
+   "scheduled_time_utc": "2026-09-16T12:30:00Z",
+   "source": "BLS_RELEASE_SCHEDULE"
+  },
+  {
+   "affected_assets": [
+    "INDEX"
+   ],
+   "event_id": "BLS-STATE-EMPLOYMENT-2026-09-18",
+   "event_type": "MACRO_RELEASE",
+   "importance": "LOW",
+   "release": "State Employment and Unemployment (Monthly), August 2026",
+   "scheduled": true,
+   "scheduled_time_basis": "10:00 ET as shown",
+   "scheduled_time_utc": "2026-09-18T14:00:00Z",
+   "source": "BLS_RELEASE_SCHEDULE"
+  },
+  {
+   "affected_assets": [
+    "INDEX"
+   ],
+   "event_id": "BLS-EMPLOYEE-TENURE-2026-09-24",
+   "event_type": "MACRO_RELEASE",
+   "importance": "LOW",
+   "release": "Employee Tenure (Biennial 2026)",
+   "scheduled": true,
+   "scheduled_time_utc": "2026-09-24T14:00:00Z",
+   "source": "BLS_RELEASE_SCHEDULE"
+  },
+  {
+   "affected_assets": [
+    "INDEX"
+   ],
+   "event_id": "BLS-JOB-FLEXIBILITIES-2026-09-24",
+   "event_type": "MACRO_RELEASE",
+   "importance": "LOW",
+   "release": "Job Flexibilities and Work Schedules (2024-2025)",
+   "scheduled": true,
+   "scheduled_time_utc": "2026-09-24T14:00:00Z",
+   "source": "BLS_RELEASE_SCHEDULE"
+  },
+  {
+   "affected_assets": [
+    "INDEX"
+   ],
+   "event_id": "BLS-EMPLOYEE-BENEFITS-2026-09-25",
+   "event_type": "MACRO_RELEASE",
+   "importance": "LOW",
+   "release": "Employee Benefits in the United States, March 2026",
+   "scheduled": true,
+   "scheduled_time_utc": "2026-09-25T14:00:00Z",
+   "source": "BLS_RELEASE_SCHEDULE"
+  }
+ ],
+ "kind": "SCHEDULED_EVENTS_SNAPSHOT",
+ "known_from": "2026-09-12T15:51:26+00:00",
+ "law": "a scheduled event is valid context for a decision only if this snapshot's known_from <= the decision time",
+ "retrieved_utc": "2026-09-12T15:51:26+00:00",
+ "snapshot_id": "SCHED-2026-09-12",
+ "sources": [
+  {
+   "latency_note": "calendar page; polled on demand, not a breaking-news service",
+   "page_last_update": "2026-08-19",
+   "retrieved_via": "WebFetch (read-only public page), transcribed",
+   "source": "FEDERAL_RESERVE_FOMC_CALENDAR",
+   "source_authority": "PRIMARY_OFFICIAL",
+   "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+  },
+  {
+   "latency_note": "schedule page; release CONTENT arrives via the catalyst BLS feed, not this snapshot",
+   "retrieved_via": "WebFetch (read-only public page), transcribed",
+   "source": "BLS_RELEASE_SCHEDULE",
+   "source_authority": "PRIMARY_OFFICIAL",
+   "url": "https://www.bls.gov/schedule/news_release/"
+  }
+ ]
+}

@@ -338,8 +338,10 @@ def build_parser() -> argparse.ArgumentParser:
                     help="with --pilot-boundary: drive the boundary from "
                          "the EXPLICIT synthetic harness; records are "
                          "labelled SYNTHETIC_FIXTURE and are not evidence")
-    ap.add_argument("--pilot-selection-policy", default="PILOT_RULE_V1", choices=("PILOT_RULE_V1", "FULL_FUNNEL_V1", "JOINT_FUNNEL_V1"),
-                    help="PILOT_RULE_V1 = deterministic rule (default); FULL_FUNNEL_V1 = the funnel engine; JOINT_FUNNEL_V1 = the R4 joint engine (needs its engine + context supplied)")
+    ap.add_argument("--pilot-selection-policy", default="PILOT_RULE_V2", choices=("PILOT_RULE_V1", "PILOT_RULE_V2", "FULL_FUNNEL_V1", "JOINT_FUNNEL_V1"),
+                    help="PILOT_RULE_V2 = deterministic rule, nearest cap-feasible strike on the signal side (default, DEFECT_STRIKE_RULE_001 repair); "
+                         "PILOT_RULE_V1 = the frozen nearest-ATM rule (replay of records that sealed it); FULL_FUNNEL_V1 = the funnel engine; "
+                         "JOINT_FUNNEL_V1 = the R4 joint engine (needs its engine + context supplied)")
     ap.add_argument("--pilot-session-id", default=None)
     ap.add_argument("--pilot-release", default=None)
     return ap

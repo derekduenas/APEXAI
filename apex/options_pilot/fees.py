@@ -139,3 +139,43 @@ class ExecutionPolicy:
 
 
 EXECUTION_POLICY_V1 = ExecutionPolicy()
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# BROKER SCHEDULE CANDIDATE (Brick 3, 2026-09-12). The paper simulation represents a Robinhood Financial
+# self-directed cash/margin account (non-Gold, non-"Professional") trading U.S. listed ETF options (SPY/QQQ/IWM).
+# Every number below is copied from the broker's published "Standard Pricing Fee Schedule" PDF; nothing is assumed.
+# It is NOT the live default: the live boundary keeps UNVERIFIED_FEES until the operator authorizes this document,
+# and it is selected only through an explicit LiveWiring(fee_schedule=...) choice.
+ROBINHOOD_RHF_2026_SOURCE = {
+    "provider": "Robinhood Financial LLC (execution broker of the account the paper simulation represents; Alpaca and ThetaData are DATA vendors, not the broker)",
+    "document": "RHF Standard Pricing Fee Schedule (PDF), https://cdn.robinhood.com/assets/robinhood/legal/RHF%20Fee%20Schedule.pdf",
+    "document_sha256": "7f9c86bf297d078ce27505cbc53eecc068cf975fbfca5aada37b9af865d7e14a",
+    "date": "retrieved 2026-09-12; per-item effective dates below",
+    "items": {
+        "commission": "$0 commissions for self-directed cash/margin accounts trading U.S. listed securities (including ETFs) and their options via the app or website",
+        "orf_and_occ_clearing": "$0.04 per options contract (buys and sells) — the schedule states a blended ORF that may differ from the exchange fee actually paid",
+        "cat_fee": "$0.0003 per options contract",
+        "finra_taf": "$0.00329 per contract (options sells), rounded to the nearest penny, no greater than $9.79; effective January 1, 2026",
+        "sec_regulatory_fee": "$20.60 per $1,000,000 of total principal amount of SALE, rounded up to the nearest penny; effective April 4, 2026 (the schedule notes it can be waived under certain criteria)",
+    },
+    "not_applicable_or_unsupported": {
+        "index_options_contract_fee": "$0.50 (non-Gold) / $0.35 (Gold) per contract applies to INDEX options only; SPY/QQQ/IWM are ETF options: NOT APPLIED",
+        "professional_orders": "$0.50 per contract effective October 15, 2026 for 'Professional' customers (>390 listed-options orders/day): NOT APPLIED; not supported if the account ever qualifies",
+        "exercise_assignment": "NOT FOUND in the document: no exercise or assignment fee is recorded; the pilot's exit policy never carries a position to exercise",
+        "sec_fee_principal_dependence": "the SEC fee depends on SALE PRINCIPAL, not a per-contract constant; the per-contract figure below assumes a $5.00 premium (the pilot's cap) and OVERSTATES it for cheaper sells by at most $0.01 after rounding",
+    },
+    "assumptions": ["non-Gold account tier", "non-Professional", "ETF options, not index options", "one contract", "no exercise/assignment path",
+                    "SEC fee computed at the $5.00 per-share cap: 500 x 20.60 / 1,000,000 = $0.0103, rounded UP to $0.02 per the document's rounding rule"],
+}
+
+ROBINHOOD_RHF_2026 = FeeSchedule(
+    schedule_id="ROBINHOOD_RHF_2026", version="2026-09-12", provenance="PROVIDER_VERIFIED",
+    commission_per_contract=0.0,
+    exchange_fee_per_contract=0.04,                      # ORF + OCC clearing, buys and sells
+    regulatory_fee_per_contract_buy=0.0003,              # CAT fee
+    regulatory_fee_per_contract_sell=round(0.0003 + 0.00329 + 0.02, 5),   # CAT + FINRA TAF + SEC fee at the cap (rounded up)
+    verified_against={"provider": ROBINHOOD_RHF_2026_SOURCE["provider"], "document": ROBINHOOD_RHF_2026_SOURCE["document"],
+                      "date": ROBINHOOD_RHF_2026_SOURCE["date"], "document_sha256": ROBINHOOD_RHF_2026_SOURCE["document_sha256"]},
+    note=("candidate broker schedule transcribed from the published PDF; NOT the live default until the operator authorizes the document; "
+          "per-contract round trip ~ $0.06 (buy 0.0403, sell 0.0236 at the cap) vs the SYNTHETIC fixture's 1.02"))

@@ -1,0 +1,4786 @@
+{
+ "kind": "STAGE0_CENSUS",
+ "session": "2026-09-11",
+ "settings": "DEFAULT (PILOT_RULE_V2 cap 5.00; FunnelEngine defaults k_side=4; UNVERIFIED fee schedule; no tuning)",
+ "n_chain_snapshots": 166,
+ "n_bars": 169,
+ "n_nbbo": 662,
+ "rule_path": {
+  "per_snapshot": [
+   {
+    "t_utc": "2026-09-11T13:30:23.096973Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.49,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.97,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.95,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:31:22.160285Z",
+    "chain_rows": 330,
+    "valid_rows": 330,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.33,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 773.0,
+     "ask": 4.9,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.96,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:32:22.196581Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.08,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.72,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.88,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:33:22.180495Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.02,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.67,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.88,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:34:22.198233Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.51,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.82,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.95,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:35:22.176453Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.88,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.96,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.82,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:36:22.204327Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.81,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.93,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.83,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:37:22.432226Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.71,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.9,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.88,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:38:22.256554Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.7,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.91,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.91,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:39:22.417189Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.54,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.88,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.97,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:40:22.382004Z",
+    "chain_rows": 330,
+    "valid_rows": 330,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.88,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 61,
+     "chosen": 774.0,
+     "ask": 4.69,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.81,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:41:22.318532Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.62,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.94,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.99,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:42:22.308399Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.21,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.8,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.93,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:43:22.293569Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.24,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.8,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.93,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:44:22.303112Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.01,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.7,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.98,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:45:22.389474Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.0,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.7,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.98,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:46:22.399218Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.74,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.95,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.98,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:47:22.594073Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.37,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.83,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.91,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:48:22.381308Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.14,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.78,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.99,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:49:22.378301Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.04,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.75,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.82,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:50:22.416023Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.16,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.79,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.97,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:51:22.397404Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.93,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.72,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.85,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:52:22.427353Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.09,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.76,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.99,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:53:22.432222Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.01,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.71,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 5.0,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:54:22.493913Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.04,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.75,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.99,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:55:22.645732Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.11,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.75,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.98,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:56:22.476648Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.44,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.85,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.84,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:57:22.510073Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.61,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.9,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.98,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:58:22.491787Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.73,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.94,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.95,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T13:59:22.599888Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.08,
+    "LONG": {
+     "on_side": 69,
+     "feasible": 61,
+     "chosen": 775.0,
+     "ask": 4.63,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.83,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:00:22.956769Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.0,
+    "LONG": {
+     "on_side": 69,
+     "feasible": 61,
+     "chosen": 775.0,
+     "ask": 4.6,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.89,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:01:22.774096Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.87,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.96,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.9,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:02:22.783834Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.66,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.89,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.96,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:03:22.787265Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.55,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.82,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.97,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:04:22.659941Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.57,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.84,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.97,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:05:22.634530Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.47,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.79,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.99,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:06:22.650690Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.1,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.66,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.89,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:07:22.636209Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.12,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.67,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.88,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:08:22.656941Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.13,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.66,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.88,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:09:22.671916Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.13,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.66,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.87,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:10:22.765773Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.61,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.81,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.91,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:11:22.851635Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.27,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.69,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.81,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:12:22.812525Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.93,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.99,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.91,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:13:22.773680Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.06,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.62,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.87,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:14:22.779368Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.14,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.64,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.83,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:15:22.793569Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.04,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.6,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.87,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:16:22.767229Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.01,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.99,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.87,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:17:22.808685Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.85,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.9,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.91,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:18:22.834718Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.96,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.95,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.85,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:19:22.841347Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.49,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.71,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.89,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:20:22.869762Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.72,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.81,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.84,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:21:22.843533Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.71,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.8,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.84,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:22:22.876114Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.81,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.84,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.81,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:23:22.881426Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.89,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.86,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.99,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:24:22.890559Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.83,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.83,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.8,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:25:22.935441Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.62,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.75,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.84,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:26:23.084406Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.71,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.78,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.81,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:27:22.940853Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.0,
+    "LONG": {
+     "on_side": 69,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.87,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.92,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:28:22.963807Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.99,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.84,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.91,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:29:22.972271Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.97,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.82,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.91,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:30:23.428577Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.65,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.7,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.83,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:31:23.004254Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.49,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 774.0,
+     "ask": 4.67,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.86,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:32:23.045963Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.12,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.99,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.98,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:33:23.058275Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.93,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.93,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.84,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:34:23.054101Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.86,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.93,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.9,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:35:23.084639Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.62,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.86,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.96,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:36:23.258803Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.58,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.85,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.98,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:37:23.158846Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.56,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.87,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.83,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:38:23.145264Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.53,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.87,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.84,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:39:23.206634Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.37,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.81,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.9,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:40:23.165365Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.71,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.9,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.98,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:41:23.343442Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.48,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.81,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.83,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:42:23.162925Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.48,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.8,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.83,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:43:23.182418Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.31,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.74,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.88,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:44:23.186455Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 763.99,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.65,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 88,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.98,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:45:23.217055Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 763.92,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.64,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 88,
+     "feasible": 73,
+     "chosen": 748.0,
+     "ask": 4.81,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:46:23.225296Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.08,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.67,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.96,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:47:23.230880Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.0,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.65,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 88,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.98,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:48:23.244189Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 763.76,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 772.0,
+     "ask": 4.98,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 88,
+     "feasible": 73,
+     "chosen": 748.0,
+     "ask": 4.85,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:49:23.383363Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.21,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.69,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.9,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:50:23.340545Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.48,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.75,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.81,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:51:23.299859Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.43,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.73,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 5.0,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:52:23.340289Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.45,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.73,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 5.0,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:53:23.371614Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.16,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.63,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.88,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:54:23.345778Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.12,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.61,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.89,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:55:23.378946Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 763.75,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 772.0,
+     "ask": 4.95,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 88,
+     "feasible": 73,
+     "chosen": 748.0,
+     "ask": 4.85,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:56:23.358282Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 763.84,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 772.0,
+     "ask": 4.99,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 88,
+     "feasible": 73,
+     "chosen": 748.0,
+     "ask": 4.84,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:57:23.664032Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 763.85,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 772.0,
+     "ask": 5.0,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 88,
+     "feasible": 73,
+     "chosen": 748.0,
+     "ask": 4.83,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:58:23.380889Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.0,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.62,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.97,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T14:59:23.419625Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 763.9,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 772.0,
+     "ask": 5.0,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 88,
+     "feasible": 73,
+     "chosen": 748.0,
+     "ask": 4.81,
+     "strikes_from_atm": 16,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:00:23.565820Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 763.9,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 772.0,
+     "ask": 4.99,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 88,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 5.0,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:01:23.460389Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.14,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.64,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.92,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:02:23.560523Z",
+    "chain_rows": 331,
+    "valid_rows": 331,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.1,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 773.0,
+     "ask": 4.62,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.93,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:03:23.550402Z",
+    "chain_rows": 330,
+    "valid_rows": 330,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.27,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 773.0,
+     "ask": 4.66,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.87,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:04:23.493248Z",
+    "chain_rows": 330,
+    "valid_rows": 330,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.38,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 62,
+     "chosen": 773.0,
+     "ask": 4.7,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.83,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:05:23.576694Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.82,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 773.0,
+     "ask": 4.82,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.86,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:06:23.503691Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.0,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 773.0,
+     "ask": 4.89,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.99,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:07:23.781002Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.15,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 773.0,
+     "ask": 4.91,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.94,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:08:23.568233Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.1,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 773.0,
+     "ask": 4.9,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.95,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:09:23.532852Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.88,
+    "LONG": {
+     "on_side": 73,
+     "feasible": 65,
+     "chosen": 773.0,
+     "ask": 4.86,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.84,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:10:23.614980Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.88,
+    "LONG": {
+     "on_side": 73,
+     "feasible": 65,
+     "chosen": 773.0,
+     "ask": 4.84,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.84,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:11:23.592035Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.68,
+    "LONG": {
+     "on_side": 73,
+     "feasible": 65,
+     "chosen": 773.0,
+     "ask": 4.77,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.9,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:12:23.642896Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.65,
+    "LONG": {
+     "on_side": 73,
+     "feasible": 65,
+     "chosen": 773.0,
+     "ask": 4.79,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.93,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:13:23.611370Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.3,
+    "LONG": {
+     "on_side": 73,
+     "feasible": 65,
+     "chosen": 773.0,
+     "ask": 4.67,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 74,
+     "chosen": 749.0,
+     "ask": 4.84,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:14:23.649650Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 764.46,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 773.0,
+     "ask": 4.71,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.99,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:15:23.639687Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.0,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 773.0,
+     "ask": 4.88,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 89,
+     "feasible": 75,
+     "chosen": 750.0,
+     "ask": 4.81,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:16:23.669615Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.21,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 65,
+     "chosen": 773.0,
+     "ask": 4.96,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.96,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:17:23.894183Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.28,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 65,
+     "chosen": 773.0,
+     "ask": 5.0,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.95,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:18:23.720902Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.39,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.62,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.92,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:19:23.687700Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.49,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.66,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.89,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:20:23.715778Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.39,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.63,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.92,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:21:23.703644Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.38,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.61,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.92,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:22:23.728959Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.47,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.63,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.88,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:23:23.711742Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.48,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.63,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.87,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:24:23.740707Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.62,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.69,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.84,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:25:23.777791Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.77,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.74,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.99,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:26:23.760672Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.77,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.74,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.99,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:27:23.810203Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.17,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.89,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.88,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:28:23.792496Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.14,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.89,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.91,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:29:23.793197Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.99,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.83,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.95,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:30:24.010899Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.88,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.8,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.99,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:31:23.830656Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.91,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.81,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.98,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:32:23.862638Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.07,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.88,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.94,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:33:23.865667Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.01,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.87,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.96,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:34:23.933270Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.96,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.86,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.97,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:35:23.904067Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.86,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.83,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 5.0,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:36:23.911523Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.82,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.8,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 5.0,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:37:24.048342Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.8,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.79,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 5.0,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:38:23.967856Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.63,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.72,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.83,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:39:23.943499Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.92,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.82,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.94,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:40:24.116127Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.95,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.83,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.93,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:41:24.044398Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.09,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.89,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.89,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:42:24.023945Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.01,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.86,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.91,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:43:24.002121Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.15,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.91,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.87,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:44:24.055022Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.15,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.91,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.87,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:45:24.137967Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.03,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.87,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.9,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:46:24.091264Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.92,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.83,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.94,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:47:24.252618Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.86,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.81,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.95,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:48:24.125363Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.9,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.82,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.92,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:49:24.105428Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.97,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.83,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.9,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:50:24.114634Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.88,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.8,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.92,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:51:24.139544Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.9,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.81,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.9,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:52:24.151402Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.74,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.74,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.96,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:53:24.172277Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.58,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.69,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 5.0,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:54:24.171035Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.48,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.65,
+     "strikes_from_atm": 9,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.82,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:55:24.253282Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.51,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.65,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.8,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:56:24.246701Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.54,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.68,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 76,
+     "chosen": 751.0,
+     "ask": 4.8,
+     "strikes_from_atm": 15,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:57:24.497795Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.7,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.74,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.96,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:58:24.247834Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.66,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.72,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.98,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T15:59:24.245844Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.73,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.75,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.95,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:00:24.599869Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.9,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.8,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.9,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:01:24.383572Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.9,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.81,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.89,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:02:24.339027Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.01,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.84,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.86,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:03:24.347887Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.11,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.87,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.84,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:04:24.352092Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.08,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.86,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.85,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:05:24.444257Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.11,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.87,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.84,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:06:24.399117Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.08,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.86,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.84,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:07:24.710200Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 766.0,
+    "LONG": {
+     "on_side": 70,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.82,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 91,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.86,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:08:24.435871Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.8,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.75,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.91,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:09:24.547523Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.85,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.76,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.9,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:10:24.491915Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.9,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.79,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.88,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:11:24.498549Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.85,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.77,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.9,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:12:24.483601Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.82,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.74,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.91,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:13:24.506554Z",
+    "chain_rows": 333,
+    "valid_rows": 333,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.59,
+    "LONG": {
+     "on_side": 72,
+     "feasible": 64,
+     "chosen": 774.0,
+     "ask": 4.67,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.98,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:14:24.531085Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.56,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.67,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.98,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   },
+   {
+    "t_utc": "2026-09-11T16:15:24.606100Z",
+    "chain_rows": 332,
+    "valid_rows": 332,
+    "excluded": 0,
+    "exclusion_reasons": {},
+    "conflicted": 0,
+    "spot": 765.62,
+    "LONG": {
+     "on_side": 71,
+     "feasible": 63,
+     "chosen": 774.0,
+     "ask": 4.68,
+     "strikes_from_atm": 8,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    },
+    "SHORT": {
+     "on_side": 90,
+     "feasible": 77,
+     "chosen": 752.0,
+     "ask": 4.96,
+     "strikes_from_atm": 14,
+     "certified_at_live_default": false,
+     "certified_why": "FEE_SCHEDULE_UNVERIFIED: UNVERIFIED (UNVERIFIED); an unknown cost is not zero, s"
+    }
+   }
+  ],
+  "totals": {
+   "chain_rows": 55045,
+   "valid_rows": 55045,
+   "rule_feasible_LONG": 10447,
+   "rule_chosen_LONG": 166,
+   "certified_approved_LONG": 0,
+   "rule_feasible_SHORT": 12559,
+   "rule_chosen_SHORT": 166,
+   "certified_approved_SHORT": 0
+  }
+ },
+ "funnel_path": {
+  "per_snapshot": [
+   {
+    "t_utc": "2026-09-11T13:30:23.096973Z",
+    "forecast": "FeaturesRefused: FEATURE_UNAVAILABLE: ret_5 is NOT_ESTIMABLE (window of 5 completed minutes not fully avail"
+   },
+   {
+    "t_utc": "2026-09-11T13:35:22.176453Z",
+    "forecast": "FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully avai"
+   },
+   {
+    "t_utc": "2026-09-11T13:40:22.382004Z",
+    "forecast": "FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully avai"
+   },
+   {
+    "t_utc": "2026-09-11T13:45:22.389474Z",
+    "forecast": "FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully avai"
+   },
+   {
+    "t_utc": "2026-09-11T13:50:22.416023Z",
+    "forecast": "FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully avai"
+   },
+   {
+    "t_utc": "2026-09-11T13:55:22.645732Z",
+    "forecast": "FeaturesRefused: FEATURE_UNAVAILABLE: rv_30 is NOT_ESTIMABLE (window of 30 completed minutes not fully avai"
+   },
+   {
+    "t_utc": "2026-09-11T14:00:22.956769Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:05:22.634530Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:10:22.765773Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:15:22.793569Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:20:22.869762Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:25:22.935441Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:30:23.428577Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:35:23.084639Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:40:23.165365Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:45:23.217055Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:50:23.340545Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T14:55:23.378946Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:00:23.565820Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:05:23.576694Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:10:23.614980Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:15:23.639687Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:20:23.715778Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:25:23.777791Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:30:24.010899Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:35:23.904067Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:40:24.116127Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:45:24.137967Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:50:24.114634Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T15:55:24.253282Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T16:00:24.599869Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T16:05:24.444257Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T16:10:24.491915Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   },
+   {
+    "t_utc": "2026-09-11T16:15:24.606100Z",
+    "forecast": "OK",
+    "decision": "WAIT",
+    "why": "PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < 400 bars",
+    "n_candidates": 0,
+    "fit": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+   }
+  ],
+  "totals": {
+   "forecast_refused": 6,
+   "forecast_ok": 28,
+   "funnel_WAIT": 28,
+   "why:PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < ": 28
+  },
+  "fit_info": {
+   "status": "INSUFFICIENT_HISTORY: 0 < 400 bars"
+  }
+ },
+ "joint_path": {
+  "count": 0,
+  "reason": "NO_AUTHORIZED_FIT: JOINT_FUNNEL_V1 requires an R4 fit (R4-FIT-001/002 not granted); 0 by construction, not by tuning"
+ },
+ "summary": {
+  "rule_path": {
+   "snapshots": 166,
+   "chosen_LONG": 166,
+   "chosen_SHORT": 166,
+   "certified_at_live_default_LONG": 0,
+   "certified_at_live_default_SHORT": 0,
+   "note": "PRIME is not a stage of the rule path (PILOT_RULE_V2 does not consult the Multiverse/PRIME by design)"
+  },
+  "funnel_path": {
+   "forecast_refused": 6,
+   "forecast_ok": 28,
+   "funnel_WAIT": 28,
+   "why:PRIME_ABSTAIN: UNSUPPORTED_STATE: INSUFFICIENT_HISTORY: 0 < ": 28
+  },
+  "joint_path": 0
+ }
+}
