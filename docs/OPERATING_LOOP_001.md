@@ -159,7 +159,29 @@ The four failures are the pre-existing environment failures also present at the 
 **Prior regression results, not restated as this candidate's.** The isolated sequential regressions run earlier
 tested `5b6863e` (candidate), its parent, and `1b86541` (final): 14 failed / 5269 passed, 14 failed / 5158 passed,
 and 14 failed / 5288 passed respectively — the same 14 environment failures in all three. **Those runs did not test
-the code in this brick.** The isolated regression on this exact candidate is reported separately below.
+the code in this brick.**
+
+### Isolated regression on this exact candidate
+
+Run in a fresh `git clone --shared` at `/private/tmp/.../scratchpad/iso/oploop`, checked out at
+`e8ebbee94a0933d34efd1061d439bbd9a75b310d`, with an interpreter outside the clone, **one process at a time**.
+
+| | baseline `1b86541` | candidate `e8ebbee` |
+|---|---|---|
+| failed | 14 | **14** |
+| passed | 5288 | **5339** |
+| skipped | 25 | **25** |
+| duration | 33m 15s | 40m 25s |
+
+The 14 failing node ids are **identical, line for line**, to the baseline's. No failure was introduced and none was
+hidden; 51 tests were added. All 14 are pre-existing environment failures that need `/opt/apex-repo` or a host path
+absent from this machine.
+
+**A contamination incident, disclosed.** A first attempt at this regression appeared dead because the process check
+matched the wrapper shell rather than pytest, so a second run was started while the first was still going — two
+pytest processes in one checkout, which is precisely the collision diagnosed in
+`docs/EXP002_EXP004_INTERMITTENT_RESOLVED.md`. Both were killed, the clone was deleted and remade, and the result
+above is from a single uncontaminated run. No partial output from the contaminated attempts was used.
 
 ## Two tests were deliberately changed
 
