@@ -355,3 +355,37 @@ class TestDecimalFeeArithmetic:
                           regulatory_fee_per_contract_sell=0.02, sale_principal_rate_per_million=20.60)
         r = bad.exit(1, sale_principal=454.0)
         assert r["total"] is None and "SELL_COMPONENTS_UNDECLARED" in r["why"]
+
+
+class TestBindingIsMandatoryNotOptional:
+    """Residual gap found by verifying through the PERSISTED path: `verify_approval` ran its envelope-binding and
+    fee-identity checks only `if present`, so an authority that omitted them left the intent unbound and all nine
+    alterations verified. Both are now mandatory, and the harness authority satisfies the same contract."""
+
+    def test_an_approval_without_an_envelope_binding_is_refused(self):
+        from apex.options_pilot import risk_gate as RG
+        it = _intent(SYNTHETIC_FEES)
+        ap = {"approved": True, "risk_provenance": "SYNTHETIC_FIXTURE", "authority_id": "X",
+              "binding_hash": RG.binding_hash(RG._binding_view(it)), "certified_max_loss": 250.0}
+        with pytest.raises(RG.RiskRefused, match="HAS_NO_ENVELOPE_BINDING"):
+            RG.verify_approval(it, ap)
+
+    def test_an_approval_without_a_fee_identity_is_refused(self):
+        from apex.options_pilot import risk_gate as RG
+        it = _intent(SYNTHETIC_FEES)
+        ap = {"approved": True, "risk_provenance": "SYNTHETIC_FIXTURE", "authority_id": "X",
+              "binding_hash": RG.binding_hash(RG._binding_view(it)), "certified_max_loss": 250.0,
+              "envelope_binding_hash": RG.envelope_binding_hash(it)}
+        with pytest.raises(RG.RiskRefused, match="HAS_NO_FEE_IDENTITY"):
+            RG.verify_approval(it, ap)
+
+    def test_the_harness_authority_satisfies_the_same_binding_contract(self):
+        from apex.options_pilot import risk_gate as RG
+        auth = RG.SyntheticRiskAuthority(harness_token="I_AM_A_SYNTHETIC_HARNESS")
+        it = _intent(SYNTHETIC_FEES)
+        ap = auth.approve(it)
+        assert isinstance(ap["fee_identity"], dict) and ap["envelope_binding_hash"]
+        assert RG.verify_approval(it, ap, authority=auth)["approved"] is True
+        it["fees"] = {**it["fees"], "terms_digest": "0" * 64}
+        with pytest.raises(RG.RiskRefused):
+            RG.verify_approval(it, ap, authority=auth)

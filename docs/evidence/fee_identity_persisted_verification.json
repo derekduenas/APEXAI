@@ -1,0 +1,346 @@
+{
+ "kind": "FEE_IDENTITY_PERSISTED_VERIFICATION",
+ "stages": {
+  "approval": {
+   "schedule_hash": {
+    "refused": true,
+    "why": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity t"
+   },
+   "provenance": {
+    "refused": true,
+    "why": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity t"
+   },
+   "known": {
+    "refused": true,
+    "why": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity t"
+   },
+   "version": {
+    "refused": true,
+    "why": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity t"
+   },
+   "effective_date": {
+    "refused": true,
+    "why": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity t"
+   },
+   "terms_digest": {
+    "refused": true,
+    "why": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity t"
+   },
+   "schedule_id": {
+    "refused": true,
+    "why": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity t"
+   },
+   "__removed_field__": {
+    "refused": true,
+    "why": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity t"
+   },
+   "__undeclared_field__": {
+    "refused": true,
+    "why": "RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different envelope or fee identity t"
+   }
+  },
+  "fill": {
+   "schedule_hash": {
+    "refused": true,
+    "why": "FEE_IDENTITY_CHANGED_SINCE_INTENT: intent sealed schedule_hash='00000000000000000000000000000000000000000000000000000000"
+   },
+   "terms_digest": {
+    "refused": true,
+    "why": "FEE_IDENTITY_CHANGED_SINCE_INTENT: intent sealed terms_digest='fffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+   },
+   "effective_date": {
+    "refused": true,
+    "why": "FEE_IDENTITY_CHANGED_SINCE_INTENT: intent sealed effective_date='1999-01-01', this boundary runs 'UNDECLARED'"
+   },
+   "__partial__": {
+    "refused": true,
+    "why": "FEE_IDENTITY_INCOMPLETE_ON_INTENT: the persisted intent lacks ['schedule_hash', 'provenance', 'known', 'version', 'effective_date', 'terms_d"
+   },
+   "__unaltered__": {
+    "refused": false,
+    "why": null
+   }
+  },
+  "recovery": {
+   "refused": true,
+   "why": "FEE_IDENTITY_CHANGED_SINCE_FILL: entry priced under schedule_id='SYNTHETIC_FEES_V1', this boundary runs 'ROBINHOOD_RHF_2026'"
+  }
+ },
+ "arithmetic": {
+  "entry_1_contract": {
+   "total": 0.04,
+   "components": {
+    "commission": 0.0,
+    "exchange": 0.04,
+    "regulatory": 0.0
+   },
+   "component_basis": {
+    "regulatory": "CAT per contract (0.0003 x 1 = 0.0003)"
+   },
+   "rounding_rules": {
+    "commission": "exact per contract, to the cent",
+    "exchange": "ORF + OCC per contract, to the cent",
+    "regulatory_cat": "sub-cent charge rounds DOWN to zero (published rule)"
+   },
+   "arithmetic": "DECIMAL_CENTS",
+   "status": "CHARGED"
+  },
+  "exit_1c_at_2.00": {
+   "total": 0.05,
+   "components": {
+    "commission": 0.0,
+    "exchange": 0.04,
+    "regulatory": 0.01
+   },
+   "component_basis": {
+    "sale_principal": 200.0,
+    "cat_raw": "0.0003",
+    "cat": 0.0,
+    "taf_raw": "0.00329",
+    "taf": 0.0,
+    "sec_raw": "0.00412",
+    "sec_component": 0.01,
+    "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"
+   },
+   "rounding_rules": {
+    "commission": "exact per contract, to the cent",
+    "exchange": "ORF + OCC per contract, to the cent",
+    "regulatory_cat": "sub-cent charge rounds DOWN to zero (published rule)",
+    "regulatory_taf": "FINRA TAF, NEAREST cent",
+    "regulatory_sec": "SEC, rounded UP to the cent"
+   },
+   "arithmetic": "DECIMAL_CENTS",
+   "status": "CHARGED"
+  },
+  "exit_1c_at_4.54": {
+   "total": 0.05,
+   "components": {
+    "commission": 0.0,
+    "exchange": 0.04,
+    "regulatory": 0.01
+   },
+   "component_basis": {
+    "sale_principal": 454.0,
+    "cat_raw": "0.0003",
+    "cat": 0.0,
+    "taf_raw": "0.00329",
+    "taf": 0.0,
+    "sec_raw": "0.0093524",
+    "sec_component": 0.01,
+    "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"
+   },
+   "rounding_rules": {
+    "commission": "exact per contract, to the cent",
+    "exchange": "ORF + OCC per contract, to the cent",
+    "regulatory_cat": "sub-cent charge rounds DOWN to zero (published rule)",
+    "regulatory_taf": "FINRA TAF, NEAREST cent",
+    "regulatory_sec": "SEC, rounded UP to the cent"
+   },
+   "arithmetic": "DECIMAL_CENTS",
+   "status": "CHARGED"
+  },
+  "exit_1c_at_5.00": {
+   "total": 0.06,
+   "components": {
+    "commission": 0.0,
+    "exchange": 0.04,
+    "regulatory": 0.02
+   },
+   "component_basis": {
+    "sale_principal": 500.0,
+    "cat_raw": "0.0003",
+    "cat": 0.0,
+    "taf_raw": "0.00329",
+    "taf": 0.0,
+    "sec_raw": "0.0103",
+    "sec_component": 0.02,
+    "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"
+   },
+   "rounding_rules": {
+    "commission": "exact per contract, to the cent",
+    "exchange": "ORF + OCC per contract, to the cent",
+    "regulatory_cat": "sub-cent charge rounds DOWN to zero (published rule)",
+    "regulatory_taf": "FINRA TAF, NEAREST cent",
+    "regulatory_sec": "SEC, rounded UP to the cent"
+   },
+   "arithmetic": "DECIMAL_CENTS",
+   "status": "CHARGED"
+  },
+  "exit_1c_at_10.00": {
+   "total": 0.07,
+   "components": {
+    "commission": 0.0,
+    "exchange": 0.04,
+    "regulatory": 0.03
+   },
+   "component_basis": {
+    "sale_principal": 1000.0,
+    "cat_raw": "0.0003",
+    "cat": 0.0,
+    "taf_raw": "0.00329",
+    "taf": 0.0,
+    "sec_raw": "0.0206",
+    "sec_component": 0.03,
+    "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"
+   },
+   "rounding_rules": {
+    "commission": "exact per contract, to the cent",
+    "exchange": "ORF + OCC per contract, to the cent",
+    "regulatory_cat": "sub-cent charge rounds DOWN to zero (published rule)",
+    "regulatory_taf": "FINRA TAF, NEAREST cent",
+    "regulatory_sec": "SEC, rounded UP to the cent"
+   },
+   "arithmetic": "DECIMAL_CENTS",
+   "status": "CHARGED"
+  },
+  "exit_2c_at_4.54": {
+   "total": 0.11,
+   "components": {
+    "commission": 0.0,
+    "exchange": 0.08,
+    "regulatory": 0.03
+   },
+   "component_basis": {
+    "sale_principal": 908.0,
+    "cat_raw": "0.0006",
+    "cat": 0.0,
+    "taf_raw": "0.00658",
+    "taf": 0.01,
+    "sec_raw": "0.0187048",
+    "sec_component": 0.02,
+    "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"
+   },
+   "rounding_rules": {
+    "commission": "exact per contract, to the cent",
+    "exchange": "ORF + OCC per contract, to the cent",
+    "regulatory_cat": "sub-cent charge rounds DOWN to zero (published rule)",
+    "regulatory_taf": "FINRA TAF, NEAREST cent",
+    "regulatory_sec": "SEC, rounded UP to the cent"
+   },
+   "arithmetic": "DECIMAL_CENTS",
+   "status": "CHARGED"
+  },
+  "exit_10c_at_4.54": {
+   "total": 0.53,
+   "components": {
+    "commission": 0.0,
+    "exchange": 0.4,
+    "regulatory": 0.13
+   },
+   "component_basis": {
+    "sale_principal": 4540.0,
+    "cat_raw": "0.0030",
+    "cat": 0.0,
+    "taf_raw": "0.03290",
+    "taf": 0.03,
+    "sec_raw": "0.093524",
+    "sec_component": 0.1,
+    "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"
+   },
+   "rounding_rules": {
+    "commission": "exact per contract, to the cent",
+    "exchange": "ORF + OCC per contract, to the cent",
+    "regulatory_cat": "sub-cent charge rounds DOWN to zero (published rule)",
+    "regulatory_taf": "FINRA TAF, NEAREST cent",
+    "regulatory_sec": "SEC, rounded UP to the cent"
+   },
+   "arithmetic": "DECIMAL_CENTS",
+   "status": "CHARGED"
+  },
+  "exit_100c_at_4.54": {
+   "total": 5.3,
+   "components": {
+    "commission": 0.0,
+    "exchange": 4.0,
+    "regulatory": 1.3
+   },
+   "component_basis": {
+    "sale_principal": 45400.0,
+    "cat_raw": "0.0300",
+    "cat": 0.03,
+    "taf_raw": "0.32900",
+    "taf": 0.33,
+    "sec_raw": "0.93524",
+    "sec_component": 0.94,
+    "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"
+   },
+   "rounding_rules": {
+    "commission": "exact per contract, to the cent",
+    "exchange": "ORF + OCC per contract, to the cent",
+    "regulatory_cat": "rounded to the NEAREST cent",
+    "regulatory_taf": "FINRA TAF, NEAREST cent",
+    "regulatory_sec": "SEC, rounded UP to the cent"
+   },
+   "arithmetic": "DECIMAL_CENTS",
+   "status": "CHARGED"
+  },
+  "no_principal": {
+   "total": null,
+   "status": "NOT_ESTIMABLE",
+   "why": "SALE_PRINCIPAL_REQUIRED: ROBINHOOD_RHF_2026 prices its regulatory fee at 20.60 per $1,000,000 of sale principal; an unknown principal is not zero"
+  },
+  "invalid_principal": {
+   "total": null,
+   "status": "REFUSED",
+   "why": "SALE_PRINCIPAL_INVALID: nan"
+  }
+ },
+ "authorization": {
+  "computational_correctness": "verified above; the arithmetic matches the published terms under each component's own rounding rule",
+  "operator_authorization_of_the_schedule": "NOT GRANTED for v2026-09-12b",
+  "why": "the schedule's COMPUTATION changed in this brick (fixed per-contract SEC constant -> exact sale-principal), so its 2026-09-12 authorization was marked SUPERSEDED_BY_COMPUTATION_CHANGE and the live default reverted",
+  "live_default_now": "UNVERIFIED",
+  "live_default_provenance": "UNVERIFIED",
+  "not_authorized_by_this_script": true
+ },
+ "persisted_trade": {
+  "decision": "TRADE",
+  "intent_fees_on_disk": {
+   "effective_date": "UNDECLARED",
+   "known": true,
+   "provenance": "SYNTHETIC_FIXTURE",
+   "schedule_hash": "58c4252b8a8ad6ab2f3e84b591e05ee8b6d9ef8257cc38fa7814da38c3f71ca5",
+   "schedule_id": "SYNTHETIC_FEES_V1",
+   "terms_digest": "133bdf8e9749f2175f75d6ed96e92e0b7d23c62caed65c2b29f97f27b2c97262",
+   "version": "1"
+  },
+  "fill_fee_identity_on_disk": {
+   "effective_date": "UNDECLARED",
+   "known": true,
+   "provenance": "SYNTHETIC_FIXTURE",
+   "schedule_hash": "58c4252b8a8ad6ab2f3e84b591e05ee8b6d9ef8257cc38fa7814da38c3f71ca5",
+   "schedule_id": "SYNTHETIC_FEES_V1",
+   "terms_digest": "133bdf8e9749f2175f75d6ed96e92e0b7d23c62caed65c2b29f97f27b2c97262",
+   "version": "1"
+  },
+  "identity_fields_present": [
+   "effective_date",
+   "known",
+   "provenance",
+   "schedule_hash",
+   "schedule_id",
+   "terms_digest",
+   "version"
+  ],
+  "approval_carries_identity": true
+ },
+ "arithmetic_source": {
+  "document": "RHF Standard Pricing Fee Schedule (PDF)",
+  "sha256": "7f9c86bf297d078ce27505cbc53eecc068cf975fbfca5aada37b9af865d7e14a",
+  "terms": {
+   "commission": "$0",
+   "orf_occ": "$0.04/contract both sides",
+   "cat": "$0.0003/contract",
+   "taf": "$0.00329/contract sells, nearest cent",
+   "sec": "$20.60 per $1,000,000 of SALE principal, rounded up, effective 2026-04-04"
+  }
+ },
+ "summary": {
+  "approval_alterations_refused": 9,
+  "approval_alterations_total": 9,
+  "fill_alterations_refused": 4,
+  "fill_alterations_total": 4,
+  "unaltered_intent_passes_at_fill": true,
+  "recovery_refuses_a_changed_schedule": true
+ }
+}

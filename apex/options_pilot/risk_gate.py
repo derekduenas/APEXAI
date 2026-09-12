@@ -92,19 +92,24 @@ def verify_approval(intent: dict, approval, *, authority=None) -> dict:
                           % (str(approval.get("binding_hash"))[:12], expected[:12]))
     if not is_real(approval.get("certified_max_loss")) or approval["certified_max_loss"] <= 0:
         raise RiskRefused("RISK_MAX_LOSS_INVALID: %r" % (approval.get("certified_max_loss"),))
-    if "envelope_binding_hash" in approval and approval["envelope_binding_hash"] != envelope_binding_hash(intent):
+    # MANDATORY, not conditional. Previously both of the checks below ran only "if present", so an authority that
+    # omitted them left the intent unbound to its envelope and its fee identity and every alteration verified.
+    if "envelope_binding_hash" not in approval:
+        raise RiskRefused("RISK_APPROVAL_HAS_NO_ENVELOPE_BINDING: an approval must commit to the envelope and the complete "
+                          "fee identity; an approval that omits the commitment is not authorization")
+    if not isinstance(approval.get("fee_identity"), dict):
+        raise RiskRefused("RISK_APPROVAL_HAS_NO_FEE_IDENTITY: an approval must name the complete fee identity it was "
+                          "issued under; got %r" % type(approval.get("fee_identity")).__name__)
+    if approval["envelope_binding_hash"] != envelope_binding_hash(intent):
         raise RiskRefused("RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different "
                           "envelope or fee identity than the intent now carries")
     # the approval's OWN recorded identity must equal the intent's, field by field: an approval whose identity block
     # was altered while its id was preserved is refused by name
-    a_id, i_id = approval.get("fee_identity"), fee_identity_of(intent)
-    if a_id is not None:
-        if not isinstance(a_id, dict):
-            raise RiskRefused("RISK_APPROVAL_FEE_IDENTITY_MALFORMED: %r" % type(a_id).__name__)
-        for k in FEE_IDENTITY_FIELDS:
-            if a_id.get(k, "__ABSENT__") != i_id[k]:
-                raise RiskRefused("RISK_APPROVAL_FEE_IDENTITY_DISAGREES: %s approval=%r intent=%r"
-                                  % (k, a_id.get(k, "__ABSENT__"), i_id[k]))
+    a_id, i_id = approval["fee_identity"], fee_identity_of(intent)
+    for k in FEE_IDENTITY_FIELDS:
+        if a_id.get(k, "__ABSENT__") != i_id[k]:
+            raise RiskRefused("RISK_APPROVAL_FEE_IDENTITY_DISAGREES: %s approval=%r intent=%r"
+                              % (k, a_id.get(k, "__ABSENT__"), i_id[k]))
     if authority is not None:
         why = authority.accepts(approval)
         if why:
@@ -158,6 +163,11 @@ class SyntheticRiskAuthority(RiskAuthority):
         if self.refuse_with:
             return {"approved": False, "why": self.refuse_with, "risk_provenance": "SYNTHETIC_FIXTURE",
                     "authority_id": self.authority_id}
+        # the harness authority satisfies the SAME binding contract as the certified one: an approval that does not
+        # commit to the envelope and the complete fee identity is refused by verify_approval for either authority
         return {"approved": True, "risk_provenance": "SYNTHETIC_FIXTURE", "authority_id": self.authority_id,
-                "binding_hash": binding_hash(_binding_view(intent)), "certified_max_loss": self.max_loss,
+                "binding_hash": binding_hash(_binding_view(intent)),
+                "envelope_binding_hash": envelope_binding_hash(intent),
+                "fee_identity": fee_identity_of(intent),
+                "certified_max_loss": self.max_loss,
                 "note": "SYNTHETIC approval for orchestration tests; carries no risk certification"}
