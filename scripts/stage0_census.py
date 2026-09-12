@@ -20,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, ".")
 from apex.options_pilot import expression_rule as ER  # noqa: E402
 from apex.options_pilot.risk_authority import CertifiedRiskAuthority, entry_cap_price, envelope_for  # noqa: E402
-from apex.options_pilot.fees import UNVERIFIED_FEES  # noqa: E402
+from apex.options_pilot.fees import LIVE_DEFAULT_FEES as LIVE_FEES  # noqa: E402
 from apex.options_pilot.clock import Clock, to_utc_string  # noqa: E402
 from apex.pulse_options import sources as SRC  # noqa: E402
 from apex.pulse_options.providers import SyntheticBarProvider  # noqa: E402
@@ -64,11 +64,11 @@ class _Bars:
                 for b in bars if start_epoch <= b["event_time"] < end_epoch]
 
 
-out = {"kind": "STAGE0_CENSUS", "session": "2026-09-11", "settings": "DEFAULT (PILOT_RULE_V2 cap %.2f; FunnelEngine defaults k_side=4; UNVERIFIED fee schedule; no tuning)" % entry_cap_price(),
+out = {"kind": "STAGE0_CENSUS", "session": "2026-09-11", "settings": "DEFAULT (PILOT_RULE_V2 cap %.2f; FunnelEngine defaults k_side=4; LIVE default fee schedule %s; no tuning)" % (entry_cap_price(), LIVE_FEES.schedule_id),
        "n_chain_snapshots": len(chains), "n_bars": len(bars), "n_nbbo": len(nbbo), "rule_path": {"per_snapshot": []}, "funnel_path": {"per_snapshot": []},
        "joint_path": {"count": 0, "reason": "NO_AUTHORIZED_FIT: JOINT_FUNNEL_V1 requires an R4 fit (R4-FIT-001/002 not granted); 0 by construction, not by tuning"}}
 tot = Counter()
-risk = CertifiedRiskAuthority(fee_schedule=UNVERIFIED_FEES, provenance="LIVE_FEED")
+risk = CertifiedRiskAuthority(fee_schedule=LIVE_FEES, provenance="LIVE_FEED")
 for rec in chains:
     t = rec["receipt_epoch"]
     quotes = rec["payload"]["quotes"]
@@ -91,7 +91,7 @@ for rec in chains:
                     "session_id": "CENSUS", "scan_id": "CENSUS", "intent_id": "CENSUS", "signal_used": sig}
             try:
                 from apex.options_pilot.book import load_book
-                ap = risk.approve(body, book=load_book(D / "_no_ledger.jsonl", session_id="CENSUS", fee_schedules={UNVERIFIED_FEES.schedule_id: UNVERIFIED_FEES}))
+                ap = risk.approve(body, book=load_book(D / "_no_ledger.jsonl", session_id="CENSUS", fee_schedules={LIVE_FEES.schedule_id: LIVE_FEES}))
                 row[sig]["certified_at_live_default"] = ap.get("approved"); row[sig]["certified_why"] = (ap.get("why") or "")[:80]
                 tot["certified_approved_%s" % sig] += 1 if ap.get("approved") else 0
             except Exception as e:                                       # noqa: BLE001
@@ -102,7 +102,7 @@ for rec in chains:
 
 # FUNNEL path at defaults: the real TwinSources with the real FunnelEngine, real bars, real chain rows
 tw = SRC.TwinSources(provenance="LIVE_FEED", clock=Clock(lambda: 0.0), bar_source=_Bars(), chain_fn=lambda s, t: None, quote_fn=lambda c: None,
-                     exit_quote_fn=lambda c: None, fee_schedule=UNVERIFIED_FEES, selection_policy="FULL_FUNNEL_V1", sleep_fn=lambda s: None)
+                     exit_quote_fn=lambda c: None, fee_schedule=LIVE_FEES, selection_policy="FULL_FUNNEL_V1", sleep_fn=lambda s: None)
 fc = Counter()
 for rec in chains[::5]:                                                  # every 5th snapshot (~5 min cadence; the pilot scans every 15)
     t = rec["receipt_epoch"]

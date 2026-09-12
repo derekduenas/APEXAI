@@ -18,7 +18,7 @@ import time
 from datetime import datetime
 
 from apex.options_pilot.clock import Clock, to_utc_string
-from apex.options_pilot.fees import SYNTHETIC_FEES, UNVERIFIED_FEES
+from apex.options_pilot.fees import LIVE_DEFAULT_FEES, SYNTHETIC_FEES, UNVERIFIED_FEES
 from apex.options_pilot.risk_authority import CertifiedRiskAuthority
 
 from .ingest import BarStore
@@ -454,7 +454,7 @@ def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn
         raise ProviderUnavailable("QUOTE_AMBIGUOUS: %d rows for %s after the duplicate policy; refused" % (len(matches), want))
 
     return TwinSources(provenance="LIVE_FEED", clock=clock, bar_source=_LiveBars(alpaca), chain_fn=chain_fn,
-                       quote_fn=quote_fn, exit_quote_fn=quote_fn, fee_schedule=(fee_schedule or UNVERIFIED_FEES), sleep_fn=time.sleep,
+                       quote_fn=quote_fn, exit_quote_fn=quote_fn, fee_schedule=(fee_schedule or LIVE_DEFAULT_FEES), sleep_fn=time.sleep,
                        book_fn=lambda s, t: alpaca.nbbo(s), selection_policy=selection_policy,
                        joint_engine=joint_engine, joint_context_fn=joint_context_fn, funnel_engine=funnel_engine,
                        event_snapshot_fn=event_snapshot_fn, event_gate_authority=event_gate_authority)

@@ -102,7 +102,7 @@ class TestLiveWiring:
         p = PEP.ProductionSources()
         d = p.describe()
         assert d["selection_policy"] == "PILOT_RULE_V2" and d["wiring"]["attach_market_data_http"] is False
-        assert "NOT ATTACHED" in d["wiring"]["bars_nbbo_client"] and d["fee_schedule"]["provenance"] == "UNVERIFIED"
+        assert "NOT ATTACHED" in d["wiring"]["bars_nbbo_client"] and d["fee_schedule"]["provenance"] == "PROVIDER_VERIFIED" and d["fee_schedule"]["id"] == "ROBINHOOD_RHF_2026"
 
     def test_joint_without_engine_and_context_is_refused_by_the_preserved_guard(self):
         from apex.options_pilot import entrypoint as PEP

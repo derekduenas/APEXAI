@@ -342,6 +342,9 @@ def build_parser() -> argparse.ArgumentParser:
                     help="PILOT_RULE_V2 = deterministic rule, nearest cap-feasible strike on the signal side (default, DEFECT_STRIKE_RULE_001 repair); "
                          "PILOT_RULE_V1 = the frozen nearest-ATM rule (replay of records that sealed it); FULL_FUNNEL_V1 = the funnel engine; "
                          "JOINT_FUNNEL_V1 = the R4 joint engine (needs its engine + context supplied)")
+    ap.add_argument("--pilot-live-wiring", action="store_true", default=False,
+                    help="with --pilot-boundary on the production route: attach the gated market-data HTTP client (HTTP_POLICY_V1), the catalyst "
+                         "event snapshot (EVENT_GATE_V0 SHADOW) and the authorized fee schedule; every call still passes LiveGate")
     ap.add_argument("--pilot-session-id", default=None)
     ap.add_argument("--pilot-release", default=None)
     return ap

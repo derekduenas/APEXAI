@@ -88,9 +88,12 @@ class ProductionSources:
         from apex.pulse_options.sources import live_twin_sources
         self.wiring = wiring or LiveWiring()
         http_get = headers_fn = None
+        gate = None
         if self.wiring.attach_market_data_http:
             from apex.intraday import options_feed as OF
             from apex.pulse_options.http_policy import EndpointHealth, guarded_get
+            from apex.pulse_options.providers import LiveGate
+            gate = LiveGate(secret_fn=OF._secret)                 # credentials from the secret backend (presence only); switch from env
             self.health = EndpointHealth()
 
             def http_get(url, headers=None):
@@ -98,7 +101,7 @@ class ProductionSources:
                 return body
             headers_fn = OF._alpaca_headers
         # a JOINT request without engine+context reaches the TwinSources guard and is refused there (preserved)
-        self._twin = live_twin_sources(selection_policy=selection_policy, http_get=http_get, headers_fn=headers_fn,
+        self._twin = live_twin_sources(gate=gate, selection_policy=selection_policy, http_get=http_get, headers_fn=headers_fn,
                                        joint_engine=self.wiring.joint_engine, joint_context_fn=self.wiring.joint_context_fn,
                                        funnel_engine=self.wiring.funnel_engine, fee_schedule=self.wiring.fee_schedule,
                                        event_snapshot_fn=self.wiring.event_snapshot_fn, event_gate_authority=self.wiring.event_gate_authority)
@@ -241,7 +244,11 @@ def run_from_args(a, *, pilot_sources=None) -> int:
         else:
             provider = _HarnessProvider(h, selection_policy=getattr(a, "pilot_selection_policy", "PILOT_RULE_V2"))
     else:
-        provider = ProductionSources(selection_policy=getattr(a, "pilot_selection_policy", "PILOT_RULE_V2"))
+        wiring = None
+        if getattr(a, "pilot_live_wiring", False):
+            from apex.catalyst.twin_snapshot import event_snapshot
+            wiring = LiveWiring(attach_market_data_http=True, event_snapshot_fn=event_snapshot, event_gate_authority="SHADOW")
+        provider = ProductionSources(selection_policy=getattr(a, "pilot_selection_policy", "PILOT_RULE_V2"), wiring=wiring)
     session_id = getattr(a, "pilot_session_id", None) or time.strftime("PILOT-%Y%m%dT%H%M%SZ", time.gmtime())
     release = getattr(a, "pilot_release", None) or "UNPINNED"
     cycles = 1 if a.dry_run else max(1, int(a.minutes // max(1, a.interval_min)))
