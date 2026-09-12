@@ -311,3 +311,46 @@ class TestF11Authorization:
         info = e.attach(T._fitted(), permission=SW.permission())
         assert info["permission"]["validated"] is True and info["permission"]["contract_pin"] == FULL_PIN
         assert info["se_a_iv_intercept"] is not None and info["G_clusters"] == 30
+
+
+# ---------------------------------------------------------------- real session -> funnel wiring (no doubles)
+def test_session_supplies_a_genuinely_certified_risk_decision_and_the_scan_key(tmp_path):
+    """The funnel doubles in tests/test_funnel_engine.py were reshaped in the same commit as the change they
+    witness, so this test uses the REAL engine through the REAL session and boundary. It asserts that what the
+    session hands the engine is a decision from the boundary's own certified authority against the real Book, and
+    that the scan key that seeds the simulation is the session's scan_id."""
+    from apex.options_pilot import entrypoint as PEP, ledger as L
+    from apex.options_pilot.risk_authority import AUTHORITY_ID, CERTIFIED_PROVENANCE
+    from apex.options_pilot.synthetic_harness import SyntheticHarness
+    from apex.pulse_options.sources import synthetic_twin_sources
+
+    led = tmp_path / "led.jsonl"
+    h = SyntheticHarness(led, session_id="R4-WIRE", t0=T.REG)
+    engine = ENG.JointEngine(n_paths=400, seed=7, comparator="JOINT")
+    engine.attach(T._fitted(), permission=SW.permission())
+    entry, exit_ = T._coherent_execution(h)
+    h.quotes.override, h.exit_quotes.override = entry, exit_
+    twin = synthetic_twin_sources(clock=h.clock, quote_fn=h.quotes, exit_quote_fn=h.exit_quotes, chain_fn=h.chain_fn,
+                                  sleep_fn=h.advance, selection_policy="JOINT_FUNNEL_V1", joint_engine=engine,
+                                  joint_context_fn=T._joint_context())
+    rep = PEP.run_pilot(ledger=led, out=tmp_path / "out.json", symbols=["SPY"], provider=PEP.TwinProvider(twin),
+                        session_id="R4-WIRE", release="synthetic-release", cycles=1)
+    rows = L.read_all(led)
+    fn = next(r for r in rows if r["kind"] == "pilot_funnel")
+    assert fn["decision"] == "TRADE", fn.get("why")
+
+    # the risk decision PRIME acted on came from the boundary's certified authority, not from the engine
+    risk = fn["trace"]["decision_rule"]["rules"]["5"]["risk"]
+    assert risk["risk_provenance"] == CERTIFIED_PROVENANCE and risk["authority_id"] == AUTHORITY_ID
+    assert risk["approved"] is True
+
+    # the scan key that seeded the simulation is the session's scan_id, not a counter
+    scan_id = fn["scan_id"]
+    assert fn["trace"]["scan_id"] == scan_id and scan_id.startswith("R4-WIRE:")
+    assert fn["trace"]["underlying"]["seed"] == ENG._seed_from(engine.seed, scan_id)
+    assert fn["trace"]["sampler"]["seed_source"] == "H(base_seed, scan_id)"
+
+    # and the whole path still completes and reconciles
+    assert rep["outcomes"] and rep["outcomes"][0]["final"] == "RESOLVED"
+    assert rep["book"]["n_positions"] == 0 and rep["book"]["integrity_problems"] == []
+    L.verify_chain(led, rows=rows)

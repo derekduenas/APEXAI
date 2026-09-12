@@ -7,23 +7,28 @@
   "F1_rule3_stub": {
    "reproduced": false,
    "detail": {
-    "scenarios_recorded": [
-     "BASE",
-     "truncation_q_0.999",
-     "truncation_q_0.99999",
-     "spread_innovation_x1.5",
-     "extension_innovation_x1.5",
+    "registered": [
      "a_iv_minus_1_cluster_robust_se",
-     "size_floor_removed"
+     "extension_innovation_x1.5",
+     "size_floor_removed",
+     "spread_innovation_x1.5",
+     "truncation_q_0.999",
+     "truncation_q_0.99999"
     ],
-    "expected": [
-     "truncation_0.999",
-     "truncation_0.99999",
-     "spread_x1.5",
-     "extension_x1.5",
-     "a_iv_minus_1se",
-     "size_floor_removed"
-    ]
+    "produced_excluding_BASE": [
+     "a_iv_minus_1_cluster_robust_se",
+     "extension_innovation_x1.5",
+     "size_floor_removed",
+     "spread_innovation_x1.5",
+     "truncation_q_0.999",
+     "truncation_q_0.99999"
+    ],
+    "missing": [],
+    "unregistered_extra": [],
+    "complete_flag": true,
+    "all_values_positive": true,
+    "parameters_recorded_for_each": true,
+    "assertion": "set equality of produced-minus-BASE against ENG.ADVERSE_SCENARIOS, plus the complete flag"
    }
   },
   "F2_self_attested_risk": {

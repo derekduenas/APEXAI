@@ -1,4 +1,7 @@
-# R4 implementation — synthetic only, against contract blob `902256e3…`
+# R4 implementation r1 + r2 — synthetic only, against contract blob `902256e3…`
+
+Filename note: this document was briefly renamed `R4_IMPLEMENTATION.md` in the r2 commit, which erased the
+r1/r2 lineage from the name. Restored to a lineage-preserving name here.
 
 **r2 (this branch) repairs the twelve findings raised against r1 `1ffd217b`; see the table at the end.**
 
@@ -128,7 +131,7 @@ against the repaired code gives `docs/evidence/r4_repair_after.json` (1/12 remai
 
 | # | Finding | Repair | Test |
 |---|---|---|---|
-| F1 | Rule 3 was a stub returning only `BASE`, so the gate passed trivially | all six registered scenarios are built and evaluated independently on the selected candidate, each recorded with its exact parameters; a missing or non-positive value FAILS the gate, and an incomplete registry fails it too | `TestF1AdverseScenarios` (3 tests, incl. failure→WAIT with the scenario named) |
+| F1 | Rule 3 was a stub returning only `BASE`, so the gate passed trivially | all six registered scenarios are built and evaluated independently on the selected candidate, each recorded with its exact parameters; a missing or non-positive value FAILS the gate, and an incomplete registry fails it too | `TestF1AdverseScenarios` (3 tests, incl. failure→WAIT with the scenario named). **Probe strengthened:** the original probe only checked that the scenario set was not `{BASE}` and its "expected" list was retyped by hand, so five of six names did not match the registry and the probe would not have caught a rename. It now asserts SET EQUALITY of the produced scenarios against `ENG.ADVERSE_SCENARIOS` sourced from the code, plus the `complete` flag, all values positive, and parameters recorded for each. F1 still passes under the stricter assertion |
 | F2 | `engine.py` manufactured `risk_decision={"approved": True}` | the engine constructs no approval. It requires a `certified_risk_fn` supplied by the BOUNDARY, validates `risk_provenance == CERTIFIED_KERNEL` and the authority id, and abstains otherwise. `session.scan` supplies the real `CertifiedRiskAuthority` against the real `Book`, with the full binding body; the kernel still re-checks at intent commit | `TestF2CertifiedRisk` (4 tests, incl. the fake-approval tripwire over four shapes) |
 | F3 | A Gaussian density was claimed from a simulated ensemble | the density is `EMPIRICAL_ENSEMBLE` with quantiles, an ensemble digest, the true underlying innovation family and the generating restrictions, plus the statement that it is a sample distribution and not a calibrated or fill probability | `TestF3ForecastDensity` (also under truncated-t innovations) |
 | F4 | Selection could use a quote available after the selected instant | selection admits only `event_time ≤ t` AND `available_time ≤ t`; the registered `t_e + 60 s` deadline is a separate, later check that can only exclude | `test_a_quote_available_after_t_cannot_select_t`, `test_deadline_is_a_separate_later_check` |
@@ -146,12 +149,28 @@ against the repaired code gives `docs/evidence/r4_repair_after.json` (1/12 remai
 - Focused: `tests/test_joint_wb.py` 43 passed, `tests/test_joint_wb_repairs.py` 26 passed — **69**.
 - Regression across every touched suite: **272 passed** (adds the funnel, pilot boundary/entrypoint/accounting/
   operator-view, twin, multiverse, worldmodel, decision, backtest and Robinhood suites).
-- Registered scale, `docs/evidence/r4_scale_synthetic_r2.json`: at 4,000 paths a decision now takes a median of
-  **0.447 s** (min 0.305, max 0.556) against 0.121 s in r1, because each decision additionally builds and prices
-  six adverse scenarios, four of which rebuild the state paths. Python traced peak **6.9 MiB**, process max RSS
-  **95.6 MiB**.
+- Registered scale — **CORRECTED, see `docs/evidence/r4_latency_budget.json`.** The figures first reported here
+  (r1 median 0.121 s, r2 median 0.447 s, both over 5 decisions) were measured with `tracemalloc` ACTIVE, which
+  inflates this allocation-heavy path by roughly 2.5x, and 5 samples is too few to be stable. Same code, 5
+  decisions with the tracer reads 0.290 s median against 0.113 s without it. **The r1 → r2 slowdown claim is
+  withdrawn.** Clean measurement, 35 decisions at 4,000 paths with the tracer off: median **0.105 s**, p95
+  **0.122 s**, max **0.124 s**, max RSS **95.3 MiB**. The six adverse scenarios cost **0.062 s** of that median
+  (0.044 s median with them disabled), so they roughly double a decision rather than quadrupling it.
+- **Latency budget: none was ever declared.** No wall-clock decision deadline exists in the contract, the engine,
+  the pilot boundary or the doctrine set. The binding constraint is `EXECUTION_MAX_AGE_S = 15 s`: the quote that
+  produces an intent must be no older than 15 s at the decision boundary, and decision time consumes that budget.
+  Proposed and NOT enforced: `decide()` ≤ **2.0 s** (13 % of the window, leaving ≥ 13 s for state assembly, ledger
+  writes, the kernel check and the fill round trip) and a per-scan budget of **5.0 s**. Margin at the measured
+  worst case is **1.88 s**, i.e. 16x headroom against the proposed deadline and 121x against the raw constraint.
+  Enforcement is new capability and is out of scope.
 - One caller-contract change: `session.scan` now passes `certified_risk_fn` and `scan_id` to any funnel callable,
   so the `FULL_FUNNEL` test doubles were updated to accept them. `TwinSources.funnel_fn` already tolerated extras.
+  Because those doubles were reshaped in the same commit as the change they witness, a REAL-wiring test was added:
+  `test_session_supplies_a_genuinely_certified_risk_decision_and_the_scan_key` runs the real engine through the
+  real session and boundary and asserts the risk decision PRIME acted on carries `CERTIFIED_KERNEL` provenance and
+  the authority id, and that the simulation seed equals `H(base_seed, session scan_id)`.
+- Module count correction: the r2 change summary said "eight modules under `apex/joint_wb`". The diff shows
+  **seven** (`accounting`, `attribution`, `decision_rule`, `endpoint`, `engine`, `sampler`, `state`).
 
 ## What r2 did NOT touch
 
