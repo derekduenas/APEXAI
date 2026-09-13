@@ -80,8 +80,13 @@ def test_pilot_route_calls_the_boundary_and_cannot_fall_back_to_geometry(tmp_pat
     d = rep["decisions"][0]
     assert d["scan_id"] == "PS-1:0001:SPY" and d["decision"] == "TRADE"
     assert d["forecast_id"] and d["intent_id"] and d["fill_id"] and d["decision_persisted"] is True
-    assert rep["outcomes"] == [{"fill_seq": 4, "recovery": False, "final": "RESOLVED",
-                                "attempts": [{"seq": 6, "status": "RESOLVED", "attempt": 1, "reconciled": False}]}]
+    out = rep["outcomes"]
+    assert len(out) == 1 and out[0]["fill_seq"] == 4 and out[0]["recovery"] is False and out[0]["final"] == "RESOLVED"
+    a = out[0]["attempts"]
+    assert [{k: x[k] for k in ("seq", "status", "attempt", "reconciled")} for x in a] == \
+        [{"seq": 6, "status": "RESOLVED", "attempt": 1, "reconciled": False}]
+    # EXIT-SCHEDULING-002 requires every attempt to carry its trigger, policy version and remaining window
+    assert a[0]["trigger"] and a[0]["policy_version"] and "remaining_window_s" in a[0]
     L.verify_chain(tmp_path / "led.jsonl")
 
 

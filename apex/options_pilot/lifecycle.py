@@ -40,6 +40,7 @@ from . import boundary as B
 from . import instant as I
 from . import ledger as L
 from . import session as S
+from . import exit_policy as EP
 from .clock import Clock
 from .records import INTENT_TTL_S
 
@@ -51,17 +52,24 @@ class LifecycleRefused(RuntimeError):
 DATA_AVAILABLE = "DATA_AVAILABLE"
 INTENT_EXPIRY = "INTENT_EXPIRY"
 EXIT_DUE = "EXIT_DUE"
+EXIT_ARRIVAL = "EXIT_ARRIVAL"           # EXIT-SCHEDULING-002: a due position, woken by a NEW observation
 EXIT_RETRY = "EXIT_RETRY"
 EXIT_WINDOW_CLOSE = "EXIT_WINDOW_CLOSE"
 SCAN = "SCAN"
 SESSION_CLOSE = "SESSION_CLOSE"
 
-EVENT_ORDER = (DATA_AVAILABLE, INTENT_EXPIRY, EXIT_DUE, EXIT_RETRY, EXIT_WINDOW_CLOSE, SCAN, SESSION_CLOSE)
+# THE TOTAL ORDER. DATA_AVAILABLE first, so an observation arriving at the same instant an exit falls due is already
+# visible when EXIT_DUE fires. EXIT_ARRIVAL then EXIT_RETRY, so a genuine arrival is preferred over a blind timer at
+# the same instant. EXIT_WINDOW_CLOSE after both, so a deadline never pre-empts an attempt that could still resolve.
+# All of them before SCAN: existing obligations are serviced before new risk is admitted.
+EVENT_ORDER = (DATA_AVAILABLE, INTENT_EXPIRY, EXIT_DUE, EXIT_ARRIVAL, EXIT_RETRY, EXIT_WINDOW_CLOSE, SCAN,
+               SESSION_CLOSE)
 RANK = {k: i for i, k in enumerate(EVENT_ORDER)}
-OBLIGATION_EVENTS = (INTENT_EXPIRY, EXIT_DUE, EXIT_RETRY, EXIT_WINDOW_CLOSE)
+OBLIGATION_EVENTS = (INTENT_EXPIRY, EXIT_DUE, EXIT_ARRIVAL, EXIT_RETRY, EXIT_WINDOW_CLOSE)
 ORDERING_POLICY = (
     "LIFECYCLE_ORDER_V1: events are totally ordered by (canonical microsecond, event rank, scheduling ordinal). The "
-    "rank order is DATA_AVAILABLE < INTENT_EXPIRY < EXIT_DUE < EXIT_RETRY < EXIT_WINDOW_CLOSE < SCAN < SESSION_CLOSE, "
+    "rank order is DATA_AVAILABLE < INTENT_EXPIRY < EXIT_DUE < EXIT_ARRIVAL < EXIT_RETRY < EXIT_WINDOW_CLOSE < "
+    "SCAN < SESSION_CLOSE, "
     "so every existing due obligation is processed before new risk is admitted at the same instant. Ties within one "
     "rank break by scheduling order. The clock never rewinds and advances only to the next scheduled event.")
 
@@ -205,7 +213,7 @@ class LifecycleRunner:
     def __init__(self, *, boundary: B.Boundary, sources: dict, clock: MonotonicClock, symbols: list,
                  selection_policy: str, scan_epochs: list | None = None, scan_interval_s: float | None = None,
                  n_scans: int | None = None, close_at: float | None = None, data_available_epochs: list | None = None,
-                 event_budget: int = DEFAULT_EVENT_BUDGET, on_event=None):
+                 event_budget: int = DEFAULT_EVENT_BUDGET, on_event=None, observation_feed=None):
         if getattr(boundary.clock, "_now", None) != clock.now:      # bound methods compare equal on (func, instance)
             raise LifecycleRefused("CLOCK_NOT_SHARED: the boundary must read the lifecycle clock, or two clocks would "
                                    "disagree about now")
@@ -229,6 +237,14 @@ class LifecycleRunner:
         self.trace: list = []
         self._exit_entries: dict = {}
         self._settled: set = set()            # positions this run will not schedule again (attempted or exhausted)
+        # EXIT-SCHEDULING-002. `observation_feed` yields (available_epoch, observation) pairs; each observation is
+        # {"contract_id", "observation_id", ...}. It supplies WHEN a new observation for a contract becomes visible.
+        # It never supplies the quote itself: the boundary still asks exit_quote_fn and rechecks everything.
+        self.observation_feed = list(observation_feed or [])
+        self._attempted_observations: dict = {}   # fill_seq -> set of observation ids already attempted
+        self._arrival_triggers: dict = {}         # fill_seq -> count, bounded by the policy
+        self._latest_observation: dict = {}       # contract_id -> the newest observation id made visible so far
+        self.scheduling_events: list = []         # decisions NOT to attempt; never counted as attempts
         self.recovered_seqs: set = set()      # positions inherited from an earlier process, filled in by run()
         self.report: dict = {"ordering_policy": ORDERING_POLICY, "clock_kind": clock.KIND, "events": [],
                              "decisions": [], "exits": [], "expiries": [], "resumed": [], "data_available": [],
@@ -242,6 +258,14 @@ class LifecycleRunner:
         self.data_epochs = [I.canonical_epoch(t, field="data") for t in (data_available_epochs or [])]
 
     # ------------------------------------------------------------ helpers
+
+    def _note(self, fill_seq, reason: str, **extra) -> dict:
+        """A SCHEDULING event: a decision not to ask the boundary. Never an attempt, in either direction."""
+        row = {"fill_seq": fill_seq, "reason": reason, "at_utc": I.canonical_utc(self.clock.now()),
+               "policy_version": getattr(self.bd.exit_policy, "policy_id", None),
+               "is_attempt": False, **extra}
+        self.scheduling_events.append(row)
+        return row
 
     def _emit(self, ev: dict, outcome: dict) -> None:
         row = {"kind": ev["kind"], "at_utc": ev["at_utc"], "at_us": ev["at_us"], "ordinal": ev["ordinal"],
@@ -331,6 +355,16 @@ class LifecycleRunner:
                 "note": ("one labelled recovery attempt for an inherited position; it remains an explicit outstanding "
                          "obligation unless that attempt discharged it")}
 
+    def _schedule_exit(self, when, kind: str, fill_seq: int) -> bool:
+        """At most ONE pending exit event per position. Two chains for one fill (a timer chain and an arrival chain)
+        would double every attempt, which is how the budget was silently consumed before this guard existed."""
+        for k in (EXIT_DUE, EXIT_ARRIVAL, EXIT_RETRY, EXIT_WINDOW_CLOSE):
+            if self.sched.has(k, fill_seq):
+                self._note(fill_seq, "EXIT_EVENT_ALREADY_PENDING", pending=k, would_have_scheduled=kind)
+                return False
+        self.sched.at(when, kind, {"fill_seq": fill_seq}, key=fill_seq)
+        return True
+
     def _next_attempt_epoch(self, spacing_s: float) -> float:
         """The next retry instant, guaranteed to be a LATER canonical instant than now, so a zero or sub-microsecond
         spacing can never schedule an event that is already due and spin the loop."""
@@ -355,6 +389,37 @@ class LifecycleRunner:
         pol = self.bd.exit_policy
         recovery = fill_seq in self.recovered_seqs
         entry = self._entry(fill_seq)
+        # THE ONE JUDGEMENT CALL, declared in the policy: a TIMER retry is not fired when the newest visible
+        # observation is one an earlier attempt already rejected. The boundary is never asked, so no attempt is
+        # created, consumed or renamed. It is recorded as a scheduling event with its reason.
+        if (ev_kind in (EXIT_RETRY, EXIT_WINDOW_CLOSE)
+                and getattr(pol, "skip_timer_when_no_new_observation", False)
+                and self._attempted_observations.get(fill_seq)):
+            rows0 = self._rows()
+            cid = rows0[fill_seq - 1].get("contract_id")
+            newest = self._latest_observation.get(cid)
+            if newest is not None and newest in self._attempted_observations[fill_seq]:
+                sch0 = pol.schedule(rows0[fill_seq - 1]["committed_epoch"])
+                note = self._note(fill_seq, "TIMER_SKIPPED_NO_NEW_OBSERVATION", observation_id=newest,
+                                  trigger=ev_kind,
+                                  attempts_used=len(B.Boundary.valuation_attempts(rows0, fill_seq)))
+                if ev_kind == EXIT_WINDOW_CLOSE:
+                    # the last chance has arrived and there is still nothing new to value against: go terminal
+                    # rather than spend the remaining budget re-reading the same observation
+                    pos0 = next((p for p in self._positions() if p["seq"] == fill_seq), None)
+                    self._settled.add(fill_seq)
+                    if pos0 is not None and not any(x.get("kind") == "pilot_exit_exhausted"
+                                                    and (x.get("fill_ref") or {}).get("seq") == fill_seq
+                                                    for x in rows0):
+                        self.bd.record_exit_exhausted(pos0)
+                    entry["final"] = "EXIT_EXHAUSTED_UNRESOLVED"
+                    return {"state": "EXIT_EXHAUSTED_UNRESOLVED", "fill_seq": fill_seq, **note}
+                nxt0 = self._next_attempt_epoch(pol.retry_spacing_s)
+                if I.is_after(nxt0, sch0["window_close_epoch"]):
+                    self._schedule_exit(sch0["window_close_epoch"], EXIT_WINDOW_CLOSE, fill_seq)
+                else:
+                    self._schedule_exit(nxt0, EXIT_RETRY, fill_seq)
+                return {"state": "TIMER_SKIPPED_NO_NEW_OBSERVATION", "fill_seq": fill_seq, **note}
         pos = next((p for p in self._positions() if p["seq"] == fill_seq), None)
         if pos is None:
             return {"state": entry["final"] or "ALREADY_RESOLVED", "fill_seq": fill_seq}
@@ -370,7 +435,7 @@ class LifecycleRunner:
             # one microsecond the deadline HAS arrived at the declared precision, and rescheduling would put the same
             # event back at the same canonical instant forever.
             if I.is_after(sch["exit_due_epoch"], self.clock.now()):
-                self.sched.at(sch["exit_due_epoch"], EXIT_DUE, {"fill_seq": fill_seq}, key=fill_seq)
+                self._schedule_exit(sch["exit_due_epoch"], EXIT_DUE, fill_seq)
                 return {"state": "NOT_DUE", "fill_seq": fill_seq, "due_utc": I.canonical_utc(sch["exit_due_epoch"]),
                         "note": "the deadline had not arrived; rescheduled at it, not waited for here"}
             status = "DUE"
@@ -388,32 +453,79 @@ class LifecycleRunner:
             nxt = self._next_attempt_epoch(pol.retry_spacing_s)
             state = "REFUSED_RETRY_SCHEDULED"
             if I.is_after(nxt, sch["window_close_epoch"]):
-                self.sched.at(sch["window_close_epoch"], EXIT_WINDOW_CLOSE, {"fill_seq": fill_seq}, key=fill_seq)
+                self._schedule_exit(sch["window_close_epoch"], EXIT_WINDOW_CLOSE, fill_seq)
                 state = "REFUSED_WINDOW_CLOSE_SCHEDULED"
             else:
-                self.sched.at(nxt, EXIT_RETRY, {"fill_seq": fill_seq}, key=fill_seq)
+                self._schedule_exit(nxt, EXIT_RETRY, fill_seq)
             entry["attempts"].append({"refused": str(e)[:160]})
             entry["final"] = state
             return {"state": state, "fill_seq": fill_seq, "why": str(e)[:200]}
         entry["attempts"].append({"seq": o["seq"], "status": o["status"], "attempt": o.get("attempt"),
-                                  "reconciled": o.get("reconciled", False)})
+                                  "reconciled": o.get("reconciled", False), "trigger": ev_kind,
+                                  "policy_version": getattr(pol, "policy_id", None),
+                                  "why": (o.get("why") or "")[:120],
+                                  "remaining_window_s": round(sch["window_close_epoch"] - self.clock.now(), 3)})
         if o.get("discharges_position"):
             entry["final"] = o["status"]
+            # a resolved position cancels its pending timers: they are reconciled, not left to fire
+            self._settled.add(fill_seq)
+            self._note(fill_seq, "PENDING_RETRY_CANCELLED_POSITION_RESOLVED", resolved_by=ev_kind)
             return {"state": o["status"], "fill_seq": fill_seq, "outcome_seq": o["seq"], "attempt": o.get("attempt"),
                     "capacity_released": True}
         # a valuation attempt that did not discharge: the quote was unavailable. Retry ON A SCHEDULE, never by
         # rewinding or by busy-waiting, and let the window close the obligation if the retries run out.
         nxt = self._next_attempt_epoch(pol.retry_spacing_s)
         if I.is_after(nxt, sch["window_close_epoch"]):
-            self.sched.at(sch["window_close_epoch"], EXIT_WINDOW_CLOSE, {"fill_seq": fill_seq}, key=fill_seq)
+            self._schedule_exit(sch["window_close_epoch"], EXIT_WINDOW_CLOSE, fill_seq)
             state = "UNRESOLVED_WINDOW_CLOSE_SCHEDULED"
         else:
-            self.sched.at(nxt, EXIT_RETRY, {"fill_seq": fill_seq}, key=fill_seq)
+            self._schedule_exit(nxt, EXIT_RETRY, fill_seq)
             state = "UNRESOLVED_RETRY_SCHEDULED"
         entry["final"] = state
         return {"state": state, "fill_seq": fill_seq, "outcome_seq": o["seq"], "status": o.get("status"),
                 "attempt": o.get("attempt"), "why": (o.get("why") or "")[:160],
                 "next_attempt_utc": I.canonical_utc(min(nxt, sch["window_close_epoch"]))}
+
+    def _on_exit_arrival(self, ev: dict) -> dict:
+        """A NEW observation for a contract became visible. If a position on that contract is due and inside its
+        window, attempt now instead of waiting for the timer.
+
+        THE ARRIVAL IS NOT THE QUOTE. This only decides WHEN to ask; the boundary then fetches the exit quote and
+        rechecks provider timestamp, receipt, contract identity, sides and prices exactly as it always did. An
+        arrival-triggered attempt fails on staleness like any other when the snapshot carries an old quote."""
+        pol = self.bd.exit_policy
+        obs_id, contract_id = ev["payload"].get("observation_id"), ev["payload"].get("contract_id")
+        self._latest_observation[contract_id] = obs_id
+        if not getattr(pol, "arrival_triggered", False):
+            return self._note(None, "ARRIVAL_TRIGGER_NOT_ENABLED_BY_POLICY", observation_id=obs_id)
+        acted = []
+        for pos in self._positions():
+            fs = pos["seq"]
+            rows = self._rows()
+            if rows[fs - 1].get("contract_id") != contract_id or fs in self._settled:
+                continue
+            n = self._arrival_triggers.get(fs, 0)
+            if n >= getattr(pol, "max_arrival_triggers", 64):
+                acted.append(self._note(fs, "ARRIVAL_TRIGGER_BUDGET_REACHED", observation_id=obs_id, triggers=n))
+                continue
+            if obs_id in self._attempted_observations.get(fs, set()):
+                acted.append(self._note(fs, "DUPLICATE_OBSERVATION_ALREADY_ATTEMPTED", observation_id=obs_id))
+                continue
+            committed = rows[fs - 1]["committed_epoch"]
+            att = len(B.Boundary.valuation_attempts(rows, fs))
+            if not pol.may_attempt_on_arrival(now=self.clock.now(), committed_epoch=committed, attempts=att):
+                acted.append(self._note(fs, "ARRIVAL_BUT_NOT_DUE_OR_NO_BUDGET", observation_id=obs_id,
+                                        status=pol.status(now=self.clock.now(), committed_epoch=committed,
+                                                          attempts=att)))
+                continue
+            self._arrival_triggers[fs] = n + 1
+            self._attempted_observations.setdefault(fs, set()).add(obs_id)
+            out = self._service_exit(fs, EXIT_ARRIVAL)
+            out.update(trigger="OBSERVATION_ARRIVAL", observation_id=obs_id,
+                       remaining_window_s=round(pol.schedule(committed)["window_close_epoch"] - self.clock.now(), 3))
+            self.report["exits"].append({"event": EXIT_ARRIVAL, "at_utc": ev["at_utc"], **out})
+            acted.append(out)
+        return {"observation_id": obs_id, "contract_id": contract_id, "acted": acted or "NO_DUE_POSITION"}
 
     def _on_exit(self, ev: dict) -> dict:
         out = self._service_exit(ev["payload"]["fill_seq"], ev["kind"])
@@ -448,7 +560,8 @@ class LifecycleRunner:
         return {"completion": rec.get("completion"), "outstanding": rec.get("outstanding_obligations")}
 
     HANDLERS = {DATA_AVAILABLE: _on_data_available, INTENT_EXPIRY: _on_intent_expiry, EXIT_DUE: _on_exit,
-                EXIT_RETRY: _on_exit, EXIT_WINDOW_CLOSE: _on_exit, SCAN: _on_scan, SESSION_CLOSE: _on_session_close}
+                EXIT_ARRIVAL: _on_exit_arrival, EXIT_RETRY: _on_exit, EXIT_WINDOW_CLOSE: _on_exit, SCAN: _on_scan,
+                SESSION_CLOSE: _on_session_close}
 
     # ------------------------------------------------------------ the loop
 
@@ -466,6 +579,16 @@ class LifecycleRunner:
         self.report["foreign_unresolved_positions"] = recovered["foreign"]
         for t in self.data_epochs:
             self.sched.at(t, DATA_AVAILABLE, {}, key=("data", t), allow_past=True)
+        # EXIT-SCHEDULING-002: an observation becomes VISIBLE at its recorded availability, never before. Replay and
+        # production schedule these identically; nothing looks ahead to pick an advantageous instant.
+        seen = set()
+        for available, obs in self.observation_feed:
+            oid = obs.get("observation_id")
+            if oid in seen:
+                self._note(None, "DUPLICATE_OBSERVATION_IN_FEED", observation_id=oid)
+                continue
+            seen.add(oid)
+            self.sched.at(available, EXIT_ARRIVAL, dict(obs), key=("obs", oid), allow_past=True)
         for t in self.scan_epochs:
             for sym in self.symbols:
                 self.sched.at(t, SCAN, {"symbol": sym}, key=(sym, t), allow_past=True)
@@ -495,6 +618,9 @@ class LifecycleRunner:
             self._on_session_close({"kind": SESSION_CLOSE, "at_utc": I.canonical_utc(self.clock.now()),
                                     "at_us": self.clock.now_us(), "ordinal": -1, "key": "close", "payload": {}})
         self.report["exit_entries"] = [self._exit_entries[k] for k in sorted(self._exit_entries)]
+        self.report["scheduling_events"] = list(self.scheduling_events)
+        self.report["exit_policy"] = self.bd.exit_policy.describe()
+        self.report["attempt_accounting"] = EP.ATTEMPT_ACCOUNTING
         self.report["n_events"] = n
         self.report["final_clock_utc"] = I.canonical_utc(self.clock.now())
         self.report["book"] = self.bd.book().summary()

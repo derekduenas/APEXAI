@@ -64,3 +64,64 @@ class ExitPolicy:
 
 
 EXIT_POLICY_V1 = ExitPolicy()
+
+
+@dataclass(frozen=True)
+class ArrivalTriggeredExitPolicy(ExitPolicy):
+    """EXIT-SCHEDULING-002. Same budget, better-placed attempts.
+
+    WHY. FLOW-VALIDATION-001 showed a due exit failing five times while eligible quotes sat in its window. The due
+    instant lands within a few hundred milliseconds of a snapshot arrival, and the fixed 15-second retry spacing
+    equals the 15-second freshness limit and divides the 60-second snapshot period, so every retry repeated the same
+    phase instead of sweeping across it. Two of five exits landed on the adverse side of arrival jitter; one was
+    saved by a rounding coin flip at the boundary and one was not.
+
+    WHAT CHANGES: WHEN an attempt fires. A due position inside its window may be attempted the moment a NEW
+    observation for its contract becomes available, instead of only on the timer.
+
+    WHAT DOES NOT CHANGE, deliberately:
+      * the attempt budget (5) and the window (120 s) are the same numbers as V1;
+      * the freshness limit is untouched. **A NEW RECEIPT IS NOT A FRESH QUOTE**: a newly arrived snapshot can carry
+        an old provider timestamp, and the boundary rechecks provider time, receipt, contract identity, sides and
+        prices exactly as before. An arrival-triggered attempt can and does still fail on staleness;
+      * the deadline timers remain. Arrival triggering is an ADDITION, never a replacement: with no data at all the
+        window still expires on its own timer and the position is still an explicit unresolved obligation.
+
+    THE ONE JUDGEMENT CALL, declared for review. `skip_timer_when_no_new_observation` lets the scheduler DECLINE to
+    fire a timer retry when the newest visible observation is one an earlier attempt already rejected. That is not
+    reclassifying a rejection: the boundary is never asked, so no attempt is created, consumed or renamed. It exists
+    so the budget is spent on new data rather than on re-reading the same stale snapshot four times, which is
+    exactly what consumed fill 37's budget. Set it False to keep V1's blind-timer behaviour; the arrival trigger
+    still fixes the original case either way, because the 127-millisecond-late snapshot fires attempt 2 with a
+    fresh quote."""
+    policy_id: str = "EXIT_AT_HORIZON_15M_V2_ARRIVAL"
+    arrival_triggered: bool = True
+    skip_timer_when_no_new_observation: bool = True
+    max_arrival_triggers: int = 64          # a flood of duplicate or invalid arrivals cannot starve the deadlines
+    supersedes: str = "EXIT_AT_HORIZON_15M_V1"
+    change_note: str = ("adds arrival-triggered attempts inside the existing window and budget; freshness, sides, "
+                        "prices, contract identity and every boundary check are unchanged; timers retained")
+    fields: tuple = field(default=("policy_id", "horizon_s", "window_s", "max_attempts", "retry_spacing_s",
+                                   "exit_side", "on_exhaustion", "relation_to_legacy", "arrival_triggered",
+                                   "skip_timer_when_no_new_observation", "max_arrival_triggers", "supersedes",
+                                   "change_note"))
+
+    def may_attempt_on_arrival(self, *, now: float, committed_epoch: float, attempts: int) -> bool:
+        """An arrival may trigger an attempt only when the position is genuinely due, inside its window, and has
+        budget left. It never extends the window and never adds an attempt."""
+        if not self.arrival_triggered:
+            return False
+        return self.status(now=now, committed_epoch=committed_epoch, attempts=attempts) == "DUE"
+
+
+EXIT_POLICY_V2 = ArrivalTriggeredExitPolicy()
+
+# The attempt accounting, stated once so it cannot drift:
+ATTEMPT_ACCOUNTING = (
+    "ATTEMPT_ACCOUNTING_V2: ONE attempt is consumed each time the boundary is asked to value a position, whatever "
+    "the answer. A stale quote, a missing bid, a malformed quote and a provider failure all consume an attempt "
+    "exactly as a successful valuation does, because each is a valuation attempt that was actually made. What does "
+    "NOT consume an attempt is a scheduling decision not to ask: an arrival that is a duplicate of an observation "
+    "already attempted, or a timer retry skipped because no new observation exists. Those are recorded as "
+    "scheduling events with their own reason and are never counted as attempts, in either direction.")
+
