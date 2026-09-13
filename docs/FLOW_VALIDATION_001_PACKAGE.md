@@ -101,7 +101,10 @@ sealed and are not touched by this package.
 - **Cadence.** Chain and bars about every 60s, NBBO about every 15s. At the pilot's 15-minute scan cadence this
   yields **12 scan instants**, which is the entire opportunity set.
 - **Option quotes** exist only as full-chain snapshots at those 166 instants. There is no continuous option quote
-  stream, so an exit is valued at the nearest recorded snapshot, not at an arbitrary instant.
+  stream, so an exit is valued at the **most recent snapshot whose recorded availability is at or before the exit
+  instant**. **CORRECTED 2026-09-12:** an earlier draft said "the nearest recorded snapshot", which would permit a
+  future one and is lookahead. The implementation never does that, and `docs/FLOW_VALIDATION_001_AUDIT.md` §2 proves
+  it three ways. If no snapshot is available inside the exit window, the position stays explicitly unresolved.
 - **Availability is recorded** per row (`receipt_epoch`), which is what makes an honest as-of replay possible.
 - **The prior-bar file was obtained OUTSIDE authorization** (`SCOPE_DEVIATION_001.md`), and `FULL_FUNNEL_V1`'s
   variance fit requires it. This is prerequisite P3.
@@ -188,7 +191,7 @@ a negative result is the expected result and says nothing about the system.
 | **P2** | **Authorization to consume the burned collection for this evaluation.** The data is already burned, so no new exposure is created, but the register records uses and this one is not yet listed. | operator |
 | **P3** | **A ruling on the prior-bar file.** It was obtained outside authorization (`SCOPE_DEVIATION_001.md`) and `FULL_FUNNEL_V1` cannot fit its variance model without it. Either authorize its use for this evaluation, or run with `WAIT` and `PILOT_RULE_V2` only and record the funnel as unavailable. **Do not run the funnel on it without a ruling.** | operator |
 | **P4** | **A durable copy of the four input files.** They currently live only in a session scratchpad that may be cleaned. Copy to a declared path and record digests before running. | either |
-| **P5** | **The repaired driver has never executed.** `scripts/loop_demonstration.py` was repaired on all four defects and deliberately not run. Its library parts are covered by 50 tests, but the driver end to end is not. Treat the first execution as part of the flow test. | noted |
+| **P5** | **RETIRED by the audit.** The driver has now executed end to end on synthetic inputs, and doing so found a crash that would have hit the recorded run at its first exit. See `docs/FLOW_VALIDATION_001_AUDIT.md`. | — |
 | **P6** | **First use of the `RECORDED_REPLAY` route on recorded data.** Its behaviour is proven synthetically only. | noted |
 
 ## 7. The exact proposed command
@@ -209,4 +212,9 @@ per policy, `loop_demonstration.json`, and one terminal marker. It refuses if th
 If P3 is declined, the same command runs with the funnel excluded and the exclusion recorded, which requires a
 one-line change to the policy tuple in the driver and is not made here.
 
-**Nothing in this package has been executed. Stopping for review.**
+**Nothing recorded has been executed.**
+
+**AUDITED 2026-09-12.** `docs/FLOW_VALIDATION_001_AUDIT.md` is the pre-execution audit of this package. It corrected
+two of my classifications, corrected the quote-selection wording above, closed a real hole in the replay route's
+input binding, and found a crash in the driver. The command in §7 is superseded by the two-step command at the end
+of the audit, which preserves the inputs first and passes their manifest.

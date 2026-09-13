@@ -24,6 +24,9 @@ separately, and it is availability that gates visibility -- an observation that 
 consumer until 13:46 is invisible at 13:45:30, which is the only honest way to replay a decision."""
 from __future__ import annotations
 
+import hashlib
+from pathlib import Path
+
 from . import boundary as B
 from . import instant as I
 from . import records as R
@@ -61,9 +64,48 @@ class ReplayAuthorization:
         self.input_digests = dict(input_digests)
         self.window = (str(recorded_window_utc[0]), str(recorded_window_utc[1]))
         self.operator_note = operator_note
+        self.verified_inputs: dict | None = None      # set only by verify_inputs(), and required before a run
+
+    @property
+    def digest(self) -> str:
+        """One identity for this authorization, so a run can be bound to it without restating it."""
+        return R.canonical_hash({"reason": self.reason, "input_digests": self.input_digests,
+                                 "recorded_window_utc": list(self.window)})
+
+    def verify_inputs(self, paths: dict) -> dict:
+        """BIND THE AUTHORIZATION TO THE BYTES. Recompute each named input's digest from the file that will actually
+        be read and refuse any mismatch, any missing label and any unnamed extra.
+
+        Without this the authorization records what someone SAID the inputs were. Declaring a digest is a claim;
+        recomputing it is evidence, and only evidence may gate a run."""
+        missing = sorted(set(self.input_digests) - set(paths))
+        extra = sorted(set(paths) - set(self.input_digests))
+        if missing or extra:
+            raise ReplayRefused("REPLAY_INPUT_SET_MISMATCH: declared but not supplied %r; supplied but not declared %r"
+                                % (missing, extra))
+        out = {}
+        for label in sorted(paths):
+            p = Path(paths[label])
+            if not p.is_file():
+                raise ReplayRefused("REPLAY_INPUT_MISSING: %s -> %s" % (label, p))
+            h = hashlib.sha256()
+            with p.open("rb") as fh:
+                for chunk in iter(lambda: fh.read(1 << 20), b""):
+                    h.update(chunk)
+            actual = h.hexdigest()
+            if actual != self.input_digests[label]:
+                raise ReplayRefused("REPLAY_INPUT_DIGEST_MISMATCH: %s declared %s, on disk %s (%s). The recorded "
+                                    "inputs are not the ones this authorization names."
+                                    % (label, self.input_digests[label][:16], actual[:16], p))
+            out[label] = {"path": str(p), "sha256": actual, "bytes": p.stat().st_size}
+        self.verified_inputs = out
+        return out
 
     def describe(self) -> dict:
         return {"route": REPLAY_PROVENANCE, "policy": REPLAY_ROUTE_POLICY, "reason": self.reason,
+                "authorization_digest": self.digest,
+                "inputs_verified": (self.verified_inputs if self.verified_inputs is not None
+                                    else "NOT_VERIFIED: verify_inputs() was never called against the files on disk"),
                 "input_digests": self.input_digests, "recorded_window_utc": list(self.window),
                 "operator_note": self.operator_note,
                 "excluded_from": ["live authorization", "promotion", "prospective-results aggregation"],
@@ -71,10 +113,14 @@ class ReplayAuthorization:
 
 
 def replay_boundary(ledger, *, clock, risk_authority, session_id: str, release: str, authorization: ReplayAuthorization,
-                    fee_schedule=UNVERIFIED_FEES, **kw) -> B.Boundary:
+                    fee_schedule=UNVERIFIED_FEES, require_verified_inputs: bool = True, **kw) -> B.Boundary:
     """Build the ONE boundary the recorded route may use. Every other constructor path stays prospective."""
     if not isinstance(authorization, ReplayAuthorization):
         raise ReplayRefused("REPLAY_AUTHORIZATION_REQUIRED: the recorded route is selected explicitly, never inferred")
+    if require_verified_inputs and authorization.verified_inputs is None:
+        raise ReplayRefused("REPLAY_INPUTS_NOT_VERIFIED: call authorization.verify_inputs({label: path}) first. A "
+                            "declared digest is a claim; a recomputed one is evidence, and the run is gated on "
+                            "evidence.")
     bd = B.Boundary(ledger, clock=clock, provenance=REPLAY_PROVENANCE, risk_authority=risk_authority,
                     session_id=session_id, release=release, fee_schedule=fee_schedule, **kw)
     bd.replay_authorization = authorization

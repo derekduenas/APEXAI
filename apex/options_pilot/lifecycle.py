@@ -209,6 +209,14 @@ class LifecycleRunner:
         if getattr(boundary.clock, "_now", None) != clock.now:      # bound methods compare equal on (func, instance)
             raise LifecycleRefused("CLOCK_NOT_SHARED: the boundary must read the lifecycle clock, or two clocks would "
                                    "disagree about now")
+        # REFUSE AT CONSTRUCTION, not at the first exit. A caller that omits a source the loop needs must find out
+        # immediately, not hours into a run when an obligation first falls due.
+        missing = [k for k in ("forecast_fn", "signal_fn", "chain_fn", "spot_fn", "quote_fn", "exit_quote_fn")
+                   if sources.get(k) is None]
+        if missing:
+            raise LifecycleRefused("SOURCES_INCOMPLETE: the loop needs %s; exit_quote_fn in particular is only used "
+                                   "when an obligation falls due, so its absence would surface as a crash mid-run"
+                                   % ", ".join(missing))
         self.bd = boundary
         self.src = dict(sources)
         self.clock = clock

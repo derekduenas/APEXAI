@@ -567,9 +567,11 @@ class TestHonestEvidenceClasses:
 
     def test_a_replay_boundary_writes_replay_labels_and_cannot_claim_prospective_evidence(self, tmp_path):
         h = SyntheticHarness(tmp_path / "syn.jsonl", t0=T)
+        # require_verified_inputs=False: this test exercises the LABELS, not the input binding, which has its own
+        # tests in tests/test_flow_validation_readiness.py. Naming the waiver keeps the two controls distinct.
         bd = RP.replay_boundary(tmp_path / "replay.jsonl", clock=h.clock, risk_authority=h.risk,
                                 session_id="RPL", release="r", authorization=self._auth(),
-                                fee_schedule=h.fee_schedule)
+                                fee_schedule=h.fee_schedule, require_verified_inputs=False)
         assert bd.replay and bd.labels["evidence_class"] == R.REPLAY_EVIDENCE_CLASS
         assert bd.labels["prospective_results_eligible"] is False
         assert bd.labels["live_promotion_eligible"] is False
@@ -598,7 +600,8 @@ class TestHonestEvidenceClasses:
         S.open_session(h.bd, symbols=["SPY"])
         with pytest.raises(R.RecordRefused, match="EVIDENCE_ROUTE_MIXED"):
             RP.replay_boundary(tmp_path / "led.jsonl", clock=h.clock, risk_authority=h.risk, session_id="RPL",
-                               release="r", authorization=self._auth(), fee_schedule=h.fee_schedule)
+                               release="r", authorization=self._auth(), fee_schedule=h.fee_schedule,
+                               require_verified_inputs=False)
 
     def test_the_prospective_route_is_not_weakened(self):
         """assert_prospective still refuses every replay marker, and a record claiming neither class is refused."""

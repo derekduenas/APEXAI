@@ -1,6 +1,6 @@
 """COMPLETE LOOP DEMONSTRATION under docs/LOOP_EVALUATION_CONTRACT.md (frozen before the 2026-09-12 run).
 
-    python scripts/loop_demonstration.py <collection_dir> <prior_bars.json> <out_base_dir> [run_id]
+    python scripts/loop_demonstration.py <collection_dir> <prior_bars.json> <out_base_dir> [run_id] [manifest.json]
 
 REPAIRED BY OPERATING-LOOP-001, AND NOT RE-RUN. Three defects of the 2026-09-12 driver are removed here; no
 recorded evaluation was executed in the repairing brick (its scope is synthetic inputs only), so this file is
@@ -45,6 +45,7 @@ from apex.pulse_options import sources as SRC  # noqa: E402
 
 D, PRIOR, BASE = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
 RUN_ID = sys.argv[4] if len(sys.argv) > 4 else "loop_demonstration"
+MANIFEST = Path(sys.argv[5]) if len(sys.argv) > 5 else None
 HOLD_S = 900.0
 CADENCE = 15                                    # every 15th one-minute snapshot = the pilot's 15-minute cadence
 
@@ -168,9 +169,15 @@ def run_policy(policy: str, rd) -> dict:
                             session_id="LOOP-%s" % policy, release="LOOP_DEMO_NOT_A_RELEASE", fee_schedule=FEES,
                             authorization=AUTHORIZATION)
     bd.runtime_identity = runtime_identity()
-    src = twin.sources(); src.pop("exit_quote_fn", None)
-    out = {"policy": policy, "ledger": str(led), "scans": [], "model_identity": model_identity(twin, policy, engine),
-           "route": "RECORDED_REPLAY", "labels": bd.labels}
+    # The LifecycleRunner needs exit_quote_fn to service exits; it never forwards it to S.scan, which names the
+    # scan sources explicitly. The old driver popped it here because it called S.scan(**src) directly. Popping it
+    # under the scheduler crashed the FIRST exit with KeyError: 'exit_quote_fn' -- found by the synthetic exercise
+    # in tests/test_flow_validation_readiness.py, which is why that exercise exists.
+    src = twin.sources()
+    out = {"policy": policy, "ledger": str(led), "scans": [], "route": "RECORDED_REPLAY", "labels": bd.labels,
+           # model_identity is filled in AFTER the run. Computed here it would report the engine's fit state before
+           # anything was fitted, and would contradict the per-scan pilot_funnel records -- which stay authoritative.
+           "model_identity_at_start": model_identity(twin, policy, engine)}
     if policy == "WAIT":
         # the null policy never reaches the boundary; it is recorded here as the floor every other policy must clear
         S.open_session(bd, symbols=["SPY"])
@@ -209,6 +216,7 @@ def run_policy(policy: str, rd) -> dict:
                                  "prime": ((tr.get("prime") or {}).get("decision")),
                                  "fees_assumption": (tr.get("fees") or {}).get("assumption")}
             out["scans"].append(row)
+    out["model_identity"] = model_identity(twin, policy, engine)     # after the run: what was ACTUALLY used
     book = bd.book()
     closed = book.closed
     rows_all = L.read_all(led)
@@ -239,19 +247,36 @@ def run_policy(policy: str, rd) -> dict:
     return out
 
 
+INPUT_PATHS = {"chain": D / "chain_SPY.jsonl", "nbbo": D / "nbbo_SPY.jsonl",
+               "bars": D / "bars_SPY.jsonl", "prior_bars": PRIOR}
+
+# WHERE THE DECLARED DIGESTS COME FROM decides whether verification means anything. With an INDEPENDENT manifest
+# the run proves the files are the ones the manifest names. Without one it can only prove the files did not change
+# between two reads in the same process, which is nearly nothing -- and it says so rather than implying more.
+if MANIFEST is not None:
+    _m = json.loads(MANIFEST.read_text())
+    _declared = {k: (v["sha256"] if isinstance(v, dict) else v) for k, v in (_m.get("inputs") or _m).items()}
+    DECLARATION_SOURCE = "INDEPENDENT_MANIFEST: %s" % MANIFEST
+else:
+    _declared = {k: RD.digest_file(p)["sha256"] for k, p in INPUT_PATHS.items()}
+    DECLARATION_SOURCE = ("SELF_DECLARED_FROM_THE_FILES_READ: no independent manifest was supplied, so verification "
+                          "proves only that the bytes did not change between two reads in this process")
+
 AUTHORIZATION = RP.ReplayAuthorization(
     reason="LOOP_EVALUATION_CONTRACT.md demonstration over the burned 2026-09-11 SPY session",
-    input_digests={k: RD.digest_file(p)["sha256"] for k, p in
-                   (("chain", D / "chain_SPY.jsonl"), ("nbbo", D / "nbbo_SPY.jsonl"),
-                    ("bars", D / "bars_SPY.jsonl"), ("prior_bars", PRIOR))},
+    input_digests=_declared,
     recorded_window_utc=(to_utc_string(chains[0][0]), to_utc_string(chains[-1][0])),
     operator_note="burned collection; SCOPE_DEVIATION_001.md covers the retained prior-bar file")
+# BIND: recompute every declared digest from the file that will actually be read. A mismatch refuses the run.
+AUTHORIZATION.verify_inputs(INPUT_PATHS)
 
 RUN = RD.new_run(BASE, run_id=RUN_ID, now_epoch=chains[0][0],
                  inputs={"chain": D / "chain_SPY.jsonl", "nbbo": D / "nbbo_SPY.jsonl", "bars": D / "bars_SPY.jsonl",
                          "prior_bars": PRIOR},
                  config={"policies": ["WAIT", "PILOT_RULE_V2", "FULL_FUNNEL_V1"], "cadence_snapshots": CADENCE,
-                         "hold_s": HOLD_S, "route": "RECORDED_REPLAY", "limits": "UNCHANGED"},
+                         "hold_s": HOLD_S, "route": "RECORDED_REPLAY", "limits": "UNCHANGED",
+                         "declaration_source": DECLARATION_SOURCE,
+                         "authorization_digest": AUTHORIZATION.digest},
                  note="loop demonstration; recorded-replay route; no provider request")
 
 results = {"kind": "LOOP_DEMONSTRATION", "contract": "docs/LOOP_EVALUATION_CONTRACT.md", "run_id": RUN_ID,
@@ -260,7 +285,9 @@ results = {"kind": "LOOP_DEMONSTRATION", "contract": "docs/LOOP_EVALUATION_CONTR
            "evidence_route": "RECORDED_REPLAY: HISTORICAL_DEVELOPMENT_REPLAY / NONE_REPLAY; excluded from live "
                              "authorization, promotion and prospective-results aggregation",
            "quarantined": "REPLAY; ledgers never merged", "scan_instants": [to_utc_string(chains[i][0]) for i in SCANS],
-           "ordering_policy": LC.ORDERING_POLICY, "timestamp_rule": I.CONVERSION_RULE, "policies": {}}
+           "ordering_policy": LC.ORDERING_POLICY, "timestamp_rule": I.CONVERSION_RULE,
+           "replay_authorization": AUTHORIZATION.describe(), "declaration_source": DECLARATION_SOURCE,
+           "policies": {}}
 try:
     for pol in ("WAIT", "PILOT_RULE_V2", "FULL_FUNNEL_V1"):
         results["policies"][pol] = run_policy(pol, RUN)
