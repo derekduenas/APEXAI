@@ -33,6 +33,13 @@ was wrong.** Reading the tracebacks from the isolated run at `e8ebbee`:
 | 1 | macOS `/private/var/folders` tmp has no sticky world-writable ancestor, unlike Linux `/tmp` | `test_a_sticky_world_writable_ancestor_is_accepted` | environment (platform) |
 | **2** | **repository content, NOT environment** | see below | **repo** |
 
+> **SUPERSEDED by `docs/FLOW_VALIDATION_001_AUDIT.md` §4. The count below is wrong: it is THIRTEEN environment and
+> ONE repo-content.** `test_every_registered_offender_still_exists` hardcodes `REPO = Path("/opt/apex-repo")`, so it
+> reports the six registered files absent because that root does not exist on this host. All six exist in the
+> checkout and the register is not stale. The remaining repo-content failure, the `alpaca` name scan, is a stale
+> TEST: twelve market-data references, no broker SDK import, no placement function, and the mechanical placement
+> scan returns zero offenders. The paragraphs below are retained unedited so the claim and its correction both stand.
+
 **The two that are not environment failures:**
 
 - `test_architecture_claims.py::test_no_execution_or_broker_dependency_exists` fails on
