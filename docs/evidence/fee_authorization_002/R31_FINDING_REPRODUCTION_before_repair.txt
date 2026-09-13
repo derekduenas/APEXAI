@@ -1,0 +1,31 @@
+FEE-AUTHORIZATION-002-R3.1 — PUBLIC EXECUTION SURFACE, REPRODUCED BEFORE REPAIR
+base c8425c07c115bd6f42b05477a94231d2dc030185
+THREAT: an ordinary source edit to the WRAPPER. No arithmetic added, no monkeypatching.
+
+baseline                                   entry=0.04 exit=0.06 policy=b7433dbaf83a impl=7ee77da02d43
+
+1 force exit down the ENTRY branch         entry=0.04   exit=0.04   policy=b7433dbaf83a impl=7ee77da02d43  structural=REJECTS
+                                           (digest or tests caught it)
+2 swap the delegated entry/exit operation  entry=0.06   exit=0.06   policy=b7433dbaf83a impl=7ee77da02d43  structural=REJECTS
+                                           (digest or tests caught it)
+3 pass a different sale principal          entry=0.04   exit=0.05   policy=b7433dbaf83a impl=7ee77da02d43  structural=REJECTS
+                                           (digest or tests caught it)
+4 replace a returned component, no arithmetic entry=0.0    exit=0.0    policy=b7433dbaf83a impl=7ee77da02d43  structural=REJECTS
+                                           (digest or tests caught it)
+5 exit() calls the wrong public operation  entry=0.04   exit=0.04   policy=b7433dbaf83a impl=7ee77da02d43  structural=REJECTS
+                                           (digest or tests caught it)
+
+source restored, baseline reproduced: True
+
+==============================================================================
+THE DECISIVE CHECK — does an AUTHORIZATION still accept the mutated wrapper?
+(the R3 test suite failing is a VALUE assertion, not a closure; tests do not run in production)
+==============================================================================
+baseline, authorization computed from this source : {"status": "AUTHORIZED", "usable": true, "exit": 0.06}
+after mutation 1 (exit forced down entry branch) : {"status": "AUTHORIZED", "usable": true, "exit": 0.04}
+
+*** LEAK CONFIRMED: the authorization computed BEFORE the edit still reports AUTHORIZED and
+    usable=True while the exit fee is now 0.04 instead of 0.06. The digest binds the arithmetic
+    module; it does not bind the public path that decides what the arithmetic is asked to do. ***
+
+source restored: True

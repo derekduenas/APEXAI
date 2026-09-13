@@ -23,13 +23,20 @@ from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP, Decimal
 
 from dataclasses import dataclass, field
 
+from .fee_computation import (FEE_COMPONENTS, FEE_PRODUCING_METHODS, PER_CONTRACT_POLICY_V1,
+                              SALE_PRINCIPAL_POLICY_V1, SEC_BASES, TERM_FIELDS, FeeComputationPolicy,
+                              FeeComputationRefused, FeeRuntime, compute_side, module_digest, policy_for_terms,
+                              validate_terms_and_policy)
 from .clock import is_real
 from .records import canonical_hash
 
 FEE_PROVENANCE = ("SYNTHETIC_FIXTURE", "PROVIDER_VERIFIED", "UNVERIFIED")
 
 
-class FeePolicyRefused(ValueError):
+class FeePolicyRefused(FeeComputationRefused):
+    # Inherits the computation refusal so ONE handler catches both a schedule-level and a runtime-level refusal.
+    # The runtime module raises FeeComputationRefused directly (it cannot import this module), and a caller that
+    # wants either must be able to say so in one except clause.
     pass
 
 
@@ -43,14 +50,6 @@ class FeePolicyRefused(ValueError):
 # Every executable step that can change a fee now lives in apex/options_pilot/fee_computation.py, and the digest
 # is taken over that module's ENTIRE canonical AST. A new helper is inside the digest by construction. The
 # authorization lives HERE and never there, so digesting the computation cannot be circular.
-from .fee_computation import (FEE_COMPONENTS, PER_CONTRACT_POLICY_V1, SALE_PRINCIPAL_POLICY_V1, SEC_BASES,
-                              FeeComputationPolicy, FeeComputationRefused, compute_side, module_digest,
-                              policy_for_terms)
-
-TERM_FIELDS = ("commission_per_contract", "exchange_fee_per_contract", "regulatory_fee_per_contract_buy",
-               "regulatory_fee_per_contract_sell", "sale_principal_rate_per_million",
-               "sell_per_contract_components", "cat_per_contract", "taf_per_contract_sell")
-
 
 class FeeAuthorizationRefused(FeePolicyRefused):
     """A cost model no person has authorized. Named, never silent, and never a number."""
@@ -128,7 +127,15 @@ class FeeAuthorization:
 
 
 @dataclass(frozen=True)
-class FeeSchedule:
+class FeeSchedule(FeeRuntime):
+    """DATA, IDENTITY AND AUTHORIZATION ONLY.
+
+    Every callable that can produce or shape a fee -- policy selection, term validation, the gate, `_side`,
+    `entry`, `exit` -- lives in `FeeRuntime` inside apex/options_pilot/fee_computation.py, which is digested as a
+    whole module. R3 digested the arithmetic and left this wrapper outside it: an ordinary edit forcing the exit
+    down the entry branch moved the charge 0.06 -> 0.04 while both digests were unchanged AND an authorization
+    computed before the edit still reported AUTHORIZED. A structural test now asserts that no fee-producing member
+    of this class resolves to any module other than the digested one."""
     schedule_id: str
     version: str
     provenance: str                       # SYNTHETIC_FIXTURE | PROVIDER_VERIFIED | UNVERIFIED
@@ -159,25 +166,12 @@ class FeeSchedule:
                 v = getattr(self, k)
                 if not is_real(v) or v < 0:
                     raise FeePolicyRefused("FEE_COMPONENT_INVALID: %s=%r" % (k, v))
-            # THE DECLARED BASIS AND THE CARRIED TERMS MUST AGREE. Without this, a policy could attest one
-            # computation in the digest while the schedule's terms supported only the other.
-            basis = self.policy.sec_basis
-            if basis == "SALE_PRINCIPAL_RATE_PER_MILLION":
-                r = self.sale_principal_rate_per_million
-                if not is_real(r) or r < 0:
-                    raise FeePolicyRefused(
-                        "SEC_BASIS_INCONSISTENT: policy declares SALE_PRINCIPAL_RATE_PER_MILLION but "
-                        "sale_principal_rate_per_million=%r is not a finite non-negative rate" % (r,))
-                if self.cat_per_contract is None or self.taf_per_contract_sell is None:
-                    raise FeePolicyRefused(
-                        "SEC_BASIS_INCONSISTENT: a sale-principal schedule must DECLARE its per-contract sell "
-                        "components; cat_per_contract=%r taf_per_contract_sell=%r"
-                        % (self.cat_per_contract, self.taf_per_contract_sell))
-            elif basis == "PER_CONTRACT_CONSTANT" and self.sale_principal_rate_per_million is not None:
-                raise FeePolicyRefused(
-                    "SEC_BASIS_INCONSISTENT: policy declares PER_CONTRACT_CONSTANT but the schedule carries "
-                    "sale_principal_rate_per_million=%r; one of the two is wrong and the code must not choose"
-                    % (self.sale_principal_rate_per_million,))
+            # THE DECLARED BASIS AND THE CARRIED TERMS MUST AGREE -- validated inside the digested runtime, so
+            # the rule that decides which arithmetic is legal is itself covered by the implementation digest.
+            try:
+                validate_terms_and_policy(self.terms(), self.policy)
+            except FeeComputationRefused as e:
+                raise FeePolicyRefused(str(e))
 
     @property
     def known(self) -> bool:
@@ -208,14 +202,6 @@ class FeeSchedule:
                                "taf_per_contract_sell": self.taf_per_contract_sell})
 
     @property
-    def policy(self) -> "FeeComputationPolicy":
-        """The computation policy in force. A schedule that declares none falls back to the form implied by its
-        own terms, so existing schedules keep working and nothing is silently defaulted to the wrong arithmetic."""
-        if self.computation_policy is not None:
-            return self.computation_policy
-        return policy_for_terms(self.terms())
-
-    @property
     def computation_digest(self) -> str:
         """A digest over the policy the arithmetic EXECUTES FROM -- not a hand-written description of it.
 
@@ -223,10 +209,6 @@ class FeeSchedule:
         rounding changed. Paired with `implementation_digest`, which binds the code itself, a change to the rules
         OR to the code that applies them invalidates an authorization."""
         return self.policy.digest
-
-    def terms(self) -> dict:
-        """The rate fields, as a plain mapping. The computation module takes these and knows nothing else."""
-        return {k: getattr(self, k) for k in TERM_FIELDS}
 
     @property
     def implementation_digest(self) -> str:
@@ -344,42 +326,6 @@ class FeeSchedule:
     # is computed from the ACTUAL principal, under its own declared rounding rule, before totalling. The per-contract
     # constant it replaces was declared, bounded at $0.01 and conservative, but an approximation is not an exactness.
     PRINCIPAL_COMPONENTS = ("sec_regulatory_fee",)
-
-    def _side(self, contracts: int, side: str, *, sale_principal: float | None = None) -> dict:
-        """GATING AND IDENTITY ONLY. **This method performs no arithmetic.**
-
-        Every number comes from `apex/options_pilot/fee_computation.compute_side`, whose entire module is covered
-        by `implementation_digest`. Keeping the arithmetic out of here is what makes the digest a closure rather
-        than an allowlist -- a structural test asserts this method contains no Decimal use and no arithmetic
-        operator, so numeric logic cannot creep back into the undigested side."""
-        _auth = self.authorization_state()
-        if self.known and _auth["status"] != AUTHORIZED:
-            # SOURCE VERIFIED IS NOT AUTHORIZED. A cost nobody cleared is not a cost we may charge.
-            return {"total": None, "status": "NOT_AUTHORIZED", "why": _auth["why"],
-                    "authorization_status": _auth["status"], "schedule_id": self.schedule_id,
-                    "schedule_hash": self.schedule_hash, "fee_identity": self.identity(), "side": side}
-        if not self.known:
-            return {"total": None, "status": "UNKNOWN",
-                    "why": "fee schedule %s is UNVERIFIED; an unknown cost is not zero" % self.schedule_id,
-                    "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "side": side,
-                    "fee_identity": self.identity()}
-        try:
-            out = compute_side(terms=self.terms(), policy=self.policy, contracts=contracts, side=side,
-                               sale_principal=sale_principal)
-        except FeeComputationRefused as e:
-            raise FeePolicyRefused(str(e))
-        out["schedule_id"] = self.schedule_id
-        out["schedule_hash"] = self.schedule_hash
-        out["fee_identity"] = self.identity()
-        return out
-
-    def entry(self, contracts: int) -> dict:
-        return self._side(contracts, "BUY")
-
-    def exit(self, contracts: int, *, sale_principal: float | None = None) -> dict:
-        """`sale_principal` = exit premium x multiplier x contracts. Required when the schedule prices a component
-        on sale principal; an unknown principal returns NOT_ESTIMABLE, never a default."""
-        return self._side(contracts, "SELL", sale_principal=sale_principal)
 
 
 SYNTHETIC_FEES = FeeSchedule(

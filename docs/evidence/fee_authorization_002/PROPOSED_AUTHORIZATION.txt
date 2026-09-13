@@ -1,4 +1,4 @@
-FEE-AUTHORIZATION-002-R3 — PROPOSED AUTHORIZATION PAYLOAD (NOT AUTHORED, NOT INSTALLED)
+FEE-AUTHORIZATION-002-R3.1 — PROPOSED AUTHORIZATION PAYLOAD (NOT AUTHORED, NOT INSTALLED)
 
   schedule_id               : ROBINHOOD_RHF_2026
   version                   : 2026-09-12b
@@ -6,15 +6,28 @@ FEE-AUTHORIZATION-002-R3 — PROPOSED AUTHORIZATION PAYLOAD (NOT AUTHORED, NOT I
   source_document_sha256    : 7f9c86bf297d078ce27505cbc53eecc068cf975fbfca5aada37b9af865d7e14a
   terms_digest              : 8cf58b1a6201dd33bc6fa03535c8c5481cbea6886304f41c0f259686bb45daeb
   computation_policy_digest : b7433dbaf83a7914eadcf0c1a1d9dcf36105692fd7050f02df7bc1fcc6650e21
-  implementation_digest     : 7ee77da02d43183d789e66325052eb540b9cf60e6eefb102d282d991b3a66230
+  implementation_digest     : 5753b1dcc069e598a1855e31f95623661093e86cff2868728bedcdf5b07af9bc
 
-  implementation_digest CHANGED AGAIN IN R3 (as forecast): it is now sha256 over the canonical AST of
-  apex/options_pilot/fee_computation.py in full, not four selected functions. The R2 payload is stale.
+EXACT IMPLEMENTATION-DIGEST BOUNDARY
+  INSIDE  apex/options_pilot/fee_computation.py, in full, canonical AST (docstrings + line numbers stripped):
+            FeeComputationPolicy (fields, validation, mode)   the rounding mapping, written not looked up
+            SALE_PRINCIPAL_POLICY_V1 / PER_CONTRACT_POLICY_V1 / policy_for_terms
+            validate_terms_and_policy                          which terms a basis may carry
+            compute_side                                       ALL arithmetic
+            FeeRuntime.terms / .policy / ._side / .entry / .exit   the COMPLETE public surface + the gate
+            every constant those reach
+  OUTSIDE the digest, and deliberately so:
+            FeeSchedule's data fields, identity(), authorization_state(), FeeAuthorization
+            -> the authorization binds the computation; the computation never contains the authorization,
+               so the digest is not circular
+  PROVEN BY  fee_surface_problems(FeeSchedule) == []  -- every fee-producing member resolves to the digested
+             module -- plus a closed free-name analysis (stdlib decimal/math only) and a NEGATIVE test that a
+             fee path added outside the module fails the build.
 
-  source document : RHF Standard Pricing Fee Schedule (PDF), https://cdn.robinhood.com/assets/robinhood/legal/RHF%20Fee%20Schedule.pdf
-  policy in force : {"sec_basis": "SALE_PRINCIPAL_RATE_PER_MILLION", "sec_rounding": "UP", "cat_rounding": "NEAREST", "cat_sub_cent_to_zero": true, "taf_rounding": "NEAREST", "commission_rounding": "NEAREST", "exchange_rounding": "NEAREST", "regulatory_sum": "EACH_COMPONENT_ROUNDED_UNDER_ITS_OWN_RULE_BEFORE_THE_SUM", "arithmetic": "DECIMAL_CENTS", "component_order": ["commission", "exchange", "regulatory"]}
+  worked example (1 contract, $540 principal): entry 0.04  exit 0.06   [unchanged R1 -> R3.1]
 
-  worked example (1 contract, $540 principal): entry 0.04  exit 0.06   [unchanged across R1, R2, R3]
+  implementation_digest CHANGED AGAIN in R3.1 -- the public surface moved inside the boundary.
+  Every earlier payload is stale and will refuse.
 
 ==============================================================================
 PROPOSED PAYLOAD
@@ -25,7 +38,7 @@ PROPOSED PAYLOAD
  "source_document_sha256": "7f9c86bf297d078ce27505cbc53eecc068cf975fbfca5aada37b9af865d7e14a",
  "terms_digest": "8cf58b1a6201dd33bc6fa03535c8c5481cbea6886304f41c0f259686bb45daeb",
  "computation_policy_digest": "b7433dbaf83a7914eadcf0c1a1d9dcf36105692fd7050f02df7bc1fcc6650e21",
- "implementation_digest": "7ee77da02d43183d789e66325052eb540b9cf60e6eefb102d282d991b3a66230",
+ "implementation_digest": "5753b1dcc069e598a1855e31f95623661093e86cff2868728bedcdf5b07af9bc",
  "effective_date": "2026-04-04",
  "status": "AUTHORIZED",
  "authorized_by": "<OPERATOR - NOT FILLED BY CLAUDE>",
@@ -34,13 +47,14 @@ PROPOSED PAYLOAD
 }
 
 BEFORE AUTHORIZING
-  implementation_digest now binds the ENTIRE fee_computation module. Any edit to it -- arithmetic, a helper, a
-  constant, a branch -- invalidates the authorization and refuses every trade until re-authorized. Comments,
-  docstrings and formatting do not. Authorize AFTER the release code is frozen.
+  Any edit to fee_computation.py -- arithmetic, gate, adapter, helper, constant, branch -- invalidates this
+  authorization and refuses every trade until re-authorized. Comments, docstrings and formatting do not.
+  Authorize AFTER the release code is frozen.
 
 HONEST THREAT BOUNDARY
   Binds COMMITTED SOURCE and DECLARED POLICY for a PAPER boundary. NOT proof against a malicious interpreter, a
-  patched stdlib, or arbitrary in-process mutation. Procedural authorship is UNAUTHENTICATED. Real-money use
-  requires an external signed authorization and a release attestation.
+  patched stdlib, or arbitrary in-process mutation -- anything that can rewrite memory can rewrite the digest.
+  Procedural authorship is UNAUTHENTICATED: authorized_by is recorded, never verified. Real-money use requires an
+  external signed authorization and a release attestation.
 
 NOT AUTHORED, NOT INSTALLED: ROBINHOOD_RHF_2026.authorization is None.

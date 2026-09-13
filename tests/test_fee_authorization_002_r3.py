@@ -252,9 +252,11 @@ class TestTheComputationModuleIsClosed:
                                      "the module or to EXTERNAL_DEPENDENCIES deliberately" % sorted(unresolved))
 
     def test_the_module_contains_no_authorization_data(self):
-        """No circular digest: the authorization binds the computation and the computation never contains it."""
+        """SUPERSEDED BY R3.1 and made precise. The runtime now CALLS the gate and REPORTS its verdict, so the
+        strings `authorization_status` and `identity()` legitimately appear. What must never appear is an
+        authorization PAYLOAD -- that is what would make the digest circular."""
         src = FC_PY.read_text()
-        for forbidden in ("FeeAuthorization", "authorized_by", "authorization_status", "identity()"):
+        for forbidden in ("class FeeAuthorization", "authorized_by", "authorized_utc", "source_document_sha256"):
             assert forbidden not in src, forbidden
 
     def test_the_gate_performs_no_arithmetic(self):
@@ -268,7 +270,7 @@ class TestTheComputationModuleIsClosed:
     def test_a_non_canonical_policy_or_schedule_class_is_unverifiable_or_refused(self):
         class P(FC.FeeComputationPolicy):
             pass
-        with pytest.raises(FeePolicyRefused, match="POLICY_NOT_CANONICAL"):
+        with pytest.raises(FC.FeeComputationRefused, match="POLICY_NOT_CANONICAL"):
             synth(computation_policy=P(**FC.SALE_PRINCIPAL_POLICY_V1.__dict__)).exit(1, sale_principal=540.0)
 
         class Sub(FeeSchedule):

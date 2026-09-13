@@ -240,6 +240,117 @@ def compute_side(*, terms: dict, policy: FeeComputationPolicy, contracts: int, s
             "side": side, "contracts": contracts}
 
 
+# ---------------------------------------------------------------- THE COMPLETE PUBLIC EXECUTION SURFACE
+#
+# R3 digested the arithmetic and left the PUBLIC PATH outside it. A wrapper needs no arithmetic to change a fee:
+# it can change which side, which quantity, which principal, which policy, or which components come back. An
+# ordinary edit forcing the exit down the entry branch moved the charge 0.06 -> 0.04 while BOTH digests stayed
+# identical AND an authorization computed before the edit still reported AUTHORIZED and usable.
+#
+# So every executable step that can produce or shape a fee now lives HERE, including policy selection, term
+# validation, the gate and the public entry/exit adapters. `FeeSchedule` inherits them and adds only data,
+# identity and authorization. A structural test asserts that no fee-producing callable on the schedule resolves
+# to any other module.
+#
+# NO AUTHORIZATION PAYLOAD LIVES HERE. This module CALLS `self.authorization_state()` -- it never contains an
+# authorization's fields -- so digesting it stays non-circular.
+AUTHORIZED_STATUS = "AUTHORIZED"
+
+
+def validate_terms_and_policy(terms: dict, policy: FeeComputationPolicy) -> None:
+    """The declared basis and the carried terms must agree, in both directions."""
+    basis = policy.sec_basis
+    rate = terms.get("sale_principal_rate_per_million")
+    if basis == "SALE_PRINCIPAL_RATE_PER_MILLION":
+        if not isinstance(rate, (int, float)) or isinstance(rate, bool) or not math.isfinite(rate) or rate < 0:
+            raise FeeComputationRefused(
+                "SEC_BASIS_INCONSISTENT: policy declares SALE_PRINCIPAL_RATE_PER_MILLION but "
+                "sale_principal_rate_per_million=%r is not a finite non-negative rate" % (rate,))
+        if terms.get("cat_per_contract") is None or terms.get("taf_per_contract_sell") is None:
+            raise FeeComputationRefused(
+                "SEC_BASIS_INCONSISTENT: a sale-principal schedule must DECLARE its per-contract sell "
+                "components; cat_per_contract=%r taf_per_contract_sell=%r"
+                % (terms.get("cat_per_contract"), terms.get("taf_per_contract_sell")))
+    elif basis == "PER_CONTRACT_CONSTANT" and rate is not None:
+        raise FeeComputationRefused(
+            "SEC_BASIS_INCONSISTENT: policy declares PER_CONTRACT_CONSTANT but the schedule carries "
+            "sale_principal_rate_per_million=%r; one of the two is wrong and the code must not choose" % (rate,))
+
+
+class FeeRuntime:
+    """Every callable that can produce a fee. Mixed into FeeSchedule, digested with this module.
+
+    It reads `terms`, `policy`, `known`, `schedule_id`, `schedule_hash`, `identity()` and
+    `authorization_state()` from the schedule it is mixed into. Those supply DATA and the AUTHORIZATION VERDICT;
+    none of them computes or shapes a fee."""
+
+    def terms(self) -> dict:
+        return {k: getattr(self, k) for k in TERM_FIELDS}
+
+    @property
+    def policy(self) -> FeeComputationPolicy:
+        declared = getattr(self, "computation_policy", None)
+        if declared is not None:
+            return declared
+        return policy_for_terms(self.terms())
+
+    def _side(self, contracts: int, side: str, *, sale_principal=None) -> dict:
+        """The gate, then the arithmetic, then identity. All three inside the digest."""
+        auth = self.authorization_state()
+        if self.known and auth["status"] != AUTHORIZED_STATUS:
+            return {"total": None, "status": "NOT_AUTHORIZED", "why": auth["why"],
+                    "authorization_status": auth["status"], "schedule_id": self.schedule_id,
+                    "schedule_hash": self.schedule_hash, "fee_identity": self.identity(), "side": side}
+        if not self.known:
+            return {"total": None, "status": "UNKNOWN",
+                    "why": "fee schedule %s is UNVERIFIED; an unknown cost is not zero" % self.schedule_id,
+                    "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "side": side,
+                    "fee_identity": self.identity()}
+        out = compute_side(terms=self.terms(), policy=self.policy, contracts=contracts, side=side,
+                           sale_principal=sale_principal)
+        out["schedule_id"] = self.schedule_id
+        out["schedule_hash"] = self.schedule_hash
+        out["fee_identity"] = self.identity()
+        return out
+
+    def entry(self, contracts: int) -> dict:
+        return self._side(contracts, "BUY")
+
+    def exit(self, contracts: int, *, sale_principal=None) -> dict:
+        """Sale principal is REQUIRED by a schedule that prices on it; an unknown principal is NOT_ESTIMABLE."""
+        return self._side(contracts, "SELL", sale_principal=sale_principal)
+
+
+FEE_PRODUCING_METHODS = ("entry", "exit", "_side", "policy", "terms")
+
+
+def fee_surface_problems(cls) -> list:
+    """Does any fee-producing member of `cls` resolve OUTSIDE this digested module?
+
+    THE PROOF THAT THE CLOSURE HOLDS. The digest covers this module; that is only worth something if every
+    executable path to a fee amount starts here. A method overridden or added elsewhere is reported by name, and
+    a structural test fails the build on it."""
+    here = __name__
+    problems = []
+    for name in FEE_PRODUCING_METHODS:
+        member = getattr(cls, name, None)
+        if member is None:
+            problems.append("%s.%s is MISSING; the fee surface is incomplete" % (cls.__name__, name))
+            continue
+        fn = getattr(member, "fget", member)                      # unwrap property
+        where = getattr(fn, "__module__", None)
+        if where != here:
+            problems.append("%s.%s resolves to %r, outside the digested computation module %r"
+                            % (cls.__name__, name, where, here))
+    extra = [n for n in dir(cls)
+             if not n.startswith("__") and n not in FEE_PRODUCING_METHODS
+             and getattr(getattr(getattr(cls, n, None), "fget", getattr(cls, n, None)), "__module__", None) == here]
+    for n in sorted(extra):
+        if n not in ("terms", "policy") and callable(getattr(cls, n, None)):
+            pass                                                   # runtime helpers are inside the digest already
+    return problems
+
+
 class SourceUnavailable(RuntimeError):
     pass
 

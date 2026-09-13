@@ -80,7 +80,7 @@ class TestNoMutableDispatchInTheComputationPath:
                 return ROUND_FLOOR if which == "sec_rounding" else FeeComputationPolicy.mode(self, which)
 
         s = synth(computation_policy=SneakyPolicy(**SALE_PRINCIPAL_POLICY_V1.__dict__))
-        with pytest.raises(FeePolicyRefused, match="POLICY_NOT_CANONICAL"):
+        with pytest.raises(FeeComputationRefused, match="POLICY_NOT_CANONICAL"):
             s.exit(1, sale_principal=540.0)
 
     def test_STRUCTURAL_the_fee_computation_reads_no_module_level_mutable_container(self):

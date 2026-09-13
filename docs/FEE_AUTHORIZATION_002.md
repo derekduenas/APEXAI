@@ -243,3 +243,56 @@ a release attestation.
 
 No authorization authored or installed. No merge, deployment, timer recreation, ledger, order, or lifting of the
 hold. **The full regression was not started.**
+
+---
+
+# R3.1 — the public execution surface, closed (2026-09-13)
+
+Base `c8425c0`. Reproduced before repair: `R31_FINDING_REPRODUCTION_before_repair.txt`, after:
+`R31_AFTER_REPAIR.txt`.
+
+## The finding
+
+R3 digested `fee_computation.py` and left the public path outside it. A wrapper needs no arithmetic to change a
+fee — it can change side, quantity, principal, policy or the returned components. All five mutations changed the
+charge with **both digests unchanged**, and the decisive check:
+
+```
+baseline                                      auth=AUTHORIZED usable=True exit=0.06
+after forcing the exit down the entry branch  auth=AUTHORIZED usable=True exit=0.04
+```
+
+An authorization computed **before** the edit still reported `AUTHORIZED`. My R3 suite did fail on those
+mutations, but only because it asserts fee **values** — a value assertion is not a closure, and tests do not run
+in production. The digest, which is what an authorization actually binds, did not move.
+
+## The repair
+
+`FeeRuntime` — `terms`, `policy`, `_side`, `entry`, `exit` — now lives **inside** `fee_computation.py`, together
+with `validate_terms_and_policy`. `FeeSchedule` inherits it and holds only data, identity and authorization.
+After repair every mutation yields `AUTHORIZATION_MISMATCH`.
+
+`fee_surface_problems(cls)` proves the closure: every fee-producing member must resolve to the digested module. A
+**negative** test adds a fee path outside it and asserts the build fails.
+
+`FeePolicyRefused` now inherits `FeeComputationRefused`, so one handler catches a schedule-level or runtime-level
+refusal (the runtime cannot import `fees`, so it raises the base directly).
+
+## Tests changed or superseded
+
+| test | change |
+|---|---|
+| `r2::test_a_policy_subclass_is_refused_outright` | expects `FeeComputationRefused` — the runtime raises it directly now |
+| `r3::test_a_non_canonical_policy_or_schedule_class…` | same |
+| `r3::test_the_module_contains_no_authorization_data` | made precise: the runtime legitimately *calls* the gate and reports `authorization_status`; what must never appear is an authorization **payload** |
+
+## Digest boundary
+
+**Inside:** all of `fee_computation.py` — policy, validation, arithmetic, gate, and the complete public surface.
+**Outside:** `FeeSchedule`'s data, `identity()`, `authorization_state()`, `FeeAuthorization` — so the digest is
+not circular.
+
+## Not done
+
+No authorization authored or installed. No merge, deployment, timer recreation, ledger, order, or lifting of the
+hold. **The full regression was not started.**
