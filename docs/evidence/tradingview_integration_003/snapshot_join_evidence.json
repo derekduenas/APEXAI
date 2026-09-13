@@ -1,0 +1,111 @@
+{
+ "kind": "SNAPSHOT_JOIN_EVIDENCE",
+ "as_of_epoch": 1789275700.0,
+ "snapshot_id": "snap:e1182eace1c3dc0876c78d6d62533ecd",
+ "state_hash": "e1182eace1c3dc0876c78d6d62533ecda651677f67a08567c6b83fbfee9032f8",
+ "ids_agree": true,
+ "context": {
+  "kind": "EXTERNAL_CONTEXT_V1",
+  "provider": "TRADINGVIEW_MCP",
+  "symbol": "SPY",
+  "as_of_epoch": 1789275700.0,
+  "snapshot_id": "snap:e1182eace1c3dc0876c78d6d62533ecd",
+  "wired": true,
+  "status": "AVAILABLE",
+  "why": null,
+  "authority": "EXTERNAL_CONTEXT_ONLY",
+  "calibrated": false,
+  "market_state_digest": "22ae8b9c2eb63d9a65859011e20504ffadb1f9dfd4016b2fc02f345feb583886",
+  "model_identities": {
+   "selection_policy": "PILOT_RULE_V2",
+   "forecast_model_id": "EXP002_L",
+   "model_hash": "4b176a1ef5536c618e81e6e530664ccbf29ba77281adcc03f2d4f5c3bb632988",
+   "params_hash": "ca04fc6e713e1a5c",
+   "artifact_digest": "0d001c7e9bb372455a9c3a8bca5bad6e103fbe1fbde51b012155df91a91b9d3f"
+  },
+  "premarket_packet_ref": "PREMARKET-PACKET-2026-09-13",
+  "external_inputs_used": [
+   {
+    "observation_key": "1d18165ded44de169097e703b47d42fe6ed5be4820ea78b60e0bfdbe56ae0ffa",
+    "tool": "get_technicals_rating",
+    "response_digest": "dfaf35b5f58cd203434d2ac00122fb12b813150f9a28f9e314928dd48a89660e",
+    "request_args_digest": "7f4b1888c67b79ef85a7b150f941306ca2b7fa9130a42ee7f08e049637805412",
+    "symbol": "AMEX:SPY",
+    "role": "DECISION_TIME_CONTEXT",
+    "known_from_utc": "2026-09-13T05:00:19.470324Z",
+    "known_from_epoch": 1789275619.470324,
+    "entitlement": "UNKNOWN",
+    "authority": "EXTERNAL_CONTEXT_ONLY",
+    "calibrated": false,
+    "feeds": [
+     "attention.trend_context"
+    ],
+    "attached_to": "snap:e1182eace1c3dc0876c78d6d62533ecd",
+    "disposition": "USED",
+    "age_s_at_decision": 80.529676
+   },
+   {
+    "observation_key": "dd6348b91ad225f3f8b3e39d4c04a47f6820c297798d4dde28edf7b781070eef",
+    "tool": "get_news",
+    "response_digest": "f4e4f2a8b689e4bc4290701498f84d4a984d769c454c39111401ac9b5034fdd3",
+    "request_args_digest": "6a88813dea1d0b7874dac4163dd82efc2491f4fdc4e1b6fa2ffd01ed19953b42",
+    "symbol": "AMEX:SPY",
+    "role": "DECISION_TIME_CONTEXT",
+    "known_from_utc": "2026-09-13T05:00:19.470324Z",
+    "known_from_epoch": 1789275619.470324,
+    "entitlement": "UNKNOWN",
+    "authority": "EXTERNAL_CONTEXT_ONLY",
+    "calibrated": false,
+    "feeds": [],
+    "attached_to": "snap:e1182eace1c3dc0876c78d6d62533ecd",
+    "disposition": "RETRIEVED_UNUSED",
+    "age_s_at_decision": 80.529676
+   },
+   {
+    "observation_key": "f02e1e035dab3e9efbaf6642236cbdf365fa802dbd4ca2ac547514952e8b3262",
+    "tool": "get_earnings_calendar",
+    "response_digest": "af1d5400bdc13447138c5283e59687c0daed5848b6c4f367d704bf9cbc01f2f1",
+    "request_args_digest": "70d56b0e8acecc3f8500d2ade7d804f229c2097adb903d5eb031d357108f8711",
+    "symbol": null,
+    "role": "PRIOR_CONTEXT",
+    "known_from_utc": "2026-09-13T05:00:33.819387Z",
+    "known_from_epoch": 1789275633.819387,
+    "entitlement": "UNKNOWN",
+    "authority": "OBSERVATION_ONLY",
+    "calibrated": false,
+    "feeds": [
+     "premarket.event_watch"
+    ],
+    "attached_to": "PREMARKET-PACKET-2026-09-13",
+    "note": "premarket observation: prior context that guided attention. It is not evidence about the decision instant, and the intraday snapshot decides whether the setup exists.",
+    "disposition": "USED",
+    "age_s_at_decision": 66.180613
+   },
+   {
+    "observation_key": "cb49dfbd950389145e4c7ba788bd8896c67ca941c7d06c541eed127cb2ea5133",
+    "tool": "get_ohlcv",
+    "response_digest": "4f46bd76a5beee1ddae10affdb05d408a957874fbe72d0a2b8a7a2f5f09821df",
+    "request_args_digest": "37e5d33b809013e11f13fb55826c06b9ad88fbee3cfe2df00a162c1d8764a757",
+    "symbol": "AMEX:SPY",
+    "role": "DECISION_TIME_CONTEXT",
+    "known_from_utc": "2026-09-13T05:06:40.000000Z",
+    "known_from_epoch": 1789276000.0,
+    "entitlement": "DELAYED_VERIFIED",
+    "authority": "OBSERVATION_ONLY",
+    "calibrated": false,
+    "feeds": [],
+    "disposition": "REFUSED_LATE_ARRIVING",
+    "attached_to": null,
+    "why": "LATE_ARRIVING_INFORMATION: this observation became knowable at 2026-09-13T05:06:40.000000Z and the decision instant is 2026-09-13T05:01:40.000000Z. Retrieving it later does not make it available earlier.",
+    "age_s_at_decision": -300.0
+   }
+  ],
+  "n_used": 2,
+  "n_retrieved_unused": 1,
+  "n_refused_late": 1,
+  "stale_tools": [],
+  "max_age_s": 900.0,
+  "law": "EXTERNAL_CONTEXT_ONLY: TradingView context informs a decision record by being NAMED in it. It is never a calibrated probability, never a standalone signal, never a model promotion and never an order authorization. It cannot enter risk authorization, exit servicing, reservations or order handling."
+ },
+ "note": "Produced through the WIRED TwinSources on observations normalized from the real recorded live payloads. The market state is built from the twin's OWN feed; TradingView bars are never a price of record and are never used to compose the state."
+}

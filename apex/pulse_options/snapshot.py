@@ -194,6 +194,15 @@ def compose(*, symbol: str, as_of: float, bars: list, source: str, book: dict | 
             "decision_power": "NONE_STATE"}
     from apex.options_pilot.records import canonical_hash
     body["state_hash"] = canonical_hash({k: body[k] for k in ("schema_version", "symbol", "as_of_epoch", "fields", "n_bars_available")})
+    # THE DECISION-FACING IDENTITY OF THIS MARKET STATE. Derived from `state_hash`, so there is exactly ONE content
+    # digest in the system and a short id can never disagree with the long one. It is deterministic and
+    # content-addressed: the same symbol, instant and field values produce the same id, and any difference in any
+    # of them produces a different one. Everything that must name the state a decision was made on -- an external
+    # observation, a candidate set, the decision record -- references THIS.
+    body["snapshot_id"] = "snap:" + body["state_hash"][:32]
+    body["snapshot_id_basis"] = ("CONTENT_ADDRESSED_V1: sha256 over schema_version, symbol, as_of_epoch, the field "
+                                 "values and the bar count, truncated to 32 hex characters. Not a sequence number, "
+                                 "not a timestamp, and not unique across differing states by convention -- by content.")
     return body
 
 

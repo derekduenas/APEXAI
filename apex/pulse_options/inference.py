@@ -107,7 +107,9 @@ class FrozenArtifact:
                 "reference_time_utc": to_utc_string(ref), "target_end_utc": to_utc_string(ref + HORIZON_MINUTES * 60),
                 "input_event_time_utc": to_utc_string(ref), "input_available_utc": to_utc_string(available),
                 "input_cutoff_utc": to_utc_string(available), "created_utc": to_utc_string(created_epoch),
-                "direction_signal": direction_signal, "inputs": {**f, "state_hash": snapshot["state_hash"]},
+                "direction_signal": direction_signal, "inputs": {**f, "state_hash": snapshot["state_hash"],
+                           # the join: every downstream record can name the market state this forecast saw
+                           "snapshot_id": snapshot.get("snapshot_id")},
                 "validation_status": ("NOT_VALIDATED: EXP-002 development result INVALID_NULL_CONTROL; parameters retained for "
                                       "engineering continuity only; no edge claim"),
                 "implied_sd": sc * math.sqrt(self.nu / (self.nu - 2.0))}

@@ -72,16 +72,20 @@ FUNNEL_STAGES = ("state_snapshot", "situation_regime", "model_bundle", "simulati
                  "risk_decision", "final")
 
 
-def funnel_trace(bd: B.Boundary, *, ids: dict, decision: str, why) -> dict:
-    """The funnel trace persisted with every decision: each required stage names what it used or WHY it is missing."""
-    rows = L.read_all(bd.ledger)
+def funnel_trace(bd: B.Boundary, *, ids: dict, decision: str, why, rows: list | None = None) -> dict:
+    """The funnel trace persisted with every decision: each required stage names what it used or WHY it is missing.
+
+    `rows` lets the caller supply the ledger it has already read, so one decision does not read the whole ledger
+    twice just because two stages both need it."""
+    rows = L.read_all(bd.ledger) if rows is None else rows
     fc = next((r for r in rows if r.get("kind") == "pilot_forecast" and r.get("forecast_id") == ids.get("forecast_id")), None) if ids.get("forecast_id") else None
     it = next((r for r in rows if r.get("kind") == "pilot_intent" and r.get("intent_id") == ids.get("intent_id")), None) if ids.get("intent_id") else None
     fn = rows[ids["funnel_seq"] - 1] if ids.get("funnel_seq") and ids["funnel_seq"] <= len(rows) and rows[ids["funnel_seq"] - 1].get("kind") == "pilot_funnel" else None
     if fn is not None:
         return _funnel_trace_from_engine(fn, seq=ids["funnel_seq"], fc=fc, it=it, decision=decision, why=why)
     t = {}
-    t["state_snapshot"] = {"state_hash": (fc.get("inputs") or {}).get("state_hash")} if fc and (fc.get("inputs") or {}).get("state_hash") else \
+    t["state_snapshot"] = {"state_hash": (fc.get("inputs") or {}).get("state_hash"),
+                           "snapshot_id": (fc.get("inputs") or {}).get("snapshot_id")} if fc and (fc.get("inputs") or {}).get("state_hash") else \
         {"missing": "NO_STATE_HASH: forecast provider did not attach a twin state" if fc else "NO_FORECAST: %s" % (why or "refused before a forecast")}
     ec = ((fc.get("inputs") or {}).get("event_context")) if fc else None
     t["situation_regime"] = {"missing": "NOT_AVAILABLE_IN_PILOT: no regime model is activated; the heuristic direction label is recorded on the forecast",
@@ -109,7 +113,8 @@ def _funnel_trace_from_engine(fn: dict, *, seq: int, fc, it, decision: str, why)
     """FUNNEL_TRACE_V2: the stages filled from the persisted engine trace (kind pilot_funnel) that preceded the decision."""
     tr = fn.get("trace") or {}
     t = {}
-    t["state_snapshot"] = ({"state_hash": (fc.get("inputs") or {}).get("state_hash")} if fc and (fc.get("inputs") or {}).get("state_hash")
+    t["state_snapshot"] = ({"state_hash": (fc.get("inputs") or {}).get("state_hash"),
+                            "snapshot_id": (fc.get("inputs") or {}).get("snapshot_id")} if fc and (fc.get("inputs") or {}).get("state_hash")
                            else {"state_hash": tr.get("state_hash")} if tr.get("state_hash") else {"missing": "NO_STATE_HASH"})
     t["situation_regime"] = {**(tr.get("regime") or {"missing": "NOT_REACHED: %s" % fn.get("why")}), "heuristic_direction": tr.get("heuristic_direction")}
     t["model_bundle"] = {"forecast": ({"model_id": fc["model_id"], "params_hash": fc["params_hash"], "family": fc["family"], "validation": fc.get("validation_status")}
@@ -135,11 +140,35 @@ def _funnel_trace_from_engine(fn: dict, *, seq: int, fc, it, decision: str, why)
     return t
 
 
+def _external_context_for(bd: B.Boundary, ids: dict, rows: list | None = None) -> dict:
+    """The external context AS PERSISTED on this scan's forecast. Read from the ledger rather than from whatever
+    the caller is holding, for the same reason every other stage is: the disk tells the story.
+
+    A scan with no forecast, or a forecast with no external context, yields the NOT_WIRED default -- a decision
+    record NEVER omits the field, because an absent field would let a broken connector read as a considered
+    abstention."""
+    from apex.tradingview.context import for_decision_record
+    ctx = None
+    fid = ids.get("forecast_id")
+    if fid:
+        rows = L.read_all(bd.ledger) if rows is None else rows
+        fc = next((r for r in rows if r.get("kind") == "pilot_forecast" and r.get("forecast_id") == fid), None)
+        if fc:
+            ctx = (fc.get("inputs") or {}).get("external_context")
+    return for_decision_record(ctx or ids.get("external_context"))
+
+
 def _decision(bd: B.Boundary, *, scan_id: str, symbol: str, decision: str, why, ids: dict, persisted_refusal=None) -> dict:
+    rows = L.read_all(bd.ledger)                 # read ONCE; both the trace and the join need it
+    ext = _external_context_for(bd, ids, rows)
     rec = {"kind": "pilot_decision", "txn_id": "decision:" + scan_id, "scan_id": scan_id, "symbol": symbol,
            "session_id": bd.session_id, "release": bd.release, "decision": decision, "why": why,
            "forecast_id": ids.get("forecast_id"), "intent_id": ids.get("intent_id"), "fill_id": ids.get("fill_id"),
-           "funnel_trace": funnel_trace(bd, ids=ids, decision=decision, why=why),
+           "funnel_trace": funnel_trace(bd, ids=ids, decision=decision, why=why, rows=rows),
+           # THE JOIN, on every decision record without exception: which external observations reached this
+           # decision, and what became of each (USED / RETRIEVED_UNUSED / REFUSED_LATE_ARRIVING).
+           "external_inputs_used": ext.pop("external_inputs_used"),
+           "external_context": ext,
            "refusal_persisted": persisted_refusal, "decided_utc": bd.clock.now_utc(), **bd.labels}
     assert_record_labels(rec)
     out = {"scan_id": scan_id, "symbol": symbol, "decision": decision, "why": why, **ids, "receipts": ids.get("receipts", {}),
@@ -195,7 +224,7 @@ def _duplicate_delivery(bd: B.Boundary, *, scan_id: str, symbol: str, prior: lis
 
 
 def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain_fn, spot_fn, quote_fn, funnel_fn=None,
-         selection_policy: str = DEFAULT_RULE, event_context_fn=None) -> dict:
+         selection_policy: str = DEFAULT_RULE, event_context_fn=None, external_context_fn=None) -> dict:
     """One scan: forecast -> (funnel) -> intent -> fill, in that order, each a receipt;
     ends in exactly one decision: TRADE / WAIT / REFUSE. A BoundaryRefused
     becomes a REFUSE decision that says whether the refusal was persisted;
@@ -231,11 +260,27 @@ def scan(bd: B.Boundary, *, symbol: str, seq: int, forecast_fn, signal_fn, chain
                 event_ctx = {"wired": True, "scheduled": {"status": "UNAVAILABLE", "why": str(e)[:160], "events": []},
                              "unscheduled": {"status": "UNAVAILABLE", "why": str(e)[:160], "events": []},
                              "gate": {"gate": "EVENT_GATE_V0", "authority": "SHADOW", "would_veto_new_entry": True, "reasons": ["R2: UNAVAILABLE"], "vetoes_new_entry": False}}
+        # 0b. EXTERNAL CONTEXT (TradingView): EXTERNAL_CONTEXT_ONLY, bound to the snapshot_id of the state this
+        #     decision reads, sealed on the forecast BEFORE any quote or intent. It NEVER raises: every failure is
+        #     a named status, so a TradingView problem cannot become control flow on this path.
+        external_ctx = None
+        if external_context_fn is not None:
+            from apex.tradingview.context import PROVIDER_RAISED, unavailable as _tv_unavailable
+            try:
+                external_ctx = external_context_fn(symbol, as_of)
+            except Exception as e:                                         # noqa: BLE001 - belt to the module's braces
+                external_ctx = _tv_unavailable(symbol=symbol, as_of=as_of, status=PROVIDER_RAISED,
+                                               why="%s: %s" % (type(e).__name__, str(e)[:200]))
+            # Recorded BEFORE the forecast is attempted. A scan that refuses at the forecast stage still obtained
+            # this context, and its decision record must say what it obtained rather than fall back to NOT_WIRED.
+            ids["external_context"] = external_ctx
         # 1. forecast persisted first, before any quote is consulted
         try:
             forecast = forecast_fn(symbol, as_of)
             if event_ctx is not None and isinstance(forecast, dict):
                 forecast = {**forecast, "inputs": {**(forecast.get("inputs") or {}), "event_context": event_ctx}}
+            if external_ctx is not None and isinstance(forecast, dict):
+                forecast = {**forecast, "inputs": {**(forecast.get("inputs") or {}), "external_context": external_ctx}}
         except Exception as e:                                             # noqa: BLE001
             bd.refuse("forecast", "FORECAST_PROVIDER_FAILED: %s: %s" % (type(e).__name__, str(e)[:300]), scan_id=scan_id)
         f_receipt = bd.record_forecast(forecast, scan_id=scan_id)

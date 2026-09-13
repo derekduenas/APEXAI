@@ -117,7 +117,21 @@ class SnapshotJoin:
     def __init__(self, *, snapshot, symbol: str, as_of_epoch: float, model_identities: dict | None = None,
                  premarket_packet_ref: str | None = None):
         self.symbol, self.as_of_epoch = symbol, float(as_of_epoch)
-        self.snapshot_id = snapshot_id(snapshot, symbol=symbol, as_of_epoch=as_of_epoch)
+        # ADOPT THE STATE'S OWN ID; never mint a competing one.
+        #
+        # This module originally always computed its own id, because when it was written the options-path snapshot
+        # had none. The snapshot now emits `snapshot_id` (apex/pulse_options/snapshot.compose), and computing a
+        # second one produced TWO different identities for one market state -- a decision record naming an id that
+        # no snapshot carries, which is worse than having no id at all: it looks like a join and joins nothing.
+        # The snapshot's own id governs whenever it has one, and `snapshot_id_source` says which happened.
+        own = (snapshot or {}).get("snapshot_id") if isinstance(snapshot, dict) else None
+        if own:
+            self.snapshot_id = own
+            self.snapshot_id_source = "SNAPSHOT_OWN_ID: adopted from the market state itself"
+        else:
+            self.snapshot_id = snapshot_id(snapshot, symbol=symbol, as_of_epoch=as_of_epoch)
+            self.snapshot_id_source = ("SEAM_COMPUTED: the market state carries no snapshot_id of its own, so the "
+                                       "seam content-addressed it here")
         self.market_state_digest = market_state_digest(snapshot)
         # WHICH MODELS were in force. `None` is recorded as UNAVAILABLE rather than omitted, because a decision
         # whose model identity is unknown is a different thing from one made with no model.
@@ -168,6 +182,7 @@ class SnapshotJoin:
         return {
             "schema": SEAM_SCHEMA,
             "snapshot_id": self.snapshot_id,
+            "snapshot_id_source": self.snapshot_id_source,
             "symbol": self.symbol,
             "as_of_epoch": self.as_of_epoch,
             "market_state_digest": self.market_state_digest,

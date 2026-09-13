@@ -37,7 +37,8 @@ class TwinSources:
     def __init__(self, *, provenance: str, clock: Clock, bar_source, chain_fn, quote_fn, exit_quote_fn,
                  fee_schedule, sleep_fn=time.sleep, book_fn=None, warmup_minutes: int = 65, artifact=None,
                  selection_policy: str = "PILOT_RULE_V2", funnel_engine=None, funnel_history_days: int = 7,
-                 joint_engine=None, joint_context_fn=None, event_snapshot_fn=None, event_gate_authority: str = "SHADOW"):
+                 joint_engine=None, joint_context_fn=None, event_snapshot_fn=None, event_gate_authority: str = "SHADOW",
+                 external_context_fn=None, external_context_max_age_s: float = 900.0):
         if selection_policy not in SELECTION_POLICIES:
             raise ValueError("SELECTION_POLICY_UNKNOWN: %r" % (selection_policy,))
         self.selection_policy = selection_policy
@@ -68,6 +69,11 @@ class TwinSources:
         self.risk_authority = CertifiedRiskAuthority(fee_schedule=fee_schedule, provenance=provenance)
         self.stores: dict = {}
         self.last_snapshot: dict = {}
+        # EXTERNAL CONTEXT (TradingView): EXTERNAL_CONTEXT_ONLY, bound to the snapshot_id of the state the
+        # decision is being made on. None -> the twin records NOT_WIRED, never silently "no external context".
+        self.external_context_fn = external_context_fn
+        self.external_context_max_age_s = float(external_context_max_age_s)
+        self.last_external_context: dict = {}
 
     # ------------------------------------------------------------ state
     def store(self, symbol: str) -> BarStore:
@@ -124,6 +130,33 @@ class TwinSources:
         ctx["gate"] = evaluate_gate(ctx, authority=self.event_gate_authority)
         self.last_event_context[symbol] = ctx
         return ctx
+
+    def external_context(self, symbol: str, as_of: float) -> dict:
+        """TradingView context for the state at `as_of`, bound to that state's `snapshot_id`.
+
+        The snapshot is taken FIRST and the context is bound to its id, so the packet can never describe a
+        different market state than the one the decision reads. This method never raises: every failure is a
+        named status on a returned packet, because an eye that fails must report, not interrupt."""
+        from apex.tradingview import context as TVC
+        snap = self.last_snapshot.get(symbol) or self.snapshot(symbol, as_of)
+        ctx = TVC.external_context(symbol=symbol, as_of=as_of, snapshot=snap,
+                                   fetch_fn=self.external_context_fn,
+                                   model_identities=self.model_identities(),
+                                   max_age_s=self.external_context_max_age_s)
+        self.last_external_context[symbol] = ctx
+        return ctx
+
+    def model_identities(self) -> dict:
+        """WHICH models were in force. Unknown is stated, never omitted -- a decision whose model identity is
+        unknown is a different thing from one made with no model."""
+        a = self.artifact
+        UNK = "UNAVAILABLE: the forecast artifact does not expose this identity"
+        out = {"selection_policy": self.selection_policy}
+        for key, attr in (("forecast_model_id", "model_id"), ("model_hash", "model_hash"),
+                          ("params_hash", "params_hash"), ("artifact_digest", "artifact_digest")):
+            v = getattr(a, attr, None)
+            out[key] = UNK if v is None else v
+        return out
 
     # ------------------------------------------------------------ THE FUNNEL (FULL_FUNNEL_V1): every layer decides together
     def _fit_funnel_for_day(self, symbol: str, day_start: float, day: str) -> dict:

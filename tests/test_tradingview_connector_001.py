@@ -346,12 +346,44 @@ class TestExistingFeedsAndControlsStayIndependent:
         assert N.compare_price(obs, other_source="X", other_value=1.0)["comparable"] is False
 
     def test_exit_servicing_does_not_depend_on_this_connector(self):
+        """EXIT, RISK, BOOK: still completely clean of the connector, checked by string as well as by import."""
         assert "EXIT_SERVICING_INDEPENDENT" in A.never_blocks()["contract"]
-        import apex.options_pilot.session as S
+        import apex.options_pilot.book as BK
         import apex.options_pilot.exit_policy as EP
-        for mod in (S, EP):
-            assert "tradingview" not in str(getattr(mod, "__file__", "")).lower()
-            assert "tradingview" not in open(mod.__file__).read().lower()
+        import apex.options_pilot.risk_authority as RA
+        import apex.options_pilot.risk_gate as RG
+        for mod in (EP, RA, RG, BK):
+            assert "tradingview" not in open(mod.__file__).read().lower(), mod.__name__
+
+    def test_the_decision_path_may_name_the_connector_but_never_depends_on_it_at_import(self):
+        """PREMISE CHANGED BY TRADINGVIEW-INTEGRATION-003, AND THE REAL PROPERTY PUT IN ITS PLACE.
+
+        This test used to assert that `session.py` contained the string "tradingview" nowhere. That was a proxy
+        for independence, and it stopped being the right proxy the moment the DECISION path was required to carry
+        `external_inputs_used` -- naming the connector in the decision path is the feature, not the leak.
+
+        What independence actually means is asserted instead: the connector is imported LAZILY, inside the branch
+        that uses it, so `apex.options_pilot.session` imports and runs with no TradingView module resolved at all;
+        and a connector failure is a named state rather than control flow, which
+        tests/test_tradingview_pilot_seam_003.py proves through real scans."""
+        import ast
+        import apex.options_pilot.session as S
+        tree = ast.parse(open(S.__file__).read())
+        nested = set()
+        for fn in [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]:
+            for node in ast.walk(fn):
+                if isinstance(node, ast.ImportFrom) and node.module and "tradingview" in node.module:
+                    nested.add(node.module)
+                elif isinstance(node, ast.Import):
+                    nested.update(a.name for a in node.names if "tradingview" in a.name)
+        top = set()
+        for node in tree.body:                               # module level only
+            if isinstance(node, ast.ImportFrom) and node.module and "tradingview" in node.module:
+                top.add(node.module)
+            elif isinstance(node, ast.Import):
+                top.update(a.name for a in node.names if "tradingview" in a.name)
+        assert top == set(), "the decision path must not import the connector at module level: %s" % top
+        assert nested, "the wiring should exist and be lazy"
 
 
 # ---------------------------------------------------------------------------- 10. no credentials
