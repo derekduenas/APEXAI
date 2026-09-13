@@ -71,14 +71,14 @@ class TestFlightAEligibleTrade:
         out, _ = flight_a
         twin = layer(out, "DIGITAL_TWIN")[0]
         assert twin["executed"] == R.EXECUTED and twin["valid"] == R.VALID
-        assert twin["consumption"]["state"] == R.USED, "the snapshot id must be found in a persisted record"
+        assert twin["consumption"]["state"] == R.REFERENCED_IN_RECORD, "the id must appear in a persisted record"
         assert twin["consumption"]["evidence"][0]["field_path"]
 
     def test_the_forecast_model_identity_is_recorded_and_consumed(self, flight_a):
         out, _ = flight_a
         f = layer(out, "LOCATION_VOLATILITY_FORECAST")[0]
         assert f["model_identity"]["params_hash"] and f["valid"] == R.VALID
-        assert f["consumption"]["state"] in (R.USED, R.NOT_CONSUMED)
+        assert f["consumption"]["state"] in (R.REFERENCED_IN_RECORD, R.NOT_REFERENCED)
 
     def test_risk_certified_independently_and_the_intent_was_persisted_before_the_fill(self, flight_a):
         _, d = flight_a
@@ -216,19 +216,22 @@ class TestTheJoinsNotTheLabels:
         tampered = dict(twin["parents"] and {} or {}, **{"missingness": 999})
         assert R.digest(tampered) != recorded
 
-    def test_consumption_is_discovered_not_declared(self):
+    def test_a_reference_is_discovered_not_declared_AND_IS_ONLY_A_REFERENCE(self):
+        """CORRECTED BY SEQUENTIAL-FUNNEL-AUDIT-001. This used to be called USED. Finding an identity in a
+        downstream record proves a REFERENCE WAS RECORDED -- not that a calculation read it, and not that it
+        changed anything. CONSUMED and BEHAVIORAL_EFFECT are separate, stronger claims established elsewhere."""
         c = Court(run_id=rid("J-consume"), world="ELIGIBLE_TRADE"); out = c.run()
-        used = [r for r in out["receipts"] if r["consumption"]["state"] == R.USED]
-        assert used, "at least one output must be findable in a downstream record"
-        for r in used:
+        refd = [r for r in out["receipts"] if r["consumption"]["state"] == R.REFERENCED_IN_RECORD]
+        assert refd, "at least one output must be findable in a downstream record"
+        for r in refd:
             ev = r["consumption"]["evidence"][0]
             assert ev["consumer_record_kind"] and ev["field_path"], "evidence must name WHERE it was found"
-        assert all(r["consumption"]["note"].startswith("discovered") for r in used)
+        assert all("not that any calculation read it" in r["consumption"]["note"] for r in refd)
 
-    def test_a_receipt_with_no_downstream_reader_says_so(self):
+    def test_a_receipt_referenced_nowhere_says_so(self):
         c = Court(run_id=rid("J-unused"), world="ELIGIBLE_TRADE"); out = c.run()
-        unused = [r for r in out["receipts"] if r["consumption"]["state"] == R.NOT_CONSUMED]
-        assert unused, "NOT_CONSUMED is a legitimate, reportable outcome"
+        unref = [r for r in out["receipts"] if r["consumption"]["state"] == R.NOT_REFERENCED]
+        assert unref, "NOT_REFERENCED is a legitimate, reportable outcome"
 
 
 # ======================================================= the FULL funnel route (separate flight)
