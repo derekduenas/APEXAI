@@ -179,3 +179,67 @@ uses, and the one excluded false positive (`recorded_feed.IDENTITY_FIELDS` is a 
 No authorization authored or installed. No merge, deployment, timer recreation or paper execution. **The full
 regression has not been started** — held for independent review, as instructed. Both digests changed in R2, so any
 payload computed from an earlier commit is stale and will refuse.
+
+---
+
+# R3 — identity closure and computation closure (2026-09-13)
+
+Base `0247f10`. Both findings reproduced first:
+`docs/evidence/fee_authorization_002/R3_FINDING_REPRODUCTION_before_repair.txt`.
+
+## F1 — `verify_approval` was not an exact verifier
+
+It iterated `FEE_IDENTITY_FIELDS` with `a_id.get(k, "__ABSENT__")`. That proves the **named** fields match and says
+nothing about an **undeclared** field on the approval — a consumer walking the declared fields cannot see an extra
+one. Other checks sometimes refused such a record anyway; **a verifier that is only accidentally correct is not
+one.**
+
+**Repair.** One comparator, `fees.identity_disagreement(left, right, left_name=, right_name=)`: exact key equality
+on **both** sides via `identity_shape_problem`, then exact value equality, returning a reason that names the side
+and the field. `identity_problem` is a thin form of it. Every consumer routes through it, and a structural test
+fails any module that iterates the identity fields itself.
+
+## F2 — the digest was an allowlist of four functions
+
+Reproduced with **two ordinary commits**, no monkeypatching: refactor the SEC component into a helper, then edit
+only that helper — charge **0.06 → 0.05**, `implementation_digest` unchanged.
+
+**Repair, the closed design.** All executable arithmetic and the declarative policy moved to
+`apex/options_pilot/fee_computation.py`. `implementation_digest` is sha256 over **that module's entire canonical
+AST**. A new helper, constant or branch is inside the digest by construction.
+
+Three properties make the closure real, each structurally asserted:
+
+1. **No authorization data in the module** — so digesting it cannot be circular.
+2. **The dependency set is closed** — every free name resolves inside the module or to `EXTERNAL_DEPENDENCIES`
+   (stdlib `decimal`/`math` only); a new unresolved global fails the test.
+3. **Non-canonical classes are refused** — `compute_side` refuses any policy that is not exactly
+   `FeeComputationPolicy` (`POLICY_NOT_CANONICAL`), and a `FeeSchedule` subclass reports
+   `UNVERIFIABLE_IMPLEMENTATION`. Both close the "override it from outside the digested module" route that a
+   module-level digest would otherwise reopen.
+
+`FeeSchedule._side` is now **gating and identity only**; a structural test asserts it performs no arithmetic.
+
+## Tests changed or superseded
+
+| test | change |
+|---|---|
+| `r1::test_the_implementation_digest_is_independently_recomputable` | recomputes from the module AST, not the function allowlist |
+| `r1::test_unreadable_source_fails_closed…` | sourceless-subclass trick no longer applies; exercises the module error path |
+| `r1::test_7_changing_the_fee_ARITHMETIC…` | a `FeeSchedule` subclass is now `UNVERIFIABLE_IMPLEMENTATION` — closed more strongly |
+| `r2::test_the_rounding_mapping_is_inside_the_digested_function` | renamed `…_module`; `mode` is no longer allowlisted |
+| `r2::test_overriding_the_rounding_mapping…` + `…covers_the_policy_class` | replaced by `test_a_policy_subclass_is_refused_outright` |
+| `r2::test_STRUCTURAL_…mutable_container` | now scans `fee_computation.py` |
+| `002::test_5_an_altered_document_digest…` | uses a well-formed 64-hex digest, since malformed now refuses at construction |
+
+## Honest threat boundary
+
+Binds **committed source and declared policy** for a **paper** boundary. **Not** proof against a malicious
+interpreter, a patched stdlib, or arbitrary in-process mutation — anything that can rewrite memory can rewrite the
+digest. Procedural authorship is **unauthenticated**. Real-money use requires an external signed authorization and
+a release attestation.
+
+## Not done
+
+No authorization authored or installed. No merge, deployment, timer recreation, ledger, order, or lifting of the
+hold. **The full regression was not started.**

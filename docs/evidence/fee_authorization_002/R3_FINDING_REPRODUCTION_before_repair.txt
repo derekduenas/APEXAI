@@ -1,0 +1,18 @@
+FEE-AUTHORIZATION-002-R3 — FINDING 2 REPRODUCED BY ORDINARY COMMITTED SOURCE EDIT
+base 0247f10eb43da775a44e341a88d65924efc2b391
+
+THREAT MODEL: a developer commits a refactor that moves part of the arithmetic into a helper, then later
+edits that helper. No monkeypatching, no malicious interpreter -- two ordinary source edits.
+
+STEP 0 baseline                         fee=0.06 policy=b7433dbaf83a7914 impl=703becfe39ec0951
+STEP 1 refactor (helper introduced)     fee=0.06 policy=b7433dbaf83a7914 impl=5529e48165c2d106
+       implementation_digest moved      : True   (expected -- _side's body changed)
+STEP 2 helper edited, _side untouched   fee=0.05 policy=b7433dbaf83a7914 impl=5529e48165c2d106
+
+   fee changed                     : True   (0.06 -> 0.05)
+   computation_policy_digest moved : False
+   implementation_digest moved     : False
+   *** LEAK: an ordinary source edit to a transitive helper changed the charge while the implementation digest stayed identical. An authorization bound to it still matches. ***
+
+STEP 3 source restored                  fee=0.06 policy=b7433dbaf83a7914 impl=703becfe39ec0951
+       restored to baseline            : True

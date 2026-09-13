@@ -18,7 +18,7 @@ approval copied onto a different intent, or hand-written, refuses.
                                  and can be told to refuse for tests."""
 from __future__ import annotations
 
-from .fees import FeeSchedule
+from .fees import FeeSchedule, identity_disagreement
 from .records import canonical_hash, is_real
 
 BINDING_FIELDS = ("intent_id", "session_id", "scan_id", "contract_id", "expression", "action", "quantity",
@@ -108,13 +108,17 @@ def verify_approval(intent: dict, approval, *, authority=None) -> dict:
     if approval["envelope_binding_hash"] != envelope_binding_hash(intent):
         raise RiskRefused("RISK_APPROVAL_NOT_BOUND_TO_THIS_ENVELOPE_OR_FEE_IDENTITY: the approval commits to a different "
                           "envelope or fee identity than the intent now carries")
-    # the approval's OWN recorded identity must equal the intent's, field by field: an approval whose identity block
-    # was altered while its id was preserved is refused by name
-    a_id, i_id = approval["fee_identity"], fee_identity_of(intent)
-    for k in FEE_IDENTITY_FIELDS:
-        if a_id.get(k, "__ABSENT__") != i_id[k]:
-            raise RiskRefused("RISK_APPROVAL_FEE_IDENTITY_DISAGREES: %s approval=%r intent=%r"
-                              % (k, a_id.get(k, "__ABSENT__"), i_id[k]))
+    # THE APPROVAL'S OWN IDENTITY MUST EQUAL THE INTENT'S, EXACTLY AND IN BOTH DIRECTIONS.
+    #
+    # This iterated FEE_IDENTITY_FIELDS with `a_id.get(k, "__ABSENT__")`. That proves the NAMED fields match and
+    # says nothing at all about an UNDECLARED field on the approval: a consumer that walks the declared fields
+    # cannot see an extra one. Later checks elsewhere sometimes happened to refuse such a record, but this
+    # consumer was not itself a complete verifier, and a verifier that is only accidentally correct is not one.
+    problem = identity_disagreement(approval["fee_identity"], intent.get("fees"),
+                                    left_name="the approval's fee identity",
+                                    right_name="the intent's fee block")
+    if problem:
+        raise RiskRefused("RISK_APPROVAL_FEE_IDENTITY_DISAGREES: %s" % problem)
     if authority is not None:
         why = authority.accepts(approval)
         if why:

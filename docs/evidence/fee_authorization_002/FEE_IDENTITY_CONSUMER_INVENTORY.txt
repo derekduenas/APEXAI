@@ -1,36 +1,46 @@
-COMPLETE INVENTORY OF FEE-IDENTITY CONSUMERS  (R2, base 0b71849)
+FINAL CONSUMER INVENTORY + DIGEST CONSTRUCTION  (R3)
 
-IDENTITY_FIELDS (12) = ['schedule_id', 'schedule_hash', 'provenance', 'known', 'version', 'effective_date', 'terms_digest', 'computation_policy_digest', 'implementation_digest', 'source_document_sha256', 'authorization_status', 'authorization_digest']
+IDENTITY_FIELDS (12): ['schedule_id', 'schedule_hash', 'provenance', 'known', 'version', 'effective_date', 'terms_digest', 'computation_policy_digest', 'implementation_digest', 'source_document_sha256', 'authorization_status', 'authorization_digest']
 
-MODULE                                       canonical  derives   hand-written subset
-------------------------------------------------------------------------------------------------
-apex/options_pilot/boundary.py               YES        -         none
-apex/options_pilot/fees.py                   YES        YES       [['authorization_digest', 'authorization_status', 'computation_policy_digest', 'effective_date', 'implementation_digest', 'known', 'provenance', 'schedule_hash', 'schedule_id', 'source_document_sha256', 'terms_digest', 'version'], ['authorized_by', 'authorized_utc', 'computation_policy_digest', 'effective_date', 'implementation_digest', 'schedule_id', 'scope', 'source_document_sha256', 'terms_digest', 'version']]
-apex/options_pilot/recorded_feed.py          -          -         none
-apex/options_pilot/risk_authority.py         YES        -         none
-apex/options_pilot/risk_gate.py              -          YES       none
+DIGEST CONSTRUCTION
+  terms_digest              sha256 over the RATE fields only
+  computation_policy_digest sha256 over FeeComputationPolicy.describe() -- every field controls execution
+  implementation_digest     sha256 over the CANONICAL AST OF THE WHOLE MODULE
+                            apex/options_pilot/fee_computation.py (docstrings + line numbers stripped)
+                            + refuses a non-canonical policy class (POLICY_NOT_CANONICAL)
+                            + a non-canonical FeeSchedule subclass reports UNVERIFIABLE_IMPLEMENTATION
+  source_document_sha256    the broker PDF
+  authorization_digest      sha256 over the FeeAuthorization record (outside the digested module)
+  -> no circularity: the authorization binds the computation; the computation never contains it
 
-VERDICT PER CONSUMER
-  apex/options_pilot/fees.py
-      identity()              PRODUCER of the identity; defines IDENTITY_FIELDS
-      identity_problem()      THE canonical comparison; every consumer routes through it
-      recompute_fees()        CONSUMER -- now calls identity_problem() BEFORE accepting numeric agreement (F3)
-  apex/options_pilot/risk_authority.py
-      accepts()               CONSUMER -- identity_problem()  (was a hand-written 7 of 12)
-      fee_identity_problem()  CONSUMER -- identity_problem()  (was a hand-written 7 of 12)
-  apex/options_pilot/boundary.py
-      fee_identity_problem()  CONSUMER -- identity_problem()
-      exit/outcome path       CONSUMER -- identity_problem() against the persisted fill's entry identity
-      __init__                GATE     -- refuses an unauthorized/unverifiable schedule before any quote
-  apex/options_pilot/risk_gate.py
-      FEE_IDENTITY_FIELDS     DERIVED from FeeSchedule.IDENTITY_FIELDS (was its own copy of the 7)
-      fee_identity_of()       feeds envelope_binding_hash; documented COMPLETE derivative -- it maps every
-                              declared field, marks a missing one __ABSENT__ and an undeclared one __EXTRA__,
-                              so the binding changes rather than ignoring either
+MODULE                                     comparator  derives   own field loop
+--------------------------------------------------------------------------------------------
+boundary.py                                YES         -         no
+fees.py                                    YES         YES       YES
+risk_authority.py                          YES         -         no
+risk_gate.py                               YES         YES       no
 
-No module outside fees.py contains a hand-written fee-identity field list.
+PER CONSUMER
+  fees.identity_disagreement()   THE comparator: exact key equality BOTH sides, then exact values;
+                                 names the side and the field
+  fees.identity_problem()        thin consumer-facing form of the same comparator
+  fees.recompute_fees()          Book -- comparator BEFORE numeric agreement
+  risk_authority.accepts()       comparator
+  risk_authority.fee_identity_problem()  comparator
+  boundary.fee_identity_problem()        comparator
+  boundary exit/outcome path             comparator vs the persisted fill's entry identity
+  boundary.__init__                      GATE: refuses unauthorized/unverifiable before any quote
+  risk_gate.verify_approval()            comparator (was its own loop -- could not see an extra)
+  risk_gate.FEE_IDENTITY_FIELDS          DERIVED from FeeSchedule.IDENTITY_FIELDS
+  risk_gate.fee_identity_of()            documented complete derivative feeding envelope_binding_hash:
+                                         maps every declared field, __ABSENT__ for missing, __EXTRA__ for
+                                         undeclared, so the binding changes rather than ignoring either
 
-CHECKED AND EXCLUDED
-  apex/options_pilot/recorded_feed.py   IDENTITY_FIELDS = ("bid","ask","bid_size","ask_size","timestamp_epoch")
-                                        -- a QUOTE identity, unrelated to fees. Matched the scan on the name
-                                        only. Not a fee-identity consumer.
+EXCLUDED (checked): recorded_feed.IDENTITY_FIELDS is a QUOTE identity, not a fee identity.
+
+HONEST THREAT BOUNDARY
+  This binds COMMITTED SOURCE and DECLARED POLICY for a PAPER boundary.
+  It is NOT proof against a malicious interpreter, a patched stdlib, or arbitrary in-process mutation:
+  anything that can rewrite memory can rewrite the digest too.
+  Procedural authorship is UNAUTHENTICATED -- authorized_by is recorded, never verified.
+  Real-money use requires an EXTERNAL SIGNED authorization and a release attestation.

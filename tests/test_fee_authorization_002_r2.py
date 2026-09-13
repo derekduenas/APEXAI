@@ -30,8 +30,9 @@ from apex.options_pilot import ledger as L
 from apex.options_pilot import session as S
 from apex.options_pilot.fees import (AUTHORIZED, FeeAuthorization, FeeAuthorizationRefused, FeeComputationPolicy,
                                      FeePolicyRefused, FeeSchedule, NOT_AUTHORIZED, ROBINHOOD_RHF_2026,
-                                     SALE_PRINCIPAL_POLICY_V1, identity_problem, implementation_digest_of,
-                                     is_digest, recompute_fees)
+                                     SALE_PRINCIPAL_POLICY_V1, identity_problem, is_digest, recompute_fees)
+from apex.options_pilot import fee_computation as FC
+from apex.options_pilot.fee_computation import FeeComputationRefused, module_digest
 from apex.options_pilot.synthetic_harness import SyntheticHarness, T0
 
 RB = ROBINHOOD_RHF_2026
@@ -61,34 +62,30 @@ def auth(s: FeeSchedule, **over) -> FeeAuthorization:
 
 class TestNoMutableDispatchInTheComputationPath:
     def test_the_module_level_rounding_table_is_gone(self):
-        assert not hasattr(F, "ROUND_MODES"), "a rebindable dispatch table must not exist to be rebound"
+        assert not hasattr(F, "ROUND_MODES") and not hasattr(FC, "ROUND_MODES")
 
-    def test_the_rounding_mapping_is_inside_the_digested_function(self):
-        assert ("FeeComputationPolicy", "mode") in F.FEE_IMPLEMENTATION_FUNCTIONS
-        src = ast.dump(ast.parse(F._canonical_ast(FeeComputationPolicy.mode)))
+    def test_the_rounding_mapping_is_inside_the_digested_module(self):
+        """SUPERSEDED BY R3: `mode` is no longer named in an allowlist -- it lives in the computation module,
+        which is digested whole."""
+        blob = FC.canonical_module_ast()
         for name in ("ROUND_CEILING", "ROUND_HALF_UP", "ROUND_FLOOR"):
-            assert name in src, "the mapping must be written in mode(), not looked up elsewhere"
+            assert name in blob
 
-    def test_overriding_the_rounding_mapping_changes_the_implementation_identity(self):
-        """The F1 reproduction, expressed the only way it still can: a policy SUBCLASS overriding `mode`."""
+    def test_a_policy_subclass_is_refused_outright(self):
+        """SUPERSEDED BY R3, and closed more strongly. Under R2 a policy subclass overriding `mode` changed the
+        digest; under R3 the digest covers a MODULE, so a subclass defined elsewhere would be outside it. Rather
+        than chase that, `compute_side` refuses any policy that is not exactly FeeComputationPolicy."""
         class SneakyPolicy(FeeComputationPolicy):
             def mode(self, which):
                 return ROUND_FLOOR if which == "sec_rounding" else FeeComputationPolicy.mode(self, which)
 
-        honest = synth()
-        sneaky = synth(computation_policy=SneakyPolicy(**SALE_PRINCIPAL_POLICY_V1.__dict__))
-        assert honest.exit(1, sale_principal=540.0)["total"] == 0.06
-        assert sneaky.exit(1, sale_principal=540.0)["total"] == 0.05        # the CHARGE changed
-        assert honest.implementation_digest != sneaky.implementation_digest
-
-    def test_the_digest_covers_the_policy_class_actually_in_use(self):
-        class P(FeeComputationPolicy):
-            pass
-        assert implementation_digest_of(FeeSchedule, P) == implementation_digest_of(FeeSchedule, FeeComputationPolicy)
+        s = synth(computation_policy=SneakyPolicy(**SALE_PRINCIPAL_POLICY_V1.__dict__))
+        with pytest.raises(FeePolicyRefused, match="POLICY_NOT_CANONICAL"):
+            s.exit(1, sale_principal=540.0)
 
     def test_STRUCTURAL_the_fee_computation_reads_no_module_level_mutable_container(self):
         """THE GUARD. A future edit that reintroduces a rebindable table feeding the arithmetic fails here."""
-        tree = ast.parse(FEES_PY.read_text())
+        tree = ast.parse(pathlib.Path(FC.__file__).read_text())
         mutable = set()
         for node in tree.body:                                   # module level only
             if not isinstance(node, ast.Assign):
@@ -99,12 +96,9 @@ class TestNoMutableDispatchInTheComputationPath:
             if is_mutable:
                 mutable.update(t.id for t in node.targets if isinstance(t, ast.Name))
         read_by_fee_code = set()
-        for cls in (n for n in ast.walk(tree) if isinstance(n, ast.ClassDef)):
-            for fn in (n for n in cls.body if isinstance(n, ast.FunctionDef)):
-                if (cls.name, fn.name) not in F.FEE_IMPLEMENTATION_FUNCTIONS:
-                    continue
-                read_by_fee_code.update(n.id for n in ast.walk(fn)
-                                        if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load))
+        for fn in (n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)):
+            read_by_fee_code.update(n.id for n in ast.walk(fn)
+                                    if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load))
         offenders = sorted(mutable & read_by_fee_code)
         assert offenders == [], ("fee calculation reads module-level MUTABLE state %s; it can be rebound at "
                                  "runtime without changing any digest" % offenders)
@@ -141,7 +135,7 @@ class TestThePolicyControlsExecutionOrDoesNotExist:
         ("component_order", ("commission", "exchange", "regulatory", "invented")),
     ])
     def test_an_unsupported_policy_value_refuses_at_construction(self, field, value):
-        with pytest.raises(FeePolicyRefused):
+        with pytest.raises((FeePolicyRefused, FeeComputationRefused)):
             FeeComputationPolicy(**{**SALE_PRINCIPAL_POLICY_V1.__dict__, field: value})
 
     def test_every_policy_field_appears_in_its_digest(self):
@@ -204,7 +198,7 @@ class TestAnUnverifiableImplementationCannotBeAuthorized:
             auth(RB, **{field: "UNVERIFIABLE_IMPLEMENTATION: source unavailable"})
 
     def test_the_sentinel_specifically_cannot_be_authorized(self):
-        sentinel = implementation_digest_of(self._no_source_cls())
+        sentinel = "UNVERIFIABLE_IMPLEMENTATION: SOURCE_UNAVAILABLE for the fee computation module"
         assert sentinel.startswith("UNVERIFIABLE_IMPLEMENTATION")
         with pytest.raises(FeeAuthorizationRefused):
             auth(RB, implementation_digest=sentinel)

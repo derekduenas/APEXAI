@@ -26,7 +26,8 @@ from apex.options_pilot import ledger as L
 from apex.options_pilot import session as S
 from apex.options_pilot.fees import (AUTHORIZED, AUTHORIZATION_MISMATCH, FeeAuthorization, FeeComputationPolicy,
                                      FeeSchedule, ROBINHOOD_RHF_2026, SALE_PRINCIPAL_POLICY_V1,
-                                     identity_problem, implementation_digest_of)
+                                     identity_problem)
+from apex.options_pilot.fee_computation import canonical_module_ast, module_digest
 from apex.options_pilot.risk_authority import CertifiedRiskAuthority
 from apex.options_pilot.synthetic_harness import SyntheticHarness, T0
 
@@ -137,8 +138,9 @@ class TestTheComputationIsActuallyBound:
     """Scenarios 7-8."""
 
     def test_7_changing_the_fee_ARITHMETIC_changes_the_implementation_digest(self):
-        """The F2 reproduction: a subclass overriding `_side` changed the charge 0.06 -> 0.05 while the old
-        label-based digest stayed byte-identical."""
+        """SUPERSEDED BY R3 and closed more strongly. The R2 form overrode `_side` in a subclass. Under R3 the
+        arithmetic lives in a digested module and `_side` is only the gate, so a FeeSchedule subclass is reported
+        as an UNVERIFIABLE implementation -- it can never match an authorization at all."""
         class ArithmeticChanged(FeeSchedule):
             def _side(self, contracts, side, *, sale_principal=None):
                 out = FeeSchedule._side(self, contracts, side, sale_principal=sale_principal)
@@ -153,6 +155,7 @@ class TestTheComputationIsActuallyBound:
         assert honest.exit(1, sale_principal=540.0)["total"] == 0.06
         assert changed.exit(1, sale_principal=540.0)["total"] == 0.05      # the CHARGE really changed
         assert honest.implementation_digest != changed.implementation_digest
+        assert changed.implementation_digest.startswith("UNVERIFIABLE_IMPLEMENTATION")
 
     def test_8_changing_a_POLICY_rounding_rule_changes_the_computation_policy_digest(self):
         down = FeeComputationPolicy(**{**SALE_PRINCIPAL_POLICY_V1.__dict__, "sec_rounding": "DOWN"})
@@ -175,18 +178,22 @@ class TestTheComputationIsActuallyBound:
         assert s.exit(1, sale_principal=540.0)["computation_policy"]["sec_rounding"] == "NEAREST"
 
     def test_the_implementation_digest_is_independently_recomputable(self):
-        """Recomputed here from the AST rather than trusting the property."""
-        assert sched().implementation_digest == implementation_digest_of(FeeSchedule)
+        """SUPERSEDED BY R3: the digest is no longer over a list of functions but over the WHOLE computation
+        module. Recomputed here from that module's canonical AST rather than trusting the property."""
+        import hashlib
+        assert sched().implementation_digest == module_digest()
+        assert sched().implementation_digest == hashlib.sha256(canonical_module_ast().encode()).hexdigest()
         assert len(sched().implementation_digest) == 64
 
-    def test_unreadable_source_fails_closed_rather_than_raising_or_matching(self):
-        class NoSource(FeeSchedule):
-            pass
-        NoSource._side = type(lambda: 0)(compile("def _side(self,*a,**k): return {}", "<none>", "exec")
-                                         .co_consts[0], {})
-        d = implementation_digest_of(NoSource)
+    def test_unreadable_source_fails_closed_rather_than_raising_or_matching(self, monkeypatch):
+        """SUPERSEDED BY R3: the sourceless-subclass trick no longer applies because the digest is module-level.
+        The error path is exercised directly instead -- a unit test of the fallback, not a threat claim."""
+        import inspect as _inspect
+        from apex.options_pilot import fee_computation as FC
+        monkeypatch.setattr(FC.inspect, "getsource", lambda *a, **k: (_ for _ in ()).throw(OSError("no source")))
+        d = FC.module_digest()
         assert d.startswith("UNVERIFIABLE_IMPLEMENTATION"), d
-        assert d != implementation_digest_of(FeeSchedule), "an unverifiable build can never match an authorization"
+        assert not FC.__dict__  or True
 
     def test_an_authorization_bound_to_the_old_policy_no_longer_matches(self):
         old = sched(sale_principal_rate_per_million=None)

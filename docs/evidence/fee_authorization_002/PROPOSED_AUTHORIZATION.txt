@@ -1,4 +1,4 @@
-FEE-AUTHORIZATION-002-R2 — PROPOSED AUTHORIZATION PAYLOAD (NOT AUTHORED, NOT INSTALLED)
+FEE-AUTHORIZATION-002-R3 — PROPOSED AUTHORIZATION PAYLOAD (NOT AUTHORED, NOT INSTALLED)
 
   schedule_id               : ROBINHOOD_RHF_2026
   version                   : 2026-09-12b
@@ -6,30 +6,15 @@ FEE-AUTHORIZATION-002-R2 — PROPOSED AUTHORIZATION PAYLOAD (NOT AUTHORED, NOT I
   source_document_sha256    : 7f9c86bf297d078ce27505cbc53eecc068cf975fbfca5aada37b9af865d7e14a
   terms_digest              : 8cf58b1a6201dd33bc6fa03535c8c5481cbea6886304f41c0f259686bb45daeb
   computation_policy_digest : b7433dbaf83a7914eadcf0c1a1d9dcf36105692fd7050f02df7bc1fcc6650e21
-  implementation_digest     : 703becfe39ec0951d38dbef6afceb2217987b53e4dc58a2f3bd04ec977046503
+  implementation_digest     : 7ee77da02d43183d789e66325052eb540b9cf60e6eefb102d282d991b3a66230
 
-  NOTE: computation_policy_digest and implementation_digest BOTH CHANGED in R2.
-        The policy gained validated fields; the implementation digest now covers
-        FeeComputationPolicy.mode and the policy class actually in use. Any payload
-        computed from an earlier commit is stale and will refuse.
+  implementation_digest CHANGED AGAIN IN R3 (as forecast): it is now sha256 over the canonical AST of
+  apex/options_pilot/fee_computation.py in full, not four selected functions. The R2 payload is stale.
 
   source document : RHF Standard Pricing Fee Schedule (PDF), https://cdn.robinhood.com/assets/robinhood/legal/RHF%20Fee%20Schedule.pdf
-
-WHAT EACH DIGEST BINDS
-  terms_digest              the RATES
-  computation_policy_digest the POLICY _side() EXECUTES FROM. Every field now controls execution:
-                            sec_basis DISPATCHES the branch, rounding names resolve through mode(),
-                            component_order drives the summation order. A value the code cannot act on
-                            no longer constructs.
-  implementation_digest     the CODE: canonical AST of (('FeeSchedule', '_side'), ('FeeSchedule', 'entry'), ('FeeSchedule', 'exit'), ('FeeComputationPolicy', 'mode')),
-                            resolved against the schedule class AND the policy class in use, so neither
-                            a subclass override nor a rebindable table can move the charge silently.
-                            There is no module-level mutable dispatch left in the computation path.
-
   policy in force : {"sec_basis": "SALE_PRINCIPAL_RATE_PER_MILLION", "sec_rounding": "UP", "cat_rounding": "NEAREST", "cat_sub_cent_to_zero": true, "taf_rounding": "NEAREST", "commission_rounding": "NEAREST", "exchange_rounding": "NEAREST", "regulatory_sum": "EACH_COMPONENT_ROUNDED_UNDER_ITS_OWN_RULE_BEFORE_THE_SUM", "arithmetic": "DECIMAL_CENTS", "component_order": ["commission", "exchange", "regulatory"]}
 
-WORKED EXAMPLE (1 contract, $540 sale principal) — unchanged across R1 and R2:
-  entry 0.04   exit 0.06
+  worked example (1 contract, $540 principal): entry 0.04  exit 0.06   [unchanged across R1, R2, R3]
 
 ==============================================================================
 PROPOSED PAYLOAD
@@ -40,7 +25,7 @@ PROPOSED PAYLOAD
  "source_document_sha256": "7f9c86bf297d078ce27505cbc53eecc068cf975fbfca5aada37b9af865d7e14a",
  "terms_digest": "8cf58b1a6201dd33bc6fa03535c8c5481cbea6886304f41c0f259686bb45daeb",
  "computation_policy_digest": "b7433dbaf83a7914eadcf0c1a1d9dcf36105692fd7050f02df7bc1fcc6650e21",
- "implementation_digest": "703becfe39ec0951d38dbef6afceb2217987b53e4dc58a2f3bd04ec977046503",
+ "implementation_digest": "7ee77da02d43183d789e66325052eb540b9cf60e6eefb102d282d991b3a66230",
  "effective_date": "2026-04-04",
  "status": "AUTHORIZED",
  "authorized_by": "<OPERATOR - NOT FILLED BY CLAUDE>",
@@ -48,13 +33,14 @@ PROPOSED PAYLOAD
  "scope": "the paper simulation's cost model for a Robinhood self-directed non-Gold non-Professional account trading ETF options; NOT an order authorization; NOT paper capital; NOT a deployment authorization"
 }
 
-BEFORE YOU AUTHORIZE
-  implementation_digest binds to the CURRENT fee-calculation code and the CURRENT policy class. Any later edit to
-  _side/entry/exit/mode invalidates it and refuses every trade until re-authorized. Authorize AFTER the code is
-  frozen for the release you intend to run. The refusal is loud, never silent.
+BEFORE AUTHORIZING
+  implementation_digest now binds the ENTIRE fee_computation module. Any edit to it -- arithmetic, a helper, a
+  constant, a branch -- invalidates the authorization and refuses every trade until re-authorized. Comments,
+  docstrings and formatting do not. Authorize AFTER the release code is frozen.
 
-PROCEDURAL LIMITATION, UNCHANGED AND ACKNOWLEDGED
-  FeeAuthorization records authorized_by but does not AUTHENTICATE it. Procedural authorization for this paper
-  pilot only; a real-money boundary needs an externally signed decision.
+HONEST THREAT BOUNDARY
+  Binds COMMITTED SOURCE and DECLARED POLICY for a PAPER boundary. NOT proof against a malicious interpreter, a
+  patched stdlib, or arbitrary in-process mutation. Procedural authorship is UNAUTHENTICATED. Real-money use
+  requires an external signed authorization and a release attestation.
 
 NOT AUTHORED, NOT INSTALLED: ROBINHOOD_RHF_2026.authorization is None.
