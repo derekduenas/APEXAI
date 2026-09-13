@@ -1,0 +1,33 @@
+===== BEFORE THE HOLD =====
+--- date_utc ---
+2026-09-13T16:54:50Z
+--- deployed release ---
+/opt/apex/releases/a6e123d36a89ac70ca512243336eb1561a9b9cd3
+--- timer state ---
+transient
+active
+--- list-timers ---
+NEXT                        LEFT LAST                         PASSED UNIT                               ACTIVATES
+Mon 2026-09-14 13:24:00 UTC  20h -                                 - apex-pilot-stage1-2026-09-14.timer apex-pilot-stage1-2026-09-14.service
+--- UNIT FILE: timer ---
+# /run/user/1000/systemd/transient/apex-pilot-stage1-2026-09-14.timer
+# This is a transient unit file, created programmatically via the systemd API. Do not edit.
+[Unit]
+Description=/opt/apex/shared/venv/bin/python /opt/apex/current/scripts/options_paper_session.py --pilot-boundary --pilot-live-wiring --pilot-selection-policy PILOT_RULE_V2 --symbols SPY --minutes 390 --interval-min 15 --ledger /apex-data/core/options_pilot_ledger.jsonl --out /apex-data/history-a/pilot_2026-09-14.json --pilot-session-id PILOT-2026-09-14 --pilot-release a6e123d36a89ac70ca512243336eb1561a9b9cd3
+
+[Timer]
+OnCalendar=2026-09-14 13:24:00 UTC
+AccuracySec=1s
+RemainAfterElapse=no
+--- UNIT FILE: service ---
+# /run/user/1000/systemd/transient/apex-pilot-stage1-2026-09-14.service
+# This is a transient unit file, created programmatically via the systemd API. Do not edit.
+[Unit]
+Description=/opt/apex/shared/venv/bin/python /opt/apex/current/scripts/options_paper_session.py --pilot-boundary --pilot-live-wiring --pilot-selection-policy PILOT_RULE_V2 --symbols SPY --minutes 390 --interval-min 15 --ledger /apex-data/core/options_pilot_ledger.jsonl --out /apex-data/history-a/pilot_2026-09-14.json --pilot-session-id PILOT-2026-09-14 --pilot-release a6e123d36a89ac70ca512243336eb1561a9b9cd3
+
+[Service]
+MemoryMax=1468006400
+WorkingDirectory=/opt/apex/current
+Environment="APEX_PILOT_LIVE_DATA=ENABLED" "PYTHONUNBUFFERED=1"
+ExecStart=
+ExecStart="/opt/apex/shared/venv/bin/python" "/opt/apex/current/scripts/options_paper_session.py" "--pilot-boundary" "--pilot-live-wiring" "--pilot-selection-policy" "PILOT_RULE_V2" "--symbols" "SPY" "--minutes" "390" "--interval-min" "15" "--ledger" "/apex-data/core/options_pilot_ledger.jsonl" "--out" "/apex-data/history-a/pilot_2026-09-14.json" "--pilot-session-id" "PILOT-2026-09-14" "--pilot-release" "a6e123d36a89ac70ca512243336eb1561a9b9cd3"

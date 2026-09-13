@@ -1,0 +1,54 @@
+FEE-AUTHORIZATION-002 — PROPOSED AUTHORIZATION PAYLOAD (NOT AUTHORED, NOT INSTALLED)
+
+The three digests you asked for, computed from the shipped candidate:
+
+  schedule_id             : ROBINHOOD_RHF_2026
+  version                 : 2026-09-12b
+  effective_date          : 2026-04-04
+  source_document_sha256  : 7f9c86bf297d078ce27505cbc53eecc068cf975fbfca5aada37b9af865d7e14a
+  terms_digest            : 8cf58b1a6201dd33bc6fa03535c8c5481cbea6886304f41c0f259686bb45daeb
+  computation_digest      : 41ebd4eedc31da75b483daab020124614d9d356e9fb03098bfea8bba3d662da4
+
+  source document         : RHF Standard Pricing Fee Schedule (PDF), https://cdn.robinhood.com/assets/robinhood/legal/RHF%20Fee%20Schedule.pdf
+
+WHAT terms_digest COVERS (the rates):
+    commission_per_contract            0.0
+    exchange_fee_per_contract          0.04
+    regulatory_fee_per_contract_buy    0.0003
+    regulatory_fee_per_contract_sell   0.02359
+    sale_principal_rate_per_million    20.6
+    sell_per_contract_components       0.00359
+    cat_per_contract                   0.0003
+    taf_per_contract_sell              0.00329
+
+WHAT computation_digest COVERS (how the rates are applied) — the field that changed:
+    sec_basis       SALE_PRINCIPAL_RATE_PER_MILLION   (v2026-09-12 was PER_CONTRACT_CONSTANT)
+    sec_rounding    UP_TO_THE_CENT
+    cat_rounding    SUB_CENT_ROUNDS_DOWN_TO_ZERO
+    taf_rounding    NEAREST_CENT
+    regulatory_sum  EACH_COMPONENT_ROUNDED_UNDER_ITS_OWN_RULE_BEFORE_THE_SUM
+    arithmetic      DECIMAL_CENTS
+    computation_digest of the SUPERSEDED per-contract-constant form: 5a8a2336f567daacadfd3993ecd3dd84e99d46ef1f4884a7ceac8a9145584667
+
+WORKED EXAMPLE (1 contract sold at $5.40, principal $540) under this computation:
+    entry total : 0.04  components={'commission': 0.0, 'exchange': 0.04, 'regulatory': 0.0}
+    exit  total : 0.06  components={'commission': 0.0, 'exchange': 0.04, 'regulatory': 0.02}
+    exit  basis : {"sale_principal": 540.0, "cat_raw": "0.0003", "cat": 0.0, "taf_raw": "0.00329", "taf": 0.0, "sec_raw": "0.011124", "sec_component": 0.02, "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"}
+
+==============================================================================
+PROPOSED PAYLOAD — fill authorized_by / authorized_utc and install ONLY on your instruction
+==============================================================================
+{
+ "schedule_id": "ROBINHOOD_RHF_2026",
+ "version": "2026-09-12b",
+ "source_document_sha256": "7f9c86bf297d078ce27505cbc53eecc068cf975fbfca5aada37b9af865d7e14a",
+ "terms_digest": "8cf58b1a6201dd33bc6fa03535c8c5481cbea6886304f41c0f259686bb45daeb",
+ "computation_digest": "41ebd4eedc31da75b483daab020124614d9d356e9fb03098bfea8bba3d662da4",
+ "effective_date": "2026-04-04",
+ "status": "AUTHORIZED",
+ "authorized_by": "<OPERATOR \u2014 NOT FILLED BY CLAUDE>",
+ "authorized_utc": "<UTC INSTANT OF YOUR AUTHORIZATION \u2014 NOT FILLED BY CLAUDE>",
+ "scope": "the paper simulation's cost model for a Robinhood self-directed non-Gold non-Professional account trading ETF options; NOT an order authorization; NOT paper capital; NOT a deployment authorization"
+}
+
+No FeeAuthorization object has been constructed in the product. ROBINHOOD_RHF_2026.authorization is None.

@@ -29,6 +29,61 @@ class FeePolicyRefused(ValueError):
     pass
 
 
+class FeeAuthorizationRefused(FeePolicyRefused):
+    """A cost model no person has authorized. Named, never silent, and never a number."""
+
+
+AUTHORIZED = "AUTHORIZED"
+NOT_AUTHORIZED = "NOT_AUTHORIZED"
+AUTHORIZATION_SUPERSEDED = "AUTHORIZATION_SUPERSEDED"
+AUTHORIZATION_MISMATCH = "AUTHORIZATION_MISMATCH"
+AUTHORIZATION_STATES = (AUTHORIZED, NOT_AUTHORIZED, AUTHORIZATION_SUPERSEDED, AUTHORIZATION_MISMATCH)
+
+
+@dataclass(frozen=True)
+class FeeAuthorization:
+    """A PERSON AUTHORIZED THIS EXACT ARITHMETIC. Immutable, and matched field by field.
+
+    WHY THIS TYPE EXISTS. `provenance` used to carry two different facts at once: that the SOURCE DOCUMENT had
+    been verified, and that the cost model was cleared for use. `known` was derived from provenance alone, so a
+    schedule transcribed from a published PDF became usable the moment it was transcribed -- no person had to
+    agree to the arithmetic. Verifying a document and authorizing a computation are different acts by different
+    parties, and conflating them meant an operator authorization for one computation silently carried over to a
+    different one.
+
+    Each field is matched EXACTLY against the schedule it claims to authorize. An authorization for another
+    schedule, another version, another source document, other terms, or another COMPUTATION does not apply."""
+    schedule_id: str
+    version: str
+    source_document_sha256: str
+    terms_digest: str                 # the RATES
+    computation_digest: str           # HOW the rates are applied -- what changed between v2026-09-12 and -b
+    effective_date: str
+    status: str                       # AUTHORIZED | NOT_AUTHORIZED | AUTHORIZATION_SUPERSEDED
+    authorized_by: str
+    authorized_utc: str
+    scope: str
+
+    def __post_init__(self):
+        if self.status not in AUTHORIZATION_STATES:
+            raise FeeAuthorizationRefused("AUTHORIZATION_STATE_UNKNOWN: %r" % (self.status,))
+        for f in ("schedule_id", "version", "source_document_sha256", "terms_digest", "computation_digest",
+                  "effective_date", "authorized_by", "authorized_utc", "scope"):
+            if not isinstance(getattr(self, f), str) or not getattr(self, f).strip():
+                raise FeeAuthorizationRefused("AUTHORIZATION_FIELD_MISSING: %s" % f)
+
+    def describe(self) -> dict:
+        return {"schedule_id": self.schedule_id, "version": self.version,
+                "source_document_sha256": self.source_document_sha256, "terms_digest": self.terms_digest,
+                "computation_digest": self.computation_digest, "effective_date": self.effective_date,
+                "status": self.status, "authorized_by": self.authorized_by,
+                "authorized_utc": self.authorized_utc, "scope": self.scope}
+
+    @property
+    def digest(self) -> str:
+        return canonical_hash(self.describe())
+
+
 @dataclass(frozen=True)
 class FeeSchedule:
     schedule_id: str
@@ -45,6 +100,8 @@ class FeeSchedule:
     effective_date: str = "UNDECLARED"                     # the date the published terms take effect
     cat_per_contract: float | None = None                  # CAT, both sides, rounded to the cent with sub-cent -> 0
     taf_per_contract_sell: float | None = None             # FINRA TAF, sells, rounded to the NEAREST cent
+    source_document_sha256: str = ""                       # VERIFIED SOURCE: which document these terms came from
+    authorization: "FeeAuthorization | None" = None        # OPERATOR ACT: who cleared this exact computation
 
     def __post_init__(self):
         if self.provenance not in FEE_PROVENANCE:
@@ -70,7 +127,9 @@ class FeeSchedule:
     # ---------------------------------------------------------------- COMPLETE CANONICAL FEE IDENTITY
     # The binding commits to ALL of this, not to schedule_id alone: an altered hash, provenance, known status,
     # effective date or term changes the identity and therefore the binding, and a persisted approval stops verifying.
-    IDENTITY_FIELDS = ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date", "terms_digest")
+    IDENTITY_FIELDS = ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date",
+                       "terms_digest", "computation_digest", "source_document_sha256",
+                       "authorization_status", "authorization_digest")
 
     @property
     def terms_digest(self) -> str:
@@ -85,11 +144,94 @@ class FeeSchedule:
                                "cat_per_contract": self.cat_per_contract,
                                "taf_per_contract_sell": self.taf_per_contract_sell})
 
+    @property
+    def computation_digest(self) -> str:
+        """A digest of HOW the rates are applied, not what they are.
+
+        This is the field that distinguishes v2026-09-12 from v2026-09-12b. The RATES did not change; the SEC
+        component moved from a fixed per-contract constant to the exact sale-principal computation. A terms
+        digest alone would not have caught that, which is precisely how the superseded authorization survived."""
+        return canonical_hash({
+            "sec_basis": ("SALE_PRINCIPAL_RATE_PER_MILLION" if self.sale_principal_rate_per_million is not None
+                          else "PER_CONTRACT_CONSTANT"),
+            "sec_rounding": "UP_TO_THE_CENT",
+            "cat_basis": ("PER_CONTRACT" if self.cat_per_contract is not None else "FOLDED_INTO_REGULATORY"),
+            "cat_rounding": "SUB_CENT_ROUNDS_DOWN_TO_ZERO",
+            "taf_basis": ("PER_CONTRACT_SELL" if self.taf_per_contract_sell is not None else "FOLDED_INTO_REGULATORY"),
+            "taf_rounding": "NEAREST_CENT",
+            "regulatory_sum": "EACH_COMPONENT_ROUNDED_UNDER_ITS_OWN_RULE_BEFORE_THE_SUM",
+            "arithmetic": "DECIMAL_CENTS"})
+
+    # ------------------------------------------------------------------ SOURCE VERIFIED vs OPERATOR AUTHORIZED
+    @property
+    def source_verified(self) -> bool:
+        """Did a document back these terms? This is what `provenance` has always meant, and ALL it means."""
+        return self.provenance == "PROVIDER_VERIFIED"
+
+    @property
+    def requires_authorization(self) -> bool:
+        """A real broker schedule is a claim about real money and needs a person. The SYNTHETIC fixture is
+        exempt: it is labelled synthetic, can never be a live cost claim, and authorizing it would be theatre."""
+        return self.provenance == "PROVIDER_VERIFIED"
+
+    def authorization_state(self) -> dict:
+        """Is this exact computation authorized? Each field matched exactly; a near miss is a refusal."""
+        if not self.requires_authorization:
+            return {"status": AUTHORIZED, "why": None,
+                    "basis": "NOT_REQUIRED: %s is not a broker schedule" % self.provenance}
+        a = self.authorization
+        if a is None:
+            return {"status": NOT_AUTHORIZED,
+                    "why": ("NO_AUTHORIZATION: %s v%s carries no operator authorization. A verified source document "
+                            "is not an authorized cost model." % (self.schedule_id, self.version)),
+                    "basis": "ABSENT"}
+        if a.status != AUTHORIZED:
+            return {"status": (AUTHORIZATION_SUPERSEDED if a.status == AUTHORIZATION_SUPERSEDED else NOT_AUTHORIZED),
+                    "why": "AUTHORIZATION_NOT_ACTIVE: status is %s" % a.status, "basis": "STATUS"}
+        for field, mine, theirs in (("schedule_id", self.schedule_id, a.schedule_id),
+                                    ("version", self.version, a.version),
+                                    ("effective_date", self.effective_date, a.effective_date),
+                                    ("source_document_sha256", self.source_document_sha256, a.source_document_sha256),
+                                    ("terms_digest", self.terms_digest, a.terms_digest),
+                                    ("computation_digest", self.computation_digest, a.computation_digest)):
+            if mine != theirs:
+                return {"status": AUTHORIZATION_MISMATCH,
+                        "why": ("AUTHORIZATION_DOES_NOT_MATCH: %s is %r on the schedule and %r on the "
+                                "authorization. An authorization applies to exactly what was authorized."
+                                % (field, str(mine)[:24], str(theirs)[:24])),
+                        "basis": field}
+        return {"status": AUTHORIZED, "why": None, "basis": "EXACT_MATCH", "authorization_digest": a.digest}
+
+    @property
+    def authorized(self) -> bool:
+        return self.authorization_state()["status"] == AUTHORIZED
+
+    @property
+    def usable(self) -> bool:
+        """The ONLY property a trading gate should consult: the terms are known AND a person authorized them."""
+        return self.known and self.authorized
+
+    def assert_usable(self, *, what: str = "operation") -> None:
+        if not self.known:
+            raise FeeAuthorizationRefused("FEE_SCHEDULE_UNKNOWN: %s is %s; an unknown cost is not zero (%s)"
+                                          % (self.schedule_id, self.provenance, what))
+        st = self.authorization_state()
+        if st["status"] != AUTHORIZED:
+            raise FeeAuthorizationRefused("FEE_SCHEDULE_NOT_AUTHORIZED: %s -- %s (%s)"
+                                          % (st["status"], st["why"], what))
+
     def identity(self) -> dict:
         """The complete canonical fee identity. Every field is compared exactly, everywhere."""
+        st = self.authorization_state()
         return {"schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "provenance": self.provenance,
                 "known": self.known, "version": self.version, "effective_date": self.effective_date,
-                "terms_digest": self.terms_digest}
+                "terms_digest": self.terms_digest,
+                # BOUND INTO THE IDENTITY, so a persisted approval stops verifying the moment the authorization
+                # changes, is removed, or is superseded.
+                "computation_digest": self.computation_digest,
+                "source_document_sha256": self.source_document_sha256,
+                "authorization_status": st["status"],
+                "authorization_digest": (self.authorization.digest if self.authorization is not None else None)}
 
     @property
     def identity_hash(self) -> str:
@@ -120,6 +262,12 @@ class FeeSchedule:
         The rounding decision for each component is persisted so the total is reconstructable."""
         if type(contracts) is not int or contracts < 0:
             raise FeePolicyRefused("CONTRACTS_INVALID: %r" % (contracts,))
+        _auth = self.authorization_state()
+        if self.known and _auth["status"] != AUTHORIZED:
+            # SOURCE VERIFIED IS NOT AUTHORIZED. A cost nobody cleared is not a cost we may charge.
+            return {"total": None, "status": "NOT_AUTHORIZED", "why": _auth["why"],
+                    "authorization_status": _auth["status"], "schedule_id": self.schedule_id,
+                    "schedule_hash": self.schedule_hash, "fee_identity": self.identity(), "side": side}
         if not self.known:
             return {"total": None, "status": "UNKNOWN", "why": "fee schedule %s is UNVERIFIED; an unknown cost is not zero"
                     % self.schedule_id, "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "side": side,
@@ -300,17 +448,34 @@ ROBINHOOD_RHF_2026 = FeeSchedule(
     cat_per_contract=0.0003,                             # CAT, both sides; sub-cent rounds to zero
     taf_per_contract_sell=0.00329,                       # FINRA TAF, sells, nearest cent, effective 2026-01-01
     effective_date="2026-04-04",                         # the latest published effective date among the components
+    source_document_sha256=ROBINHOOD_RHF_2026_SOURCE["document_sha256"],
+    # SOURCE VERIFICATION ONLY. `verified_against` records WHICH DOCUMENT backs these terms and nothing else.
+    # The superseded 2026-09-12 operator authorization is NO LONGER CARRIED HERE: it authorized a different
+    # computation, and leaving it inside the schedule is what let it travel to arithmetic nobody had reviewed.
+    # It is retained, unaltered, as history in ROBINHOOD_RHF_2026_SUPERSEDED_AUTHORIZATION below.
     verified_against={"provider": ROBINHOOD_RHF_2026_SOURCE["provider"], "document": ROBINHOOD_RHF_2026_SOURCE["document"],
-                      "date": ROBINHOOD_RHF_2026_SOURCE["date"], "document_sha256": ROBINHOOD_RHF_2026_SOURCE["document_sha256"],
-                      "authorization": ROBINHOOD_RHF_2026_AUTHORIZATION},
-    note=("broker schedule transcribed from the published PDF; AUTHORIZED by the operator 2026-09-12 and the LIVE default from that date; "
-          "per-contract round trip ~ $0.06 (buy 0.0403, sell 0.0236 at the cap) vs the SYNTHETIC fixture's 1.02"))
+                      "date": ROBINHOOD_RHF_2026_SOURCE["date"], "document_sha256": ROBINHOOD_RHF_2026_SOURCE["document_sha256"]},
+    authorization=None,          # NOT AUTHORIZED. No operator has cleared the v2026-09-12b computation.
+    note=("CANDIDATE, NOT AUTHORIZED. Broker schedule transcribed from the published PDF (source document "
+          "verified, digest 7f9c86bf). The v2026-09-12b SEC computation -- exact sale principal rather than a "
+          "per-contract constant -- has NOT been authorized by an operator, so this schedule is not usable and is "
+          "not the live default. Per-contract round trip ~ $0.06 vs the SYNTHETIC fixture's 1.02."))
 
 # THE COMPUTATION CHANGED (sale-principal SEC component), so the schedule is a CANDIDATE again and the live default
 # reverts to UNVERIFIED until the operator reviews the new arithmetic. An unknown cost is not zero, and a changed
 # cost model is not an authorized one.
-ROBINHOOD_RHF_2026_AUTHORIZATION["status"] = ("SUPERSEDED_BY_COMPUTATION_CHANGE: the 2026-09-12 authorization covered the "
-                                              "transcription of v2026-09-12; v2026-09-12b changes the SEC component from a "
-                                              "fixed per-contract constant to the exact sale-principal computation and needs "
-                                              "operator review")
-LIVE_DEFAULT_FEES = UNVERIFIED_FEES          # reverted 2026-09-12 pending review of v2026-09-12b
+# HISTORY, NOT AUTHORITY. The 2026-09-12 authorization is kept verbatim as a record of what was authorized and
+# when. It is deliberately NOT attached to any schedule: it authorized the v2026-09-12 computation, and the
+# arithmetic has since changed. Mutating its status in place -- which is what this module used to do -- left an
+# object that read AUTHORIZED to everything that did not happen to inspect one nested key.
+ROBINHOOD_RHF_2026_SUPERSEDED_AUTHORIZATION = dict(ROBINHOOD_RHF_2026_AUTHORIZATION)
+ROBINHOOD_RHF_2026_SUPERSEDED_AUTHORIZATION["status"] = (
+    "SUPERSEDED_BY_COMPUTATION_CHANGE: authorized the v2026-09-12 transcription; v2026-09-12b changes the SEC "
+    "component from a fixed per-contract constant to the exact sale-principal computation. It does not apply.")
+ROBINHOOD_RHF_2026_SUPERSEDED_AUTHORIZATION["applies_to_current_schedule"] = False
+
+# THE DEFAULT IS NOT THE CONTROL. LIVE_DEFAULT_FEES being UNVERIFIED only governs a caller that asks for no
+# schedule; a caller could always pass the candidate explicitly and be charged. The control is
+# FeeSchedule.usable / assert_usable(), enforced at the boundary and the risk authority, which refuses a
+# PROVIDER_VERIFIED schedule carrying no matching operator authorization however it was supplied.
+LIVE_DEFAULT_FEES = UNVERIFIED_FEES          # reverted 2026-09-12 pending authorization of v2026-09-12b

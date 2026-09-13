@@ -146,6 +146,13 @@ class CertifiedRiskAuthority(RiskAuthority):
         if not self.fee_schedule.known:
             return {"approved": False, "risk_provenance": CERTIFIED_PROVENANCE, "authority_id": self.authority_id,
                     "why": "FEE_SCHEDULE_UNKNOWN: %s" % self.fee_schedule.schedule_id, "fee_identity": self.fee_identity()}
+        # SOURCE VERIFIED IS NOT OPERATOR AUTHORIZED. Checked here, before the certificate, the kernel, the
+        # envelope and any quote -- an unauthorized cost model never reaches an intent, however it was supplied.
+        _auth = self.fee_schedule.authorization_state()
+        if _auth["status"] != "AUTHORIZED":
+            return {"approved": False, "risk_provenance": CERTIFIED_PROVENANCE, "authority_id": self.authority_id,
+                    "why": "FEE_SCHEDULE_NOT_AUTHORIZED: %s -- %s" % (_auth["status"], _auth["why"]),
+                    "authorization_status": _auth["status"], "fee_identity": self.fee_identity()}
         env = intent.get("risk_envelope") or {}
         _fee_identity = self.fee_identity()
         if not is_real(env.get("max_entry_price")) or env["max_entry_price"] <= 0:

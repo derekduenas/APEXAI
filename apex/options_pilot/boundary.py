@@ -37,7 +37,7 @@ from .clock import Clock, ClockRefused, check_reading, to_utc_string
 from . import exit_policy as EP
 from . import instant as I
 from .exit_policy import EXIT_POLICY_V1, ExitPolicy
-from .fees import EXECUTION_POLICY_V1, UNVERIFIED_FEES, ExecutionPolicy, FeeSchedule
+from .fees import EXECUTION_POLICY_V1, UNVERIFIED_FEES, ExecutionPolicy, FeeSchedule, FeeAuthorizationRefused
 from .records import (TOLL_FORMULA_V1, FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_record_labels, canonical_hash, is_real, labels_for,
                       validate_forecast, validate_intent, validate_quote)
 
@@ -98,6 +98,17 @@ class Boundary:
         self.session_id = session_id
         self.release = release
         self.fee_schedule = fee_schedule
+        # THE EARLIEST GATE. A boundary carrying a broker schedule that no operator has authorized cannot be
+        # built at all, so the refusal precedes every quote request, certificate, kernel check, intent and fill
+        # rather than arriving somewhere downstream. UNVERIFIED is still permitted here -- it refuses later, by
+        # design, because a session that records refusals is useful and a session that cannot start is not.
+        if fee_schedule.known and not fee_schedule.authorized:
+            st = fee_schedule.authorization_state()
+            raise FeeAuthorizationRefused(
+                "BOUNDARY_REFUSES_UNAUTHORIZED_FEE_SCHEDULE: %s v%s -- %s: %s. A verified source document is not "
+                "an authorized cost model; supply an authorization that matches this exact computation, or use "
+                "UNVERIFIED_FEES and record refusals."
+                % (fee_schedule.schedule_id, fee_schedule.version, st["status"], st["why"]))
         self.execution_policy = execution_policy
         self.exit_policy = exit_policy
 

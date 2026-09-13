@@ -1,0 +1,25 @@
+Failed to stop apex-pilot-stage1-2026-09-14.service: Unit apex-pilot-stage1-2026-09-14.service not loaded.
+===== AFTER THE HOLD =====
+--- date_utc ---
+2026-09-13T16:55:16Z
+--- timer present? ---
+NO PILOT TIMER PRESENT
+--- units matching pilot ---
+NO PILOT UNITS PRESENT
+--- transient dir ---
+no transient pilot unit files
+--- ledger / positions unchanged ---
+no pilot ledger (unchanged: none existed)
+no pilot output (unchanged: none existed)
+--- deployed release untouched ---
+/opt/apex/releases/a6e123d36a89ac70ca512243336eb1561a9b9cd3
+INDEPENDENT RECHECK 2026-09-13T16:55:29Z
+NEXT                        LEFT LAST                         PASSED UNIT                           ACTIVATES
+Mon 2026-09-14 01:10:22 UTC   8h Sun 2026-09-13 01:10:22 UTC 15h ago launchpadlib-cache-clean.timer launchpadlib-cache-clean.service
+
+1 timers listed.
+--- any unit whose name or description mentions the pilot ---
+0
+0
+--- anything scheduled in the next 48h at all ---
+1

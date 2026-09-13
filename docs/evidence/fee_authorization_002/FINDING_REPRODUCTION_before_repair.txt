@@ -1,0 +1,37 @@
+FEE-AUTHORIZATION-002 — FINDING REPRODUCED BEFORE ANY REPAIR
+code pin 35af566087537ccc1c203ed049a522019cc4c224
+
+D1. THE OBJECT SAYS BOTH CANDIDATE AND AUTHORIZED
+    source comment above it : 'RETURNS TO CANDIDATE and needs operator review'
+    provenance              : 'PROVIDER_VERIFIED'
+    known                   : True   <-- derived ONLY from provenance != UNVERIFIED
+    note                    : 'broker schedule transcribed from the published PDF; AUTHORIZED by the operator 2026-09-12 and th'
+    -> the note still asserts AUTHORIZED and LIVE default while the comment says candidate.
+
+D2. THE SUPERSEDED AUTHORIZATION IS STILL CARRIED INSIDE THE SCHEDULE
+    authorization.authorized_by : 'operator'
+    authorization.date          : '2026-09-12'
+    authorization.status        : 'SUPERSEDED_BY_COMPUTATION_CHANGE: the 2026-09-12 authorization covered the trans'
+    -> an operator authorization for v2026-09-12 travels with v2026-09-12b.
+
+D3. AUTHORIZATION IS BOUND INTO NO IDENTITY FIELD
+    IDENTITY_FIELDS : ('schedule_id', 'schedule_hash', 'provenance', 'known', 'version', 'effective_date', 'terms_digest')
+    identity()      : {"effective_date": "2026-04-04", "known": true, "provenance": "PROVIDER_VERIFIED", "schedule_hash": "09dd9cbeeb644b309d1f43da23dc65e08729202cdc9343ea5
+    -> nothing in the canonical identity names an authorization, so no downstream
+       verification can detect its absence, its supersession, or its alteration.
+
+D4. THE EXPLICIT-CANDIDATE BYPASS — the gate is not the only gate
+    LIVE_DEFAULT_FEES : UNVERIFIED (known=False)
+      LIVE_DEFAULT (UNVERIFIED)  decision=REFUSE  intents=0 fills=0
+      explicit ROBINHOOD v-b     decision=TRADE   intents=1 fills=1
+    -> a caller that simply PASSES the candidate obtains a certified trade.
+       LIVE_DEFAULT_FEES = UNVERIFIED_FEES is a DEFAULT, not a control.
+
+D5. MUTATION AFTER CONSTRUCTION IS LOAD-BEARING
+    the status above was assigned by a module-level statement AFTER the frozen dataclass
+    was built, reaching through verified_against (a mutable dict inside a frozen object).
+    schedule_hash is a property, so it recomputes -- but nothing CHECKS the status.
+
+CONCLUSION: source verification and operator authorization are conflated in `provenance`.
+A schedule whose document is verified is automatically `known`, and `known` is what every
+downstream gate consults. There is no field that says A PERSON AUTHORIZED THIS ARITHMETIC.
