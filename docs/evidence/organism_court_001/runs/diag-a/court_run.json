@@ -1,0 +1,626 @@
+{
+ "run_id": "diag-a",
+ "world": "ELIGIBLE_TRADE",
+ "policy": "PILOT_RULE_V2",
+ "declared_world": {
+  "recipe": "ORGANISM_COURT_WORLD_V1",
+  "seed": 20260913,
+  "bars": "1-minute bars, deterministic LCG, drift and volatility declared per world",
+  "law": "SYNTHETIC. Proves ORCHESTRATION and CONNECTION only. It is not market data, not a backtest, and no number produced from it is evidence of edge, calibration or profitability.",
+  "no_tuning": "min_train_bars and fit_budget are the engine's own values, NOT lowered or raised to make a flight pass. A flight that cannot reach a layer reports where it stopped.",
+  "drift_bp_per_bar": 0.8,
+  "vol_bp_per_bar": 4.0,
+  "chain_ask": 2.45,
+  "quote": [
+   2.4,
+   2.5
+  ],
+  "exit_quote": [
+   2.7,
+   2.8
+  ],
+  "why": "declared BEFORE running: a persistent upward drift with an affordable near-money ask"
+ },
+ "fixture_revisions": [],
+ "decision": "TRADE",
+ "why": null,
+ "consumption": {
+  "n_receipts": 12,
+  "n_used": 7,
+  "n_not_consumed": 5
+ },
+ "receipts": [
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": null,
+   "snapshot_id": null,
+   "layer": "REALITY_DATA",
+   "operation": "synthetic bar generation + availability validation",
+   "parents": [],
+   "code_identity": "ORGANISM_COURT_WORLD_V1",
+   "model_identity": null,
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [
+    {
+     "id": "seed",
+     "digest": "4a005e712204a54bc91a5d2893f5b4acbaa7ac72198a8a9874f8e8913c8d8044"
+    }
+   ],
+   "output_id": "bars:942ff61128630790",
+   "output_digest": "66f5f185f14242c060273939e451d05fa2f6aea155df87a456de15df1332b015",
+   "started_epoch": null,
+   "ended_epoch": null,
+   "availability_cutoff_epoch": 1789000020.0,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "NOT_CONSUMED",
+    "evidence": [],
+    "note": "set only by scanning persisted downstream records for this output's identity"
+   },
+   "declared_not_measured": {
+    "synthetic": true,
+    "law": "SYNTHETIC. Proves ORCHESTRATION and CONNECTION only. It is not market data, not a backtest, and no number produced from it is evidence of edge, calibration or profitability."
+   },
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:070efb6bb47ac3d688505df4e727be1f"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": null,
+   "snapshot_id": null,
+   "layer": "TRADINGVIEW_EXTERNAL_CONTEXT",
+   "operation": "external_context",
+   "parents": [],
+   "code_identity": "apex.tradingview.context.external_context",
+   "model_identity": null,
+   "implementation": null,
+   "available": "UNAVAILABLE",
+   "why_unavailable": "no observation reached this decision instant",
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [
+    {
+     "id": "symbol",
+     "digest": "a15fe2728c965565e820efea2b3771ccd37e2d588d1af56c7905fe5b1714f6d3"
+    }
+   ],
+   "output_id": "extctx:6dc0ab3f018f5517",
+   "output_digest": "efdb35afa35d42abd5132cbd69cb7ed5f0511767329bd8ad9a641c7eb06bd043",
+   "started_epoch": 1789325335.0575511,
+   "ended_epoch": 1789325335.057934,
+   "availability_cutoff_epoch": null,
+   "refusal": "no observation reached this decision instant",
+   "fallback": null,
+   "consumption": {
+    "state": "NOT_CONSUMED",
+    "evidence": [],
+    "note": "set only by scanning persisted downstream records for this output's identity"
+   },
+   "declared_not_measured": {
+    "authority": "EXTERNAL_CONTEXT_ONLY",
+    "note": "USED here can only ever be 0: no production consumer is registered"
+   },
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:4f3ad4213b88706297c22cd1dd188129"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": null,
+   "snapshot_id": "snap:1853abe52d9cb064b942282167ace8bc",
+   "layer": "DIGITAL_TWIN",
+   "operation": "snapshot.compose",
+   "parents": [],
+   "code_identity": "apex.pulse_options.snapshot.compose",
+   "model_identity": null,
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [
+    {
+     "id": "bars:942ff61128630790",
+     "digest": "942ff611286307906db9ac53a33bc7d5f204443d26fb7d3111361076df05f05d"
+    }
+   ],
+   "output_id": "snap:1853abe52d9cb064b942282167ace8bc",
+   "output_digest": "acccbdf888f29d92845998b0a58ed7c4b73a20b7e1ab8b3e2346ac8daffa5c42",
+   "started_epoch": 1789325335.0580091,
+   "ended_epoch": 1789325335.063989,
+   "availability_cutoff_epoch": 1789000020.0,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "USED",
+    "evidence": [
+     {
+      "consumer_record_kind": "pilot_forecast",
+      "consumer_record_id": "forecast:ff4c7500794382ff2ecf9328",
+      "matched_on": "output_id",
+      "field_path": ".inputs.snapshot_id",
+      "value": "snap:1853abe52d9cb064b942282167ace8bc"
+     },
+     {
+      "consumer_record_kind": "pilot_forecast",
+      "consumer_record_id": "forecast:ff4c7500794382ff2ecf9328",
+      "matched_on": "snapshot_id",
+      "field_path": ".inputs.snapshot_id",
+      "value": "snap:1853abe52d9cb064b942282167ace8bc"
+     },
+     {
+      "consumer_record_kind": "pilot_decision",
+      "consumer_record_id": "decision:diag-a:0001:SPY",
+      "matched_on": "output_id",
+      "field_path": ".funnel_trace.state_snapshot.snapshot_id",
+      "value": "snap:1853abe52d9cb064b942282167ace8bc"
+     },
+     {
+      "consumer_record_kind": "pilot_decision",
+      "consumer_record_id": "decision:diag-a:0001:SPY",
+      "matched_on": "snapshot_id",
+      "field_path": ".funnel_trace.state_snapshot.snapshot_id",
+      "value": "snap:1853abe52d9cb064b942282167ace8bc"
+     }
+    ],
+    "note": "discovered in a persisted record written by the real downstream path"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:9297a1edbdcd2ab6475be8d181d6c4ad"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": null,
+   "snapshot_id": "snap:1853abe52d9cb064b942282167ace8bc",
+   "layer": "LOCATION_VOLATILITY_FORECAST",
+   "operation": "forecast provider",
+   "parents": [],
+   "code_identity": "SYNTHETIC_FIXTURE_MODEL",
+   "model_identity": {
+    "model_hash": "SYNTHETIC:28367e9c7d89c1902e7b0fdb9da69c2b45d18ba9",
+    "params_hash": "SYNTHETIC:0bcead7c4ced138d",
+    "artifact": "SYNTHETIC:0bcead7c4ced138dc330d89f327ab13091a3bf31"
+   },
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [
+    {
+     "id": "snap:1853abe52d9cb064b942282167ace8bc",
+     "digest": "1853abe52d9cb064b942282167ace8bc773c261edb98e644d9293ab2fb8e4cab"
+    }
+   ],
+   "output_id": "forecast:f755ecee24d818ec",
+   "output_digest": "676ef08a535955f24f0ee2ac093ef26a76dff40bf06462b2cdad71aa7b0a6f26",
+   "started_epoch": 1789325335.0580091,
+   "ended_epoch": 1789325335.0642009,
+   "availability_cutoff_epoch": 1789000020.0,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "USED",
+    "evidence": [
+     {
+      "consumer_record_kind": "pilot_forecast",
+      "consumer_record_id": "forecast:ff4c7500794382ff2ecf9328",
+      "matched_on": "snapshot_id",
+      "field_path": ".inputs.snapshot_id",
+      "value": "snap:1853abe52d9cb064b942282167ace8bc"
+     },
+     {
+      "consumer_record_kind": "pilot_decision",
+      "consumer_record_id": "decision:diag-a:0001:SPY",
+      "matched_on": "snapshot_id",
+      "field_path": ".funnel_trace.state_snapshot.snapshot_id",
+      "value": "snap:1853abe52d9cb064b942282167ace8bc"
+     }
+    ],
+    "note": "discovered in a persisted record written by the real downstream path"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:95fbd2849b7d6506b81a825d3cf3012e"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": null,
+   "snapshot_id": null,
+   "layer": "TWIN_SPOT",
+   "operation": "spot_fn",
+   "parents": [],
+   "code_identity": "SyntheticHarness.spot_fn",
+   "model_identity": null,
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [
+    {
+     "id": "args",
+     "digest": "055b188e59e3e3eeeac77770f2d6c67b068515de8f56fd217c78a6b97f767405"
+    }
+   ],
+   "output_id": "twin_spot:0dcb4124ae50a7ba",
+   "output_digest": "0dcb4124ae50a7bab6771d01f464d19031d1fb9198332b7a4dda7d2c83b36779",
+   "started_epoch": 1789325335.0699189,
+   "ended_epoch": 1789325335.069956,
+   "availability_cutoff_epoch": null,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "NOT_CONSUMED",
+    "evidence": [],
+    "note": "set only by scanning persisted downstream records for this output's identity"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:89210b2af83af3a03acdd25be73b5a7f"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": null,
+   "snapshot_id": null,
+   "layer": "CHAIN",
+   "operation": "chain_fn",
+   "parents": [],
+   "code_identity": "SyntheticHarness.chain_fn",
+   "model_identity": null,
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [
+    {
+     "id": "args",
+     "digest": "055b188e59e3e3eeeac77770f2d6c67b068515de8f56fd217c78a6b97f767405"
+    }
+   ],
+   "output_id": "chain:5d72133410c6d418",
+   "output_digest": "5d72133410c6d418ecc6a748d11577a8f24d7d3a440fde22c427dfd7baaede28",
+   "started_epoch": 1789325335.070051,
+   "ended_epoch": 1789325335.070155,
+   "availability_cutoff_epoch": null,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "NOT_CONSUMED",
+    "evidence": [],
+    "note": "set only by scanning persisted downstream records for this output's identity"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:d91ae55887887f751bc4ac9dfdb7c000"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": "diag-a:0001:SPY",
+   "snapshot_id": null,
+   "layer": "PERSISTED_FORECAST",
+   "operation": "persisted by the real path",
+   "parents": [],
+   "code_identity": null,
+   "model_identity": null,
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [],
+   "output_id": "forecast:ff4c7500794382ff2ecf9328",
+   "output_digest": "2bfd14f43d17fc7cea24e0917a8879b4b2f880b8baeec1b9d90fbaad655e71bd",
+   "started_epoch": null,
+   "ended_epoch": null,
+   "availability_cutoff_epoch": null,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "USED",
+    "evidence": [
+     {
+      "consumer_record_kind": "pilot_forecast",
+      "consumer_record_id": "forecast:ff4c7500794382ff2ecf9328",
+      "matched_on": "output_id",
+      "field_path": ".txn_id",
+      "value": "forecast:ff4c7500794382ff2ecf9328"
+     }
+    ],
+    "note": "discovered in a persisted record written by the real downstream path"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:a213d898e0f31a6bba703c8842eb33eb"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": null,
+   "snapshot_id": null,
+   "layer": "FUNNEL_ENGINE",
+   "operation": "persisted by the real path",
+   "parents": [],
+   "code_identity": null,
+   "model_identity": null,
+   "implementation": null,
+   "available": "UNAVAILABLE",
+   "why_unavailable": "no pilot_funnel record was written",
+   "executed": "NOT_EXECUTED",
+   "valid": "NOT_ASSESSED",
+   "why_invalid": null,
+   "inputs": [],
+   "output_id": null,
+   "output_digest": null,
+   "started_epoch": null,
+   "ended_epoch": null,
+   "availability_cutoff_epoch": null,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "NOT_CONSUMED",
+    "evidence": [],
+    "note": "set only by scanning persisted downstream records for this output's identity"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:2e68d43b19f72fe0a7fb4df5b71cae10"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": "diag-a:0001:SPY",
+   "snapshot_id": null,
+   "layer": "PERSISTED_INTENT",
+   "operation": "persisted by the real path",
+   "parents": [],
+   "code_identity": null,
+   "model_identity": null,
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [],
+   "output_id": "intent:23d8dc3234da02a9c09753be",
+   "output_digest": "2bfd14f43d17fc7cea24e0917a8879b4b2f880b8baeec1b9d90fbaad655e71bd",
+   "started_epoch": null,
+   "ended_epoch": null,
+   "availability_cutoff_epoch": null,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "USED",
+    "evidence": [
+     {
+      "consumer_record_kind": "pilot_intent",
+      "consumer_record_id": "intent:23d8dc3234da02a9c09753be",
+      "matched_on": "output_id",
+      "field_path": ".txn_id",
+      "value": "intent:23d8dc3234da02a9c09753be"
+     }
+    ],
+    "note": "discovered in a persisted record written by the real downstream path"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:6d5ae611c826bd43f99e45b23c34bdb6"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": "diag-a:0001:SPY",
+   "snapshot_id": null,
+   "layer": "PAPER_FILL",
+   "operation": "persisted by the real path",
+   "parents": [],
+   "code_identity": null,
+   "model_identity": null,
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [],
+   "output_id": "fill:23d8dc3234da02a9c09753be:1",
+   "output_digest": "2bfd14f43d17fc7cea24e0917a8879b4b2f880b8baeec1b9d90fbaad655e71bd",
+   "started_epoch": null,
+   "ended_epoch": null,
+   "availability_cutoff_epoch": null,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "USED",
+    "evidence": [
+     {
+      "consumer_record_kind": "pilot_fill",
+      "consumer_record_id": "fill:23d8dc3234da02a9c09753be:1",
+      "matched_on": "output_id",
+      "field_path": ".txn_id",
+      "value": "fill:23d8dc3234da02a9c09753be:1"
+     }
+    ],
+    "note": "discovered in a persisted record written by the real downstream path"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:023e4c4a8c8ac858a8f33b63ff5fb376"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": "diag-a:0001:SPY",
+   "snapshot_id": null,
+   "layer": "EXIT_AND_BOOK",
+   "operation": "persisted by the real path",
+   "parents": [],
+   "code_identity": null,
+   "model_identity": null,
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [],
+   "output_id": "outcome:23d8dc3234da02a9c09753be:1",
+   "output_digest": "363379742f80b51bdb9206579af7754911543079b9399cb3fc315fb199f476e8",
+   "started_epoch": null,
+   "ended_epoch": null,
+   "availability_cutoff_epoch": null,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "USED",
+    "evidence": [
+     {
+      "consumer_record_kind": "pilot_outcome",
+      "consumer_record_id": "outcome:23d8dc3234da02a9c09753be:1",
+      "matched_on": "output_id",
+      "field_path": ".txn_id",
+      "value": "outcome:23d8dc3234da02a9c09753be:1"
+     }
+    ],
+    "note": "discovered in a persisted record written by the real downstream path"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:f0a99b8456ca91d6a3f98a7466e757a3"
+  },
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "diag-a",
+   "scan_id": "diag-a:0001:SPY",
+   "snapshot_id": null,
+   "layer": "DECISION_RECORD",
+   "operation": "persisted by the real path",
+   "parents": [],
+   "code_identity": null,
+   "model_identity": null,
+   "implementation": null,
+   "available": "AVAILABLE",
+   "why_unavailable": null,
+   "executed": "EXECUTED",
+   "valid": "VALID",
+   "why_invalid": null,
+   "inputs": [],
+   "output_id": "decision:diag-a:0001:SPY",
+   "output_digest": "2bfd14f43d17fc7cea24e0917a8879b4b2f880b8baeec1b9d90fbaad655e71bd",
+   "started_epoch": null,
+   "ended_epoch": null,
+   "availability_cutoff_epoch": null,
+   "refusal": null,
+   "fallback": null,
+   "consumption": {
+    "state": "USED",
+    "evidence": [
+     {
+      "consumer_record_kind": "pilot_decision",
+      "consumer_record_id": "decision:diag-a:0001:SPY",
+      "matched_on": "output_id",
+      "field_path": ".txn_id",
+      "value": "decision:diag-a:0001:SPY"
+     }
+    ],
+    "note": "discovered in a persisted record written by the real downstream path"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:4b80db67214c41a3988aca171ece7c97"
+  }
+ ],
+ "ledger_kinds": {
+  "pilot_decision": 1,
+  "pilot_fill": 1,
+  "pilot_forecast": 1,
+  "pilot_intent": 1,
+  "pilot_outcome": 2,
+  "pilot_session_close": 1,
+  "pilot_session_open": 1
+ },
+ "lifecycle_report": {
+  "n_events": 3,
+  "decisions": [
+   {
+    "scan_id": "diag-a:0001:SPY",
+    "symbol": "SPY",
+    "decision": "TRADE",
+    "why": null,
+    "forecast_id": "ff4c7500794382ff2ecf9328",
+    "intent_id": "23d8dc3234da02a9c09753be",
+    "fill_id": "f0ce5a77f89b738ead8b40ac",
+    "decision_persisted": true,
+    "refusal_persisted": null,
+    "at_utc": "2026-09-10T00:27:00.000000Z",
+    "exit_due_utc": "2026-09-10T00:42:00.000000Z"
+   }
+  ],
+  "exits": [
+   {
+    "event": "EXIT_DUE",
+    "at_utc": "2026-09-10T00:42:00.000000Z",
+    "state": "UNRESOLVED_RETRY_SCHEDULED",
+    "fill_seq": 4,
+    "outcome_seq": 6,
+    "status": "NOT_ESTIMABLE",
+    "attempt": 1,
+    "why": "",
+    "next_attempt_utc": "2026-09-10T00:42:15.000000Z"
+   },
+   {
+    "event": "EXIT_ARRIVAL",
+    "at_utc": "2026-09-10T00:42:00.200000Z",
+    "state": "RESOLVED",
+    "fill_seq": 4,
+    "outcome_seq": 7,
+    "attempt": 2,
+    "capacity_released": true,
+    "trigger": "OBSERVATION_ARRIVAL",
+    "observation_id": "obs-0",
+    "arrival_observation_id": "obs-0",
+    "quote_observation_id": null,
+    "request_epoch": 1789000920.2,
+    "receipt_epoch": 1789000920.2,
+    "quote_available_epoch": null,
+    "timing_basis": "PERSISTED_BY_THE_BOUNDARY: request and receipt are the instants the boundary recorded around its own provider call, not a later clock read",
+    "same_observation": null,
+    "provenance_note": "an arrival wakes the scheduler; the quote the boundary was served is identified separately and need not be the waking observation",
+    "remaining_window_s": 119.8
+   },
+   {
+    "event": "EXIT_RETRY",
+    "at_utc": "2026-09-10T00:42:15.000000Z",
+    "state": "RESOLVED",
+    "fill_seq": 4,
+    "reason": "STALE_EVENT_RECONCILED_POSITION_ALREADY_RESOLVED",
+    "policy_version": "EXIT_AT_HORIZON_15M_V2_ARRIVAL",
+    "is_attempt": false,
+    "trigger": "EXIT_RETRY",
+    "final": "RESOLVED"
+   }
+  ]
+ },
+ "verdict_limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity."
+}

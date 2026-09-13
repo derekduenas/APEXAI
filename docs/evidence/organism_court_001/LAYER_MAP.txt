@@ -1,0 +1,41 @@
+ORGANISM-COURT-001 — LAYER MAP FROM RUN EVIDENCE (not from status documents)
+
+CAPABILITY                       MODULE                 AVAIL     EXEC      VALID    USED / NOTE
+--------------------------------------------------------------------------------------------------------------------------------
+Data ingestion + availability    court world / ingest   YES       YES       YES      USED by twin
+PULSE features                   pulse_options.features YES       YES       YES      via snapshot fields
+Digital Market Twin              pulse_options.snapshot YES       YES       YES      USED: snapshot_id found in decision record
+Premarket / catalyst             catalyst.twin_snapshot YES       NOT WIRED -        event_context_fn not supplied by court
+TradingView ext context          tradingview.context    UNAVAIL*  YES       YES      NOT_CONSUMED - no registered consumer (USED=0 by design)
+Regime detection                 decision_wb regime     YES       YES       YES      feeds simulation; entropy+parameter_version recorded
+Location/vol forecast            pulse_options.inference YES       YES       YES      USED by funnel + intent
+Variance model                   decision_wb GARCH/EWMA YES       YES       YES      EWMA_FALLBACK ran, NOT GARCH
+Joint return/IV/skew/liq         (R4 joint engine)      NO        NO        -        JOINT_FUNNEL_V1 refused: needs joint_engine+joint_context_fn
+Multiverse simulation            decision_wb simulate   YES       YES       YES      2000 paths, truncated-t, IV held FIXED
+Market-implied compare           decision_wb implied    YES       YES       PARTIAL  CALL refused PRICE_OUTSIDE_NO_ARBITRAGE_BOUNDS
+Setup detection / Lab            (none on this line)    NO        NO        -        NOT_IMPLEMENTED - no setup detector is wired
+Expression vs WAIT               decision_wb expression_war YES       YES       YES      WAIT competed; selection recorded
+PRIME supervision                decision_wb prime      YES       YES       YES      PRELIMINARY_AFFORDABILITY only; kernel separate
+Risk certification               options_pilot.risk_authority YES       YES       YES      USED: CERTIFIED_KERNEL on intent
+Persisted intent                 options_pilot.boundary YES       YES       YES      USED: precedes fill
+Paper entry/exit/recovery        options_pilot.lifecycle YES       YES       YES      USED: arrival-triggered exit RESOLVED
+Book reconciliation              options_pilot.book     YES       YES       YES      P&L independently recomputed, agrees
+Experience / challenger          (none on this line)    NO        NO        -        NOT_IMPLEMENTED - loop does not close
+
+* TradingView is UNAVAILABLE in the hung-provider flight by construction; AVAILABLE otherwise.
+
+ENGINE'S OWN DECLARATION OF WHAT IT DID NOT INVOKE:
+   enrichment     NOT_INVOKED
+   fusion         NOT_INVOKED: no learned weights
+   jumps          NOT_MODELLED
+   svi_surface    NOT_INVOKED: ATM implied vol only (no surface fit, no skew)
+
+CLASSIFICATION
+  IMPLEMENTED_CONNECTED : data, PULSE, Twin, regime, forecast, variance(EWMA), Multiverse, implied,
+                          expression-vs-WAIT, PRIME, risk, intent, paper lifecycle, Book
+  IMPLEMENTED_UNWIRED   : premarket/catalyst (exists, not supplied in this route);
+                          TradingView (executes, zero registered consumers)
+  UNAVAILABLE           : JOINT route (missing joint_engine + joint_context_fn);
+                          GARCH (refused at fit, fell back to EWMA); SVI surface/skew; jumps; fusion
+  NOT_IMPLEMENTED       : setup detection / Strategy Lab; Experience + challenger learning;
+                          stock/ETF cross-instrument expression (options-only today)

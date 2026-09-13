@@ -1,0 +1,41 @@
+{
+ "run_id": "fc-JOIN-500",
+ "policy": "JOINT_FUNNEL_V1",
+ "reachable": false,
+ "refusal": "JOINT_FUNNEL_V1 requires joint_engine and joint_context_fn (R4 contract a0228fac, Amendment A1)",
+ "receipts": [
+  {
+   "schema": "LAYER_RECEIPT_V1",
+   "run_id": "fc-JOIN-500",
+   "scan_id": null,
+   "snapshot_id": null,
+   "layer": "SELECTION_POLICY",
+   "operation": "TwinSources construction",
+   "parents": [],
+   "code_identity": null,
+   "model_identity": null,
+   "implementation": null,
+   "available": "UNAVAILABLE",
+   "why_unavailable": "JOINT_FUNNEL_V1 requires joint_engine and joint_context_fn (R4 contract a0228fac, Amendment A1)",
+   "executed": "NOT_EXECUTED",
+   "valid": "NOT_ASSESSED",
+   "why_invalid": null,
+   "inputs": [],
+   "output_id": null,
+   "output_digest": null,
+   "started_epoch": null,
+   "ended_epoch": null,
+   "availability_cutoff_epoch": null,
+   "refusal": "JOINT_FUNNEL_V1 requires joint_engine and joint_context_fn (R4 contract a0228fac, Amendment A1)",
+   "fallback": null,
+   "consumption": {
+    "state": "NOT_CONSUMED",
+    "evidence": [],
+    "note": "set only by scanning persisted downstream records for this output's identity"
+   },
+   "declared_not_measured": {},
+   "limits": "A receipt establishes identity, execution and consumption. It does NOT establish that every field of a digested object was examined, that consumption contributed economically, or anything about calibration, edge or predictive validity.",
+   "receipt_id": "rcpt:a360b976334d6cb47f0ae28e83e230a2"
+  }
+ ]
+}
