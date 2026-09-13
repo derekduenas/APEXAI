@@ -36,8 +36,11 @@ class of mistake surfaces immediately rather than mid-run.
 | 2b | No fabricated fill when no quote is eligible | **PASS** | Chain gap across an exit window leaves an explicit unresolved obligation and a null net |
 | 3 | Replay dataset/use authorization and input binding | **WAS FAIL, NOW PASS** | The authorization recorded digests that nothing verified. It now recomputes them from the files that will be read and refuses a mismatch; a boundary is refused until inputs are verified |
 | 3b | Verification precedes parsing | **WAS FAIL, NOW PASS** | Inputs were parsed at the top and verified at the bottom. The run directory is now claimed first, the manifest is required, the bytes read are the bytes hashed and the bytes parsed. §7 |
-| 3c | Prior-bar historical availability | **GAP, REPORTED AND NOW ENFORCED** | `PROVENANCE_UNVERIFIED`: no assigning code path can be named. Using it requires the accepted `BULK_PULL_AVAILABILITY_V1`, and the run refuses without it. §8 |
-| 3d | Provenance distinguished from timestamp shape | **WAS FAIL, NOW PASS** | Offsets were read as proof. Provenance now comes from the assigning code path with a marker check; offsets are diagnostics. §8 |
+| 3c | Prior-bar historical availability | **GAP, ENFORCED COMPUTATIONALLY** | Availability is DERIVED by the accepted formula, the source receipt is preserved, and a row disagreeing with the formula refuses the run. §9 |
+| 3d | Provenance distinguished from timestamp shape | **WAS FAIL, NOW PASS** | Offsets are diagnostics only. §8, §9 |
+| 3f | Artifact attribution separated from source evidence | **WAS OVERSTATED, NOW HONEST** | `artifact_execution_attribution` is UNVERIFIED for every artifact; a marker establishes only what the source contains. §9 |
+| 3g | Acceptance bound to run, authorship boundary stated | **WAS FAIL, NOW PASS** | Required fields checked; evaluation, manifest digest and code pin bound; authorship recorded as procedural and unauthenticated. §9 |
+| — | P4 durable preservation | **DONE** | `~/apex-preserved/flow_validation_001`, all four digests match what was recorded before. Manifest sha256 `2ca1103d…` |
 | 3e | Manifest captured inside the failure boundary | **WAS FAIL, NOW PASS** | It was parsed before the directory was claimed, and read three times. Claimed first, captured once, digest recorded. §8 |
 | 7 | Fit contract enumerated and budgeted | **PASS** | `docs/FLOW_VALIDATION_001_FIT_CONTRACT.md`. One `fit()` call, at most three counted attempts, internal optimizer attempts enumerated. Budget pinned to 3 |
 | 4 | The `alpaca` governance finding | **PASS, test is stale** | Twelve market-data references, no broker SDK, no placement function. The mechanical placement scan returns zero offenders. Detail below |
@@ -277,6 +280,68 @@ malformed manifest each leave `RUN_START` and `RUN_FAILED`; the driver contains 
 `read_text()` of it; and replacing the manifest after the run still leaves the record naming the bytes actually
 used.
 
+## 9. The three findings raised against `0fab0b6`, closed, and P4 done
+
+### P4: the inputs are preserved
+
+`~/apex-preserved/flow_validation_001/`, outside the session scratchpad. Copies re-read after writing, and each
+verified against the digest recorded **before** this preservation: `prior_bars` against the evidence register,
+the other three against the package inventory. All four match.
+
+| | |
+|---|---|
+| `INPUTS_MANIFEST.json` sha256 | `2ca1103dc23ac849e0c8e7b942e74c6bf1444e94a90a7e6c41d4b81e7b51869f` |
+| bytes preserved | 14,201,181 |
+| prior-bar acquisition record | `NONE AT ACQUISITION TIME`, carried through the copy |
+
+**That digest is what a grant should name.** The driver was not executed.
+
+### A marker in today's source does not attribute an existing artifact
+
+Correct, and the merged verdict is gone. `classify()` now returns two fields that are never combined:
+
+- **`assignment_path_evidence`** answers what the inspected source contains today, and carries its own scope
+  sentence saying it establishes nothing about which execution produced any artifact.
+- **`artifact_execution_attribution`** is **`UNVERIFIED` for every artifact**, including the session bars, because
+  nothing binds those rows to a run. The reason names the gap and lists what would close it: a run identity written
+  into each record, a collector-signed manifest, or a host execution log naming the path and digest at write time.
+
+A fabricated artifact handed over with a valid assignment key gets `MARKER_PRESENT` and `UNVERIFIED`, and a test
+asserts exactly that.
+
+**Write time and parse time are not network receipt.** Each entry now records what its stamp measures
+(`WRITE_TIME` for the collector's record, `PARSE_TIME` for the adapters) and states that both are upper bounds on
+arrival, not arrival.
+
+A third field, `availability_basis`, says how **this run** obtains the value it gates on: `PER_RECORD_RECORDED` for
+session bars, `DERIVED_BY_FORMULA` for prior bars. That is a property of the run, not an inference about the file.
+
+### The accepted formula is now the computation performed
+
+Correct: acceptance said `event_time + 60` while the driver gated on each row's supplied `receipt_time`. Now
+`apply_bulk_pull_availability()` computes the derived value, **preserves the source receipt** as
+`source_receipt_time`, tags each row with the assumption id, and **refuses the run** if any supplied receipt
+disagrees with the formula. The bars adapter gates on `available_time`, which is the derived value for prior bars
+and the recorded one for session bars.
+
+The check found the discrepancy immediately: my own synthetic generator used a 65-second lag, and the run refused
+until the fixture was aligned and a knob added to exercise the refusal deliberately.
+
+### The acceptance document is bound, and its limits are stated
+
+`validate_acceptance()` requires `accepted_by`, `accepted_utc`, `evaluation_id`, `input_manifest_sha256`,
+`code_pin`, `scope` and `accepted_assumptions`, and checks the evaluation, the manifest digest and the code pin
+against the run. An acceptance written for something else cannot be reused here.
+
+**On authorship, plainly: this is a JSON file and nothing here verifies who wrote it.** There is no signature, no
+key and no identity check, and no source scan can supply one. The run records
+`authorship: PROCEDURAL_UNAUTHENTICATED` and reports `accepted_by` as `accepted_by_claimed`, a claim rather than an
+identity. What the file does establish is that an acceptance exists, names this evaluation, binds to this manifest
+and pin, states a scope, and accepts the assumption word for word.
+
+`docs/FLOW_VALIDATION_001_ACCEPTANCE_TEMPLATE.json` is unsigned and unpopulated. Every field reads `<FILL IN>`, a
+test enforces that, and nothing in the repository may complete it.
+
 ## Unresolved prerequisites
 
 | | prerequisite | who |
@@ -284,7 +349,7 @@ used.
 | **P1** | Independent review of the candidate. This audit is still builder-reported. | reviewer |
 | **P2** | Authorization to consume the burned collection for this evaluation. | operator |
 | **P3** | A ruling on the prior-bar file, obtained outside authorization, which `FULL_FUNNEL_V1` needs for its variance fit. Without it, run WAIT and the rule policy only. | operator |
-| **P4** | Run `scripts/preserve_inputs.py` to create the durable copy and manifest before executing. | either |
+| **P4** | **DONE.** `~/apex-preserved/flow_validation_001`, manifest sha256 `2ca1103dc23ac849e0c8e7b942e74c6bf1444e94a90a7e6c41d4b81e7b51869f`. | — |
 | **P5** | **RETIRED.** The driver has now executed end to end, twelve times, on synthetic inputs. | — |
 | **P6** | First use of the recorded-replay route on recorded data. Still true, but the route is now exercised through the real driver rather than only in unit tests. | noted |
 | **P7** | **ANSWERED.** The contract is enumerated and the budget is pinned to 3. What remains is the operator's word on the wording below. | operator |

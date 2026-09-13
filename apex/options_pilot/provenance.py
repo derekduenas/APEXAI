@@ -1,5 +1,15 @@
 """AVAILABILITY PROVENANCE, and the assumptions that stand in for it.
 
+**TWO SEPARATE QUESTIONS, NEVER MERGED.** (1) What does the inspected source say about how a field is assigned?
+(2) Were THESE PARTICULAR RECORDS produced by an execution of that path? A marker in today's source answers the
+first and says nothing about the second: a fabricated artifact handed over with the same assignment key would look
+identical. So `assignment_path_evidence` and `artifact_execution_attribution` are reported apart, and attribution
+stays UNVERIFIED unless something actually binds the rows to a run.
+
+**A WRITE-TIME OR PARSE-TIME STAMP IS NOT A NETWORK RECEIPT.** `time.time()` when a record is written measures the
+write. `self.clock()` when a response is parsed measures the parse. Both are upper bounds on when the payload
+arrived over the network, and neither is that arrival. The distinction is recorded on every classification.
+
 **A PATTERN IN TIMESTAMPS IS NOT EVIDENCE OF HOW THEY WERE PRODUCED.** An earlier version of this check declared a
 field MEASURED whenever its receipt offsets varied. That is unsound in both directions: fabricated timestamps can
 vary, and a genuine per-record clock read can happen to land on a constant offset. Varied offsets are a
@@ -18,10 +28,32 @@ from __future__ import annotations
 
 from pathlib import Path
 
-MEASURED_BY_COLLECTOR = "MEASURED_BY_COLLECTOR"
-ASSUMED = "ASSUMED"
-UNVERIFIED = "PROVENANCE_UNVERIFIED"
+# assignment_path_evidence
+MARKER_PRESENT = "MARKER_PRESENT"
+MARKER_ABSENT = "MARKER_ABSENT"
+PATH_NOT_CLAIMED = "NO_ASSIGNMENT_PATH_CLAIMED"
+PATH_UNREADABLE = "ASSIGNMENT_PATH_UNREADABLE"
+
+# artifact_execution_attribution
+VERIFIED = "VERIFIED"
+UNVERIFIED = "UNVERIFIED"
+
+# availability_basis: how THIS RUN obtains the availability it gates on
+PER_RECORD_RECORDED = "PER_RECORD_RECORDED"
+DERIVED_BY_FORMULA = "DERIVED_BY_FORMULA"
 ABSENT = "ABSENT"
+
+ATTRIBUTION_GAP = (
+    "Nothing binds these particular records to an execution of the named path. There is no signed run identity on "
+    "the rows, no chained run receipt covering the artifact, and no execution id to match. A fabricated artifact "
+    "presented with the same assignment key would receive the same assignment-path evidence, so attribution is "
+    "UNVERIFIED and must be read as such.")
+
+WHAT_WOULD_ESTABLISH_ATTRIBUTION = [
+    "a run identity written into each record by the producing execution, chained and verifiable",
+    "a signed manifest produced by the collector at the end of its session, covering the file's digest",
+    "a host-side execution log that names the output path and its digest at write time",
+]
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -32,20 +64,27 @@ ASSIGNMENT_PATHS = {
     "pilot_collection_record": {
         "file": "scripts/options_pilot_collector.py",
         "marker": '"receipt_epoch": time.time()',
-        "establishes": ("the collector reads the wall clock at the instant it writes each record, so a record's "
-                        "receipt_epoch is a measurement of when this system received the payload"),
-        "field": "record.receipt_epoch"},
+        "establishes": ("the source contains a wall-clock read at the moment a record is written, so where that "
+                        "code produced a record, its receipt_epoch is the WRITE instant"),
+        "field": "record.receipt_epoch",
+        "measures": "WRITE_TIME",
+        "not": ("network receipt. The payload arrived at or before this instant; how much earlier is not recorded "
+                "anywhere in the artifact.")},
     "alpaca_bar_receipt": {
         "file": "apex/pulse_options/providers.py",
         "marker": "return self.parse_bars(txt, symbol=symbol, receipt_time=self.clock())",
-        "establishes": ("the bars adapter stamps receipt_time from its own clock at the instant the response is "
-                        "parsed, so a bar's receipt_time is a measurement"),
-        "field": "bar.receipt_time"},
+        "establishes": ("the source stamps receipt_time from the adapter's clock when the HTTP body is parsed, so "
+                        "where that code produced a bar, its receipt_time is the PARSE instant"),
+        "field": "bar.receipt_time",
+        "measures": "PARSE_TIME",
+        "not": "network receipt. Parsing happens after the bytes arrive, so this is an upper bound on arrival."},
     "alpaca_nbbo_available": {
         "file": "apex/pulse_options/providers.py",
         "marker": "return self.parse_nbbo(txt, receipt_time=self.clock())",
-        "establishes": "the NBBO adapter stamps `available` from its own clock at parse time",
-        "field": "nbbo.available"},
+        "establishes": "the source stamps `available` from the adapter's clock at parse time",
+        "field": "nbbo.available",
+        "measures": "PARSE_TIME",
+        "not": "network receipt. An upper bound on arrival, not arrival."},
 }
 
 
@@ -81,35 +120,97 @@ def offset_diagnostics(rows: list, *, event_field: str = "event_time", receipt_f
 
 
 def classify(label: str, rows: list, *, assignment_key: str | None = None, acquisition_note: str | None = None,
-             event_field: str = "event_time", receipt_field: str = "receipt_time") -> dict:
-    """The availability provenance of one artifact.
+             availability_basis: str = PER_RECORD_RECORDED, event_field: str = "event_time",
+             receipt_field: str = "receipt_time") -> dict:
+    """What is known about one artifact's availability, in three separate parts that are never merged.
 
-    `assignment_key` names an entry in ASSIGNMENT_PATHS. Supply it only when the artifact really was produced by
-    that path. With no key the answer is PROVENANCE_UNVERIFIED, whatever the offsets look like."""
+    `assignment_path_evidence` -- what the inspected source contains TODAY. Nothing more.
+    `artifact_execution_attribution` -- whether THESE ROWS came from an execution of that path. UNVERIFIED unless
+        something binds them, which nothing currently does. Supplying an assignment key does not change this.
+    `availability_basis` -- how THIS RUN obtains the value it gates on: carried per record, or derived by an
+        accepted formula.
+    `diagnostics` -- offset statistics, which prove nothing either way."""
     diag = offset_diagnostics(rows, event_field=event_field, receipt_field=receipt_field)
-    out = {"artifact": label, "diagnostics": diag, "acquisition_note": acquisition_note}
-    if diag.get("n_with_receipt", 0) == 0:
-        out.update(provenance=ABSENT, evidence=None,
-                   why="no row carries a receipt field; availability is not present at all")
-        return out
+    if diag.get("n_with_receipt", 0) == 0 and availability_basis != DERIVED_BY_FORMULA:
+        availability_basis = ABSENT
+
     if assignment_key is None:
-        out.update(provenance=UNVERIFIED, evidence=None,
-                   why=("no assigning code path is named for this artifact, so how its receipts were produced is "
-                        "not established. Using them as availability requires a declared, accepted assumption."))
-        return out
-    if assignment_key not in ASSIGNMENT_PATHS:
-        raise ProvenanceRefused("ASSIGNMENT_PATH_UNKNOWN: %r" % (assignment_key,))
-    check = _marker_present(assignment_key)
-    spec = ASSIGNMENT_PATHS[assignment_key]
-    if not check.get("checked") or not check.get("present"):
-        out.update(provenance=UNVERIFIED, evidence=check,
-                   why=("the named assigning path no longer contains its marker, so the claim it supported cannot "
-                        "be made: %s" % spec["file"]))
-        return out
-    out.update(provenance=MEASURED_BY_COLLECTOR, evidence={**check, "establishes": spec["establishes"],
-                                                           "field": spec["field"]},
-               why=spec["establishes"])
-    return out
+        path_ev = {"status": PATH_NOT_CLAIMED,
+                   "why": "no assigning code path is named for this artifact"}
+        semantics = {"status": "UNKNOWN", "why": "with no named path, what any timestamp measures is not established"}
+    else:
+        if assignment_key not in ASSIGNMENT_PATHS:
+            raise ProvenanceRefused("ASSIGNMENT_PATH_UNKNOWN: %r" % (assignment_key,))
+        spec = ASSIGNMENT_PATHS[assignment_key]
+        check = _marker_present(assignment_key)
+        if not check.get("checked"):
+            path_ev = {"status": PATH_UNREADABLE, "file": spec["file"], "why": check.get("why")}
+            semantics = {"status": "UNKNOWN", "why": "the named source could not be read"}
+        elif not check.get("present"):
+            path_ev = {"status": MARKER_ABSENT, "file": spec["file"], "marker": spec["marker"],
+                       "why": ("the named path no longer contains its marker, so the claim it supported cannot be "
+                               "made from today's source")}
+            semantics = {"status": "UNKNOWN", "why": "the marker that defined the semantics is gone"}
+        else:
+            path_ev = {"status": MARKER_PRESENT, "file": spec["file"], "marker": spec["marker"],
+                       "field": spec["field"], "establishes": spec["establishes"],
+                       "scope": ("this establishes only what the inspected source contains now. It does not "
+                                 "establish that any particular artifact was produced by running it.")}
+            semantics = {"measures": spec["measures"], "not": spec["not"], "field": spec["field"]}
+
+    attribution = {"status": UNVERIFIED, "why": ATTRIBUTION_GAP,
+                   "what_would_establish_it": list(WHAT_WOULD_ESTABLISH_ATTRIBUTION)}
+
+    return {"artifact": label,
+            "assignment_path_evidence": path_ev,
+            "artifact_execution_attribution": attribution,
+            "timestamp_semantics": semantics,
+            "availability_basis": availability_basis,
+            "acquisition_note": acquisition_note,
+            "diagnostics": diag,
+            "reading": ("availability_basis says where the gating value comes from; attribution says whether these "
+                        "rows can be tied to the code that would have produced it. Both must be read; neither "
+                        "substitutes for the other.")}
+
+
+# ---------------------------------------------------------------- computing an assumed availability
+
+ASSUMED_FIELD = "assumed_available_time"
+SOURCE_FIELD = "source_receipt_time"
+
+
+def apply_bulk_pull_availability(rows: list, *, assumption_id: str = "BULK_PULL_AVAILABILITY_V1",
+                                 offset_s: float = 60.0, event_field: str = "event_time",
+                                 receipt_field: str = "receipt_time") -> dict:
+    """COMPUTE the accepted formula rather than trusting whatever the artifact happens to carry.
+
+    The accepted assumption says availability is `event_time + 60`. If the run then gates on each row's supplied
+    `receipt_time`, the accepted words and the executed computation are two different things, and a row carrying a
+    different receipt would quietly change the assumption. So the derived value is computed here, the source value
+    is PRESERVED beside it, and any row whose supplied receipt disagrees with the formula is REFUSED rather than
+    silently overridden."""
+    out, disagreements = [], []
+    for i, r in enumerate(rows):
+        ev = r.get(event_field)
+        if not isinstance(ev, (int, float)) or isinstance(ev, bool):
+            raise ProvenanceRefused("ASSUMED_AVAILABILITY_NEEDS_EVENT_TIME: row %d has %r" % (i, ev))
+        derived = float(ev) + float(offset_s)
+        src = r.get(receipt_field)
+        if isinstance(src, (int, float)) and not isinstance(src, bool) and abs(float(src) - derived) > 1e-6:
+            disagreements.append({"row": i, event_field: ev, receipt_field: src, ASSUMED_FIELD: derived,
+                                  "delta_s": round(float(src) - derived, 6)})
+        out.append({**r, SOURCE_FIELD: src, ASSUMED_FIELD: derived,
+                    "availability_assumption": assumption_id, "availability_basis": DERIVED_BY_FORMULA})
+    if disagreements:
+        raise ProvenanceRefused(
+            "ASSUMED_AVAILABILITY_INCONSISTENT: %d row(s) carry a receipt that is not %s + %.0fs, which is what "
+            "%s says availability is. The accepted assumption and the values in the artifact disagree, so the run "
+            "refuses rather than applying one while the operator accepted the other. First: %r"
+            % (len(disagreements), event_field, offset_s, assumption_id, disagreements[:3]))
+    return {"rows": out, "assumption_id": assumption_id, "offset_s": offset_s, "n_rows": len(out),
+            "derived_field": ASSUMED_FIELD, "source_field_preserved": SOURCE_FIELD,
+            "checked": ("every supplied receipt was compared with the formula; a disagreement would have refused "
+                        "the run")}
 
 
 # ---------------------------------------------------------------- declared assumptions (declared here, accepted elsewhere)
@@ -126,6 +227,41 @@ def assumption_text(assumption_id: str) -> str:
     if assumption_id not in ASSUMPTIONS:
         raise ProvenanceRefused("ASSUMPTION_UNKNOWN: %r (declared: %s)" % (assumption_id, sorted(ASSUMPTIONS)))
     return ASSUMPTIONS[assumption_id]
+
+
+ACCEPTANCE_REQUIRED_FIELDS = ("accepted_by", "accepted_utc", "evaluation_id", "input_manifest_sha256",
+                              "code_pin", "scope", "accepted_assumptions")
+
+AUTHORSHIP_BOUNDARY = (
+    "PROCEDURAL_UNAUTHENTICATED: this is a JSON file on disk. Nothing here verifies who wrote it, and no test can: "
+    "there is no signature, no key and no identity check. What is enforced is that the document EXISTS, names this "
+    "evaluation, binds to this input manifest and this code pin, states a scope, and accepts the assumption in its "
+    "exact declared words. Treat `accepted_by` as a claim recorded on the run, not as an authenticated identity.")
+
+
+def validate_acceptance(doc: dict | None, *, evaluation_id: str, manifest_sha256: str, code_pin: str) -> dict:
+    """Check the acceptance document's required fields and BIND it to this run.
+
+    An acceptance that does not name this evaluation, this manifest and this code pin could have been written for
+    something else and reused. That is the part a file on disk can establish; who typed it is not."""
+    if not isinstance(doc, dict):
+        raise ProvenanceRefused("ACCEPTANCE_MISSING: no authorization document was supplied")
+    missing = [k for k in ACCEPTANCE_REQUIRED_FIELDS if not doc.get(k)]
+    if missing:
+        raise ProvenanceRefused("ACCEPTANCE_INCOMPLETE: missing or empty %s" % ", ".join(missing))
+    if doc["evaluation_id"] != evaluation_id:
+        raise ProvenanceRefused("ACCEPTANCE_WRONG_EVALUATION: names %r, this run is %r"
+                                % (doc["evaluation_id"], evaluation_id))
+    if doc["input_manifest_sha256"] != manifest_sha256:
+        raise ProvenanceRefused("ACCEPTANCE_WRONG_MANIFEST: names %s, this run captured %s"
+                                % (str(doc["input_manifest_sha256"])[:16], manifest_sha256[:16]))
+    if doc["code_pin"] != code_pin:
+        raise ProvenanceRefused("ACCEPTANCE_WRONG_CODE_PIN: names %s, this run is at %s"
+                                % (str(doc["code_pin"])[:12], str(code_pin)[:12]))
+    return {"evaluation_id": doc["evaluation_id"], "input_manifest_sha256": doc["input_manifest_sha256"],
+            "code_pin": doc["code_pin"], "scope": doc["scope"],
+            "accepted_by_claimed": doc["accepted_by"], "accepted_utc_claimed": doc["accepted_utc"],
+            "authorship": AUTHORSHIP_BOUNDARY}
 
 
 def require_accepted(assumption_id: str, authorization: dict | None) -> dict:

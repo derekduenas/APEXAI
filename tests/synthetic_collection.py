@@ -73,7 +73,7 @@ def chain_quotes(i: int, *, ask: float, strikes: int = 9, step: float = 5.0, rec
 
 def write(dirpath, *, minutes: int = 60, ask: float = 4.95, prior_days: int = 6,
           chain_gap: tuple | None = None, expensive_after: int | None = None,
-          expensive_ask: float = 40.0) -> dict:
+          expensive_ask: float = 40.0, prior_receipt_lag: float = 60.0) -> dict:
     """Write one synthetic collection.
 
     `chain_gap` is an (from_index, to_index) half-open range of chain snapshots to OMIT, which creates a stretch
@@ -121,12 +121,15 @@ def write(dirpath, *, minutes: int = 60, ask: float = 4.95, prior_days: int = 6,
             fh.write(json.dumps(rec("pilot_collection_nbbo", payload, t, "SYNTHETIC_FIXTURE")) + "\n")
 
     # ---- prior bars: the shape the funnel's variance fit consumes
+    # prior_receipt_lag defaults to 60.0, which is what BULK_PULL_AVAILABILITY_V1 says availability is. A test can
+    # set anything else to exercise the refusal when the artifact and the accepted formula disagree.
     prior = []
     for day in range(prior_days, 0, -1):
         t0 = SESSION_OPEN - day * 86400.0
         for i in range(390):
-            prior.append(bar(i, t0=t0))
+            prior.append(bar(i, t0=t0, receipt_lag=prior_receipt_lag - BAR_S))
     (d / "prior_bars.json").write_text(json.dumps(prior))
     return {"dir": str(d), "n_bars": n_bars, "n_chain": n_chain - len(omit), "n_nbbo": n_nbbo,
             "n_prior_bars": len(prior), "session_open_utc": _utc(SESSION_OPEN),
-            "expiration": EXPIRATION, "ask": ask, "chain_gap": chain_gap, "expensive_after": expensive_after}
+            "expiration": EXPIRATION, "ask": ask, "chain_gap": chain_gap, "expensive_after": expensive_after,
+            "prior_receipt_lag": prior_receipt_lag}

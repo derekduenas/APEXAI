@@ -32,18 +32,27 @@ def preserve(coll: Path, dest: Path, *, prior: Path | None = None):
                            str(dest)], cwd=REPO, capture_output=True, text=True)
 
 
-def synthetic_authorization(dest: Path, *, assumption_id: str = "BULK_PULL_AVAILABILITY_V1", text: str | None = None) -> Path:
+def synthetic_authorization(dest: Path, *, manifest: Path | None = None, assumption_id: str = "BULK_PULL_AVAILABILITY_V1",
+                            text: str | None = None, **override) -> Path:
     """A SYNTHETIC operator authorization, for tests only.
 
     Nothing in the repository may author the real one: an acceptance written by the process that needs it is not an
-    acceptance. This exists so the assumption GATE can be exercised, and it says so in its own contents."""
+    acceptance. This exists so the acceptance GATE can be exercised, and it says so in its own contents."""
+    import hashlib
     from apex.options_pilot import provenance as PROV
+    from apex.options_pilot import run_dir as RD
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(json.dumps({
-        "accepted_by": "SYNTHETIC_TEST_FIXTURE — not an operator acceptance",
-        "accepted_utc": "2026-09-12T00:00:00Z",
-        "accepted_assumptions": [{"id": assumption_id,
-                                  "text": text if text is not None else PROV.assumption_text(assumption_id)}]}, indent=1))
+    doc = {"accepted_by": "SYNTHETIC_TEST_FIXTURE - not an operator acceptance",
+           "accepted_utc": "2026-09-12T00:00:00Z",
+           "evaluation_id": "FLOW-VALIDATION-001",
+           "input_manifest_sha256": (hashlib.sha256(manifest.read_bytes()).hexdigest()
+                                     if manifest is not None and manifest.is_file() else "0" * 64),
+           "code_pin": RD.code_pin().get("commit"),
+           "scope": "synthetic exercise of the acceptance gate",
+           "accepted_assumptions": [{"id": assumption_id,
+                                     "text": text if text is not None else PROV.assumption_text(assumption_id)}]}
+    doc.update(override)
+    dest.write_text(json.dumps(doc, indent=1))
     return dest
 
 
@@ -64,7 +73,7 @@ def run_driver(coll: Path, out_base: Path, run_id: str, *, manifest: Path | None
     if manifest is not None:
         argv.append(str(manifest))
         if not no_authz:
-            argv.append(str(authz or synthetic_authorization(out_base.parent / "authz.json")))
+            argv.append(str(authz or synthetic_authorization(out_base.parent / "authz.json", manifest=manifest)))
     return subprocess.run(argv, cwd=REPO, capture_output=True, text=True, timeout=900)
 
 
@@ -492,12 +501,13 @@ class TestAvailabilityAppliesToEveryInputFamily:
         rep = result(tmp_path / "runs", "nobarreceipt")["input_report"]
         assert rep["bars_excluded_no_recorded_receipt"] == stripped > 0
 
-    def test_the_prior_bar_artifact_is_not_called_measured(self, ok_run_manifested):
-        """SUPERSEDES the two offset-shape tests that lived here. Provenance now comes from the assigning code path,
-        so the prior-bar artifact is PROVENANCE_UNVERIFIED and its constant offset is a diagnostic, not a verdict."""
+    def test_the_prior_bar_artifact_claims_no_measurement(self, ok_run_manifested):
+        """Its availability is DERIVED by the accepted formula, its attribution is UNVERIFIED, and its constant
+        offset is a diagnostic rather than a verdict."""
         rep = result(ok_run_manifested["out"], ok_run_manifested["run_id"])["input_report"]
         prov = rep["prior_bars_provenance"]
-        assert prov["provenance"] == "PROVENANCE_UNVERIFIED"
+        assert prov["availability_basis"] == "DERIVED_BY_FORMULA"
+        assert prov["artifact_execution_attribution"]["status"] == "UNVERIFIED"
         assert prov["diagnostics"]["constant_offset_s"] is not None
         assert "DIAGNOSTIC ONLY" in prov["diagnostics"]["note"]
         assert rep["accepted_assumption"]["assumption_id"] == "BULK_PULL_AVAILABILITY_V1"
@@ -556,47 +566,49 @@ class TestTheFitBudgetIsTheRunsBudget:
 
 
 class TestProvenanceIsNotInferredFromTimestampShape:
-    """Finding 1 at f4d2d20: a field was called MEASURED whenever its offsets varied. Varied offsets can be
-    fabricated and genuine measurements can be constant, so the pattern establishes nothing either way."""
+    """Offsets are diagnostics. This class pins that; the attribution question is pinned by
+    TestAssignmentPathIsNotArtifactAttribution below."""
 
     from apex.options_pilot import provenance as P
 
-    def test_varied_offsets_alone_do_not_establish_measurement(self):
+    def test_varied_offsets_alone_establish_nothing(self):
         varied = [{"event_time": 10.0 * i, "receipt_time": 10.0 * i + 3.0 + (i % 7) * 0.31} for i in range(60)]
         got = self.P.classify("fabricated_but_varied", varied, assignment_key=None)
-        assert got["provenance"] == self.P.UNVERIFIED
+        assert got["assignment_path_evidence"]["status"] == self.P.PATH_NOT_CLAIMED
+        assert got["artifact_execution_attribution"]["status"] == self.P.UNVERIFIED
         assert got["diagnostics"]["n_distinct_offsets"] > 1, "the fixture really does vary"
         assert "DIAGNOSTIC ONLY" in got["diagnostics"]["note"]
 
-    def test_constant_offsets_alone_do_not_establish_absence_of_measurement(self):
+    def test_constant_offsets_alone_veto_nothing(self):
         constant = [{"event_time": 10.0 * i, "receipt_time": 10.0 * i + 60.0} for i in range(60)]
-        named = self.P.classify("constant_but_named", constant, assignment_key="alpaca_bar_receipt")
-        assert named["provenance"] == self.P.MEASURED_BY_COLLECTOR, \
-            "a constant offset must not veto a provenance the code path supports"
-        assert named["diagnostics"]["constant_offset_s"] == 60.0
+        got = self.P.classify("constant_but_named", constant, assignment_key="alpaca_bar_receipt")
+        assert got["assignment_path_evidence"]["status"] == self.P.MARKER_PRESENT, \
+            "a constant offset must not veto what the source actually says"
+        assert got["diagnostics"]["constant_offset_s"] == 60.0
 
-    def test_provenance_comes_from_the_assigning_code_path(self):
+    def test_the_source_claim_comes_from_the_named_path(self):
         got = self.P.classify("session_bars", [{"event_time": 1.0, "receipt_time": 2.0}],
                               assignment_key="alpaca_bar_receipt")
-        assert got["provenance"] == self.P.MEASURED_BY_COLLECTOR
-        assert got["evidence"]["present"] is True and got["evidence"]["file"].endswith("providers.py")
+        assert got["assignment_path_evidence"]["file"].endswith("providers.py")
+        assert got["assignment_path_evidence"]["marker"] in \
+            (REPO / got["assignment_path_evidence"]["file"]).read_text()
 
     def test_a_claim_dies_when_its_marker_leaves_the_code(self, monkeypatch):
-        """The registry cannot outlive the code it points at."""
         spec = dict(self.P.ASSIGNMENT_PATHS["alpaca_bar_receipt"])
         monkeypatch.setitem(self.P.ASSIGNMENT_PATHS, "alpaca_bar_receipt",
                             {**spec, "marker": "this text is not in the file"})
         got = self.P.classify("x", [{"event_time": 1.0, "receipt_time": 2.0}], assignment_key="alpaca_bar_receipt")
-        assert got["provenance"] == self.P.UNVERIFIED and "no longer contains its marker" in got["why"]
+        assert got["assignment_path_evidence"]["status"] == self.P.MARKER_ABSENT
+        assert got["timestamp_semantics"]["status"] == "UNKNOWN"
 
-    def test_an_absent_receipt_is_absent_not_unverified(self):
+    def test_an_absent_receipt_is_reported_as_absent(self):
         got = self.P.classify("x", [{"event_time": 1.0}], assignment_key="alpaca_bar_receipt")
-        assert got["provenance"] == self.P.ABSENT
+        assert got["availability_basis"] == self.P.ABSENT
 
     def test_the_run_reports_the_two_artifacts_differently(self, ok_run_manifested):
         rep = result(ok_run_manifested["out"], ok_run_manifested["run_id"])["input_report"]
-        assert rep["session_bars_provenance"]["provenance"] == "MEASURED_BY_COLLECTOR"
-        assert rep["prior_bars_provenance"]["provenance"] == "PROVENANCE_UNVERIFIED"
+        assert rep["session_bars_provenance"]["availability_basis"] == "PER_RECORD_RECORDED"
+        assert rep["prior_bars_provenance"]["availability_basis"] == "DERIVED_BY_FORMULA"
         assert rep["prior_bars_provenance"]["diagnostics"]["n_distinct_offsets"] == 1
 
 
@@ -608,9 +620,9 @@ class TestTheAssumptionMustBeAcceptedNotMerelyRequired:
     def test_no_authorization_refuses_before_any_model(self, tmp_path):
         coll = tmp_path / "coll"
         write(coll, minutes=60)
-        r = run_driver(coll, tmp_path / "runs", "noauth", no_authz=False if False else True)
+        r = run_driver(coll, tmp_path / "runs", "noauth", no_authz=True)
         assert r.returncode != 0
-        assert "ASSUMPTION_NOT_ACCEPTED" in (r.stdout + r.stderr)
+        assert "ACCEPTANCE_MISSING" in (r.stdout + r.stderr)
         body = json.loads((tmp_path / "runs" / "noauth" / "RUN_FAILED.json").read_text())
         assert body["summary"]["stage"] == "INPUT_VALIDATION"
 
@@ -707,3 +719,146 @@ class TestTheManifestIsCapturedOnceInsideTheBoundary:
         rep = result(tmp_path / "runs", "cap")["input_report"]
         assert rep["manifest_capture"]["sha256"] == expected, "the run recorded the bytes it actually used"
         assert hashlib.sha256(man.read_bytes()).hexdigest() != expected, "the file on disk really did change"
+
+
+# ---------------------------------------------------------------------------- 0fab0b6 findings
+
+
+class TestAssignmentPathIsNotArtifactAttribution:
+    """Finding 1 at 0fab0b6: a marker in today's source was being read as proof that particular records came from
+    that code. It is not: a fabricated artifact handed over with the same key looks identical."""
+
+    from apex.options_pilot import provenance as P
+
+    def test_fabricated_rows_with_a_valid_key_do_not_gain_verified_attribution(self):
+        fabricated = [{"event_time": 10.0 * i, "receipt_time": 10.0 * i + 3.0 + (i % 5) * 0.7} for i in range(40)]
+        got = self.P.classify("fabricated", fabricated, assignment_key="alpaca_bar_receipt")
+        assert got["assignment_path_evidence"]["status"] == self.P.MARKER_PRESENT
+        assert got["artifact_execution_attribution"]["status"] == self.P.UNVERIFIED
+        assert "fabricated artifact presented with the same assignment key" in \
+            got["artifact_execution_attribution"]["why"]
+
+    def test_the_two_fields_are_separate_and_neither_is_a_verdict_on_the_other(self):
+        got = self.P.classify("x", [{"event_time": 1.0, "receipt_time": 2.0}], assignment_key="alpaca_bar_receipt")
+        assert set(("assignment_path_evidence", "artifact_execution_attribution")) <= set(got)
+        assert "MEASURED_BY_COLLECTOR" not in json.dumps(got), "the merged verdict is gone"
+        assert got["assignment_path_evidence"]["scope"].startswith("this establishes only what the inspected source")
+
+    def test_write_and_parse_time_are_not_network_receipt(self):
+        for key, expect in (("pilot_collection_record", "WRITE_TIME"), ("alpaca_bar_receipt", "PARSE_TIME")):
+            got = self.P.classify("x", [{"event_time": 1.0, "receipt_time": 2.0}], assignment_key=key)
+            assert got["timestamp_semantics"]["measures"] == expect
+            assert "network receipt" in got["timestamp_semantics"]["not"]
+
+    def test_the_run_reports_both_fields_for_both_artifacts(self, ok_run_manifested):
+        rep = result(ok_run_manifested["out"], ok_run_manifested["run_id"])["input_report"]
+        for k in ("session_bars_provenance", "prior_bars_provenance"):
+            assert rep[k]["artifact_execution_attribution"]["status"] == "UNVERIFIED", k
+        assert rep["session_bars_provenance"]["assignment_path_evidence"]["status"] == "MARKER_PRESENT"
+        assert rep["prior_bars_provenance"]["assignment_path_evidence"]["status"] == "NO_ASSIGNMENT_PATH_CLAIMED"
+        assert rep["session_bars_provenance"]["availability_basis"] == "PER_RECORD_RECORDED"
+        assert rep["prior_bars_provenance"]["availability_basis"] == "DERIVED_BY_FORMULA"
+
+
+class TestTheAcceptedFormulaIsTheComputationUsed:
+    """Finding 2 at 0fab0b6: the acceptance said event_time + 60 while the driver gated on each row's supplied
+    receipt. Accepting one thing and computing another is not an accepted assumption."""
+
+    from apex.options_pilot import provenance as P
+
+    def test_the_derived_field_is_computed_and_the_source_is_preserved(self):
+        got = self.P.apply_bulk_pull_availability([{"event_time": 100.0, "receipt_time": 160.0, "close": 1.0}])
+        row = got["rows"][0]
+        assert row[self.P.ASSUMED_FIELD] == 160.0 and row[self.P.SOURCE_FIELD] == 160.0
+        assert row["availability_assumption"] == "BULK_PULL_AVAILABILITY_V1"
+        assert row["close"] == 1.0, "the rest of the row is untouched"
+
+    def test_a_row_inconsistent_with_the_formula_refuses(self):
+        with pytest.raises(self.P.ProvenanceRefused, match="ASSUMED_AVAILABILITY_INCONSISTENT"):
+            self.P.apply_bulk_pull_availability([{"event_time": 100.0, "receipt_time": 160.0},
+                                                 {"event_time": 200.0, "receipt_time": 275.0}])
+
+    def test_the_driver_refuses_a_collection_whose_prior_receipts_disagree(self, tmp_path):
+        coll = tmp_path / "coll"
+        write(coll, minutes=60, prior_receipt_lag=75.0)          # the artifact says +75, the acceptance says +60
+        r = run_driver(coll, tmp_path / "runs", "lagmismatch")
+        assert r.returncode != 0 and "ASSUMED_AVAILABILITY_INCONSISTENT" in (r.stdout + r.stderr)
+        body = json.loads((tmp_path / "runs" / "lagmismatch" / "RUN_FAILED.json").read_text())
+        assert body["summary"]["stage"] == "INPUT_VALIDATION"
+
+    def test_a_missing_event_time_refuses_rather_than_guessing(self):
+        with pytest.raises(self.P.ProvenanceRefused, match="ASSUMED_AVAILABILITY_NEEDS_EVENT_TIME"):
+            self.P.apply_bulk_pull_availability([{"receipt_time": 1.0}])
+
+    def test_the_run_gates_prior_bars_on_the_derived_value(self, ok_run_manifested):
+        rep = result(ok_run_manifested["out"], ok_run_manifested["run_id"])["input_report"]
+        a = rep["assumed_availability"]
+        assert a["assumption_id"] == "BULK_PULL_AVAILABILITY_V1" and a["offset_s"] == 60.0
+        assert a["derived_field"] == "assumed_available_time" and a["source_field_preserved"] == "source_receipt_time"
+        assert "a disagreement would have refused the run" in a["checked"]
+
+    def test_the_driver_gates_bars_on_available_time_not_a_raw_receipt(self):
+        src = DRIVER.read_text()
+        assert 'b["available_time"] <= self.t' in src
+        assert 'b["receipt_time"] <= self.t' not in src
+
+
+class TestTheAcceptanceDocumentIsBoundAndItsLimitsStated:
+    """Finding 3 at 0fab0b6: the acceptance checked only the assumption text, and the schema bound to nothing."""
+
+    from apex.options_pilot import provenance as P
+
+    def _doc(self, **over):
+        d = {"accepted_by": "x", "accepted_utc": "2026-09-12T00:00:00Z", "evaluation_id": "FLOW-VALIDATION-001",
+             "input_manifest_sha256": "a" * 64, "code_pin": "b" * 40, "scope": "one diagnostic",
+             "accepted_assumptions": [{"id": "BULK_PULL_AVAILABILITY_V1",
+                                       "text": self.P.assumption_text("BULK_PULL_AVAILABILITY_V1")}]}
+        d.update(over)
+        return d
+
+    def test_every_required_field_is_required(self):
+        for field in self.P.ACCEPTANCE_REQUIRED_FIELDS:
+            with pytest.raises(self.P.ProvenanceRefused, match="ACCEPTANCE_INCOMPLETE"):
+                self.P.validate_acceptance(self._doc(**{field: None}), evaluation_id="FLOW-VALIDATION-001",
+                                           manifest_sha256="a" * 64, code_pin="b" * 40)
+
+    def test_it_binds_to_this_evaluation_manifest_and_pin(self):
+        ok = dict(evaluation_id="FLOW-VALIDATION-001", manifest_sha256="a" * 64, code_pin="b" * 40)
+        assert self.P.validate_acceptance(self._doc(), **ok)["code_pin"] == "b" * 40
+        with pytest.raises(self.P.ProvenanceRefused, match="ACCEPTANCE_WRONG_EVALUATION"):
+            self.P.validate_acceptance(self._doc(evaluation_id="SOMETHING-ELSE"), **ok)
+        with pytest.raises(self.P.ProvenanceRefused, match="ACCEPTANCE_WRONG_MANIFEST"):
+            self.P.validate_acceptance(self._doc(input_manifest_sha256="c" * 64), **ok)
+        with pytest.raises(self.P.ProvenanceRefused, match="ACCEPTANCE_WRONG_CODE_PIN"):
+            self.P.validate_acceptance(self._doc(code_pin="d" * 40), **ok)
+
+    def test_authorship_is_described_as_procedural_not_authenticated(self):
+        got = self.P.validate_acceptance(self._doc(), evaluation_id="FLOW-VALIDATION-001",
+                                         manifest_sha256="a" * 64, code_pin="b" * 40)
+        assert got["authorship"].startswith("PROCEDURAL_UNAUTHENTICATED")
+        assert "Nothing here verifies who wrote it" in got["authorship"]
+        assert got["accepted_by_claimed"] == "x", "recorded as a CLAIM, and named as one"
+
+    def test_a_manifest_mismatch_refuses_the_real_run(self, tmp_path):
+        coll = tmp_path / "coll"
+        write(coll, minutes=60)
+        assert preserve(coll, tmp_path / "d").returncode == 0
+        bad = synthetic_authorization(tmp_path / "bad_authz.json", manifest=None)   # names a manifest digest of zeros
+        r = run_driver(tmp_path / "d" / "collection", tmp_path / "runs", "badman",
+                       manifest=tmp_path / "d" / "INPUTS_MANIFEST.json", prior=tmp_path / "d" / "prior_bars.json",
+                       authz=bad)
+        assert r.returncode != 0 and "ACCEPTANCE_WRONG_MANIFEST" in (r.stdout + r.stderr)
+
+    def test_the_template_exists_and_is_not_filled_in(self):
+        from pathlib import Path as P_
+        t = json.loads(P_("docs/FLOW_VALIDATION_001_ACCEPTANCE_TEMPLATE.json").read_text())
+        for field in ("accepted_by", "accepted_utc", "input_manifest_sha256", "code_pin", "scope"):
+            assert str(t[field]).startswith("<FILL IN"), "%s is pre-filled; the template must stay unpopulated" % field
+        assert t["accepted_assumptions"][0]["text"].startswith("<FILL IN")
+        assert any("who wrote it" in line for line in t["_README"])
+
+    def test_the_run_records_the_acceptance_and_its_boundary(self, ok_run_manifested):
+        acc = result(ok_run_manifested["out"], ok_run_manifested["run_id"])["input_report"]["acceptance"]
+        assert acc["evaluation_id"] == "FLOW-VALIDATION-001"
+        assert acc["authorship"].startswith("PROCEDURAL_UNAUTHENTICATED")
+        assert acc["accepted_by_claimed"].startswith("SYNTHETIC_TEST_FIXTURE")

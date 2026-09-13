@@ -144,27 +144,40 @@ try:
 
     PRIOR_BARS = json.loads(RAW["prior_bars"].decode())
 
-    # ---- PROVENANCE, from the assigning code path, not from the shape of the numbers
+    # ---- PROVENANCE: assignment-path evidence and artifact attribution, reported apart and never merged
     SESSION_PROV = PROV.classify("session_bars", list(sbars.values()), assignment_key="alpaca_bar_receipt",
-                                 acquisition_note="written by scripts/options_pilot_collector.py during the session")
+                                 availability_basis=PROV.PER_RECORD_RECORDED,
+                                 acquisition_note="presented as written by scripts/options_pilot_collector.py")
     PRIOR_PROV = PROV.classify("prior_bars", PRIOR_BARS, assignment_key=None,
-                               acquisition_note=("bulk historical pull on 2026-09-12; no per-row receipt was "
-                                                 "recorded and no assigning path is named (SCOPE_DEVIATION_001.md)"))
+                               availability_basis=PROV.DERIVED_BY_FORMULA,
+                               acquisition_note=("bulk historical pull on 2026-09-12; no assigning path is named "
+                                                 "(SCOPE_DEVIATION_001.md)"))
 
-    # ---- an artifact whose availability is not established may be used ONLY under an accepted assumption
-    ASSUMPTION_BINDING = None
-    if PRIOR_PROV["provenance"] != PROV.MEASURED_BY_COLLECTOR:
-        ASSUMPTION_BINDING = PROV.require_accepted("BULK_PULL_AVAILABILITY_V1", AUTHZ_DOC)
+    # ---- the acceptance document must name THIS evaluation, THIS manifest and THIS code pin, then accept the
+    #      assumption in its exact declared words. Refused before any adapter or model exists.
+    ACCEPTANCE = PROV.validate_acceptance(AUTHZ_DOC, evaluation_id="FLOW-VALIDATION-001",
+                                          manifest_sha256=MANIFEST_CAPTURE["sha256"],
+                                          code_pin=RD.code_pin().get("commit"))
+    ASSUMPTION_BINDING = PROV.require_accepted("BULK_PULL_AVAILABILITY_V1", AUTHZ_DOC)
 
-    prior_kept = [b for b in PRIOR_BARS if isinstance(b.get("receipt_time"), (int, float))
-                  and not isinstance(b.get("receipt_time"), bool)]
-    ALLBARS = sorted(list(prior_kept) + list(sbars.values()), key=lambda b: b["event_time"])
+    # ---- COMPUTE the accepted formula. The source receipt is preserved; a row that disagrees refuses the run.
+    ASSUMED = PROV.apply_bulk_pull_availability(PRIOR_BARS)
+    PRIOR_BARS = ASSUMED["rows"]
+
+    # every bar carries ONE explicit availability field, and says where that value came from
+    prior_kept = [{**b, "available_time": b[PROV.ASSUMED_FIELD]} for b in PRIOR_BARS]
+    session_kept = [{**b, "available_time": b["receipt_time"], "availability_basis": PROV.PER_RECORD_RECORDED}
+                    for b in sbars.values()]
+    ALLBARS = sorted(prior_kept + session_kept, key=lambda b: b["event_time"])
     SCANS = list(range(0, len(chains), CADENCE))
     AUTHORIZATION.window = (to_utc_string(chains[0][0]), to_utc_string(chains[-1][0]))
     INPUT_REPORT = {"bars_excluded_no_recorded_receipt": bars_without_receipt,
                     "prior_bars_total": len(PRIOR_BARS), "prior_bars_kept": len(prior_kept),
                     "session_bars_provenance": SESSION_PROV, "prior_bars_provenance": PRIOR_PROV,
-                    "accepted_assumption": ASSUMPTION_BINDING,
+                    "accepted_assumption": ASSUMPTION_BINDING, "acceptance": ACCEPTANCE,
+                    "assumed_availability": {k: ASSUMED[k] for k in ("assumption_id", "offset_s", "n_rows",
+                                                                     "derived_field", "source_field_preserved",
+                                                                     "checked")},
                     "manifest_capture": {k: MANIFEST_CAPTURE[k] for k in ("path", "bytes", "sha256")},
                     "authorization_capture": ({k: AUTHZ_CAPTURE[k] for k in ("path", "bytes", "sha256")}
                                               if AUTHZ_CAPTURE else None)}
@@ -191,11 +204,13 @@ class Rec:
     def bars(self, symbol, *, start_epoch, end_epoch):
         # NO DEFAULT RECEIPT. Bars without a recorded receipt were excluded at parse time, so `b["receipt_time"]` is
         # present by construction; reaching for a default here would silently backdate an unknown availability.
-        return [{"symbol": symbol, "event_time": b["event_time"], "available_time": b["receipt_time"],
-                 "receipt_time": b["receipt_time"], "open": b["open"], "high": b["high"],
+        return [{"symbol": symbol, "event_time": b["event_time"], "available_time": b["available_time"],
+                 "receipt_time": b["available_time"], "availability_basis": b.get("availability_basis"),
+                 "source_receipt_time": b.get(PROV.SOURCE_FIELD, b.get("receipt_time")),
+                 "open": b["open"], "high": b["high"],
                  "low": b["low"], "close": b["close"], "volume": b.get("volume", 0), "publication_time": b.get("publication_time"),
                  "vwap": b.get("vwap"), "trades": b.get("trades"), "provider": "ALPACA_DATA_V2"}
-                for b in ALLBARS if start_epoch <= b["event_time"] < end_epoch and b["receipt_time"] <= self.t]
+                for b in ALLBARS if start_epoch <= b["event_time"] < end_epoch and b["available_time"] <= self.t]
 
     def _snap(self):
         return RP.most_recent_available(chains, self.t)          # THE ONE GATE: recorded receipt, never nearest-time

@@ -1,0 +1,28 @@
+{
+  "_README": [
+    "UNSIGNED TEMPLATE. Nothing in this repository may fill it in: an acceptance written by the process that needs",
+    "it is not an acceptance. Copy this file, complete every field, and pass it as the SIXTH argument to",
+    "scripts/loop_demonstration.py.",
+    "",
+    "WHAT THIS DOCUMENT ESTABLISHES, honestly: that an acceptance EXISTS, names this evaluation, binds to this",
+    "input manifest and this code pin, states a scope, and accepts the assumption in its exact declared words.",
+    "WHAT IT DOES NOT ESTABLISH: who wrote it. There is no signature and no identity check here, so accepted_by is",
+    "a claim recorded on the run, not an authenticated identity. Read apex/options_pilot/provenance.py",
+    "AUTHORSHIP_BOUNDARY before relying on it.",
+    "",
+    "The assumption text must match apex/options_pilot/provenance.py ASSUMPTIONS['BULK_PULL_AVAILABILITY_V1']",
+    "word for word; whitespace is normalised, wording is not."
+  ],
+  "accepted_by": "<FILL IN: who is accepting>",
+  "accepted_utc": "<FILL IN: ISO-8601 UTC instant of acceptance>",
+  "evaluation_id": "FLOW-VALIDATION-001",
+  "input_manifest_sha256": "<FILL IN: sha256 of the preserved INPUTS_MANIFEST.json>",
+  "code_pin": "<FILL IN: the full commit this acceptance was reviewed against>",
+  "scope": "<FILL IN: e.g. one diagnostic run of FLOW-VALIDATION-001; no trading authority, no model promotion, no profitability claim>",
+  "accepted_assumptions": [
+    {
+      "id": "BULK_PULL_AVAILABILITY_V1",
+      "text": "<FILL IN: the exact declared text>"
+    }
+  ]
+}
