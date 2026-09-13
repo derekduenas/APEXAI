@@ -25,7 +25,7 @@ from apex.organism import risk_certificate as RC
 from apex.organism import risk_kernel as RK
 
 from .book import CONTRACT_MULTIPLIER, Book
-from .fees import FeeSchedule
+from .fees import identity_problem, FeeSchedule
 from .records import canonical_hash, is_real
 from .risk_gate import RiskAuthority, RiskRefused, _binding_view, binding_hash, envelope_binding_hash
 
@@ -74,15 +74,11 @@ class CertifiedRiskAuthority(RiskAuthority):
         if approval.get("risk_provenance") != CERTIFIED_PROVENANCE or approval.get("authority_id") != self.authority_id:
             return "certified authority honours only %s/%s approvals, got %r/%r" % (
                 CERTIFIED_PROVENANCE, self.authority_id, approval.get("risk_provenance"), approval.get("authority_id"))
-        # COMPLETE identity, not schedule_id: an authority whose terms differ must not honour a stored approval
-        mine, theirs = self.fee_schedule.identity(), approval.get("fee_identity")
-        if not isinstance(theirs, dict):
-            return ("approval carries no complete fee identity (got %r); the active authority honours only approvals "
-                    "that name the full schedule identity" % type(theirs).__name__)
-        for k in ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date", "terms_digest"):
-            if theirs.get(k) != mine[k]:
-                return "approval was issued under fee %s=%r, active authority runs %r" % (k, theirs.get(k), mine[k])
-        return None
+        # COMPLETE identity, through the ONE comparison. This used to carry its own seven-field tuple and so kept
+        # honouring approvals after the identity grew to twelve -- including approvals issued under a DIFFERENT
+        # operator authorization.
+        return identity_problem(self.fee_schedule.identity(), approval.get("fee_identity"),
+                                what="this approval")
 
     # -------------------------------------------------- certificate + kernel
     def _sleeve(self, intent: dict) -> dict:
@@ -115,18 +111,8 @@ class CertifiedRiskAuthority(RiskAuthority):
     def fee_identity_problem(self, intent: dict) -> str | None:
         """The intent must CARRY the fee identity the boundary will seal, and it must be this authority's schedule,
         matched on id, hash, provenance and known-ness. Missing or mismatched REFUSES."""
-        f = intent.get("fees")
-        if not isinstance(f, dict):
-            return ("FEE_IDENTITY_MISSING: the intent carries no fee block; the authority will not approve against a "
-                    "schedule it cannot see (authority holds %s)" % self.fee_schedule.schedule_id)
-        mine = self.fee_identity()
-        for k in ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date", "terms_digest"):
-            if k not in f:
-                return "FEE_IDENTITY_INCOMPLETE: the intent's fee block lacks %r" % k
-            if f[k] != mine[k]:
-                return ("FEE_IDENTITY_MISMATCH: the intent will be sealed with %s=%r while this authority gates on %r; "
-                        "one run has exactly one fee schedule" % (k, f[k], mine[k]))
-        return None
+        return identity_problem(self.fee_identity(), intent.get("fees"),
+                                what="the intent's fee block (authority holds %s)" % self.fee_schedule.schedule_id)
 
     def approve(self, intent: dict, *, book: Book | None = None) -> dict:
         if book is None:

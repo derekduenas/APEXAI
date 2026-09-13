@@ -31,7 +31,8 @@ def exact_authorization(sched: FeeSchedule, **over) -> FeeAuthorization:
     the test, and no authorization is authored into the product."""
     base = dict(schedule_id=sched.schedule_id, version=sched.version,
                 source_document_sha256=sched.source_document_sha256, terms_digest=sched.terms_digest,
-                computation_digest=sched.computation_digest, effective_date=sched.effective_date,
+                computation_policy_digest=sched.computation_digest,
+                implementation_digest=sched.implementation_digest, effective_date=sched.effective_date,
                 status=AUTHORIZED, authorized_by="TEST_ONLY_NOT_AN_OPERATOR",
                 authorized_utc="2026-09-13T00:00:00Z", scope="test")
     base.update(over)
@@ -74,7 +75,8 @@ class TestSourceVerificationIsNotAuthorization:
 class TestTheAuthorizationIsBoundIntoTheIdentity:
     def test_identity_names_the_authorization_and_the_computation(self):
         i = RB.identity()
-        for f in ("authorization_status", "authorization_digest", "computation_digest", "source_document_sha256"):
+        for f in ("authorization_status", "authorization_digest", "computation_policy_digest",
+                  "implementation_digest", "source_document_sha256"):
             assert f in i, f
         assert i["authorization_status"] == NOT_AUTHORIZED and i["authorization_digest"] is None
 
@@ -109,7 +111,7 @@ class TestTheEightScenarios:
         """The superseded authorization, presented for the new computation, is refused on the field that
         actually changed."""
         stale = exact_authorization(RB, version="2026-09-12",
-                                    computation_digest=FeeSchedule(
+                                    computation_policy_digest=FeeSchedule(
                                         **{**RB.__dict__, "sale_principal_rate_per_million": None}).computation_digest)
         sched = FeeSchedule(**{**RB.__dict__, "authorization": stale})
         st = sched.authorization_state()
@@ -122,7 +124,7 @@ class TestTheEightScenarios:
         altered = FeeSchedule(**{**RB.__dict__, "sale_principal_rate_per_million": None, "authorization": auth})
         st = altered.authorization_state()
         assert st["status"] == AUTHORIZATION_MISMATCH
-        assert st["basis"] in ("terms_digest", "computation_digest")
+        assert st["basis"] in ("terms_digest", "computation_policy_digest")
 
     def test_4_an_altered_terms_digest_invalidates_the_authorization(self):
         bad = exact_authorization(RB, terms_digest="0" * 64)

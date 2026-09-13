@@ -15,7 +15,10 @@ simulated fill says it is simulated."""
 from __future__ import annotations
 
 import math
-from decimal import ROUND_CEILING, ROUND_HALF_UP, Decimal
+import ast
+import inspect
+import textwrap
+from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP, Decimal
 
 from dataclasses import dataclass, field
 
@@ -27,6 +30,108 @@ FEE_PROVENANCE = ("SYNTHETIC_FIXTURE", "PROVIDER_VERIFIED", "UNVERIFIED")
 
 class FeePolicyRefused(ValueError):
     pass
+
+
+ROUND_MODES = {"UP": ROUND_CEILING, "NEAREST": ROUND_HALF_UP, "DOWN": ROUND_FLOOR}
+
+
+@dataclass(frozen=True)
+class FeeComputationPolicy:
+    """HOW the rates are applied -- declared once, and EXECUTED FROM.
+
+    The first version of `computation_digest` hashed a hand-written description of the arithmetic while `_side()`
+    carried its own parallel hard-coded rules. That made the digest a CLAIM about the implementation rather than a
+    binding to it: changing ROUND_CEILING to ROUND_FLOOR in `_side()` changed the charged amount from 0.06 to 0.05
+    and left the digest byte-identical, so an authorization bound to it still matched.
+
+    This object is the single source of the rounding and basis decisions. `_side()` reads its modes from here, so
+    the description and the behaviour cannot drift apart -- and the digest over it is a digest over rules that are
+    actually in force."""
+    sec_basis: str                      # SALE_PRINCIPAL_RATE_PER_MILLION | PER_CONTRACT_CONSTANT
+    sec_rounding: str                   # UP | NEAREST | DOWN
+    cat_rounding: str
+    cat_sub_cent_to_zero: bool
+    taf_rounding: str
+    commission_rounding: str
+    exchange_rounding: str
+    regulatory_sum: str
+    arithmetic: str
+    component_order: tuple
+
+    def __post_init__(self):
+        for f in ("sec_rounding", "cat_rounding", "taf_rounding", "commission_rounding", "exchange_rounding"):
+            if getattr(self, f) not in ROUND_MODES:
+                raise FeePolicyRefused("ROUNDING_MODE_UNKNOWN: %s=%r" % (f, getattr(self, f)))
+
+    def mode(self, which: str):
+        return ROUND_MODES[getattr(self, which)]
+
+    def describe(self) -> dict:
+        return {"sec_basis": self.sec_basis, "sec_rounding": self.sec_rounding, "cat_rounding": self.cat_rounding,
+                "cat_sub_cent_to_zero": self.cat_sub_cent_to_zero, "taf_rounding": self.taf_rounding,
+                "commission_rounding": self.commission_rounding, "exchange_rounding": self.exchange_rounding,
+                "regulatory_sum": self.regulatory_sum, "arithmetic": self.arithmetic,
+                "component_order": list(self.component_order)}
+
+    @property
+    def digest(self) -> str:
+        return canonical_hash(self.describe())
+
+
+SALE_PRINCIPAL_POLICY_V1 = FeeComputationPolicy(
+    sec_basis="SALE_PRINCIPAL_RATE_PER_MILLION", sec_rounding="UP",
+    cat_rounding="NEAREST", cat_sub_cent_to_zero=True, taf_rounding="NEAREST",
+    commission_rounding="NEAREST", exchange_rounding="NEAREST",
+    regulatory_sum="EACH_COMPONENT_ROUNDED_UNDER_ITS_OWN_RULE_BEFORE_THE_SUM",
+    arithmetic="DECIMAL_CENTS", component_order=("commission", "exchange", "regulatory"))
+
+PER_CONTRACT_POLICY_V1 = FeeComputationPolicy(
+    sec_basis="PER_CONTRACT_CONSTANT", sec_rounding="NEAREST",
+    cat_rounding="NEAREST", cat_sub_cent_to_zero=True, taf_rounding="NEAREST",
+    commission_rounding="NEAREST", exchange_rounding="NEAREST",
+    regulatory_sum="EACH_COMPONENT_ROUNDED_UNDER_ITS_OWN_RULE_BEFORE_THE_SUM",
+    arithmetic="DECIMAL_CENTS", component_order=("commission", "exchange", "regulatory"))
+
+
+# ---------------------------------------------------------------- the EXECUTABLE implementation digest
+FEE_IMPLEMENTATION_FUNCTIONS = ("_side", "entry", "exit")
+
+
+class SourceUnavailable(RuntimeError):
+    pass
+
+
+def _canonical_ast(fn) -> str:
+    """A structural digest of a function's SOURCE, with docstrings and line numbers removed.
+
+    Reformatting, comments and moving code do not change it. Changing arithmetic, dispatch, component ordering or
+    rounding does. It carries no authorization payload data -- only the code that computes a fee."""
+    try:
+        src = textwrap.dedent(inspect.getsource(fn))
+    except (OSError, TypeError) as e:
+        # THE CODE CANNOT BE READ, so it cannot be verified. This must not raise into the fee path and must not
+        # quietly match: it becomes a sentinel that no authorization can equal, so the schedule fails closed.
+        raise SourceUnavailable("SOURCE_UNAVAILABLE for %r: %s" % (getattr(fn, "__qualname__", fn), e))
+    tree = ast.parse(src)
+    for node in ast.walk(tree):
+        body = getattr(node, "body", None)
+        if isinstance(body, list) and body and isinstance(body[0], ast.Expr) \
+                and isinstance(body[0].value, ast.Constant) and isinstance(body[0].value.value, str):
+            body.pop(0)
+    return ast.dump(tree, annotate_fields=True, include_attributes=False)
+
+
+def implementation_digest_of(cls) -> str:
+    """Digest of the fee-calculation code ACTUALLY BOUND to `cls`, so a subclass that overrides the arithmetic
+    produces a different digest than the class it inherits from.
+
+    If the source cannot be read -- a frozen build, a zipimport, a class defined in an interactive session -- this
+    returns a NAMED sentinel rather than raising or guessing. The sentinel can never equal an authorization's
+    digest, so an unverifiable implementation is refused instead of trusted."""
+    try:
+        return canonical_hash({name: _canonical_ast(getattr(cls, name)) for name in FEE_IMPLEMENTATION_FUNCTIONS})
+    except SourceUnavailable as e:
+        return "UNVERIFIABLE_IMPLEMENTATION: %s" % str(e)[:120]
 
 
 class FeeAuthorizationRefused(FeePolicyRefused):
@@ -56,8 +161,9 @@ class FeeAuthorization:
     schedule_id: str
     version: str
     source_document_sha256: str
-    terms_digest: str                 # the RATES
-    computation_digest: str           # HOW the rates are applied -- what changed between v2026-09-12 and -b
+    terms_digest: str                    # the RATES
+    computation_policy_digest: str       # HOW the rates are applied -- the policy _side() executes from
+    implementation_digest: str           # the fee-calculation CODE itself, so a recipe cannot drift from behaviour
     effective_date: str
     status: str                       # AUTHORIZED | NOT_AUTHORIZED | AUTHORIZATION_SUPERSEDED
     authorized_by: str
@@ -67,7 +173,8 @@ class FeeAuthorization:
     def __post_init__(self):
         if self.status not in AUTHORIZATION_STATES:
             raise FeeAuthorizationRefused("AUTHORIZATION_STATE_UNKNOWN: %r" % (self.status,))
-        for f in ("schedule_id", "version", "source_document_sha256", "terms_digest", "computation_digest",
+        for f in ("schedule_id", "version", "source_document_sha256", "terms_digest",
+                  "computation_policy_digest", "implementation_digest",
                   "effective_date", "authorized_by", "authorized_utc", "scope"):
             if not isinstance(getattr(self, f), str) or not getattr(self, f).strip():
                 raise FeeAuthorizationRefused("AUTHORIZATION_FIELD_MISSING: %s" % f)
@@ -75,7 +182,8 @@ class FeeAuthorization:
     def describe(self) -> dict:
         return {"schedule_id": self.schedule_id, "version": self.version,
                 "source_document_sha256": self.source_document_sha256, "terms_digest": self.terms_digest,
-                "computation_digest": self.computation_digest, "effective_date": self.effective_date,
+                "computation_policy_digest": self.computation_policy_digest,
+                "implementation_digest": self.implementation_digest, "effective_date": self.effective_date,
                 "status": self.status, "authorized_by": self.authorized_by,
                 "authorized_utc": self.authorized_utc, "scope": self.scope}
 
@@ -102,6 +210,7 @@ class FeeSchedule:
     taf_per_contract_sell: float | None = None             # FINRA TAF, sells, rounded to the NEAREST cent
     source_document_sha256: str = ""                       # VERIFIED SOURCE: which document these terms came from
     authorization: "FeeAuthorization | None" = None        # OPERATOR ACT: who cleared this exact computation
+    computation_policy: "FeeComputationPolicy | None" = None   # HOW the rates are applied; _side() executes from it
 
     def __post_init__(self):
         if self.provenance not in FEE_PROVENANCE:
@@ -128,8 +237,8 @@ class FeeSchedule:
     # The binding commits to ALL of this, not to schedule_id alone: an altered hash, provenance, known status,
     # effective date or term changes the identity and therefore the binding, and a persisted approval stops verifying.
     IDENTITY_FIELDS = ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date",
-                       "terms_digest", "computation_digest", "source_document_sha256",
-                       "authorization_status", "authorization_digest")
+                       "terms_digest", "computation_policy_digest", "implementation_digest",
+                       "source_document_sha256", "authorization_status", "authorization_digest")
 
     @property
     def terms_digest(self) -> str:
@@ -145,22 +254,31 @@ class FeeSchedule:
                                "taf_per_contract_sell": self.taf_per_contract_sell})
 
     @property
-    def computation_digest(self) -> str:
-        """A digest of HOW the rates are applied, not what they are.
+    def policy(self) -> "FeeComputationPolicy":
+        """The computation policy in force. A schedule that declares none falls back to the form implied by its
+        own terms, so existing schedules keep working and nothing is silently defaulted to the wrong arithmetic."""
+        if self.computation_policy is not None:
+            return self.computation_policy
+        return (SALE_PRINCIPAL_POLICY_V1 if self.sale_principal_rate_per_million is not None
+                else PER_CONTRACT_POLICY_V1)
 
-        This is the field that distinguishes v2026-09-12 from v2026-09-12b. The RATES did not change; the SEC
-        component moved from a fixed per-contract constant to the exact sale-principal computation. A terms
-        digest alone would not have caught that, which is precisely how the superseded authorization survived."""
-        return canonical_hash({
-            "sec_basis": ("SALE_PRINCIPAL_RATE_PER_MILLION" if self.sale_principal_rate_per_million is not None
-                          else "PER_CONTRACT_CONSTANT"),
-            "sec_rounding": "UP_TO_THE_CENT",
-            "cat_basis": ("PER_CONTRACT" if self.cat_per_contract is not None else "FOLDED_INTO_REGULATORY"),
-            "cat_rounding": "SUB_CENT_ROUNDS_DOWN_TO_ZERO",
-            "taf_basis": ("PER_CONTRACT_SELL" if self.taf_per_contract_sell is not None else "FOLDED_INTO_REGULATORY"),
-            "taf_rounding": "NEAREST_CENT",
-            "regulatory_sum": "EACH_COMPONENT_ROUNDED_UNDER_ITS_OWN_RULE_BEFORE_THE_SUM",
-            "arithmetic": "DECIMAL_CENTS"})
+    @property
+    def computation_digest(self) -> str:
+        """A digest over the policy the arithmetic EXECUTES FROM -- not a hand-written description of it.
+
+        This distinguishes v2026-09-12 from v2026-09-12b: the RATES are identical, and only the SEC basis and
+        rounding changed. Paired with `implementation_digest`, which binds the code itself, a change to the rules
+        OR to the code that applies them invalidates an authorization."""
+        return self.policy.digest
+
+    @property
+    def implementation_digest(self) -> str:
+        """A digest over the EXECUTABLE fee-calculation code bound to this schedule's class.
+
+        The policy digest says what the rules are; this says what the code does. Changing arithmetic, dispatch,
+        component ordering or rounding inside _side/entry/exit changes it -- including in a subclass that
+        overrides them -- so a declared recipe can no longer drift away from the behaviour it claims."""
+        return implementation_digest_of(type(self))
 
     # ------------------------------------------------------------------ SOURCE VERIFIED vs OPERATOR AUTHORIZED
     @property
@@ -193,7 +311,8 @@ class FeeSchedule:
                                     ("effective_date", self.effective_date, a.effective_date),
                                     ("source_document_sha256", self.source_document_sha256, a.source_document_sha256),
                                     ("terms_digest", self.terms_digest, a.terms_digest),
-                                    ("computation_digest", self.computation_digest, a.computation_digest)):
+                                    ("computation_policy_digest", self.computation_digest, a.computation_policy_digest),
+                                    ("implementation_digest", self.implementation_digest, a.implementation_digest)):
             if mine != theirs:
                 return {"status": AUTHORIZATION_MISMATCH,
                         "why": ("AUTHORIZATION_DOES_NOT_MATCH: %s is %r on the schedule and %r on the "
@@ -228,7 +347,8 @@ class FeeSchedule:
                 "terms_digest": self.terms_digest,
                 # BOUND INTO THE IDENTITY, so a persisted approval stops verifying the moment the authorization
                 # changes, is removed, or is superseded.
-                "computation_digest": self.computation_digest,
+                "computation_policy_digest": self.computation_digest,
+                "implementation_digest": self.implementation_digest,
                 "source_document_sha256": self.source_document_sha256,
                 "authorization_status": st["status"],
                 "authorization_digest": (self.authorization.digest if self.authorization is not None else None)}
@@ -274,6 +394,7 @@ class FeeSchedule:
                     "fee_identity": self.identity()}
         n = Decimal(contracts)
         cent = Decimal("0.01")
+        pol = self.policy                      # EVERY rounding decision below comes from here, never a literal
         comps, rounding = {}, {}
 
         def _cent(x, rule, name, *, sub_cent_to_zero=False):
@@ -282,21 +403,23 @@ class FeeSchedule:
                 v = Decimal("0.00")
                 rounding[name] = "sub-cent charge rounds DOWN to zero (published rule)"
             else:
-                rounding[name] = ("rounded UP to the cent" if rule is ROUND_CEILING else "rounded to the NEAREST cent")
+                rounding[name] = ("rounded UP to the cent" if rule is ROUND_CEILING else
+                                  "rounded DOWN to the cent" if rule is ROUND_FLOOR else
+                                  "rounded to the NEAREST cent")
             return v
 
-        comms = (Decimal(str(self.commission_per_contract)) * n).quantize(cent, rounding=ROUND_HALF_UP)
+        comms = (Decimal(str(self.commission_per_contract)) * n).quantize(cent, rounding=pol.mode("commission_rounding"))
         comps["commission"] = comms; rounding["commission"] = "exact per contract, to the cent"
-        exch = (Decimal(str(self.exchange_fee_per_contract)) * n).quantize(cent, rounding=ROUND_HALF_UP)
+        exch = (Decimal(str(self.exchange_fee_per_contract)) * n).quantize(cent, rounding=pol.mode("exchange_rounding"))
         comps["exchange"] = exch; rounding["exchange"] = "ORF + OCC per contract, to the cent"
         basis = {}
         if side == "BUY":
             _buy_cat = self.cat_per_contract if self.cat_per_contract is not None else self.regulatory_fee_per_contract_buy   # UNKNOWN_TO_ZERO_EXEMPT: not a zero default; falls back to the schedule's declared buy-side regulatory rate, which is validated non-None for a known schedule
             raw_cat = Decimal(str(_buy_cat)) * n
-            comps["regulatory"] = _cent(raw_cat, ROUND_HALF_UP, "regulatory_cat", sub_cent_to_zero=True)
+            comps["regulatory"] = _cent(raw_cat, pol.mode("cat_rounding"), "regulatory_cat", sub_cent_to_zero=pol.cat_sub_cent_to_zero)
             basis["regulatory"] = "CAT per contract (%s x %d = %s)" % (_buy_cat, contracts, raw_cat)
         elif self.sale_principal_rate_per_million is None:
-            comps["regulatory"] = (Decimal(str(self.regulatory_fee_per_contract_sell)) * n).quantize(cent, rounding=ROUND_HALF_UP)
+            comps["regulatory"] = (Decimal(str(self.regulatory_fee_per_contract_sell)) * n).quantize(cent, rounding=pol.mode("sec_rounding"))
             rounding["regulatory"] = "per contract (schedule declares no sale-principal rate), to the cent"
         else:
             if sale_principal is None:
@@ -316,18 +439,19 @@ class FeeSchedule:
                         "why": ("SELL_COMPONENTS_UNDECLARED: %s prices on sale principal but does not declare cat_per_contract=%r "
                                 "and taf_per_contract_sell=%r" % (self.schedule_id, self.cat_per_contract, self.taf_per_contract_sell))}
             raw_cat = Decimal(str(self.cat_per_contract)) * n
-            cat = _cent(raw_cat, ROUND_HALF_UP, "regulatory_cat", sub_cent_to_zero=True)
+            cat = _cent(raw_cat, pol.mode("cat_rounding"), "regulatory_cat", sub_cent_to_zero=pol.cat_sub_cent_to_zero)
             raw_taf = Decimal(str(self.taf_per_contract_sell)) * n
-            taf = raw_taf.quantize(cent, rounding=ROUND_HALF_UP); rounding["regulatory_taf"] = "FINRA TAF, NEAREST cent"
+            taf = raw_taf.quantize(cent, rounding=pol.mode("taf_rounding")); rounding["regulatory_taf"] = "FINRA TAF, %s" % pol.taf_rounding
             raw_sec = Decimal(str(sale_principal)) * Decimal(str(self.sale_principal_rate_per_million)) / Decimal("1000000")
-            sec = raw_sec.quantize(cent, rounding=ROUND_CEILING); rounding["regulatory_sec"] = "SEC, rounded UP to the cent"
+            sec = raw_sec.quantize(cent, rounding=pol.mode("sec_rounding")); rounding["regulatory_sec"] = "SEC, %s" % pol.sec_rounding
             comps["regulatory"] = cat + taf + sec
             basis.update({"sale_principal": float(sale_principal), "cat_raw": str(raw_cat), "cat": float(cat),
                           "taf_raw": str(raw_taf), "taf": float(taf), "sec_raw": str(raw_sec), "sec_component": float(sec),
                           "regulatory_is": "CAT + TAF + SEC, each rounded under its own rule BEFORE the sum"})
-        total = sum(comps.values(), Decimal("0.00")).quantize(cent, rounding=ROUND_HALF_UP)
+        total = sum((comps[k] for k in pol.component_order if k in comps), Decimal("0.00")).quantize(cent, rounding=ROUND_HALF_UP)
         return {"total": float(total), "components": {k: float(v) for k, v in comps.items()},
-                "component_basis": basis, "rounding_rules": rounding, "arithmetic": "DECIMAL_CENTS",
+                "component_basis": basis, "rounding_rules": rounding, "arithmetic": pol.arithmetic,
+                "computation_policy": pol.describe(),
                 "status": "CHARGED" if contracts else "NONE", "sale_principal": sale_principal,
                 "schedule_id": self.schedule_id, "schedule_hash": self.schedule_hash, "fee_identity": self.identity(),
                 "side": side, "contracts": contracts}
@@ -352,6 +476,36 @@ UNVERIFIED_FEES = FeeSchedule(
     commission_per_contract=None, exchange_fee_per_contract=None,
     regulatory_fee_per_contract_buy=None, regulatory_fee_per_contract_sell=None,
     note="no provider fee schedule has been verified for the pilot path; trading under it is refused")
+
+
+def identity_problem(mine: dict, theirs, *, what: str) -> str | None:
+    """THE canonical fee-identity comparison. Every consumer calls THIS; nobody writes a field list again.
+
+    WHY IT EXISTS. `accepts()` and `fee_identity_problem()` each carried their own hand-written tuple of seven
+    fields. When the identity grew, both kept comparing the old seven -- so an approval issued under one operator
+    authorization was honoured by an authority running a DIFFERENT one, and an intent sealed under one passed the
+    gate on another. The schema had grown; the joins had not. Comparing against IDENTITY_FIELDS itself makes that
+    failure mode unreachable: adding a field automatically tightens every consumer at once.
+
+    EXACT KEY EQUALITY, both directions. A MISSING field refuses, so an older record cannot be quietly accepted by
+    a newer authority. An EXTRA field refuses too, because an identity carrying something nobody declared is not
+    an identity this code understands."""
+    if not isinstance(theirs, dict):
+        return ("FEE_IDENTITY_MISSING: %s carries no fee identity (got %s); only a complete identity is honoured"
+                % (what, type(theirs).__name__))
+    expected = set(FeeSchedule.IDENTITY_FIELDS)
+    missing = sorted(expected - set(theirs))
+    if missing:
+        return "FEE_IDENTITY_INCOMPLETE: %s lacks %s" % (what, ", ".join(repr(m) for m in missing))
+    extra = sorted(set(theirs) - expected)
+    if extra:
+        return ("FEE_IDENTITY_UNDECLARED_FIELDS: %s carries %s, which this code does not declare; an identity is "
+                "compared in full or not at all" % (what, ", ".join(repr(e) for e in extra)))
+    for k in FeeSchedule.IDENTITY_FIELDS:
+        if theirs[k] != mine[k]:
+            return ("FEE_IDENTITY_MISMATCH: %s has %s=%r while the active authority runs %r"
+                    % (what, k, str(theirs[k])[:48], str(mine[k])[:48]))
+    return None
 
 
 def recompute_fees(record_fee_block: dict, schedule: FeeSchedule, *, contracts: int, side: str) -> list:

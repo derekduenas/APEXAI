@@ -18,6 +18,7 @@ approval copied onto a different intent, or hand-written, refuses.
                                  and can be told to refuse for tests."""
 from __future__ import annotations
 
+from .fees import FeeSchedule
 from .records import canonical_hash, is_real
 
 BINDING_FIELDS = ("intent_id", "session_id", "scan_id", "contract_id", "expression", "action", "quantity",
@@ -47,7 +48,11 @@ def _binding_view(intent: dict) -> dict:
     return v
 
 
-FEE_IDENTITY_FIELDS = ("schedule_id", "schedule_hash", "provenance", "known", "version", "effective_date", "terms_digest")
+# DERIVED, NEVER RESTATED. This module kept its own copy of the identity field list, so when the identity grew to
+# include the computation policy, the implementation digest and the operator authorization, the ENVELOPE BINDING
+# went on committing to the old seven -- and a binding made under one authorization still verified under another.
+# Taking the tuple from its single definition means the binding tightens automatically when the identity does.
+FEE_IDENTITY_FIELDS = FeeSchedule.IDENTITY_FIELDS
 
 
 def fee_identity_of(intent: dict) -> dict:

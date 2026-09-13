@@ -37,7 +37,8 @@ from .clock import Clock, ClockRefused, check_reading, to_utc_string
 from . import exit_policy as EP
 from . import instant as I
 from .exit_policy import EXIT_POLICY_V1, ExitPolicy
-from .fees import EXECUTION_POLICY_V1, UNVERIFIED_FEES, ExecutionPolicy, FeeSchedule, FeeAuthorizationRefused
+from .fees import (EXECUTION_POLICY_V1, UNVERIFIED_FEES, ExecutionPolicy, FeeAuthorizationRefused,
+                    FeeSchedule, identity_problem)
 from .records import (TOLL_FORMULA_V1, FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_record_labels, canonical_hash, is_real, labels_for,
                       validate_forecast, validate_intent, validate_quote)
 
@@ -310,6 +311,9 @@ class Boundary:
         f = it.get("fees")
         if not isinstance(f, dict):
             return "FEE_IDENTITY_MISSING_ON_INTENT: %r" % (it.get("intent_id"),)
+        _p = identity_problem(self.fee_schedule.identity(), f, what="the persisted intent's fee block")
+        if _p:
+            return _p
         mine = self.fee_schedule.identity()
         extra = [k for k in f if k not in mine]
         if extra:
@@ -769,6 +773,9 @@ class Boundary:
             fe = fl.get("fees_entry") or {}
             fid = fe.get("fee_identity")
             mine = self.fee_schedule.identity()
+            _p = identity_problem(mine, fid, what="the persisted fill's entry fee identity")
+            if _p:
+                self.refuse("outcome", "FEE_IDENTITY_CHANGED_SINCE_FILL: %s" % _p, scan_id=scan_id)
             if not isinstance(fid, dict):
                 self.refuse("outcome", "FEE_IDENTITY_MISSING_ON_FILL: the persisted fill carries no complete fee identity; "
                                        "an exit is never priced against an unknown entry identity", scan_id=scan_id)

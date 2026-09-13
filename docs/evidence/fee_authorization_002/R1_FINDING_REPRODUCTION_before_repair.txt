@@ -1,0 +1,26 @@
+FEE-AUTHORIZATION-002-R1 — BOTH FINDINGS REPRODUCED BEFORE REPAIR
+base f3c8cb9c101aa41c4f414451b913163f68a60d64
+
+F1. IDENTITY CONSUMERS USE AN OBSOLETE FIELD SUBSET
+   authority A authorization_digest : 296cdf6a260861dc74898208f69806bf
+   authority B authorization_digest : aa83d6f96bea04beb1e6bc86ad829c67
+   identities differ?               : True
+   accepts() an approval issued under A, while running B -> None
+   *** LEAK: the persisted approval is HONOURED despite a different authorization ***
+   fee_identity_problem() with A's identity on authority B -> None
+   *** LEAK: an intent sealed under A passes the gate on B ***
+   fields actually compared : ('schedule_id','schedule_hash','provenance','known','version',
+                              'effective_date','terms_digest')   -- 7 of 11
+   fields NOT compared      : computation_digest, source_document_sha256,
+                              authorization_status, authorization_digest
+
+F2. computation_digest HASHES LABELS, NOT THE EXECUTABLE COMPUTATION
+   exit total, published rounding (UP)   : 0.06
+   exit total, arithmetic changed (DOWN) : 0.05
+   the charged amount CHANGED            : True
+   computation_digest before             : 41ebd4eedc31da75b483daab020124614d9d356e
+   computation_digest after              : 41ebd4eedc31da75b483daab020124614d9d356e
+   *** LEAK: the arithmetic changed and the digest did NOT. An authorization bound to it would still match. ***
+
+   computation_digest hashes a HAND-WRITTEN RECIPE ('sec_rounding': 'UP_TO_THE_CENT'), which is a
+   CLAIM about _side(), not a binding to it. _side() carries its own parallel hard-coded rules.

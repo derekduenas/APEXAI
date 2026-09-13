@@ -64,3 +64,61 @@ No authorization has been authored or installed. `ROBINHOOD_RHF_2026.authorizati
 a proposed payload are in `docs/evidence/fee_authorization_002/PROPOSED_AUTHORIZATION.txt` for review.
 
 No merge, no deployment, no pilot restart, no lifting of the hold, no paper execution.
+
+
+---
+
+# R1 — two blocking findings from review (2026-09-13)
+
+Base `f3c8cb9`. Both reproduced before repair:
+`docs/evidence/fee_authorization_002/R1_FINDING_REPRODUCTION_before_repair.txt`.
+
+## F1 — identity consumers compared an obsolete subset
+
+`accepts()` and `fee_identity_problem()` each carried their **own hand-written tuple of seven fields**. The identity
+had grown to twelve. Reproduced: an approval issued under one operator authorization was **honoured** by an
+authority running a different one (`accepts() -> None`), and an intent sealed under one **passed the gate** on
+another.
+
+This is the same defect family as the fee gate itself: the producer records the right information and the consumer
+inspects a hand-written subset of it.
+
+**Repair.** One canonical `fees.identity_problem(mine, theirs, *, what)` comparing against `IDENTITY_FIELDS`
+itself, with exact key equality **in both directions** — a missing field refuses (an older record cannot be quietly
+accepted by a newer authority) and an **extra** field refuses (an identity carrying something undeclared is not one
+this code understands). All consumers call it.
+
+**A structural test greps every module for a hand-written identity tuple — and immediately found a third
+consumer neither the review nor I had listed: `risk_gate.FEE_IDENTITY_FIELDS`, its own copy of the seven, feeding
+`envelope_binding_hash`.** The envelope binding was therefore also committing to the old seven, so a binding made
+under one authorization still verified under another. It now derives from the single definition.
+
+## F2 — `computation_digest` hashed labels, not computation
+
+Reproduced: changing `ROUND_CEILING` to `ROUND_FLOOR` in the executable path changed the charge **0.06 → 0.05**
+and left the digest **byte-identical**.
+
+**Repair, non-self-referential:**
+
+- `FeeComputationPolicy` — immutable, declarative, holding the actual bases and rounding modes. **`_side()` reads
+  its rounding modes from it**, so the description cannot drift from the behaviour. Changing a policy rounding rule
+  now changes the charge (verified: 0.06 → 0.05).
+- `implementation_digest` — a canonical AST of `_side`/`entry`/`exit`, docstrings and line numbers stripped,
+  carrying no authorization payload data. Computed from `type(self)`, so a subclass overriding the arithmetic
+  digests differently. Independently recomputed in tests.
+- Both are bound into `FeeAuthorization` and `IDENTITY_FIELDS`.
+- **Unreadable source fails closed**: a frozen build or zipimport yields `UNVERIFIABLE_IMPLEMENTATION:…`, which can
+  never equal an authorization digest — it refuses rather than raising into the fee path or matching by accident.
+
+## Operational consequence of binding the code
+
+`implementation_digest` binds the authorization to the **current** fee-calculation code. Any later edit to
+`_side`/`entry`/`exit` invalidates it and refuses every trade until re-authorized. **Authorize after the code is
+frozen for the release you intend to run.** The refusal is loud and safe, not silent.
+
+## Procedural limitation, acknowledged
+
+`FeeAuthorization` records `authorized_by` but does not **authenticate** it. For this paper pilot that is
+procedural authorization — acceptable only because the operator authorizes the exact digests, the artifact is
+preserved, and Claude does not create it before instruction. For a real-money boundary it must become an
+externally signed decision.
