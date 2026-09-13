@@ -25,7 +25,7 @@ from datetime import datetime, timezone
 
 from apex.pulse import twin as TW
 
-from .allowlist import EXTERNAL_CONTEXT_TOOLS, PROVIDER
+from .allowlist import EXTERNAL_CONTEXT_TOOLS, PROVIDER, canonical, live_name
 
 SCHEMA_VERSION = "TRADINGVIEW_OBSERVATION_V0"
 SOURCE_CLASS = "EXTERNAL_CONTEXT"          # never a price of record; never substituted for another feed
@@ -69,6 +69,13 @@ def observation(*, tool: str, args: dict, payload, request_start: float, respons
         raise NormalizationRefused("QUALITY_NOT_IN_VOCABULARY: %r" % (quality,))
     if response_receipt < request_start:
         raise NormalizationRefused("RECEIPT_BEFORE_REQUEST: %.6f < %.6f" % (response_receipt, request_start))
+    # ONE TOOL, ONE IDENTITY. The server exposes `mcp__mcp-tradingview__mcp-tv-get-news`; the reviewed name is
+    # `get_news`. Keying off the raw string meant a live-spelled call was never recognised as an EXTERNAL_CONTEXT
+    # tool and would have been stamped OBSERVATION_ONLY -- a live news headline silently carrying more authority
+    # than the same headline fetched under the bare name. The canonical name governs; the live one is kept for
+    # provenance so the record still says exactly which wire name was called.
+    tool_as_called = str(tool)
+    tool = canonical(tool)
     ing = float(response_receipt if ingestion is None else ingestion)
     if ing < response_receipt:
         raise NormalizationRefused("INGESTION_BEFORE_RECEIPT: %.6f < %.6f" % (ing, response_receipt))
@@ -77,7 +84,9 @@ def observation(*, tool: str, args: dict, payload, request_start: float, respons
     obs = {
         "schema_version": SCHEMA_VERSION,
         "provider": PROVIDER,
-        "tool": tool,                              # the ACTUAL tool name, not a category
+        "tool": tool,                              # the CANONICAL reviewed name, not a category
+        "tool_as_called": tool_as_called,          # the exact spelling handed to the transport
+        "tool_live_name": live_name(tool),         # the spelling this server actually exposes
         "source_class": SOURCE_CLASS,
         "authority": AUTHORITY_CONTEXT if ctx else AUTHORITY_OBSERVATION,
         "calibrated": False,
@@ -202,7 +211,7 @@ def normalize_bars(payload, *, symbol: str, interval: str, request_start: float,
 
 def completed_bars(obs: dict) -> list:
     """The ONLY accessor a completed-bar consumer may use. Partial and incomplete bars are not reachable through it."""
-    if obs.get("tool") != "get_ohlcv":
+    if canonical(obs.get("tool") or "") != "get_ohlcv":
         raise NormalizationRefused("NOT_A_BARS_OBSERVATION: %r" % (obs.get("tool"),))
     return list(obs.get("bars_complete") or [])
 
@@ -240,7 +249,7 @@ def compare_price(obs: dict, *, other_source: str, other_value, other_as_of=None
     """TradingView never overwrites or substitutes another source's price. A difference is RECORDED as a
     disagreement, with both sources and both timings, and left visible."""
     mine = None
-    if obs.get("tool") == "get_ohlcv":
+    if canonical(obs.get("tool") or "") == "get_ohlcv":
         bars = completed_bars(obs)
         mine = bars[-1][field] if bars else None
     if mine is None or not _is_number(other_value):

@@ -1,14 +1,28 @@
 # TRADINGVIEW-CONNECTOR-001 — read-only TradingView observations for the Digital Market Twin (2026-09-12)
 
-Branch `tradingview-connector-001`, based on `trace-replay-001` at `1b86541`. **Deliberately not based on
-`operating-loop-001`**, so the two bricks stay separate and neither depends on the other's review. No running
-regression was disturbed. No existing market-data feed was replaced, no risk limit, selection policy, fee or model
-promotion was changed, nothing was deployed and no order exists.
+> **BRANCH/BASE IDENTITY CORRECTED, AND THIS DOCUMENT IS SUPERSEDED IN PART (2026-09-13).**
+> This file was written ON branch `tradingview-connector-001` at `39fbd21`, based on `trace-replay-001` at
+> `1b86541`. It no longer lives there. The modules it describes were carried onto
+> `tradingview-integration-002` (`4682e4f`, based on `be626bb`) and then onto `tradingview-integration-003`,
+> so **the branch and base named below are this document's ORIGIN, not the code line it now sits on.**
+> Its §"Status in one line" and its tool-visibility finding are **superseded** by
+> `docs/TRADINGVIEW_INTEGRATION_003.md`: the live catalog HAS now been observed (27 tools) and the bounded
+> smoke HAS now run (9/9 OK). What stands below is the record of what was true when the connector was built.
+
+Written on branch `tradingview-connector-001` at `39fbd21`, based on `trace-replay-001` at `1b86541`.
+**Deliberately not based on `operating-loop-001`**, so the two bricks stay separate and neither depends on the
+other's review. No running regression was disturbed. No existing market-data feed was replaced, no risk limit,
+selection policy, fee or model promotion was changed, nothing was deployed and no order exists.
 
 ## Status in one line
 
 **Authorized and connected at the account level; the offline adapter and its 45 acceptance tests pass. The bounded
 smoke test has NOT run, because the session that built this could not see the tools.**
+
+> **SUPERSEDED 2026-09-13.** The smoke HAS since run: 9 live read-only calls, 9/9 `OK`, recorded in
+> `results/tradingview/smoke_calls_2026-09-13.json` and `results/tradingview/smoke_result_2026-09-13.json`.
+> The prescription below — *start the session from `/Users/derekduenas` and work on the worktree from there* —
+> is what was done, and **it worked**: that session was exposed all 27 TradingView tools.
 
 ## Capability matrix
 
@@ -49,6 +63,10 @@ project /Users/derekduenas/apex-equities -> ['robinhood-trading']
 There is no entry for `/Users/derekduenas/apex-tv-wt` at all. **A session started in this worktree would not see
 the server, authorized or not.** An earlier instruction in this brick's delivery to `cd ~/apex-tv-wt && claude` was
 therefore wrong, and is corrected here.
+
+> **CONFIRMED 2026-09-13.** A session started from `/Users/derekduenas` with the worktree added was exposed the
+> full catalog — 27 `mcp__mcp-tradingview__mcp-tv-*` tools. The diagnosis above was right and the first remedy
+> was sufficient; the server was never promoted to user scope, and no configuration was changed.
 
 Two ways to run the smoke test, both fine:
 

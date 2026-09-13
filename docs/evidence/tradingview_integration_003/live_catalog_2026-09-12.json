@@ -1,0 +1,58 @@
+{
+ "kind": "TRADINGVIEW_LIVE_TOOL_CATALOG",
+ "recorded_utc": "2026-09-12",
+ "server": "mcp-tradingview",
+ "how_observed": "Enumerated from the tool registry exposed to THIS Claude Code session (the session's deferred-tool listing), then each tool below that this connector calls had its full JSONSchema fetched via ToolSearch 'select:' and read verbatim. `/mcp` itself is a terminal-dialog command and is unavailable in the desktop Code tab; the registry listing and the fetched schemas are the same underlying catalog and are what is recorded here.",
+ "naming": "Every tool is exposed as mcp__mcp-tradingview__mcp-tv-<kebab-name>. The reviewed allowlist was written in bare snake_case (get_ohlcv). These are the SAME tools under two spellings; the reconciliation makes the mapping explicit rather than assuming either spelling.",
+ "n_tools_exposed": 27,
+ "tools_exposed_verbatim": [
+  "mcp__mcp-tradingview__mcp-tv-create-alert",
+  "mcp__mcp-tradingview__mcp-tv-delete-alert",
+  "mcp__mcp-tradingview__mcp-tv-get-alerts",
+  "mcp__mcp-tradingview__mcp-tv-get-alerts-log",
+  "mcp__mcp-tradingview__mcp-tv-get-dividends-calendar",
+  "mcp__mcp-tradingview__mcp-tv-get-document-view",
+  "mcp__mcp-tradingview__mcp-tv-get-documents",
+  "mcp__mcp-tradingview__mcp-tv-get-earnings-calendar",
+  "mcp__mcp-tradingview__mcp-tv-get-economic-calendar",
+  "mcp__mcp-tradingview__mcp-tv-get-economic-data",
+  "mcp__mcp-tradingview__mcp-tv-get-economic-symbols",
+  "mcp__mcp-tradingview__mcp-tv-get-financial-history",
+  "mcp__mcp-tradingview__mcp-tv-get-financials",
+  "mcp__mcp-tradingview__mcp-tv-get-forecasts",
+  "mcp__mcp-tradingview__mcp-tv-get-news",
+  "mcp__mcp-tradingview__mcp-tv-get-news-story",
+  "mcp__mcp-tradingview__mcp-tv-get-ohlcv",
+  "mcp__mcp-tradingview__mcp-tv-get-screener-columns",
+  "mcp__mcp-tradingview__mcp-tv-get-symbol-data",
+  "mcp__mcp-tradingview__mcp-tv-get-symbol-data-batch",
+  "mcp__mcp-tradingview__mcp-tv-get-technicals-rating",
+  "mcp__mcp-tradingview__mcp-tv-list-alerts",
+  "mcp__mcp-tradingview__mcp-tv-restart-alerts",
+  "mcp__mcp-tradingview__mcp-tv-run-screener",
+  "mcp__mcp-tradingview__mcp-tv-search-symbols",
+  "mcp__mcp-tradingview__mcp-tv-stop-alerts",
+  "mcp__mcp-tradingview__mcp-tv-update-alert"
+ ],
+ "not_present_in_the_live_catalog": {
+  "watchlist_tools": ["create_watchlist","delete_watchlist","add_to_watchlist","remove_from_watchlist","update_watchlist","get_active_watchlist","list_watchlists","get_watchlist"],
+  "finding": "NO watchlist tool of any kind is exposed by this server to this session. The connector brick denied eight of them on the strength of the published documentation, including get_active_watchlist and its documented activation/creation side effects. That denial is RETAINED -- a tool absent today can appear tomorrow, and default-deny plus a named denial is the point -- but it is now labelled DOCUMENTED_NOT_LIVE rather than silently implying it was observed on the server.",
+  "order_execution_or_quote_tools": "NONE. This server exposes no order, position, portfolio, execution or options-quote tool at all."
+ },
+ "schemas_read_verbatim_for_the_nine_allowed": {
+  "search-symbols": {"required": ["query"], "optional": ["type_filter"], "returns": "symbol, description, type, exchange, logoid"},
+  "get-ohlcv": {"required": ["symbol"], "optional": ["interval","count","summary"], "returns": "aggregate summary and raw bars [{t (unix sec UTC), o, h, l, c, v}]", "note": "bar timestamp key is 't' in unix seconds UTC; normalize.normalize_bars already reads 't'/'time'/'timestamp' and o/h/l/c/v single-letter keys"},
+  "get-technicals-rating": {"required": ["symbol"], "optional": ["interval"], "returns": "RSI, Stoch K/D, CCI20, ADX, MACD, Momentum, AO, EMA/SMA 10-200, VWMA, HullMA9, plus 3 Recommend aggregates"},
+  "get-news": {"required": ["symbol"], "optional": ["limit","offset","lang"], "returns": "id, title, published (unix), provider, urgency, storyPath, link, permission, relatedSymbols, paywall, total_available, has_more"},
+  "get-news-story": {"required": ["id"], "optional": ["lang","user_country","user_prostatus"], "returns": "ast_description, short_description, summary, permission, provider, copyright"},
+  "get-screener-columns": {"required": [], "optional": ["group","search","market"], "returns": "catalog of screener column names by group"},
+  "get-earnings-calendar": {"required": ["symbols"], "optional": ["date_from","date_to"], "returns": "earnings dates with EPS and revenue consensus"},
+  "get-economic-calendar": {"required": [], "optional": ["countries","currencies","category","date_from","date_to","min_importance"], "returns": "macro events; data since 2003-09-01, forward ~31 days"},
+  "get-dividends-calendar": {"required": [], "optional": ["symbols","market","date_from","date_to","limit"], "returns": "ex-dates, amount, yield, payment date"}
+ },
+ "schema_findings_that_change_the_code": [
+  "get-earnings-calendar marks `symbols` REQUIRED. A bare earnings-calendar call with no symbols is a schema error, not a market-wide sweep.",
+  "get-news-story takes a urn-format `id` that only get-news can supply, so it is inherently a second-hop call.",
+  "get-ohlcv bar keys are single letters (t,o,h,l,c,v) exactly as the existing normalizer already accepts."
+ ]
+}

@@ -1,7 +1,15 @@
 # TRADINGVIEW-INTEGRATION-002 — carry-forward, catalog reconciliation, and the snapshot join seam (2026-09-12)
 
-Branch `tradingview-integration-002`, based on `be626bbc42a5a9ae359994191baaf3165617be41`. TradingView modules
-carried from `tradingview-connector-001` at `39fbd21`.
+Branch `tradingview-integration-002` at `4682e4f7a29d09f74699dbc8815cdcdb465e529d`, based on
+`be626bbc42a5a9ae359994191baaf3165617be41`. TradingView modules carried from `tradingview-connector-001` at
+`39fbd21`. *(Base and carry verified against the repository on 2026-09-13: `be626bb` is `4682e4f`'s parent, and
+`39fbd21` is the tip of `tradingview-connector-001`.)*
+
+> **§1 AND §2 ARE SUPERSEDED (2026-09-13) by `docs/TRADINGVIEW_INTEGRATION_003.md`.** The central finding below
+> — *"this session is exposed no TradingView tools at all"* — was true of the session that wrote it and is
+> **false of the successor session**, which was exposed all 27 tools. The reconciliation in §2 was
+> documentation-based; it has since been redone against the live catalog, and that reconciliation found two real
+> defects §2 could not have found. Everything else in this file stands.
 
 **Observation-only boundary preserved. Nothing is connected to execution, risk, exits or order submission.**
 
@@ -27,7 +35,8 @@ session runs, not a refusal and not an authorization problem. What was run inste
 | `ToolSearch "select:search_symbols,get_ohlcv,get_technicals_rating,get_news,get_screener_columns"` | **no matching tools** |
 | `ToolSearch "ohlcv candles technicals rating economic calendar dividends earnings"` | returned only Robinhood and Apollo tools — **nothing from this provider** |
 
-**The discovered TradingView tool catalog for this session is empty.** The server is reachable and the account
+**The discovered TradingView tool catalog for this session is empty.** *(Superseded: see
+`docs/TRADINGVIEW_INTEGRATION_003.md` §1 — the successor session discovered 27 tools.)* The server is reachable and the account
 authorization stands; the session's tool registry contains zero `mcp__mcp-tradingview__*` entries. This is the
 same state the connector brick recorded on 2026-09-12, and it is unchanged by starting from
 `/Users/derekduenas` — the working directory where the server is registered — because the registry is built at
@@ -53,7 +62,8 @@ comparing `ALLOWED_TOOLS` element-by-element against the authorized list.
 
 ### 2.2 Denied — and the denial survives a mistaken edit
 
-`DENIED_TOOLS` carries 24 named entries with reasons, in four groups: watchlist mutation, alerts (including
+`DENIED_TOOLS` carries **26** named entries with reasons *(corrected 2026-09-13: the figure "24" stated here was
+wrong — `len(DENIED_TOOLS)` is 26, being 8 watchlist + 8 alert + 10 out-of-scope)*, in four groups: watchlist mutation, alerts (including
 anything that can register a webhook), account-state reads that are outside this connector's purpose, and
 read-only tools not reviewed in this brick (`run_screener`, `get_symbol_data`, `get_forecasts`, `get_financials`,
 the document tools, and others).

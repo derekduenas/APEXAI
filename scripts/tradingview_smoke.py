@@ -88,7 +88,14 @@ def run(calls: list) -> dict:
         a._call = transport
         env = a.call(c["tool"], **c["args"])
         obs = None
-        if env["state"] == A.STATE_OK:
+        if env["state"] == A.STATE_OK and AL.canonical(c["tool"]) == "get_ohlcv":
+            # bars go through the BAR contract, so partial/incomplete candles are exercised on live data
+            obs = N.normalize_bars(payload, symbol=c["symbol"], interval=c["interval"],
+                                   request_start=env["request_start_epoch"],
+                                   response_receipt=env["response_receipt_epoch"],
+                                   entitlement=c.get("entitlement", N.ENTITLEMENT_UNKNOWN))
+            a.observations.append(obs)
+        elif env["state"] == A.STATE_OK:
             obs = N.observation(tool=c["tool"], args=c["args"], payload=payload,
                                 request_start=env["request_start_epoch"],
                                 response_receipt=env["response_receipt_epoch"],
@@ -97,7 +104,8 @@ def run(calls: list) -> dict:
                                 source_publication_time=c.get("source_publication_time"),
                                 entitlement=c.get("entitlement", N.ENTITLEMENT_UNKNOWN))
             a.observations.append(obs)
-        results.append({"tool": c["tool"], "args": c["args"], "state": env["state"], "why": env.get("why"),
+        results.append({"tool": c["tool"], "tool_canonical": AL.canonical(c["tool"]), "args": c["args"],
+                        "state": env["state"], "why": env.get("why"),
                         "from_cache": env["from_cache"],
                         "observation": ({k: v for k, v in obs.items() if k != "payload"} if obs else None),
                         "payload_digest": (obs["response_digest"] if obs else None)})

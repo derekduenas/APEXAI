@@ -1,0 +1,638 @@
+[
+ {
+  "tool": "mcp__mcp-tradingview__mcp-tv-search-symbols",
+  "args": {
+   "query": "SPY",
+   "type_filter": "etf"
+  },
+  "request_start": 1789275563.131187,
+  "response_receipt": 1789275585.735981,
+  "group": "A",
+  "units": "symbol identities",
+  "payload": {
+   "data": {
+    "count": 10,
+    "symbols": [
+     {
+      "currency_logoid": "country/US",
+      "description": "SPDR S&P 500 ETF TRUST",
+      "exchange": "NYSE Arca",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "AMEX:SPY",
+      "type": "fund"
+     },
+     {
+      "currency_logoid": "country/US",
+      "description": "SPDR S&P 500 ETF Trust",
+      "exchange": "Spreadex",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "SPREADEX:SPY",
+      "type": "fund"
+     },
+     {
+      "currency_logoid": "country/MX",
+      "description": "State Street SPDR S&P 500 ETF",
+      "exchange": "BMV",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "BMV:SPY",
+      "type": "fund"
+     },
+     {
+      "currency_logoid": "country/MX",
+      "description": "State Street SPDR S&P 500 ETF",
+      "exchange": "BIVA",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "BIVA:SPY",
+      "type": "fund"
+     },
+     {
+      "currency_logoid": "country/AU",
+      "description": "SPDR S&P 500 ETF",
+      "exchange": "ASX",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "ASX:SPY",
+      "type": "fund"
+     },
+     {
+      "currency_logoid": "country/US",
+      "description": "SPDR S&P 500 ETF TRUST",
+      "exchange": "BOATS",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "BOATS:SPY",
+      "type": "fund"
+     },
+     {
+      "currency_logoid": "country/US",
+      "description": "SPDR S&P 500 ETF",
+      "exchange": "Skilling",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "SKILLING:SPY",
+      "type": "fund"
+     },
+     {
+      "currency_logoid": "country/US",
+      "description": "SPDR S&P 500 ETF Trust",
+      "exchange": "Vantage",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "VANTAGE:SPY",
+      "type": "fund"
+     },
+     {
+      "currency_logoid": "country/US",
+      "description": "State Street SPDR S&P 500 ETF Trust",
+      "exchange": "Eightcap",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "EIGHTCAP:SPY",
+      "type": "fund"
+     },
+     {
+      "currency_logoid": "country/US",
+      "description": "SPDR S&P 500ETF Trust",
+      "exchange": "CFI",
+      "logoid": "spdr-sandp500-etf-tr",
+      "symbol": "CFI:SPY",
+      "type": "fund"
+     }
+    ]
+   },
+   "success": true
+  }
+ },
+ {
+  "tool": "mcp__mcp-tradingview__mcp-tv-get-screener-columns",
+  "args": {
+   "search": "volatility",
+   "market": "etf"
+  },
+  "request_start": 1789275563.131187,
+  "response_receipt": 1789275585.735981,
+  "group": "A",
+  "units": "screener field catalog",
+  "payload": {
+   "columns": [
+    {
+     "description": "Volatility",
+     "group": "performance",
+     "markets": [
+      "coin",
+      "crypto-cex",
+      "crypto-dex",
+      "etf",
+      "stock"
+     ],
+     "name": "Volatility.D",
+     "variants": [
+      "Volatility.D",
+      "Volatility.W",
+      "Volatility.1M"
+     ]
+    }
+   ],
+   "count": 1,
+   "success": true
+  }
+ },
+ {
+  "tool": "mcp__mcp-tradingview__mcp-tv-get-economic-calendar",
+  "args": {
+   "countries": "US",
+   "min_importance": 1
+  },
+  "request_start": 1789275563.131187,
+  "response_receipt": 1789275585.735981,
+  "group": "A",
+  "units": "calendar entries",
+  "payload": {
+   "result": [],
+   "status": "ok"
+  }
+ },
+ {
+  "tool": "mcp__mcp-tradingview__mcp-tv-get-ohlcv",
+  "args": {
+   "symbol": "AMEX:SPY",
+   "interval": "1D",
+   "count": 5
+  },
+  "request_start": 1789275585.735981,
+  "response_receipt": 1789275619.470324,
+  "group": "B",
+  "symbol": "AMEX:SPY",
+  "interval": "1D",
+  "units": "price in USD; volume in shares",
+  "entitlement": "DELAYED_VERIFIED",
+  "entitlement_basis": "the response itself states 'bars are delayed 15+ minutes depending on the exchange'",
+  "payload": {
+   "bars": [
+    {
+     "c": 770.19,
+     "h": 772.87,
+     "l": 769,
+     "o": 772.01,
+     "t": 1788528600,
+     "v": 34054199
+    },
+    {
+     "c": 765.96,
+     "h": 769.7,
+     "l": 765.14,
+     "o": 769.07,
+     "t": 1788874200,
+     "v": 44746095
+    },
+    {
+     "c": 762.4,
+     "h": 764.47,
+     "l": 760.94,
+     "o": 764.08,
+     "t": 1788960600,
+     "v": 32812411
+    },
+    {
+     "c": 757.83,
+     "h": 760.11,
+     "l": 756.64,
+     "o": 758.03,
+     "t": 1789047000,
+     "v": 42740375
+    },
+    {
+     "c": 764.29,
+     "h": 766.38,
+     "l": 763.6,
+     "o": 764.72,
+     "t": 1789133400,
+     "v": 45512741
+    }
+   ],
+   "count": 5,
+   "interval": "1D",
+   "notice": "Market data notice: bars are delayed 15+ minutes depending on the exchange — the last bar is not a live price and may still change; no pre/post-market bars; prices are split-adjusted only; some exchanges are served from an alternative or end-of-day feed. For the most recent quote use get_symbol_data (or get_symbol_data_batch) with the \"close\", \"change\" and \"update_mode\" columns.",
+   "success": true,
+   "summary": {
+    "avg_volume": 39973164.2,
+    "first_open": 772.01,
+    "first_t": 1788528600,
+    "high": 772.87,
+    "last_bar_notional_estimate": 34784932818.89,
+    "last_bar_volume": 45512741,
+    "last_close": 764.29,
+    "last_t": 1789133400,
+    "low": 756.64,
+    "net_change": -7.720000000000027,
+    "net_change_pct": -0.9999870467999155,
+    "period_high": 772.87,
+    "period_low": 756.64,
+    "total_volume": 199865821,
+    "volume_unit_note": "avg_volume / total_volume / last_bar_volume are in BASE units (shares for equities, base tokens for crypto). Do NOT prepend $ to these. last_bar_notional_estimate is approximately the dollar volume of the LAST bar (close × volume), valid only for USD-equivalent quote currencies (USDT/USDC/USD/USX equities)."
+   },
+   "symbol": "AMEX:SPY"
+  }
+ },
+ {
+  "tool": "mcp__mcp-tradingview__mcp-tv-get-technicals-rating",
+  "args": {
+   "symbol": "AMEX:SPY",
+   "interval": "1D"
+  },
+  "request_start": 1789275585.735981,
+  "response_receipt": 1789275619.470324,
+  "group": "B",
+  "symbol": "AMEX:SPY",
+  "interval": "1D",
+  "units": "indicator values and aggregate ratings",
+  "payload": {
+   "data": {
+    "change": 0.8524339231753721,
+    "interval": "1D",
+    "moving_averages": {
+     "ema10": 764.9420331703087,
+     "ema100": 744.0327687202391,
+     "ema20": 765.015110738228,
+     "ema200": 717.8324419659361,
+     "ema50": 758.4624516340673,
+     "hullma9": 760.5517407407406,
+     "sma10": 765.7180000000005,
+     "sma100": 747.6139999999994,
+     "sma20": 766.8789999999996,
+     "sma200": 714.2339500000002,
+     "sma50": 758.6163999999989,
+     "vwma": 766.7253027328125
+    },
+    "oscillators": {
+     "adx": 11.592675803536405,
+     "ao": 0.9764867647051005,
+     "cci20": -44.822457885746736,
+     "macd": 1.0501470276300324,
+     "macd_signal": 2.479344594643849,
+     "momentum": -6.810000000000059,
+     "rsi": 50.307310750162024,
+     "stoch_d": 28.74944651685406,
+     "stoch_k": 21.943903570401044
+    },
+    "price": 764.29,
+    "summary": {
+     "ma": "BUY",
+     "other": "NEUTRAL",
+     "recommendation": "BUY",
+     "value": 0.11212121212121212
+    },
+    "symbol": "AMEX:SPY",
+    "volume": 45512363
+   },
+   "success": true
+  }
+ },
+ {
+  "tool": "mcp__mcp-tradingview__mcp-tv-get-news",
+  "args": {
+   "symbol": "AMEX:SPY",
+   "limit": 3
+  },
+  "request_start": 1789275585.735981,
+  "response_receipt": 1789275619.470324,
+  "group": "B",
+  "symbol": "AMEX:SPY",
+  "units": "headline text",
+  "payload": {
+   "data": {
+    "count": 3,
+    "has_more": true,
+    "headlines": [
+     {
+      "id": "benzinga:2bde0dae6094b:0",
+      "link": "https://www.tradingview.com/news/benzinga:2bde0dae6094b:0-iran-war-inflation-fears-trigger-40-billion-large-cap-exodus-but-voo-qqq-buck-the-trend/",
+      "paywall": false,
+      "permission": null,
+      "provider": {
+       "id": "benzinga",
+       "logo_id": "benzinga",
+       "name": "Benzinga",
+       "url": "https://www.benzinga.com/"
+      },
+      "published": 1789140500,
+      "relatedSymbols": [
+       {
+        "logo": {
+         "logoid": "vanguard",
+         "style": "single"
+        },
+        "logoid": "vanguard",
+        "symbol": "AMEX:VOO"
+       },
+       {
+        "logo": {
+         "logoid": "spdr-sandp500-etf-tr",
+         "style": "single"
+        },
+        "logoid": "spdr-sandp500-etf-tr",
+        "symbol": "AMEX:SPY"
+       },
+       {
+        "logo": {
+         "logoid": "invesco",
+         "style": "single"
+        },
+        "logoid": "invesco",
+        "symbol": "NASDAQ:QQQ"
+       },
+       {
+        "logo": {
+         "logoid": "vaneck",
+         "style": "single"
+        },
+        "logoid": "vaneck",
+        "symbol": "NASDAQ:SMH"
+       },
+       {
+        "logo": {
+         "logoid": "ishares",
+         "style": "single"
+        },
+        "logoid": "ishares",
+        "symbol": "NASDAQ:SOXX"
+       }
+      ],
+      "storyPath": "/news/benzinga:2bde0dae6094b:0-iran-war-inflation-fears-trigger-40-billion-large-cap-exodus-but-voo-qqq-buck-the-trend/",
+      "title": "Iran War, Inflation Fears Trigger $40 Billion Large-Cap Exodus — But VOO, QQQ Buck the Trend",
+      "urgency": 2
+     },
+     {
+      "id": "zacks:be42cf243094b:0",
+      "link": "https://www.tradingview.com/news/zacks:be42cf243094b:0-cpi-3-4-as-expected-wherefor-go-fed-rates/",
+      "paywall": false,
+      "permission": null,
+      "provider": {
+       "id": "zacks",
+       "logo_id": "zacks",
+       "name": "Zacks",
+       "url": "http://www.zacks.com/"
+      },
+      "published": 1789137000,
+      "relatedSymbols": [
+       {
+        "logo": {
+         "logoid": "invesco",
+         "style": "single"
+        },
+        "logoid": "invesco",
+        "symbol": "NASDAQ:QQQ"
+       },
+       {
+        "logo": {
+         "logoid": "spdr-sandp500-etf-tr",
+         "style": "single"
+        },
+        "logoid": "spdr-sandp500-etf-tr",
+        "symbol": "AMEX:SPY"
+       },
+       {
+        "logo": {
+         "logoid": "spdr-sandp500-etf-tr",
+         "style": "single"
+        },
+        "logoid": "spdr-sandp500-etf-tr",
+        "symbol": "AMEX:DIA"
+       }
+      ],
+      "storyPath": "/news/zacks:be42cf243094b:0-cpi-3-4-as-expected-wherefor-go-fed-rates/",
+      "title": "CPI +3.4%, as Expected: Wherefor Go Fed Rates?",
+      "urgency": 2
+     },
+     {
+      "id": "benzinga:158c69f7b094b:0",
+      "link": "https://www.tradingview.com/news/benzinga:158c69f7b094b:0-as-the-rotation-dies-wall-street-is-blaming-the-wrong-flaw-in-small-caps/",
+      "paywall": false,
+      "permission": null,
+      "provider": {
+       "id": "benzinga",
+       "logo_id": "benzinga",
+       "name": "Benzinga",
+       "url": "https://www.benzinga.com/"
+      },
+      "published": 1789120964,
+      "relatedSymbols": [
+       {
+        "logo": {
+         "logoid": "spdr-sandp500-etf-tr",
+         "style": "single"
+        },
+        "logoid": "spdr-sandp500-etf-tr",
+        "symbol": "AMEX:SPY"
+       },
+       {
+        "logo": {
+         "logoid": "invesco",
+         "style": "single"
+        },
+        "logoid": "invesco",
+        "symbol": "NASDAQ:QQQ"
+       },
+       {
+        "logo": {
+         "logoid": "ishares",
+         "style": "single"
+        },
+        "logoid": "ishares",
+        "symbol": "NASDAQ:TLT"
+       },
+       {
+        "logo": {
+         "logoid": "sector/energy",
+         "style": "single"
+        },
+        "logoid": "sector/energy",
+        "symbol": "AMEX:XLE"
+       },
+       {
+        "logo": {
+         "logoid": "ishares",
+         "style": "single"
+        },
+        "logoid": "ishares",
+        "symbol": "NASDAQ:SOXX"
+       },
+       {
+        "logo": {
+         "logoid": "sector/financial",
+         "style": "single"
+        },
+        "logoid": "sector/financial",
+        "symbol": "AMEX:XLF"
+       },
+       {
+        "logo": {
+         "logoid": "ishares",
+         "style": "single"
+        },
+        "logoid": "ishares",
+        "symbol": "AMEX:IWM"
+       },
+       {
+        "logo": {
+         "logoid": "sector/consumer-discretionary",
+         "style": "single"
+        },
+        "logoid": "sector/consumer-discretionary",
+        "symbol": "AMEX:XLY"
+       },
+       {
+        "logo": {
+         "logoid": "invesco",
+         "style": "single"
+        },
+        "logoid": "invesco",
+        "symbol": "AMEX:RSP"
+       },
+       {
+        "logo": {
+         "logoid": "sector/health-care",
+         "style": "single"
+        },
+        "logoid": "sector/health-care",
+        "symbol": "AMEX:XLV"
+       },
+       {
+        "logo": {
+         "logoid": "ishares",
+         "style": "single"
+        },
+        "logoid": "ishares",
+        "symbol": "AMEX:IJR"
+       }
+      ],
+      "storyPath": "/news/benzinga:158c69f7b094b:0-as-the-rotation-dies-wall-street-is-blaming-the-wrong-flaw-in-small-caps/",
+      "title": "As the Rotation Dies, Wall Street Is Blaming the Wrong Flaw in Small Caps",
+      "urgency": 2
+     }
+    ],
+    "hint": "showing headlines 1-3 of 200; call get_news again with offset=3 to read older ones",
+    "next_offset": 3,
+    "offset": 0,
+    "total_available": 200
+   },
+   "success": true
+  }
+ },
+ {
+  "tool": "mcp__mcp-tradingview__mcp-tv-get-earnings-calendar",
+  "args": {
+   "symbols": [
+    "AMEX:SPY",
+    "NASDAQ:NVDA"
+   ]
+  },
+  "request_start": 1789275619.470324,
+  "response_receipt": 1789275633.819387,
+  "group": "C",
+  "units": "calendar entries",
+  "payload": {
+   "data": {
+    "count": 1,
+    "earnings": [
+     {
+      "close": 218.29,
+      "description": "NVIDIA Corporation",
+      "eps_forecast_next_fq": 2.469278,
+      "name": "NVDA",
+      "release_date": "2026-08-26",
+      "release_next_date": "2026-10-31",
+      "revenue_forecast_next_fq": 108672703315,
+      "symbol": "NASDAQ:NVDA"
+     }
+    ],
+    "from": "2026-09-13",
+    "to": "2027-03-12"
+   },
+   "success": true
+  }
+ },
+ {
+  "tool": "mcp__mcp-tradingview__mcp-tv-get-dividends-calendar",
+  "args": {
+   "symbols": [
+    "AMEX:SPY"
+   ]
+  },
+  "request_start": 1789275619.470324,
+  "response_receipt": 1789275633.819387,
+  "group": "C",
+  "units": "calendar entries",
+  "payload": {
+   "count": 1,
+   "data": [
+    {
+     "currency": "USD",
+     "description": "State Street SPDR S&P 500 ETF",
+     "dividend_amount": 1.90351605,
+     "dividend_amount_recent": 1.90351605,
+     "dividend_amount_upcoming": null,
+     "dividend_ex_date_recent": "2026-06-18",
+     "dividend_ex_date_upcoming": null,
+     "dividend_payment_date_recent": "2026-07-31",
+     "dividend_payment_date_upcoming": null,
+     "dividends_yield": 0.98,
+     "name": "SPY",
+     "symbol": "AMEX:SPY"
+    }
+   ],
+   "success": true
+  }
+ },
+ {
+  "tool": "mcp__mcp-tradingview__mcp-tv-get-news-story",
+  "args": {
+   "id": "zacks:be42cf243094b:0"
+  },
+  "request_start": 1789275633.819387,
+  "response_receipt": 1789275648.807049,
+  "group": "D",
+  "symbol": "AMEX:SPY",
+  "units": "story text",
+  "payload": {
+   "ast_description": "{\"children\":[{\"children\":[{\"children\":[\"Friday, September 11th, 2026\"],\"type\":\"b\"}],\"type\":\"p\"},{\"children\":[\"We’ve waited all week for inflation reports to inform the markets, and as of this morning we’ve gotten them. Yesterday’s Producer Price Index (PPI) — the wholesale read on inflation — showed us a headline month-over-month print of +5.4%, out ahead of estimates that levels might have ticked lower for August. For investors following these reports closely, the retail version came almost fully in-line with estimates.\"],\"type\":\"p\"},{\"children\":[{\"children\":[\"CPI for August In-Line YoY, Core\"],\"type\":\"b\"}],\"type\":\"p\"},{\"children\":[\"This retail inflation report, the \",{\"children\":[\"Consumer Price Index (CPI) \"],\"type\":\"b\"},\"for August out this morning, gives some comfort to those who feel inflation may be spiraling out of control. Month over month, we jump from an unrevised +0.1% in July to +0.4% in August, but only a 10 basis-point (bps) increase on core — when we strip out food and gas prices: +0.2% in July moves to +0.3% for August.\"],\"type\":\"p\"},{\"children\":[\"Year over year CPI is also known as the “\",{\"children\":[\"Inflation Rate\"],\"type\":\"b\"},\",” and here we are steady at +3.4% for the past two months. We had been jumping 40+ bps per month from February to May, where we peaked so far this year at +4.2%. Since then, we’ve been at +3.5%, +3.4% and +3.4%. Core is even better: +2.4% last month — so far, the lows for 2026 — down 10 bps from July. These are numbers even ex-Fed Chair Jerome Powell could live with.\"],\"type\":\"p\"},{\"children\":[\"However, when we flip the page back to yesterday and see the PPI came in at +5.4% and +4.8%, this is an extraordinarily wide gap between wholesale and retail inflation. We’re looking at a 200 bps margin on headline, 240 bps on core. This strongly suggests that retailers are eating a significant amount of inflation on the customer-facing side; otherwise these CPI numbers would be notably higher. It also pushes the question: how long will retailers be able to keep this up?\"],\"type\":\"p\"},{\"children\":[{\"children\":[\"Will the Fed Raise Interest Rates Next Week?\"],\"type\":\"b\"}],\"type\":\"p\"},{\"children\":[\"These inflation numbers have now helped increase odds to an 88% chance of an interest rate hike when the Fed meets next week for its next FOMC meeting. A quarter-point raise would bring the Fed funds rate to +3.75-4.00% for the first time since early December of last year.\"],\"type\":\"p\"},{\"children\":[\"But Fed Chair Kevin Warsh has been miserly with details on how the Fed has been coming to their decisions over the previous two meetings, and we know the man who appointed him to the position — President Trump — is vehemently in favor of lower interest rate levels, not higher. Warsh has only been in office for four months of his four-year term; does he really want to subject himself to Trump’s wrath the way Powell was?\"],\"type\":\"p\"},{\"children\":[\"There is also the question of whether the rest of the voting members at the FOMC would be willing to carry water for the new Fed chair. Indeed, it is Warsh’s job to bring the committee to consensus on monetary policy, but what if a majority of the vote refutes where the Fed Chair wants to set interest rates? Beyond this, how would the bond yields react to a standoff at the Fed?\"],\"type\":\"p\"},{\"children\":[{\"children\":[\"What to Expect from Today’s Stock Market\"],\"type\":\"b\"}],\"type\":\"p\"},{\"children\":[\"Speaking of bond yields, they’re jumping around a bit this morning: after spiking up to +4.97% on the 10-year, this has now subsided to +4.92%, matching heights last reached in October of 2023. The 2-year has drifted back below +4.6% after striking +4.65% in the pre-market, and the 30-year is also at multi-year highs: +5.32%, but has reduced back from +5.36% earlier this morning.\"],\"type\":\"p\"},{\"children\":[\"Pre-market futures are ramping up this morning, after four sessions in the red. Perhaps the relative good news on inflation is giving bulls a reason to assert themselves this morning; we will keep an eye on this momentum, especially following today’s preliminary University of Michigan consumer survey, out at 10am ET.\"],\"type\":\"p\"},{\"children\":[\"Other than that, oil prices are down -3% from yesterday — $99 per barrel (/bbl) on WTI and $104 on Brent — but up +7.5% from a week ago. As always, keeping an eye on developments in and around the Strait of Hormuz remains paramount, especially now that the Iranian ally Houthis are resuming military actions in the Red Sea. Stay tuned…\"],\"type\":\"p\"},{\"children\":[\"Questions or comments about this article and/or author? Click here>>\"],\"type\":\"p\"},{\"children\":[{\"children\":[\"7 Best Stocks for the Next 30 Days\"],\"type\":\"b\"}],\"type\":\"p\"},{\"children\":[\"Just released: Experts distill 7 elite stocks from the current list of 220 Zacks Rank #1 Strong Buys. They deem these tickers \\\"Most Likely for Early Price Pops.\\\"\"],\"type\":\"p\"},{\"children\":[\"Since 1988, the full list has beaten the market more than 2X over with an average gain of +23.9% per year. So be sure to give these hand picked 7 your immediate attention. See them now >>\"],\"type\":\"p\"},{\"children\":[\"Want the latest recommendations from Zacks Investment Research? Today, you can download 7 Best Stocks for the Next 30 Days. Click to get this free report\"],\"type\":\"p\"},{\"children\":[\"Invesco QQQ (QQQ): ETF Research Reports\"],\"type\":\"p\"},{\"children\":[\"State Street SPDR S&P 500 ETF Trust (SPY): ETF Research Reports\"],\"type\":\"p\"},{\"children\":[\"State Street SPDR Dow Jones Industrial Average ETF Trust (DIA): ETF Research Reports\"],\"type\":\"p\"},{\"children\":[\"This article originally published on Zacks Investment Research (zacks.com).\"],\"type\":\"p\"},{\"children\":[\"Zacks Investment Research\"],\"type\":\"p\"}],\"type\":\"root\"}",
+   "copyright": null,
+   "id": "zacks:be42cf243094b:0",
+   "language": "en",
+   "permission": null,
+   "provider": {
+    "id": "zacks",
+    "logo_id": "zacks",
+    "name": "Zacks",
+    "url": "http://www.zacks.com/"
+   },
+   "published": 1789137000,
+   "related_symbols": [
+    {
+     "logo": {
+      "logoid": "invesco",
+      "style": "single"
+     },
+     "logoid": "invesco",
+     "symbol": "NASDAQ:QQQ"
+    },
+    {
+     "logo": {
+      "logoid": "spdr-sandp500-etf-tr",
+      "style": "single"
+     },
+     "logoid": "spdr-sandp500-etf-tr",
+     "symbol": "AMEX:SPY"
+    },
+    {
+     "logo": {
+      "logoid": "spdr-sandp500-etf-tr",
+      "style": "single"
+     },
+     "logoid": "spdr-sandp500-etf-tr",
+     "symbol": "AMEX:DIA"
+    }
+   ],
+   "short_description": "Friday, September 11th, 2026We’ve waited all week for inflation reports to inform the markets, and as of this morning we’ve gotten them. Yesterday’s Producer Price Index (PPI) — the wholesale read on inflation — showed us a headline month-over-month print of +5.4%, out ahead of estimates that level…",
+   "story_path": "/news/zacks:be42cf243094b:0-cpi-3-4-as-expected-wherefor-go-fed-rates/",
+   "summary": "Friday, September 11th, 2026 We’ve waited all week for inflation reports to inform the markets, and as of this morning we’ve gotten them. Yesterday’s Producer Price Index (PPI) — the wholesale read on inflation — showed us a headline month-over-month print of +5.4%, out ahead of estimates that levels might have ticked lower for August. For investors following these reports closely, the retail version came almost fully in-line with estimates. CPI for August In-Line YoY, Core This retail inflation report, the  Consumer Price Index (CPI)  for August out this morning, gives some comfort to those who feel inflation may be spiraling out of control. Month over month, we jump from an unrevised +0.1% in July to +0.4% in August, but only a 10 basis-point (bps) increase on core — when we strip out food and gas prices: +0.2% in July moves to +0.3% for August. Year over year CPI is also known as the “ Inflation Rate ,” and here we are steady at +3.4% for the past two months. We had been jumping 40+ bps per month from February to May, where we peaked so far this year at +4.2%. Since then, we’ve been at +3.5%, +3.4% and +3.4%. Core is even better: +2.4% last month — so far, the lows for 2026 — down 10 bps from July. These are numbers even ex-Fed Chair Jerome Powell could live with. However, when we flip the page back to yesterday and see the PPI came in at +5.4% and +4.8%, this is an extraordinarily wide gap between wholesale and retail inflation. We’re looking at a 200 bps margin on headline, 240 bps on core. This strongly suggests that retailers are eating a significant amount of inflation on the customer-facing side; otherwise these CPI numbers would be notably higher. It also pushes the question: how long will retailers be able to keep this up? Will the Fed Raise Interest Rates Next Week? These inflation numbers have now helped increase odds to an 88% chance of an interest rate hike when the Fed meets next week for its next FOMC meeting. A quarter-point raise would bring the F",
+   "title": "CPI +3.4%, as Expected: Wherefor Go Fed Rates?",
+   "urgency": 2
+  }
+ }
+]
