@@ -87,20 +87,22 @@ class ArrivalTriggeredExitPolicy(ExitPolicy):
       * the deadline timers remain. Arrival triggering is an ADDITION, never a replacement: with no data at all the
         window still expires on its own timer and the position is still an explicit unresolved obligation.
 
-    THE ONE JUDGEMENT CALL, declared for review. `skip_timer_when_no_new_observation` lets the scheduler DECLINE to
-    fire a timer retry when the newest visible observation is one an earlier attempt already rejected. That is not
-    reclassifying a rejection: the boundary is never asked, so no attempt is created, consumed or renamed. It exists
-    so the budget is spent on new data rather than on re-reading the same stale snapshot four times, which is
-    exactly what consumed fill 37's budget. Set it False to keep V1's blind-timer behaviour; the arrival trigger
-    still fixes the original case either way, because the 127-millisecond-late snapshot fires attempt 2 with a
-    fresh quote."""
+    `skip_timer_when_no_new_observation` is **DISABLED (False) in this candidate**, and the review that disabled it
+    was right. The rule suppressed a timer retry when the newest NOTIFICATION id had already been "attempted". But a
+    notification id is not proof of which quote was evaluated: the id was recorded before the boundary was asked,
+    nothing bound it to the quote actually returned, and no refusal reason was examined. A transient provider
+    failure therefore marked an observation attempted when no quote had been seen at all, and suppressed the later
+    timer that would have succeeded. The switch remains, off, with no replacement mechanism; arrival triggering
+    fixes the demonstrated case without it."""
     policy_id: str = "EXIT_AT_HORIZON_15M_V2_ARRIVAL"
     arrival_triggered: bool = True
-    skip_timer_when_no_new_observation: bool = True
+    skip_timer_when_no_new_observation: bool = False
     max_arrival_triggers: int = 64          # a flood of duplicate or invalid arrivals cannot starve the deadlines
     supersedes: str = "EXIT_AT_HORIZON_15M_V1"
     change_note: str = ("adds arrival-triggered attempts inside the existing window and budget; freshness, sides, "
-                        "prices, contract identity and every boundary check are unchanged; timers retained")
+                        "prices, contract identity and every boundary check are unchanged; timers retained. "
+                        "skip_timer_when_no_new_observation is DISABLED: a notification id does not establish which "
+                        "quote was evaluated, so it could suppress a later timer after a transient failure.")
     fields: tuple = field(default=("policy_id", "horizon_s", "window_s", "max_attempts", "retry_spacing_s",
                                    "exit_side", "on_exhaustion", "relation_to_legacy", "arrival_triggered",
                                    "skip_timer_when_no_new_observation", "max_arrival_triggers", "supersedes",
@@ -116,6 +118,10 @@ class ArrivalTriggeredExitPolicy(ExitPolicy):
 
 EXIT_POLICY_V2 = ArrivalTriggeredExitPolicy()
 
+# The identity this policy had while the suppression optimisation was ON. Turning it off CHANGES the policy, and a
+# reader comparing two runs must be able to see that from the hash alone.
+ARRIVAL_POLICY_HASH_WITH_SUPPRESSION = "74aa83147430195964ed216b4e3d73307aa842cb1fda08c3728d1f604a764ce2"
+
 # The attempt accounting, stated once so it cannot drift:
 ATTEMPT_ACCOUNTING = (
     "ATTEMPT_ACCOUNTING_V2: ONE attempt is consumed each time the boundary is asked to value a position, whatever "
@@ -123,5 +129,7 @@ ATTEMPT_ACCOUNTING = (
     "exactly as a successful valuation does, because each is a valuation attempt that was actually made. What does "
     "NOT consume an attempt is a scheduling decision not to ask: an arrival that is a duplicate of an observation "
     "already attempted, or a timer retry skipped because no new observation exists. Those are recorded as "
-    "scheduling events with their own reason and are never counted as attempts, in either direction.")
+    "scheduling events with their own reason and are never counted as attempts, in either direction. The optional "
+    "timer suppression that once used this distinction is DISABLED in the current policy: see "
+    "ArrivalTriggeredExitPolicy for why a notification id cannot stand in for the quote that was evaluated.")
 

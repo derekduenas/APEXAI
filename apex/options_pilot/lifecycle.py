@@ -73,7 +73,8 @@ ORDERING_POLICY = (
     "so every existing due obligation is processed before new risk is admitted at the same instant. Ties within one "
     "rank break by scheduling order. The clock never rewinds and advances only to the next scheduled event.")
 
-DEFAULT_EVENT_BUDGET = 20000
+DEFAULT_EVENT_BUDGET = 20000            # the NON-CONVERGENCE detector: events that can schedule further events
+DEFAULT_ARRIVAL_EVENT_BUDGET = 200000   # supplied notifications, which cannot loop and are counted separately
 
 
 # ---------------------------------------------------------------------------- clocks
@@ -213,7 +214,8 @@ class LifecycleRunner:
     def __init__(self, *, boundary: B.Boundary, sources: dict, clock: MonotonicClock, symbols: list,
                  selection_policy: str, scan_epochs: list | None = None, scan_interval_s: float | None = None,
                  n_scans: int | None = None, close_at: float | None = None, data_available_epochs: list | None = None,
-                 event_budget: int = DEFAULT_EVENT_BUDGET, on_event=None, observation_feed=None):
+                 event_budget: int = DEFAULT_EVENT_BUDGET, on_event=None, observation_feed=None,
+                 arrival_event_budget: int = DEFAULT_ARRIVAL_EVENT_BUDGET):
         if getattr(boundary.clock, "_now", None) != clock.now:      # bound methods compare equal on (func, instance)
             raise LifecycleRefused("CLOCK_NOT_SHARED: the boundary must read the lifecycle clock, or two clocks would "
                                    "disagree about now")
@@ -241,6 +243,11 @@ class LifecycleRunner:
         # {"contract_id", "observation_id", ...}. It supplies WHEN a new observation for a contract becomes visible.
         # It never supplies the quote itself: the boundary still asks exit_quote_fn and rechecks everything.
         self.observation_feed = list(observation_feed or [])
+        # ARRIVAL EVENTS ARE ACCOUNTED SEPARATELY. The global budget exists to catch a loop that keeps scheduling
+        # itself; a finite list of supplied notifications cannot do that, and charging them to the non-convergence
+        # detector let ordinary traffic end the run before a deadline. They get their own bound instead.
+        self.arrival_event_budget = int(arrival_event_budget)
+        self._arrival_events: list = []
         self._attempted_observations: dict = {}   # fill_seq -> set of observation ids already attempted
         self._arrival_triggers: dict = {}         # fill_seq -> count, bounded by the policy
         self._latest_observation: dict = {}       # contract_id -> the newest observation id made visible so far
@@ -389,9 +396,17 @@ class LifecycleRunner:
         pol = self.bd.exit_policy
         recovery = fill_seq in self.recovered_seqs
         entry = self._entry(fill_seq)
-        # THE ONE JUDGEMENT CALL, declared in the policy: a TIMER retry is not fired when the newest visible
-        # observation is one an earlier attempt already rejected. The boundary is never asked, so no attempt is
-        # created, consumed or renamed. It is recorded as a scheduling event with its reason.
+        # TERMINAL STATE FIRST, before any suppression or scheduling decision. A timer queued before an arrival
+        # resolved the position would otherwise run on to window close and overwrite the report's terminal state
+        # with an exhaustion the Book correctly denies. The Book was right and the report contradicted it.
+        pos = next((p for p in self._positions() if p["seq"] == fill_seq), None)
+        if pos is None:
+            self._settled.add(fill_seq)
+            note = self._note(fill_seq, "STALE_EVENT_RECONCILED_POSITION_ALREADY_RESOLVED", trigger=ev_kind,
+                              final=entry.get("final"))
+            return {"state": entry.get("final") or "ALREADY_RESOLVED", "fill_seq": fill_seq, **note}
+        # THE OPTIONAL SUPPRESSION, disabled in the current policy (see ArrivalTriggeredExitPolicy). It remains
+        # reachable only when a caller explicitly turns it back on.
         if (ev_kind in (EXIT_RETRY, EXIT_WINDOW_CLOSE)
                 and getattr(pol, "skip_timer_when_no_new_observation", False)
                 and self._attempted_observations.get(fill_seq)):
@@ -420,9 +435,6 @@ class LifecycleRunner:
                 else:
                     self._schedule_exit(nxt0, EXIT_RETRY, fill_seq)
                 return {"state": "TIMER_SKIPPED_NO_NEW_OBSERVATION", "fill_seq": fill_seq, **note}
-        pos = next((p for p in self._positions() if p["seq"] == fill_seq), None)
-        if pos is None:
-            return {"state": entry["final"] or "ALREADY_RESOLVED", "fill_seq": fill_seq}
         if recovery:
             return self._recovery_attempt(pos, entry, pol)
         rows = self._rows()
@@ -525,7 +537,10 @@ class LifecycleRunner:
                        remaining_window_s=round(pol.schedule(committed)["window_close_epoch"] - self.clock.now(), 3))
             self.report["exits"].append({"event": EXIT_ARRIVAL, "at_utc": ev["at_utc"], **out})
             acted.append(out)
-        return {"observation_id": obs_id, "contract_id": contract_id, "acted": acted or "NO_DUE_POSITION"}
+        return {"observation_id": obs_id, "contract_id": contract_id,
+                "n_coalesced": ev["payload"].get("n_coalesced", 1),
+                "coalesced_ids": ev["payload"].get("coalesced_ids"),
+                "acted": acted or "NO_DUE_POSITION"}
 
     def _on_exit(self, ev: dict) -> dict:
         out = self._service_exit(ev["payload"]["fill_seq"], ev["kind"])
@@ -581,29 +596,55 @@ class LifecycleRunner:
             self.sched.at(t, DATA_AVAILABLE, {}, key=("data", t), allow_past=True)
         # EXIT-SCHEDULING-002: an observation becomes VISIBLE at its recorded availability, never before. Replay and
         # production schedule these identically; nothing looks ahead to pick an advantageous instant.
-        seen = set()
+        # COALESCE BY (availability instant, contract). Notifications that share an instant and a contract cannot
+        # be distinguished by the loop -- it will ask the boundary once and get one quote -- so they become one
+        # event. This groups only what is ALREADY AVAILABLE at that instant, so nothing later is pulled forward.
+        seen, groups = set(), {}
         for available, obs in self.observation_feed:
-            oid = obs.get("observation_id")
-            if oid in seen:
-                self._note(None, "DUPLICATE_OBSERVATION_IN_FEED", observation_id=oid)
+            oid, cid = obs.get("observation_id"), obs.get("contract_id")
+            if (oid, cid) in seen:
+                self._note(None, "DUPLICATE_OBSERVATION_IN_FEED", observation_id=oid, contract_id=cid)
                 continue
-            seen.add(oid)
-            self.sched.at(available, EXIT_ARRIVAL, dict(obs), key=("obs", oid), allow_past=True)
+            seen.add((oid, cid))
+            key = (I.canonical_micros(available, field="observation"), cid)
+            g = groups.setdefault(key, {"available": available, "contract_id": cid, "ids": [], "n_coalesced": 0})
+            g["ids"].append(oid)
+            g["n_coalesced"] += 1
+        for (us, cid), g in sorted(groups.items()):
+            if len(self._arrival_events) >= self.arrival_event_budget:
+                self._note(None, "ARRIVAL_EVENT_BUDGET_REACHED", contract_id=cid,
+                           budget=self.arrival_event_budget, dropped_from_us=us,
+                           note=("further notifications are not scheduled. Obligation events already queued are "
+                                 "untouched, so no deadline is starved and no terminal accounting is lost."))
+                break
+            # the observation identity a coalesced group presents is the LAST id at that instant, which is
+            # available then; the full set is carried so nothing is hidden
+            ev = self.sched.at(g["available"], EXIT_ARRIVAL,
+                               {"observation_id": g["ids"][-1], "contract_id": cid,
+                                "n_coalesced": g["n_coalesced"],
+                                "coalesced_ids": (g["ids"] if g["n_coalesced"] <= 8 else g["ids"][:8] + ["..."])},
+                               key=("obs", us, cid), allow_past=True)
+            self._arrival_events.append(ev["ordinal"])
         for t in self.scan_epochs:
             for sym in self.symbols:
                 self.sched.at(t, SCAN, {"symbol": sym}, key=(sym, t), allow_past=True)
         if self.close_at is not None:
             self.sched.at(self.close_at, SESSION_CLOSE, {}, key="close", allow_past=True)
         self._reconcile()
-        n = 0
+        n = n_arrivals = 0
         while True:
             due = self.sched.pop_due()
             if due:
                 for ev in due:
-                    n += 1
-                    if n > self.budget:
-                        raise LifecycleRefused("LIFECYCLE_EVENT_BUDGET_EXCEEDED: %d events; the loop is not converging"
-                                               % self.budget)
+                    # an arrival is supplied input, not something the loop generated, so it is not evidence of
+                    # non-convergence and is not charged to that detector
+                    if ev["kind"] == EXIT_ARRIVAL:
+                        n_arrivals += 1
+                    else:
+                        n += 1
+                        if n > self.budget:
+                            raise LifecycleRefused("LIFECYCLE_EVENT_BUDGET_EXCEEDED: %d self-scheduled events; the "
+                                                   "loop is not converging" % self.budget)
                     handler = self.HANDLERS[ev["kind"]]
                     outcome = handler(self, ev)
                     self._emit(ev, outcome)
@@ -622,6 +663,10 @@ class LifecycleRunner:
         self.report["exit_policy"] = self.bd.exit_policy.describe()
         self.report["attempt_accounting"] = EP.ATTEMPT_ACCOUNTING
         self.report["n_events"] = n
+        self.report["n_arrival_events"] = n_arrivals
+        self.report["arrival_accounting"] = (
+            "arrival events are supplied notifications, counted separately from the non-convergence budget and "
+            "bounded by arrival_event_budget; obligation events already queued are never dropped")
         self.report["final_clock_utc"] = I.canonical_utc(self.clock.now())
         self.report["book"] = self.bd.book().summary()
         still = S.recover_positions(self.bd)

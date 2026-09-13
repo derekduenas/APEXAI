@@ -249,13 +249,17 @@ class TestAttemptAndEventAccounting:
         arrivals_that_attempted = [e for e in rep["exits"] if e.get("event") == LC.EXIT_ARRIVAL]
         assert len(arrivals_that_attempted) <= 1, "the repeated observation must not be attempted twice"
 
-    def test_a_skipped_timer_is_a_scheduling_event_not_an_attempt(self, tmp_path):
+    def test_scheduling_decisions_are_never_counted_as_attempts(self, tmp_path):
+        """SUPERSEDED FORM. This test used to assert that blind retries WERE skipped. The repair at
+        `tests/test_exit_scheduling_002_repair.py` disabled that optimisation, because a notification id does not
+        establish which quote was evaluated. What survives, and is the part that mattered, is that a scheduling
+        decision is never counted as an attempt in either direction."""
         h, rep, feed, fill = scenario(tmp_path, "SKIP", arrivals=[DUE + 1.0], quote_lag_s=40.0)
-        skipped = [s for s in rep["scheduling_events"] if s["reason"] == "TIMER_SKIPPED_NO_NEW_OBSERVATION"]
-        assert skipped, "the blind retries against the same snapshot must be skipped"
         assert all(s["is_attempt"] is False for s in rep["scheduling_events"])
-        assert len(attempts(h)) == 2, "one at the due timer, one on the arrival; the skips consumed nothing"
-        assert not resolved(h), "and it must not manufacture a resolution either"
+        assert not [s for s in rep["scheduling_events"] if s["reason"] == "TIMER_SKIPPED_NO_NEW_OBSERVATION"], \
+            "the optimisation is disabled in this candidate"
+        assert len(attempts(h)) == 5, "with no suppression the budget is spent on the timer, honestly and visibly"
+        assert not resolved(h), "and no resolution is manufactured"
 
     def test_the_accounting_rule_is_stated_on_the_run(self, tmp_path):
         h, rep, feed, fill = scenario(tmp_path, "ACCT", arrivals=[DUE + 0.2])
