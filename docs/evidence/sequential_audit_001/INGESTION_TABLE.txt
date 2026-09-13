@@ -1,0 +1,15 @@
+SEQUENTIAL-FUNNEL-AUDIT-001 STAGE 1 — REAL INGESTION PATH (no pre-filtering in the harness)
+fixture SEQUENTIAL_AUDIT_STAGE1_V1, scan instant 1789000020.0, code pin cb184fc
+
+CLEAN FIXTURE: accepted=40 problems=0 | available by as_of 40/40, newest close 603.90
+
+CASE                   VERDICT     REASON FROM THE REAL GUARD
+----------------------------------------------------------------------------------------------------------------
+FUTURE_AVAILABILITY    EXCLUDED    accepted into the store, NOT visible at as_of (availability filter held)
+MALFORMED_PRICE        REFUSED     close: not a finite real: nan
+NEGATIVE_PRICE         REFUSED     BAR_INCONSISTENT: o=603.9 h=603.95 l=603.85 c=-5.0 v=1000.0
+MISSING_TIMESTAMP      CRASH       *** UNCAUGHT KeyError: 'event_time' -- load_bars promises malformed bars are 'counted and named,
+                                       never dropped silently'; a missing key escapes it entirely ***
+DUPLICATE_CONFLICTING  REFUSED     BAR_INCONSISTENT: o=603.9 h=603.95 l=603.85 c=608.9 v=1000.0
+OUT_OF_ORDER           EXCLUDED    accepted into the store, NOT visible at as_of (availability filter held)
+STALE                  EXCLUDED    accepted into the store, NOT visible at as_of (availability filter held)

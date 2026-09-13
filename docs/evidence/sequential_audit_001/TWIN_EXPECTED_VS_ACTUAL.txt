@@ -1,0 +1,43 @@
+STAGE 1 — PULSE / TWIN: INDEPENDENTLY EXPECTED vs ACTUAL  (code pin cb184fc)
+
+FIELD            EXPECTED       ACTUAL         AGREE     QUALITY
+----------------------------------------------------------------------------------
+last_bar_close   603.90000000   603.90000000   YES       VALID
+ret_15           0.00248694     0.00248694     YES       VALID
+
+  ret_15 is a LOG return (apex/pulse_options/features.py: ret_1 = log(c[t]/c[t-1m])).
+  The audit's first expectation used a SIMPLE return and disagreed at the 6th decimal.
+  THE TWIN WAS RIGHT; THE AUDIT WAS WRONG. Recorded, not quietly amended.
+
+MISSING IS NOT ZERO:
+   chain_quote_count          value=None   quality=NOT_AVAILABLE
+   chain_expirations          value=None   quality=NOT_AVAILABLE
+   next_scheduled_event_type  value=None   quality=NOT_AVAILABLE
+
+CONSUMED — observed at the real reader usable_value():
+   last_bar_close   read by ['apex.pulse_options.sources.spot_fn']
+   ret_15           read by ['apex.pulse_options.sources.signal_fn']
+   fields in Twin=32  CONSUMED=2  NOT_CONSUMED=30
+
+BEHAVIORAL_EFFECT — one valid perturbation of the newest bar (+$1.00, OHLC kept consistent):
+   last_bar_close  603.90 -> 604.90   (expected 604.90)
+   ret_15          0.00248694 -> 0.00414148   (expected 0.00414148)
+   snapshot_id changed: True
+   perturbation produced the INDEPENDENTLY EXPECTED value: True
+
+CONNECTION PROOFS:
+   input available only AFTER the scan -> excluded; last_bar_close 603.90 (was 603.90), n_bars 40 (was 40)
+   another scan's snapshot (as_of -600s) -> different id: True
+   content altered under the retained digest -> recomputation disagrees: True
+
+VERDICT: both inspected fields AGREE with independent computation
+
+CORRECTION TO THE LATE-INPUT PROOF
+  The first attempt set bar['available'] and observed NO change. That was the audit's error:
+  providers.load_bars keys availability off `receipt_time`, not `available`. Redone against the
+  field that actually governs.
+
+  baseline : n_bars=40 last_bar_close=603.90 id=snap:e130c688f1ec114
+  late bar : n_bars=39 last_bar_close=603.80 id=snap:8dd19335f003033
+  EXCLUDED correctly: True   (expected 39 bars, close 603.80)
+  snapshot_id changed: True

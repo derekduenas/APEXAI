@@ -30,8 +30,25 @@ SCHEMA = "LAYER_RECEIPT_V1"
 AVAILABLE, UNAVAILABLE = "AVAILABLE", "UNAVAILABLE"
 EXECUTED, NOT_EXECUTED = "EXECUTED", "NOT_EXECUTED"
 VALID, INVALID, NOT_ASSESSED = "VALID", "INVALID", "NOT_ASSESSED"
-# the discovered state
-USED, NOT_CONSUMED, RETRIEVED_UNUSED = "USED", "NOT_CONSUMED", "RETRIEVED_UNUSED"
+# ---------------------------------------------------------------- THREE DIFFERENT CLAIMS, PREVIOUSLY ONE
+#
+# ORGANISM-COURT-001 called it USED when an output's id appeared inside a downstream record. Review was right
+# that this overstates: finding an id in a record proves a REFERENCE WAS RECORDED. It does not prove any
+# calculation read that output, and it certainly does not prove the output changed anything.
+#
+#   REFERENCED_IN_RECORD  the identity appears in a persisted downstream record. Cheap, and weak.
+#   CONSUMED              a READER was instrumented and observed reading named fields of that exact input,
+#                         naming the operation that read them and the output identity it produced.
+#   BEHAVIORAL_EFFECT     a controlled perturbation of that input changed a named downstream value.
+#
+# They are ordered by strength and reported separately. A layer can be REFERENCED_IN_RECORD and not CONSUMED;
+# CONSUMED and have no BEHAVIORAL_EFFECT. None of the three is evidence of economic contribution.
+REFERENCED_IN_RECORD = "REFERENCED_IN_RECORD"
+CONSUMED = "CONSUMED"
+BEHAVIORAL_EFFECT = "BEHAVIORAL_EFFECT"
+NO_BEHAVIORAL_EFFECT = "NO_BEHAVIORAL_EFFECT"
+NOT_REFERENCED, NOT_CONSUMED, RETRIEVED_UNUSED = "NOT_REFERENCED", "NOT_CONSUMED", "RETRIEVED_UNUSED"
+USED = REFERENCED_IN_RECORD          # retained name, corrected meaning; see above
 
 LIMITS = ("A receipt establishes identity, execution and consumption. It does NOT establish that every field of a "
           "digested object was examined, that consumption contributed economically, or anything about calibration, "
@@ -104,13 +121,16 @@ class ReceiptLog:
                                      "consumer_record_id": rec.get("txn_id") or rec.get("scan_id"),
                                      "matched_on": name, "field_path": path, "value": str(needle)[:40]})
             if hits:
-                r["consumption"] = {"state": USED, "evidence": hits,
-                                    "note": "discovered in a persisted record written by the real downstream path"}
+                r["consumption"] = {"state": REFERENCED_IN_RECORD, "evidence": hits,
+                                    "note": ("an identity found in a persisted downstream record. This proves a "
+                                             "REFERENCE WAS RECORDED -- not that any calculation read it, and not "
+                                             "that it changed anything. See CONSUMED and BEHAVIORAL_EFFECT.")}
                 found += 1
             else:
-                r["consumption"]["state"] = NOT_CONSUMED
-        return {"n_receipts": len(self.receipts), "n_used": found,
-                "n_not_consumed": len(self.receipts) - found}
+                r["consumption"]["state"] = NOT_REFERENCED
+        return {"n_receipts": len(self.receipts), "n_referenced_in_record": found,
+                "n_not_referenced": len(self.receipts) - found,
+                "claim": ("REFERENCE ONLY. Not consumption, not behavioural effect, not economic contribution.")}
 
     def describe(self) -> dict:
         return {"schema": SCHEMA, "run_id": self.run_id, "n_receipts": len(self.receipts),

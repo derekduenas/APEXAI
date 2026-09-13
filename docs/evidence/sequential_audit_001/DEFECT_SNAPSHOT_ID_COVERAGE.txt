@@ -1,0 +1,29 @@
+SEQUENTIAL-FUNNEL-AUDIT-001 — DEFECT: snapshot_id DOES NOT COVER THE CHAIN OR THE QUOTES
+code pin cb184fc0189a40d011b66caebcf13c9d39d397c6
+
+THE PRODUCTION PATH, two scans differing ONLY in the option chain:
+  chain A : 1x 2026-10-09 650 CALL ask 2.45
+  chain B : 1x 2027-06-18 900 PUT  ask 88.00
+
+  snapshot_id A : snap:b23fdddd0786f6ccebd946ae59315550
+  snapshot_id B : snap:b23fdddd0786f6ccebd946ae59315550
+  IDENTICAL     : True
+
+  chain_quote_count A: value=None quality=NOT_AVAILABLE
+  chain_expirations A: value=None quality=NOT_AVAILABLE
+
+WHY: TwinSources.snapshot() calls compose(symbol, as_of, bars, source, book) and NEVER passes
+     chain_meta, although compose() accepts it. The chain fields are therefore NOT_AVAILABLE and
+     contribute nothing to state_hash -- and snapshot_id is state_hash[:32].
+
+WHY IT MATTERS: the decision record uses snapshot_id as 'the market state this decision was made on',
+     and snapshot.py states that a candidate set and a decision record reference THIS. But the decision
+     is made ON THE CHAIN AND THE SELECTED QUOTE, neither of which the id covers. Two decisions on
+     completely different option chains are indistinguishable by the identifier that claims to name
+     the state they were made on.
+
+NOT A DEFECT IN: the id's own stated basis, which accurately lists what it hashes. The defect is the
+     GAP between that basis and the role the id is given downstream.
+
+SCOPE: quotes are likewise absent. The selected contract's bid/ask never enters the snapshot at all;
+     it reaches the intent separately via quote_fn.
