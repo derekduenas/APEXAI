@@ -46,10 +46,28 @@ DECISION_TIME_CONTEXT = "DECISION_TIME_CONTEXT"   # attached to the current intr
 ROLES = (PRIOR_CONTEXT, DECISION_TIME_CONTEXT)
 
 # what became of it
+#
+# `USED` MEANS A NAMED, IMPLEMENTED CONSUMER ACTUALLY READ IT -- nothing weaker.
+#
+# The first version of this seam set USED whenever the CALLER passed a non-empty `feeds` list. That proved only
+# that somebody wrote a label; it did not establish that any model, setup detector or scorer had read the
+# observation. A decision record saying USED on that basis would overstate what the eyes contributed, which is
+# the specific dishonesty this module exists to prevent.
+#
+# So the middle state exists now: ATTACHED_CONTEXT is "recorded against this decision, and nothing read it."
+# USED requires a consumer from the registry to have run and returned a value, and the record carries that
+# consumer's identity, its implementation, and the value it derived, so the read is reproducible.
 USED = "USED"
+ATTACHED_CONTEXT = "ATTACHED_CONTEXT"
 RETRIEVED_UNUSED = "RETRIEVED_UNUSED"
 REFUSED_LATE = "REFUSED_LATE_ARRIVING"
-DISPOSITIONS = (USED, RETRIEVED_UNUSED, REFUSED_LATE)
+DISPOSITIONS = (USED, ATTACHED_CONTEXT, RETRIEVED_UNUSED, REFUSED_LATE)
+
+CONSUMPTION_LAW = (
+    "USED_REQUIRES_A_READER: an observation is USED only when a named, implemented consumer read it and returned "
+    "a value, and the record names that consumer and carries what it derived. A caller-supplied `feeds` label is "
+    "a DECLARED INTEREST, not a read, and yields ATTACHED_CONTEXT. APEX registers NO production consumer of "
+    "TradingView context today -- nothing may act on it -- so no production decision record can say USED.")
 
 AUTHORITY_LAW = (
     "EXTERNAL_CONTEXT_JOIN_V0: a joined TradingView observation is EXTERNAL CONTEXT. It is never a calibrated "
@@ -141,23 +159,32 @@ class SnapshotJoin:
 
     # ------------------------------------------------------------------ attaching
 
-    def attach(self, obs: dict, *, role: str, feeds=None) -> dict:
-        """Attach one observation. `feeds` names the fields it informs; empty means RETRIEVED_UNUSED."""
+    def attach(self, obs: dict, *, role: str, feeds=None, consumed=None) -> dict:
+        """Attach one observation.
+
+        `consumed` is the list of CONSUMER READ RECORDS produced by actually running registered consumers over
+        this observation (see apex.tradingview.consumers). Only that produces USED.
+        `feeds` is a caller-supplied DECLARED INTEREST. On its own it produces ATTACHED_CONTEXT, never USED."""
         _assert_context_only(obs)
         if role not in ROLES:
             raise JoinRefused("ROLE_NOT_RECOGNISED: %r not in %r" % (role, ROLES))
         feeds = [str(f) for f in (feeds or [])]
+        consumed = [dict(c) for c in (consumed or [])]
         entry = {"observation_key": N.observation_key(obs), "tool": obs["tool"],
                  "response_digest": obs["response_digest"], "request_args_digest": obs["request_args_digest"],
                  "symbol": obs.get("symbol"), "role": role,
                  "known_from_utc": obs["known_from_utc"], "known_from_epoch": obs["known_from_epoch"],
                  "entitlement": obs["entitlement"], "authority": obs["authority"], "calibrated": obs["calibrated"],
-                 "feeds": feeds}
+                 "declared_feeds": feeds,
+                 "declared_feeds_note": ("CALLER_SUPPLIED_INTEREST: names the fields a caller says this could "
+                                         "inform. It is not evidence that anything read the observation."),
+                 "consumed_by": consumed, "n_consumers_read": len(consumed)}
         if role == DECISION_TIME_CONTEXT:
             v = N.valid_for_as_of(obs, self.as_of_epoch)
             if not v["valid"]:
                 # LATE-ARRIVING INFORMATION. Attached as evidence of the refusal, never as context.
-                entry.update(disposition=REFUSED_LATE, attached_to=None, why=v["why"], feeds=[])
+                entry.update(disposition=REFUSED_LATE, attached_to=None, why=v["why"], declared_feeds=[],
+                             consumed_by=[], n_consumers_read=0)
                 self.attached.append(entry)
                 return entry
             entry["attached_to"] = self.snapshot_id
@@ -167,7 +194,16 @@ class SnapshotJoin:
             entry["attached_to"] = self.premarket_packet_ref
             entry["note"] = ("premarket observation: prior context that guided attention. It is not evidence about "
                              "the decision instant, and the intraday snapshot decides whether the setup exists.")
-        entry["disposition"] = USED if feeds else RETRIEVED_UNUSED
+        # THE THREE-WAY DISTINCTION. A reader makes it USED; a declared interest makes it ATTACHED_CONTEXT;
+        # neither makes it RETRIEVED_UNUSED.
+        if consumed:
+            entry["disposition"] = USED
+        elif feeds:
+            entry["disposition"] = ATTACHED_CONTEXT
+            entry["why"] = ("no registered consumer read this observation. The declared feeds record an intent, "
+                            "not a read, so this is attached context and not evidence that it informed anything.")
+        else:
+            entry["disposition"] = RETRIEVED_UNUSED
         self.attached.append(entry)
         return entry
 
@@ -193,9 +229,11 @@ class SnapshotJoin:
             "decision": decision if decision is not None else {"status": "UNAVAILABLE: no decision supplied"},
             "external_inputs_used": self.external_inputs_used(),
             "n_external_used": len(used),
+            "n_external_attached_context": len([e for e in self.attached if e["disposition"] == ATTACHED_CONTEXT]),
             "n_external_retrieved_unused": len([e for e in self.attached if e["disposition"] == RETRIEVED_UNUSED]),
             "n_external_refused_late": len([e for e in self.attached if e["disposition"] == REFUSED_LATE]),
             "authority_law": AUTHORITY_LAW,
+            "consumption_law": CONSUMPTION_LAW,
             "join_law": JOIN_LAW,
             "wiring_status": NOT_WIRED,
         }

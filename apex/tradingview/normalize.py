@@ -33,7 +33,23 @@ AUTHORITY_CONTEXT = "EXTERNAL_CONTEXT_ONLY"
 AUTHORITY_OBSERVATION = "OBSERVATION_ONLY"
 
 ENTITLEMENT_UNKNOWN = "UNKNOWN"
-ENTITLEMENT_STATES = ("REALTIME_VERIFIED", "DELAYED_VERIFIED", ENTITLEMENT_UNKNOWN)
+ENTITLEMENT_PROVIDER_STATED_DELAY = "PROVIDER_STATED_DELAY"
+# THE TWO *_VERIFIED STATES MEAN **WE** VERIFIED IT, and nothing else may claim them.
+#
+# The first live smoke labelled bars DELAYED_VERIFIED because the response said "delayed 15+ minutes". That is the
+# PROVIDER'S STATEMENT ABOUT ITSELF -- not a measurement, and not a check of the account's entitlement. A verified
+# label on an unverified fact is exactly the kind of quiet upgrade this package exists to prevent, so:
+#   PROVIDER_STATED_DELAY  the provider says the data is delayed. Recorded verbatim, believed, NOT verified.
+#   DELAYED_VERIFIED       WE measured or confirmed it, and `verification_evidence` says how.
+#   REALTIME_VERIFIED      likewise.
+# `observation()` REFUSES either *_VERIFIED state unless verification evidence is supplied, so the label cannot be
+# set by assertion again.
+VERIFIED_STATES = ("REALTIME_VERIFIED", "DELAYED_VERIFIED")
+ENTITLEMENT_STATES = VERIFIED_STATES + (ENTITLEMENT_PROVIDER_STATED_DELAY, ENTITLEMENT_UNKNOWN)
+
+# Phrases a provider uses to describe its own delay. Matching is evidence-DERIVED: the statement is pulled out of
+# the payload the server sent, never typed in by whoever recorded the call.
+DELAY_PHRASES = ("delayed", "delay of", "end-of-day feed", "not a live price", "15 minute", "15+ minute")
 
 AVAILABILITY_LAW = (
     "TRADINGVIEW_AVAILABILITY_V0: known_from is the instant THIS connection received the response. A source event "
@@ -53,6 +69,18 @@ def digest(obj) -> str:
     return hashlib.sha256(json.dumps(obj, sort_keys=True, separators=(",", ":"), default=str).encode()).hexdigest()
 
 
+def delay_statement_from_payload(payload) -> str | None:
+    """The provider's own delay statement, extracted FROM THE PAYLOAD.
+
+    Derived rather than asserted: if the server did not say it, this returns None and the observation stays
+    UNKNOWN. No hand-written label can put a delay claim on a response that never made one."""
+    for key in ("notice", "note", "disclaimer", "warning", "message"):
+        v = (payload or {}).get(key) if isinstance(payload, dict) else None
+        if isinstance(v, str) and any(ph in v.lower() for ph in DELAY_PHRASES):
+            return v
+    return None
+
+
 def _is_number(x) -> bool:
     return isinstance(x, (int, float)) and not isinstance(x, bool)
 
@@ -61,10 +89,16 @@ def observation(*, tool: str, args: dict, payload, request_start: float, respons
                 ingestion: float | None = None, symbol: str | None = None, interval: str | None = None,
                 units: str | None = None, source_event_time=None, source_publication_time=None,
                 entitlement: str = ENTITLEMENT_UNKNOWN, revision: int = 0, quality: str = TW.VALID,
-                refusal: str | None = None, completeness: str = "COMPLETE") -> dict:
+                refusal: str | None = None, completeness: str = "COMPLETE",
+                verification_evidence: str | None = None) -> dict:
     """One normalized observation. Every field the operator's brief lists is present or explicitly unknown."""
     if entitlement not in ENTITLEMENT_STATES:
         raise NormalizationRefused("ENTITLEMENT_STATE_UNKNOWN: %r not in %r" % (entitlement, ENTITLEMENT_STATES))
+    if entitlement in VERIFIED_STATES and not verification_evidence:
+        raise NormalizationRefused(
+            "ENTITLEMENT_NOT_VERIFIED: %r claims verification but no verification_evidence was supplied. A "
+            "provider's statement about its own feed is PROVIDER_STATED_DELAY, not a verified entitlement."
+            % (entitlement,))
     if quality not in TW.QUALITIES:
         raise NormalizationRefused("QUALITY_NOT_IN_VOCABULARY: %r" % (quality,))
     if response_receipt < request_start:
@@ -79,6 +113,10 @@ def observation(*, tool: str, args: dict, payload, request_start: float, respons
     ing = float(response_receipt if ingestion is None else ingestion)
     if ing < response_receipt:
         raise NormalizationRefused("INGESTION_BEFORE_RECEIPT: %.6f < %.6f" % (ing, response_receipt))
+    # The provider's own words about its feed, taken from the payload, and kept SEPARATE from any claim we make.
+    stated_delay = delay_statement_from_payload(payload)
+    if stated_delay and entitlement == ENTITLEMENT_UNKNOWN:
+        entitlement = ENTITLEMENT_PROVIDER_STATED_DELAY
     known_from = float(response_receipt)          # THE RULE: availability is receipt on THIS connection
     ctx = tool in EXTERNAL_CONTEXT_TOOLS
     obs = {
@@ -111,6 +149,13 @@ def observation(*, tool: str, args: dict, payload, request_start: float, respons
         "historical_availability": "NOT_ESTABLISHED",
         "availability_law": AVAILABILITY_LAW,
         "entitlement": entitlement,
+        # THREE SEPARATE FACTS, never collapsed into one label:
+        "provider_delay_statement": stated_delay,          # what the PROVIDER said, verbatim, or None
+        "latency_measurement": ("NOT_MEASURED: this connector does not measure feed latency. The request/receipt "
+                                "instants bound THIS connection's round trip, which is not the data's age."),
+        "account_entitlement": ("NOT_ESTABLISHED: the account's market-data entitlement has not been checked. This "
+                                "adapter does not verify the plan and does not claim one."),
+        "entitlement_verification": verification_evidence,
         "delay_status": ("UNKNOWN: the server does not state a delay or a real-time entitlement for this response"
                          if entitlement == ENTITLEMENT_UNKNOWN else entitlement),
         "quality": quality,

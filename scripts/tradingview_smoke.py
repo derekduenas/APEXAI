@@ -38,6 +38,27 @@ from apex.tradingview import normalize as N  # noqa: E402
 
 MAX_CALLS = 10
 
+PROVENANCE = {
+    "capture_method": "AGENT_TRANSCRIPTION",
+    "what_that_means": (
+        "The MCP tools live in the Claude Code client, not in this process. An agent holding the authorized "
+        "session called each tool and TRANSCRIBED the returned payload into the recording. This is NOT a "
+        "byte-exact transport capture: there is no packet trace, no raw HTTP body and no server-side digest to "
+        "compare against. The digests in this result are digests OF THE RECORDING, which is the artifact of "
+        "record. Structural corroboration only: the recorded payloads parse as JSON, and the one long prose "
+        "payload's `ast_description` parses as JSON in its own right."),
+    "timing_method": "CLOCK_BRACKET_BOUNDS_NOT_TRANSPORT_INSTANTS",
+    "timing_detail": (
+        "The agent cannot observe the socket. Each call is bracketed by a real wall-clock reading taken BEFORE "
+        "the request was issued and AFTER the response arrived, so [request_start, response_receipt] is a true "
+        "CONTAINING INTERVAL, not the transport's own instants. Calls were issued in groups, so a group shares "
+        "one bracket and the interval is wider than any single call's true round trip. known_from is the LATER "
+        "bound, which can only understate availability and can never manufacture hindsight."),
+    "latency": "NOT_MEASURED: a bracket bounds this connection's round trip; it is not feed latency and not data age.",
+    "entitlement": ("NOT_ESTABLISHED: the account's market-data plan was never checked. A provider statement that "
+                    "its bars are delayed is recorded as PROVIDER_STATED_DELAY -- believed, not verified."),
+}
+
 
 class SmokeRefused(RuntimeError):
     """The recording does not support an honest run. Named, never silent."""
@@ -92,8 +113,7 @@ def run(calls: list) -> dict:
             # bars go through the BAR contract, so partial/incomplete candles are exercised on live data
             obs = N.normalize_bars(payload, symbol=c["symbol"], interval=c["interval"],
                                    request_start=env["request_start_epoch"],
-                                   response_receipt=env["response_receipt_epoch"],
-                                   entitlement=c.get("entitlement", N.ENTITLEMENT_UNKNOWN))
+                                   response_receipt=env["response_receipt_epoch"])
             a.observations.append(obs)
         elif env["state"] == A.STATE_OK:
             obs = N.observation(tool=c["tool"], args=c["args"], payload=payload,
@@ -101,10 +121,17 @@ def run(calls: list) -> dict:
                                 response_receipt=env["response_receipt_epoch"],
                                 symbol=c.get("symbol"), interval=c.get("interval"), units=c.get("units"),
                                 source_event_time=c.get("source_event_time"),
-                                source_publication_time=c.get("source_publication_time"),
-                                entitlement=c.get("entitlement", N.ENTITLEMENT_UNKNOWN))
+                                source_publication_time=c.get("source_publication_time"))
             a.observations.append(obs)
         results.append({"tool": c["tool"], "tool_canonical": AL.canonical(c["tool"]), "args": c["args"],
+                        # THE RECORDING'S OWN ENTITLEMENT LABEL IS A CLAIM, NOT EVIDENCE. It is carried here so a
+                        # reviewer can see what was asserted, and it is NOT used: the entitlement on the
+                        # observation is derived from the provider's statement inside the payload.
+                        "recorded_entitlement_claim": c.get("entitlement"),
+                        "recorded_entitlement_claim_status": (
+                            "DISCARDED_NOT_EVIDENCE: a label typed into a transcription does not verify anything; "
+                            "the observation's entitlement is derived from the payload"
+                            if c.get("entitlement") else "NONE_CLAIMED"),
                         "state": env["state"], "why": env.get("why"),
                         "from_cache": env["from_cache"],
                         "observation": ({k: v for k, v in obs.items() if k != "payload"} if obs else None),
@@ -114,9 +141,10 @@ def run(calls: list) -> dict:
             "observations_deduped": [
                 {k: v for k, v in o.items() if k != "payload"}
                 for o in _dedupe([o for o in a.observations])],
+            "provenance": PROVENANCE,
             "law": ("recorded live responses replayed through the real adapter; known_from is the recorded response "
-                    "receipt, historical availability is NOT_ESTABLISHED, entitlement is whatever the server stated "
-                    "or UNKNOWN")}
+                    "receipt bound, historical availability is NOT_ESTABLISHED, and entitlement is DERIVED from the "
+                    "provider's own statement inside the payload -- never from a label in the recording")}
 
 
 def _dedupe(observations: list) -> list:

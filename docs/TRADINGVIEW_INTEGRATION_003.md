@@ -188,6 +188,68 @@ sealed-packet fixtures, research-board reconciliation, the whole-ledger guard, a
 difference between 30 in the full run and 16 in the subset is test-ordering side effects in the `exp002`/`exp004`
 historical paths, which also reproduce without this branch.
 
+---
+
+# REVIEW CORRECTIONS (2026-09-13) — four claims that were weaker than they sounded
+
+Raised at independent review, all four correct, all four now closed in code and evidence.
+
+## R1. Regression reconciliation — see `docs/evidence/tradingview_integration_003/REGRESSION_RECONCILIATION.md`
+
+The first report gave 30 failures in the full run and then a 14-vs-16 subset comparison, which does not account
+for all 30. Reconciled per test ID under matching conditions on the final committed candidate, in isolated
+checkouts. That document is the record.
+
+## R2. Exit independence, against a provider that never returns
+
+Raising `TimeoutError` inside a fixture establishes exception handling and nothing more: control came back. A
+provider that **never returns** cannot be caught by `try`/`except` at all.
+
+- `context._fetch_with_deadline` runs the provider on a worker with a hard wall-clock deadline
+  (`DEFAULT_DEADLINE_S = 5.0`). On expiry the packet says `TIMEOUT` and names `PROVIDER_DID_NOT_RETURN`.
+- **The worker is abandoned, not killed** — Python cannot kill a thread. It is a daemon, it holds no lock, no
+  ledger handle and no resource the decision, exit or lifecycle paths need, and the record says so. If a future
+  consumer ever needs a lock, this deadline stops being safe and must be revisited.
+- **Proved through the real `LifecycleRunner`**: a scan opens a position with the provider blocked from the moment
+  it is called; the exit falls due and is serviced and **RESOLVED**; the provider has *still not returned* when the
+  run ends (asserted, not assumed). Whole run: 0.43s.
+- Structural: `lifecycle.py` reaches external context from `_on_scan` **only**; a test walks every other function
+  and asserts none names it.
+
+## R3. `USED` now requires a named, implemented consumer
+
+The first version set `USED` whenever the caller passed a non-empty `feeds` list. That proved a label was written,
+not that anything read the observation.
+
+- New disposition **`ATTACHED_CONTEXT`**: recorded against the decision, bound to the snapshot, and *nothing read
+  it*. A caller-supplied `feeds` list is now `declared_feeds` — an intent, carried with a note saying it is not
+  evidence of a read.
+- `USED` requires a consumer from `apex/tradingview/consumers.py` to have actually run and returned a value. The
+  record carries the consumer's name, its real implementation path, the derived value and a digest, so a reviewer
+  can re-run it and reproduce the read.
+- **The production registry is empty, and that is the correct state.** Nothing in APEX may act on external
+  context, so there is no legitimate consumer to register and **no production decision record can report `USED`**.
+  `register(production=True)` refuses any name not in `REVIEWED_PRODUCTION_CONSUMERS` (empty).
+- The join evidence now reads `USED=0, ATTACHED_CONTEXT=2, RETRIEVED_UNUSED=1, REFUSED_LATE_ARRIVING=1`.
+
+## R4. Provenance labelled; claim separated from verification
+
+`DELAYED_VERIFIED` asserted a verification that was never performed — the basis string recorded beside it even said
+*"the response itself states…"*.
+
+- New entitlement state **`PROVIDER_STATED_DELAY`**: believed, not verified. Entitlement is now **derived from the
+  payload** (`delay_statement_from_payload`), never read from a label in the recording; the recording's own claim
+  is carried into the result as `recorded_entitlement_claim` with status `DISCARDED_NOT_EVIDENCE`.
+- `observation()` **refuses** `DELAYED_VERIFIED`/`REALTIME_VERIFIED` without `verification_evidence`.
+- Three facts kept apart: `provider_delay_statement` (verbatim), `latency_measurement` = `NOT_MEASURED`,
+  `account_entitlement` = `NOT_ESTABLISHED`.
+- **Original artifacts preserved unchanged**, including the wrong label — the first run is evidence, mistake
+  included. `PROVENANCE.md` states that capture was **agent transcription, not byte-exact transport capture**
+  (no packet trace, no raw body, no server-side digest; digests are of the recording), and that timings are
+  **clock-bracket bounds, not transport instants** — groups share a bracket, so `T1-T0 = 22.6s` covers three calls
+  and is not a round trip. `smoke_result_2026-09-13_relabelled.json` is a **replay of the same nine recordings —
+  no new live calls.**
+
 ## 9. What this branch does not do
 
 It does not connect TradingView to order placement, execution, risk authorization or options quotes. It does not

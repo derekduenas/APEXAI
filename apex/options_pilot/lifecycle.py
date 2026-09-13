@@ -600,7 +600,11 @@ class LifecycleRunner:
         d = S.scan(self.bd, symbol=sym, seq=seq, forecast_fn=self.src["forecast_fn"], signal_fn=self.src["signal_fn"],
                    chain_fn=self.src["chain_fn"], spot_fn=self.src["spot_fn"], quote_fn=self.src["quote_fn"],
                    funnel_fn=self.src.get("funnel_fn"), selection_policy=self.policy,
-                   event_context_fn=self.src.get("event_context_fn"))
+                   event_context_fn=self.src.get("event_context_fn"),
+                   # EXTERNAL CONTEXT is a SCAN-side sense only. No exit handler, retry, window close or deadline
+                   # re-check on this runner consults it, so a slow or hung provider can delay a scan and nothing
+                   # else. tests/test_tradingview_evidence_004.py proves that against a provider that never returns.
+                   external_context_fn=self.src.get("external_context_fn"))
         row = {k: d.get(k) for k in ("scan_id", "symbol", "decision", "why", "forecast_id", "intent_id", "fill_id",
                                      "decision_persisted", "refusal_persisted")}
         row["at_utc"] = ev["at_utc"]

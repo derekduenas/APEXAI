@@ -37,11 +37,15 @@
     "entitlement": "UNKNOWN",
     "authority": "EXTERNAL_CONTEXT_ONLY",
     "calibrated": false,
-    "feeds": [
+    "declared_feeds": [
      "attention.trend_context"
     ],
+    "declared_feeds_note": "CALLER_SUPPLIED_INTEREST: names the fields a caller says this could inform. It is not evidence that anything read the observation.",
+    "consumed_by": [],
+    "n_consumers_read": 0,
     "attached_to": "snap:e1182eace1c3dc0876c78d6d62533ecd",
-    "disposition": "USED",
+    "disposition": "ATTACHED_CONTEXT",
+    "why": "no registered consumer read this observation. The declared feeds record an intent, not a read, so this is attached context and not evidence that it informed anything.",
     "age_s_at_decision": 80.529676
    },
    {
@@ -56,7 +60,10 @@
     "entitlement": "UNKNOWN",
     "authority": "EXTERNAL_CONTEXT_ONLY",
     "calibrated": false,
-    "feeds": [],
+    "declared_feeds": [],
+    "declared_feeds_note": "CALLER_SUPPLIED_INTEREST: names the fields a caller says this could inform. It is not evidence that anything read the observation.",
+    "consumed_by": [],
+    "n_consumers_read": 0,
     "attached_to": "snap:e1182eace1c3dc0876c78d6d62533ecd",
     "disposition": "RETRIEVED_UNUSED",
     "age_s_at_decision": 80.529676
@@ -73,12 +80,16 @@
     "entitlement": "UNKNOWN",
     "authority": "OBSERVATION_ONLY",
     "calibrated": false,
-    "feeds": [
+    "declared_feeds": [
      "premarket.event_watch"
     ],
+    "declared_feeds_note": "CALLER_SUPPLIED_INTEREST: names the fields a caller says this could inform. It is not evidence that anything read the observation.",
+    "consumed_by": [],
+    "n_consumers_read": 0,
     "attached_to": "PREMARKET-PACKET-2026-09-13",
     "note": "premarket observation: prior context that guided attention. It is not evidence about the decision instant, and the intraday snapshot decides whether the setup exists.",
-    "disposition": "USED",
+    "disposition": "ATTACHED_CONTEXT",
+    "why": "no registered consumer read this observation. The declared feeds record an intent, not a read, so this is attached context and not evidence that it informed anything.",
     "age_s_at_decision": 66.180613
    },
    {
@@ -90,22 +101,35 @@
     "role": "DECISION_TIME_CONTEXT",
     "known_from_utc": "2026-09-13T05:06:40.000000Z",
     "known_from_epoch": 1789276000.0,
-    "entitlement": "DELAYED_VERIFIED",
+    "entitlement": "PROVIDER_STATED_DELAY",
     "authority": "OBSERVATION_ONLY",
     "calibrated": false,
-    "feeds": [],
+    "declared_feeds": [],
+    "declared_feeds_note": "CALLER_SUPPLIED_INTEREST: names the fields a caller says this could inform. It is not evidence that anything read the observation.",
+    "consumed_by": [],
+    "n_consumers_read": 0,
     "disposition": "REFUSED_LATE_ARRIVING",
     "attached_to": null,
     "why": "LATE_ARRIVING_INFORMATION: this observation became knowable at 2026-09-13T05:06:40.000000Z and the decision instant is 2026-09-13T05:01:40.000000Z. Retrieving it later does not make it available earlier.",
     "age_s_at_decision": -300.0
    }
   ],
-  "n_used": 2,
+  "n_used": 0,
+  "n_attached_context": 2,
   "n_retrieved_unused": 1,
   "n_refused_late": 1,
   "stale_tools": [],
   "max_age_s": 900.0,
-  "law": "EXTERNAL_CONTEXT_ONLY: TradingView context informs a decision record by being NAMED in it. It is never a calibrated probability, never a standalone signal, never a model promotion and never an order authorization. It cannot enter risk authorization, exit servicing, reservations or order handling."
+  "law": "EXTERNAL_CONTEXT_ONLY: TradingView context informs a decision record by being NAMED in it. It is never a calibrated probability, never a standalone signal, never a model promotion and never an order authorization. It cannot enter risk authorization, exit servicing, reservations or order handling.",
+  "consumption_law": "USED_REQUIRES_A_READER: an observation is USED only when a named, implemented consumer read it and returned a value, and the record names that consumer and carries what it derived. A caller-supplied `feeds` label is a DECLARED INTEREST, not a read, and yields ATTACHED_CONTEXT. APEX registers NO production consumer of TradingView context today -- nothing may act on it -- so no production decision record can say USED.",
+  "consumers": {
+   "law": "A consumer READS an observation and returns a derived value. Registering one is a claim that a real, reviewed reader exists. No production consumer of TradingView context is registered, because nothing in APEX may act on external context; production decision records therefore report ATTACHED_CONTEXT, never USED.",
+   "n_registered": 0,
+   "reviewed_production_consumers": [],
+   "registered": [],
+   "production_registry_is_empty": true
+  }
  },
- "note": "Produced through the WIRED TwinSources on observations normalized from the real recorded live payloads. The market state is built from the twin's OWN feed; TradingView bars are never a price of record and are never used to compose the state."
+ "note": "Produced through the WIRED TwinSources on observations normalized from the real recorded live payloads. The market state is built from the twin's OWN feed; TradingView bars are never a price of record and are never used to compose the state.",
+ "why_nothing_is_USED": "APEX registers NO production consumer of TradingView context, because nothing may act on external context. The declared `feeds` labels below are caller-supplied INTERESTS, not reads, so every decision-time observation is ATTACHED_CONTEXT. USED would require a named, implemented consumer to have read the observation and returned a value."
 }

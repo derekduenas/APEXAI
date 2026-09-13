@@ -63,18 +63,23 @@ class TestSnapshotId:
 class TestTheJoin:
 
     def test_an_observation_knowable_at_the_instant_attaches_to_the_snapshot(self):
+        """CORRECTED: a caller-supplied `feeds` label is a DECLARED INTEREST, not a read. It attaches the
+        observation to the snapshot and yields ATTACHED_CONTEXT -- it does NOT yield USED, which now requires a
+        named, implemented consumer to have actually read the observation."""
         j = join()
         e = j.attach(obs(), role=SM.DECISION_TIME_CONTEXT, feeds=["premarket_context.external_context"])
-        assert e["disposition"] == SM.USED
+        assert e["disposition"] == SM.ATTACHED_CONTEXT
         assert e["attached_to"] == j.snapshot_id
-        assert e["feeds"] == ["premarket_context.external_context"]
+        assert e["declared_feeds"] == ["premarket_context.external_context"]
+        assert e["consumed_by"] == [] and e["n_consumers_read"] == 0
+        assert j.decision_record()["n_external_used"] == 0, "a label must never produce USED"
 
     def test_late_arriving_information_is_refused_not_attached(self):
         """Retrieving something after the decision instant does not make it available earlier."""
         j = join()
         e = j.attach(obs(receipt=T + 60.0), role=SM.DECISION_TIME_CONTEXT, feeds=["anything"])
         assert e["disposition"] == SM.REFUSED_LATE
-        assert e["attached_to"] is None and e["feeds"] == []
+        assert e["attached_to"] is None and e["declared_feeds"] == []
         assert "LATE_ARRIVING_INFORMATION" in e["why"]
         assert j.decision_record()["n_external_refused_late"] == 1
         assert j.decision_record()["n_external_used"] == 0
@@ -82,7 +87,7 @@ class TestTheJoin:
     def test_an_observation_that_fed_nothing_says_so(self):
         j = join()
         e = j.attach(obs(tool="get_news"), role=SM.DECISION_TIME_CONTEXT)
-        assert e["disposition"] == SM.RETRIEVED_UNUSED and e["feeds"] == []
+        assert e["disposition"] == SM.RETRIEVED_UNUSED and e["declared_feeds"] == []
         assert j.decision_record()["n_external_retrieved_unused"] == 1
 
     def test_a_premarket_observation_is_prior_context_and_never_decision_time_evidence(self):
@@ -96,7 +101,8 @@ class TestTheJoin:
         """Prior context is knowable before the snapshot by construction; that is what makes it prior."""
         j = join(premarket_packet_ref="PMK-1")
         e = j.attach(obs(receipt=T - 20000.0), role=SM.PRIOR_CONTEXT, feeds=["attention_rank"])
-        assert e["disposition"] == SM.USED
+        assert e["disposition"] == SM.ATTACHED_CONTEXT      # attached, and still nothing read it
+        assert e["role"] == SM.PRIOR_CONTEXT
 
     def test_an_unrecognised_role_is_refused(self):
         j = join()
@@ -165,12 +171,17 @@ class TestTheChainIsRepresentable:
         assert r["model_identities"]["forecast"] == "EXP002_L"
         assert len(r["candidate_set"]) == 2
         assert r["decision"]["decision"] == "WAIT"
-        assert r["n_external_used"] == 2 and r["n_external_retrieved_unused"] == 1
+        # CORRECTED: two observations carry declared interests and one does not. NOTHING read any of them, so
+        # nothing is USED -- the honest counts are 2 attached-context and 1 retrieved-unused.
+        assert r["n_external_used"] == 0
+        assert r["n_external_attached_context"] == 2 and r["n_external_retrieved_unused"] == 1
 
     def test_the_record_says_which_observation_fed_which_field(self):
         r = self._full()
         ohlcv = [e for e in r["external_inputs_used"] if e["tool"] == "get_ohlcv"][0]
-        assert "setup.features.cross_check" in ohlcv["feeds"]
+        assert "setup.features.cross_check" in ohlcv["declared_feeds"]
+        assert ohlcv["disposition"] == SM.ATTACHED_CONTEXT and ohlcv["consumed_by"] == []
+        assert "not evidence that anything read" in ohlcv["declared_feeds_note"]
         news = [e for e in r["external_inputs_used"] if e["tool"] == "get_news"][0]
         assert news["disposition"] == SM.RETRIEVED_UNUSED
 

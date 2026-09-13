@@ -29,6 +29,7 @@ from apex.options_pilot import ledger as L
 from apex.options_pilot import session as S
 from apex.options_pilot.synthetic_harness import SyntheticHarness
 from apex.pulse_options.snapshot import compose
+from apex.tradingview import consumers as CONS
 from apex.tradingview import context as TVC
 from apex.tradingview import normalize as N
 from apex.tradingview import seam as SEAM
@@ -46,10 +47,11 @@ def live_observation(canonical_tool: str, *, known_from: float) -> dict:
     place it before or after a decision instant. Nothing about the payload is invented."""
     from apex.tradingview import allowlist as AL
     c = next(c for c in live_calls() if AL.canonical(c["tool"]) == canonical_tool)
+    # The recording's own `entitlement` label is a CLAIM and is deliberately NOT passed through: entitlement is
+    # derived from the provider's statement inside the payload.
     return N.observation(tool=c["tool"], args=c["args"], payload=c["payload"],
                          request_start=known_from - 0.5, response_receipt=known_from,
-                         symbol=c.get("symbol"), interval=c.get("interval"), units=c.get("units"),
-                         entitlement=c.get("entitlement", N.ENTITLEMENT_UNKNOWN))
+                         symbol=c.get("symbol"), interval=c.get("interval"), units=c.get("units"))
 
 
 def bars(n: int, *, end: float) -> list:
@@ -136,13 +138,17 @@ class TestSnapshotIdIsDeterministicAndContentAddressed:
 
 
 class TestEveryObservationRecordsWhatBecameOfIt:
-    def test_an_observation_that_fed_a_field_is_USED(self):
+    def test_a_caller_label_alone_is_ATTACHED_CONTEXT_and_never_USED(self):
+        """THE CORRECTION. A `feeds` list says what a caller INTENDS the observation to inform. It is not
+        evidence that anything read it, so it can never produce USED."""
         obs = live_observation("get_technicals_rating", known_from=T - 30.0)
         ctx = TVC.build(symbol="SPY", as_of=T, snapshot=snap_at(T),
                         observations=[(obs, SEAM.DECISION_TIME_CONTEXT, ["attention.rsi_context"])])
-        assert ctx["status"] == TVC.AVAILABLE and ctx["n_used"] == 1
-        assert ctx["external_inputs_used"][0]["disposition"] == "USED"
-        assert ctx["external_inputs_used"][0]["feeds"] == ["attention.rsi_context"]
+        assert ctx["status"] == TVC.AVAILABLE
+        assert ctx["n_used"] == 0 and ctx["n_attached_context"] == 1
+        e = ctx["external_inputs_used"][0]
+        assert e["disposition"] == "ATTACHED_CONTEXT"
+        assert e["declared_feeds"] == ["attention.rsi_context"] and e["consumed_by"] == []
 
     def test_an_observation_that_fed_nothing_is_RETRIEVED_UNUSED_not_omitted(self):
         """Retrieval is not use. The record must distinguish 'we looked and it changed nothing' from
@@ -159,18 +165,19 @@ class TestEveryObservationRecordsWhatBecameOfIt:
         ctx = TVC.build(symbol="SPY", as_of=T, snapshot=snap_at(T),
                         observations=[(obs, SEAM.DECISION_TIME_CONTEXT, ["anything"])])
         e = ctx["external_inputs_used"][0]
-        assert e["disposition"] == "REFUSED_LATE_ARRIVING" and e["attached_to"] is None and e["feeds"] == []
+        assert e["disposition"] == "REFUSED_LATE_ARRIVING" and e["attached_to"] is None
+        assert e["declared_feeds"] == [] and e["consumed_by"] == []
         assert ctx["n_refused_late"] == 1 and ctx["n_used"] == 0
 
-    def test_every_disposition_is_one_of_the_three_named_ones(self):
-        assert set(SEAM.DISPOSITIONS) == {"USED", "RETRIEVED_UNUSED", "REFUSED_LATE_ARRIVING"}
+    def test_every_disposition_is_one_of_the_four_named_ones(self):
+        assert set(SEAM.DISPOSITIONS) == {"USED", "ATTACHED_CONTEXT", "RETRIEVED_UNUSED", "REFUSED_LATE_ARRIVING"}
 
     def test_stale_data_is_downgraded_and_says_why_rather_than_feeding_a_decision(self):
         obs = live_observation("get_technicals_rating", known_from=T - 5000.0)
         ctx = TVC.build(symbol="SPY", as_of=T, snapshot=snap_at(T),
                         observations=[(obs, SEAM.DECISION_TIME_CONTEXT, ["attention.trend"])], max_age_s=900.0)
         e = ctx["external_inputs_used"][0]
-        assert e["disposition"] == "RETRIEVED_UNUSED" and e["feeds"] == [] and "STALE_DATA" in e["why"]
+        assert e["disposition"] == "RETRIEVED_UNUSED" and e["declared_feeds"] == [] and "STALE_DATA" in e["why"]
         assert ctx["status"] == TVC.STALE_DATA
 
 
@@ -192,7 +199,7 @@ class TestPremarketIsPriorContextOnly:
         ctx = TVC.build(symbol="SPY", as_of=T, snapshot=snap_at(T),
                         observations=[(obs, SEAM.PRIOR_CONTEXT, ["premarket.watch"])],
                         premarket_refs={"packet_ref": "P1"}, max_age_s=900.0)
-        assert ctx["external_inputs_used"][0]["disposition"] == "USED"
+        assert ctx["external_inputs_used"][0]["disposition"] == "ATTACHED_CONTEXT"
         assert ctx["n_refused_late"] == 0
 
 
@@ -271,10 +278,19 @@ class TestTheJoinThroughTheRealPilotPath:
     def test_the_observation_is_bound_to_that_same_snapshot_id(self, joined):
         """THE JOIN: observation -> snapshot_id -> market state, in the record that was persisted."""
         _, dec, snap = joined
-        used = [e for e in dec["external_inputs_used"] if e["disposition"] == "USED"]
-        assert used, "a declared consumer must produce a USED entry"
-        assert all(e["attached_to"] == snap["snapshot_id"] for e in used)
+        attached = [e for e in dec["external_inputs_used"] if e["disposition"] == "ATTACHED_CONTEXT"]
+        assert attached, "an attached observation must be bound to the state"
+        assert all(e["attached_to"] == snap["snapshot_id"] for e in attached)
+        assert dec["external_context"]["n_used"] == 0, "nothing read it, so nothing is USED"
         assert dec["external_context"]["snapshot_id"] == snap["snapshot_id"]
+
+    def test_no_production_decision_record_can_report_USED(self, joined):
+        """APEX registers no production consumer of TradingView context, because nothing may act on it. So the
+        honest disposition on a real decision is ATTACHED_CONTEXT, and USED is unreachable."""
+        _, dec, _ = joined
+        assert dec["external_context"]["n_used"] == 0
+        assert all(e["disposition"] != "USED" for e in dec["external_inputs_used"])
+        assert "no production decision record can say USED" in dec["external_context"]["consumption_law"]
 
     def test_the_chain_is_complete_from_observation_to_decision(self, joined):
         """observation -> snapshot_id -> market state -> model inputs -> candidate set -> decision record."""
@@ -290,7 +306,7 @@ class TestTheJoinThroughTheRealPilotPath:
     def test_both_dispositions_survive_into_the_persisted_record(self, joined):
         _, dec, _ = joined
         d = {e["tool"]: e["disposition"] for e in dec["external_inputs_used"]}
-        assert d["get_technicals_rating"] == "USED"
+        assert d["get_technicals_rating"] == "ATTACHED_CONTEXT"
         assert d["get_news"] == "RETRIEVED_UNUSED"
 
     def test_the_persisted_record_still_says_external_context_only(self, joined):
@@ -336,7 +352,7 @@ class TestARefusedScanStillReportsWhatItActuallyObtained:
         dec = next(r for r in L.read_all(led) if r.get("kind") == "pilot_decision")
         assert dec["external_context"]["status"] == TVC.AVAILABLE
         assert dec["external_context"]["snapshot_id"] == snap["snapshot_id"]
-        assert [e["disposition"] for e in dec["external_inputs_used"]] == ["USED"]
+        assert [e["disposition"] for e in dec["external_inputs_used"]] == ["ATTACHED_CONTEXT"]
 
 
 class TestEveryFailureIsANamedStateAndNothingBlocks:
