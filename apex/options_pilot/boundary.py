@@ -706,10 +706,20 @@ class Boundary:
         """The AUTOMATIC exit policy stops trying. The position REMAINS an unresolved obligation."""
         rows = L.read_all(self.ledger)
         fl = L.verify_receipt(self.ledger, fill_receipt, expected_kind="pilot_fill", rows=rows)
+        # EXHAUSTION IS A STATEMENT ABOUT A CONTRACT: it says THIS policy's window closed or THIS policy's attempt
+        # budget was spent. Falling back to the running process's policy here would stamp a contract the position
+        # was never opened under onto its terminal record, which is the very substitution the binding forbids.
+        # An unresolved contract cannot be exhausted: the position stays an explicit unresolved obligation.
+        pol, policy_problem = self.original_exit_policy(fl, rows)
+        if policy_problem:
+            self.refuse("exit", "EXIT_POLICY_UNRESOLVED: %s -- exhaustion is not recorded against an unknown "
+                                "contract; the position remains an explicit unresolved obligation" % policy_problem,
+                        scan_id=fl.get("scan_id"))
         rec = {"kind": "pilot_exit_exhausted", "txn_id": "exit_exhausted:%s" % fl["intent_id"], "intent_id": fl["intent_id"],
                "fill_ref": {"seq": fill_receipt["seq"], "entry_hash": fill_receipt["entry_hash"]}, "scan_id": fl.get("scan_id"),
                "session_id": self.session_id, "release": self.release, "attempts": len(self.valuation_attempts(rows, fill_receipt["seq"])),
-               "exit_policy": (self.original_exit_policy(fl, rows)[0] or self.exit_policy).describe(),
+               "exit_policy": pol.describe(),
+               "exit_policy_binding": EP.resolution_record(pol, fl, process_policy=self.exit_policy),
                "obligation": "POSITION REMAINS UNRESOLVED; P&L UNKNOWN; exposure open",
                "at_utc": self.clock.now_utc(), **self.labels}
         assert_record_labels(rec)

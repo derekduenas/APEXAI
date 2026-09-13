@@ -224,3 +224,38 @@ recorded availability rather than assuming one. Tested here so the two semantics
 - **`session.attempt_exits`** still carries the legacy `recovery=True` branch producing
   `UNRESOLVED_AFTER_RECOVERY_ATTEMPT`; no caller passes it. It now binds to the original policy like every other
   path, but the dead branch is left rather than changed in a bounded correction.
+
+---
+
+## C4. The exhaustion fallback (review of `d56701c`)
+
+**The finding was correct.** `record_exit_exhausted()` kept
+`(self.original_exit_policy(fl, rows)[0] or self.exit_policy).describe()`. The scheduler paths guarded it, but the
+boundary method contradicted the contract on its own: given unresolvable evidence it stamped **the running
+process's policy** onto the terminal record of a position that was never opened under it.
+
+**Reproduced directly against the boundary**, not through the scheduler. At `d56701c` the new test fails with
+`DID NOT RAISE BoundaryRefused` and an exhaustion record is written; `record_outcome` on the same ledger already
+refused, so the exhaustion path was the only hole — exactly as the review said.
+
+**Repaired.** The fallback is gone. `record_exit_exhausted` resolves and verifies the original policy **before**
+building the record and refuses `EXIT_POLICY_UNRESOLVED` otherwise. Exhaustion is a statement about a specific
+contract — that *this* window closed or *this* budget was spent — so it cannot be recorded against an unknown one.
+An exhaustion that IS written now also carries `exit_policy_binding` naming how the contract was established.
+
+**The synthetic legacy ledger.** `LegacyLedgerPolicy` is a clearly labelled fixture modelling a ledger written
+before exit policies recorded their identity: the fill's `exit_schedule` and the intent pins carry a policy **name
+but no hash**. It is not a real historical record and is not presented as one; it exists so the missing-evidence
+refusal is exercised end to end through the real boundary. Four tests: `record_exit_exhausted` refuses and writes
+nothing (only a `pilot_refusal`, position still an obligation); `record_outcome` refuses the same evidence; a
+resolvable exhaustion names V1's own numbers while the process runs the 50-attempt policy; and the scheduler leaves
+the same ledger `UNSERVICEABLE_EXIT_POLICY_UNRESOLVED` with no quote requested.
+
+**On the process-policy hash as evidence** — accepted per review: it resolves the recorded *configuration* only. It
+does not establish unchanged implementation code, and release provenance remains a separate concern. The
+`resolved_from` field names which source was used so the two are never conflated.
+
+| suite | result |
+|---|---|
+| `tests/test_exit_scheduling_003_correction.py` | 27 passed (23 + 4 boundary) |
+| 18 affected suites together | **581 passed, 1 skipped, 0 failed** |

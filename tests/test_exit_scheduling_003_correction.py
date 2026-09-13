@@ -338,3 +338,89 @@ class TestProcessIdentityIsALabel:
         assert "LOGICAL_INVOCATION_LABEL" in pi["basis"]
         assert "NOT" in pi["basis"] and "operating-system" in pi["basis"]
         assert "does not prevent" in pi["basis"] or "no exclusivity" in pi["basis"]
+
+
+# ==================================================== the boundary refuses on its own, not only via the scheduler
+
+
+class LegacyLedgerPolicy(EP.ExitPolicy):
+    """SYNTHETIC LEGACY FIXTURE, and labelled as one.
+
+    This models a ledger written before exit policies recorded their identity: the fill's `exit_schedule` and the
+    intent's pins carry a policy NAME but no hash. It is NOT a real historical record, is not presented as one, and
+    no claim is made that any such ledger exists. It exists so the missing-evidence refusal can be exercised
+    end to end through the real boundary rather than only as a resolver unit test -- a name is not evidence, and
+    the system must say so on a record it actually wrote."""
+
+    @property
+    def policy_hash(self):
+        return None
+
+
+LEGACY = LegacyLedgerPolicy(policy_id="EXIT_AT_HORIZON_15M_PREHASH")
+
+
+def legacy_ledger(tmp_path, sid):
+    """Open a position whose persisted policy evidence is a name with no hash, then hand it to a fresh process."""
+    open_under(tmp_path, sid, LEGACY)
+    h2 = harness(tmp_path, sid)
+    on_clock(h2, t0=DUE + 0.5)
+    h2.bd.exit_policy = EP.EXIT_POLICY_V1
+    rows = L.read_all(h2.bd.ledger)
+    fl = next(r for r in rows if r["kind"] == "pilot_fill" and r.get("status") == "FILLED")
+    assert fl["exit_schedule"]["policy_hash"] is None, "the fixture really is missing the evidence"
+    assert fl["exit_schedule"]["policy_id"] == "EXIT_AT_HORIZON_15M_PREHASH", "and really does carry only a name"
+    return h2, fl
+
+
+class TestTheBoundaryRefusesUnresolvedPolicyEvidenceItself:
+    """The scheduler guards these paths, but the boundary must not depend on its callers being careful. Each of
+    these calls the boundary METHOD directly."""
+
+    def test_record_exit_exhausted_refuses_and_writes_nothing(self, tmp_path):
+        """REPRODUCER for the review finding at d56701c: `record_exit_exhausted` fell back to
+        `self.exit_policy.describe()`, stamping the running process's contract onto the terminal record of a
+        position that was never opened under it."""
+        h2, fl = legacy_ledger(tmp_path, "LX")
+        pos = S.recover_positions(h2.bd)["own"][0]
+        before = len(L.read_all(h2.bd.ledger))
+        with pytest.raises(B.BoundaryRefused) as e:
+            h2.bd.record_exit_exhausted(pos)
+        assert "EXIT_POLICY_UNRESOLVED" in str(e.value) and "EXIT_POLICY_EVIDENCE_MISSING" in str(e.value)
+        rows = L.read_all(h2.bd.ledger)
+        assert not any(r["kind"] == "pilot_exit_exhausted" for r in rows), "no exhaustion was written"
+        assert len(rows) == before + 1 and rows[-1]["kind"] == "pilot_refusal", "the refusal itself is recorded"
+        assert h2.bd.book().positions, "the position remains an explicit unresolved obligation"
+
+    def test_an_exhaustion_that_is_written_names_the_contract_it_exhausted(self, tmp_path):
+        """The other side of the same rule: when the contract IS resolvable the record carries that policy and the
+        binding that established it -- never the running process's."""
+        open_under(tmp_path, "LY", EP.EXIT_POLICY_V1)
+        h2, rep, feed, r = restart_under(tmp_path, "LY", WIDE, start=DUE + 0.5)
+        ex = [x for x in L.read_all(h2.bd.ledger) if x["kind"] == "pilot_exit_exhausted"]
+        assert len(ex) == 1
+        assert ex[0]["exit_policy"]["policy_id"] == "EXIT_AT_HORIZON_15M_V1"
+        assert ex[0]["exit_policy"]["max_attempts"] == 5 and ex[0]["exit_policy"]["window_s"] == 120.0
+        assert ex[0]["exit_policy_binding"]["binding"] == "ORIGINAL_POLICY_OF_RECORD"
+        assert ex[0]["exit_policy_binding"]["process_policy_matches_original"] is False
+        assert ex[0]["attempts"] == 5
+
+    def test_record_outcome_refuses_the_same_evidence(self, tmp_path):
+        h2, fl = legacy_ledger(tmp_path, "LZ")
+        pos = S.recover_positions(h2.bd)["own"][0]
+        with pytest.raises(B.BoundaryRefused) as e:
+            h2.bd.record_outcome(fill_receipt=pos, exit_quote_fn=lambda c: None)
+        assert "EXIT_POLICY_UNRESOLVED" in str(e.value) and "EXIT_POLICY_EVIDENCE_MISSING" in str(e.value)
+        assert not any(r["kind"] == "pilot_outcome" for r in L.read_all(h2.bd.ledger))
+
+    def test_the_scheduler_leaves_it_unserviceable_end_to_end_on_the_same_ledger(self, tmp_path):
+        open_under(tmp_path, "LW", LEGACY)
+        h2, rep, feed, r = restart_under(tmp_path, "LW", EP.EXIT_POLICY_V1, start=DUE + 0.5,
+                                         snapshots=snaps(("good", DUE + 1.0, 0.1)))
+        entry = rep["exit_entries"][0]
+        assert entry["final"] == "UNSERVICEABLE_EXIT_POLICY_UNRESOLVED"
+        assert "EXIT_POLICY_EVIDENCE_MISSING" in entry["policy_problem"]
+        assert [s for s in feed.served if s["outcome"] == "SERVED"] == [], "no quote was requested"
+        assert outcomes(h2) == [] and not any(x["kind"] == "pilot_exit_exhausted"
+                                              for x in L.read_all(h2.bd.ledger))
+        assert rep["outstanding_obligations"] >= 1 and h2.bd.book().positions
