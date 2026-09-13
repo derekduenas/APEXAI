@@ -53,6 +53,11 @@ def digest_file(path) -> dict:
     return {"path": str(p), "sha256": h.hexdigest(), "bytes": n}
 
 
+def digest_obj_bytes(blob: bytes) -> str:
+    """The digest of bytes already in hand. Used where a document is captured once and must not be re-read."""
+    return hashlib.sha256(blob).hexdigest()
+
+
 def digest_obj(obj) -> str:
     return hashlib.sha256(json.dumps(obj, sort_keys=True, separators=(",", ":"), default=str).encode()).hexdigest()
 

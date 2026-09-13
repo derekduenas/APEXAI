@@ -42,28 +42,8 @@ from apex.options_pilot import instant as I  # noqa: E402
 from apex.options_pilot import lifecycle as LC  # noqa: E402
 from apex.options_pilot import replay as RP  # noqa: E402
 from apex.options_pilot import run_dir as RD  # noqa: E402
+from apex.options_pilot import provenance as PROV  # noqa: E402
 from apex.pulse_options import sources as SRC  # noqa: E402
-
-
-def availability_class(bars: list) -> dict:
-    """Is an artifact's `receipt_time` a MEASUREMENT or a FORMULA?
-
-    A bulk historical pull has no per-bar receipt to record, so a single constant offset from `event_time` across
-    every row is the signature of a computed value, not an observed one. Saying so is the difference between an
-    honest point-in-time replay and a manufactured one."""
-    have = [b for b in bars if isinstance(b.get("receipt_time"), (int, float)) and not isinstance(b.get("receipt_time"), bool)]
-    if not have:
-        return {"status": "ABSENT", "why": "no row carries a receipt_time", "n_with_receipt": 0, "n_rows": len(bars)}
-    deltas = {round(b["receipt_time"] - b["event_time"], 3) for b in have}
-    if len(deltas) == 1:
-        return {"status": "FORMULAIC_NOT_MEASURED", "constant_offset_s": next(iter(deltas)),
-                "n_with_receipt": len(have), "n_rows": len(bars),
-                "why": ("every row's receipt_time is exactly event_time + %s, one distinct value across %d rows. That "
-                        "is a computed offset, not a recorded receipt: the artifact came from a bulk pull and carries "
-                        "no evidence of when APEX could first have seen each bar." % (next(iter(deltas)), len(have))),
-                "assumption_required": True}
-    return {"status": "MEASURED", "n_with_receipt": len(have), "n_rows": len(bars),
-            "n_distinct_offsets": len(deltas), "min_offset_s": min(deltas), "max_offset_s": max(deltas)}
 
 
 D, PRIOR, BASE = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
@@ -73,6 +53,7 @@ if len(sys.argv) <= 5:
                      "Produce one with scripts/preserve_inputs.py and pass it as the fifth argument. A digest this "
                      "process computes from the same file it reads is not an independent declaration.")
 MANIFEST = Path(sys.argv[5])
+AUTHZ = Path(sys.argv[6]) if len(sys.argv) > 6 else None    # operator-authored; never written by this repository
 HOLD_S = 900.0
 CADENCE = 15                                    # every 15th one-minute snapshot = the pilot's 15-minute cadence
 FIT_BUDGET = 3                                  # see docs/FLOW_VALIDATION_001_FIT_CONTRACT.md: one fit() call, at
@@ -82,30 +63,49 @@ FIT_BUDGET = 3                                  # see docs/FLOW_VALIDATION_001_F
 INPUT_PATHS = {"chain": D / "chain_SPY.jsonl", "nbbo": D / "nbbo_SPY.jsonl",
                "bars": D / "bars_SPY.jsonl", "prior_bars": PRIOR}
 
-# ---------------------------------------------------------------- 1. CLAIM THE RUN DIRECTORY BEFORE READING ANYTHING
-# A validation failure must leave evidence. Claiming the directory first means a refused run is still a recorded run.
-_declared = {k: (v["sha256"] if isinstance(v, dict) else v)
-             for k, v in (json.loads(MANIFEST.read_text()).get("inputs") or json.loads(MANIFEST.read_text())).items()}
+# ---------------------------------------------------------------- 1. CLAIM THE RUN DIRECTORY BEFORE OPENING ANYTHING
+# Including the manifest. A missing or malformed manifest is a validation failure like any other, and a validation
+# failure must leave a record; claiming the directory after reading it would lose exactly those cases.
 RUN = RD.new_run(BASE, run_id=RUN_ID, now_epoch=time.time(),
                  config={"policies": ["WAIT", "PILOT_RULE_V2", "FULL_FUNNEL_V1"], "cadence_snapshots": CADENCE,
                          "hold_s": HOLD_S, "route": "RECORDED_REPLAY", "limits": "UNCHANGED",
-                         "fit_budget": FIT_BUDGET, "manifest": str(MANIFEST), "declared_digests": _declared},
+                         "fit_budget": FIT_BUDGET, "manifest_path": str(MANIFEST),
+                         "authorization_path": (str(AUTHZ) if AUTHZ else None)},
                  note="loop demonstration; recorded-replay route; manifest-pinned; no provider request")
 
+def _capture(path):
+    """Read a document ONCE and keep its bytes and their digest. Everything downstream uses the capture, so no
+    later read can disagree with what was recorded."""
+    blob = Path(path).read_bytes()
+    return {"path": str(path), "bytes": len(blob), "sha256": RD.digest_obj_bytes(blob), "raw": blob,
+            "parsed": json.loads(blob.decode())}
+
+
 try:
-    # ------------------------------------------------------------ 2. READ THE BYTES ONCE
+    # ------------------------------------------------------------ 2. CAPTURE THE MANIFEST ONCE
+    MANIFEST_CAPTURE = _capture(MANIFEST)
+    _m = MANIFEST_CAPTURE["parsed"]
+    _declared = {k: (v["sha256"] if isinstance(v, dict) else v) for k, v in (_m.get("inputs") or _m).items()}
+    if not _declared:
+        raise SystemExit("MANIFEST_EMPTY: %s declares no inputs" % MANIFEST)
+    DECLARATION_SOURCE = "INDEPENDENT_MANIFEST: %s (sha256 %s)" % (MANIFEST, MANIFEST_CAPTURE["sha256"][:16])
+
+    # ------------------------------------------------------------ 3. CAPTURE THE OPERATOR AUTHORIZATION ONCE
+    AUTHZ_CAPTURE = _capture(AUTHZ) if AUTHZ is not None else None
+    AUTHZ_DOC = AUTHZ_CAPTURE["parsed"] if AUTHZ_CAPTURE else None
+
+    # ------------------------------------------------------------ 4. READ THE INPUT BYTES ONCE
     # THE SAME BYTES ARE HASHED AND PARSED. Hashing one read and parsing another cannot establish that the parsed
     # content is what the manifest names: a file replaced between the two operations would pass and then be used.
     RAW = {label: p.read_bytes() for label, p in INPUT_PATHS.items()}
 
-    # ------------------------------------------------------------ 3. VERIFY BEFORE PARSING, BEFORE ANY MODEL EXISTS
+    # ------------------------------------------------------------ 5. VERIFY BEFORE PARSING, BEFORE ANY MODEL EXISTS
     AUTHORIZATION = RP.ReplayAuthorization(
         reason="FLOW-VALIDATION-001 complete-flow diagnostic over the burned 2026-09-11 SPY session",
         input_digests=_declared,
         recorded_window_utc=("SET_AFTER_PARSE", "SET_AFTER_PARSE"),
         operator_note="burned collection; SCOPE_DEVIATION_001.md covers the retained prior-bar file")
     AUTHORIZATION.verify_bytes(RAW)
-    DECLARATION_SOURCE = "INDEPENDENT_MANIFEST: %s" % MANIFEST
 
     # ------------------------------------------------------------ 4. PARSE THOSE BYTES, and only now
     chains, nbbo, sbars = [], [], {}
@@ -143,7 +143,19 @@ try:
         raise SystemExit("NO_CHAIN_SNAPSHOTS: the collection carries no pilot_collection_chain records")
 
     PRIOR_BARS = json.loads(RAW["prior_bars"].decode())
-    AVAILABILITY = availability_class(PRIOR_BARS)
+
+    # ---- PROVENANCE, from the assigning code path, not from the shape of the numbers
+    SESSION_PROV = PROV.classify("session_bars", list(sbars.values()), assignment_key="alpaca_bar_receipt",
+                                 acquisition_note="written by scripts/options_pilot_collector.py during the session")
+    PRIOR_PROV = PROV.classify("prior_bars", PRIOR_BARS, assignment_key=None,
+                               acquisition_note=("bulk historical pull on 2026-09-12; no per-row receipt was "
+                                                 "recorded and no assigning path is named (SCOPE_DEVIATION_001.md)"))
+
+    # ---- an artifact whose availability is not established may be used ONLY under an accepted assumption
+    ASSUMPTION_BINDING = None
+    if PRIOR_PROV["provenance"] != PROV.MEASURED_BY_COLLECTOR:
+        ASSUMPTION_BINDING = PROV.require_accepted("BULK_PULL_AVAILABILITY_V1", AUTHZ_DOC)
+
     prior_kept = [b for b in PRIOR_BARS if isinstance(b.get("receipt_time"), (int, float))
                   and not isinstance(b.get("receipt_time"), bool)]
     ALLBARS = sorted(list(prior_kept) + list(sbars.values()), key=lambda b: b["event_time"])
@@ -151,7 +163,11 @@ try:
     AUTHORIZATION.window = (to_utc_string(chains[0][0]), to_utc_string(chains[-1][0]))
     INPUT_REPORT = {"bars_excluded_no_recorded_receipt": bars_without_receipt,
                     "prior_bars_total": len(PRIOR_BARS), "prior_bars_kept": len(prior_kept),
-                    "prior_bars_availability": AVAILABILITY}
+                    "session_bars_provenance": SESSION_PROV, "prior_bars_provenance": PRIOR_PROV,
+                    "accepted_assumption": ASSUMPTION_BINDING,
+                    "manifest_capture": {k: MANIFEST_CAPTURE[k] for k in ("path", "bytes", "sha256")},
+                    "authorization_capture": ({k: AUTHZ_CAPTURE[k] for k in ("path", "bytes", "sha256")}
+                                              if AUTHZ_CAPTURE else None)}
 except BaseException as _e:                                                    # noqa: BLE001
     RUN.failed(now_epoch=time.time(), error=_e,
                summary={"stage": "INPUT_VALIDATION", "note": "refused before any adapter or model was constructed"})
@@ -343,18 +359,6 @@ def run_policy(policy: str, rd) -> dict:
 INPUT_PATHS = {"chain": D / "chain_SPY.jsonl", "nbbo": D / "nbbo_SPY.jsonl",
                "bars": D / "bars_SPY.jsonl", "prior_bars": PRIOR}
 
-# WHERE THE DECLARED DIGESTS COME FROM decides whether verification means anything. With an INDEPENDENT manifest
-# the run proves the files are the ones the manifest names. Without one it can only prove the files did not change
-# between two reads in the same process, which is nearly nothing -- and it says so rather than implying more.
-if MANIFEST is not None:
-    _m = json.loads(MANIFEST.read_text())
-    _declared = {k: (v["sha256"] if isinstance(v, dict) else v) for k, v in (_m.get("inputs") or _m).items()}
-    DECLARATION_SOURCE = "INDEPENDENT_MANIFEST: %s" % MANIFEST
-else:
-    _declared = {k: RD.digest_file(p)["sha256"] for k, p in INPUT_PATHS.items()}
-    DECLARATION_SOURCE = ("SELF_DECLARED_FROM_THE_FILES_READ: no independent manifest was supplied, so verification "
-                          "proves only that the bytes did not change between two reads in this process")
-
 results = {"kind": "LOOP_DEMONSTRATION", "contract": "docs/LOOP_EVALUATION_CONTRACT.md", "run_id": RUN_ID,
            "run_dir": str(RUN.path),
            "data": "burned 2026-09-11 SPY collection + retained prior bars (SCOPE_DEVIATION_001.md); no provider request",
@@ -364,6 +368,8 @@ results = {"kind": "LOOP_DEMONSTRATION", "contract": "docs/LOOP_EVALUATION_CONTR
            "ordering_policy": LC.ORDERING_POLICY, "timestamp_rule": I.CONVERSION_RULE,
            "replay_authorization": AUTHORIZATION.describe(), "declaration_source": DECLARATION_SOURCE,
            "input_report": INPUT_REPORT, "fit_budget": FIT_BUDGET,
+           "accepted_assumptions": ([INPUT_REPORT["accepted_assumption"]] if INPUT_REPORT.get("accepted_assumption")
+                                    else []),
            "availability_policy": ("every input family is gated on its RECORDED receipt: chain and NBBO on the "
                                    "record's receipt_epoch, session bars on the bar's own receipt_time. A datum with "
                                    "no recorded receipt is EXCLUDED, never backdated. The prior-bar artifact's "

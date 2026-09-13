@@ -32,8 +32,23 @@ def preserve(coll: Path, dest: Path, *, prior: Path | None = None):
                            str(dest)], cwd=REPO, capture_output=True, text=True)
 
 
+def synthetic_authorization(dest: Path, *, assumption_id: str = "BULK_PULL_AVAILABILITY_V1", text: str | None = None) -> Path:
+    """A SYNTHETIC operator authorization, for tests only.
+
+    Nothing in the repository may author the real one: an acceptance written by the process that needs it is not an
+    acceptance. This exists so the assumption GATE can be exercised, and it says so in its own contents."""
+    from apex.options_pilot import provenance as PROV
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(json.dumps({
+        "accepted_by": "SYNTHETIC_TEST_FIXTURE — not an operator acceptance",
+        "accepted_utc": "2026-09-12T00:00:00Z",
+        "accepted_assumptions": [{"id": assumption_id,
+                                  "text": text if text is not None else PROV.assumption_text(assumption_id)}]}, indent=1))
+    return dest
+
+
 def run_driver(coll: Path, out_base: Path, run_id: str, *, manifest: Path | None = None, prior: Path | None = None,
-               no_manifest: bool = False):
+               no_manifest: bool = False, authz: Path | None = None, no_authz: bool = False):
     """The driver REQUIRES a manifest, so unless a test is specifically about that requirement, one is produced from
     the collection first. The preserved layout keeps prior_bars.json OUTSIDE the collection directory on purpose: it
     is a different dataset with a different authorization, and the command names the two separately."""
@@ -48,6 +63,8 @@ def run_driver(coll: Path, out_base: Path, run_id: str, *, manifest: Path | None
     argv = [sys.executable, str(DRIVER), str(coll), str(prior), str(out_base), run_id]
     if manifest is not None:
         argv.append(str(manifest))
+        if not no_authz:
+            argv.append(str(authz or synthetic_authorization(out_base.parent / "authz.json")))
     return subprocess.run(argv, cwd=REPO, capture_output=True, text=True, timeout=900)
 
 
@@ -475,27 +492,15 @@ class TestAvailabilityAppliesToEveryInputFamily:
         rep = result(tmp_path / "runs", "nobarreceipt")["input_report"]
         assert rep["bars_excluded_no_recorded_receipt"] == stripped > 0
 
-    def test_a_formulaic_receipt_is_reported_as_not_measured(self, ok_run_manifested):
-        """The prior-bar artifact's receipt is a constant offset from event time across every row, which is a
-        computed value from a bulk pull, not a recorded receipt. It must be labelled, not used silently."""
+    def test_the_prior_bar_artifact_is_not_called_measured(self, ok_run_manifested):
+        """SUPERSEDES the two offset-shape tests that lived here. Provenance now comes from the assigning code path,
+        so the prior-bar artifact is PROVENANCE_UNVERIFIED and its constant offset is a diagnostic, not a verdict."""
         rep = result(ok_run_manifested["out"], ok_run_manifested["run_id"])["input_report"]
-        av = rep["prior_bars_availability"]
-        assert av["status"] == "FORMULAIC_NOT_MEASURED" and av["assumption_required"] is True
-        assert "not a recorded receipt" in av["why"]
-
-    def test_a_measured_receipt_is_reported_as_measured(self):
-        from scripts import preserve_inputs  # noqa: F401  (import guard only)
-        import importlib.util
-        spec = importlib.util.spec_from_file_location("drv_helpers", DRIVER)
-        # availability_class is defined before argv parsing fails, so read it out of the source instead
-        ns = {}
-        src = DRIVER.read_text()
-        start = src.index("def availability_class")
-        end = src.index("D, PRIOR, BASE")
-        exec(compile(src[start:end], "drv", "exec"), ns)
-        measured = [{"event_time": 10.0 * i, "receipt_time": 10.0 * i + 3.0 + (i % 4)} for i in range(50)]
-        assert ns["availability_class"](measured)["status"] == "MEASURED"
-        assert ns["availability_class"]([{"event_time": 1.0}])["status"] == "ABSENT"
+        prov = rep["prior_bars_provenance"]
+        assert prov["provenance"] == "PROVENANCE_UNVERIFIED"
+        assert prov["diagnostics"]["constant_offset_s"] is not None
+        assert "DIAGNOSTIC ONLY" in prov["diagnostics"]["note"]
+        assert rep["accepted_assumption"]["assumption_id"] == "BULK_PULL_AVAILABILITY_V1"
 
 
 @pytest.fixture(scope="module")
@@ -545,3 +550,160 @@ class TestTheFitBudgetIsTheRunsBudget:
         assert funnels
         assert all(f["engine"]["fits"] <= 3 for f in funnels), [f["engine"]["fits"] for f in funnels]
         assert all(f["engine"]["fit_budget"] == 3 for f in funnels)
+
+
+# ---------------------------------------------------------------------------- f4d2d20 findings
+
+
+class TestProvenanceIsNotInferredFromTimestampShape:
+    """Finding 1 at f4d2d20: a field was called MEASURED whenever its offsets varied. Varied offsets can be
+    fabricated and genuine measurements can be constant, so the pattern establishes nothing either way."""
+
+    from apex.options_pilot import provenance as P
+
+    def test_varied_offsets_alone_do_not_establish_measurement(self):
+        varied = [{"event_time": 10.0 * i, "receipt_time": 10.0 * i + 3.0 + (i % 7) * 0.31} for i in range(60)]
+        got = self.P.classify("fabricated_but_varied", varied, assignment_key=None)
+        assert got["provenance"] == self.P.UNVERIFIED
+        assert got["diagnostics"]["n_distinct_offsets"] > 1, "the fixture really does vary"
+        assert "DIAGNOSTIC ONLY" in got["diagnostics"]["note"]
+
+    def test_constant_offsets_alone_do_not_establish_absence_of_measurement(self):
+        constant = [{"event_time": 10.0 * i, "receipt_time": 10.0 * i + 60.0} for i in range(60)]
+        named = self.P.classify("constant_but_named", constant, assignment_key="alpaca_bar_receipt")
+        assert named["provenance"] == self.P.MEASURED_BY_COLLECTOR, \
+            "a constant offset must not veto a provenance the code path supports"
+        assert named["diagnostics"]["constant_offset_s"] == 60.0
+
+    def test_provenance_comes_from_the_assigning_code_path(self):
+        got = self.P.classify("session_bars", [{"event_time": 1.0, "receipt_time": 2.0}],
+                              assignment_key="alpaca_bar_receipt")
+        assert got["provenance"] == self.P.MEASURED_BY_COLLECTOR
+        assert got["evidence"]["present"] is True and got["evidence"]["file"].endswith("providers.py")
+
+    def test_a_claim_dies_when_its_marker_leaves_the_code(self, monkeypatch):
+        """The registry cannot outlive the code it points at."""
+        spec = dict(self.P.ASSIGNMENT_PATHS["alpaca_bar_receipt"])
+        monkeypatch.setitem(self.P.ASSIGNMENT_PATHS, "alpaca_bar_receipt",
+                            {**spec, "marker": "this text is not in the file"})
+        got = self.P.classify("x", [{"event_time": 1.0, "receipt_time": 2.0}], assignment_key="alpaca_bar_receipt")
+        assert got["provenance"] == self.P.UNVERIFIED and "no longer contains its marker" in got["why"]
+
+    def test_an_absent_receipt_is_absent_not_unverified(self):
+        got = self.P.classify("x", [{"event_time": 1.0}], assignment_key="alpaca_bar_receipt")
+        assert got["provenance"] == self.P.ABSENT
+
+    def test_the_run_reports_the_two_artifacts_differently(self, ok_run_manifested):
+        rep = result(ok_run_manifested["out"], ok_run_manifested["run_id"])["input_report"]
+        assert rep["session_bars_provenance"]["provenance"] == "MEASURED_BY_COLLECTOR"
+        assert rep["prior_bars_provenance"]["provenance"] == "PROVENANCE_UNVERIFIED"
+        assert rep["prior_bars_provenance"]["diagnostics"]["n_distinct_offsets"] == 1
+
+
+class TestTheAssumptionMustBeAcceptedNotMerelyRequired:
+    """Finding 1b: `assumption_required: true` reported a requirement and then used the rows anyway."""
+
+    from apex.options_pilot import provenance as P
+
+    def test_no_authorization_refuses_before_any_model(self, tmp_path):
+        coll = tmp_path / "coll"
+        write(coll, minutes=60)
+        r = run_driver(coll, tmp_path / "runs", "noauth", no_authz=False if False else True)
+        assert r.returncode != 0
+        assert "ASSUMPTION_NOT_ACCEPTED" in (r.stdout + r.stderr)
+        body = json.loads((tmp_path / "runs" / "noauth" / "RUN_FAILED.json").read_text())
+        assert body["summary"]["stage"] == "INPUT_VALIDATION"
+
+    def test_a_different_assumption_id_refuses(self, tmp_path):
+        with pytest.raises(self.P.ProvenanceRefused, match="ASSUMPTION_NOT_ACCEPTED"):
+            self.P.require_accepted("BULK_PULL_AVAILABILITY_V1",
+                                    {"accepted_assumptions": [{"id": "SOMETHING_ELSE", "text": "x"}]})
+
+    def test_different_words_refuse(self, tmp_path):
+        with pytest.raises(self.P.ProvenanceRefused, match="ASSUMPTION_TEXT_MISMATCH"):
+            self.P.require_accepted("BULK_PULL_AVAILABILITY_V1",
+                                    {"accepted_assumptions": [{"id": "BULK_PULL_AVAILABILITY_V1",
+                                                               "text": "close enough"}]})
+
+    def test_whitespace_differences_are_tolerated_but_wording_is_not(self):
+        text = self.P.assumption_text("BULK_PULL_AVAILABILITY_V1")
+        got = self.P.require_accepted("BULK_PULL_AVAILABILITY_V1",
+                                      {"accepted_assumptions": [{"id": "BULK_PULL_AVAILABILITY_V1",
+                                                                 "text": "  " + text.replace(" ", "  ") + "\n"}]})
+        assert got["accepted"] is True
+
+    def test_an_unknown_assumption_id_refuses(self):
+        with pytest.raises(self.P.ProvenanceRefused, match="ASSUMPTION_UNKNOWN"):
+            self.P.assumption_text("NOT_DECLARED_ANYWHERE")
+
+    def test_the_accepted_text_is_bound_into_the_run(self, ok_run_manifested):
+        res = result(ok_run_manifested["out"], ok_run_manifested["run_id"])
+        acc = res["accepted_assumptions"]
+        assert len(acc) == 1 and acc[0]["assumption_id"] == "BULK_PULL_AVAILABILITY_V1"
+        assert acc[0]["text"] == self.P.assumption_text("BULK_PULL_AVAILABILITY_V1")
+        assert acc[0]["accepted_by"].startswith("SYNTHETIC_TEST_FIXTURE")
+
+    def test_the_repository_authors_no_operator_acceptance(self):
+        """Reading an acceptance and REPORTING it is fine; CONSTRUCTING one is not. The check is for a literal
+        acceptance being built in shipped code, not for the words appearing anywhere."""
+        import pathlib
+        for p in list(pathlib.Path("apex").rglob("*.py")) + list(pathlib.Path("scripts").rglob("*.py")):
+            txt = p.read_text()
+            assert '"accepted_assumptions": [{' not in txt, "%s constructs an acceptance literal" % p
+            if p.name != "provenance.py":
+                assert self.P.ASSUMPTIONS["BULK_PULL_AVAILABILITY_V1"][:40] not in txt, \
+                    "%s restates the assumption text instead of referring to the one declaration" % p
+        assert "Nothing in this repository may write it" in pathlib.Path("apex/options_pilot/provenance.py").read_text()
+        # and the manifest the preservation tool writes carries no acceptance
+        assert "accepted_assumptions" not in pathlib.Path("scripts/preserve_inputs.py").read_text()
+
+
+class TestTheManifestIsCapturedOnceInsideTheBoundary:
+    """Finding 2 at f4d2d20: the manifest was parsed before the run directory was claimed, and read twice."""
+
+    def test_the_run_directory_is_claimed_before_the_manifest_is_opened(self):
+        src = DRIVER.read_text()
+        assert src.index("RUN = RD.new_run(") < src.index("MANIFEST_CAPTURE = _capture(MANIFEST)")
+
+    def test_a_missing_manifest_still_leaves_a_failure_record(self, tmp_path):
+        coll = tmp_path / "coll"
+        write(coll, minutes=30)
+        r = run_driver(coll, tmp_path / "runs", "nomani", manifest=tmp_path / "does_not_exist.json")
+        assert r.returncode != 0
+        d = tmp_path / "runs" / "nomani"
+        assert (d / "RUN_START.json").exists() and (d / "RUN_FAILED.json").exists()
+        assert "FileNotFoundError" in json.loads((d / "RUN_FAILED.json").read_text())["error"]
+
+    def test_a_malformed_manifest_still_leaves_a_failure_record(self, tmp_path):
+        coll = tmp_path / "coll"
+        write(coll, minutes=30)
+        bad = tmp_path / "bad.json"
+        bad.write_text("{not json")
+        r = run_driver(coll, tmp_path / "runs", "badmani", manifest=bad)
+        assert r.returncode != 0
+        body = json.loads((tmp_path / "runs" / "badmani" / "RUN_FAILED.json").read_text())
+        assert "JSONDecodeError" in body["error"] or "Expecting" in body["error"]
+
+    def test_the_manifest_is_read_exactly_once(self):
+        src = DRIVER.read_text()
+        assert src.count("_capture(MANIFEST)") == 1
+        assert "json.loads(MANIFEST.read_text())" not in src
+        assert "SELF_DECLARED_FROM_THE_FILES_READ" not in src, "the obsolete reread block must be gone"
+
+    def test_replacing_the_manifest_after_capture_changes_nothing(self, tmp_path):
+        """The recorded declaration must be the captured one. Since the file is opened once and never reopened,
+        a later replacement cannot reach the run; the digest on the record proves which bytes were used."""
+        coll = tmp_path / "coll"
+        write(coll, minutes=180)
+        assert preserve(coll, tmp_path / "d").returncode == 0
+        man = tmp_path / "d" / "INPUTS_MANIFEST.json"
+        original = man.read_bytes()
+        import hashlib
+        expected = hashlib.sha256(original).hexdigest()
+        r = run_driver(tmp_path / "d" / "collection", tmp_path / "runs", "cap", manifest=man,
+                       prior=tmp_path / "d" / "prior_bars.json")
+        assert r.returncode == 0, r.stderr[-2000:]
+        man.write_text('{"inputs": {"chain": "%s"}}' % ("0" * 64))     # replace it AFTER the run
+        rep = result(tmp_path / "runs", "cap")["input_report"]
+        assert rep["manifest_capture"]["sha256"] == expected, "the run recorded the bytes it actually used"
+        assert hashlib.sha256(man.read_bytes()).hexdigest() != expected, "the file on disk really did change"

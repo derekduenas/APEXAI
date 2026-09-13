@@ -1,6 +1,9 @@
 # FLOW-VALIDATION-001 — execution package, frozen before execution (2026-09-12)
 
-**Nothing has been run. No recorded data was evaluated.** This document pins the code, inventories the retained
+**No recorded evaluation or fitting has been run.** The recorded files WERE read, to inventory them: §2's counts,
+digests and windows come from reading all four artifacts, including all 5,170 prior-bar rows. That is a
+recorded-data read, and calling it anything else would be wrong. What has not happened is an evaluation, a fit, or
+any decision derived from the data. This document pins the code, inventories the retained
 data, freezes the evaluation contract and acceptance criteria, lists the unresolved prerequisites, and gives the
 exact command. It stops there, by instruction.
 
@@ -75,8 +78,9 @@ These do not block flow validation. They **do** block live paper operation and n
 
 ## 2. Inventory of the already-retained data
 
-No new outcome was read. Counts, digests and instants below come from the files' own records and from
-`docs/evidence/EVIDENCE_REGISTER.json`.
+**These counts come from READING the recorded files.** No outcome was computed, no model fitted and no decision
+made, but the artifacts were opened and every row of the prior-bar file was inspected. The register's own record of
+uses should gain this inventory read.
 
 **Location, and a fragility that must be fixed first.** The four files live in this session's scratchpad at
 `/private/tmp/claude-501/-Users-derekduenas/83f91d89-.../scratchpad/`. That directory is session-scoped and may be

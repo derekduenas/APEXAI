@@ -1,7 +1,12 @@
 # FLOW-VALIDATION-001 — pre-execution audit (2026-09-12)
 
-Review and synthetic verification only. **No recorded data was evaluated.** Every driver scenario below ran the
-actual command line in a subprocess against a generated collection; no market observation was read.
+Review and synthetic verification only. **No recorded evaluation or fitting was run.** Every driver scenario below
+ran the actual command line in a subprocess against a generated collection.
+
+**A reporting correction.** Earlier passes said "no recorded data read". That was wrong: the inventory in
+`FLOW_VALIDATION_001_PACKAGE.md` §2 opened all four recorded artifacts and inspected all 5,170 prior-bar rows to
+count them and compute their digests. Reading is reading. The accurate statement is that no recorded evaluation,
+fit or decision has happened, and that is the wording used from here on.
 
 **Candidate pin for the evaluation:** `operating-loop-001` at `e8ebbee94a0933d34efd1061d439bbd9a75b310d`, plus the
 audit repairs committed on `flow-validation-001` and listed under "What the audit changed".
@@ -31,7 +36,9 @@ class of mistake surfaces immediately rather than mid-run.
 | 2b | No fabricated fill when no quote is eligible | **PASS** | Chain gap across an exit window leaves an explicit unresolved obligation and a null net |
 | 3 | Replay dataset/use authorization and input binding | **WAS FAIL, NOW PASS** | The authorization recorded digests that nothing verified. It now recomputes them from the files that will be read and refuses a mismatch; a boundary is refused until inputs are verified |
 | 3b | Verification precedes parsing | **WAS FAIL, NOW PASS** | Inputs were parsed at the top and verified at the bottom. The run directory is now claimed first, the manifest is required, the bytes read are the bytes hashed and the bytes parsed. §7 |
-| 3c | Prior-bar historical availability | **GAP, REPORTED NOT ASSUMED** | Every row's receipt is `event_time + 60` exactly, one distinct value across 5,170 rows, from a bulk pull. Classified `FORMULAIC_NOT_MEASURED`; the assumption is P3 |
+| 3c | Prior-bar historical availability | **GAP, REPORTED AND NOW ENFORCED** | `PROVENANCE_UNVERIFIED`: no assigning code path can be named. Using it requires the accepted `BULK_PULL_AVAILABILITY_V1`, and the run refuses without it. §8 |
+| 3d | Provenance distinguished from timestamp shape | **WAS FAIL, NOW PASS** | Offsets were read as proof. Provenance now comes from the assigning code path with a marker check; offsets are diagnostics. §8 |
+| 3e | Manifest captured inside the failure boundary | **WAS FAIL, NOW PASS** | It was parsed before the directory was claimed, and read three times. Claimed first, captured once, digest recorded. §8 |
 | 7 | Fit contract enumerated and budgeted | **PASS** | `docs/FLOW_VALIDATION_001_FIT_CONTRACT.md`. One `fit()` call, at most three counted attempts, internal optimizer attempts enumerated. Budget pinned to 3 |
 | 4 | The `alpaca` governance finding | **PASS, test is stale** | Twelve market-data references, no broker SDK, no placement function. The mechanical placement scan returns zero offenders. Detail below |
 | 4b | The "stale exemption register" finding | **MISCLASSIFIED BY ME — it is environmental** | `REPO = Path("/opt/apex-repo")` is hardcoded in that test. All six registered files exist in the checkout |
@@ -167,8 +174,11 @@ artifacts behind.
 | `tests/test_operating_loop_001.py` | two label tests now name their `require_verified_inputs=False` waiver |
 
 | `docs/FLOW_VALIDATION_001_FIT_CONTRACT.md` | new: the enumerated fit contract and this run's budget |
+| `apex/options_pilot/provenance.py` | new: provenance from the assigning code path, offsets as diagnostics, declared assumptions, and an acceptance check the repository cannot satisfy itself |
+| `apex/options_pilot/run_dir.py` | `digest_obj_bytes()` for a document captured once |
 
-No model was added, no parameter tuned, no limit changed, no recorded data read. `fit_budget` is a run parameter
+No model was added, no parameter tuned, no limit changed, and no recorded evaluation or fitting was run.
+`fit_budget` is a run parameter
 pinned to the enumerated maximum, not a tuning of any model. Suites re-run at the end of the second pass.
 
 ## 7. The two findings raised against `f87113a`, closed
@@ -227,6 +237,46 @@ the counter does not see.
 **The budget for this run is 3**, the exact maximum one `fit()` call can consume, pinned in the driver and asserted
 against the run's own records. 400 was the constructor default and is not retained.
 
+## 8. The two findings raised against `f4d2d20`, closed
+
+### Timestamp variation was being read as proof of provenance
+
+Correct, and the objection cuts both ways: fabricated timestamps can vary, and a genuine per-record clock read can
+land on a constant offset. `availability_class()` is gone. `apex/options_pilot/provenance.py` replaces it, and it
+establishes provenance ONE way, by naming the code path that assigns the field and checking the path still says so.
+
+| artifact | verdict | on what evidence |
+|---|---|---|
+| session bars | `MEASURED_BY_COLLECTOR` | `apex/pulse_options/providers.py` stamps `receipt_time=self.clock()` when the response is parsed; the marker is checked at classify time |
+| collection records | `MEASURED_BY_COLLECTOR` | `scripts/options_pilot_collector.py` sets `"receipt_epoch": time.time()` as each record is written |
+| prior bars | **`PROVENANCE_UNVERIFIED`** | no assigning path can be named for a host-side bulk pull |
+
+Offsets survive only as `diagnostics`, carrying the sentence "a varied offset does not establish that a receipt was
+measured, and a constant one does not establish that it was not". A registry entry whose marker leaves the code
+degrades that artifact to `PROVENANCE_UNVERIFIED` rather than continuing to assert what the code stopped
+supporting, and a test proves it.
+
+**The assumption is now enforced, not merely announced.** Previously `assumption_required: true` was a note and the
+rows entered `ALLBARS` regardless. Now an artifact whose availability is not `MEASURED_BY_COLLECTOR` requires
+`BULK_PULL_AVAILABILITY_V1` to be accepted in an operator-authored authorization document, matched on id AND exact
+text, and the run refuses **before any adapter or model is constructed** if it is absent, differently named or
+differently worded. The accepted id and text are bound into the run record. **This repository declares the
+assumption and cannot accept it**: a structural test forbids any shipped module from constructing an acceptance
+literal or restating the text, and the only builder is a test fixture that labels itself as one.
+
+### The manifest was read outside the failure boundary, and twice
+
+Also correct. It was parsed before the run directory was claimed, so a missing or malformed manifest left no record,
+and the single expression that parsed it called `read_text()` twice. An obsolete block near the bottom read it a
+third time and still carried the self-declared branch.
+
+Now: the run directory is claimed **before any file is opened, the manifest included**; the manifest is captured
+once with its digest and only the capture is parsed; the operator authorization is captured the same way; and the
+obsolete block is deleted. Both captures' digests appear on the run record. Tested: a missing manifest and a
+malformed manifest each leave `RUN_START` and `RUN_FAILED`; the driver contains exactly one manifest capture and no
+`read_text()` of it; and replacing the manifest after the run still leaves the record naming the bytes actually
+used.
+
 ## Unresolved prerequisites
 
 | | prerequisite | who |
@@ -242,7 +292,10 @@ against the run's own records. 400 was the constructor default and is not retain
 ## Exact authorization wording
 
 If you grant these, the words below are what I will treat as the grant and quote into the run's records. Nothing
-starts without them.
+starts without them. **Each grant should name the final code pin and the preserved manifest digest**, which I will
+supply when you are ready: the pin is this branch's head at the time of the run, and the digest comes from
+`scripts/preserve_inputs.py` when P4 is done. A grant that names neither cannot be checked against what actually
+ran.
 
 **P2 — the collection.**
 
@@ -253,10 +306,16 @@ starts without them.
 **P3 — the prior bars and their availability assumption.**
 
 > I authorize the retained `ALPACA-SPY-1MIN-2026-09-02..09-11` artifact as an input to this single diagnostic run,
-> and I accept the declared assumption `BULK_PULL_AVAILABILITY_V1`: a one-minute bar is treated as available at its
-> event time plus sixty seconds. This is a formula, not a recorded receipt, and the artifact carries no evidence of
-> when APEX could first have seen each bar. Any claim resting on it is diagnostic only. This authorizes a use; it
-> does not retroactively legitimize the acquisition recorded in `SCOPE_DEVIATION_001.md`.
+> and I accept the declared assumption `BULK_PULL_AVAILABILITY_V1` in the exact words declared in
+> `apex/options_pilot/provenance.py`. This authorizes a use; it does not retroactively legitimize the acquisition
+> recorded in `SCOPE_DEVIATION_001.md`.
+>
+> Acceptance must reach the run as an operator-authored file, because the code refuses to accept on your behalf:
+>
+> ```json
+> {"accepted_by": "<you>", "accepted_utc": "<when>",
+>  "accepted_assumptions": [{"id": "BULK_PULL_AVAILABILITY_V1", "text": "<the exact declared text>"}]}
+> ```
 
 **P7 — the fit.**
 
@@ -269,8 +328,12 @@ starts without them.
 ```bash
 python scripts/preserve_inputs.py <scratchpad_collection_dir> <scratchpad_prior_bars.json> <durable_dir>
 python scripts/loop_demonstration.py <durable_dir>/collection <durable_dir>/prior_bars.json \
-  docs/evidence/flow_validation flow_validation_001 <durable_dir>/INPUTS_MANIFEST.json
+  docs/evidence/flow_validation flow_validation_001 \
+  <durable_dir>/INPUTS_MANIFEST.json <your_authorization.json>
 ```
+
+The sixth argument is your acceptance document. Without it the run refuses at input validation, before any adapter
+or model exists, and leaves the refusal in the run directory.
 
 The manifest is the fifth argument and is **required**. The prior bars sit outside the collection directory on
 purpose: a different dataset with a different authorization, named separately on the command line.
