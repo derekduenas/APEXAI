@@ -161,7 +161,12 @@ reference to the connector at all. The decision path imports it **lazily**, insi
 4. **Entitlement is `UNKNOWN` for eight of the nine tools.** Only the bars response states a delay.
 5. **Nothing has been measured about whether this context is any use.** No edge claim, no calibration, no
    attribution. The seam records what the eyes contributed so that question can *later* be asked from the record.
-6. **The catalog is a point-in-time observation** (2026-09-12). A tool added tomorrow is denied by default;
+6. **An abandoned worker is not reclaimed until its call unblocks.** The deadline frees the *caller*, not the
+   thread. Each hung fetch leaves one daemon thread parked until whatever it is blocked on releases it, so a
+   long session whose provider is permanently hung accumulates one parked thread per scan (26 for a 390-minute
+   session at 15-minute scans; 390 at 1-minute scans). They hold no lock and cannot block shutdown, but this is a
+   leak, it is not bounded, and no cap is implemented.
+7. **The catalog is a point-in-time observation** (2026-09-12). A tool added tomorrow is denied by default;
    `reconcile()` is what makes it visible.
 
 ## 8. Test results
