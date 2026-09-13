@@ -167,11 +167,25 @@ class SyntheticBarProvider:
 def load_bars(store: BarStore, provider_bars: list) -> dict:
     """Feed provider bars into a BarStore; malformed bars are counted and named, never dropped silently."""
     problems = []
-    for b in provider_bars:
+    for i, b in enumerate(provider_bars):
+        # A MISSING KEY IS A MALFORMED ROW, NOT A PROGRAMMING ERROR.
+        #
+        # This loop caught IngestRefused only, so a row lacking `event_time` raised KeyError straight out and
+        # ABORTED THE WHOLE BATCH -- every valid row after it was lost, and the docstring's promise that malformed
+        # bars are "counted and named, never dropped silently" was false for the one case that silently took
+        # everything with it. The required keys are checked explicitly and reported through the SAME named
+        # mechanism. No blanket except: a genuine implementation error still propagates.
+        if not isinstance(b, dict):
+            problems.append("BAR_%d_NOT_AN_OBJECT: %s" % (i, type(b).__name__))
+            continue
+        missing = [k for k in ("event_time", "open", "high", "low", "close", "volume", "receipt_time") if k not in b]
+        if missing:
+            problems.append("BAR_%d_FIELDS_MISSING: %s" % (i, ", ".join(missing)))
+            continue
         try:
             store.add_provider_bar(event_time=b["event_time"], open=b["open"], high=b["high"], low=b["low"], close=b["close"],
                                   volume=b["volume"], receipt_time=b["receipt_time"], publication_time=b.get("publication_time"),
                                   vwap=b.get("vwap"), trades=b.get("trades"))
         except IngestRefused as e:
-            problems.append(str(e))
+            problems.append("BAR_%d_REFUSED: %s" % (i, e))
     return {"accepted": store.counters["provider_bars"], "problems": problems, "counters": dict(store.counters)}

@@ -1,0 +1,18 @@
+D1 — DECISION CONTEXT IDENTITY (additive; snapshot_id scope preserved)
+
+  BEFORE (snapshot_id only): chain-only change -> same id : True
+  AFTER  (context_id)      : chain-only change -> same id : False
+
+PERTURBATION                       context_id     snapshot_id
+------------------------------------------------------------------------------
+baseline (CHEAP chain)             ctx:38883e267e snap:e130c688f
+chain-only change                  ctx:400c6cf8f3 snap:e130c688f
+quote-only change                  ctx:2f238cfd2e snap:e130c688f
+  (different quote)                ctx:ba49b438b4 snap:e130c688f
+underlying change                  ctx:39e36fd641 snap:25215c059
+late input excluded                ctx:1f66af6d35 snap:8dd19335f
+cross-snapshot (as_of -600s)       ctx:4e17e1b45f snap:319bbba94
+
+  equivalent reordered chain -> SAME context_id : True
+  execution re-quotes bind SEPARATELY per attempt : exq:a928faeaf2 != exq:5ba49a5489
+  and do NOT change the decision context          : True

@@ -1,0 +1,35 @@
+SEQUENTIAL-FUNNEL-AUDIT-001-R1 — CLAIM CORRECTIONS (base ce2c972)
+
+CLAIM 1: 'only 2 of 32 Twin fields are read' -- WITHDRAWN. It was measured through ONE accessor.
+  Other access paths found by inspection:
+    apex/pulse_options/features.py:27  feature_vector()  snapshot['fields'].get(name)  -- second accessor
+    apex/pulse_options/inference.py:98 forecast()        snapshot['fields']['ret_1']   -- direct indexing
+    apex/pulse_options/inference.py:97 forecast()        snapshot['last_bar_event_time'] (top-level key)
+  FEATURE_ORDER consumed by feature_vector: ['ret_1', 'ret_5', 'rv_30']
+
+Traceback (most recent call last):
+  File "<stdin>", line 34, in <module>
+  File "/Users/derekduenas/apex-r1-wt/apex/pulse_options/sources.py", line 86, in snapshot
+    bars = self.bar_source.bars(symbol, start_epoch=as_of - self.warmup_minutes * 60, end_epoch=as_of)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Feed.bars() got an unexpected keyword argument 'start_epoch'
+CONSUMPTION OBSERVED across all three access paths (PILOT_RULE_V2 providers):
+   last_bar_close     ['apex.pulse_options.sources.spot_fn via usable_value']
+   ret_1              ['apex.pulse_options.inference.forecast via feature_vector']
+   ret_15             ['apex.pulse_options.sources.signal_fn via usable_value']
+   ret_5              ['apex.pulse_options.inference.forecast via feature_vector']
+   rv_30              ['apex.pulse_options.inference.forecast via feature_vector']
+
+  fields in Twin           : 32
+  CONSUMPTION OBSERVED     : 5 -> ['last_bar_close', 'ret_1', 'ret_15', 'ret_5', 'rv_30']
+  CONSUMPTION_NOT_OBSERVED : 27  (NOT 'never read')
+  policy exercised         : PILOT_RULE_V2 only; FULL and JOINT NOT measured
+
+CLAIM 2 NARROWED: only last_bar_close and ret_15 were independently checked, on ONE fixture.
+  ret_1/ret_5/rv_30 are consumed by the forecast but were NOT independently verified.
+
+CLAIM 3 WITHDRAWN — fee binding inspected:
+  fee IDENTITY_FIELDS      : ['schedule_id', 'schedule_hash', 'provenance', 'known', 'version', 'effective_date', 'terms_digest', 'computation_policy_digest', 'implementation_digest', 'source_document_sha256', 'authorization_status', 'authorization_digest']
+  implementation_digest    : covers apex.options_pilot.fee_computation ONLY
+  snapshot.py / sources.py : NOT in that module -> a snapshot_id change moves NO fee-bound field
+  what DOES change         : release/pedigree identity -> release verification, NOT fee reauthorization

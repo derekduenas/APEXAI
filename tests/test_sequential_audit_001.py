@@ -70,14 +70,18 @@ class TestRealIngestionGuards:
         r = load_bars(st, [bad])
         assert r["problems"] and expect in r["problems"][0]
 
-    def test_DEFECT_a_bar_missing_its_timestamp_CRASHES_ingestion(self):
-        """PRODUCTION DEFECT. providers.load_bars documents 'malformed bars are counted and named, never dropped
-        silently', and catches IngestRefused -- but a missing key raises KeyError straight out of the loop, so one
-        malformed bar aborts the whole batch instead of being recorded."""
+    def test_D2_a_bar_missing_its_timestamp_is_NAMED_not_crashed(self):
+        """SUPERSEDED BY R1, WHICH REPAIRED IT. The defect as found: providers.load_bars documented that
+        malformed bars are 'counted and named, never dropped silently' and caught IngestRefused, but a missing
+        key raised KeyError straight out of the loop, so ONE malformed bar aborted the whole batch and every
+        valid row after it was lost. The repair checks required keys explicitly and reports through the same
+        named mechanism -- no blanket handler. This test now asserts the repaired behaviour, and the defect it
+        replaces is recorded above."""
         bad = next(b for n, b, _ in adversarial(BARS) if n == "MISSING_TIMESTAMP")
         st = BarStore("SPY", source="audit")
-        with pytest.raises(KeyError, match="event_time"):
-            load_bars(st, [bad])
+        r = load_bars(st, [BARS[0], bad, BARS[1]])
+        assert any("FIELDS_MISSING: event_time" in p for p in r["problems"])
+        assert r["accepted"] == 2, "valid rows either side of the malformed one must survive"
 
     def test_receipt_time_is_the_field_that_governs_availability(self):
         """AUDIT ERROR, recorded: the first late-input proof set `available` and saw no change, because
