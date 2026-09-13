@@ -280,9 +280,11 @@ class TestStrengthenedAcceptance:
 
 
 class TestRecoveryIsACarriedForwardLimitation:
-    """The existing contract: a position inherited from an earlier process gets ONE labelled recovery attempt and is
-    then excluded from further servicing in that run, arrivals included. **Not changed here.** This test states the
-    behaviour so a reader is not misled by the restart case in the previous brick."""
+    """SUPERSEDED IN PLACE by EXIT-SCHEDULING-003. This class originally pinned the carried-forward limitation: an
+    inherited position got ONE labelled recovery attempt and was then excluded from servicing, arrivals included,
+    so a usable quote at due + 30 s went unused. That contract is gone. An inherited position is now serviced under
+    the original policy's remaining window and remaining budget, and this test asserts the repaired behaviour on the
+    same fixture. The full 003 evidence lives in tests/test_exit_scheduling_003.py."""
 
     def test_restart_then_failed_recovery_then_a_fresh_arrival_inside_the_window(self, tmp_path):
         h1 = SyntheticHarness(tmp_path / "led.jsonl", session_id="RECOV", t0=T, risk="certified")
@@ -309,8 +311,14 @@ class TestRecoveryIsACarriedForwardLimitation:
         assert rep2["recovered_positions"], "the restart saw the inherited obligation"
         entry = rep2["exit_entries"][0]
         assert entry["recovery"] is True
-        assert len(entry["attempts"]) == 1, "the existing contract: exactly ONE labelled recovery attempt"
-        # CURRENT BEHAVIOUR, reported rather than changed: the later arrival did not produce a second attempt
-        assert entry["final"] == "UNRESOLVED_AFTER_RECOVERY_ATTEMPT"
-        assert not resolved(h2), "the usable quote at due+30 was NOT used, because the position was settled"
-        assert h2.bd.book().positions, "so it remains an obligation with retained exposure"
+        # EXIT-SCHEDULING-003: the inherited position keeps being serviced inside its remaining window
+        assert len(entry["attempts"]) > 1, "servicing continued past the first failed attempt"
+        assert len(entry["attempts"]) <= EP.EXIT_POLICY_V1.max_attempts, "under the ORIGINAL budget, not a new one"
+        assert entry["final"] == "RESOLVED"
+        assert resolved(h2), "the usable quote at due+30 WAS used"
+        assert not h2.bd.book().positions, "so the obligation is discharged and exposure released"
+        # the ledger names the process that performed each attempt, and that the position was inherited
+        rows = L.read_all(tmp_path / "led.jsonl")
+        outs = [r for r in rows if r.get("kind") == "pilot_outcome" and (r.get("fill_ref") or {}).get("seq") == entry["fill_seq"]]
+        assert outs and all(r.get("process_identity", {}).get("process_id") == r2.process_id for r in outs)
+        assert all(r["process_identity"]["inherited_position"] is True for r in outs)

@@ -33,7 +33,9 @@ every handler it RE-CHECKS deadlines -- both by draining anything that has becom
 reconciling the ledger's obligations against the queue -- before it is allowed to advance again."""
 from __future__ import annotations
 
+import hashlib
 import heapq
+import json
 import time
 
 from . import boundary as B
@@ -215,7 +217,7 @@ class LifecycleRunner:
                  selection_policy: str, scan_epochs: list | None = None, scan_interval_s: float | None = None,
                  n_scans: int | None = None, close_at: float | None = None, data_available_epochs: list | None = None,
                  event_budget: int = DEFAULT_EVENT_BUDGET, on_event=None, observation_feed=None,
-                 arrival_event_budget: int = DEFAULT_ARRIVAL_EVENT_BUDGET):
+                 arrival_event_budget: int = DEFAULT_ARRIVAL_EVENT_BUDGET, process_id: str | None = None):
         if getattr(boundary.clock, "_now", None) != clock.now:      # bound methods compare equal on (func, instance)
             raise LifecycleRefused("CLOCK_NOT_SHARED: the boundary must read the lifecycle clock, or two clocks would "
                                    "disagree about now")
@@ -243,6 +245,10 @@ class LifecycleRunner:
         # {"contract_id", "observation_id", ...}. It supplies WHEN a new observation for a contract becomes visible.
         # It never supplies the quote itself: the boundary still asks exit_quote_fn and rechecks everything.
         self.observation_feed = list(observation_feed or [])
+        # EXIT-SCHEDULING-003: WHO is running. Deterministic by default (session + start instant), so a replay of
+        # the same inputs names the same process; a caller may supply its own run identity instead.
+        self.process_id = process_id or "%s@%dus" % (boundary.session_id, clock.now_us())
+        self.process_started_utc = I.canonical_utc(clock.now())
         # ARRIVAL EVENTS ARE ACCOUNTED SEPARATELY. The global budget exists to catch a loop that keeps scheduling
         # itself; a finite list of supplied notifications cannot do that, and charging them to the non-convergence
         # detector let ordinary traffic end the run before a deadline. They get their own bound instead.
@@ -304,10 +310,8 @@ class LifecycleRunner:
             if self.sched.has(EXIT_DUE, key) or self.sched.has(EXIT_RETRY, key) or self.sched.has(EXIT_WINDOW_CLOSE, key):
                 continue
             sch = self._exit_schedule(pos, rows)
-            if key not in self.recovered_seqs and \
-                    any(x.get("kind") == "pilot_exit_exhausted" and (x.get("fill_ref") or {}).get("seq") == key for x in rows):
-                continue      # already terminal for the run that opened it. A RECOVERY run still owes it one labelled
-                              # attempt, so an inherited exhausted position is NOT skipped here.
+            if any(x.get("kind") == "pilot_exit_exhausted" and (x.get("fill_ref") or {}).get("seq") == key for x in rows):
+                continue      # already terminal: its budget is spent, and a restart does not grant a new one
             when, kind = sch["exit_due_epoch"], EXIT_DUE
             if I.is_after(self.clock.now(), sch["window_close_epoch"]):
                 when, kind = self.clock.now(), EXIT_WINDOW_CLOSE
@@ -332,36 +336,6 @@ class LifecycleRunner:
         self.report["expiries"].extend(acts)
         return {"resume_actions": [{k: a.get(k) for k in ("seq", "intent_id", "action", "why")} for a in acts]}
 
-    def _recovery_attempt(self, pos: dict, entry: dict, pol) -> dict:
-        """ONE labelled attempt on an inherited position, exactly as the recovery contract requires."""
-        if entry["final"] is not None:
-            self._settled.add(pos["seq"])
-            return {"state": entry["final"], "fill_seq": pos["seq"], "recovery": True, "already_attempted": True}
-        rows = self._rows()
-        committed = rows[pos["seq"] - 1]["committed_epoch"]
-        n_att = len(B.Boundary.valuation_attempts(rows, pos["seq"]))
-        if pol.status(now=self.clock.now(), committed_epoch=committed, attempts=n_att) == "NOT_DUE":
-            due = pol.schedule(committed)["exit_due_epoch"]
-            if I.is_after(due, self.clock.now()):
-                self.sched.at(due, EXIT_DUE, {"fill_seq": pos["seq"]}, key=pos["seq"])
-                return {"state": "NOT_DUE", "fill_seq": pos["seq"], "recovery": True}
-        try:
-            o = self.bd.record_outcome(fill_receipt=pos, exit_quote_fn=self.src["exit_quote_fn"], recovery=True)
-        except B.BoundaryRefused as e:
-            entry["final"] = "REFUSED"
-            entry["attempts"].append({"refused": str(e)[:160]})
-            self._settled.add(pos["seq"])
-            return {"state": "REFUSED", "fill_seq": pos["seq"], "recovery": True, "why": str(e)[:200]}
-        entry["attempts"].append({"seq": o["seq"], "status": o["status"], "attempt": o.get("attempt"),
-                                  "reconciled": o.get("reconciled", False)})
-        entry["final"] = o["status"] if o.get("discharges_position") else "UNRESOLVED_AFTER_RECOVERY_ATTEMPT"
-        self._settled.add(pos["seq"])
-        return {"state": entry["final"], "fill_seq": pos["seq"], "recovery": True, "outcome_seq": o["seq"],
-                "status": o.get("status"),
-                "capacity_released": bool(o.get("discharges_position")),
-                "note": ("one labelled recovery attempt for an inherited position; it remains an explicit outstanding "
-                         "obligation unless that attempt discharged it")}
-
     def _schedule_exit(self, when, kind: str, fill_seq: int) -> bool:
         """At most ONE pending exit event per position. Two chains for one fill (a timer chain and an arrival chain)
         would double every attempt, which is how the budget was silently consumed before this guard existed."""
@@ -371,6 +345,10 @@ class LifecycleRunner:
                 return False
         self.sched.at(when, kind, {"fill_seq": fill_seq}, key=fill_seq)
         return True
+
+    def _process_identity(self, fill_seq: int) -> dict:
+        return {"process_id": self.process_id, "started_utc": self.process_started_utc,
+                "inherited_position": fill_seq in self.recovered_seqs}
 
     def _next_attempt_epoch(self, spacing_s: float) -> float:
         """The next retry instant, guaranteed to be a LATER canonical instant than now, so a zero or sub-microsecond
@@ -390,9 +368,8 @@ class LifecycleRunner:
         """ONE exit attempt, driven by the frozen exit policy through the REAL boundary. One event, one attempt: the
         loop, not a nested wait, decides when the next attempt happens.
 
-        A RECOVERED position -- one this run inherited from an earlier process rather than opened itself -- gets
-        exactly ONE labelled recovery attempt and is then left as an explicit outstanding obligation. It does not get
-        to consume the frozen policy's attempt budget, which belongs to the run that opened the position."""
+        An INHERITED position -- one an earlier process opened -- is serviced under the SAME policy, window and
+        remaining budget as one this process opened (EXIT-SCHEDULING-003). Every attempt names its process."""
         pol = self.bd.exit_policy
         recovery = fill_seq in self.recovered_seqs
         entry = self._entry(fill_seq)
@@ -435,8 +412,10 @@ class LifecycleRunner:
                 else:
                     self._schedule_exit(nxt0, EXIT_RETRY, fill_seq)
                 return {"state": "TIMER_SKIPPED_NO_NEW_OBSERVATION", "fill_seq": fill_seq, **note}
-        if recovery:
-            return self._recovery_attempt(pos, entry, pol)
+        # EXIT-SCHEDULING-003: an INHERITED position is serviced exactly like one this process opened, under the
+        # original policy's remaining window and remaining attempt budget. Both are read from the ledger (the fill's
+        # committed instant and the outcomes already on disk), so a restart cannot extend either. The one-attempt
+        # recovery path that stranded closable positions is gone; `recovery` survives only as a label.
         rows = self._rows()
         committed = rows[fill_seq - 1]["committed_epoch"]
         sch = pol.schedule(committed)
@@ -460,7 +439,8 @@ class LifecycleRunner:
             return {"state": "EXIT_EXHAUSTED_UNRESOLVED", "fill_seq": fill_seq, "n_attempts": n_att,
                     "note": "an explicit, persisted, unresolved obligation; it does not disappear from the accounting"}
         try:
-            o = self.bd.record_outcome(fill_receipt=pos, exit_quote_fn=self.src["exit_quote_fn"], recovery=False)
+            o = self.bd.record_outcome(fill_receipt=pos, exit_quote_fn=self.src["exit_quote_fn"], recovery=False,
+                                       process_identity=self._process_identity(fill_seq))
         except B.BoundaryRefused as e:
             nxt = self._next_attempt_epoch(pol.retry_spacing_s)
             state = "REFUSED_RETRY_SCHEDULED"
@@ -533,13 +513,30 @@ class LifecycleRunner:
             self._arrival_triggers[fs] = n + 1
             self._attempted_observations.setdefault(fs, set()).add(obs_id)
             out = self._service_exit(fs, EXIT_ARRIVAL)
-            out.update(trigger="OBSERVATION_ARRIVAL", observation_id=obs_id,
+            # PROVENANCE. The arrival only WOKE the scheduler. The boundary then asked the quote source itself, and
+            # what it was served may be a different observation (a newer one at the same instant, for example).
+            # Both identities are recorded, with whether they coincide, and neither is required to equal the other.
+            q_id = q_avail = None
+            if out.get("outcome_seq"):
+                orow = self._rows()[out["outcome_seq"] - 1]
+                qo = orow.get("exit_quote_observed") or {}
+                q_id, q_avail = qo.get("observation_id"), qo.get("available_epoch")
+            out.update(trigger="OBSERVATION_ARRIVAL",
+                       observation_id=obs_id,            # the waking observation (field retained from 002)
+                       arrival_observation_id=obs_id, quote_observation_id=q_id,
+                       request_epoch=self.clock.now(), quote_available_epoch=q_avail,
+                       same_observation=(q_id == obs_id) if q_id is not None else None,
+                       provenance_note=("an arrival wakes the scheduler; the quote the boundary was served is "
+                                        "identified separately and need not be the waking observation"),
                        remaining_window_s=round(pol.schedule(committed)["window_close_epoch"] - self.clock.now(), 3))
             self.report["exits"].append({"event": EXIT_ARRIVAL, "at_utc": ev["at_utc"], **out})
             acted.append(out)
         return {"observation_id": obs_id, "contract_id": contract_id,
                 "n_coalesced": ev["payload"].get("n_coalesced", 1),
                 "coalesced_ids": ev["payload"].get("coalesced_ids"),
+                "coalesced_ids_digest": ev["payload"].get("coalesced_ids_digest"),
+                "input_order": ev["payload"].get("input_order"),
+                "representative_rule": ev["payload"].get("representative_rule"),
                 "acted": acted or "NO_DUE_POSITION"}
 
     def _on_exit(self, ev: dict) -> dict:
@@ -585,8 +582,9 @@ class LifecycleRunner:
         # a restart picks up whatever the previous process left: unfinished intents first, then every obligation
         self.report["resumed"] = S.resume(self.bd, quote_fn=self.src["quote_fn"])
         recovered = S.recover_positions(self.bd)
-        # AN INHERITED OBLIGATION IS NOT THIS RUN'S TO RE-DRIVE. It gets one labelled recovery attempt; the frozen
-        # policy's attempt budget belongs to the run that opened the position.
+        # EXIT-SCHEDULING-003: an inherited obligation is serviced under the ORIGINAL policy's remaining window and
+        # remaining budget, both read from the ledger. `recovered_seqs` now only labels which positions were
+        # inherited, so every attempt record can say so; it no longer gates servicing.
         self.recovered_seqs = {r["seq"] for r in recovered["own"]}
         self.report["recovered_positions"] = [{k: r.get(k) for k in ("seq", "intent_id", "scan_id", "fill_id",
                                                                       "contract_id", "valuation_attempts",
@@ -610,19 +608,24 @@ class LifecycleRunner:
             g = groups.setdefault(key, {"available": available, "contract_id": cid, "ids": [], "n_coalesced": 0})
             g["ids"].append(oid)
             g["n_coalesced"] += 1
-        for (us, cid), g in sorted(groups.items()):
+        for (us, cid), g in sorted(groups.items(), key=lambda kv: (kv[0][0], str(kv[0][1]))):
             if len(self._arrival_events) >= self.arrival_event_budget:
                 self._note(None, "ARRIVAL_EVENT_BUDGET_REACHED", contract_id=cid,
                            budget=self.arrival_event_budget, dropped_from_us=us,
                            note=("further notifications are not scheduled. Obligation events already queued are "
                                  "untouched, so no deadline is starved and no terminal accounting is lost."))
                 break
-            # the observation identity a coalesced group presents is the LAST id at that instant, which is
-            # available then; the full set is carried so nothing is hidden
+            # DETERMINISTIC. The representative is the canonical MINIMUM id, not whichever arrived last in input
+            # order; the complete set is carried sorted and never truncated; a digest over the sorted set makes two
+            # equivalent feeds provably equivalent; the input order is kept as the one declared ordering field.
+            ordered = sorted(str(i) for i in g["ids"])
             ev = self.sched.at(g["available"], EXIT_ARRIVAL,
-                               {"observation_id": g["ids"][-1], "contract_id": cid,
-                                "n_coalesced": g["n_coalesced"],
-                                "coalesced_ids": (g["ids"] if g["n_coalesced"] <= 8 else g["ids"][:8] + ["..."])},
+                               {"observation_id": ordered[0], "contract_id": cid,
+                                "n_coalesced": g["n_coalesced"], "coalesced_ids": ordered,
+                                "coalesced_ids_digest": hashlib.sha256(
+                                    json.dumps(ordered, separators=(",", ":")).encode()).hexdigest(),
+                                "input_order": [str(i) for i in g["ids"]],
+                                "representative_rule": "CANONICAL_MIN_ID"},
                                key=("obs", us, cid), allow_past=True)
             self._arrival_events.append(ev["ordinal"])
         for t in self.scan_epochs:

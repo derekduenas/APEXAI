@@ -201,8 +201,11 @@ def run_pilot(*, ledger, out, symbols: list, provider, session_id: str, release:
     if I.is_real(interval_s) and interval_s > 0:
         step = float(interval_s)
     scan_epochs = [t0 + i * step for i in range(n_cycles)]
+    # EXIT-SCHEDULING-003: the process identity every exit attempt will carry. Deterministic from the session and
+    # the start instant, so the same restart replayed names the same process.
     runner = LC.LifecycleRunner(boundary=bd, sources=src, clock=lclock, symbols=symbols, selection_policy=policy,
-                                scan_epochs=scan_epochs)
+                                scan_epochs=scan_epochs,
+                                process_id="%s@%dus" % (session_id, I.canonical_micros(t0)))
     lrep = runner.run()
     report["lifecycle"] = {k: lrep[k] for k in ("ordering_policy", "clock_kind", "n_events", "final_clock_utc",
                                                 "data_available", "clock_advances")}

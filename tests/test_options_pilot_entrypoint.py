@@ -237,8 +237,9 @@ def test_f6_lifecycle_recovery_through_the_entry_point(tmp_path, fenced):
     with pytest.raises(KeyboardInterrupt):
         sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
                   pilot_sources=E._HarnessProvider(h))
-    # run 2: resume fills the pending intent (a RECOVERED position: one labelled recovery attempt after it is due);
-    # the new scan's position is driven through the policy; the exit provider returns None for everything
+    # run 2: resume fills the pending intent (a RECOVERED position). EXIT-SCHEDULING-003: an inherited position is
+    # serviced under the SAME frozen policy as one this process opened, so with the exit provider returning None for
+    # everything BOTH positions spend the full budget and both are explicitly exhausted.
     h2 = SyntheticHarness(led, session_id="LC-1", t0=T0 + 5.0)
     h2.exit_quotes.override = lambda c: None
     rc = sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
@@ -249,40 +250,49 @@ def test_f6_lifecycle_recovery_through_the_entry_point(tmp_path, fenced):
     assert len(rep["recovered_positions"]) == 1 and len(rep["outcomes"]) == 2
     rec_out = [o for o in rep["outcomes"] if o["recovery"]][0]
     new_out = [o for o in rep["outcomes"] if not o["recovery"]][0]
-    assert rec_out["final"] == "UNRESOLVED_AFTER_RECOVERY_ATTEMPT" and len(rec_out["attempts"]) == 1
+    assert rec_out["final"] == "EXIT_EXHAUSTED_UNRESOLVED" and len(rec_out["attempts"]) == 5
     assert new_out["final"] == "EXIT_EXHAUSTED_UNRESOLVED" and len(new_out["attempts"]) == 5
     assert all(a["status"] == "NOT_ESTIMABLE" for a in rec_out["attempts"] + new_out["attempts"])
     assert len(rep["unresolved_positions"]) == 2 and rep["outstanding_obligations"] == 2
-    assert {p["valuation_attempts"] for p in rep["unresolved_positions"]} == {1, 5}
+    assert {p["valuation_attempts"] for p in rep["unresolved_positions"]} == {5}
+    # every attempt names the process that made it, and the inherited one is labelled as inherited
+    rows2 = L.read_all(led)
+    pid = {r["process_identity"]["process_id"] for r in rows2 if r.get("kind") == "pilot_outcome" and r.get("process_identity")}
+    assert len(pid) == 1, "one process made every attempt in run 2"
+    inh = {(r["fill_ref"]["seq"], r["process_identity"]["inherited_position"]) for r in rows2
+           if r.get("kind") == "pilot_outcome" and r.get("process_identity")}
+    assert {i for _, i in inh} == {True, False}
     assert all(p["last_attempt_why"] == "EXIT_QUOTE_MISSING" for p in rep["unresolved_positions"])
     assert rep["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS"
     rows = L.read_all(led)
     close = rows[rep["session_close"]["seq"] - 1]
     assert sorted(close["unresolved_fill_seqs_at_close"]) == sorted(p["seq"] for p in rep["unresolved_positions"])
-    assert len(close["exit_exhausted_fill_seqs_at_close"]) == 1 and close["failed_valuation_attempts_at_close"]
+    assert len(close["exit_exhausted_fill_seqs_at_close"]) == 2 and close["failed_valuation_attempts_at_close"]
     assert any(r["kind"] == "pilot_exit_exhausted" for r in rows)
-    # run 3, same (closed) session, recovery only: exit quotes are STALE -> one recovery attempt each, still outstanding
+    # run 3, same (closed) session, recovery only. EXIT-SCHEDULING-003: an exhausted position has NO remaining
+    # budget, and a restart does not grant a new one, so nothing is attempted. Both remain explicit obligations.
+    # (Before 003 each restart spent one extra labelled attempt on them; that path is gone. How an exhausted
+    # position is eventually discharged is an operator policy question recorded in docs/EXIT_SCHEDULING_003.md.)
     h3 = SyntheticHarness(led, session_id="LC-1", t0=h2.now() + 5.0)
     h3.exit_quotes.age = 61.0
     sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
               pilot_sources=E._HarnessProvider(h3))
     rep3 = json.loads((tmp_path / "out.json").read_text())
     assert rep3["mode"] == "RECOVERY_ONLY" and rep3["decisions"] == [] and len(rep3["recovered_positions"]) == 2
-    assert all(o["recovery"] and o["final"] == "UNRESOLVED_AFTER_RECOVERY_ATTEMPT" for o in rep3["outcomes"])
-    assert {p["valuation_attempts"] for p in rep3["unresolved_positions"]} == {2, 6}
-    assert rep3["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS"
-    assert all(p["last_attempt_why"].startswith("STALE_SELECTED_CONTRACT") for p in rep3["unresolved_positions"])
-    # run 4: valid exits discharge both; a NEW close record says clean; the Book cash identity holds
+    assert rep3["outcomes"] == [], "no new budget is granted to an exhausted position"
+    assert {p["valuation_attempts"] for p in rep3["unresolved_positions"]} == {5}
+    assert rep3["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS" and rep3["outstanding_obligations"] == 2
+    # run 4: even with valid exits available, the exhausted positions are not re-attempted; the Book still holds
     h4 = SyntheticHarness(led, session_id="LC-1", t0=h3.now() + 5.0)
     sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-1", "--pilot-release", "synthetic-release"),
               pilot_sources=E._HarnessProvider(h4))
     rep4 = json.loads((tmp_path / "out.json").read_text())
-    assert rep4["mode"] == "RECOVERY_ONLY" and all(o["final"] == "RESOLVED" for o in rep4["outcomes"])
-    assert rep4["unresolved_positions"] == [] and rep4["completion"] == "CLOSED_CLEAN" and rep4["outstanding_obligations"] == 0
+    assert rep4["mode"] == "RECOVERY_ONLY" and rep4["outcomes"] == []
+    assert len(rep4["unresolved_positions"]) == 2 and rep4["completion"] == "CLOSED_WITH_OUTSTANDING_OBLIGATIONS"
     assert rep4["book"]["cash_identity"]["holds"] is True and rep4["book"]["integrity_problems"] == []
     assert L.read_all(led)[rep4["session_close"]["seq"] - 1]["close_number"] == 3
     assert not any(r["kind"] == "pilot_forecast" and r["scan_id"].startswith("LC-1:0003") for r in L.read_all(led))
-    # a different session reports another session's outstanding position as foreign and does not touch it
+    # a different session reports another session's outstanding positions as foreign and does not touch them
     h5 = SyntheticHarness(led, session_id="LC-2", t0=h4.now() + 5.0)
     h5.exit_quotes.override = lambda c: None
     sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-2", "--pilot-release", "synthetic-release"),
@@ -291,9 +301,10 @@ def test_f6_lifecycle_recovery_through_the_entry_point(tmp_path, fenced):
     sess.main(_argv(tmp_path, "--pilot-boundary", "--pilot-session-id", "LC-3", "--pilot-release", "synthetic-release"),
               pilot_sources=E._HarnessProvider(h6))
     rep6 = json.loads((tmp_path / "out.json").read_text())
-    assert len(rep6["foreign_unresolved_positions"]) == 1 and rep6["foreign_unresolved_positions"][0]["session_id"] == "LC-2"
+    foreign = rep6["foreign_unresolved_positions"]
+    assert sorted(p["session_id"] for p in foreign) == ["LC-1", "LC-1", "LC-2"]
     assert rep6["unresolved_positions"] == [] and rep6["completion"] == "CLOSED_CLEAN"
-    assert len(S.unresolved_fills(led)) == 1                                           # still LC-2's obligation, untouched
+    assert len(S.unresolved_fills(led)) == 3                                           # all three untouched
     L.verify_chain(led)
 
 

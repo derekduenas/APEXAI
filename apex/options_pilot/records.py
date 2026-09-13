@@ -343,9 +343,26 @@ def validate_quote(q, *, contract: dict) -> dict:
     bs = _int(q.get("bid_size"), "bid_size", minimum=0)
     as_ = _int(q.get("ask_size"), "ask_size", minimum=0)
     ts = _real(q.get("timestamp_epoch"), "timestamp_epoch")
+    # EXIT-SCHEDULING-003: a DURABLE observation identity and the availability instant, carried through from the
+    # adapter when it supplies them. Two observations can share a provider timestamp, so the timestamp cannot say
+    # which one was evaluated; the identity can. The boundary carries these, it does not verify them: an adapter
+    # that lies about its own receipt is out of this function's reach, and the basis field says so.
+    oid = q.get("observation_id")
+    if oid is not None and not isinstance(oid, str):
+        raise RecordRefused("OBSERVATION_ID_NOT_A_STRING: %r" % (oid,))
+    avail = q.get("available_epoch")
+    if avail is not None:
+        avail = _real(avail, "available_epoch")
+        if avail < ts - 1e-6:
+            raise RecordRefused("QUOTE_AVAILABLE_BEFORE_ITS_OWN_TIMESTAMP: available %.6f < timestamp %.6f" % (avail, ts))
     return {"contract": qc, "contract_id": contract_id(qc), "bid": bid, "ask": ask, "bid_size": bs, "ask_size": as_,
             "timestamp_epoch": ts, "timestamp_utc": to_utc_string(ts),
             "timestamp_meaning": "PROVIDER_SNAPSHOT: one asserted timestamp for both sides; side update times are NOT inferred",
+            "observation_id": oid, "available_epoch": avail,
+            "identity_basis": ("ADAPTER_SUPPLIED_UNVERIFIED: observation_id and available_epoch are carried from the "
+                               "quote source as given; the boundary does not verify them"
+                               if oid is not None else
+                               "NOT_SUPPLIED: the quote source gave no observation identity; nothing is invented"),
             "quote_contract": QUOTE_CONTRACT}
 
 

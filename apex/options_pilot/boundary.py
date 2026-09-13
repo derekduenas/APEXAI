@@ -712,7 +712,8 @@ class Boundary:
             self.refuse("exit", str(e), scan_id=fl.get("scan_id"))
         return receipt
 
-    def record_outcome(self, *, fill_receipt: dict, exit_quote_fn, recovery: bool = False) -> dict:
+    def record_outcome(self, *, fill_receipt: dict, exit_quote_fn, recovery: bool = False,
+                       process_identity: dict | None = None) -> dict:
         """One VALUATION ATTEMPT for a fill. RESOLVED and NO_POSITION discharge
         the position; NOT_ESTIMABLE (missing/stale/malformed exit, provider
         failure) is persisted as an attempt and the position REMAINS an
@@ -748,6 +749,9 @@ class Boundary:
         attempt = len(self.valuation_attempts(rows, fill_receipt["seq"])) + 1
         txn_id = "outcome:%s:%d" % (fl["intent_id"], attempt)
         out = {"kind": "pilot_outcome", "txn_id": txn_id, "attempt": attempt, "intent_id": fl["intent_id"],
+               # EXIT-SCHEDULING-003: WHICH PROCESS made this attempt. A restarted process continues an inherited
+               # obligation under the same window and budget, and the ledger must say who did what.
+               "process_identity": (dict(process_identity) if isinstance(process_identity, dict) else None),
                "fill_id": fl.get("fill_id"), "scan_id": scan_id, "session_id": self.session_id, "release": self.release,
                "fill_ref": {"seq": fill_receipt["seq"], "entry_hash": fill_receipt["entry_hash"]},
                "contract_id": fl["contract_id"], **self.labels}
@@ -794,7 +798,9 @@ class Boundary:
                 except RecordRefused as e:
                     why = str(e)
             out.update(exit_quote_request_epoch=t_req, exit_quote_receipt_epoch=t_rcpt,
-                       exit_quote_observed=({k: q[k] for k in ("bid", "ask", "bid_size", "ask_size", "timestamp_epoch")} if q else None))
+                       exit_quote_observed=({k: q[k] for k in ("bid", "ask", "bid_size", "ask_size", "timestamp_epoch",
+                                                                "observation_id", "available_epoch", "identity_basis")}
+                                            if q else None))
             if why:
                 out.update(status="NOT_ESTIMABLE", pnl=None, why=why, discharges_position=False,
                            exit_law="a long leg exits at THAT contract's BID; missing/stale -> NOT_ESTIMABLE, never imputed; "
