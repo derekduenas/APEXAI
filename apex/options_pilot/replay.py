@@ -72,12 +72,42 @@ class ReplayAuthorization:
         return R.canonical_hash({"reason": self.reason, "input_digests": self.input_digests,
                                  "recorded_window_utc": list(self.window)})
 
+    def verify_bytes(self, blobs: dict) -> dict:
+        """BIND THE AUTHORIZATION TO THE BYTES THE RUN WILL ACTUALLY PARSE.
+
+        Prefer this over `verify_inputs`. Hashing a file and then re-opening it to parse leaves a window in which the
+        file can change: the digest would describe one read and the decisions would come from another. Here the
+        caller reads each input ONCE, hands the bytes over, and parses the same objects it verified, so there is no
+        second read to disagree with the first."""
+        missing = sorted(set(self.input_digests) - set(blobs))
+        extra = sorted(set(blobs) - set(self.input_digests))
+        if missing or extra:
+            raise ReplayRefused("REPLAY_INPUT_SET_MISMATCH: declared but not supplied %r; supplied but not declared %r"
+                                % (missing, extra))
+        out = {}
+        for label in sorted(blobs):
+            blob = blobs[label]
+            if not isinstance(blob, (bytes, bytearray)):
+                raise ReplayRefused("REPLAY_INPUT_NOT_BYTES: %s is %s; verify the bytes that will be parsed"
+                                    % (label, type(blob).__name__))
+            actual = hashlib.sha256(blob).hexdigest()
+            if actual != self.input_digests[label]:
+                raise ReplayRefused("REPLAY_INPUT_DIGEST_MISMATCH: %s declared %s, in the bytes read %s. The recorded "
+                                    "inputs are not the ones this authorization names."
+                                    % (label, self.input_digests[label][:16], actual[:16]))
+            out[label] = {"sha256": actual, "bytes": len(blob), "verified": "THE_BYTES_PARSED_BY_THIS_RUN"}
+        self.verified_inputs = out
+        return out
+
     def verify_inputs(self, paths: dict) -> dict:
         """BIND THE AUTHORIZATION TO THE BYTES. Recompute each named input's digest from the file that will actually
         be read and refuse any mismatch, any missing label and any unnamed extra.
 
         Without this the authorization records what someone SAID the inputs were. Declaring a digest is a claim;
-        recomputing it is evidence, and only evidence may gate a run."""
+        recomputing it is evidence, and only evidence may gate a run.
+
+        WEAKER THAN `verify_bytes`: this reads the file to hash it and the caller reads it again to parse it. Use it
+        only where the parse is not under this process's control."""
         missing = sorted(set(self.input_digests) - set(paths))
         extra = sorted(set(paths) - set(self.input_digests))
         if missing or extra:
@@ -136,6 +166,33 @@ def assert_excluded_from_prospective_results(rows: list) -> dict:
     return {"n_total": len(rows), "n_prospective": len(kept), "n_replay_excluded": len(dropped),
             "classes_kept": sorted({r.get("evidence_class") for r in kept if r.get("evidence_class")}),
             "classes_excluded": sorted({r.get("evidence_class") for r in dropped if r.get("evidence_class")})}
+
+
+# ---------------------------------------------------------------------------- the one availability gate
+
+
+def most_recent_available(pairs: list, now) -> tuple | None:
+    """THE ONE GATE every recorded input family passes through.
+
+    `pairs` is [(available_epoch, payload)] sorted ascending by availability. Returns the LAST pair whose recorded
+    availability is at or before `now`, or None.
+
+    MOST RECENT AVAILABLE, NOT NEAREST IN TIME. A later observation can sit closer to `now` than an earlier one; a
+    nearest-in-time selection would reach forward and use it. `available_epoch` must be the instant the observation
+    REACHED this system -- a record's receipt -- and never the observation's own event time. A quote that existed at
+    13:45 and arrived at 13:46 is invisible at 13:45:30, and a datum with no recorded availability does not belong in
+    `pairs` at all."""
+    now_us = I.canonical_micros(now, field="now")
+    best = None
+    for available, payload in pairs:
+        if available is None:
+            raise ReplayRefused("AVAILABILITY_UNKNOWN: a datum with no recorded availability cannot be gated; "
+                                "exclude it rather than backdating it")
+        if I.canonical_micros(available, field="available") <= now_us:
+            best = (available, payload)
+        else:
+            break
+    return best
 
 
 # ---------------------------------------------------------------------------- recorded inputs

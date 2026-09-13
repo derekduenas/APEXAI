@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from collections import Counter
 from pathlib import Path
 
@@ -43,31 +44,118 @@ from apex.options_pilot import replay as RP  # noqa: E402
 from apex.options_pilot import run_dir as RD  # noqa: E402
 from apex.pulse_options import sources as SRC  # noqa: E402
 
+
+def availability_class(bars: list) -> dict:
+    """Is an artifact's `receipt_time` a MEASUREMENT or a FORMULA?
+
+    A bulk historical pull has no per-bar receipt to record, so a single constant offset from `event_time` across
+    every row is the signature of a computed value, not an observed one. Saying so is the difference between an
+    honest point-in-time replay and a manufactured one."""
+    have = [b for b in bars if isinstance(b.get("receipt_time"), (int, float)) and not isinstance(b.get("receipt_time"), bool)]
+    if not have:
+        return {"status": "ABSENT", "why": "no row carries a receipt_time", "n_with_receipt": 0, "n_rows": len(bars)}
+    deltas = {round(b["receipt_time"] - b["event_time"], 3) for b in have}
+    if len(deltas) == 1:
+        return {"status": "FORMULAIC_NOT_MEASURED", "constant_offset_s": next(iter(deltas)),
+                "n_with_receipt": len(have), "n_rows": len(bars),
+                "why": ("every row's receipt_time is exactly event_time + %s, one distinct value across %d rows. That "
+                        "is a computed offset, not a recorded receipt: the artifact came from a bulk pull and carries "
+                        "no evidence of when APEX could first have seen each bar." % (next(iter(deltas)), len(have))),
+                "assumption_required": True}
+    return {"status": "MEASURED", "n_with_receipt": len(have), "n_rows": len(bars),
+            "n_distinct_offsets": len(deltas), "min_offset_s": min(deltas), "max_offset_s": max(deltas)}
+
+
 D, PRIOR, BASE = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
 RUN_ID = sys.argv[4] if len(sys.argv) > 4 else "loop_demonstration"
-MANIFEST = Path(sys.argv[5]) if len(sys.argv) > 5 else None
+if len(sys.argv) <= 5:
+    raise SystemExit("MANIFEST_REQUIRED: FLOW-VALIDATION-001 runs only against an independently pinned manifest. "
+                     "Produce one with scripts/preserve_inputs.py and pass it as the fifth argument. A digest this "
+                     "process computes from the same file it reads is not an independent declaration.")
+MANIFEST = Path(sys.argv[5])
 HOLD_S = 900.0
 CADENCE = 15                                    # every 15th one-minute snapshot = the pilot's 15-minute cadence
+FIT_BUDGET = 3                                  # see docs/FLOW_VALIDATION_001_FIT_CONTRACT.md: one fit() call, at
+                                                # most GARCH + regime + the conditional EWMA fallback. 400 is the
+                                                # constructor default and has nothing to do with this run.
 
-chains, nbbo, sbars = [], [], {}
-for line in open(D / "chain_SPY.jsonl"):
-    r = json.loads(line)
-    if r.get("kind") == "pilot_collection_chain":
-        chains.append((r["receipt_epoch"], r["payload"]))
-for line in open(D / "nbbo_SPY.jsonl"):
-    r = json.loads(line)
-    if r.get("kind") == "pilot_collection_nbbo":
-        nbbo.append((r["payload"]["as_of"], r["payload"]))
-for line in open(D / "bars_SPY.jsonl"):
-    r = json.loads(line)
-    if r.get("kind") == "pilot_collection_bars":
-        for b in r["payload"]:
-            p = sbars.get(b["event_time"])
-            if p is None or b["receipt_time"] < p["receipt_time"]:
-                sbars[b["event_time"]] = b
-chains.sort(); nbbo.sort()
-ALLBARS = sorted(list(json.loads(PRIOR.read_text())) + list(sbars.values()), key=lambda b: b["event_time"])
-SCANS = list(range(0, len(chains), CADENCE))
+INPUT_PATHS = {"chain": D / "chain_SPY.jsonl", "nbbo": D / "nbbo_SPY.jsonl",
+               "bars": D / "bars_SPY.jsonl", "prior_bars": PRIOR}
+
+# ---------------------------------------------------------------- 1. CLAIM THE RUN DIRECTORY BEFORE READING ANYTHING
+# A validation failure must leave evidence. Claiming the directory first means a refused run is still a recorded run.
+_declared = {k: (v["sha256"] if isinstance(v, dict) else v)
+             for k, v in (json.loads(MANIFEST.read_text()).get("inputs") or json.loads(MANIFEST.read_text())).items()}
+RUN = RD.new_run(BASE, run_id=RUN_ID, now_epoch=time.time(),
+                 config={"policies": ["WAIT", "PILOT_RULE_V2", "FULL_FUNNEL_V1"], "cadence_snapshots": CADENCE,
+                         "hold_s": HOLD_S, "route": "RECORDED_REPLAY", "limits": "UNCHANGED",
+                         "fit_budget": FIT_BUDGET, "manifest": str(MANIFEST), "declared_digests": _declared},
+                 note="loop demonstration; recorded-replay route; manifest-pinned; no provider request")
+
+try:
+    # ------------------------------------------------------------ 2. READ THE BYTES ONCE
+    # THE SAME BYTES ARE HASHED AND PARSED. Hashing one read and parsing another cannot establish that the parsed
+    # content is what the manifest names: a file replaced between the two operations would pass and then be used.
+    RAW = {label: p.read_bytes() for label, p in INPUT_PATHS.items()}
+
+    # ------------------------------------------------------------ 3. VERIFY BEFORE PARSING, BEFORE ANY MODEL EXISTS
+    AUTHORIZATION = RP.ReplayAuthorization(
+        reason="FLOW-VALIDATION-001 complete-flow diagnostic over the burned 2026-09-11 SPY session",
+        input_digests=_declared,
+        recorded_window_utc=("SET_AFTER_PARSE", "SET_AFTER_PARSE"),
+        operator_note="burned collection; SCOPE_DEVIATION_001.md covers the retained prior-bar file")
+    AUTHORIZATION.verify_bytes(RAW)
+    DECLARATION_SOURCE = "INDEPENDENT_MANIFEST: %s" % MANIFEST
+
+    # ------------------------------------------------------------ 4. PARSE THOSE BYTES, and only now
+    chains, nbbo, sbars = [], [], {}
+    bars_without_receipt = 0
+    for line in RAW["chain"].decode().splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        if r.get("kind") == "pilot_collection_chain":
+            chains.append((r["receipt_epoch"], r["payload"]))          # RECEIPT, the instant APEX received it
+    for line in RAW["nbbo"].decode().splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        if r.get("kind") == "pilot_collection_nbbo":
+            # AVAILABILITY IS THE RECEIPT, NOT as_of. `as_of` is the quote's own event time; a quote that existed at
+            # 13:45 but reached this process at 13:46 is invisible at 13:45:30. The event time is retained beside it.
+            nbbo.append((r["receipt_epoch"], {**r["payload"], "event_as_of": r["payload"].get("as_of"),
+                                              "received_epoch": r["receipt_epoch"]}))
+    for line in RAW["bars"].decode().splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        if r.get("kind") == "pilot_collection_bars":
+            for b in r["payload"]:
+                # NO INVENTED RECEIPT. A bar with no recorded receipt has unknown availability and is EXCLUDED.
+                if not isinstance(b.get("receipt_time"), (int, float)) or isinstance(b.get("receipt_time"), bool):
+                    bars_without_receipt += 1
+                    continue
+                p = sbars.get(b["event_time"])
+                if p is None or b["receipt_time"] < p["receipt_time"]:
+                    sbars[b["event_time"]] = b
+    chains.sort(); nbbo.sort()
+    if not chains:
+        raise SystemExit("NO_CHAIN_SNAPSHOTS: the collection carries no pilot_collection_chain records")
+
+    PRIOR_BARS = json.loads(RAW["prior_bars"].decode())
+    AVAILABILITY = availability_class(PRIOR_BARS)
+    prior_kept = [b for b in PRIOR_BARS if isinstance(b.get("receipt_time"), (int, float))
+                  and not isinstance(b.get("receipt_time"), bool)]
+    ALLBARS = sorted(list(prior_kept) + list(sbars.values()), key=lambda b: b["event_time"])
+    SCANS = list(range(0, len(chains), CADENCE))
+    AUTHORIZATION.window = (to_utc_string(chains[0][0]), to_utc_string(chains[-1][0]))
+    INPUT_REPORT = {"bars_excluded_no_recorded_receipt": bars_without_receipt,
+                    "prior_bars_total": len(PRIOR_BARS), "prior_bars_kept": len(prior_kept),
+                    "prior_bars_availability": AVAILABILITY}
+except BaseException as _e:                                                    # noqa: BLE001
+    RUN.failed(now_epoch=time.time(), error=_e,
+               summary={"stage": "INPUT_VALIDATION", "note": "refused before any adapter or model was constructed"})
+    raise
 
 
 class Rec:
@@ -85,15 +173,16 @@ class Rec:
         return self._now()
 
     def bars(self, symbol, *, start_epoch, end_epoch):
-        return [{"symbol": symbol, "event_time": b["event_time"], "available_time": b.get("receipt_time", b["event_time"] + 60.0),
-                 "receipt_time": b.get("receipt_time", b["event_time"] + 60.0), "open": b["open"], "high": b["high"],
+        # NO DEFAULT RECEIPT. Bars without a recorded receipt were excluded at parse time, so `b["receipt_time"]` is
+        # present by construction; reaching for a default here would silently backdate an unknown availability.
+        return [{"symbol": symbol, "event_time": b["event_time"], "available_time": b["receipt_time"],
+                 "receipt_time": b["receipt_time"], "open": b["open"], "high": b["high"],
                  "low": b["low"], "close": b["close"], "volume": b.get("volume", 0), "publication_time": b.get("publication_time"),
                  "vwap": b.get("vwap"), "trades": b.get("trades"), "provider": "ALPACA_DATA_V2"}
-                for b in ALLBARS if start_epoch <= b["event_time"] < end_epoch and b.get("receipt_time", b["event_time"] + 60.0) <= self.t]
+                for b in ALLBARS if start_epoch <= b["event_time"] < end_epoch and b["receipt_time"] <= self.t]
 
     def _snap(self):
-        p = [(ts, pl) for ts, pl in chains if ts <= self.t]
-        return p[-1] if p else None
+        return RP.most_recent_available(chains, self.t)          # THE ONE GATE: recorded receipt, never nearest-time
 
     def chain_fn(self, symbol, as_of):
         s = self._snap()
@@ -114,11 +203,15 @@ class Rec:
         raise ProviderUnavailable("QUOTE_NOT_IN_RECORDED_SNAPSHOT: %s at %s" % (want, to_utc_string(self.t)))
 
     def nbbo_fn(self, symbol, t):
-        p = [x for ts, x in nbbo if ts <= self.t]
-        if not p:
+        got = RP.most_recent_available(nbbo, self.t)             # gated on the RECORD'S RECEIPT, not on `as_of`
+        if got is None:
             return None
-        q = p[-1]
-        return {"bid": q["bid"], "ask": q["ask"], "bid_size": q["bid_size"], "ask_size": q["ask_size"], "t": q["as_of"], "source": q["source"]}
+        q = got[1]
+        # `t` stays the quote's own event time, which is what a consumer means by "when was this true"; visibility
+        # was decided by the receipt above, which is what "when could we know it" means. The two are different.
+        return {"bid": q["bid"], "ask": q["ask"], "bid_size": q["bid_size"], "ask_size": q["ask_size"],
+                "t": q.get("event_as_of", q.get("as_of")), "received_epoch": q.get("received_epoch"),
+                "source": q["source"]}
 
 
 def model_identity(twin, policy, engine):
@@ -155,7 +248,7 @@ def run_policy(policy: str, rd) -> dict:
     lclock = LC.MonotonicClock(chains[0][0])
     rec = Rec(lclock.now)                     # the recorded adapter READS the lifecycle clock; it cannot move it
     clock = lclock.clock()
-    engine = FunnelEngine() if policy == "FULL_FUNNEL_V1" else None
+    engine = FunnelEngine(fit_budget=FIT_BUDGET) if policy == "FULL_FUNNEL_V1" else None
     twin = SRC.TwinSources(provenance="LIVE_FEED", clock=clock, bar_source=rec, chain_fn=rec.chain_fn, quote_fn=rec.quote_fn,
                            exit_quote_fn=rec.quote_fn, fee_schedule=FEES, sleep_fn=lclock.sleep, book_fn=rec.nbbo_fn,
                            selection_policy=("PILOT_RULE_V2" if policy in ("WAIT", "PILOT_RULE_V2") else policy),
@@ -262,23 +355,6 @@ else:
     DECLARATION_SOURCE = ("SELF_DECLARED_FROM_THE_FILES_READ: no independent manifest was supplied, so verification "
                           "proves only that the bytes did not change between two reads in this process")
 
-AUTHORIZATION = RP.ReplayAuthorization(
-    reason="LOOP_EVALUATION_CONTRACT.md demonstration over the burned 2026-09-11 SPY session",
-    input_digests=_declared,
-    recorded_window_utc=(to_utc_string(chains[0][0]), to_utc_string(chains[-1][0])),
-    operator_note="burned collection; SCOPE_DEVIATION_001.md covers the retained prior-bar file")
-# BIND: recompute every declared digest from the file that will actually be read. A mismatch refuses the run.
-AUTHORIZATION.verify_inputs(INPUT_PATHS)
-
-RUN = RD.new_run(BASE, run_id=RUN_ID, now_epoch=chains[0][0],
-                 inputs={"chain": D / "chain_SPY.jsonl", "nbbo": D / "nbbo_SPY.jsonl", "bars": D / "bars_SPY.jsonl",
-                         "prior_bars": PRIOR},
-                 config={"policies": ["WAIT", "PILOT_RULE_V2", "FULL_FUNNEL_V1"], "cadence_snapshots": CADENCE,
-                         "hold_s": HOLD_S, "route": "RECORDED_REPLAY", "limits": "UNCHANGED",
-                         "declaration_source": DECLARATION_SOURCE,
-                         "authorization_digest": AUTHORIZATION.digest},
-                 note="loop demonstration; recorded-replay route; no provider request")
-
 results = {"kind": "LOOP_DEMONSTRATION", "contract": "docs/LOOP_EVALUATION_CONTRACT.md", "run_id": RUN_ID,
            "run_dir": str(RUN.path),
            "data": "burned 2026-09-11 SPY collection + retained prior bars (SCOPE_DEVIATION_001.md); no provider request",
@@ -287,12 +363,18 @@ results = {"kind": "LOOP_DEMONSTRATION", "contract": "docs/LOOP_EVALUATION_CONTR
            "quarantined": "REPLAY; ledgers never merged", "scan_instants": [to_utc_string(chains[i][0]) for i in SCANS],
            "ordering_policy": LC.ORDERING_POLICY, "timestamp_rule": I.CONVERSION_RULE,
            "replay_authorization": AUTHORIZATION.describe(), "declaration_source": DECLARATION_SOURCE,
+           "input_report": INPUT_REPORT, "fit_budget": FIT_BUDGET,
+           "availability_policy": ("every input family is gated on its RECORDED receipt: chain and NBBO on the "
+                                   "record's receipt_epoch, session bars on the bar's own receipt_time. A datum with "
+                                   "no recorded receipt is EXCLUDED, never backdated. The prior-bar artifact's "
+                                   "availability class is reported under input_report and governs what this run may "
+                                   "claim."),
            "policies": {}}
 try:
     for pol in ("WAIT", "PILOT_RULE_V2", "FULL_FUNNEL_V1"):
         results["policies"][pol] = run_policy(pol, RUN)
 except BaseException as _e:                                                    # noqa: BLE001
-    RUN.failed(now_epoch=chains[0][0], error=_e)                               # partial artifacts are PRESERVED
+    RUN.failed(now_epoch=time.time(), error=_e)                                # partial artifacts are PRESERVED
     raise
 
 # head to head on identical instants
@@ -308,5 +390,5 @@ for n in range(len(SCANS)):
 results["head_to_head"] = hh
 results["summary"] = {p: results["policies"][p]["totals"] for p in results["policies"]}
 RUN.write_json("loop_demonstration.json", results)
-RUN.complete(now_epoch=chains[-1][0], summary=results["summary"])
+RUN.complete(now_epoch=time.time(), summary={**results["summary"], "input_report": INPUT_REPORT})
 print(json.dumps({"run_dir": str(RUN.path), "summary": results["summary"]}, indent=1, default=str))

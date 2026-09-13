@@ -26,10 +26,26 @@ CADENCE_S = 15 * 60.0
 HOLD_S = 900.0
 
 
-def run_driver(coll: Path, out_base: Path, run_id: str, *, manifest: Path | None = None, prior: Path | None = None):
-    # The preserved layout keeps prior_bars.json OUTSIDE the collection directory on purpose: it is a different
-    # dataset with a different authorization, and the command names the two separately.
-    argv = [sys.executable, str(DRIVER), str(coll), str(prior or (coll / "prior_bars.json")), str(out_base), run_id]
+def preserve(coll: Path, dest: Path, *, prior: Path | None = None):
+    """Run the real preservation CLI, which is how a manifest is produced."""
+    return subprocess.run([sys.executable, str(PRESERVE), str(coll), str(prior or (coll / "prior_bars.json")),
+                           str(dest)], cwd=REPO, capture_output=True, text=True)
+
+
+def run_driver(coll: Path, out_base: Path, run_id: str, *, manifest: Path | None = None, prior: Path | None = None,
+               no_manifest: bool = False):
+    """The driver REQUIRES a manifest, so unless a test is specifically about that requirement, one is produced from
+    the collection first. The preserved layout keeps prior_bars.json OUTSIDE the collection directory on purpose: it
+    is a different dataset with a different authorization, and the command names the two separately."""
+    prior = prior or (coll / "prior_bars.json")
+    if manifest is None and not no_manifest:
+        dest = coll.parent / (coll.name + "__preserved")
+        if not dest.exists():
+            r = preserve(coll, dest, prior=prior)
+            assert r.returncode == 0, r.stderr[-1500:]
+        coll, prior = dest / "collection", dest / "prior_bars.json"
+        manifest = dest / "INPUTS_MANIFEST.json"
+    argv = [sys.executable, str(DRIVER), str(coll), str(prior), str(out_base), run_id]
     if manifest is not None:
         argv.append(str(manifest))
     return subprocess.run(argv, cwd=REPO, capture_output=True, text=True, timeout=900)
@@ -254,14 +270,13 @@ class TestTheReplayRoutesOwnDataControls:
         """A self-declared digest and an independently declared one are not the same evidence, and the run says
         which it had."""
         res = result(ok_run["out"], ok_run["run_id"])
-        assert res["declaration_source"].startswith("SELF_DECLARED_FROM_THE_FILES_READ")
-        assert "proves only that the bytes did not change" in res["declaration_source"]
+        assert res["declaration_source"].startswith("INDEPENDENT_MANIFEST"), \
+            "the driver now REQUIRES a manifest, so every run declares independently"
 
     def test_an_independent_manifest_upgrades_the_declaration(self, tmp_path):
         coll = tmp_path / "coll"
         write(coll, minutes=180)
-        out = subprocess.run([sys.executable, str(PRESERVE), str(coll), str(coll / "prior_bars.json"),
-                              str(tmp_path / "durable")], cwd=REPO, capture_output=True, text=True)
+        out = preserve(coll, tmp_path / "durable")
         assert out.returncode == 0, out.stderr[-2000:]
         man = tmp_path / "durable" / "INPUTS_MANIFEST.json"
         r = run_driver(tmp_path / "durable" / "collection", tmp_path / "runs", "manifested", manifest=man,
@@ -349,3 +364,184 @@ class TestTheInvocationMapComesFromTheRecords:
         assert funnels
         for f in funnels:
             assert f["engine"]["fit"]["status"], "the engine must state its fit status on every scan"
+
+
+# ---------------------------------------------------------------------------- f87113a findings: bytes and timing
+
+
+class TestVerificationHappensBeforeParsing:
+    """Finding 1 at f87113a: the driver parsed the inputs near the top and verified them near the bottom, so the
+    digest described one read and the decisions came from another."""
+
+    def test_the_manifest_is_required(self, tmp_path):
+        coll = tmp_path / "coll"
+        write(coll, minutes=30)
+        r = run_driver(coll, tmp_path / "runs", "nomanifest", no_manifest=True)
+        assert r.returncode != 0 and "MANIFEST_REQUIRED" in (r.stdout + r.stderr)
+
+    def test_the_bytes_hashed_are_the_bytes_parsed(self):
+        """STRUCTURAL. The inputs are read once into RAW, RAW is verified, and only RAW is parsed. A second read
+        would reopen the window this finding is about, so no file is opened again after verification."""
+        src = DRIVER.read_text()
+        i_read = src.index("RAW = {label: p.read_bytes()")
+        i_verify = src.index("AUTHORIZATION.verify_bytes(RAW)")
+        i_parse = src.index('for line in RAW["chain"].decode()')
+        assert i_read < i_verify < i_parse, "read, then verify, then parse"
+        after = src[i_verify:]
+        assert ".read_text()" not in after.split("def run_policy")[0], "no re-read after verification"
+        assert "json.loads(PRIOR.read_text())" not in src
+
+    def test_a_digest_mismatch_refuses_before_any_model_and_leaves_evidence(self, tmp_path):
+        coll = tmp_path / "coll"
+        write(coll, minutes=30)
+        out = subprocess.run([sys.executable, str(PRESERVE), str(coll), str(coll / "prior_bars.json"),
+                              str(tmp_path / "durable")], cwd=REPO, capture_output=True, text=True)
+        assert out.returncode == 0, out.stderr[-1500:]
+        # replace a preserved file with different bytes: the manifest now names something that is not on disk
+        (tmp_path / "durable" / "collection" / "nbbo_SPY.jsonl").write_text('{"kind":"pilot_collection_nbbo"}\n')
+        r = run_driver(tmp_path / "durable" / "collection", tmp_path / "runs", "tampered",
+                       manifest=tmp_path / "durable" / "INPUTS_MANIFEST.json",
+                       prior=tmp_path / "durable" / "prior_bars.json")
+        assert r.returncode != 0 and "REPLAY_INPUT_DIGEST_MISMATCH" in (r.stdout + r.stderr)
+        d = tmp_path / "runs" / "tampered"
+        assert (d / "RUN_START.json").exists(), "the run directory is claimed before reading, so a refusal is recorded"
+        body = json.loads((d / "RUN_FAILED.json").read_text())
+        assert body["status"] == "FAILED" and "DIGEST_MISMATCH" in body["error"]
+        assert body["summary"]["stage"] == "INPUT_VALIDATION"
+
+    def test_verify_bytes_refuses_a_path_instead_of_bytes(self, tmp_path):
+        import hashlib
+        a = RP.ReplayAuthorization(reason="x", input_digests={"k": hashlib.sha256(b"x").hexdigest()},
+                                   recorded_window_utc=("a", "b"))
+        with pytest.raises(RP.ReplayRefused, match="REPLAY_INPUT_NOT_BYTES"):
+            a.verify_bytes({"k": str(tmp_path / "f")})
+
+
+class TestAvailabilityAppliesToEveryInputFamily:
+    """Finding 2 at f87113a: chain used the recorded receipt, but NBBO used the quote's own `as_of` and bars fell
+    back to `event_time + 60`. Neither establishes when APEX received the observation."""
+
+    def test_the_gate_takes_the_most_recent_available_not_the_nearest(self):
+        pairs = [(100.0, "old"), (140.0, "late")]      # 140 is closer to 130 than 100 is, and it has not arrived
+        assert RP.most_recent_available(pairs, 130.0)[1] == "old"
+        assert RP.most_recent_available(pairs, 140.0)[1] == "late"
+        assert RP.most_recent_available(pairs, 99.0) is None
+
+    def test_an_old_quote_received_after_the_scan_is_invisible(self):
+        """The exact case the correction names: the observation is OLD, its arrival is LATE. Event time would admit
+        it; availability must not."""
+        scan = 1000.0
+        pairs = [(900.0, {"as_of": 890.0, "tag": "arrived_before"}),
+                 (1001.0, {"as_of": 500.0, "tag": "old_event_late_arrival"})]
+        got = RP.most_recent_available(pairs, scan)
+        assert got[1]["tag"] == "arrived_before"
+        assert got[1]["as_of"] < scan and pairs[1][1]["as_of"] < scan, \
+            "both quotes PREDATE the scan by event time; only availability separates them"
+
+    def test_a_datum_with_no_recorded_availability_is_refused_not_backdated(self):
+        with pytest.raises(RP.ReplayRefused, match="AVAILABILITY_UNKNOWN"):
+            RP.most_recent_available([(None, {"x": 1})], 10.0)
+
+    def test_the_driver_gates_nbbo_on_the_record_receipt(self):
+        src = DRIVER.read_text()
+        assert 'nbbo.append((r["receipt_epoch"]' in src
+        assert 'nbbo.append((r["payload"]["as_of"]' not in src
+        assert "RP.most_recent_available(nbbo, self.t)" in src
+
+    def test_the_driver_invents_no_bar_receipt(self):
+        src = DRIVER.read_text()
+        assert 'b.get("receipt_time", b["event_time"] + 60.0)' not in src
+        assert "bars_excluded_no_recorded_receipt" in src
+
+    def test_bars_without_a_recorded_receipt_are_excluded_and_counted(self, tmp_path):
+        coll = tmp_path / "coll"
+        write(coll, minutes=60)
+        lines = (coll / "bars_SPY.jsonl").read_text().splitlines()
+        stripped = 0
+        out = []
+        for i, line in enumerate(lines):
+            r = json.loads(line)
+            if i % 5 == 0:
+                for b in r["payload"]:
+                    b.pop("receipt_time", None)
+                    stripped += 1
+            out.append(json.dumps(r))
+        (coll / "bars_SPY.jsonl").write_text("\n".join(out) + "\n")
+        subprocess.run([sys.executable, str(PRESERVE), str(coll), str(coll / "prior_bars.json"),
+                        str(tmp_path / "d")], cwd=REPO, capture_output=True, text=True)
+        r = run_driver(tmp_path / "d" / "collection", tmp_path / "runs", "nobarreceipt",
+                       manifest=tmp_path / "d" / "INPUTS_MANIFEST.json", prior=tmp_path / "d" / "prior_bars.json")
+        assert r.returncode == 0, r.stderr[-2000:]
+        rep = result(tmp_path / "runs", "nobarreceipt")["input_report"]
+        assert rep["bars_excluded_no_recorded_receipt"] == stripped > 0
+
+    def test_a_formulaic_receipt_is_reported_as_not_measured(self, ok_run_manifested):
+        """The prior-bar artifact's receipt is a constant offset from event time across every row, which is a
+        computed value from a bulk pull, not a recorded receipt. It must be labelled, not used silently."""
+        rep = result(ok_run_manifested["out"], ok_run_manifested["run_id"])["input_report"]
+        av = rep["prior_bars_availability"]
+        assert av["status"] == "FORMULAIC_NOT_MEASURED" and av["assumption_required"] is True
+        assert "not a recorded receipt" in av["why"]
+
+    def test_a_measured_receipt_is_reported_as_measured(self):
+        from scripts import preserve_inputs  # noqa: F401  (import guard only)
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("drv_helpers", DRIVER)
+        # availability_class is defined before argv parsing fails, so read it out of the source instead
+        ns = {}
+        src = DRIVER.read_text()
+        start = src.index("def availability_class")
+        end = src.index("D, PRIOR, BASE")
+        exec(compile(src[start:end], "drv", "exec"), ns)
+        measured = [{"event_time": 10.0 * i, "receipt_time": 10.0 * i + 3.0 + (i % 4)} for i in range(50)]
+        assert ns["availability_class"](measured)["status"] == "MEASURED"
+        assert ns["availability_class"]([{"event_time": 1.0}])["status"] == "ABSENT"
+
+
+@pytest.fixture(scope="module")
+def ok_run_manifested(tmp_path_factory):
+    base = tmp_path_factory.mktemp("okm")
+    coll = base / "coll"
+    write(coll, minutes=180)
+    subprocess.run([sys.executable, str(PRESERVE), str(coll), str(coll / "prior_bars.json"), str(base / "d")],
+                   cwd=REPO, capture_output=True, text=True)
+    r = run_driver(base / "d" / "collection", base / "runs", "okm",
+                   manifest=base / "d" / "INPUTS_MANIFEST.json", prior=base / "d" / "prior_bars.json")
+    assert r.returncode == 0, r.stderr[-3000:]
+    return {"out": base / "runs", "run_id": "okm"}
+
+
+class TestTheFitBudgetIsTheRunsBudget:
+
+    def test_the_driver_pins_three_not_the_constructor_default(self):
+        """Checked on the CODE. The comment explains why 400 is wrong for this run, so a prose scan would trip on
+        the explanation itself."""
+        import ast
+        tree = ast.parse(DRIVER.read_text())
+        assigns = {t.id: n.value for n in ast.walk(tree) if isinstance(n, ast.Assign)
+                   for t in n.targets if isinstance(t, ast.Name)}
+        assert isinstance(assigns.get("FIT_BUDGET"), ast.Constant) and assigns["FIT_BUDGET"].value == 3
+        calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
+                 and getattr(n.func, "id", None) == "FunnelEngine"]
+        assert calls and all(any(k.arg == "fit_budget" for k in c.keywords) for c in calls), \
+            "every FunnelEngine in the driver must be given this run's budget explicitly"
+
+    def test_three_is_the_exact_maximum_one_fit_call_can_consume(self):
+        """GARCH, then the regime model, then the conditional EWMA fallback. Nothing else consumes the counter."""
+        from apex.decision_wb.engine import FunnelEngine
+        import inspect
+        src = inspect.getsource(FunnelEngine.fit)
+        assert src.count("self.fits += 1") == 2, "one per model in the loop, plus the fallback below"
+        assert '("garch", lambda: GARCH()), ("regime", lambda: MarkovSwitching2' in src
+        e = FunnelEngine(fit_budget=3)
+        assert e.fit_budget == 3 and e.fits == 0
+
+    def test_the_budget_is_reported_on_the_run(self, ok_run_manifested):
+        assert result(ok_run_manifested["out"], ok_run_manifested["run_id"])["fit_budget"] == 3
+
+    def test_the_engine_fitted_within_the_budget(self, ok_run_manifested):
+        rows = ledger(ok_run_manifested["out"], ok_run_manifested["run_id"], "FULL_FUNNEL_V1")
+        funnels = [r for r in rows if r["kind"] == "pilot_funnel"]
+        assert funnels
+        assert all(f["engine"]["fits"] <= 3 for f in funnels), [f["engine"]["fits"] for f in funnels]
+        assert all(f["engine"]["fit_budget"] == 3 for f in funnels)
