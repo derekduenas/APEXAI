@@ -1,0 +1,24 @@
+FEE-AUTHORIZATION-002-R2 — AFTER REPAIR
+
+F1 mutable dispatch table
+   ROUND_MODES removed from the module : True
+   mode() is in the implementation digest: True
+   the mapping cannot be rebound: no module-level table exists to mutate
+   fee unchanged by repair: 0.06
+
+F2 sec_basis
+   inconsistent basis refused at construction: SEC_BASIS_INCONSISTENT: policy declares PER_CONTRACT_CONSTANT but the schedule carries s
+   a genuine PER_CONTRACT schedule executes that branch: exit=0.07
+   sec_basis       refused: SEC_BASIS_UNKNOWN: 'NONSENSE' not in ['PER_CONTRACT_CONS
+   regulatory_sum  refused: REGULATORY_SUM_UNKNOWN: 'ANYTHING'
+   arithmetic      refused: ARITHMETIC_UNKNOWN: 'FLOATS'
+   component_order refused: COMPONENT_ORDER_HAS_DUPLICATES: ('commission', 'commissi
+   component_order refused: COMPONENT_ORDER_INCOMPLETE: ('commission', 'exchange') m
+
+F3 Book recomputation
+   same terms, same total, different authorization -> FEE_IDENTITY_INTEGRITY: FEE_IDENTITY_MISMATCH: the recorded fee block has authorization_digest='
+   same authorization reconciles clean               -> []
+
+F4 unverifiable sentinel
+   authorization REFUSES a non-digest: AUTHORIZATION_DIGEST_MALFORMED: implementation_digest='UNVERIFIABLE_IMPLEMENTATION: SOURCE_U
+   unverifiable build with a VALID authorization -> NOT_AUTHORIZED / IMPLEMENTATION_UNVERIFIABLE

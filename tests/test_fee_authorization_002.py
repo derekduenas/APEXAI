@@ -132,7 +132,9 @@ class TestTheEightScenarios:
         assert st["status"] == AUTHORIZATION_MISMATCH and st["basis"] == "terms_digest"
 
     def test_5_an_altered_document_digest_invalidates_the_authorization(self):
-        bad = exact_authorization(RB, source_document_sha256="deadbeef")
+        # a WELL-FORMED but different digest: R2 now refuses a malformed one at construction, so the
+        # "wrong document" case must be expressed with a real-shaped digest to test the matching, not the format
+        bad = exact_authorization(RB, source_document_sha256="d" * 64)
         st = FeeSchedule(**{**RB.__dict__, "authorization": bad}).authorization_state()
         assert st["status"] == AUTHORIZATION_MISMATCH and st["basis"] == "source_document_sha256"
 

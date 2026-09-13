@@ -122,3 +122,60 @@ frozen for the release you intend to run.** The refusal is loud and safe, not si
 procedural authorization — acceptable only because the operator authorizes the exact digests, the artifact is
 preserved, and Claude does not create it before instruction. For a real-money boundary it must become an
 externally signed decision.
+
+---
+
+# R2 — the computation binding made transitive (2026-09-13)
+
+Base `0b71849`. All four findings reproduced before repair:
+`docs/evidence/fee_authorization_002/R2_FINDING_REPRODUCTION_before_repair.txt`.
+
+## F1 — a transitive dependency was unbound
+
+`_side()` resolved rounding through the module-level mutable dict `ROUND_MODES`, which was in **neither** digest.
+`ROUND_MODES["UP"] = ROUND_FLOOR` — one assignment, no source file touched — moved the charge **0.06 → 0.05** with
+both digests byte-identical. The original defect, one level down: the digest covered the functions, not what they
+resolved *through*.
+
+**Repair.** The table is deleted. `FeeComputationPolicy.mode()` writes the mapping directly and its own AST is in
+`implementation_digest`, which now also resolves against **the policy class actually in use** — so a
+`FeeComputationPolicy` subclass overriding `mode()` (the same hole one step over) changes the digest too. A
+structural test parses `fees.py` and fails if any fee-calculation function reads a module-level mutable container.
+
+## F2 — the declared basis was not the executed basis
+
+`_side()` dispatched on `sale_principal_rate_per_million`, so `sec_basis` was attested in the digest while the code
+consulted something else. `sec_basis="NONSENSE"`, `arithmetic="FLOATS"` and
+`component_order=("commission","commission")` all constructed.
+
+**Repair.** `_side()` dispatches on `pol.sec_basis`. `FeeComputationPolicy.__post_init__` rejects unsupported
+`sec_basis`, `regulatory_sum`, `arithmetic`, non-bool `cat_sub_cent_to_zero`, and any `component_order` that is not
+a duplicate-free permutation of the components. `FeeSchedule.__post_init__` refuses a schedule whose declared basis
+and carried terms disagree, in either direction. **Every policy field now controls execution or does not exist.**
+
+## F3 — Book recomputation ignored the authorization
+
+`recompute_fees` compared `schedule_id`, `schedule_hash` and the total. Two schedules with identical **terms** and
+different **operator authorizations** share a `schedule_hash` and produce the same number, so an outcome written
+under one reconciled clean under another. It now calls `identity_problem()` on the recorded `fee_identity` **before**
+numeric agreement is accepted. Numeric agreement is not identity agreement.
+
+## F4 — the sentinel was authorizable
+
+`UNVERIFIABLE_IMPLEMENTATION:…` was accepted as an `implementation_digest`, authorizing exactly the build the
+sentinel exists to refuse.
+
+**Repair.** Every digest field must be exactly 64 lowercase hex (`is_digest`), enforced at authorization
+construction. Independently, `authorization_state()` refuses an unverifiable runtime implementation **before it
+examines the supplied authorization at all**, so no payload can match its way past. Both are named refusals.
+
+## Consumer inventory
+
+`docs/evidence/fee_authorization_002/FEE_IDENTITY_CONSUMER_INVENTORY.txt` — every fee-identity consumer, what it
+uses, and the one excluded false positive (`recorded_feed.IDENTITY_FIELDS` is a *quote* identity).
+
+## Not done
+
+No authorization authored or installed. No merge, deployment, timer recreation or paper execution. **The full
+regression has not been started** — held for independent review, as instructed. Both digests changed in R2, so any
+payload computed from an earlier commit is stale and will refuse.

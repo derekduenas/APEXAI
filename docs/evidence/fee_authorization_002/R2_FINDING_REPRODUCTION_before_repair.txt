@@ -1,0 +1,34 @@
+FEE-AUTHORIZATION-002-R2 — ALL FOUR FINDINGS REPRODUCED BEFORE REPAIR
+base 0b7184905f724b8b989417ebee194aa001da4012
+
+F1. A TRANSITIVE COMPUTATION DEPENDENCY IS UNBOUND (mutable global ROUND_MODES)
+   fee                   : 0.06 -> 0.05   (CHANGED: True)
+   computation_policy    : b7433dbaf83a7914eadcf0c1 (changed: False)
+   implementation_digest : e4f530c380cfa7c58b9196aa (changed: False)
+   *** LEAK: the charge changed and NEITHER digest moved -- the original defect, one level down ***
+   implementation_digest hashes ('_side', 'entry', 'exit') only; it does not cover FeeComputationPolicy.mode
+   nor the ROUND_MODES table that maps 'UP' to a rounding constant.
+
+F2. sec_basis IS RECORDED AND DIGESTED BUT NOT EXECUTED
+   policy DECLARES sec_basis : PER_CONTRACT_CONSTANT
+   _side() actually EXECUTED : SALE_PRINCIPAL (it dispatched on sale_principal_rate_per_million)
+   declared basis is in the digest: True
+   *** LEAK: the digest attests a basis the code never consults ***
+   *** LEAK: a policy with sec_basis='NONSENSE' CONSTRUCTS ***
+   *** LEAK: regulatory_sum='ANYTHING' CONSTRUCTS unvalidated ***
+   *** LEAK: arithmetic='FLOATS' CONSTRUCTS unvalidated ***
+   *** LEAK: component_order=('commission', 'commission') CONSTRUCTS unvalidated ***
+
+F3. BOOK RECOMPUTATION IGNORES THE COMPLETE IDENTITY
+   record written under A, recomputed under B
+   identities differ            : True
+   schedule_hash identical      : True
+   recompute_fees problems      : []
+   *** LEAK: an outcome produced under one authorization reconciles clean under another ***
+
+F4. THE UNVERIFIABLE SENTINEL IS AUTHORIZABLE
+   runtime implementation digest : UNVERIFIABLE_IMPLEMENTATION: SOURCE_UNAVAILABLE for '_side':
+   is it a real digest?          : False
+   *** LEAK: FeeAuthorization ACCEPTS the sentinel as an implementation_digest ***
+   authorization_state on the unverifiable build -> AUTHORIZED
+   *** LEAK: an UNVERIFIABLE implementation is AUTHORIZED by exact sentinel match ***

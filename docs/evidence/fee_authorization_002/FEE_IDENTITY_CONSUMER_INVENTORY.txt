@@ -1,0 +1,36 @@
+COMPLETE INVENTORY OF FEE-IDENTITY CONSUMERS  (R2, base 0b71849)
+
+IDENTITY_FIELDS (12) = ['schedule_id', 'schedule_hash', 'provenance', 'known', 'version', 'effective_date', 'terms_digest', 'computation_policy_digest', 'implementation_digest', 'source_document_sha256', 'authorization_status', 'authorization_digest']
+
+MODULE                                       canonical  derives   hand-written subset
+------------------------------------------------------------------------------------------------
+apex/options_pilot/boundary.py               YES        -         none
+apex/options_pilot/fees.py                   YES        YES       [['authorization_digest', 'authorization_status', 'computation_policy_digest', 'effective_date', 'implementation_digest', 'known', 'provenance', 'schedule_hash', 'schedule_id', 'source_document_sha256', 'terms_digest', 'version'], ['authorized_by', 'authorized_utc', 'computation_policy_digest', 'effective_date', 'implementation_digest', 'schedule_id', 'scope', 'source_document_sha256', 'terms_digest', 'version']]
+apex/options_pilot/recorded_feed.py          -          -         none
+apex/options_pilot/risk_authority.py         YES        -         none
+apex/options_pilot/risk_gate.py              -          YES       none
+
+VERDICT PER CONSUMER
+  apex/options_pilot/fees.py
+      identity()              PRODUCER of the identity; defines IDENTITY_FIELDS
+      identity_problem()      THE canonical comparison; every consumer routes through it
+      recompute_fees()        CONSUMER -- now calls identity_problem() BEFORE accepting numeric agreement (F3)
+  apex/options_pilot/risk_authority.py
+      accepts()               CONSUMER -- identity_problem()  (was a hand-written 7 of 12)
+      fee_identity_problem()  CONSUMER -- identity_problem()  (was a hand-written 7 of 12)
+  apex/options_pilot/boundary.py
+      fee_identity_problem()  CONSUMER -- identity_problem()
+      exit/outcome path       CONSUMER -- identity_problem() against the persisted fill's entry identity
+      __init__                GATE     -- refuses an unauthorized/unverifiable schedule before any quote
+  apex/options_pilot/risk_gate.py
+      FEE_IDENTITY_FIELDS     DERIVED from FeeSchedule.IDENTITY_FIELDS (was its own copy of the 7)
+      fee_identity_of()       feeds envelope_binding_hash; documented COMPLETE derivative -- it maps every
+                              declared field, marks a missing one __ABSENT__ and an undeclared one __EXTRA__,
+                              so the binding changes rather than ignoring either
+
+No module outside fees.py contains a hand-written fee-identity field list.
+
+CHECKED AND EXCLUDED
+  apex/options_pilot/recorded_feed.py   IDENTITY_FIELDS = ("bid","ask","bid_size","ask_size","timestamp_epoch")
+                                        -- a QUOTE identity, unrelated to fees. Matched the scan on the name
+                                        only. Not a fee-identity consumer.
