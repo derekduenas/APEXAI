@@ -325,7 +325,6 @@ def attempt_exits(bd: B.Boundary, *, exit_quote_fn, sleep_fn, recovery: bool = F
     """Drive the frozen exit policy over this session's unresolved positions:
     wait until due, value, retry inside the window, record exhaustion.
     Returns one entry per position with the final state THIS run reached."""
-    pol = bd.exit_policy
     out = []
     positions = recover_positions(bd)["own"] if positions is None else positions
     for pos in positions:
@@ -333,6 +332,14 @@ def attempt_exits(bd: B.Boundary, *, exit_quote_fn, sleep_fn, recovery: bool = F
         fl = rows[pos["seq"] - 1]
         committed = fl.get("committed_epoch")
         entry = {"fill_seq": pos["seq"], "intent_id": pos.get("intent_id"), "attempts": [], "final": None}
+        # THE ORIGINAL CONTRACT BINDS (EXIT-SCHEDULING-003 correction), here as in the lifecycle runner: this
+        # driver's own policy governs only a position whose persisted policy hash it matches.
+        pol, policy_problem = bd.original_exit_policy(fl, rows)
+        if policy_problem:
+            entry["final"] = "UNSERVICEABLE_EXIT_POLICY_UNRESOLVED"
+            entry["policy_problem"] = policy_problem
+            out.append(entry)
+            continue
         if pos.get("exit_exhausted") or any(x.get("kind") == "pilot_exit_exhausted" and (x.get("fill_ref") or {}).get("seq") == pos["seq"] for x in rows):
             if not recovery:
                 entry["final"] = "EXIT_EXHAUSTED_UNRESOLVED"

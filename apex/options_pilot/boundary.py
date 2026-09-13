@@ -34,6 +34,8 @@ from . import ledger as L
 from . import risk_gate as RG
 from .book import Book, load_book
 from .clock import Clock, ClockRefused, check_reading, to_utc_string
+from . import exit_policy as EP
+from . import instant as I
 from .exit_policy import EXIT_POLICY_V1, ExitPolicy
 from .fees import EXECUTION_POLICY_V1, UNVERIFIED_FEES, ExecutionPolicy, FeeSchedule
 from .records import (TOLL_FORMULA_V1, FORECAST_FRESHNESS_S, INTENT_TTL_S, RecordRefused, assert_record_labels, canonical_hash, is_real, labels_for,
@@ -666,6 +668,15 @@ class Boundary:
         return receipt
 
     # ------------------------------------------------------------ 5. outcome
+    def original_exit_policy(self, fl: dict, rows: list | None = None) -> tuple:
+        """THE exit contract of the POSITION, resolved from the ledger and hash-verified (EXIT-SCHEDULING-003
+        correction). Returns (policy, problem). This process's configured policy is only ever used when its hash
+        matches the one persisted with the fill, which is a verification, not a substitution."""
+        rows = L.read_all(self.ledger) if rows is None else rows
+        intent = next((r for r in rows if r.get("kind") == "pilot_intent"
+                       and r.get("intent_id") == fl.get("intent_id")), None)
+        return EP.resolve_for_fill(fl, intent_row=intent, process_policy=self.exit_policy)
+
     @staticmethod
     def discharging_outcomes(rows: list, fill_seq: int) -> list:
         return [(i + 1, r) for i, r in enumerate(rows) if r.get("kind") == "pilot_outcome"
@@ -698,7 +709,8 @@ class Boundary:
         rec = {"kind": "pilot_exit_exhausted", "txn_id": "exit_exhausted:%s" % fl["intent_id"], "intent_id": fl["intent_id"],
                "fill_ref": {"seq": fill_receipt["seq"], "entry_hash": fill_receipt["entry_hash"]}, "scan_id": fl.get("scan_id"),
                "session_id": self.session_id, "release": self.release, "attempts": len(self.valuation_attempts(rows, fill_receipt["seq"])),
-               "exit_policy": self.exit_policy.describe(), "obligation": "POSITION REMAINS UNRESOLVED; P&L UNKNOWN; exposure open",
+               "exit_policy": (self.original_exit_policy(fl, rows)[0] or self.exit_policy).describe(),
+               "obligation": "POSITION REMAINS UNRESOLVED; P&L UNKNOWN; exposure open",
                "at_utc": self.clock.now_utc(), **self.labels}
         assert_record_labels(rec)
 
@@ -759,15 +771,21 @@ class Boundary:
             # THE FROZEN EXIT POLICY governs WHEN a valuation may happen. A recovery run may attempt an exhausted or
             # late position, labelled as such; it may never value a position before it is due.
             committed = fl.get("committed_epoch")
-            status = self.exit_policy.status(now=self.clock.now(), committed_epoch=committed, attempts=attempt - 1) \
+            # THE ORIGINAL CONTRACT BINDS. Resolved and hash-verified BEFORE any deadline is evaluated and before
+            # the provider is asked, so a restart under a wider policy cannot widen this position's window or
+            # budget, and an unresolvable contract is refused rather than approximated.
+            pol, policy_problem = self.original_exit_policy(fl, rows)
+            if policy_problem:
+                self.refuse("outcome", "EXIT_POLICY_UNRESOLVED: %s" % policy_problem, scan_id=scan_id)
+            status = pol.status(now=self.clock.now(), committed_epoch=committed, attempts=attempt - 1) \
                 if isinstance(committed, (int, float)) else "UNSCHEDULED"
             if status == "NOT_DUE":
                 self.refuse("outcome", "EXIT_NOT_DUE: clock %s < exit_due %s under %s"
-                            % (self.clock.now_utc(), to_utc_string(committed + self.exit_policy.horizon_s), self.exit_policy.policy_id),
+                            % (self.clock.now_utc(), to_utc_string(committed + pol.horizon_s), pol.policy_id),
                             scan_id=scan_id)
             if status == "EXHAUSTED" and not recovery:
                 self.refuse("outcome", "EXIT_WINDOW_EXHAUSTED: automatic attempts stopped; recovery attempt required", scan_id=scan_id)
-            out.update(exit_policy={"policy_id": self.exit_policy.policy_id, "policy_hash": self.exit_policy.policy_hash},
+            out.update(exit_policy=EP.resolution_record(pol, fl, process_policy=self.exit_policy),
                        exit_policy_status=status + ("_RECOVERY_ATTEMPT" if recovery else ""))
         if fl["status"] != "FILLED":
             out.update(status="NO_POSITION", pnl=0.0, why="intent was %s (%s)" % (fl["status"], fl.get("why")),
@@ -789,8 +807,17 @@ class Boundary:
                 try:
                     q = validate_quote(raw, contract=fl["contract"])
                     age = t_rcpt - q["timestamp_epoch"]
+                    av = q.get("available_epoch")
                     if age < 0:
                         why = "EXIT_QUOTE_FROM_THE_FUTURE: %.3fs" % age
+                    elif av is not None and I.canonical_micros(av) > I.canonical_micros(t_rcpt):
+                        # AVAILABILITY <= RECEIPT, never availability <= request. A live request can legitimately be
+                        # served a quote that became available WHILE the request was in flight; a quote that claims
+                        # to have become available after it was received is a claim this system could not have acted
+                        # on. Recorded as-of sources enforce their declared lookup instant separately, in replay.
+                        why = ("EXIT_QUOTE_AVAILABLE_AFTER_RECEIPT: declared available %s, received %s; a quote "
+                               "cannot have reached this system after it was handed to it"
+                               % (to_utc_string(av), to_utc_string(t_rcpt)))
                     elif age > MAX_SELECTED_QUOTE_AGE_S:
                         why = "STALE_SELECTED_CONTRACT: BID side %.3fs old at receipt" % age
                     elif q["bid"] <= 0:

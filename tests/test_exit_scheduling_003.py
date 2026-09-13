@@ -407,7 +407,10 @@ class TestCarriedForwardAcceptance:
         for o in outcomes(h):
             q = o.get("exit_quote_observed") or {}
             if q.get("available_epoch") is not None:
-                assert q["available_epoch"] <= o["exit_quote_request_epoch"], "recorded availability precedes the request"
+                # THE LAW IS AVAILABILITY <= RECEIPT. A live request may legitimately be served a quote that became
+                # available while the request was in flight, so availability <= REQUEST is NOT required and this
+                # assertion deliberately does not demand it (EXIT-SCHEDULING-003 correction).
+                assert q["available_epoch"] <= o["exit_quote_receipt_epoch"], "availability never postdates receipt"
 
     def test_limits_hash_and_suppression_are_unchanged(self):
         assert B.MAX_SELECTED_QUOTE_AGE_S == 15.0

@@ -297,7 +297,29 @@ class LifecycleRunner:
     def _exit_schedule(self, pos: dict, rows: list | None = None) -> dict:
         rows = self._rows() if rows is None else rows
         fl = rows[pos["seq"] - 1]
-        return self.bd.exit_policy.schedule(fl["committed_epoch"])
+        pol, problem = self.bd.original_exit_policy(fl, rows)
+        if problem:
+            return {"policy_problem": problem}
+        return pol.schedule(fl["committed_epoch"])
+
+    def _policy_for(self, fill_seq: int, rows: list | None = None) -> tuple:
+        """The ORIGINAL exit contract of this position, hash-verified from the ledger (EXIT-SCHEDULING-003
+        correction). Every scheduling decision in this runner asks THIS, never `self.bd.exit_policy`: the process's
+        own configuration governs only positions whose persisted hash it matches."""
+        rows = self._rows() if rows is None else rows
+        return self.bd.original_exit_policy(rows[fill_seq - 1], rows)
+
+    def _unserviceable(self, fill_seq: int, problem: str, trigger: str) -> dict:
+        """A position whose original contract cannot be reconstructed. It is NOT exhausted -- no part of its budget
+        was spent -- and it is not attempted. It stays an explicit obligation and says what is missing."""
+        entry = self._entry(fill_seq)
+        self._settled.add(fill_seq)
+        entry["final"] = "UNSERVICEABLE_EXIT_POLICY_UNRESOLVED"
+        entry["policy_problem"] = problem
+        note = self._note(fill_seq, "EXIT_POLICY_UNRESOLVED", trigger=trigger, problem=problem,
+                          note=("the position remains an explicit unresolved obligation with retained exposure; "
+                                "no quote was requested and no attempt was consumed"))
+        return {"state": "UNSERVICEABLE_EXIT_POLICY_UNRESOLVED", "fill_seq": fill_seq, **note}
 
     def _reconcile(self) -> None:
         """RE-CHECK DEADLINES. Called after every handler, and after anything that advanced time. Every obligation on
@@ -310,6 +332,11 @@ class LifecycleRunner:
             if self.sched.has(EXIT_DUE, key) or self.sched.has(EXIT_RETRY, key) or self.sched.has(EXIT_WINDOW_CLOSE, key):
                 continue
             sch = self._exit_schedule(pos, rows)
+            if sch.get("policy_problem"):
+                # THE CONTRACT CANNOT BE RECONSTRUCTED, so there is no deadline to schedule and none is invented.
+                # The obligation is recorded as unserviceable and left explicit; it is not exhausted.
+                self._unserviceable(key, sch["policy_problem"], "RECONCILE")
+                continue
             if any(x.get("kind") == "pilot_exit_exhausted" and (x.get("fill_ref") or {}).get("seq") == key for x in rows):
                 continue      # already terminal: its budget is spent, and a restart does not grant a new one
             when, kind = sch["exit_due_epoch"], EXIT_DUE
@@ -346,9 +373,16 @@ class LifecycleRunner:
         self.sched.at(when, kind, {"fill_seq": fill_seq}, key=fill_seq)
         return True
 
+    PROCESS_IDENTITY_BASIS = (
+        "LOGICAL_INVOCATION_LABEL: a name for one run of this runner, derived from the session id and the start "
+        "instant. It is NOT an operating-system process identity, it is not authenticated, and it is not proof of "
+        "exclusivity: it does not prevent concurrent writers and two runs configured alike could mint the same "
+        "label. It records WHICH INVOCATION made an attempt, nothing more.")
+
     def _process_identity(self, fill_seq: int) -> dict:
         return {"process_id": self.process_id, "started_utc": self.process_started_utc,
-                "inherited_position": fill_seq in self.recovered_seqs}
+                "inherited_position": fill_seq in self.recovered_seqs,
+                "basis": self.PROCESS_IDENTITY_BASIS}
 
     def _next_attempt_epoch(self, spacing_s: float) -> float:
         """The next retry instant, guaranteed to be a LATER canonical instant than now, so a zero or sub-microsecond
@@ -370,7 +404,6 @@ class LifecycleRunner:
 
         An INHERITED position -- one an earlier process opened -- is serviced under the SAME policy, window and
         remaining budget as one this process opened (EXIT-SCHEDULING-003). Every attempt names its process."""
-        pol = self.bd.exit_policy
         recovery = fill_seq in self.recovered_seqs
         entry = self._entry(fill_seq)
         # TERMINAL STATE FIRST, before any suppression or scheduling decision. A timer queued before an arrival
@@ -382,6 +415,10 @@ class LifecycleRunner:
             note = self._note(fill_seq, "STALE_EVENT_RECONCILED_POSITION_ALREADY_RESOLVED", trigger=ev_kind,
                               final=entry.get("final"))
             return {"state": entry.get("final") or "ALREADY_RESOLVED", "fill_seq": fill_seq, **note}
+        # THE ORIGINAL CONTRACT, resolved and hash-verified BEFORE anything is scheduled or requested.
+        pol, policy_problem = self._policy_for(fill_seq)
+        if policy_problem:
+            return self._unserviceable(fill_seq, policy_problem, ev_kind)
         # THE OPTIONAL SUPPRESSION, disabled in the current policy (see ArrivalTriggeredExitPolicy). It remains
         # reachable only when a caller explicitly turns it back on.
         if (ev_kind in (EXIT_RETRY, EXIT_WINDOW_CLOSE)
@@ -454,7 +491,7 @@ class LifecycleRunner:
             return {"state": state, "fill_seq": fill_seq, "why": str(e)[:200]}
         entry["attempts"].append({"seq": o["seq"], "status": o["status"], "attempt": o.get("attempt"),
                                   "reconciled": o.get("reconciled", False), "trigger": ev_kind,
-                                  "policy_version": getattr(pol, "policy_id", None),
+                                  "policy_version": pol.policy_id, "policy_hash": pol.policy_hash,
                                   "why": (o.get("why") or "")[:120],
                                   "remaining_window_s": round(sch["window_close_epoch"] - self.clock.now(), 3)})
         if o.get("discharges_position"):
@@ -485,16 +522,23 @@ class LifecycleRunner:
         THE ARRIVAL IS NOT THE QUOTE. This only decides WHEN to ask; the boundary then fetches the exit quote and
         rechecks provider timestamp, receipt, contract identity, sides and prices exactly as it always did. An
         arrival-triggered attempt fails on staleness like any other when the snapshot carries an old quote."""
-        pol = self.bd.exit_policy
         obs_id, contract_id = ev["payload"].get("observation_id"), ev["payload"].get("contract_id")
         self._latest_observation[contract_id] = obs_id
-        if not getattr(pol, "arrival_triggered", False):
-            return self._note(None, "ARRIVAL_TRIGGER_NOT_ENABLED_BY_POLICY", observation_id=obs_id)
         acted = []
         for pos in self._positions():
             fs = pos["seq"]
             rows = self._rows()
             if rows[fs - 1].get("contract_id") != contract_id or fs in self._settled:
+                continue
+            # EACH POSITION UNDER ITS OWN CONTRACT: whether an arrival may trigger an attempt is a property of the
+            # policy the POSITION was opened under, not of the policy this process happens to run.
+            pol, policy_problem = self._policy_for(fs, rows)
+            if policy_problem:
+                acted.append(self._unserviceable(fs, policy_problem, EXIT_ARRIVAL))
+                continue
+            if not getattr(pol, "arrival_triggered", False):
+                acted.append(self._note(fs, "ARRIVAL_TRIGGER_NOT_ENABLED_BY_POLICY", observation_id=obs_id,
+                                        policy_id=pol.policy_id))
                 continue
             n = self._arrival_triggers.get(fs, 0)
             if n >= getattr(pol, "max_arrival_triggers", 64):
@@ -516,19 +560,25 @@ class LifecycleRunner:
             # PROVENANCE. The arrival only WOKE the scheduler. The boundary then asked the quote source itself, and
             # what it was served may be a different observation (a newer one at the same instant, for example).
             # Both identities are recorded, with whether they coincide, and neither is required to equal the other.
-            q_id = q_avail = None
+            q_id = q_avail = t_req = t_rcpt = None
             if out.get("outcome_seq"):
                 orow = self._rows()[out["outcome_seq"] - 1]
                 qo = orow.get("exit_quote_observed") or {}
                 q_id, q_avail = qo.get("observation_id"), qo.get("available_epoch")
+                # THE BOUNDARY'S OWN INSTANTS, as persisted. Reading the clock here would record a time after the
+                # provider call and after persistence -- a time the request never happened at.
+                t_req, t_rcpt = orow.get("exit_quote_request_epoch"), orow.get("exit_quote_receipt_epoch")
+            close = pol.schedule(committed)["window_close_epoch"]
             out.update(trigger="OBSERVATION_ARRIVAL",
                        observation_id=obs_id,            # the waking observation (field retained from 002)
                        arrival_observation_id=obs_id, quote_observation_id=q_id,
-                       request_epoch=self.clock.now(), quote_available_epoch=q_avail,
+                       request_epoch=t_req, receipt_epoch=t_rcpt, quote_available_epoch=q_avail,
+                       timing_basis=("PERSISTED_BY_THE_BOUNDARY: request and receipt are the instants the boundary "
+                                     "recorded around its own provider call, not a later clock read"),
                        same_observation=(q_id == obs_id) if q_id is not None else None,
                        provenance_note=("an arrival wakes the scheduler; the quote the boundary was served is "
                                         "identified separately and need not be the waking observation"),
-                       remaining_window_s=round(pol.schedule(committed)["window_close_epoch"] - self.clock.now(), 3))
+                       remaining_window_s=round(close - (t_req if t_req is not None else self.clock.now()), 3))
             self.report["exits"].append({"event": EXIT_ARRIVAL, "at_utc": ev["at_utc"], **out})
             acted.append(out)
         return {"observation_id": obs_id, "contract_id": contract_id,
@@ -664,6 +714,10 @@ class LifecycleRunner:
         self.report["exit_entries"] = [self._exit_entries[k] for k in sorted(self._exit_entries)]
         self.report["scheduling_events"] = list(self.scheduling_events)
         self.report["exit_policy"] = self.bd.exit_policy.describe()
+        self.report["exit_policy_role"] = ("PROCESS_CONFIGURED_POLICY: the policy this invocation is configured "
+                                           "with. It governs a position ONLY when its hash matches the one "
+                                           "persisted with that position's fill; every attempt record names the "
+                                           "policy that actually bound it. " + EP.POLICY_BINDING_LAW)
         self.report["attempt_accounting"] = EP.ATTEMPT_ACCOUNTING
         self.report["n_events"] = n
         self.report["n_arrival_events"] = n_arrivals
