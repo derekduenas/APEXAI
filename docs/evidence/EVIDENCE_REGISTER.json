@@ -1,6 +1,6 @@
 {
  "kind": "EVIDENCE_REGISTER",
- "updated_utc": "2026-09-12T20:00:00+00:00",
+ "updated_utc": "2026-09-12T22:30:00+00:00",
  "datasets": [
   {
    "id": "PILOT-COLLECTION/2026-09-11",
@@ -24,6 +24,19 @@
      "date": "2026-09-12",
      "use": "TRACE_REPLAY_PART1",
      "artifact": "docs/TRACE_ONE_TRADE.md"
+    },
+    {
+     "date": "2026-09-12",
+     "use": "PACKAGE_INVENTORY_READ",
+     "artifact": "docs/FLOW_VALIDATION_001_PACKAGE.md",
+     "note": "counts, digests and windows; no evaluation, fit or decision"
+    },
+    {
+     "date": "2026-09-12",
+     "use": "FLOW_VALIDATION_001",
+     "artifact": "docs/FLOW_VALIDATION_001_RESULT.md",
+     "authorization": "operator grant of P2/P3/P7 at code pin a3d5696",
+     "note": "one diagnostic run; mechanism validation only"
     }
    ],
    "may_support": "mechanism validation only",
@@ -72,6 +85,14 @@
    "authorization": "NONE \u2014 the governing repair-brick prompt prohibited provider contact; see SCOPE_DEVIATION_001.md",
    "may_support": "mechanism diagnosis only",
    "may_never_support": "any claim about edge, expectancy or calibration"
+  }
+ ],
+ "preserved_inputs": [
+  {
+   "id": "FLOW-VALIDATION-001-INPUTS",
+   "path": "~/apex-preserved/flow_validation_001",
+   "manifest_sha256": "2ca1103dc23ac849e0c8e7b942e74c6bf1444e94a90a7e6c41d4b81e7b51869f",
+   "note": "durable copy of the burned collection and the retained prior bars; acquisition history carried"
   }
  ]
 }

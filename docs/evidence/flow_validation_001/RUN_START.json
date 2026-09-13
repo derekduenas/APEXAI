@@ -1,0 +1,34 @@
+{
+ "code_pin": {
+  "branch": "HEAD",
+  "commit": "a3d5696e84144e8ee8dade5c0127e61831b7fbf8",
+  "dirty": false,
+  "dirty_paths": [],
+  "status": "PINNED"
+ },
+ "config": {
+  "authorization_path": "/Users/derekduenas/apex-preserved/flow_validation_001/ACCEPTANCE.json",
+  "cadence_snapshots": 15,
+  "fit_budget": 3,
+  "hold_s": 900.0,
+  "limits": "UNCHANGED",
+  "manifest_path": "/Users/derekduenas/apex-preserved/flow_validation_001/INPUTS_MANIFEST.json",
+  "policies": [
+   "WAIT",
+   "PILOT_RULE_V2",
+   "FULL_FUNNEL_V1"
+  ],
+  "route": "RECORDED_REPLAY"
+ },
+ "config_digest": "290a73319d37ca9b024db71677d166998b6c6ab308f693eecd8618459b06a842",
+ "inputs": {},
+ "kind": "RUN_START",
+ "note": "loop demonstration; recorded-replay route; manifest-pinned; no provider request",
+ "preservation_policy": "RUN_DIR_V1: one evaluation, one directory, claimed by creation. A directory that already exists is a COLLISION and is refused; an artifact name claimed twice is refused. Nothing in this module unlinks, truncates or overwrites. A failed run keeps its partial artifacts and gains a RUN_FAILED marker.",
+ "run_id": "flow_validation_001",
+ "started_canonical_us": 1789262342310593,
+ "started_epoch": 1789262342.3105931,
+ "started_utc": "2026-09-13T01:19:02.310593Z",
+ "status": "STARTED",
+ "timestamp_rule": "CANONICAL_INSTANT_V1: an instant is an exact integer of microseconds since 1970-01-01T00:00:00Z. A float epoch is converted with datetime.fromtimestamp(epoch, tz=UTC) -- nearest microsecond, ties to even -- which is the same conversion the record serializer performs, so the canonical integer is exactly the microsecond written to disk and read back. Instants are compared as integers; no epsilon is added, so the next representable future instant (+1 microsecond) is in the future and is refused. Source timestamps are preserved verbatim, separately."
+}

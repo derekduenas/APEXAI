@@ -1,0 +1,30 @@
+{
+ "kind": "FLOW_VALIDATION_001_ARTIFACT_DIGESTS",
+ "run_dir": "/Users/derekduenas/apex-preserved/flow_validation_runs/flow_validation_001",
+ "artifacts": {
+  "REPLAY_QUARANTINED_FULL_FUNNEL_V1.jsonl": {
+   "sha256": "2a47b0a031003d42a7479f9ccbd8441bc9b0dab02cec2913395d5244431e68dc",
+   "bytes": 426300
+  },
+  "REPLAY_QUARANTINED_PILOT_RULE_V2.jsonl": {
+   "sha256": "5e8a9ee99e582fc8ccf98e6313595de21a0aa5351333a00221f705488e4db05a",
+   "bytes": 244461
+  },
+  "REPLAY_QUARANTINED_WAIT.jsonl": {
+   "sha256": "3e1f232f182c9b9109469cf4de0ad3ec375290a06334fa3278b84430d0ec9a38",
+   "bytes": 5514
+  },
+  "RUN_COMPLETE.json": {
+   "sha256": "d9b5aed3927ef4906c6c98dd5facd2d2b36eb42e691ff5f8e8b7981f0f2c5e68",
+   "bytes": 9628
+  },
+  "RUN_START.json": {
+   "sha256": "ce7611df60642f642a0b4ad0b1fdb102b64f14ba937b0f177c4ef0ab2c1bfd67",
+   "bytes": 1859
+  },
+  "loop_demonstration.json": {
+   "sha256": "e2b5dc616893e6e2592b7b00d136869229f1991c2b07013f27c6b4a3428878b6",
+   "bytes": 93130
+  }
+ }
+}

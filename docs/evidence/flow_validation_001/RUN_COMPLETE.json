@@ -1,0 +1,198 @@
+{
+ "artifacts": [
+  "REPLAY_QUARANTINED_FULL_FUNNEL_V1.jsonl",
+  "REPLAY_QUARANTINED_FULL_FUNNEL_V1.jsonl.lock",
+  "REPLAY_QUARANTINED_FULL_FUNNEL_V1.jsonl.txn.lock",
+  "REPLAY_QUARANTINED_PILOT_RULE_V2.jsonl",
+  "REPLAY_QUARANTINED_PILOT_RULE_V2.jsonl.lock",
+  "REPLAY_QUARANTINED_PILOT_RULE_V2.jsonl.txn.lock",
+  "REPLAY_QUARANTINED_WAIT.jsonl",
+  "REPLAY_QUARANTINED_WAIT.jsonl.lock",
+  "REPLAY_QUARANTINED_WAIT.jsonl.txn.lock",
+  "RUN_START.json",
+  "loop_demonstration.json"
+ ],
+ "completed_utc": "2026-09-13T01:19:13.354109Z",
+ "kind": "RUN_COMPLETE",
+ "run_id": "flow_validation_001",
+ "started_utc": "2026-09-13T01:19:02.310593Z",
+ "status": "COMPLETED",
+ "summary": {
+  "FULL_FUNNEL_V1": {
+   "best": null,
+   "by_decision": {
+    "WAIT": 12
+   },
+   "exposure_usd": 0,
+   "known_realized_pnl": 0,
+   "net_pnl": 0.0,
+   "net_status": "NET",
+   "per_trade_net": null,
+   "scans": 12,
+   "scans_blocked_by_unavailable_stage": 0,
+   "trades": 0,
+   "unresolved_exits": 0,
+   "wait_and_refusal_reasons": {
+    "FUNNEL_WAIT: NO_ELIGIBLE_CANDIDATE: every contract rejected ": 12
+   },
+   "why_not_estimable": [],
+   "wins": 0,
+   "worst": null
+  },
+  "PILOT_RULE_V2": {
+   "best": -22.09,
+   "by_decision": {
+    "REFUSE": 7,
+    "TRADE": 5
+   },
+   "exposure_usd": 2405.0,
+   "known_realized_pnl": -156.36,
+   "net_pnl": null,
+   "net_status": "NOT_ESTIMABLE",
+   "per_trade_net": -39.09,
+   "scans": 12,
+   "scans_blocked_by_unavailable_stage": 0,
+   "trades": 5,
+   "unresolved_exits": 1,
+   "wait_and_refusal_reasons": {
+    "intent: RISK_NOT_APPROVED: 'KERNEL_REFUSED: SPY risk would r": 7
+   },
+   "why_not_estimable": [
+    "UNRESOLVED_POSITIONS: 1 (fill seqs [37]) -- open exposure with no outcome; its economics are unknown",
+    "EXIT_EXHAUSTED_POSITIONS: 1 (fill seqs [37]) -- an explicit unresolved obligation, not a zero"
+   ],
+   "wins": 0,
+   "worst": -49.09
+  },
+  "WAIT": {
+   "best": null,
+   "by_decision": {
+    "WAIT": 12
+   },
+   "exposure_usd": 0,
+   "known_realized_pnl": 0,
+   "net_pnl": 0.0,
+   "net_status": "NET",
+   "per_trade_net": null,
+   "scans": 12,
+   "scans_blocked_by_unavailable_stage": 0,
+   "trades": 0,
+   "unresolved_exits": 0,
+   "wait_and_refusal_reasons": {
+    "POLICY_WAIT: this policy never trades; it is the null": 12
+   },
+   "why_not_estimable": [],
+   "wins": 0,
+   "worst": null
+  },
+  "input_report": {
+   "acceptance": {
+    "accepted_by_claimed": "Derek Duenas (operator), authorization message of 2026-09-12; transcribed by Claude at his instruction",
+    "accepted_utc_claimed": "2026-09-12T18:20:00Z",
+    "authorship": "PROCEDURAL_UNAUTHENTICATED: this is a JSON file on disk. Nothing here verifies who wrote it, and no test can: there is no signature, no key and no identity check. What is enforced is that the document EXISTS, names this evaluation, binds to this input manifest and this code pin, states a scope, and accepts the assumption in its exact declared words. Treat `accepted_by` as a claim recorded on the run, not as an authenticated identity.",
+    "code_pin": "a3d5696e84144e8ee8dade5c0127e61831b7fbf8",
+    "evaluation_id": "FLOW-VALIDATION-001",
+    "input_manifest_sha256": "2ca1103dc23ac849e0c8e7b942e74c6bf1444e94a90a7e6c41d4b81e7b51869f",
+    "scope": "One FLOW-VALIDATION-001 diagnostic run. P2: the already-burned 2026-09-11 collection. P3: the retained prior-bar artifact under BULK_PULL_AVAILABILITY_V1. P7: one funnel fit() call under the enumerated contract (seven-day training window, session-day-start cutoff, 400-row minimum, at most three model-fit attempts, existing internal optimizer limits and GARCH-to-EWMA fallback). No additional fitting or retuning. Grants no deployment, live trading, model promotion or further data use."
+   },
+   "accepted_assumption": {
+    "accepted": true,
+    "accepted_by": "Derek Duenas (operator), authorization message of 2026-09-12; transcribed by Claude at his instruction",
+    "accepted_utc": "2026-09-12T18:20:00Z",
+    "assumption_id": "BULK_PULL_AVAILABILITY_V1",
+    "binding": "the id and its exact text are recorded on the run",
+    "text": "A one-minute bar in a bulk historical pull is treated as available at its event time plus sixty seconds. This is a formula, not a recorded receipt: the artifact carries no evidence of when this system could first have seen each bar. Any claim resting on it is diagnostic only."
+   },
+   "assumed_availability": {
+    "assumption_id": "BULK_PULL_AVAILABILITY_V1",
+    "checked": "every supplied receipt was compared with the formula; a disagreement would have refused the run",
+    "derived_field": "assumed_available_time",
+    "n_rows": 5170,
+    "offset_s": 60.0,
+    "source_field_preserved": "source_receipt_time"
+   },
+   "authorization_capture": {
+    "bytes": 1650,
+    "path": "/Users/derekduenas/apex-preserved/flow_validation_001/ACCEPTANCE.json",
+    "sha256": "9a3879b86908d1f43029e40fcf187f2bd8942e25b9eda1d86f520d7190f76ae2"
+   },
+   "bars_excluded_no_recorded_receipt": 0,
+   "manifest_capture": {
+    "bytes": 2926,
+    "path": "/Users/derekduenas/apex-preserved/flow_validation_001/INPUTS_MANIFEST.json",
+    "sha256": "2ca1103dc23ac849e0c8e7b942e74c6bf1444e94a90a7e6c41d4b81e7b51869f"
+   },
+   "prior_bars_kept": 5170,
+   "prior_bars_provenance": {
+    "acquisition_note": "bulk historical pull on 2026-09-12; no assigning path is named (SCOPE_DEVIATION_001.md)",
+    "artifact": "prior_bars",
+    "artifact_execution_attribution": {
+     "status": "UNVERIFIED",
+     "what_would_establish_it": [
+      "a run identity written into each record by the producing execution, chained and verifiable",
+      "a signed manifest produced by the collector at the end of its session, covering the file's digest",
+      "a host-side execution log that names the output path and its digest at write time"
+     ],
+     "why": "Nothing binds these particular records to an execution of the named path. There is no signed run identity on the rows, no chained run receipt covering the artifact, and no execution id to match. A fabricated artifact presented with the same assignment key would receive the same assignment-path evidence, so attribution is UNVERIFIED and must be read as such."
+    },
+    "assignment_path_evidence": {
+     "status": "NO_ASSIGNMENT_PATH_CLAIMED",
+     "why": "no assigning code path is named for this artifact"
+    },
+    "availability_basis": "DERIVED_BY_FORMULA",
+    "diagnostics": {
+     "constant_offset_s": 60.0,
+     "max_offset_s": 60.0,
+     "min_offset_s": 60.0,
+     "n_distinct_offsets": 1,
+     "n_rows": 5170,
+     "n_with_receipt": 5170,
+     "note": "DIAGNOSTIC ONLY. A varied offset does not establish that a receipt was measured, and a constant one does not establish that it was not. Provenance comes from the assigning code path, never from this table."
+    },
+    "reading": "availability_basis says where the gating value comes from; attribution says whether these rows can be tied to the code that would have produced it. Both must be read; neither substitutes for the other.",
+    "timestamp_semantics": {
+     "status": "UNKNOWN",
+     "why": "with no named path, what any timestamp measures is not established"
+    }
+   },
+   "prior_bars_total": 5170,
+   "session_bars_provenance": {
+    "acquisition_note": "presented as written by scripts/options_pilot_collector.py",
+    "artifact": "session_bars",
+    "artifact_execution_attribution": {
+     "status": "UNVERIFIED",
+     "what_would_establish_it": [
+      "a run identity written into each record by the producing execution, chained and verifiable",
+      "a signed manifest produced by the collector at the end of its session, covering the file's digest",
+      "a host-side execution log that names the output path and its digest at write time"
+     ],
+     "why": "Nothing binds these particular records to an execution of the named path. There is no signed run identity on the rows, no chained run receipt covering the artifact, and no execution id to match. A fabricated artifact presented with the same assignment key would receive the same assignment-path evidence, so attribution is UNVERIFIED and must be read as such."
+    },
+    "assignment_path_evidence": {
+     "establishes": "the source stamps receipt_time from the adapter's clock when the HTTP body is parsed, so where that code produced a bar, its receipt_time is the PARSE instant",
+     "field": "bar.receipt_time",
+     "file": "apex/pulse_options/providers.py",
+     "marker": "return self.parse_bars(txt, symbol=symbol, receipt_time=self.clock())",
+     "scope": "this establishes only what the inspected source contains now. It does not establish that any particular artifact was produced by running it.",
+     "status": "MARKER_PRESENT"
+    },
+    "availability_basis": "PER_RECORD_RECORDED",
+    "diagnostics": {
+     "constant_offset_s": null,
+     "max_offset_s": 262.183,
+     "min_offset_s": 82.101,
+     "n_distinct_offsets": 164,
+     "n_rows": 169,
+     "n_with_receipt": 169,
+     "note": "DIAGNOSTIC ONLY. A varied offset does not establish that a receipt was measured, and a constant one does not establish that it was not. Provenance comes from the assigning code path, never from this table."
+    },
+    "reading": "availability_basis says where the gating value comes from; attribution says whether these rows can be tied to the code that would have produced it. Both must be read; neither substitutes for the other.",
+    "timestamp_semantics": {
+     "field": "bar.receipt_time",
+     "measures": "PARSE_TIME",
+     "not": "network receipt. Parsing happens after the bytes arrive, so this is an upper bound on arrival."
+    }
+   }
+  }
+ }
+}
