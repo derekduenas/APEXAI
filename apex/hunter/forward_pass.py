@@ -325,7 +325,8 @@ def _uncertain_from_record(market_state: dict | None) -> bool:
     return abs(market_state["day_return"]) >= 0.015
 
 
-def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
+def enrichment_pass(t, date: str, decisions: list, universe: dict,
+                    bars_by_symbol: dict | None = None) -> list:
     """THE OPTIONAL INTELLIGENCE PASS — runs strictly AFTER candidates are
     persistable, reading ONLY the decision records themselves (analog ->
     swarm -> ForecastBundle -> APEX CAPITAL). Every seat is
@@ -383,7 +384,18 @@ def enrichment_pass(t, date: str, decisions: list, universe: dict) -> list:
                     status="NOT_REQUESTED",
                     provenance={"reason": "per-tick swarm budget spent; "
                                           "archive outranks enrichment"})
-            bundle = assemble_bundle(d, analog_result=analog, swarm=swarm)
+            # ASK EVERY LAYER. Until 2026-09-14 this call passed neither a prediction nor a simulation, so the
+            # bundle recorded assemble_bundle's own defaults and no reader could tell a starved model from one
+            # that was never wired. Both layers may still refuse -- but now they refuse with a number.
+            from apex.hunter.intelligence_wiring import ml_view, simulation_view
+            mlv = ml_view(d, _ledger_rows(), horizon_minutes=60,
+                          evidence_class=EvidenceClass.EODHD_FORWARD_OBSERVATION)
+            # Bars reach enrichment only when the caller supplies them. Absent, the simulation layer records
+            # a named refusal -- never a silent None, which is what could not be told from "not wired".
+            simv = simulation_view(d, (bars_by_symbol or {}).get(d["symbol"]),
+                                   as_of_epoch=float(pd.Timestamp(t).timestamp()))
+            bundle = assemble_bundle(d, analog_result=analog, swarm=swarm,
+                                     ml_prediction=mlv, simulation=simv)
             bundle_rec = stamp(bundle.as_record(),
                                EvidenceClass.EODHD_FORWARD_OBSERVATION)
             bundle_rec["session_date"] = date

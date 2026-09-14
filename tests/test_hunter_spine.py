@@ -136,7 +136,19 @@ def test_bundle_monday_truth_and_no_fake_ensemble():
                          "playbook_id": "HUNTER-001_v1",
                          "t_utc": "2026-08-17T14:00:00+00:00"})
     assert b.distribution_source_status == "REFUSED"
-    assert b.ml_view["status"] == "UNTRAINED"
+    # NOT_REQUESTED, not UNTRAINED. This assertion used to read UNTRAINED, and that is precisely the confusion
+    # the 2026-09-14 wiring audit found: UNTRAINED is a model LIFECYCLE state, and asserting it on behalf of a
+    # model nobody consulted made an UNWIRED layer indistinguishable from a STARVED one for a month of records.
+    # The honesty guard this test exists for -- no invented probability, no fake ensemble -- is unchanged.
+    assert b.ml_view["status"] == "NOT_REQUESTED"
+    assert b.ml_view["p_positive"] is None
+    # and a model that WAS consulted and genuinely has nothing still reports its own lifecycle state
+    asked = assemble_bundle({"decision_id": "d1", "direction": "LONG"},
+                            ml_prediction={"status": "UNTRAINED", "p_positive": None,
+                                           "reasons": ["INSUFFICIENT_FORWARD_DATA: n_effective 4 < 40"],
+                                           "asked": True})
+    assert asked.ml_view["status"] == "UNTRAINED" and asked.ml_view["asked"] is True
+    assert asked.distribution_source_status == "REFUSED", "an untrained model still supplies no probability"
     assert b.swarm_view["status"] == "BLOCKED_EXTERNAL_AUTH"  # default absence
     assert b.disagreement["level"] == "UNMEASURABLE"
     r = b.as_record()

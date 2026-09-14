@@ -159,19 +159,26 @@ def assemble_bundle(candidate: dict, *, analog_result=None, ml_prediction=None,
                          "uncertainty": analog_result.uncertainty,
                          "survivorship_limitation":
                              analog_result.survivorship_limitation})
-    ml_view = ml_prediction or {"status": "UNTRAINED", "p_positive": None,
-                                "reasons": ["INSUFFICIENT_FORWARD_DATA"]}
+    # NOT_REQUESTED, not UNTRAINED. The old default asserted a model LIFECYCLE state on behalf of a model that
+    # was never consulted, and every record produced since has been unable to distinguish a starved model from an
+    # unwired one.
+    ml_view = ml_prediction or {"status": "NOT_REQUESTED", "p_positive": None,
+                                "reasons": ["no ml_prediction was supplied to assemble_bundle"]}
     swarm = swarm or SwarmAssessment(
         candidate_id=candidate.get("decision_id", "?"),
         as_of=as_of or candidate.get("t_utc", "?"),
         status="BLOCKED_EXTERNAL_AUTH")
-    sim_view = None
+    sim_view = {"status": "NOT_REQUESTED", "reasons": ["no simulation was supplied to assemble_bundle"],
+                "note": "NOT_REQUESTED is not a measured absence -- nobody asked"}
     if simulation is not None:
         sim_view = {"status": simulation.calibration_status,
                     "source": simulation.source,
                     "n_paths": simulation.n_paths,
                     "branch_scenario_frequencies":
                         simulation.branch_scenario_frequencies,
+                    # a REFUSED simulation must carry why, or it reads exactly like one that was never wired
+                    "reasons": list(getattr(simulation, "reasons", ()) or ()),
+                    "provenance": getattr(simulation, "provenance", {}) or {},
                     "note": "scenario frequency, NOT calibrated probability"}
 
     analog_p = analog_view.get("p_positive")
