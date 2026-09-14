@@ -77,20 +77,48 @@ def ml_view(candidate: dict, ledger_rows: list, *, evidence_class,
 
 
 # ------------------------------------------------------------------ the variance + multiverse layer
-def _return_rows(bars, *, cutoff_epoch: float) -> list:
-    """One-minute log returns in the row shape the variance models consume.
+def _visible_simulation_bars(bars, *, cutoff_epoch: float):
+    """Use Hunter's completed-bar/session rule for BOTH returns and spot.
 
-    EACH ROW CARRIES WHEN IT BECAME KNOWABLE. The variance model enforces a point-in-time firewall and refuses a
-    fit offered any row available after the cutoff -- correctly, and it caught this adapter's first version, which
-    supplied bare returns with no availability stamp at all. A return from bar[i] to bar[i+1] is knowable at
-    bar[i+1]'s close, so that is its `event_time`."""
+    Legacy normalized frames do not carry measured receipt times. Bar completion
+    is an explicit availability assumption, not evidence of network receipt.
+    When available_epoch is supplied it must also precede the cutoff; unknown
+    supplied availability is excluded rather than backdated.
+    """
     import numpy as np
-    closes = [float(c) for c in bars["close"].tolist()]
-    times = [float(t.timestamp()) for t in bars["event_time_utc"].tolist()]
+    import pandas as pd
+    from apex.hunter.chartstate import visible_bars
+    cutoff = pd.Timestamp(cutoff_epoch, unit="s", tz="UTC")
+    frame = visible_bars(bars, cutoff).copy()
+    market_date = cutoff.tz_convert("America/New_York").date()
+    frame = frame[frame["event_time_utc"].dt.tz_convert("America/New_York").dt.date == market_date]
+    if "available_epoch" in frame:
+        availability = pd.to_numeric(frame["available_epoch"], errors="coerce")
+        frame = frame[np.isfinite(availability) & (availability <= cutoff_epoch)]
+    frame = frame.sort_values("event_time_utc", kind="stable")
+    if frame["event_time_utc"].duplicated().any():
+        raise ValueError("DUPLICATE_SIMULATION_BAR")
+    closes = pd.to_numeric(frame["close"], errors="coerce")
+    if not (np.isfinite(closes) & (closes > 0)).all():
+        raise ValueError("INVALID_SIMULATION_CLOSE")
+    return frame
+
+
+def _return_rows(bars, *, cutoff_epoch: float) -> list:
+    """Adjacent completed one-minute returns; gaps are not one-minute returns."""
+    import math
+    frame = _visible_simulation_bars(bars, cutoff_epoch=cutoff_epoch)
+    closes = [float(c) for c in frame["close"].tolist()]
+    times = [float(t.timestamp()) for t in frame["event_time_utc"].tolist()]
+    availability = (frame["available_epoch"].astype(float).tolist()
+                    if "available_epoch" in frame else [t + 60 for t in times])
     rows = []
-    for (a, b, tb) in zip(closes, closes[1:], times[1:]):
-        if a > 0 and b > 0 and tb <= cutoff_epoch:
-            rows.append({"ret_1": float(np.log(b / a)), "event_time": tb, "available": tb})
+    for i in range(1, len(closes)):
+        if times[i] - times[i - 1] != 60:
+            continue
+        known = max(times[i] + 60, availability[i - 1], availability[i])
+        rows.append({"ret_1": math.log(closes[i] / closes[i - 1]),
+                     "event_time": times[i] + 60, "available": known})
     return rows
 
 
@@ -120,9 +148,17 @@ def simulation_view(candidate: dict, bars, *, as_of_epoch: float,
     try:
         if bars is None or not len(bars):
             return SimulationView("REFUSED", "NO_BARS", 0, {}, ("NO_BARS_FOR_SYMBOL",), prov)
-        rows = _return_rows(bars, cutoff_epoch=as_of_epoch)
+        visible = _visible_simulation_bars(bars, cutoff_epoch=as_of_epoch)
+        if visible.empty:
+            return SimulationView("REFUSED", "NO_VISIBLE_BARS", 0, {},
+                                  ("NO_COMPLETED_VISIBLE_BARS",), prov)
+        rows = _return_rows(visible, cutoff_epoch=as_of_epoch)
         prov["return_rows"] = len(rows)
-        spot = float(bars["close"].iloc[-1])
+        spot = float(visible["close"].iloc[-1])
+        prov.update(spot=spot, last_bar_start=str(visible["event_time_utc"].iloc[-1]),
+                    availability_basis=("BAR_COMPLETION_AND_SUPPLIED_AVAILABILITY"
+                                        if "available_epoch" in visible else
+                                        "BAR_COMPLETION_ASSUMED_NOT_MEASURED_RECEIPT"))
         if not (spot > 0):
             return SimulationView("REFUSED", "SPOT_INVALID", 0, {}, ("SPOT_NOT_POSITIVE",), prov)
 

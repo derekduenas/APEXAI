@@ -21,7 +21,7 @@ from apex.hunter.forecast import assemble_bundle
 EC = EvidenceClass.EODHD_FORWARD_OBSERVATION
 
 
-def synth_bars(n=400, s0=100.0, seed=0, end="2026-09-14 12:00"):
+def synth_bars(n=400, s0=100.0, seed=0, end="2026-09-14 18:00"):
     rng = np.random.default_rng(seed)
     r = rng.normal(0, 0.0008, n)
     close = s0 * np.exp(np.cumsum(r))
@@ -31,7 +31,7 @@ def synth_bars(n=400, s0=100.0, seed=0, end="2026-09-14 12:00"):
                          "close": close, "volume": 1000})
 
 
-CUTOFF = pd.Timestamp("2026-09-14 12:00", tz="UTC").timestamp()
+CUTOFF = pd.Timestamp("2026-09-14 18:01", tz="UTC").timestamp()
 
 
 # ======================================================= the semantic change
@@ -127,7 +127,7 @@ class TestNoLookahead:
     def test_a_return_is_knowable_at_the_CLOSING_bar_not_the_opening_one(self):
         bars = synth_bars(n=3)
         rows = W._return_rows(bars, cutoff_epoch=CUTOFF)
-        assert rows[0]["event_time"] == float(bars["event_time_utc"].iloc[1].timestamp())
+        assert rows[0]["event_time"] == float(bars["event_time_utc"].iloc[1].timestamp()) + 60
 
     def test_rows_after_the_cutoff_are_excluded(self):
         bars = synth_bars(n=100)
