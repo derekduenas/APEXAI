@@ -1,0 +1,31 @@
+host timezone      America/Los_Angeles   (/etc/localtime: /etc/localtime -> /var/db/timezone/zoneinfo/America/Los_Angeles)
+market timezone    America/New_York   (authoritative: every stage target is a market instant)
+tracks the market  True
+next market session 2026-09-14
+
+   STAGE                MARKET       LOCAL        UTC INSTANT (next session) MKT-LOC  ALL-YEAR LOCAL TRIGGERS
+   0815_ET_initial      08:15 ET     05:15        2026-09-14T12:15:00+00:00  3.0      05:15
+   0832_ET_post_macro   08:32 ET     05:32        2026-09-14T12:32:00+00:00  3.0      05:32
+   0905_ET_refresh      09:05 ET     06:05        2026-09-14T13:05:00+00:00  3.0      06:05
+   0920_ET_final        09:20 ET     06:20        2026-09-14T13:20:00+00:00  3.0      06:20
+   seal                 09:25 ET     06:25        2026-09-14T13:25:00+00:00  3.0      06:25
+   reconcile            09:40 ET     06:40        2026-09-14T13:40:00+00:00  3.0      06:40
+
+HOST TIMEZONE EVIDENCE, from the operating system rather than from an assumption:
+   /etc/localtime is a symlink -> /var/db/timezone/zoneinfo/America/Los_Angeles
+   date +%Z %z                 -> PDT -0700
+   systemsetup -gettimezone    -> requires administrator access; NOT RUN (this audit changes no host settings)
+
+WHAT HAPPENS IF THE HOST MOVES. The generated schedule is bound to America/Los_Angeles in
+ops/premarket_repair/timezone_binding.json, which install.sh places at ops/timezone_binding.json. The staged CLI
+checks it on every invocation and exits 5 with TIMEZONE_CONFIGURATION_MISMATCH if the live host no longer
+matches -- it does not run at a shifted market time.
+
+THE SECOND, INDEPENDENT GUARD. Even with no binding installed at all, a stage decides its disposition from the
+MARKET instant, never from the local hour that triggered it. A trigger firing at the wrong local time therefore
+lands outside its market window and is refused as TOO_EARLY or MISSED_WINDOW. The binding turns a silent
+skip into a named refusal; it is not what prevents the shifted run.
+
+A HOST THAT DOES NOT TRACK THE MARKET ZONE needs more than one local trigger per stage -- a UTC host needs 12:15
+in summer and 13:15 in winter for one 08:15 ET target, and StartCalendarInterval cannot express "whichever is
+current". The generator emits BOTH; the out-of-season one lands outside the market window and is refused.

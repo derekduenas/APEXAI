@@ -1,0 +1,46 @@
+{
+ "schema": "MARKET_TIME_V1",
+ "market_tz": "America/New_York",
+ "host_tz": "America/Los_Angeles",
+ "offset_stable_vs_market": true,
+ "generated_for_year": 2026,
+ "triggers": {
+  "0815_ET_initial": [
+   [
+    5,
+    15
+   ]
+  ],
+  "0832_ET_post_macro": [
+   [
+    5,
+    32
+   ]
+  ],
+  "0905_ET_refresh": [
+   [
+    6,
+    5
+   ]
+  ],
+  "0920_ET_final": [
+   [
+    6,
+    20
+   ]
+  ],
+  "seal": [
+   [
+    6,
+    25
+   ]
+  ],
+  "reconcile": [
+   [
+    6,
+    40
+   ]
+  ]
+ },
+ "why": "launchd fires StartCalendarInterval in the HOST's local time. These local triggers were computed for host_tz. If the host moves zones they are wrong, and the runner refuses with TIMEZONE_CONFIGURATION_MISMATCH rather than running at a shifted market time."
+}

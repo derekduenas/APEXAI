@@ -1,0 +1,49 @@
+PRODUCTION CALL GRAPH AFTER R5
+
+   com.apex.premarket.<stage>.plist   (six: one per stage, each carrying every local trigger the host
+                                       needs across the year, derived from the MARKET target)
+     -> ops/premarket.sh <stage>
+     -> scripts/premarket_stage.py --stage <stage>
+       -> market_time: TIMEZONE GUARD (refuses TIMEZONE_CONFIGURATION_MISMATCH, exit 5)
+       -> premarket_stages.run_stage / .finalize     THE authoritative absorb
+         -> premarket.assemble                       the real builder
+         -> premarket_time                           the production time model (V1 schema block)
+         -> premarket_journal                        durable, hash-chained, content-addressed
+         -> Captain  (BEFORE the seal, so its instants are bound by the digest)
+         -> premarket.seal                           the real sealer, PREMARKET_CONTEXT_PACKET_V2
+
+AST CLOSURE FROM THE PREPARED PRODUCTION ENTRY POINT:
+   modules reachable            25
+   reaches premarket_run.py     False
+   reaches the audit harness    False
+   reaches apex/frontier/premarket_time.py    True
+   reaches apex/frontier/market_time.py       True
+   reaches apex/frontier/premarket_journal.py True
+   executable sleep() sites in the closure:
+      apex/data/sharadar_api.py        line 139   time.sleep
+      apex/intraday/eodhd.py           line 200   time.sleep
+      apex/intraday/eodhd.py           line 341   time.sleep
+   All three are provider rate-limit or retry backoffs. None takes a stage target. The test asserts this
+   SET, so a new sleep anywhere in the reachable closure fails it.
+
+LEGACY RUNNER (parity oracle; reachable from NO prepared artifact) still carries BOTH of its defects:
+      scripts/premarket_run.py         line 94    time.sleep   <- the capped scheduling sleep
+      scripts/premarket_run.py         line 84    time.sleep   <- the capped scheduling sleep
+      scripts/premarket_run.py               normalize() + Timedelta  <- the latent DST target defect
+
+PREPARED ARTIFACT HASHES (sha256, first 32):
+   com.apex.premarket.0815_ET_initial.plist.NEW         fe456b4e644274f3b5fbe089d258513f
+   com.apex.premarket.0832_ET_post_macro.plist.NEW      c007ebbf3f8a948f73839d00160a7c15
+   com.apex.premarket.0905_ET_refresh.plist.NEW         94b522ed04d57d44bf32008822811a85
+   com.apex.premarket.0920_ET_final.plist.NEW           7f2fc99f91edb0611641c363cbbb9564
+   com.apex.premarket.plist.PRIOR                       6a22ee77ee8e4af2994889826c13bf42
+   com.apex.premarket.reconcile.plist.NEW               5ace44ed59f2a98bb4c0f5a2644fc469
+   com.apex.premarket.seal.plist.NEW                    4ca148309ca979a2adb6c5c36bab2782
+   generate.py                                          c7b63d4c5ae817c10eb8be8b354dfe04
+   install.sh                                           fcb5d2bba465c70ffdb7cd35d7cceee8
+   once.sh                                              a927d1cd805e3b3f00c96b8f34a175dd
+   premarket.sh.NEW                                     9f3306c46945adcf50c326c83e0369b7
+   premarket.sh.PRIOR                                   3508fe93467f7eb96c459389e9460491
+   rollback.sh                                          0c3c48973cc47a83c9ed6ed21b6a9fe8
+   status.sh                                            eee3c170e333b27d62a292b75f268721
+   timezone_binding.json                                42fad780fdb518080adf718f2b196918

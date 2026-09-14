@@ -12,6 +12,7 @@
        made a 19-day gap silent. -->
   <key>StandardOutPath</key><string>/Users/derekduenas/apex-equities/logs/premarket.reconcile.launchd.out</string>
   <key>StandardErrorPath</key><string>/Users/derekduenas/apex-equities/logs/premarket.reconcile.launchd.err</string>
+  <!-- market target 09:40 America/New_York. Host America/Los_Angeles tracks the market zone, so ONE local trigger covers the year. -->
   <key>StartCalendarInterval</key>
   <array>
     <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>40</integer></dict>

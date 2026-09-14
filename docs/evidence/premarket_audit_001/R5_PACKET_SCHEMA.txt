@@ -1,0 +1,132 @@
+PREMARKET_CONTEXT_PACKET_V2 — the versioned packet, as actually written by the production CLI
+
+VERSIONING. A V1 packet carries no `schema` field and one `as_of_time` that was doing three jobs. Its
+bytes and its original interpretation are preserved; `interpret()` reports its source freshness as
+UNRECONSTRUCTIBLE rather than inferring it from the seal clock. V2 separates the jobs and KEEPS
+`as_of_time` only with a machine-readable definition attached to every packet.
+
+V1 interpretation:
+   {"schema": "PREMARKET_CONTEXT_PACKET_V1", "as_of_time": {"field": "as_of_time", "means": "PACKET_SEALED_AT", "does_not_mean": ["SOURCE_FRESHNESS", "INFORMATION_CUTOFF"], "information_cutoff_field": "UNRECONSTRUCTIBLE", "per_source_freshness_field": "UNRECONSTRUCTIBLE", "note": "a V1 packet records no source instants at all. Its downstream availability is reconstructible from as_of_time; its SOURCE FRESHNESS is not, and must be reported UNRECONSTRUCTIBLE rather than inferred from the seal clock."}, "information_cutoff": "UNRECONSTRUCTIBLE", "packet_known_from": "2026-08-26 13:25:00+00:00", "per_source_freshness_s": {}, "source_freshness": "UNRECONSTRUCTIBLE"}
+
+V2 fields added on top of the thirteen V1 fields:
+   schema                 PREMARKET_CONTEXT_PACKET_V2
+   time                   ai_request_time, ai_response_time, latest_accepted_known_from, laws, legacy_note, morning_started_at, packet_collection_started_at, packet_c
+   source_observations    19 entries
+   stage_time             absorption_finished_at, capture_finished_at, capture_started_at, code_identity, config_identity, disposition, lateness_s, market_date, marke
+   as_of_time_semantics   availability_field, does_not_mean, equals, field, information_cutoff_field, means, per_source_freshness_field
+
+THE TIME BLOCK, as sealed:
+{
+ "ai_request_time": 1787750700.0,
+ "ai_response_time": 1787750700.0,
+ "latest_accepted_known_from": 1787750400.0,
+ "packet_collection_started_at": 1787750400.0,
+ "packet_created_at": 1787750400.0,
+ "packet_data_cutoff": 1787750400.0,
+ "packet_known_from": 1787750700.0,
+ "packet_sealed_at": 1787750700.0,
+ "per_source_freshness_s": {
+  "EODHD_PREMARKET": 0.0,
+  "SEC_EDGAR": 1200.0
+ },
+ "per_source_known_from": {
+  "EODHD_PREMARKET": 1787750400.0,
+  "SEC_EDGAR": 1787749200.0
+ },
+ "per_source_last_probe": {
+  "EODHD_PREMARKET": 1787750400.0,
+  "SEC_EDGAR": 1787750400.0
+ },
+ "schema": "PREMARKET_TIME_V1",
+ "morning_started_at": 1787746500.0
+}
+
+as_of_time_semantics (no reader has to infer the field's meaning from its name):
+{
+ "field": "as_of_time",
+ "means": "PACKET_SEALED_AT",
+ "equals": "time.packet_sealed_at",
+ "does_not_mean": [
+  "SOURCE_FRESHNESS",
+  "INFORMATION_CUTOFF",
+  "LATEST_OBSERVATION_TIME"
+ ],
+ "information_cutoff_field": "time.packet_data_cutoff",
+ "availability_field": "time.packet_known_from",
+ "per_source_freshness_field": "time.per_source_freshness_s"
+}
+
+A SOURCE OBSERVATION with provider-declared availability (SEC EDGAR):
+{
+ "availability_basis": "PROVIDER_AVAILABILITY",
+ "carries_content": true,
+ "normalization": "ACCEPTED",
+ "source_event_time": 1787739900.0,
+ "source_id": "NVDA.US:NVDA-8K-1",
+ "source_kind": "SEC_EDGAR",
+ "source_known_from": 1787740200.0,
+ "source_publication_time": "UNAVAILABLE",
+ "source_receipt_time": 1787750400.0,
+ "source_request_time": 1787750400.0,
+ "source_timezone": "UTC"
+}
+
+A SOURCE OBSERVATION whose availability is the RECEIPT instant (EODHD bars):
+{
+ "availability_basis": "RECEIPT_INSTANT",
+ "carries_content": true,
+ "normalization": "ACCEPTED",
+ "source_event_time": 1787750400.0,
+ "source_id": "SPY.US",
+ "source_kind": "EODHD_PREMARKET",
+ "source_known_from": 1787750400.0,
+ "source_publication_time": "UNAVAILABLE",
+ "source_receipt_time": 1787750400.0,
+ "source_request_time": 1787750400.0,
+ "source_timezone": "UTC"
+}
+
+A REFUSED OBSERVATION (provider stamped a future availability):
+{
+ "availability_basis": "PROVIDER_AVAILABILITY",
+ "carries_content": true,
+ "normalization": "REFUSED_AS_FUTURE",
+ "refusal_reason": "PROVIDER_DECLARED_AVAILABILITY_AFTER_STAGE_INSTANT: the payload claims it became available at 1787751900.0, after the 1787750400.0 this stage reasons as of; its data was dropped at the transport boundary and never reached the normalizer, the packet or the Captain prompt",
+ "source_event_time": 1787750400.0,
+ "source_id": "SKEW.US",
+ "source_kind": "EODHD_PREMARKET",
+ "source_known_from": 1787751900.0,
+ "source_publication_time": "UNAVAILABLE",
+ "source_receipt_time": 1787750400.0,
+ "source_request_time": 1787750400.0,
+ "source_timezone": "UTC"
+}
+
+THE STAGE TIME BLOCK:
+{
+ "absorption_finished_at": 1787750400.0,
+ "capture_finished_at": 1787750400.0,
+ "capture_started_at": 1787750400.0,
+ "code_identity": {
+  "producer_digest": "933cf46be0e20ecc",
+  "...": "elided"
+ },
+ "config_identity": {
+  "config_digest": "68bd17f489b7e201",
+  "...": "elided"
+ },
+ "disposition": "ON_TIME",
+ "lateness_s": 0.0,
+ "market_date": "2026-08-26",
+ "market_tz": "America/New_York",
+ "normalization_finished_at": 1787750400.0,
+ "process_started_at": 1787750400.0,
+ "process_started_market": "2026-08-26T09:20:00-04:00",
+ "schema": "PREMARKET_STAGE_TIME_V1",
+ "stage": "0920_ET_final",
+ "target_epoch": 1787750400.0,
+ "target_instant": "2026-08-26T09:20:00-04:00",
+ "window_closes": "2026-08-26T09:30:00-04:00",
+ "window_opens": "2026-08-26T09:19:00-04:00",
+ "window_s": 600.0
+}

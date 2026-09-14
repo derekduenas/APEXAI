@@ -27,6 +27,8 @@ from pathlib import Path
 
 SCHEMA = "PREMARKET_STAGES_V1"
 
+from apex.frontier.premarket import AS_OF_TIME_SEMANTICS_V2, PACKET_SCHEMA_V2  # noqa: E402
+
 # ------------------------------------------------------------------ the schedule, in ONE place
 # ET wall-clock targets. These were read out of scripts/premarket_run.py's own schedule list and its seal target;
 # they are authoritative here now, and the legacy runner imports them rather than restating them.
@@ -90,9 +92,22 @@ class StageRefused(RuntimeError):
 
 # ------------------------------------------------------------------ timing
 def target_for(stage: str, now_et):
-    import pandas as pd
+    """The stage's target as a WALL-CLOCK market instant.
+
+    R5 DEFECT, found by the daylight-transition test. This was `now_et.normalize() + Timedelta(hours=h,
+    minutes=m)`, which adds ELAPSED time to local midnight -- not the same thing as a wall-clock time on a day
+    that has 23 or 25 hours. On the spring-forward date, midnight plus 8h15m of elapsed time is 09:15 local, so
+    the 08:15 target was computed an hour late and an ON-TIME arrival was judged TOO_EARLY; on the fall-back
+    date it was computed an hour early and an on-time arrival was judged MISSED_WINDOW.
+
+    DORMANT, NOT LIVE, and the distinction matters: US daylight transitions fall on a SUNDAY in
+    America/New_York and this job runs Monday to Friday, so no scheduled stage has ever hit it. It is fixed
+    because a correctness property that holds only by a calendar coincidence is not a property. The legacy
+    runner keeps the old construction deliberately -- it is the parity oracle, and this is a SECOND latent
+    defect it carries, now on the record."""
+    from apex.frontier import market_time as MT
     h, m = STAGES[stage]
-    return now_et.normalize() + pd.Timedelta(hours=h, minutes=m)
+    return MT.market_instant(str(now_et.date()), h, m)
 
 
 def disposition(stage: str, now_et):
@@ -125,10 +140,20 @@ def stage_symbols() -> list:
 # ------------------------------------------------------------------ the transport seam
 class RecordingTransport:
     """Wraps the EODHD chunk fetch so every raw response becomes a content-addressed blob BEFORE anything
-    normalizes it. Production writes these too -- this is not audit scaffolding."""
+    normalizes it, AND so the request and receipt instants are recorded as a source observation. Production
+    writes both -- this is not audit scaffolding.
 
-    def __init__(self, journal, inner=None):
+    It is also the boundary where a PROVIDER-DECLARED FUTURE availability is refused: a payload that says it
+    became available after the instant this stage is reasoning about is dropped here, so its data never reaches
+    the normalizer, the packet or the Captain prompt. Refusing it later would be too late -- the numbers would
+    already be in the packet with a note attached."""
+
+    def __init__(self, journal, inner=None, *, as_of_epoch=None):
+        # `journal=None` records observations and refusals but writes no blobs. That is the form the LEGACY
+        # oracle gets, so both producers build the same observation table from the same code and the new time
+        # fields can be compared semantically between them.
         self.journal, self._inner, self.manifest = journal, inner, []
+        self.observations, self.as_of_epoch = [], as_of_epoch
 
     def _real(self):
         if self._inner is not None:
@@ -141,10 +166,51 @@ class RecordingTransport:
         return fetch_intraday_chunk
 
     def __call__(self, symbol, lo, hi, gov, *a, **k):
+        from apex.frontier import premarket_runtime as RT
+        from apex.frontier import premarket_time as T
+        req = RT.now_utc().timestamp()
         rows, src = self._real()(symbol, lo, hi, gov, *a, **k)
-        sha = self.journal.put_blob({"symbol": symbol, "lo": lo, "hi": hi, "rows": rows, "source": src})
-        self.manifest.append({"key": "%s|%s|%s" % (symbol, lo, hi), "blob": sha, "source": src})
+        rec = RT.now_utc().timestamp()
+        available_at = _declared_availability(rows)
+        obs = T.source_observation(
+            source_id=symbol, source_kind="EODHD_PREMARKET",
+            event_time=_latest_event_time(rows), request_time=req, receipt_time=rec,
+            known_from=available_at, availability_basis=(T.BASIS_EXPLICIT if available_at is not None else None),
+            source_timezone="UTC", carries_content=bool(rows),
+            normalization=(T.NORM_ACCEPTED if rows else T.NORM_UNAVAILABLE))
+        refused = T.provider_declared_future(obs, self.as_of_epoch)
+        if refused:
+            obs["normalization"] = T.NORM_REFUSED_FUTURE
+            obs["refusal_reason"] = (
+                "PROVIDER_DECLARED_AVAILABILITY_AFTER_STAGE_INSTANT: the payload claims it became available at "
+                "%r, after the %r this stage reasons as of; its data was dropped at the transport boundary and "
+                "never reached the normalizer, the packet or the Captain prompt" % (available_at, self.as_of_epoch))
+            rows = []
+        if self.journal is not None:
+            sha = self.journal.put_blob({"symbol": symbol, "lo": lo, "hi": hi, "rows": rows, "source": src,
+                                         "observation": obs})
+            self.manifest.append({"key": "%s|%s|%s" % (symbol, lo, hi), "blob": sha, "source": src})
+        self.observations.append(obs)
         return rows, src
+
+
+def _latest_event_time(rows):
+    """The newest instant the PROVIDER says its data is about. Absent rows give UNAVAILABLE, never `now`."""
+    ts = [r.get("timestamp") for r in (rows or []) if isinstance(r, dict) and isinstance(r.get("timestamp"),
+                                                                                        (int, float))]
+    return float(max(ts)) if ts else None
+
+
+def _declared_availability(rows):
+    """A provider may state when a payload became available to us. EODHD does not, so this is normally None and
+    known_from falls back to the receipt instant with its basis recorded as RECEIPT_INSTANT."""
+    if isinstance(rows, dict):
+        v = rows.get("available_at")
+        return float(v) if isinstance(v, (int, float)) else None
+    for r in (rows or []):
+        if isinstance(r, dict) and isinstance(r.get("available_at"), (int, float)):
+            return float(r["available_at"])
+    return None
 
 
 class ReplayTransport:
@@ -154,7 +220,7 @@ class ReplayTransport:
     def __init__(self, journal, manifest):
         self.journal = journal
         self.by_key = {m["key"]: m for m in manifest}
-        self.served = []
+        self.served, self.observations = [], []
 
     def __call__(self, symbol, lo, hi, gov, *a, **k):
         key = "%s|%s|%s" % (symbol, lo, hi)
@@ -164,12 +230,18 @@ class ReplayTransport:
                                "has no record of capturing" % key)
         blob = self.journal.get_blob(m["blob"])     # re-hashed; an altered blob raises here
         self.served.append(key)
+        if blob.get("observation"):
+            self.observations.append(blob["observation"])
         return blob["rows"], blob["source"]
 
 
 # ------------------------------------------------------------------ THE authoritative absorb
 def absorb(label: str, *, as_of=None, fetch=None, symbols=None) -> dict:
-    """One absorption. Verbatim the legacy runner's `absorb()` body, now living in exactly one place.
+    """One absorption: the legacy runner's selection and assembly, plus the production time model.
+
+    R4 moved this here so there is exactly one absorb. R5 added the time model to it -- the observation table,
+    the declared cutoff and the packet's instants -- so that a packet cannot be produced by ANY caller without
+    carrying the instants that say how fresh it is.
 
     Note preserved deliberately, not fixed here: a fresh QuotaGovernor is constructed per absorption, so the
     'daily' LAB budget is in truth a per-stage budget. That was true of the legacy runner too. Changing it would
@@ -177,21 +249,78 @@ def absorb(label: str, *, as_of=None, fetch=None, symbols=None) -> dict:
     from apex.events.catalyst import catalyst_state
     from apex.events.cik_bridge import cik_of
     from apex.frontier import premarket_runtime as RT
+    from apex.frontier import premarket_time as T
     from apex.frontier.premarket import assemble
     from apex.intraday.eodhd import QuotaGovernor
 
+    collection_started_at = RT.now_utc().timestamp()
+    as_of_epoch = (pd_ts(as_of).timestamp() if as_of is not None else collection_started_at)
+
     # The declared transport seam is resolved HERE, so the legacy oracle and the staged producer reach the same
-    # transport. Resolving it in only one of them was the first thing this parity run caught.
+    # transport. Resolving it in only one of them was the first thing the R4 parity run caught.
     fetch = fetch if fetch is not None else RT.transport()
+    if not isinstance(fetch, (RecordingTransport, ReplayTransport)):
+        # Always observed, even on the legacy path: a transport that is not observed produces a packet whose
+        # freshness is once again unreconstructible, which is the defect this brick exists to close.
+        fetch = RecordingTransport(None, inner=fetch, as_of_epoch=as_of_epoch)
     syms = list(symbols) if symbols is not None else stage_symbols()
     gov = QuotaGovernor(daily_budget=PREMARKET_LAB_BUDGET, purpose="LAB")
 
+    catalyst_obs = []
+
     def cat(sym, now):
-        return catalyst_state(sym, now, cik=cik_of(sym))
+        req = RT.now_utc().timestamp()
+        st = catalyst_state(sym, now, cik=cik_of(sym))
+        rec = RT.now_utc().timestamp()
+        for e in (st.events or ()):
+            kf = _epoch(e.get("known_from"))
+            catalyst_obs.append(T.source_observation(
+                source_id="%s:%s" % (sym, e.get("accession")), source_kind="SEC_EDGAR",
+                event_time=_epoch(e.get("event_time")), request_time=req, receipt_time=rec,
+                known_from=kf, availability_basis=T.BASIS_EXPLICIT, source_timezone="UTC",
+                normalization=T.NORM_ACCEPTED))
+        if not st.events:
+            # A MEASURED ABSENCE is itself an observation known at the query instant. Recording it is what lets a
+            # reader distinguish "we asked and nothing matched" from "we never asked".
+            catalyst_obs.append(T.source_observation(
+                source_id=sym, source_kind="SEC_EDGAR", request_time=req, receipt_time=rec,
+                source_timezone="UTC", carries_content=False,
+                normalization=(T.NORM_ACCEPTED if st.status.startswith("NO_KNOWN_CATALYST")
+                               else T.NORM_UNAVAILABLE)))
+        return st
 
     pkt = assemble(symbols=syms, gov=gov, as_of=as_of, catalyst_lookup=cat, fetch=fetch)
     pkt["absorption_label"] = label
+
+    # ---------------------------------------------------------------- the production time model
+    absorption_finished_at = RT.now_utc().timestamp()
+    observations = list(getattr(fetch, "observations", [])) + catalyst_obs
+    receipts = [o["source_receipt_time"] for o in observations
+                if isinstance(o.get("source_receipt_time"), (int, float))]
+    # The DECLARED CUTOFF is the instant this packet stopped accepting input: never earlier than any receipt,
+    # never taken from the seal clock.
+    declared_cutoff = max([as_of_epoch, absorption_finished_at] + receipts)
+    pkt["schema"] = PACKET_SCHEMA_V2
+    pkt["source_observations"] = observations
+    pkt["time"] = T.collection_times(collection_started_at=collection_started_at, observations=observations,
+                                     declared_cutoff=declared_cutoff, created_at=absorption_finished_at)
+    pkt["as_of_time_semantics"] = dict(AS_OF_TIME_SEMANTICS_V2)
     return pkt
+
+
+def pd_ts(v):
+    import pandas as pd
+    t = pd.Timestamp(v)
+    return t.tz_localize("UTC") if t.tz is None else t
+
+
+def _epoch(v):
+    if v is None or v == "UNAVAILABLE":
+        return None
+    try:
+        return pd_ts(v).timestamp()
+    except Exception:                                               # noqa: BLE001
+        return None
 
 
 def absorb_summary(pkt: dict) -> dict:
@@ -307,7 +436,7 @@ def predecessor_report(journal, stage: str) -> dict:
     chain = journal.verify()
     states, missing = {}, []
     for s in earlier:
-        st = journal.stage_state(s)
+        st = journal.stage_outcome(s)
         states[s] = st
         if st == "PENDING":
             missing.append(s)
@@ -316,7 +445,44 @@ def predecessor_report(journal, stage: str) -> dict:
 
 
 # ------------------------------------------------------------------ THE production stage operation
-def run_stage(stage: str, *, journal, now_et, symbols=None, emit=print) -> dict:
+def config_identity() -> dict:
+    """What CONFIGURATION produced this morning: the schedule, the window policy and the source-coverage matrix.
+    Digested, so a packet can be tied to the configuration as well as to the code."""
+    import hashlib
+
+    from apex.frontier.premarket import SOURCES
+    body = {"stage_schedule": [list(x) for x in STAGE_SCHEDULE], "window_s": WINDOW_S, "on_time_s": ON_TIME_S,
+            "market_tz": "America/New_York", "sources": dict(SOURCES),
+            "lab_budget": PREMARKET_LAB_BUDGET, "required_brief_sections": list(REQUIRED_BRIEF_SECTIONS)}
+    return {"config_digest": hashlib.sha256(canonical_json(body).encode()).hexdigest(), "config": body}
+
+
+def canonical_json(obj) -> str:
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), default=str)
+
+
+def stage_time_block(*, stage, now_et, disposition_, delta, process_started_at, capture_started_at,
+                     capture_finished_at, normalization_finished_at, absorption_finished_at,
+                     code_identity=None) -> dict:
+    """Every instant in a stage's own life, in market time and in epochs. `lateness_s` is the ACTUAL start minus
+    the target and is never rounded toward the target -- a stage that started at 08:22 records 08:22."""
+    from apex.frontier import market_time as MT
+    t = target_for(stage, now_et)
+    return {"schema": "PREMARKET_STAGE_TIME_V1", "market_tz": MT.MARKET_TZ,
+            "market_date": str(now_et.date()), "stage": stage,
+            "target_instant": t.isoformat(), "target_epoch": t.timestamp(),
+            "window_opens": (t - __import__("pandas").Timedelta(seconds=ON_TIME_S)).isoformat(),
+            "window_closes": (t + __import__("pandas").Timedelta(seconds=WINDOW_S)).isoformat(),
+            "window_s": WINDOW_S,
+            "process_started_at": process_started_at, "process_started_market": now_et.isoformat(),
+            "capture_started_at": capture_started_at, "capture_finished_at": capture_finished_at,
+            "normalization_finished_at": normalization_finished_at,
+            "absorption_finished_at": absorption_finished_at,
+            "disposition": disposition_, "lateness_s": round(delta, 3),
+            "code_identity": code_identity, "config_identity": config_identity()}
+
+
+def run_stage(stage: str, *, journal, now_et, symbols=None, emit=print, code_identity=None) -> dict:
     """One bounded invocation of one stage, start to terminal state, entirely through durable evidence.
 
     PENDING -> STARTED -> CAPTURED -> NORMALIZED -> ABSORBED -> COMPLETED, with the terminal alternatives named in
@@ -335,10 +501,10 @@ def run_stage(stage: str, *, journal, now_et, symbols=None, emit=print) -> dict:
         return {**result, "state": "REFUSED_INPUT", "reason": "POST_SEAL"}
 
     # --- duplicate delivery
-    prior = journal.stage_state(stage)
-    if prior in PJ.TERMINAL:
+    prior = journal.stage_outcome(stage)
+    if prior in PJ.DECISIVE:
         journal.append(stage=stage, state="RECONCILED_DUPLICATE", prior_state=prior,
-                       note="a terminal record already exists for this stage; nothing was absorbed again")
+                       note="this stage already reached a decisive outcome; nothing was absorbed again")
         emit("RECONCILED_DUPLICATE stage=%s prior=%s" % (stage, prior))
         return {**result, "state": "RECONCILED_DUPLICATE", "prior_state": prior}
 
@@ -378,6 +544,8 @@ def run_stage(stage: str, *, journal, now_et, symbols=None, emit=print) -> dict:
 
     resume = journal.resume_point(stage)
     as_of = resume["payload"].get("as_of") or str(now_et.tz_convert("UTC"))
+    as_of_epoch = pd_ts(as_of).timestamp()
+    process_started_at = now_et.tz_convert("UTC").timestamp()
 
     # ---------------- ABSORBED already reached: reuse it, never re-absorb
     if resume["state"] == "ABSORBED":
@@ -396,8 +564,10 @@ def run_stage(stage: str, *, journal, now_et, symbols=None, emit=print) -> dict:
         transport = ReplayTransport(journal, manifest)
         replayed = True
     else:
-        transport = RecordingTransport(journal)
+        transport = RecordingTransport(journal, as_of_epoch=as_of_epoch)
 
+    from apex.frontier import premarket_runtime as _RT
+    capture_started_at = _RT.now_utc().timestamp()
     try:
         pkt = absorb(stage, as_of=as_of, fetch=transport, symbols=symbols)
     except Exception as e:                                          # noqa: BLE001
@@ -409,6 +579,7 @@ def run_stage(stage: str, *, journal, now_et, symbols=None, emit=print) -> dict:
         emit("%s stage=%s: %s: %s" % (kind, stage, type(e).__name__, e))
         return {**result, "state": kind, "reason": "%s: %s" % (type(e).__name__, e)}
 
+    capture_finished_at = _RT.now_utc().timestamp()
     manifest = (transport.manifest if not replayed else
                 journal.get_blob(resume["payload"]["capture_manifest_blob"]))
     manifest_blob = journal.put_blob(manifest)
@@ -420,6 +591,7 @@ def run_stage(stage: str, *, journal, now_et, symbols=None, emit=print) -> dict:
 
     # ---------------- normalize
     obs = observations(pkt)
+    normalization_finished_at = _RT.now_utc().timestamp()
     obs_blob = journal.put_blob(obs)
     disp_map = source_dispositions(pkt)
     journal.append(stage=stage, state="NORMALIZED", normalized_blob=obs_blob,
@@ -429,6 +601,12 @@ def run_stage(stage: str, *, journal, now_et, symbols=None, emit=print) -> dict:
     _maybe_crash("normalize")
 
     # ---------------- absorb
+    absorption_finished_at = _RT.now_utc().timestamp()
+    pkt["stage_time"] = stage_time_block(
+        stage=stage, now_et=now_et, disposition_=disp, delta=delta, process_started_at=process_started_at,
+        capture_started_at=capture_started_at, capture_finished_at=capture_finished_at,
+        normalization_finished_at=normalization_finished_at, absorption_finished_at=absorption_finished_at,
+        code_identity=code_identity)
     packet_blob = journal.put_blob(pkt)
     summary = absorb_summary(pkt)
     journal.append(stage=stage, state="ABSORBED", packet_blob=packet_blob, normalized_blob=obs_blob,
@@ -440,7 +618,8 @@ def run_stage(stage: str, *, journal, now_et, symbols=None, emit=print) -> dict:
 
     journal.append(stage=stage, state="COMPLETED", packet_blob=packet_blob, normalized_blob=obs_blob,
                    capture_manifest_blob=manifest_blob, capture_blobs=[m["blob"] for m in manifest],
-                   summary=summary, disposition=disp, as_of=as_of)
+                   summary=summary, disposition=disp, as_of=as_of, stage_time=pkt["stage_time"],
+                   time=pkt["time"], source_observation_count=len(pkt["source_observations"]))
     emit("COMPLETED stage=%s packet=%s" % (stage, packet_blob[:12]))
     return {**result, "state": "COMPLETED", "packet_blob": packet_blob, "summary": summary,
             "dispositions": disp_map}
@@ -479,8 +658,8 @@ def finalize(*, journal, now_et, emit=print) -> dict:
     from apex.frontier.premarket import seal
 
     stage = "seal"
-    prior = journal.stage_state(stage)
-    if prior in PJ.TERMINAL:
+    prior = journal.stage_outcome(stage)
+    if prior in PJ.DECISIVE:
         ev = journal.sealed_event()
         journal.append(stage=stage, state="RECONCILED_DUPLICATE", prior_state=prior,
                        note="the morning is already finalised; the sealed packet was not rewritten")
@@ -526,27 +705,53 @@ def finalize(*, journal, now_et, emit=print) -> dict:
 
     packet = dict(rec["packet"])
     from apex.frontier import premarket_runtime as RT
-    packet["as_of_time"] = str(RT.now_utc())
-    sealed = seal(packet)
-    journal.put_blob(sealed)
-    emit("PACKET SEALED %s (rebuilt from %s, blob %s)"
-         % (sealed["packet_sha256"][:12], rec["from_stage"], rec["packet_blob"][:12]))
+    from apex.frontier import premarket_time as T
 
-    # --- the Captain path, real, with its transport declared
+    # THE CAPTAIN RUNS BEFORE THE SEAL, which is a deliberate ORDER CHANGE from the legacy runner.
+    # The brick requires the Captain's request and response instants to be IN the packet, and the seal to bind the
+    # complete time block. Sealing first and briefing afterwards cannot do both: the ai_* instants would exist
+    # only outside the digest. The brief ARTIFACT is still written after the seal, because its header cites the
+    # sealed digest. The packet itself is unaffected by the Captain in either order -- a Captain failure still
+    # leaves the sealed packet standing alone, exactly as before.
     captain_rec = {"status": "NOT_ATTEMPTED"}
+    ai_req = ai_resp = T.UNAVAILABLE
+    text = None
     try:
-        text = captain_call(brief_prompt(sealed))
+        ai_req = RT.now_utc().timestamp()
+        text = captain_call(brief_prompt(packet))
+        ai_resp = RT.now_utc().timestamp()
         verdict = brief_verdict(text)
-        path = write_brief(sealed, text, verdict)
-        captain_rec = {"status": verdict["verdict"], "brief_path": path,
-                       "response_blob": journal.put_blob({"text": text}),
-                       "firewall_hits": verdict["firewall_hits"],
+        captain_rec = {"status": verdict["verdict"], "firewall_hits": verdict["firewall_hits"],
                        "missing_sections": verdict["missing_sections"],
+                       "response_blob": journal.put_blob({"text": text}),
+                       "ai_request_time": ai_req, "ai_response_time": ai_resp,
                        "transport": RT.substitutions().get(RT.ENV_CAPTAIN, "REAL_CLAUDE_CLI")}
     except subprocess.TimeoutExpired as e:                          # noqa: PERF203
-        captain_rec = {"status": "CAPTAIN_TIMEOUT", "detail": str(e)[:200]}
+        captain_rec = {"status": "CAPTAIN_TIMEOUT", "detail": str(e)[:200], "ai_request_time": ai_req,
+                       "ai_response_time": T.UNAVAILABLE}
     except Exception as e:                                          # noqa: BLE001
-        captain_rec = {"status": "CAPTAIN_DEGRADED_%s" % type(e).__name__, "detail": str(e)[:200]}
+        captain_rec = {"status": "CAPTAIN_DEGRADED_%s" % type(e).__name__, "detail": str(e)[:200],
+                       "ai_request_time": ai_req, "ai_response_time": T.UNAVAILABLE}
+
+    packet["as_of_time"] = str(RT.now_utc())
+    if packet.get("schema") == PACKET_SCHEMA_V2:
+        t = dict(packet.get("time") or {})
+        # TWO DIFFERENT "STARTS", named apart. `packet_collection_started_at` is when the stage whose packet this
+        # IS began collecting; `morning_started_at` is when the trading date's first process opened the session.
+        # They differ by over an hour and a reader that conflates them will misjudge every freshness number.
+        sess = next((e for e in journal.events() if e["stage"] == "session"), None)
+        t["morning_started_at"] = (sess or {}).get("at", T.UNAVAILABLE)
+        t["ai_request_time"] = ai_req
+        t["ai_response_time"] = ai_resp if captain_rec["status"] == "ACCEPTED" or text is not None else T.UNAVAILABLE
+        packet["time"] = t
+    sealed = seal(packet)
+    journal.put_blob(sealed)
+    emit("PACKET SEALED %s (rebuilt from %s, blob %s, schema %s)"
+         % (sealed["packet_sha256"][:12], rec["from_stage"], rec["packet_blob"][:12],
+            sealed.get("schema", "V1")))
+
+    if text is not None:
+        captain_rec["brief_path"] = write_brief(sealed, text, brief_verdict(text))
     if captain_rec["status"] not in ("ACCEPTED",):
         emit("morning brief %s — the sealed packet stands alone" % captain_rec["status"])
     else:
@@ -556,7 +761,8 @@ def finalize(*, journal, now_et, emit=print) -> dict:
                    sealed_blob=journal.put_blob(sealed), rebuilt_from=rec["from_stage"],
                    source_packet_blob=rec["packet_blob"],
                    provenance=[p["stage"] for p in rec["provenance"]],
-                   missing_stages=pred["missing"], captain=captain_rec, disposition=disp)
+                   missing_stages=pred["missing"], captain=captain_rec, disposition=disp,
+                   packet_schema=sealed.get("schema"), time=sealed.get("time"))
     return {"state": "COMPLETED", "packet_sha256": sealed["packet_sha256"], "sealed": sealed,
             "rebuilt_from": rec["from_stage"], "missing_stages": pred["missing"], "captain": captain_rec}
 

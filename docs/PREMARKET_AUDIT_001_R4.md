@@ -1,5 +1,8 @@
 # PREMARKET-SEQUENTIAL-AUDIT-001-R4 — Checkpoint 1A: the staged production producer
 
+> **ERRATUM 001 (issued in R5, see the end of this file).** Section 1 of this report overstated the
+> consequence of the early-start defect. The original text stands below, unedited; the correction is appended.
+
 Base `602d5a232be851890a23cdd3cd6d4e7b560ed3a0`. Checkpoint 1A only.
 
 **No disposable LaunchAgent was created. The production scheduler was NOT installed. The installed plist and
@@ -235,3 +238,31 @@ Checkpoint 1A remains **not complete**: the scheduler is unproven and uninstalle
 
 Next, in order: the disposable LaunchAgent proof against **this** entry point; then install, arm and observe one
 real scheduled morning; then connect additional sources.
+
+
+---
+
+# ERRATUM 001 — issued with R5
+
+**What R4 said.** Section 1 claimed the early-start defect *"manufactures three false 'nobody knows why this is
+moving' signals"*, and the commit subject read *"the early start now manufactures nothing"*.
+
+**What is actually true.** At 03:00 ET the NVDA, SYND and FUTR filings were genuinely not yet knowable.
+`NO_KNOWN_CATALYST_WITHIN_ACTIVE_SOURCES` was the **correct point-in-time answer for that instant**, produced by
+the same PIT rule that is working as designed. Nothing was fabricated and no classification was false.
+
+**The defect, stated correctly.** The old runner stored those correct *early* observations under the
+**09:20-final stage identity and packet context**, where a reader is entitled to read them as the state of the
+world at 09:20. The consequence is:
+
+> **EARLY OBSERVATIONS MISREPRESENTED AS FINAL-PREMARKET OBSERVATIONS**
+
+The misrepresentation is in the label and the context, not in the classification. Everything else in Section 1 —
+the 205-minute gap, the differing digests, the identical `absorption_label` — is unchanged and still holds.
+
+**Why the distinction is load-bearing.** "The producer fabricates signals" and "the producer mislabels valid
+observations" call for different repairs. The first would implicate the catalyst logic, which is correct. The
+second implicates stage identity and time semantics, which is what R5 repairs: under
+`PREMARKET_CONTEXT_PACKET_V2` the same early packet now carries `time.packet_data_cutoff = 06:00 ET` beside
+`time.packet_sealed_at = 09:25 ET`, so the contradiction is visible in the packet itself rather than requiring
+an auditor to notice it.

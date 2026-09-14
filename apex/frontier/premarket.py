@@ -34,6 +34,59 @@ def packets_dir() -> Path:
 
 INDICES = ("SPY.US", "QQQ.US", "IWM.US", "DIA.US")
 
+# ------------------------------------------------------------------ packet schema versions
+#
+# WHY A VERSION RATHER THAN A REDEFINITION. Until R5 the packet had no schema field and one timestamp,
+# `as_of_time`, that was doing three jobs: downstream availability, the data cutoff, and source freshness. R5
+# separates them. Silently changing what `as_of_time` means would have made every packet already on disk lie
+# about itself in retrospect, so the new shape is a NEW VERSION and the old one keeps its bytes and its original
+# interpretation.
+PACKET_SCHEMA_V1 = "PREMARKET_CONTEXT_PACKET_V1"      # implicit; V1 packets carry no `schema` field at all
+PACKET_SCHEMA_V2 = "PREMARKET_CONTEXT_PACKET_V2"
+
+# `as_of_time` survives into V2 because real downstream readers (closing_run, mission_control, frontier_loop)
+# already consume it -- but it survives WITH A MACHINE-READABLE DEFINITION attached to every packet, so no reader
+# has to infer its meaning from the field name. That inference is exactly the defect being repaired.
+AS_OF_TIME_SEMANTICS_V2 = {
+    "field": "as_of_time",
+    "means": "PACKET_SEALED_AT",
+    "equals": "time.packet_sealed_at",
+    "does_not_mean": ["SOURCE_FRESHNESS", "INFORMATION_CUTOFF", "LATEST_OBSERVATION_TIME"],
+    "information_cutoff_field": "time.packet_data_cutoff",
+    "availability_field": "time.packet_known_from",
+    "per_source_freshness_field": "time.per_source_freshness_s",
+}
+
+AS_OF_TIME_SEMANTICS_V1 = {
+    "field": "as_of_time",
+    "means": "PACKET_SEALED_AT",
+    "does_not_mean": ["SOURCE_FRESHNESS", "INFORMATION_CUTOFF"],
+    "information_cutoff_field": "UNRECONSTRUCTIBLE",
+    "per_source_freshness_field": "UNRECONSTRUCTIBLE",
+    "note": ("a V1 packet records no source instants at all. Its downstream availability is reconstructible from "
+             "as_of_time; its SOURCE FRESHNESS is not, and must be reported UNRECONSTRUCTIBLE rather than "
+             "inferred from the seal clock."),
+}
+
+
+def packet_schema(packet: dict) -> str:
+    return packet.get("schema") or PACKET_SCHEMA_V1
+
+
+def interpret(packet: dict) -> dict:
+    """What this packet's timestamps mean, for THIS packet's version. Readers call this instead of guessing."""
+    v = packet_schema(packet)
+    if v == PACKET_SCHEMA_V2:
+        return {"schema": v, "as_of_time": AS_OF_TIME_SEMANTICS_V2,
+                "information_cutoff": (packet.get("time") or {}).get("packet_data_cutoff", "UNAVAILABLE"),
+                "packet_known_from": (packet.get("time") or {}).get("packet_known_from", "UNAVAILABLE"),
+                "per_source_freshness_s": (packet.get("time") or {}).get("per_source_freshness_s", {}),
+                "source_freshness": "RECONSTRUCTIBLE"}
+    return {"schema": v, "as_of_time": AS_OF_TIME_SEMANTICS_V1,
+            "information_cutoff": "UNRECONSTRUCTIBLE",
+            "packet_known_from": packet.get("as_of_time", "UNAVAILABLE"),
+            "per_source_freshness_s": {}, "source_freshness": "UNRECONSTRUCTIBLE"}
+
 # Source coverage, stated per section. Tonight's honest matrix: EODHD
 # extended-hours and SEC are live; Robinhood earnings runs through the
 # child session when available; everything else is NOT_CONNECTED and the
@@ -185,13 +238,35 @@ def seal(packet: dict) -> dict:
     morning coat."""
     import pandas as pd
     et = pd.Timestamp(packet["as_of_time"]).tz_convert("America/New_York")
-    bell = et.normalize() + pd.Timedelta(hours=9, minutes=30)
+    # WALL-CLOCK, not midnight-plus-elapsed. `normalize() + Timedelta(hours=9, minutes=30)` lands at 10:30 on the
+    # spring-forward date and 08:30 on the fall-back date, so the hindsight guard would have been an hour wrong
+    # in both directions on those days. Dormant (both are Sundays in the market timezone) and fixed anyway.
+    bell = pd.Timestamp("%s 09:30" % et.date(), tz="America/New_York")
     if et >= bell:
         raise PremarketViolation(
             f"refusing to seal a premarket packet at {et} — the session "
             f"is open; this would be hindsight, not context")
     body = {k: v for k, v in packet.items()}
     body["sealed"] = "SEALED_BEFORE_OPEN"
+
+    # V2: the seal instant is STAMPED INTO the time block and then BOUND BY THE DIGEST below, so a packet cannot
+    # be sealed without its complete time model being part of what the hash covers. The laws are re-checked here,
+    # at the seal, because that is the last moment a violation can still be refused instead of published.
+    if body.get("schema") == PACKET_SCHEMA_V2:
+        from apex.frontier import premarket_time as _pt
+        sealed_at = et.tz_convert("UTC").timestamp()
+        t = dict(body.get("time") or {})
+        # Recompute the LAWS-CHECKED fields, but do not discard instants the producer recorded that the law
+        # checker does not know about (morning_started_at). Replacing the block wholesale silently dropped one.
+        computed = _pt.packet_times(
+            collection_started_at=t.get("packet_collection_started_at", _pt.UNAVAILABLE),
+            observations=body.get("source_observations") or [],
+            ai_request_time=t.get("ai_request_time"), ai_response_time=t.get("ai_response_time"),
+            created_at=t.get("packet_created_at", _pt.UNAVAILABLE), sealed_at=sealed_at,
+            declared_cutoff=t.get("packet_data_cutoff"))
+        body["time"] = {**t, **computed}
+        body["as_of_time_semantics"] = dict(AS_OF_TIME_SEMANTICS_V2)
+
     body["packet_sha256"] = hashlib.sha256(
         json.dumps({k: v for k, v in body.items()
                     if k != "packet_sha256"},

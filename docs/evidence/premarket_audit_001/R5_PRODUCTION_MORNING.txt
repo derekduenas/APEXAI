@@ -1,0 +1,240 @@
+PREMARKET-FLIGHT-001-SYNTHETIC (R4) — driven through scripts/premarket_stage.py, one OS process per stage
+fixture=PREMARKET_FIXTURE_V2 trading_date=2026-08-26
+REAL: symbol selection, assemble(), normalize_rows(), _premarket_state(), catalyst_state() with its
+      PIT filter and 72h/12h staleness policy, packet schema, seal(), brief firewall, journal,
+      run accounting, window logic, and scripts/premarket_stage.py itself.
+SUBSTITUTED: clock, EODHD transport, Captain transport, output root — each named in every record.
+fixture world: {
+ "universe": "/Users/derekduenas/apex-pm-r5-wt/results/hunter/scan_universe_2026-08-25.json",
+ "edgar_ledger": "/Users/derekduenas/apex-pm-r5-wt/results/events/edgar_events.jsonl",
+ "capture_health": "/Users/derekduenas/apex-pm-r5-wt/results/events/capture_health.json",
+ "cik_bridge": "/Users/derekduenas/apex-pm-r5-wt/data/reference/sec_company_tickers.json",
+ "daily_memory": "/Users/derekduenas/apex-pm-r5-wt/results/frontier/daily_memory/2026-08-25.json"
+}
+
+== MARKET TIME VS LOCAL TIME (the scheduler fires local; every target is a market instant) ==
+   host timezone        America/Los_Angeles   (/etc/localtime: /etc/localtime -> /var/db/timezone/zoneinfo/America/Los_Angeles)
+   market timezone      America/New_York   (authoritative)
+   tracks the market    True
+   next market session  2026-09-14
+   STAGE                MARKET      LOCAL    UTC INSTANT                MKT-LOC  ALL-YEAR TRIGGERS
+   0815_ET_initial      08:15 ET    05:15    2026-09-14T12:15:00+00:00  +3.0     05:15
+   0832_ET_post_macro   08:32 ET    05:32    2026-09-14T12:32:00+00:00  +3.0     05:32
+   0905_ET_refresh      09:05 ET    06:05    2026-09-14T13:05:00+00:00  +3.0     06:05
+   0920_ET_final        09:20 ET    06:20    2026-09-14T13:20:00+00:00  +3.0     06:20
+   seal                 09:25 ET    06:25    2026-09-14T13:25:00+00:00  +3.0     06:25
+   reconcile            09:40 ET    06:40    2026-09-14T13:40:00+00:00  +3.0     06:40
+
+== THE MORNING ==
+   0815_ET_initial    | SUBSTITUTIONS ACTIVE (this run is NOT fully real): ['APEX_PREMARKET_CAPTAIN', 'APEX_PREMARKET_CLOCK_FILE', 'APEX_PREMARKET_ROOT', 'APEX_PREMARKET_TRANSPORT']
+   0815_ET_initial    | host_tz=America/Los_Angeles (/etc/localtime) binding=UNBOUND
+   0815_ET_initial    | stage=0815_ET_initial disposition=ON_TIME delta=0s missing_predecessors=none
+   0815_ET_initial    | CAPTURED stage=0815_ET_initial responses=11
+   0815_ET_initial    | NORMALIZED stage=0815_ET_initial symbols=10
+   0815_ET_initial    | ABSORBED stage=0815_ET_initial indices_ok=3/4 movers=6 unknown_catalyst=3
+   0815_ET_initial    | COMPLETED stage=0815_ET_initial packet=a251a97f06c4
+   0832_ET_post_macro | SUBSTITUTIONS ACTIVE (this run is NOT fully real): ['APEX_PREMARKET_CAPTAIN', 'APEX_PREMARKET_CLOCK_FILE', 'APEX_PREMARKET_ROOT', 'APEX_PREMARKET_TRANSPORT']
+   0832_ET_post_macro | host_tz=America/Los_Angeles (/etc/localtime) binding=UNBOUND
+   0832_ET_post_macro | stage=0832_ET_post_macro disposition=ON_TIME delta=0s missing_predecessors=none
+   0832_ET_post_macro | CAPTURED stage=0832_ET_post_macro responses=11
+   0832_ET_post_macro | NORMALIZED stage=0832_ET_post_macro symbols=10
+   0832_ET_post_macro | ABSORBED stage=0832_ET_post_macro indices_ok=3/4 movers=6 unknown_catalyst=3
+   0832_ET_post_macro | COMPLETED stage=0832_ET_post_macro packet=e253f43f499d
+   0905_ET_refresh    | SUBSTITUTIONS ACTIVE (this run is NOT fully real): ['APEX_PREMARKET_CAPTAIN', 'APEX_PREMARKET_CLOCK_FILE', 'APEX_PREMARKET_ROOT', 'APEX_PREMARKET_TRANSPORT']
+   0905_ET_refresh    | host_tz=America/Los_Angeles (/etc/localtime) binding=UNBOUND
+   0905_ET_refresh    | stage=0905_ET_refresh disposition=ON_TIME delta=0s missing_predecessors=none
+   0905_ET_refresh    | CAPTURED stage=0905_ET_refresh responses=11
+   0905_ET_refresh    | NORMALIZED stage=0905_ET_refresh symbols=10
+   0905_ET_refresh    | ABSORBED stage=0905_ET_refresh indices_ok=3/4 movers=6 unknown_catalyst=2
+   0905_ET_refresh    | COMPLETED stage=0905_ET_refresh packet=76228a557ceb
+   0920_ET_final      | SUBSTITUTIONS ACTIVE (this run is NOT fully real): ['APEX_PREMARKET_CAPTAIN', 'APEX_PREMARKET_CLOCK_FILE', 'APEX_PREMARKET_ROOT', 'APEX_PREMARKET_TRANSPORT']
+   0920_ET_final      | host_tz=America/Los_Angeles (/etc/localtime) binding=UNBOUND
+   0920_ET_final      | stage=0920_ET_final disposition=ON_TIME delta=0s missing_predecessors=none
+   0920_ET_final      | CAPTURED stage=0920_ET_final responses=11
+   0920_ET_final      | NORMALIZED stage=0920_ET_final symbols=10
+   0920_ET_final      | ABSORBED stage=0920_ET_final indices_ok=3/4 movers=6 unknown_catalyst=2
+   0920_ET_final      | COMPLETED stage=0920_ET_final packet=513b69542e60
+   seal               | SUBSTITUTIONS ACTIVE (this run is NOT fully real): ['APEX_PREMARKET_CAPTAIN', 'APEX_PREMARKET_CLOCK_FILE', 'APEX_PREMARKET_ROOT', 'APEX_PREMARKET_TRANSPORT']
+   seal               | host_tz=America/Los_Angeles (/etc/localtime) binding=UNBOUND
+   seal               | stage=seal disposition=ON_TIME delta=0s missing=none
+   seal               | PACKET SEALED 1ad4a399f99c (rebuilt from 0920_ET_final, blob 513b69542e60, schema PREMARKET_CONTEXT_PACKET_V2)
+   seal               | brief -> /private/tmp/claude-501/-Users-derekduenas/493f47ba-c471-4af0-9432-ba9bb8f8a672/scratchpad/r5/ev/staged/2026-08-26_morning_brief.md
+   reconcile          | SUBSTITUTIONS ACTIVE (this run is NOT fully real): ['APEX_PREMARKET_CAPTAIN', 'APEX_PREMARKET_CLOCK_FILE', 'APEX_PREMARKET_ROOT', 'APEX_PREMARKET_TRANSPORT']
+   reconcile          | host_tz=America/Los_Angeles (/etc/localtime) binding=UNBOUND
+   reconcile          | reconcile 2026-08-26: chain=CHAIN_INTACT events=23; 0 stage(s) without a record
+
+== THE TEN DECLARED OBSERVATIONS, ADJUDICATED WHERE PRODUCTION DECIDES THEM ==
+   OBSERVATION                 EXPECTED                                       ACTUAL                                         VERDICT
+   overnight_state             ACCEPTED_AS_PRIOR_MEMORY                       ACCEPTED_AS_PRIOR_MEMORY                       AS DECLARED
+        decided by assemble -> closing.load_memory: memory_sha256=ffffffffffff
+   premarket_price_and_volume  ACCEPTED                                       ACCEPTED                                       AS DECLARED
+        decided by _premarket_state: SPY gap_frac=0.005 volume=680520.0 bars=321
+   macro_event                 MARKED_UNAVAILABLE                             MARKED_UNAVAILABLE                             AS DECLARED
+        decided by premarket.SOURCES: MACRO_CALENDAR=NOT_CONNECTED; it is named in blind_spots=True
+   company_catalyst            ACCEPTED_AS_KNOWN_CATALYST                     ACCEPTED_AS_KNOWN_CATALYST                     AS DECLARED
+        decided by catalyst_state: NVDA.US catalyst_status=KNOWN_CATALYST
+   syndicated_duplicate        RETAINED_BOTH_NO_DEDUPLICATION_IN_PRODUCTION   RETAINED_BOTH_NO_DEDUPLICATION_IN_PRODUCTION   AS DECLARED
+        decided by catalyst_state: two byte-distinct filings of one announcement -> 2 event(s) retained: ['SYND-8K-1', 'SYND-8K-1-WIRE']
+   revision_or_retraction      RETAINED_BOTH_NO_REVISION_LINKAGE_IN_PRODUCTION RETAINED_BOTH_NO_REVISION_LINKAGE_IN_PRODUCTION AS DECLARED
+        decided by catalyst_state: forms retained=['8-K/A', '8-K']; no field links the amendment to the original
+   unavailable_source          MARKED_UNAVAILABLE                             MARKED_UNAVAILABLE                             AS DECLARED
+        decided by _premarket_state: DIA.US status=NO_BARS (the transport returned no rows)
+   stale_observation           EXCLUDED_AS_STALE                              EXCLUDED_AS_STALE                              AS DECLARED
+        decided by catalyst.LOOKBACK_HOURS: a filing 100h old is outside the real 72h window -> NO_KNOWN_CATALYST_WITHIN_ACTIVE_SOURCES
+   future_observation          REFUSED_AS_FUTURE                              REFUSED_AS_FUTURE                              AS DECLARED
+        decided by catalyst PIT filter on known_from_utc: knowable 09:00 ET: at 08:15 -> NO_KNOWN_CATALYST_WITHIN_ACTIVE_SOURCES; at 09:20 -> KNOWN_CATALYST. The packet shows it leaving UNKNOWN_CATALYST_MOVERS between the 08:32 and 09:05 stages.
+   hostile_headline            REFUSED_BY_FIREWALL                            REFUSED_BY_FIREWALL                            AS DECLARED
+        decided by premarket_stages.brief_verdict: the real firewall matched ['buy '] in the Captain response
+
+== INDEPENDENT TIME RECONSTRUCTION (expectations derived from the fixture, not the packet) ==
+   schema is the new version                            PREMARKET_CONTEXT_PACK PREMARKET_CONTEXT_PACK OK
+   morning_started_at = first stage instant             1787746500.0           1787746500.0           OK
+   collection_started_at = sealing stage's own start    1787750400.0           1787750400.0           OK
+   declared information cutoff = that stage's absorption end 1787750400.0           1787750400.0           OK
+   latest accepted content known_from                   1787750400.0           1787750400.0           OK
+   ai_request_time = the seal stage instant             1787750700.0           1787750700.0           OK
+   ai_response_time = the seal stage instant            1787750700.0           1787750700.0           OK
+   packet_created_at = absorption end                   1787750400.0           1787750400.0           OK
+   packet_sealed_at = the seal stage instant            1787750700.0           1787750700.0           OK
+   packet_known_from = packet_sealed_at                 1787750700.0           1787750700.0           OK
+   as_of_time resolves to packet_sealed_at              1787750700.0           1787750700.0           OK
+   as_of_time_semantics declares that                   PACKET_SEALED_AT       PACKET_SEALED_AT       OK
+   SEC_EDGAR newest content known_from                  1787749200.0           1787749200.0           OK
+   SEC_EDGAR freshness at cutoff                        1200.0                 1200.0                 OK
+   SEC_EDGAR last probed at the stage instant           1787750400.0           1787750400.0           OK
+   EODHD newest content known_from                      1787750400.0           1787750400.0           OK
+   EODHD freshness at cutoff                            0.0                    0.0                    OK
+   every SEC observation carries the filing's declared availability []                     []                     OK
+   every observation names its timezone                 []                     []                     OK
+   every observation names its availability basis       []                     []                     OK
+   stage_time names the sealing stage's source stage    0920_ET_final          0920_ET_final          OK
+   stage target instant                                 1787750400.0           1787750400.0           OK
+   stage lateness                                       0.0                    0.0                    OK
+   final packet digest recomputes                       1ad4a399f99cead680ec8c 1ad4a399f99cead680ec8c OK
+   the time block is INSIDE the digest                  False                  False                  OK
+   25/25 checks agree
+
+== A PROVIDER-DECLARED FUTURE INPUT (SKEW.US, stamped available 09:45 ET) ==
+   indices                  contains it: False
+   gap_map                  contains it: False
+   watch_map                contains it: False
+   blind_spots              contains it: False
+   source_coverage          contains it: False
+   yesterday_memory         contains it: False
+   the Captain prompt       contains it: False
+   source_observations      contains it: True   <- the REFUSAL is recorded, which is the requirement
+   normalization: REFUSED_AS_FUTURE
+   VERDICT: REFUSED AT THE BOUNDARY, RECORDED, NEVER IN THE FACTS
+
+== A LATE-BUT-ALLOWED STAGE (0832_ET_post_macro started 5 minutes after target) ==
+   disposition            LATE_START
+   target_instant         2026-08-26T08:32:00-04:00
+   process_started_market 2026-08-26T08:37:00-04:00   <- the ACTUAL start, not the target
+   lateness_s             300.0
+   window_closes          2026-08-26T08:42:00-04:00
+   packet_data_cutoff     1787747820.0
+   VERDICT: LATE START RECORDED AT ITS ACTUAL TIME, NOT BACKDATED
+
+== INDEPENDENT RECONSTRUCTION FROM PERSISTED ARTIFACTS ==
+   events                 23
+   chain                  INTACT
+   rebuilt_from           0920_ET_final
+   packet_blob            513b69542e60bf75f25fa22ccc8625c4bca25fc69c347249fa94c15c30d1fbe9
+   recorded_sha           1ad4a399f99cead680ec8cb0bffb46101f177740f7d0462c7f5b72aca53673dc
+   recomputed_sha         1ad4a399f99cead680ec8cb0bffb46101f177740f7d0462c7f5b72aca53673dc
+   agrees                 True
+   packet_fields_match    False
+   as_of_time_packet      2026-08-26 13:20:00+00:00
+   as_of_time_sealed      2026-08-26 13:25:00+00:00
+
+== PARITY: LEGACY RUNNER vs STAGED PRODUCTION ENTRY POINT ==
+   identical frozen transport, identical recorded Captain response, identical fixture world.
+   legacy | 12:15:00 absorb[0815_ET_initial] indices_ok=3/4 movers=6 unknown_catalyst=3
+   legacy | 12:32:00 absorb[0832_ET_post_macro] indices_ok=3/4 movers=6 unknown_catalyst=3
+   legacy | 13:05:00 absorb[0905_ET_refresh] indices_ok=3/4 movers=6 unknown_catalyst=2
+   legacy | 13:20:00 absorb[0920_ET_final] indices_ok=3/4 movers=6 unknown_catalyst=2
+   legacy | PACKET SEALED f16a7ce43085 -> results/frontier/premarket/2026-08-26.json
+   legacy | brief -> /private/tmp/claude-501/-Users-derekduenas/493f47ba-c471-4af0-9432-ba9bb8f8a672/scratchpad/r5/ev/parity_legacy/2026-08-26_morning_brief.md
+   legacy | ORACLE slept 5 times, total 4260s of virtual time
+   staged | five separate OS processes completed (see THE MORNING above for their output)
+
+   SEMANTIC PARITY OVER THE THIRTEEN V1 FIELDS (byte parity is no longer required: R5 changes
+   the packet SCHEMA, so the two producers legitimately emit different bytes).
+   PACKET FIELD           AGREE
+   kind                   yes
+   yesterday_memory       yes
+   market_date            yes
+   prior_session          yes
+   as_of_time             yes
+   created_at             yes
+   source_coverage        yes
+   indices                yes
+   gap_map                yes
+   watch_map              yes
+   blind_spots            yes
+   decision_power         yes
+   absorption_label       yes
+   V1 fields compared: 13   differing: 0
+
+   INTENTIONAL ADDITIONS in PREMARKET_CONTEXT_PACKET_V2 (present in both producers, because
+   both call the same authoritative absorb):
+      as_of_time_semantics     legacy=True staged=True
+      schema                   legacy=True staged=True
+      source_observations      legacy=True staged=True
+      stage_time               legacy=False staged=True
+      time                     legacy=True staged=True
+
+   accepted source observations                  IDENTICAL
+   source_observations table                     IDENTICAL
+   time block                                    DIFFERS
+   rejection and unavailable reasons             IDENTICAL
+   accumulated factual state (V1 fields)         IDENTICAL
+   packet classification (watch_map / states)    IDENTICAL
+   Captain input (the exact prompt)              IDENTICAL
+   final seal input (V1 fields)                  IDENTICAL
+   packet_sha256 (reported, NOT an acceptance requirement) DIFFERS
+   legacy sha=f16a7ce43085753d
+   staged sha=1ad4a399f99cead6
+
+== EARLY START: THE OLD BEHAVIOUR AND THE NEW ONE, SAME CLOCK ==
+   NOTE ON WHAT THIS DOES AND DOES NOT SHOW: 02:00 ET is a CONTROLLED early-start fixture.
+   It establishes that any sufficiently early process start makes the legacy runner absorb
+   hours early under the target stage's label. It does NOT establish that launchd actually
+   produced such a start on this host; only the disposable operating-system test can.
+   legacy | 07:00:00 absorb[0815_ET_initial] indices_ok=3/4 movers=0 unknown_catalyst=0
+   legacy | 08:00:00 absorb[0832_ET_post_macro] indices_ok=3/4 movers=6 unknown_catalyst=0
+   legacy | 09:00:00 absorb[0905_ET_refresh] indices_ok=3/4 movers=6 unknown_catalyst=5
+   legacy | 10:00:00 absorb[0920_ET_final] indices_ok=3/4 movers=6 unknown_catalyst=5
+   legacy | PACKET SEALED dd8a942a05f9 -> results/frontier/premarket/2026-08-26.json
+   legacy | ORACLE slept 5 times, total 26700s of virtual time
+   CONSEQUENCE: EARLY OBSERVATIONS MISREPRESENTED AS FINAL-PREMARKET OBSERVATIONS.
+
+   A CORRECTION TO THE R4 REPORT, which overstated this. The 03:00 ET catalyst
+   classifications were NOT intrinsically false: at 03:00 the NVDA, SYND and FUTR filings
+   were genuinely not yet knowable, and NO_KNOWN_CATALYST was the correct point-in-time
+   answer for that instant. Nothing was fabricated. The defect is that those correct
+   EARLY observations were stored under the 09:20-final stage identity and packet context,
+   where a reader is entitled to read them as the state of the world at 09:20. The
+   misrepresentation is in the LABEL and the CONTEXT, not in the classification.
+
+      early-start sha   dd8a942a05f9fe1c
+      on-time sha       f16a7ce43085753d
+      same market_date=2026-08-26, same absorption_label=0920_ET_final, DIFFERENT CONTENT
+      newest bar in the early packet: 2026-08-26 10:00:00+00:00; sealed as_of 2026-08-26 13:25:00+00:00 -- 205 minutes apart
+      UNKNOWN_CATALYST_MOVERS early=['NVDA.US', 'AMD.US', 'STAL.US', 'FUTR.US', 'SYND.US']
+                             on-time=['AMD.US', 'STAL.US']
+      -- correct for 03:00-06:00 ET; wrong to present as the 09:20 final refresh.
+
+   WHAT R5 CHANGES ABOUT THIS. Under PREMARKET_CONTEXT_PACKET_V2 the same early packet
+   CARRIES ITS OWN CONTRADICTION, because the instants are now separate fields:
+      time.packet_data_cutoff        06:00 ET   <- when this packet stopped accepting input
+      time.latest_accepted_known_from 06:00 ET  <- the newest thing that actually got in
+      time.packet_sealed_at          09:25 ET   <- when it was sealed
+      as_of_time                     2026-08-26 13:25:00+00:00   (means PACKET_SEALED_AT, and now says so)
+      A reader comparing the cutoff with the seal instant sees a 205-minute gap on a
+      packet labelled the final refresh. In V1 there was one field and no way to ask.
+   staged | stage=0815_ET_initial disposition=TOO_EARLY delta=-22500s missing_predecessors=none
+   staged | stage=0832_ET_post_macro disposition=TOO_EARLY delta=-23520s missing_predecessors=none
+   staged | stage=0905_ET_refresh disposition=TOO_EARLY delta=-25500s missing_predecessors=none
+   staged | stage=0920_ET_final disposition=TOO_EARLY delta=-26400s missing_predecessors=none
+   staged | stage=seal disposition=TOO_EARLY delta=-26700s missing=none

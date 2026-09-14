@@ -67,9 +67,26 @@ def main() -> int:
     if subs:
         print("SUBSTITUTIONS ACTIVE (this run is NOT fully real): %s" % sorted(subs))
 
+    # ---- TIMEZONE GUARD. launchd fires in LOCAL time; every stage target is a NEW YORK instant. If the host has
+    # moved zones since the schedule was generated, the local triggers now land at the wrong market time, and the
+    # right answer is to refuse rather than to run three hours off and record it as ordinary lateness.
+    from apex.frontier import market_time as MT
     if a.stage == "verify":
+        # The diagnostic must work even on a host that would be refused; refusing to REPORT on a misconfigured
+        # host is how a misconfiguration stays invisible.
         print(journal.verify())
         return 0
+    host = MT.host_timezone()
+    binding = MT.load_binding()
+    try:
+        tzstatus = MT.verify_binding(binding, host)
+    except MT.TimezoneConfigurationMismatch as e:
+        journal.append(stage=a.stage, state="REFUSED_INPUT", reason="TIMEZONE_CONFIGURATION_MISMATCH",
+                       detail=str(e)[:500], host_timezone=host, binding=binding)
+        print("REFUSED stage=%s reason=TIMEZONE_CONFIGURATION_MISMATCH\n%s" % (a.stage, e))
+        return 5
+    print("host_tz=%s (%s) binding=%s" % (host["name"], host["source"], tzstatus["status"]))
+
     if a.stage == "reconcile":
         return reconcile(day, now, journal, RR)
 
@@ -112,9 +129,9 @@ def main() -> int:
                       delta_s=round(delta, 1))
             journal.append(stage=a.stage, state="STARTED", disposition=disp, delta_s=round(delta, 1),
                            dry_run=True)
-            terminal = disp if disp in ("TOO_EARLY", "MISSED_WINDOW") else "REFUSED_INPUT"
-            journal.append(stage=a.stage, state=terminal, dry_run=True,
-                           note="dry run: window logic and claiming exercised; no provider was called")
+            journal.append(stage=a.stage, state=PJ.DRY_RUN, dry_run=True, disposition=disp,
+                           note="dry run: window logic exercised, no provider called, and NOT a decisive "
+                                "outcome -- the real stage can still run today")
             rec.stage("SOURCES", "SKIPPED_DRY_RUN"); rec.finish(exit_status="DRY_RUN_%s" % disp)
             print("stage=%s disposition=%s delta=%.0fs (dry run)" % (a.stage, disp, delta))
             return 0
@@ -122,7 +139,7 @@ def main() -> int:
         if a.stage == "seal":
             out = PS.finalize(journal=journal, now_et=now)
         else:
-            out = PS.run_stage(a.stage, journal=journal, now_et=now)
+            out = PS.run_stage(a.stage, journal=journal, now_et=now, code_identity=code_identity())
 
         state = out["state"]
         rec.stage("SOURCES", state)
@@ -167,7 +184,7 @@ def reconcile(day, now, journal, RR) -> int:
         return 4
     missing = []
     for stage, _h, _m in PS.STAGE_SCHEDULE:
-        st = journal.stage_state(stage)
+        st = journal.stage_outcome(stage)
         if st in ("PENDING",):
             disp, delta = disposition(stage, now)
             missing.append((stage, disp, delta))

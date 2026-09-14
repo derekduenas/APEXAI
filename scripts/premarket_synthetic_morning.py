@@ -24,6 +24,11 @@ REPO = _S.parent
 CLI = "scripts/premarket_stage.py"
 
 
+def PS_schedule():
+    from apex.frontier import premarket_stages as PS
+    return list(PS.STAGE_SCHEDULE) + [("reconcile", 9, 40)]
+
+
 def env_for(root, clock_file, *, captain="apex.audit.premarket_fixture:captain",
             transport="apex.audit.premarket_fixture:transport", crash=None, extra=None):
     e = dict(os.environ)
@@ -119,16 +124,23 @@ def run_oracle(root, clock_file, *, start_h, start_m, captain="apex.audit.premar
     return {"rc": r.returncode, "out": r.stdout.strip(), "err": r.stderr.strip()[-800:]}
 
 
-def compare_packets(a: dict, b: dict) -> list:
+# The thirteen fields a V1 packet carried. R5 changes the packet SCHEMA, so byte parity with the legacy runner is
+# no longer an acceptance requirement -- but these thirteen must still mean exactly the same thing, and that is
+# what is now compared. Everything outside this set is an INTENTIONAL ADDITION and is listed as one.
+V1_FIELDS = ("kind", "yesterday_memory", "market_date", "prior_session", "as_of_time", "created_at",
+             "source_coverage", "indices", "gap_map", "watch_map", "blind_spots", "decision_power",
+             "absorption_label")
+
+
+def compare_packets(a: dict, b: dict) -> tuple:
     """Field by field, not a hash. A hash tells you THAT two things differ; it never tells you what."""
-    out, keys = [], sorted(set(a) | set(b))
-    for k in keys:
-        if k in ("packet_sha256", "sealed"):
-            continue
+    out = []
+    for k in V1_FIELDS:
         va, vb = a.get(k, "<ABSENT>"), b.get(k, "<ABSENT>")
         out.append({"field": k, "same": va == vb,
-                    "legacy": json.dumps(va, default=str)[:120], "staged": json.dumps(vb, default=str)[:120]})
-    return out
+                    "legacy": json.dumps(va, default=str)[:110], "staged": json.dumps(vb, default=str)[:110]})
+    added = sorted((set(a) | set(b)) - set(V1_FIELDS) - {"packet_sha256", "sealed"})
+    return out, added
 
 
 def parity(root, lines):
@@ -149,15 +161,22 @@ def parity(root, lines):
 
     lp = json.loads((legacy_root / ("%s.json" % FX.TRADING_DATE)).read_text())
     sp = json.loads((staged_root / ("%s.json" % FX.TRADING_DATE)).read_text())
-    rows = compare_packets(lp, sp)
+    rows, added = compare_packets(lp, sp)
     diff = [r for r in rows if not r["same"]]
     lines.append("")
+    lines.append("   SEMANTIC PARITY OVER THE THIRTEEN V1 FIELDS (byte parity is no longer required: R5 changes")
+    lines.append("   the packet SCHEMA, so the two producers legitimately emit different bytes).")
     lines.append("   %-22s %s" % ("PACKET FIELD", "AGREE"))
     for r in rows:
         lines.append("   %-22s %s" % (r["field"], "yes" if r["same"] else "NO"))
     for r in diff:
         lines.append("      %s: legacy=%s staged=%s" % (r["field"], r["legacy"], r["staged"]))
-    lines.append("   fields compared: %d   differing: %d" % (len(rows), len(diff)))
+    lines.append("   V1 fields compared: %d   differing: %d" % (len(rows), len(diff)))
+    lines.append("")
+    lines.append("   INTENTIONAL ADDITIONS in PREMARKET_CONTEXT_PACKET_V2 (present in both producers, because")
+    lines.append("   both call the same authoritative absorb):")
+    for k in added:
+        lines.append("      %-24s legacy=%s staged=%s" % (k, k in lp, k in sp))
 
     # the derived comparisons the brick asks for by name
     def obs(p):
@@ -168,14 +187,17 @@ def parity(root, lines):
             "blind_spots": p["blind_spots"], "source_coverage": p["source_coverage"]}
     checks = [
         ("accepted source observations", obs(lp) == obs(sp)),
+        ("source_observations table", lp.get("source_observations") == sp.get("source_observations")),
+        ("time block", lp.get("time") == sp.get("time")),
         ("rejection and unavailable reasons", rejections(lp) == rejections(sp)),
-        ("accumulated factual state", {k: v for k, v in lp.items() if k not in ("packet_sha256",)}
-         == {k: v for k, v in sp.items() if k not in ("packet_sha256",)}),
+        ("accumulated factual state (V1 fields)",
+         {k: lp.get(k) for k in V1_FIELDS} == {k: sp.get(k) for k in V1_FIELDS}),
         ("packet classification (watch_map / states)", lp["watch_map"] == sp["watch_map"]),
         ("Captain input (the exact prompt)", PS.brief_prompt(lp) == PS.brief_prompt(sp)),
-        ("final seal input", {k: v for k, v in lp.items() if k not in ("packet_sha256", "sealed")}
-         == {k: v for k, v in sp.items() if k not in ("packet_sha256", "sealed")}),
-        ("packet_sha256 (reported, not relied on)", lp["packet_sha256"] == sp["packet_sha256"]),
+        ("final seal input (V1 fields)",
+         {k: lp.get(k) for k in V1_FIELDS} == {k: sp.get(k) for k in V1_FIELDS}),
+        ("packet_sha256 (reported, NOT an acceptance requirement)",
+         lp["packet_sha256"] == sp["packet_sha256"]),
     ]
     lines.append("")
     for name, ok in checks:
@@ -205,18 +227,47 @@ def early_start(root, lines):
         import pandas as pd
         last_bar = max((v.get("last_bar_time") or "") for v in early_pkt["indices"].values())
         stale_s = (pd.Timestamp(early_pkt["as_of_time"]) - pd.Timestamp(last_bar)).total_seconds()
-        lines.append("   DAMAGE, from the two sealed packets themselves:")
+        lines.append("   CONSEQUENCE: EARLY OBSERVATIONS MISREPRESENTED AS FINAL-PREMARKET OBSERVATIONS.")
+        lines.append("")
+        lines.append("   A CORRECTION TO THE R4 REPORT, which overstated this. The 03:00 ET catalyst")
+        lines.append("   classifications were NOT intrinsically false: at 03:00 the NVDA, SYND and FUTR filings")
+        lines.append("   were genuinely not yet knowable, and NO_KNOWN_CATALYST was the correct point-in-time")
+        lines.append("   answer for that instant. Nothing was fabricated. The defect is that those correct")
+        lines.append("   EARLY observations were stored under the 09:20-final stage identity and packet context,")
+        lines.append("   where a reader is entitled to read them as the state of the world at 09:20. The")
+        lines.append("   misrepresentation is in the LABEL and the CONTEXT, not in the classification.")
+        lines.append("")
         lines.append("      early-start sha   %s" % early_pkt["packet_sha256"][:16])
         lines.append("      on-time sha       %s" % good_pkt["packet_sha256"][:16])
         lines.append("      same market_date=%s, same absorption_label=%s, DIFFERENT CONTENT"
                      % (early_pkt["market_date"], early_pkt["absorption_label"]))
-        lines.append("      newest bar in the early packet: %s; sealed as_of %s -> the packet labelled the"
-                     % (last_bar, early_pkt["as_of_time"]))
-        lines.append("      09:20 ET final refresh carries data %.0f minutes old, and nothing in it says so."
-                     % (stale_s / 60.0))
-        lines.append("      UNKNOWN_CATALYST_MOVERS early=%s  on-time=%s"
-                     % (early_pkt["watch_map"]["UNKNOWN_CATALYST_MOVERS"],
-                        good_pkt["watch_map"]["UNKNOWN_CATALYST_MOVERS"]))
+        lines.append("      newest bar in the early packet: %s; sealed as_of %s -- %.0f minutes apart"
+                     % (last_bar, early_pkt["as_of_time"], stale_s / 60.0))
+        lines.append("      UNKNOWN_CATALYST_MOVERS early=%s"
+                     % (early_pkt["watch_map"]["UNKNOWN_CATALYST_MOVERS"],))
+        lines.append("                             on-time=%s"
+                     % (good_pkt["watch_map"]["UNKNOWN_CATALYST_MOVERS"],))
+        lines.append("      -- correct for 03:00-06:00 ET; wrong to present as the 09:20 final refresh.")
+        lines.append("")
+        lines.append("   WHAT R5 CHANGES ABOUT THIS. Under PREMARKET_CONTEXT_PACKET_V2 the same early packet")
+        lines.append("   CARRIES ITS OWN CONTRADICTION, because the instants are now separate fields:")
+        et_ = early_pkt.get("time") or {}
+
+        def _et(v):
+            return (pd.Timestamp(v, unit="s", tz="America/New_York").strftime("%H:%M ET")
+                    if isinstance(v, (int, float)) else v)
+        lines.append("      time.packet_data_cutoff        %s   <- when this packet stopped accepting input"
+                     % _et(et_.get("packet_data_cutoff")))
+        lines.append("      time.latest_accepted_known_from %s  <- the newest thing that actually got in"
+                     % _et(et_.get("latest_accepted_known_from")))
+        lines.append("      time.packet_sealed_at          %s   <- when it was sealed" % _et(et_.get("packet_sealed_at")))
+        lines.append("      as_of_time                     %s   (means PACKET_SEALED_AT, and now says so)"
+                     % early_pkt["as_of_time"])
+        gap = (et_.get("packet_sealed_at", 0) - et_.get("packet_data_cutoff", 0)
+               if isinstance(et_.get("packet_sealed_at"), (int, float)) else 0)
+        lines.append("      A reader comparing the cutoff with the seal instant sees a %.0f-minute gap on a"
+                     % (gap / 60.0))
+        lines.append("      packet labelled the final refresh. In V1 there was one field and no way to ask.")
     except Exception as e:                                              # noqa: BLE001
         lines.append("   DAMAGE MEASUREMENT UNAVAILABLE: %s: %s" % (type(e).__name__, e))
 
@@ -229,6 +280,144 @@ def early_start(root, lines):
             if "disposition" in ln or "exited" in ln:
                 lines.append("   staged | %s" % ln)
     return True
+
+
+def time_verification(root, trading_date, lines):
+    """Independently re-derive every instant the packet claims, from the FIXTURE's declared ground truth and the
+    journal -- never from the packet's own time block. A packet that grades its own timestamps proves nothing."""
+    import pandas as pd
+
+    from apex.audit import premarket_fixture as FX
+    from apex.frontier import premarket as PM
+    from apex.frontier import premarket_stages as PS
+    pkt = json.loads((pathlib.Path(root) / ("%s.json" % trading_date)).read_text())
+    t = pkt["time"]
+    rows = []
+
+    def ck(name, expected, actual):
+        ok = (expected == actual) or (isinstance(expected, float) and isinstance(actual, float)
+                                      and abs(expected - actual) < 1e-6)
+        rows.append({"check": name, "expected": expected, "actual": actual, "ok": ok})
+
+    def et(h, m):
+        return FX.et_epoch(h, m, trading_date)
+
+    final_stage, fh, fm = PS.ABSORB_STAGES[-1]
+    seal_h, seal_m = PS.STAGES["seal"]
+
+    ck("schema is the new version", PM.PACKET_SCHEMA_V2, pkt.get("schema"))
+    ck("morning_started_at = first stage instant", et(*PS.STAGES[PS.ABSORB_STAGES[0][0]]), t["morning_started_at"])
+    ck("collection_started_at = sealing stage's own start", et(fh, fm), t["packet_collection_started_at"])
+    ck("declared information cutoff = that stage's absorption end", et(fh, fm), t["packet_data_cutoff"])
+    ck("latest accepted content known_from", et(fh, fm), t["latest_accepted_known_from"])
+    ck("ai_request_time = the seal stage instant", et(seal_h, seal_m), t["ai_request_time"])
+    ck("ai_response_time = the seal stage instant", et(seal_h, seal_m), t["ai_response_time"])
+    ck("packet_created_at = absorption end", et(fh, fm), t["packet_created_at"])
+    ck("packet_sealed_at = the seal stage instant", et(seal_h, seal_m), t["packet_sealed_at"])
+    ck("packet_known_from = packet_sealed_at", t["packet_sealed_at"], t["packet_known_from"])
+    ck("as_of_time resolves to packet_sealed_at",
+       pd.Timestamp(pkt["as_of_time"]).timestamp(), t["packet_sealed_at"])
+    ck("as_of_time_semantics declares that", "PACKET_SEALED_AT", pkt["as_of_time_semantics"]["means"])
+
+    # per-source: SEC's newest CONTENT is the FUTR filing, knowable at 09:00 ET by the fixture's own declaration
+    ck("SEC_EDGAR newest content known_from", et(9, 0), t["per_source_known_from"]["SEC_EDGAR"])
+    ck("SEC_EDGAR freshness at cutoff", et(fh, fm) - et(9, 0), t["per_source_freshness_s"]["SEC_EDGAR"])
+    ck("SEC_EDGAR last probed at the stage instant", et(fh, fm), t["per_source_last_probe"]["SEC_EDGAR"])
+    ck("EODHD newest content known_from", et(fh, fm), t["per_source_known_from"]["EODHD_PREMARKET"])
+    ck("EODHD freshness at cutoff", 0.0, t["per_source_freshness_s"]["EODHD_PREMARKET"])
+
+    # per-observation: every SEC content observation's known_from must be the fixture's declared availability
+    declared = {}
+    for e in FX._edgar_events():
+        declared[e["accession"]] = pd.Timestamp(e["known_from_utc"]).timestamp()
+    mismatched = []
+    for o in pkt["source_observations"]:
+        if o["source_kind"] == "SEC_EDGAR" and o.get("carries_content"):
+            acc = str(o["source_id"]).split(":", 1)[-1]
+            if acc in declared and abs(declared[acc] - o["source_known_from"]) > 1e-6:
+                mismatched.append(acc)
+    ck("every SEC observation carries the filing's declared availability", [], mismatched)
+    ck("every observation names its timezone", [],
+       [o["source_id"] for o in pkt["source_observations"] if o["source_timezone"] == "UNAVAILABLE"])
+    ck("every observation names its availability basis", [],
+       [o["source_id"] for o in pkt["source_observations"] if not o.get("availability_basis")])
+
+    # stage identity
+    st = pkt["stage_time"]
+    ck("stage_time names the sealing stage's source stage", final_stage, st["stage"])
+    ck("stage target instant", et(fh, fm), st["target_epoch"])
+    ck("stage lateness", 0.0, st["lateness_s"])
+
+    # the digest, recomputed with seal()'s own formula
+    import hashlib
+    body = {k: v for k, v in pkt.items() if k != "packet_sha256"}
+    ck("final packet digest recomputes", pkt["packet_sha256"],
+       hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest())
+    ck("the time block is INSIDE the digest", False,
+       hashlib.sha256(json.dumps({k: v for k, v in body.items() if k != "time"}, sort_keys=True,
+                                 default=str).encode()).hexdigest() == pkt["packet_sha256"])
+
+    lines.append("== INDEPENDENT TIME RECONSTRUCTION (expectations derived from the fixture, not the packet) ==")
+    for r in rows:
+        lines.append("   %-52s %-22s %-22s %s"
+                     % (r["check"], str(r["expected"])[:22], str(r["actual"])[:22],
+                        "OK" if r["ok"] else "MISMATCH"))
+    bad = [r for r in rows if not r["ok"]]
+    lines.append("   %d/%d checks agree" % (len(rows) - len(bad), len(rows)))
+    return not bad
+
+
+def future_input_proof(root, trading_date, lines):
+    """A provider-declared FUTURE input must not reach the packet's facts or the Captain prompt. Its REFUSAL must
+    be on the record -- the two are different requirements and both are checked."""
+    from apex.audit import premarket_fixture as FX
+    from apex.frontier import premarket_stages as PS
+    pkt = json.loads((pathlib.Path(root) / ("%s.json" % trading_date)).read_text())
+    sym = FX.FUTURE_AVAILABLE_SYMBOL
+    fact_fields = ("indices", "gap_map", "watch_map", "blind_spots", "source_coverage", "yesterday_memory")
+    lines.append("== A PROVIDER-DECLARED FUTURE INPUT (%s, stamped available %02d:%02d ET) ==" %
+                 (sym, *FX.FUTURE_AVAILABLE_AT_ET))
+    for f in fact_fields:
+        lines.append("   %-24s contains it: %s" % (f, sym.split(".")[0] in json.dumps(pkt[f])))
+    prompt = PS.brief_prompt(pkt)
+    lines.append("   %-24s contains it: %s" % ("the Captain prompt", sym.split(".")[0] in prompt))
+    obs = [o for o in pkt["source_observations"] if sym in str(o["source_id"])]
+    lines.append("   %-24s contains it: %s   <- the REFUSAL is recorded, which is the requirement"
+                 % ("source_observations", bool(obs)))
+    lines.append("   normalization: %s" % (obs[0]["normalization"] if obs else "NO RECORD"))
+    ok = (not any(sym.split(".")[0] in json.dumps(pkt[f]) for f in fact_fields)
+          and sym.split(".")[0] not in prompt and obs and obs[0]["normalization"] == "REFUSED_AS_FUTURE")
+    lines.append("   VERDICT: %s" % ("REFUSED AT THE BOUNDARY, RECORDED, NEVER IN THE FACTS" if ok else "FAILED"))
+    return ok
+
+
+def late_stage_proof(root, clock, lines):
+    """A stage that starts late but inside its window must absorb AND keep its ACTUAL time visible. Backdating a
+    late stage to its target is the exact failure mode the old runner had in reverse."""
+    from apex.audit import premarket_fixture as FX
+    from apex.frontier import premarket_stages as PS
+    r = pathlib.Path(root)
+    stage = "0832_ET_post_macro"
+    h, m = PS.STAGES[stage]
+    set_clock(clock, 8, 15)
+    invoke("0815_ET_initial", r, clock)
+    set_clock(clock, h, m + 5)                    # five minutes late: inside the ten-minute window
+    out = invoke(stage, r, clock)
+    set_clock(clock, 9, 25)
+    invoke("seal", r, clock)
+    pkt = json.loads((r / ("%s.json" % FX.TRADING_DATE)).read_text())
+    st = pkt["stage_time"]
+    lines.append("== A LATE-BUT-ALLOWED STAGE (%s started 5 minutes after target) ==" % stage)
+    lines.append("   disposition            %s" % st["disposition"])
+    lines.append("   target_instant         %s" % st["target_instant"])
+    lines.append("   process_started_market %s   <- the ACTUAL start, not the target" % st["process_started_market"])
+    lines.append("   lateness_s             %s" % st["lateness_s"])
+    lines.append("   window_closes          %s" % st["window_closes"])
+    lines.append("   packet_data_cutoff     %s" % pkt["time"]["packet_data_cutoff"])
+    ok = (st["disposition"] == "LATE_START" and abs(st["lateness_s"] - 300.0) < 1.0
+          and st["process_started_market"] != st["target_instant"])
+    lines.append("   VERDICT: %s" % ("LATE START RECORDED AT ITS ACTUAL TIME, NOT BACKDATED" if ok else "FAILED"))
+    return ok
 
 
 def observation_table(root, trading_date):
@@ -334,6 +523,22 @@ def main() -> int:
              "SUBSTITUTED: clock, EODHD transport, Captain transport, output root — each named in every record.",
              "fixture world: %s" % json.dumps(world, indent=1), ""]
 
+    lines.append("== MARKET TIME VS LOCAL TIME (the scheduler fires local; every target is a market instant) ==")
+    from apex.frontier import market_time as MT
+    host = MT.host_timezone()
+    nxt = MT.next_market_session()
+    lines.append("   host timezone        %s   (%s: %s)" % (host["name"], host["source"], host["evidence"]))
+    lines.append("   market timezone      %s   (authoritative)" % MT.MARKET_TZ)
+    lines.append("   tracks the market    %s" % MT.offset_is_stable(host["name"]))
+    lines.append("   next market session  %s" % nxt)
+    lines.append("   %-20s %-11s %-8s %-26s %-8s %s"
+                 % ("STAGE", "MARKET", "LOCAL", "UTC INSTANT", "MKT-LOC", "ALL-YEAR TRIGGERS"))
+    for r in MT.schedule_table(list(PS_schedule()), host["name"], nxt):
+        lines.append("   %-20s %-11s %-8s %-26s %+-8.1f %s"
+                     % (r["stage"], r["market_time"] + " ET", r["local_time"], r["utc_instant"],
+                        r["market_minus_local_hours"], ", ".join("%02d:%02d" % t for t in r["triggers_all_year"])))
+    lines.append("")
+
     staged_root = root / "staged"
     lines.append("== THE MORNING ==")
     run_morning(staged_root, clock, lines=lines)
@@ -344,6 +549,13 @@ def main() -> int:
     for r in observation_table(staged_root, FX.TRADING_DATE):
         lines.append("   %-27s %-46s %-46s %s" % (r["observation"], r["expected"], r["actual"], r["verdict"]))
         lines.append("        decided by %s: %s" % (r["decided_by"], r["evidence"]))
+
+    lines.append("")
+    time_verification(staged_root, FX.TRADING_DATE, lines)
+    lines.append("")
+    future_input_proof(staged_root, FX.TRADING_DATE, lines)
+    lines.append("")
+    late_stage_proof(root / "late", root / "clock.late", lines)
 
     lines.append("")
     lines.append("== INDEPENDENT RECONSTRUCTION FROM PERSISTED ARTIFACTS ==")

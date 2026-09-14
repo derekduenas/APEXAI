@@ -27,8 +27,9 @@ ENV_NOW = "APEX_PREMARKET_NOW"              # a fixed ISO-8601 instant
 ENV_TRANSPORT = "APEX_PREMARKET_TRANSPORT"  # "module:callable" replacing the EODHD network call
 ENV_CAPTAIN = "APEX_PREMARKET_CAPTAIN"      # "module:callable" replacing the Captain model transport
 ENV_CRASH = "APEX_PREMARKET_CRASH_AFTER"    # kill THIS process at a named phase boundary; never alters output
+ENV_TZ_BINDING = "APEX_PREMARKET_TZ_BINDING"  # path to the installed timezone binding to check against
 
-ENV_NAMES = (ENV_ROOT, ENV_CLOCK_FILE, ENV_NOW, ENV_TRANSPORT, ENV_CAPTAIN, ENV_CRASH)
+ENV_NAMES = (ENV_ROOT, ENV_CLOCK_FILE, ENV_NOW, ENV_TRANSPORT, ENV_CAPTAIN, ENV_CRASH, ENV_TZ_BINDING)
 
 DEFAULT_ROOT = "results/frontier/premarket"
 

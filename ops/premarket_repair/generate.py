@@ -16,7 +16,6 @@ import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 REPO_AT_RUNTIME = "/Users/derekduenas/apex-equities"
-SCHEDULER_TZ = "America/Los_Angeles"
 RECONCILE_ET = (9, 40)
 
 PLIST = """<?xml version="1.0" encoding="UTF-8"?>
@@ -33,6 +32,7 @@ PLIST = """<?xml version="1.0" encoding="UTF-8"?>
        made a 19-day gap silent. -->
   <key>StandardOutPath</key><string>{repo}/logs/premarket.{stage}.launchd.out</string>
   <key>StandardErrorPath</key><string>{repo}/logs/premarket.{stage}.launchd.err</string>
+  {tznote}
   <key>StartCalendarInterval</key>
   <array>
 {intervals}
@@ -74,35 +74,74 @@ exit $rc
 """
 
 
-def et_to_local(h, m):
-    """Convert an ET wall time to the scheduler's local wall time, and PROVE the offset is stable."""
-    import pandas as pd
-    for probe in ("2026-01-15", "2026-07-15"):
-        a = pd.Timestamp("%s %02d:%02d" % (probe, h, m), tz="America/New_York")
-        b = a.tz_convert(SCHEDULER_TZ)
-        if (a.hour - b.hour) % 24 != 3:
-            raise SystemExit("SCHEDULER_TZ_OFFSET_NOT_CONSTANT at %s: ET %02d:%02d -> %s %02d:%02d"
-                             % (probe, h, m, SCHEDULER_TZ, b.hour, b.minute))
-    ref = pd.Timestamp("2026-07-15 %02d:%02d" % (h, m), tz="America/New_York").tz_convert(SCHEDULER_TZ)
-    return ref.hour, ref.minute
+def scheduler_tz() -> str:
+    """R5: the host zone is DISCOVERED from the operating system, not assumed. R4 hard-coded
+    America/Los_Angeles and verified the assumption at two probe instants, which is a check that can only ever
+    agree with itself."""
+    from apex.frontier import market_time as MT
+    h = MT.host_timezone()
+    if not h["resolved"]:
+        raise SystemExit("HOST_TIMEZONE_UNRESOLVED: %s -- refusing to generate a local schedule for a host whose "
+                         "IANA zone cannot be determined" % h["evidence"])
+    return h["name"]
 
 
-def artifacts() -> dict:
+def schedule() -> list:
     from apex.frontier import premarket_stages as PS
-    schedule = list(PS.STAGE_SCHEDULE) + [("reconcile", RECONCILE_ET[0], RECONCILE_ET[1])]
+    return list(PS.STAGE_SCHEDULE) + [("reconcile", RECONCILE_ET[0], RECONCILE_ET[1])]
+
+
+def artifacts(tz=None, year=2026) -> dict:
+    import json
+
+    from apex.frontier import market_time as MT
+    tz = tz or scheduler_tz()
     out = {}
-    for stage, h, m in schedule:
-        lh, lm = et_to_local(h, m)
-        intervals = "\n".join(INTERVAL.format(d=d, h=lh, m=lm) for d in range(1, 6))
+    for stage, h, m in schedule():
+        # EVERY local trigger this NY target needs across the year. A host that tracks New York needs one; a host
+        # that does not needs two, and both are emitted -- the out-of-season one fires at the wrong market time
+        # and is refused by the market-time window rather than absorbing.
+        triggers = MT.local_triggers(h, m, tz, year)
+        intervals = "\n".join(INTERVAL.format(d=d, h=lh, m=lm) for lh, lm in triggers for d in range(1, 6))
+        note = ("<!-- market target %02d:%02d %s. Host %s tracks the market zone, so ONE local trigger covers "
+                "the year. -->" % (h, m, MT.MARKET_TZ, tz)) if len(triggers) == 1 else \
+               ("<!-- market target %02d:%02d %s. Host %s does NOT track the market zone across daylight time, "
+                "so BOTH seasonal local triggers are emitted (%s). The out-of-season one lands outside the "
+                "market window and is refused; it never absorbs. -->"
+                % (h, m, MT.MARKET_TZ, tz, ", ".join("%02d:%02d" % t for t in triggers)))
         out["com.apex.premarket.%s.plist.NEW" % stage] = PLIST.format(
-            stage=stage, repo=REPO_AT_RUNTIME, intervals=intervals)
-    out["premarket.sh.NEW"] = SHELL % {"stages": " ".join(s for s, _h, _m in schedule)}
+            stage=stage, repo=REPO_AT_RUNTIME, intervals=intervals, tznote=note)
+    out["premarket.sh.NEW"] = SHELL % {"stages": " ".join(s for s, _h, _m in schedule())}
+    out[MT.BINDING_NAME] = json.dumps(MT.binding_body(tz, schedule(), generated_for_year=year), indent=1) + "\n"
     return out
 
 
+def show(tz=None, year=2026) -> None:
+    """The table the brick asks for: market stage, local trigger, UTC instant, host zone, offset, next session."""
+    from apex.frontier import market_time as MT
+    tz = tz or scheduler_tz()
+    host = MT.host_timezone()
+    nxt = MT.next_market_session()
+    print("host timezone      %s   (%s: %s)" % (host["name"], host["source"], host["evidence"]))
+    print("market timezone    %s   (authoritative: every stage target is a market instant)" % MT.MARKET_TZ)
+    print("tracks the market  %s" % MT.offset_is_stable(tz, year))
+    print("next market session %s" % nxt)
+    print()
+    print("   %-20s %-12s %-12s %-26s %-8s %s"
+          % ("STAGE", "MARKET", "LOCAL", "UTC INSTANT (next session)", "MKT-LOC", "ALL-YEAR LOCAL TRIGGERS"))
+    for row in MT.schedule_table(schedule(), tz, nxt if nxt != "UNRESOLVED" else "2026-07-15"):
+        print("   %-20s %-12s %-12s %-26s %-8.1f %s"
+              % (row["stage"], row["market_time"] + " ET", row["local_time"], row["utc_instant"],
+                 row["market_minus_local_hours"],
+                 ", ".join("%02d:%02d" % t for t in row["triggers_all_year"])))
+
+
 def main() -> int:
-    check = "--check" in sys.argv
     sys.path.insert(0, str(HERE.parents[1]))
+    if "--show" in sys.argv:
+        show()
+        return 0
+    check = "--check" in sys.argv
     bad = []
     for name, body in artifacts().items():
         p = HERE / name
@@ -112,9 +151,10 @@ def main() -> int:
         else:
             p.write_text(body)
     if check:
-        print("DRIFT: %s" % bad if bad else "all prepared artifacts match the schedule")
+        print("DRIFT: %s" % bad if bad else "all prepared artifacts match the schedule and the host timezone")
         return 1 if bad else 0
     print("wrote %d artifacts" % len(artifacts()))
+    show()
     return 0
 
 

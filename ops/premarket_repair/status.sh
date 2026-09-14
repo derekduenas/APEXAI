@@ -11,11 +11,31 @@ done
 printf '%-20s ' "(superseded single)"
 launchctl print "gui/$(id -u)/com.apex.premarket" >/dev/null 2>&1 \
   && echo "STILL LOADED -- it should not be; run install.sh" || echo "absent, as intended"
-echo "== scheduler timezone =="
-# The plists carry LOCAL times derived from ET. They are only correct while this host tracks US Eastern.
-TZN="$(readlink /etc/localtime | sed 's|.*zoneinfo/||')"
-[[ "$TZN" == "America/Los_Angeles" ]] && echo "$TZN (matches the zone the plists were generated for)" \
-  || echo "$TZN -- MISMATCH: the prepared plists assume America/Los_Angeles; regenerate them"
+echo "== market time vs local time =="
+# The plists carry LOCAL trigger times derived from MARKET (America/New_York) targets. This prints both, the UTC
+# instant, the host zone and the binding check, so a shifted morning is visible before it happens.
+cd "$HOME/apex-equities" 2>/dev/null && .venv/bin/python - <<'PY'
+import sys
+sys.path.insert(0, "."); sys.path.insert(0, "ops/premarket_repair")
+from apex.frontier import market_time as MT
+from apex.frontier import premarket_stages as PS
+host = MT.host_timezone()
+binding = MT.load_binding()
+print("host timezone       %s  (%s)" % (host["name"], host["evidence"]))
+print("market timezone     %s  (authoritative)" % MT.MARKET_TZ)
+try:
+    print("binding             %s" % MT.verify_binding(binding, host)["status"])
+except MT.TimezoneConfigurationMismatch as e:
+    print("binding             REFUSED\n%s" % e)
+nxt = MT.next_market_session()
+print("next market session %s" % nxt)
+stages = list(PS.STAGE_SCHEDULE) + [("reconcile", 9, 40)]
+print("   %-20s %-10s %-8s %-26s %s" % ("STAGE", "MARKET", "LOCAL", "UTC INSTANT", "MKT-LOC"))
+for r in MT.schedule_table(stages, host["name"] if host["resolved"] else "UTC", nxt):
+    print("   %-20s %-10s %-8s %-26s %+.1fh"
+          % (r["stage"], r["market_time"] + " ET", r["local_time"], r["utc_instant"],
+             r["market_minus_local_hours"]))
+PY
 echo "== last completed packet =="
 ls -t "$HOME/apex-equities/results/frontier/premarket"/????-??-??.json 2>/dev/null | head -1 || echo "NONE"
 echo "== today's journal =="

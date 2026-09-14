@@ -10,6 +10,8 @@ STAGES=(0815_ET_initial 0832_ET_post_macro 0905_ET_refresh 0920_ET_final seal re
 
 cp "$D/premarket.sh.NEW" "$HOME/apex-equities/ops/premarket.sh"
 chmod +x "$HOME/apex-equities/ops/premarket.sh"
+# The timezone the local triggers were generated for. The runner refuses if the live host no longer matches.
+cp "$D/timezone_binding.json" "$HOME/apex-equities/ops/timezone_binding.json"
 
 launchctl bootout "gui/$(id -u)/com.apex.premarket" 2>/dev/null || true
 rm -f "$HOME/Library/LaunchAgents/com.apex.premarket.plist"

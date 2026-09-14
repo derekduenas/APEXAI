@@ -129,10 +129,17 @@ def main() -> int:
     set_clock(clock, 8, 15)
     procs = [subprocess.Popen([sys.executable, "scripts/premarket_stage.py", "--stage", S0], cwd=str(REPO),
                               env=env_for(r, clock), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-             for _ in range(3)]
+             for _ in range(5)]
     outs = [p.communicate()[0] for p in procs]
-    record("concurrent stage processes", "exactly 1 absorption",
-           "exactly 1 absorption" if absorbed_count(r, D, S0) == 1 else "%d absorptions" % absorbed_count(r, D, S0),
+    # BOTH halves matter. "No duplicate absorption" is satisfied by absorbing ZERO times, which is how this
+    # scenario failed in R5 -- a losing racer poisoned the winner and the whole stage was lost. So the assertion
+    # is exactly one absorption AND a COMPLETED outcome.
+    states = [e["state"] for e in events(r, D) if e["stage"] == S0]
+    done = "COMPLETED" in states
+    record("concurrent stage processes (5)", "exactly 1 absorption AND the stage COMPLETED",
+           "exactly 1 absorption AND the stage COMPLETED"
+           if absorbed_count(r, D, S0) == 1 and done
+           else "%d absorptions, completed=%s" % (absorbed_count(r, D, S0), done),
            "; ".join(o.strip().splitlines()[-1][:60] for o in outs if o.strip()))
 
     # ---------------------------------------------------------- 7: altered predecessor, old digest retained

@@ -35,7 +35,14 @@ TAPE = {
     "FUTR.US": (48.00, 0.0220),           # its filing becomes knowable at 09:00 ET, not before
     "SYND.US": (77.00, 0.0210),           # the same announcement filed twice
     "CORR.US": (133.00, -0.0230),         # an 8-K and a later 8-K/A correcting it
+    "SKEW.US": (210.00, 0.0450),          # a provider stamping a FUTURE availability: refused at the boundary
 }
+
+# SKEW's payload claims it became available at 09:45 ET -- after every stage instant of this morning. The
+# transport refuses it, its rows never reach the normalizer, and neither its symbol nor its prices can appear in
+# the packet or in the Captain prompt. This is provider clock skew, which is a real thing providers do.
+FUTURE_AVAILABLE_SYMBOL = "SKEW.US"
+FUTURE_AVAILABLE_AT_ET = (9, 45)
 
 CIKS = {"NVDA": "1045810", "AMD": "2488", "STAL": "9000001", "FUTR": "9000002",
         "SYND": "9000003", "CORR": "9000004"}
@@ -106,7 +113,12 @@ def _rows_for(symbol, now_utc):
 def transport(symbol, lo, hi, gov, *a, **k):
     """The declared EODHD substitution. Signature-identical to `fetch_intraday_chunk`."""
     from apex.frontier import premarket_runtime as RT
-    return _rows_for(symbol, RT.now_utc()), "fixture:%s" % FIXTURE_ID
+    rows = _rows_for(symbol, RT.now_utc())
+    if symbol == FUTURE_AVAILABLE_SYMBOL and rows:
+        at = et_epoch(*FUTURE_AVAILABLE_AT_ET)
+        for r in rows:
+            r["available_at"] = at
+    return rows, "fixture:%s" % FIXTURE_ID
 
 
 def transport_all_unavailable(symbol, lo, hi, gov, *a, **k):

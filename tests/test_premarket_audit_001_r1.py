@@ -51,8 +51,14 @@ class TestTheTimeModel:
             refuse_future_source(source_observation(receipt_time=300.0), 200.0)
 
     def test_unavailable_timestamps_stay_unavailable(self):
+        """R5 narrowed this from 'every field' to 'every TIMESTAMP field'. A source observation now also carries
+        its availability basis, its normalization verdict and whether it carries content -- which are facts about
+        the observation, not instants. The property under test is unchanged: no absent time is ever defaulted to
+        a clock reading."""
         o = source_observation()
-        assert all(v == UNAVAILABLE for v in o.values())
+        times = [k for k in o if k.endswith("_time") or k == "source_known_from"]
+        assert times, "the timestamp fields must still exist"
+        assert all(o[k] == UNAVAILABLE for k in times), {k: o[k] for k in times}
         assert data_cutoff([o]) == UNAVAILABLE
         assert freshness_s(o, 100.0) == UNAVAILABLE
 

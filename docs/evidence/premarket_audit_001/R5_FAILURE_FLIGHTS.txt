@@ -1,0 +1,36 @@
+FAILURE AND RECOVERY FLIGHTS (R4) — every scenario through scripts/premarket_stage.py as a real
+OS process. Crashes are real process deaths at real phase boundaries.
+
+   SCENARIO                                   ACTUAL                                               VERDICT
+   crash after capture, before NORMALIZED     recovered; exactly 1 ABSORBED; original bytes reused PASS
+        killed rc=70 (no stdout survived the hard death; the fsync'd journal did). states before retry ['STARTED', 'CAPTURED']; recovery path: replayed the recorded capture
+   crash after normalize, before ABSORBED     recovered; exactly 1 ABSORBED; original bytes reused PASS
+        killed rc=70 (no stdout survived the hard death; the fsync'd journal did). states before retry ['STARTED', 'CAPTURED', 'NORMALIZED']; recovery path: replayed the recorded capture
+   crash after absorb, before COMPLETED       recovered; exactly 1 ABSORBED; original bytes reused PASS
+        killed rc=70 (no stdout survived the hard death; the fsync'd journal did). states before retry ['STARTED', 'CAPTURED', 'NORMALIZED', 'ABSORBED']; recovery path: reused the recorded packet, no capture phase at all
+   duplicate stage delivery                   RECONCILED_DUPLICATE and exactly 1 absorption        PASS
+        RECONCILED_DUPLICATE stage=0815_ET_initial prior=COMPLETED
+   out-of-order stage delivery                proceeds with predecessors named MISSING             PASS
+        recorded missing_predecessors=['0815_ET_initial', '0832_ET_post_macro']
+   concurrent stage processes (5)             exactly 1 absorption AND the stage COMPLETED         PASS
+        RACED stage=0815_ET_initial day=2026-08-26 run_id=2026-08-26; COMPLETED stage=0815_ET_initial packet=a251a97f06c4; LOCKED stage=0815_ET_initial: PREMARKET_RUN_LOCKED: held by ; RACED stage=0815_ET_initial day=2026-08-26 run_id=2026-08-26; RACED stage=0815_ET_initial day=2026-08-26 run_id=2026-08-26
+   altered predecessor with retained digest   REFUSED as JOURNAL_CHAIN_BROKEN                      PASS
+        49151811b47ebab2 -> FAILED stage=0832_ET_post_macro reason=JOURNAL_CHAIN_BROKEN: BLOB_DIGEST_MISMATCH: 38dfe37a585a7144c8cd85a06f65ca68baa1b241057ea18bcf2dc3120
+   missing predecessor                        seals and NAMES the missing stages                   PASS
+        rebuilt from 0920_ET_final
+   finalizer invoked twice                    RECONCILED_DUPLICATE; sealed bytes unchanged         PASS
+        packet file sha db6713834e44a318
+   source unavailable for one stage           SOURCE_UNAVAILABLE recorded, not silence             PASS
+        rc=3 SOURCE_UNAVAILABLE stage=0815_ET_initial: IntradayDataError: FIXTURE_SOURCE_UNAVAILABLE: the provider returned
+   seal with every absorption failed          NOTHING_TO_SEAL, non-zero exit, no packet written    PASS
+        matches the legacy runner's 'nothing to seal' exit
+   Captain timeout                            CAPTAIN_TIMEOUT; packet still sealed                 PASS
+        packet sha e6bc89db85591988
+   Captain invalid schema                     CAPTAIN_SCHEMA_INVALID; packet still sealed          PASS
+        packet sha e1c2773ddfabab21
+   stage attempted after the seal             REFUSED_INPUT/POST_SEAL; sealed bytes unchanged      PASS
+        REFUSED_INPUT stage=0920_ET_final reason=POST_SEAL
+   invocation >1h before the target           TOO_EARLY, no fetch, returns immediately             PASS
+        exited in 1.1s (the legacy runner would have slept 3600s and then absorbed)
+
+   15/15 PASS

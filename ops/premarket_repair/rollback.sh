@@ -7,6 +7,7 @@ for s in $STAGES; do
   launchctl bootout "gui/$(id -u)/com.apex.premarket.$s" 2>/dev/null || true
   rm -f "$HOME/Library/LaunchAgents/com.apex.premarket.$s.plist"
 done
+rm -f "$HOME/apex-equities/ops/timezone_binding.json"
 cp "$D/com.apex.premarket.plist.PRIOR" "$HOME/Library/LaunchAgents/com.apex.premarket.plist"
 cp "$D/premarket.sh.PRIOR" "$HOME/apex-equities/ops/premarket.sh"
 chmod +x "$HOME/apex-equities/ops/premarket.sh"

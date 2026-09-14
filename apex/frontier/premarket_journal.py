@@ -42,9 +42,26 @@ PROGRESS = ("PENDING", "STARTED", "CAPTURED", "NORMALIZED", "ABSORBED", "COMPLET
 # note exists so the difference is not discovered later as a surprise.
 TERMINAL = ("COMPLETED", "TOO_EARLY", "MISSED_WINDOW", "SOURCE_UNAVAILABLE", "REFUSED_INPUT", "FAILED",
             "RECONCILED_DUPLICATE")
+
+# DECISIVE terminal states -- the ones that mean THIS STAGE REACHED AN OUTCOME.
+#
+# RECONCILED_DUPLICATE is deliberately NOT one of them, and the reason is a defect the R5 concurrency flight
+# caught. RECONCILED_DUPLICATE means "some other invocation was also here"; it is a note about a RACE, not an
+# outcome for the stage. While it counted as terminal, a LOSING racer could append its own duplicate marker
+# before the winner reached its work, the winner would then read that marker, conclude the stage was already
+# done, and abandon it -- and the stage was lost entirely. Three concurrent processes produced ZERO absorptions.
+#
+# R4's version of this test passed, but it passed on TIMING: the winner happened to finish before the losers
+# wrote their markers. It was never correct.
+DECISIVE = ("COMPLETED", "TOO_EARLY", "MISSED_WINDOW", "SOURCE_UNAVAILABLE", "REFUSED_INPUT", "FAILED")
 DISPOSITIONS = ("ON_TIME", "LATE_START", "TOO_EARLY", "MISSED_WINDOW")
 
-STATES = tuple(dict.fromkeys(PROGRESS + TERMINAL))
+# A rehearsal, recorded but NOT an outcome. It must never be decisive: a `--dry-run` at 08:15 that wrote a
+# decisive state would make the real 08:15 stage look like a duplicate and the morning would lose the stage --
+# the same shape as the racer-poisoning defect, from a different direction.
+DRY_RUN = "DRY_RUN"
+
+STATES = tuple(dict.fromkeys(PROGRESS + TERMINAL + (DRY_RUN,)))
 
 
 class JournalRefused(RuntimeError):
@@ -141,7 +158,11 @@ class Journal:
         if state not in STATES:
             raise JournalRefused("UNKNOWN_STATE: %r" % state)
         from apex.frontier import premarket_runtime as RT
-        at = float(now if now is not None else time.time())
+        # ONE CLOCK. This used to be `time.time()` while the packet's instants came from the runtime clock, so a
+        # run under a controlled clock produced a journal whose event times disagreed with the packet they were
+        # describing -- the record and the thing recorded gave different answers to "when". In production the two
+        # are the same reading; the point is that they are now the same READING, not merely usually equal.
+        at = float(now if now is not None else RT.now_utc().timestamp())
         with self._exclusive():
             existing = self.events()
             prev = existing[-1]["digest"] if existing else None
@@ -193,8 +214,21 @@ class Journal:
         return [e for e in self.events() if e["stage"] == stage]
 
     def stage_state(self, stage: str) -> str:
+        """The most recent state recorded for this stage. Use `stage_outcome` to ask whether it is DONE."""
         evs = self.stage_events(stage)
         return evs[-1]["state"] if evs else "PENDING"
+
+    def stage_outcome(self, stage: str) -> str:
+        """The FIRST decisive terminal state this stage ever reached, or PENDING.
+
+        First, not last, and decisive, not merely terminal. Reading the LAST state would let a duplicate marker
+        appended after a COMPLETED make a finished stage look unfinished; counting RECONCILED_DUPLICATE as an
+        outcome lets a losing racer make an unfinished stage look finished. Both were live: the second one lost
+        a whole stage under concurrency."""
+        for e in self.stage_events(stage):
+            if e["state"] in DECISIVE:
+                return e["state"]
+        return "PENDING"
 
     def last_event(self, stage: str, state: str):
         for e in reversed(self.stage_events(stage)):
@@ -238,7 +272,7 @@ class Journal:
             pid = (held or {}).get("pid")
             if not pid or _pid_alive(pid):
                 return {"status": "HELD", "holder": held}
-            if self.stage_state(stage) in TERMINAL:
+            if self.stage_outcome(stage) in DECISIVE:
                 return {"status": "HELD", "holder": held}
             tmp = p.with_suffix(".claim.tmp.%d" % os.getpid())
             tmp.write_text(json.dumps({**body, "took_over_from": held}))
