@@ -18,6 +18,15 @@ PHASE_RX = re.compile(r"(setup|call|teardown)")
 ADDR_RX = re.compile(r"0x[0-9a-f]+")
 TMP_RX = re.compile(r"(/private)?/(tmp|var)/[^\s'\"]+")
 NUM_RX = re.compile(r"\b\d{6,}\b")
+# THE TWO SIDES LIVE IN DIFFERENT WORKTREES, so every absolute path in every traceback differs. The first run of
+# this tool flagged 50 tests as "mechanism changed" on nothing but `apex-pm-r3-wt` vs `apex-pm-r4-wt` -- including
+# SKIPPED tests, which is what gave it away. A comparator that reports a difference in the thing it failed to
+# normalize is the same defect family this audit keeps finding, now in the audit tool itself.
+ROOT_RX = re.compile(r"/Users/[^/\s]+/apex[-\w]*(-wt)?")
+# pytest's own truncation notice reports how many lines of DIFF OUTPUT it hid. That count grows whenever the
+# candidate adds source files to a corpus the test concatenates -- a property of the REPORTER, not of the defect.
+# It made one genuinely identical failure look like a changed mechanism (93435 vs 94815 hidden lines).
+TRUNC_RX = re.compile(r"\(\d+ lines hidden\)")
 
 
 def load(path: str) -> dict:
@@ -39,10 +48,19 @@ def load(path: str) -> dict:
 
 
 def normalize(text: str) -> str:
-    t = ADDR_RX.sub("0xADDR", text or "")
+    t = ROOT_RX.sub("REPO", text or "")
+    t = ADDR_RX.sub("0xADDR", t)
     t = TMP_RX.sub("/TMP", t)
+    t = TRUNC_RX.sub("(N lines hidden)", t)
     t = NUM_RX.sub("N", t)
     return "\n".join(line.rstrip() for line in t.strip().splitlines())
+
+
+def assertions(text: str) -> list:
+    """The failing assertion lines only. Two runs of the same defect in files whose LINE NUMBERS moved are the
+    same defect; the assertion text is what says whether the mechanism changed."""
+    return [normalize(l.strip()) for l in (text or "").splitlines()
+            if l.strip().startswith("E ") or l.strip().startswith("E\t")]
 
 
 def assertion_line(text: str) -> str:
@@ -81,7 +99,9 @@ def main() -> int:
         elif b["outcome"] != "passed" and c["outcome"] == "passed":
             fixed.append((tid, b, c))
         elif b["outcome"] == c["outcome"]:
-            if (b["phase"], b["type"], digest(b["text"])) == (c["phase"], c["type"], digest(c["text"])):
+            same_shape = (b["phase"], b["type"], normalize(b["message"])) == \
+                         (c["phase"], c["type"], normalize(c["message"]))
+            if same_shape and assertions(b["text"]) == assertions(c["text"]):
                 same_fail.append((tid, b, c))
             else:
                 changed.append((tid, b, c))

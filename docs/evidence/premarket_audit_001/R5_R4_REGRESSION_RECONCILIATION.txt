@@ -1,0 +1,88 @@
+R4 REGRESSION RECONCILIATION — base 602d5a232be851890a23cdd3cd6d4e7b560ed3a0 vs candidate 533dfbd83d5769a3
+Both suites run with --junit-xml, same interpreter, same flags, each in its own worktree.
+Compared PER TEST ID by phase, exception type, failing assertion and normalized traceback.
+
+TWO DEFECTS IN THIS TOOL, FOUND AND FIXED BEFORE ANY VERDICT WAS REPORTED:
+  1. the two sides live in different worktrees, so every absolute path in every traceback differed. The first
+     run flagged 50 tests as "mechanism changed" on nothing but `apex-pm-r3-wt` vs `apex-pm-r4-wt` -- including
+     SKIPPED tests, which is what gave it away.
+  2. pytest's own truncation notice reports how many lines of diff output it hid. That count grows when the
+     candidate adds source files to a corpus a test concatenates (93435 -> 94815), which made one genuinely
+     identical failure look like a changed mechanism.
+A comparator that reports a difference in the thing it failed to normalize is the same defect family this audit
+keeps finding, now in the audit tool itself.
+
+BASE /private/tmp/claude-501/-Users-derekduenas/493f47ba-c471-4af0-9432-ba9bb8f8a672/scratchpad/base.xml   tests=6091
+CAND /private/tmp/claude-501/-Users-derekduenas/493f47ba-c471-4af0-9432-ba9bb8f8a672/scratchpad/cand.xml   tests=6134
+   base outcomes: {'passed': 6003, 'failed': 45, 'skipped': 26, 'error': 17}
+   cand outcomes: {'passed': 6046, 'failed': 45, 'skipped': 26, 'error': 17}
+
+IDENTICAL FAILURES (same id, phase, exception and normalized traceback): 88
+NEW FAILURES introduced by the candidate:                                0
+FAILURES the candidate FIXED:                                            0
+FAILURES whose MECHANISM CHANGED:                                        0
+TESTS PRESENT ON ONLY ONE SIDE:                                          45
+
+ONLY ON ONE SIDE (expected for tests the candidate adds or renames):
+   ONLY_IN_BASE tests.test_premarket_audit_001_r2.TestTheProductionRunnerWasNotStagedUntilR3::test_the_prepared_plist_invokes_the_long_sleeping_runner
+   ONLY_IN_CAND tests.test_premarket_audit_001_r2.TestTheProductionRunnerWasNotStagedUntilR3::test_the_prepared_production_path_no_longer_reaches_the_long_sleeping_runner
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_an_altered_blob_that_kept_its_digest_is_detected
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_an_altered_event_is_detected
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_blobs_are_content_addressed_and_write_once
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_no_pickle_anywhere_in_the_durable_path
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_nothing_to_reconstruct_is_named_not_guessed
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_reconstruction_reads_evidence_and_never_a_caller_supplied_flag
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_sequence_numbers_are_dense_and_unique_under_concurrency
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_the_log_is_hash_chained_and_verifies
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_the_state_vocabulary_covers_the_declared_transitions
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestExactlyOnceClaim::test_a_dead_holder_on_a_TERMINAL_stage_is_a_duplicate_not_a_recovery
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestExactlyOnceClaim::test_a_dead_holder_on_a_non_terminal_stage_is_taken_over_and_recorded
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestExactlyOnceClaim::test_a_live_holder_is_never_displaced
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestExactlyOnceClaim::test_an_unreadable_claim_is_treated_as_held
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestNothingWasActivated::test_no_disposable_launchagent_was_left_behind
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestNothingWasActivated::test_no_per_stage_agent_was_installed
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestNothingWasActivated::test_the_installed_production_files_are_byte_for_byte_unchanged
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestOneImplementation::test_assemble_is_reached_from_exactly_one_place_in_the_premarket_path
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestOneImplementation::test_the_brief_firewall_and_prompt_have_one_definition
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestOneImplementation::test_the_legacy_runner_calls_the_library_absorb_and_defines_no_second_one
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestOneImplementation::test_the_schedule_has_one_definition
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_every_prepared_plist_invokes_the_shell_with_an_explicit_stage
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_no_prepared_artifact_reaches_the_long_sleeping_runner
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_legacy_runner_still_has_its_two_scheduling_sleeps_because_it_is_the_oracle
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_only_sleeps_reachable_from_production_are_the_declared_provider_backoffs
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_prepared_artifacts_are_generated_from_the_schedule_and_have_not_drifted
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_prepared_shell_exports_no_runtime_substitution
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_prepared_shell_invokes_the_staged_cli
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_staged_entry_point_cannot_reach_the_legacy_runner
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestRunLockLiveness::test_a_dead_holder_is_taken_over_and_the_dead_holder_is_named
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestRunLockLiveness::test_a_live_holder_is_refused_at_any_age
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestRunLockLiveness::test_a_run_record_is_per_invocation_not_per_stage
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestRunLockLiveness::test_the_strict_R3_behaviour_is_still_available
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheCaptainPath::test_an_invalid_schema_is_named_separately_from_the_firewall
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheCaptainPath::test_the_captain_prompt_does_not_depend_on_which_producer_serialized_the_packet
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheCaptainPath::test_the_firewall_still_refuses_the_forbidden_terms
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheRuntimeSeam::test_a_clean_environment_is_fully_real
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheRuntimeSeam::test_every_substitution_is_reported
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheRuntimeSeam::test_the_crash_injector_is_a_declared_name
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[3-0-TOO_EARLY]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[8-14-ON_TIME]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[8-15-ON_TIME]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[8-22-LATE_START]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[8-40-MISSED_WINDOW]
+
+VERDICT: NO NEW FAILURE AND NO CHANGED FAILURE MECHANISM
+
+
+THE ONE TEST PRESENT ONLY ON THE BASE SIDE, explained:
+   test_the_prepared_plist_invokes_the_long_sleeping_runner  was RENAMED in R4 to
+   test_the_prepared_production_path_no_longer_reaches_the_long_sleeping_runner  (present in the candidate, same
+   class). Its assertion was deliberately INVERTED: R4 repointed the prepared artifacts at the staged CLI, so the
+   property "production reaches the sleeping runner" became "production cannot reach it". Eight further tests in
+   TestPreparedProductionPath cover the same surface. No coverage was removed.
+
+ARITHMETIC:
+   base tests 6091 + 43 new = 6134 candidate tests
+   base passed 6003 + 43    = 6046 candidate passed
+   failed 45 = 45, errors 17 = 17, skipped 26 = 26 on both sides
+
+CONCLUSION: R4 introduced NO new failure and changed NO existing failure mechanism.
