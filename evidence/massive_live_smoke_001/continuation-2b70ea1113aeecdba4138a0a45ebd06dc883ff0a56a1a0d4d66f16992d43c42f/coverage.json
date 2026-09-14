@@ -1,0 +1,38 @@
+{
+  "bars": {
+    "SPY": {
+      "rows": 390,
+      "minute_grid": "PASS",
+      "bar_completion_perturbation": "PASS: 13:30:59.999Z excludes first bar; 13:31:00Z includes it",
+      "receipt_is_historical_availability": false
+    },
+    "QQQ": {
+      "rows": 390,
+      "minute_grid": "PASS",
+      "bar_completion_perturbation": "PASS: 13:30:59.999Z excludes first bar; 13:31:00Z includes it",
+      "receipt_is_historical_availability": false
+    },
+    "NVDA": {
+      "rows": 390,
+      "minute_grid": "PASS",
+      "bar_completion_perturbation": "PASS: 13:30:59.999Z excludes first bar; 13:31:00Z includes it",
+      "receipt_is_historical_availability": false
+    }
+  },
+  "chain_count": 6,
+  "chain_scope": "Bounded as_of discovery; not full universe or trading admission",
+  "missing": [
+    "historical NBBO",
+    "prior/premarket bars"
+  ],
+  "malformed_rows_detected": 0,
+  "late_data": "UNKNOWN: no historical delivery timestamps",
+  "unavailable": [
+    "quote-based liquidity and affordability admission",
+    "source authenticity",
+    "pagination metadata",
+    "historical revisions"
+  ],
+  "source_attribution": "UNVERIFIED",
+  "evaluation_ready": false
+}

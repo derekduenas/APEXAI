@@ -1,0 +1,124 @@
+{
+  "schema": "MASSIVE_LIVE_SMOKE_001_CAPABILITY_REPORT_V1",
+  "gate": "MASSIVE-LIVE-SMOKE-001",
+  "status": "BLOCKED_BEFORE_PROVIDER_EXECUTION",
+  "observed_at_utc": "2026-09-14T05:23:14.885Z",
+  "repository": {
+    "path": "/workspace/scratch/cb56a7a2cfb2/apex-evaluation",
+    "branch": "codex/chronological-flow-evaluation",
+    "head": "471e73310b6273859afb52b33f8a95ea772fdeb1",
+    "adapter_pin": "471e733",
+    "pin_is_ancestor": true,
+    "worktree_clean_before_evidence": true,
+    "head_subject": "Pin Massive quote ordering contract"
+  },
+  "connector_verification": {
+    "exposed_tools": [
+      "mcp__codex_apps__massive_call_api",
+      "mcp__codex_apps__massive_query_data",
+      "mcp__codex_apps__massive_search_endpoints",
+      "mcp__codex_apps__massive_workspace"
+    ],
+    "endpoint_search_probe": {
+      "callable": true,
+      "is_error": false,
+      "endpoint_confirmed": "/v2/aggs/ticker/{stocksTicker}/range/{multiplier}/{timespan}/{from}/{to}"
+    },
+    "data_call_capability": "NOT_VERIFIABLE: automatic approval review failed before provider execution",
+    "authentication_status": "NOT_VERIFIABLE: the connected tool was exposed, but no live vendor response was returned"
+  },
+  "bounded_call_accounting": {
+    "provider_calls_attempted_or_probed": 5,
+    "endpoint_search_calls": 1,
+    "data_call_attempts": 4,
+    "stated_maximum": 10,
+    "within_bound": true
+  },
+  "smoke_requests": [
+    {
+      "ordinal": 1,
+      "purpose": "historical stock bars",
+      "symbol": "SPY",
+      "path": "/v2/aggs/ticker/SPY/range/1/minute/2026-09-11/2026-09-11",
+      "params": {
+        "adjusted": false,
+        "sort": "asc",
+        "limit": 2000
+      },
+      "connector_requested_utc": "2026-09-14T05:19:12.906Z",
+      "connector_receipt_utc": "2026-09-14T05:19:15.180Z",
+      "executed_at_vendor": false,
+      "vendor_payload_returned": false,
+      "outcome": "AUTOMATIC_APPROVAL_USAGE_LIMIT"
+    },
+    {
+      "ordinal": 2,
+      "purpose": "historical stock bars",
+      "symbol": "QQQ",
+      "path": "/v2/aggs/ticker/QQQ/range/1/minute/2026-09-11/2026-09-11",
+      "params": {
+        "adjusted": false,
+        "sort": "asc",
+        "limit": 2000
+      },
+      "connector_requested_utc": "2026-09-14T05:19:15.181Z",
+      "connector_receipt_utc": "2026-09-14T05:19:17.734Z",
+      "executed_at_vendor": false,
+      "vendor_payload_returned": false,
+      "outcome": "AUTOMATIC_APPROVAL_USAGE_LIMIT"
+    },
+    {
+      "ordinal": 3,
+      "purpose": "historical stock bars",
+      "symbol": "NVDA",
+      "path": "/v2/aggs/ticker/NVDA/range/1/minute/2026-09-11/2026-09-11",
+      "params": {
+        "adjusted": false,
+        "sort": "asc",
+        "limit": 2000
+      },
+      "connector_requested_utc": "2026-09-14T05:19:17.734Z",
+      "connector_receipt_utc": "2026-09-14T05:19:20.291Z",
+      "executed_at_vendor": false,
+      "vendor_payload_returned": false,
+      "outcome": "AUTOMATIC_APPROVAL_USAGE_LIMIT"
+    },
+    {
+      "ordinal": 4,
+      "purpose": "diagnostic retry of the first bounded request",
+      "symbol": "SPY",
+      "path": "/v2/aggs/ticker/SPY/range/1/minute/2026-09-11/2026-09-11",
+      "params": {
+        "adjusted": false,
+        "sort": "asc",
+        "limit": 2000
+      },
+      "executed_at_vendor": false,
+      "vendor_payload_returned": false,
+      "outcome": "AUTOMATIC_APPROVAL_USAGE_LIMIT",
+      "exact_refusal_captured": "Automatic approval review failed: You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 8:31 AM. The action was not executed because automatic approval review could not be completed. This is a review failure, not a determination that the action was unsafe. Do not bypass the approval check; resolve the error or ask the user for guidance."
+    }
+  ],
+  "first_failure": {
+    "step": "STEP_2A_HISTORICAL_STOCK_BARS",
+    "finding": "MASSIVE_DATA_CALL_BLOCKED_BEFORE_PROVIDER_EXECUTION",
+    "downstream_stop": true
+  },
+  "downstream_status": {
+    "point_in_time_contract_universe": "NOT_RUN",
+    "historical_option_nbbo": "NOT_RUN",
+    "raw_vendor_payload_capture": "NO_VENDOR_PAYLOAD_AVAILABLE",
+    "normalized_outputs": "NOT_RUN",
+    "flow_data_preflight": "NOT_RUN",
+    "sequential_layer_audit": "NOT_RUN",
+    "evaluation_ready": false
+  },
+  "limitations": [
+    "The local connector receipt timestamps are preserved separately and are not historical availability timestamps.",
+    "No vendor response bytes were returned, so no market-data authenticity, coverage, or causal-availability claim is made.",
+    "No contracts, quote, model, forecast, simulation, PRIME, risk, paper-fill, Book, or independent-reconstruction layer was executed.",
+    "No code, thresholds, models, scheduler, ledger, broker, deployment, or authority state was changed."
+  ],
+  "smallest_next_repair_brick": "RESTORE_MASSIVE_PROVIDER_CALL_APPROVAL_OR_USAGE_ENTITLEMENT; rerun the identical bounded smoke requests and preserve the returned payloads before any downstream gate."
+}
+

@@ -1,0 +1,18 @@
+{
+  "gate": "MASSIVE-LIVE-SMOKE-001",
+  "status": "BLOCKED",
+  "first_failure": "MASSIVE_RESPONSE_MALFORMED_JSON",
+  "boundary": "connector CSV -> pinned adapter JSON parser",
+  "head": "471e73310b6273859afb52b33f8a95ea772fdeb1",
+  "connector_callable": true,
+  "new_provider_calls": 1,
+  "cumulative_data_attempts": 5,
+  "rows_in_connector_csv": 390,
+  "source_attribution": "UNVERIFIED",
+  "historical_availability": "bar completion is earliest assumed availability; archive revisions and historical delivery unknown",
+  "connector_receipt": "stored in connector_capture.json; not historical availability",
+  "normalized_outputs": "NOT_ADMITTED",
+  "downstream_layers": "NOT_EXECUTED",
+  "evaluation_ready": false,
+  "smallest_next_repair_brick": "MASSIVE-CONNECTOR-TRANSPORT-001: lossless CSV connector transport into existing normalizers, retaining metadata, exact timestamps and pagination; no credential workaround."
+}

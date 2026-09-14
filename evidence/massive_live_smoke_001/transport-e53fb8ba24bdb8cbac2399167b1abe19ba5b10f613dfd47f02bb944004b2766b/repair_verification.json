@@ -1,0 +1,21 @@
+{
+  "brick": "MASSIVE-CONNECTOR-TRANSPORT-001",
+  "status": "BOUNDED_TRANSPORT_VERIFIED",
+  "tests_passed": 28,
+  "preserved_spy_rows_normalized": 390,
+  "rejections": [],
+  "bar_completion_boundary": "PASS",
+  "receipt_separation": "PASS",
+  "source_attribution": "UNVERIFIED",
+  "pagination_status": "UNKNOWN",
+  "evaluation_ready": false,
+  "new_provider_calls": 0,
+  "limitations": [
+    "Decoder is an explicit offline seam; existing credential-based HTTP adapter unchanged.",
+    "QQQ/NVDA/contracts/NBBO smoke and sequential layers remain unexecuted.",
+    "No source authenticity or historical revision guarantee."
+  ],
+  "input_sha256": "ad2a01ad988fa2350e12d4088e949a1d9a1ff09810d5925fe4fcf015a0ca6076",
+  "normalized_sha256": "e53fb8ba24bdb8cbac2399167b1abe19ba5b10f613dfd47f02bb944004b2766b",
+  "code_sha256": "b085266d8748302a6b70742cacfff86f7bf57322c5b8ce2d6ce6a0ca9675102b"
+}

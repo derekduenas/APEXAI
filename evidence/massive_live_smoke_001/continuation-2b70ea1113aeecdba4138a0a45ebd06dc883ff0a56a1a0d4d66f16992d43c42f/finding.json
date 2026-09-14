@@ -1,0 +1,18 @@
+{
+  "first_stop": "PROVIDER_CALL_BUDGET_EXHAUSTED_BEFORE_NBBO",
+  "conservative_call_count": 10,
+  "accounting": {
+    "prior_catalog": 1,
+    "prior_blocked_data_attempts": 4,
+    "prior_successful_SPY": 1,
+    "new_QQQ": 1,
+    "new_NVDA": 1,
+    "new_options_catalog": 1,
+    "new_as_of_contracts": 1
+  },
+  "new_calls": 4,
+  "new_successful_data_calls": 3,
+  "downstream_execution": false,
+  "evaluation_ready": false,
+  "next_brick": "MASSIVE-NBBO-ADMISSION-001: separately bounded historical quote acquisition for persisted as_of candidates, explicit causal liquidity/affordability policy, then a preflight that verifies every manifest file and stable opened-file identity. No model execution until admission passes."
+}

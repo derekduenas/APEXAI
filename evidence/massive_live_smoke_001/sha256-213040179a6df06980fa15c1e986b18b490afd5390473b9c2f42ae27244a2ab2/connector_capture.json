@@ -1,0 +1,22 @@
+{
+  "connector_receipt_utc": "2026-09-14T12:49:26.071Z",
+  "connector_requested_utc": "2026-09-14T12:49:25.771Z",
+  "request": {
+    "market": "Options",
+    "max_results": 2,
+    "query": "Historical point-in-time option contracts as_of underlying_ticker expiration_date strike_price contract_type and historical option NBBO quotes timestamp",
+    "scope": "endpoints"
+  },
+  "response": {
+    "content": [
+      {
+        "text": "1. Quotes [Options]\n   GET /v3/quotes/{optionsTicker}\n   Retrieve historical quotes for a specified options contract over a defined time range.\n   Ticker format: \"O:\" prefix, e.g. O:AAPL270115C00250000\n   Params: optionsTicker*, timestamp, order(asc|desc), limit, sort(timestamp) (.gt/.gte/.lt/.lte variants on: timestamp)\n\n2. All Contracts [Options]\n   GET /v3/reference/options/contracts\n   Retrieve a comprehensive index of options contracts, encompassing both active and expired listings.\n   Ticker format: \"O:\" prefix, e.g. O:AAPL270115C00250000\n   Params: underlying_ticker, ticker, contract_type(call|put), expiration_date, as_of, strike_price, expired, order(asc|desc), limit, sort(ticker|underlying_ticker|expiration_date|strike_price) (.gt/.gte/.lt/.lte variants on: underlying_ticker, expiration_date, strike_price)",
+        "type": "text"
+      }
+    ],
+    "isError": false,
+    "structuredContent": {
+      "result": "1. Quotes [Options]\n   GET /v3/quotes/{optionsTicker}\n   Retrieve historical quotes for a specified options contract over a defined time range.\n   Ticker format: \"O:\" prefix, e.g. O:AAPL270115C00250000\n   Params: optionsTicker*, timestamp, order(asc|desc), limit, sort(timestamp) (.gt/.gte/.lt/.lte variants on: timestamp)\n\n2. All Contracts [Options]\n   GET /v3/reference/options/contracts\n   Retrieve a comprehensive index of options contracts, encompassing both active and expired listings.\n   Ticker format: \"O:\" prefix, e.g. O:AAPL270115C00250000\n   Params: underlying_ticker, ticker, contract_type(call|put), expiration_date, as_of, strike_price, expired, order(asc|desc), limit, sort(ticker|underlying_ticker|expiration_date|strike_price) (.gt/.gte/.lt/.lte variants on: underlying_ticker, expiration_date, strike_price)"
+    }
+  }
+}

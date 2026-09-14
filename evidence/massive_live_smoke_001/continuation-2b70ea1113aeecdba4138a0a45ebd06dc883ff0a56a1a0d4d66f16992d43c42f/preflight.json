@@ -1,0 +1,48 @@
+{
+  "schema": "FLOW_DATA_PREFLIGHT_V1",
+  "manifest_sha256": "2618cf773cde96a131519ba97c708bb0e852a5d0f83874e973a5ac7d2ea22ff1",
+  "sessions": [
+    {
+      "market_date": "2026-09-11",
+      "exposure_status_claim": "PREVIOUSLY_OBSERVED_SMOKE_NOT_HOLDOUT",
+      "coverage_status": "NOT_INSPECTED",
+      "inputs": [
+        {
+          "family": "bars",
+          "path": "evidence/massive_live_smoke_001/continuation-2b70ea1113aeecdba4138a0a45ebd06dc883ff0a56a1a0d4d66f16992d43c42f/bars.json",
+          "declared_sha256": "44b89f115641dcdf2d418007e676a978e48b4440df52441584e99cff6cc4561c",
+          "actual_sha256": "44b89f115641dcdf2d418007e676a978e48b4440df52441584e99cff6cc4561c",
+          "bytes": 905685,
+          "status": "MATCH"
+        },
+        {
+          "family": "chain",
+          "path": "evidence/massive_live_smoke_001/continuation-2b70ea1113aeecdba4138a0a45ebd06dc883ff0a56a1a0d4d66f16992d43c42f/chain.json",
+          "declared_sha256": "7eaa3a7f50eb88ed3a2207c2e03454b40ca0a9f9ac7a3cc618ea7c1c4a205fdd",
+          "actual_sha256": "7eaa3a7f50eb88ed3a2207c2e03454b40ca0a9f9ac7a3cc618ea7c1c4a205fdd",
+          "bytes": 3273,
+          "status": "MATCH"
+        },
+        {
+          "family": "nbbo",
+          "status": "NOT_DECLARED"
+        },
+        {
+          "family": "prior_bars",
+          "status": "NOT_DECLARED"
+        }
+      ],
+      "input_bytes_match": false
+    }
+  ],
+  "all_input_bytes_match": false,
+  "evaluation_ready": false,
+  "remaining_checks": [
+    "record-level causal availability and coverage",
+    "dataset-use scope and prior exposure",
+    "chronological train/test split with overlapping labels purged",
+    "matched candidate universe and execution assumptions",
+    "recorded V2 arrival wiring and fee configuration"
+  ],
+  "limitations": "Byte inventory only. No authenticity, authority, clean-holdout or profitability claim."
+}

@@ -1,0 +1,16 @@
+{
+  "gate": "MASSIVE-NBBO-ADMISSION-001",
+  "status": "BLOCKED",
+  "first_failure": "NOT_ENTITLED",
+  "connector_isError": false,
+  "semantic_payload_status": "PROVIDER_ENTITLEMENT_REFUSAL",
+  "authorized_additional_calls": 5,
+  "additional_calls_used": 1,
+  "remaining_additional_calls": 4,
+  "cumulative_conservative_calls": 11,
+  "market_quote_rows_returned": 0,
+  "trading_admitted": false,
+  "downstream_executed": false,
+  "evaluation_ready": false,
+  "next_action": "Enable historical options quote entitlement on connected Massive account, then retry the same bounded request. Do not substitute current quotes or another asset class."
+}
