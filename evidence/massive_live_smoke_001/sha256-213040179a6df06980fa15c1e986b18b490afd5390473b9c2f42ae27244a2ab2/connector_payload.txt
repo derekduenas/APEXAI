@@ -1,0 +1,11 @@
+1. Quotes [Options]
+   GET /v3/quotes/{optionsTicker}
+   Retrieve historical quotes for a specified options contract over a defined time range.
+   Ticker format: "O:" prefix, e.g. O:AAPL270115C00250000
+   Params: optionsTicker*, timestamp, order(asc|desc), limit, sort(timestamp) (.gt/.gte/.lt/.lte variants on: timestamp)
+
+2. All Contracts [Options]
+   GET /v3/reference/options/contracts
+   Retrieve a comprehensive index of options contracts, encompassing both active and expired listings.
+   Ticker format: "O:" prefix, e.g. O:AAPL270115C00250000
+   Params: underlying_ticker, ticker, contract_type(call|put), expiration_date, as_of, strike_price, expired, order(asc|desc), limit, sort(ticker|underlying_ticker|expiration_date|strike_price) (.gt/.gte/.lt/.lte variants on: underlying_ticker, expiration_date, strike_price)
