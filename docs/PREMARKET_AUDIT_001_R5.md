@@ -42,8 +42,47 @@ keeps finding — this time in the audit tool.
 
 **R4 introduced no new failure and changed no existing failure mechanism.**
 
-**R5's own full suite is running** against the same base and against R4, so this candidate is not judged by R4's
-result. Reported when it lands.
+### R5's own regression — also clean
+
+`b63f24a`, solo, 49:10 → **45 failed / 17 errors / 26 skipped / 6114 passed**, reconciled per test ID against the
+base **and** against R4 independently:
+
+```
+                          vs base 602d5a2     vs R4 533dfbd
+identical failures                    88                88
+NEW failures                           0                 0
+changed mechanisms                     0                 0
+tests removed                          1 (the R4 rename)  0
+```
+
+### The 59-versus-45 discrepancy, resolved against me
+
+The first, uninstrumented R4 run reported **59** failures; three instrumented runs on stable trees all report
+**45 / 17 / 26**. The cause is mine, and it is established from file timestamps rather than supposed: while that
+suite was executing in `apex-pm-r4-wt`, I ran the evidence generators **in the same worktree**. Their
+`install_world()` wrote fixture artifacts into that tree at 18:31 — mid-run — and rewrote them repeatedly:
+
+```
+results/events/edgar_events.jsonl        written 18:31   (run spanned 18:18–19:02)
+results/events/capture_health.json       written 18:31
+data/reference/sec_company_tickers.json  written 18:31
+results/frontier/daily_memory/*.json     written 18:31
+```
+
+`test_catalyst_eyes.py`, `test_frontier1.py` and `test_close1.py` read exactly those artifacts.
+
+This is the R1 dirty-working-tree mistake in a new form. I had explicitly decided earlier in this session not to
+edit files under a running suite — and then violated that decision through evidence generators that write files
+as a side effect. It surfaced only because two runs of the **same commit** disagreed.
+
+**What cannot be recovered:** only the tail of that run was captured, so its 59 failures cannot be enumerated and
+the excess 14 cannot be named. That is a capture defect on my part. Of the 19 names the tail preserves, all 19
+also fail in the instrumented run, so nothing visible in it is unique.
+
+The three instrumented runs are the sound basis: each ran against a tree stable for its whole duration, base ran
+*without* the fixture artifacts and R4/R5 *with* them present and unchanging, and all three produced the same
+counts — so their presence does not move the result; their **mutation during a run** is what distinguished the
+first.
 
 ---
 
