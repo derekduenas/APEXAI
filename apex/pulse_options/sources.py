@@ -38,7 +38,8 @@ class TwinSources:
                  fee_schedule, sleep_fn=time.sleep, book_fn=None, warmup_minutes: int = 65, artifact=None,
                  selection_policy: str = "PILOT_RULE_V2", funnel_engine=None, funnel_history_days: int = 7,
                  joint_engine=None, joint_context_fn=None, event_snapshot_fn=None, event_gate_authority: str = "SHADOW",
-                 external_context_fn=None, external_context_max_age_s: float = 900.0):
+                 external_context_fn=None, external_context_max_age_s: float = 900.0,
+                 premarket_root=None):
         if selection_policy not in SELECTION_POLICIES:
             raise ValueError("SELECTION_POLICY_UNKNOWN: %r" % (selection_policy,))
         self.selection_policy = selection_policy
@@ -74,6 +75,7 @@ class TwinSources:
         self.external_context_fn = external_context_fn
         self.external_context_max_age_s = float(external_context_max_age_s)
         self.last_external_context: dict = {}
+        self.premarket_root = premarket_root
 
     # ------------------------------------------------------------ state
     def store(self, symbol: str) -> BarStore:
@@ -87,6 +89,9 @@ class TwinSources:
         load_bars(st, bars)
         book = self._book_fn(symbol, as_of) if self._book_fn else None
         snap = compose(symbol=symbol, as_of=as_of, bars=st.bars_available_by(as_of), source=st.source, book=book)
+        from .premarket_context import read_context
+        snap["premarket_context"] = read_context(root=self.premarket_root, symbol=symbol,
+                                               as_of=as_of, snapshot_id=snap["snapshot_id"], clock=self.clock)
         self.last_snapshot[symbol] = snap
         return snap
 
@@ -95,7 +100,9 @@ class TwinSources:
         snap = self.snapshot(symbol, as_of)
         # under either funnel the heuristic label is NOT the selector: it is recorded on the trace, not on the forecast
         signal = None if self.selection_policy in ("FULL_FUNNEL_V1", "JOINT_FUNNEL_V1") else self.signal_fn(symbol, as_of, snap)
-        return self.artifact.forecast(snap, created_epoch=self.clock.now(), direction_signal=signal)
+        forecast = self.artifact.forecast(snap, created_epoch=self.clock.now(), direction_signal=signal)
+        forecast["inputs"]["premarket_context"] = snap["premarket_context"]
+        return forecast
 
     def signal_fn(self, symbol: str, as_of: float, snap: dict | None = None):
         snap = snap or self.last_snapshot.get(symbol) or self.snapshot(symbol, as_of)
@@ -272,11 +279,11 @@ def returns_rows(bars: list) -> list:
 
 
 def synthetic_twin_sources(*, clock: Clock, quote_fn, exit_quote_fn, chain_fn, sleep_fn, seed: int = 7, selection_policy: str = "PILOT_RULE_V2",
-                           funnel_engine=None, joint_engine=None, joint_context_fn=None) -> TwinSources:
+                           funnel_engine=None, joint_engine=None, joint_context_fn=None, premarket_root=None) -> TwinSources:
     return TwinSources(provenance="SYNTHETIC_FIXTURE", clock=clock, bar_source=SyntheticBarProvider(seed=seed), chain_fn=chain_fn,
                        quote_fn=quote_fn, exit_quote_fn=exit_quote_fn, fee_schedule=SYNTHETIC_FEES, sleep_fn=sleep_fn,
                        selection_policy=selection_policy, funnel_engine=funnel_engine,
-                       joint_engine=joint_engine, joint_context_fn=joint_context_fn)
+                       joint_engine=joint_engine, joint_context_fn=joint_context_fn, premarket_root=premarket_root)
 
 
 class _LiveBars:
@@ -424,7 +431,8 @@ def apply_duplicate_policy(rows: list) -> tuple:
 
 def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn=None, selection_policy: str = "PILOT_RULE_V2",
                       expirations_fn=None, chain_snapshot_fn=None, clock=None, joint_engine=None, joint_context_fn=None,
-                      funnel_engine=None, fee_schedule=None, event_snapshot_fn=None, event_gate_authority: str = "SHADOW") -> TwinSources:
+                      funnel_engine=None, fee_schedule=None, event_snapshot_fn=None, event_gate_authority: str = "SHADOW",
+                      premarket_root=None) -> TwinSources:
     """LIVE_FEED sources. Connectivity is gated: with the default environment every provider call raises
     ProviderUnavailable before any network access, and the boundary persists the refusal.
 
@@ -490,4 +498,5 @@ def live_twin_sources(*, gate: LiveGate | None = None, http_get=None, headers_fn
                        quote_fn=quote_fn, exit_quote_fn=quote_fn, fee_schedule=(fee_schedule or LIVE_DEFAULT_FEES), sleep_fn=time.sleep,
                        book_fn=lambda s, t: alpaca.nbbo(s), selection_policy=selection_policy,
                        joint_engine=joint_engine, joint_context_fn=joint_context_fn, funnel_engine=funnel_engine,
-                       event_snapshot_fn=event_snapshot_fn, event_gate_authority=event_gate_authority)
+                       event_snapshot_fn=event_snapshot_fn, event_gate_authority=event_gate_authority,
+                       premarket_root=premarket_root)

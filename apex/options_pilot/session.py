@@ -161,6 +161,10 @@ def _external_context_for(bd: B.Boundary, ids: dict, rows: list | None = None) -
 def _decision(bd: B.Boundary, *, scan_id: str, symbol: str, decision: str, why, ids: dict, persisted_refusal=None) -> dict:
     rows = L.read_all(bd.ledger)                 # read ONCE; both the trace and the join need it
     ext = _external_context_for(bd, ids, rows)
+    from apex.pulse_options.premarket_context import unavailable as premarket_unavailable
+    forecast = next((r for r in rows if r.get("kind") == "pilot_forecast"
+                     and r.get("forecast_id") == ids.get("forecast_id")), {})
+    premarket = (forecast.get("inputs") or {}).get("premarket_context", premarket_unavailable())
     rec = {"kind": "pilot_decision", "txn_id": "decision:" + scan_id, "scan_id": scan_id, "symbol": symbol,
            "session_id": bd.session_id, "release": bd.release, "decision": decision, "why": why,
            "forecast_id": ids.get("forecast_id"), "intent_id": ids.get("intent_id"), "fill_id": ids.get("fill_id"),
@@ -169,6 +173,7 @@ def _decision(bd: B.Boundary, *, scan_id: str, symbol: str, decision: str, why, 
            # decision, and what became of each (USED / RETRIEVED_UNUSED / REFUSED_LATE_ARRIVING).
            "external_inputs_used": ext.pop("external_inputs_used"),
            "external_context": ext,
+           "premarket_context": premarket,
            "refusal_persisted": persisted_refusal, "decided_utc": bd.clock.now_utc(), **bd.labels}
     assert_record_labels(rec)
     out = {"scan_id": scan_id, "symbol": symbol, "decision": decision, "why": why, **ids, "receipts": ids.get("receipts", {}),
