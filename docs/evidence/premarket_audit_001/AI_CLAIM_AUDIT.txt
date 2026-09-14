@@ -1,0 +1,19 @@
+PREMARKET-FLIGHT-001 — AI FACTUAL CLAIM AUDIT (packet 2026-08-25, sha cb8144b2)
+
+CLAIM FROM THE BRIEF                                 VERDICT      CHECK AGAINST THE SEALED PACKET
+----------------------------------------------------------------------------------------------------------------------
+SPY prior_close 763.6496                             SUPPORTED    packet=763.6496
+SPY premarket_last 763.47                            SUPPORTED    packet=763.47
+IWM prior_close 297.94                               SUPPORTED    packet=297.94
+IWM premarket_last 297.97                            SUPPORTED    packet=297.97
+SPY gap -2.4 bps                                     SUPPORTED    computed=-2.35 bps
+IWM gap 1.0 bps                                      SUPPORTED    computed=1.01 bps
+
+QQQ: packet premarket_last is None -> any QQQ gap claim would be UNSUPPORTED (no premarket print)
+brief mentions QQQ gap number: True
+
+BLIND SPOTS the brief must NOT fill from knowledge: ['COMPANY_NEWS', 'ANALYST_NEWS', 'MACRO_CALENDAR', 'CROSS_ASSET']
+   COMPANY_NEWS     declared in packet: yes | brief claims coverage: no
+   ANALYST_NEWS     declared in packet: yes | brief claims coverage: no
+   MACRO_CALENDAR   declared in packet: yes | brief claims coverage: no
+   CROSS_ASSET      declared in packet: yes | brief claims coverage: no

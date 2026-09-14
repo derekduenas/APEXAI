@@ -1,0 +1,22 @@
+PREMARKET-FLIGHT-001 — THE HANDOFF
+
+READERS OF THE SEALED PACKET, by import-graph inspection of the whole package:
+   apex/frontier/premarket.py
+   scripts/daily_forensics_v2.py
+   scripts/mission_control.py
+   scripts/premarket_run.py
+
+TRADE-PATH modules referencing the premarket packet: ['apex/pulse_options/snapshot.py']
+
+VERDICT ON THE HANDOFF
+   REFERENCED_IN_RECORD : NO  -- no pilot record carries the packet sha or any packet field
+   CONSUMED             : NO  -- no trade-path reader exists to instrument
+   BEHAVIORAL_EFFECT    : NOT TESTABLE -- there is no reader to perturb
+   RETRIEVED_UNUSED     : n/a -- the packet is not even retrieved by the decision path
+   -> NO_DOWNSTREAM_READER in the decision path.
+
+   The one real reader is scripts/daily_forensics_v2.py via morning_prior_manifest.locate(),
+   which runs AFTER the close. The packet is an evening-forensics input, not a morning decision input.
+
+   The pilot entrypoint supplies event_snapshot_fn from apex.catalyst (SHADOW authority) --
+   a DIFFERENT source. The premarket packet is not what the decision path sees.
