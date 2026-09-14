@@ -1,0 +1,22 @@
+#!/bin/zsh
+# CORRECTED. Two changes, both about making failure VISIBLE:
+#   1. the log redirect now happens FIRST. It was on line 9, AFTER the keychain read on line 6, so any failure
+#      in the secret lookup exited under `set -euo pipefail` with no log line at all.
+#   2. the secret read is checked explicitly and reports a named reason instead of a bare non-zero exit.
+set -uo pipefail
+REPO="$HOME/apex-equities"
+mkdir -p "$REPO/logs"
+exec >> "$REPO/logs/premarket.log" 2>&1
+echo "=== premarket run start $(date -u +%Y-%m-%dT%H:%M:%SZ) pid=$$ ==="
+export PATH="$HOME/.local/bin:/usr/local/bin:/opt/homebrew/bin:$PATH"
+export DISABLE_AUTOUPDATER=1
+if ! EODHD_API_TOKEN="$(security find-generic-password -a apex -s EODHD_API_TOKEN -w 2>&1)"; then
+  echo "FAILED stage=SECRET reason=keychain read failed: $EODHD_API_TOKEN"
+  exit 11
+fi
+export EODHD_API_TOKEN
+cd "$REPO" || { echo "FAILED stage=CHDIR reason=$REPO missing"; exit 12; }
+.venv/bin/python scripts/premarket_run.py
+rc=$?
+echo "=== premarket run end rc=$rc $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
+exit $rc

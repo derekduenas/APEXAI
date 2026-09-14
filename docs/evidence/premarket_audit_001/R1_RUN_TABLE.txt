@@ -1,0 +1,28 @@
+EXPECTED vs OBSERVED RUNS — 2026-08-25 through 2026-09-13
+
+launchd evidence: runs = 0, last exit code = (never exited)  -> NO EXECUTION in this load session
+log evidence    : last write 2026-08-25 06:27, 7 PACKET SEALED entries, then nothing
+
+DATE         DOW  SCHEDULED  PROCESS    PACKET     FAILURE STAGE
+------------------------------------------------------------------------------------
+2026-08-25   Tue  05:14 PT   yes(log)   SEALED     -
+2026-08-26   Wed  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-08-27   Thu  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-08-28   Fri  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-08-31   Mon  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-09-01   Tue  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-09-02   Wed  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-09-03   Thu  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-09-04   Fri  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-09-07   Mon  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-09-08   Tue  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-09-09   Wed  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-09-10   Thu  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+2026-09-11   Fri  05:14 PT   NO EVIDENCE ABSENT     NEVER STARTED -- no log line, no run record, launchd runs=0
+
+  expected weekday runs : 14
+  produced packets      : 1
+  MISSED, NOT RETRIED   : 13
+
+  NOTE: missing events are counted as MISSED, never inferred as successes.
+  A missed StartCalendarInterval is NOT retried by this configuration -- there is no catch-up.
