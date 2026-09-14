@@ -228,8 +228,11 @@ class FunnelCourt:
     FunnelEngine, so running one and reporting the other would claim reach the run never had."""
 
     def __init__(self, *, run_id: str, n_bars: int = 500, t0: float = 1_789_000_020.0, out_root="results/court",
-                 policy: str = "FULL_FUNNEL_V1"):
+                 policy: str = "FULL_FUNNEL_V1", premarket_root=None, synthetic_bars=None, synthetic_chain=None):
         self.run_id, self.n_bars, self.t0, self.policy = run_id, n_bars, t0, policy
+        self.premarket_root = premarket_root
+        self.synthetic_bars = synthetic_bars
+        self.synthetic_chain = synthetic_chain
         self.dir = pathlib.Path(out_root) / run_id
         if self.dir.exists():
             raise RuntimeError("RUN_DIR_EXISTS: %s" % self.dir)
@@ -244,10 +247,14 @@ class FunnelCourt:
         h = SyntheticHarness(self.dir / "ledger.jsonl", session_id=self.run_id, t0=self.t0, risk="certified",
                              fee_schedule=fees)
         h.chain = [{**c, "ask": 2.45} for c in h.chain]
+        if self.synthetic_chain is not None:
+            h.chain = self.synthetic_chain
         lc = LC.MonotonicClock(h.now()); h.clock = lc.clock(); h.bd.clock = h.clock
         h.now, h.advance = lc.now, lc.sleep
         h.bd.exit_policy = EP.EXIT_POLICY_V2
         bars = W.bars(n=self.n_bars, end_epoch=self.t0, drift_bp_per_bar=0.8, vol_bp_per_bar=4.0)
+        if self.synthetic_bars is not None:
+            bars = self.synthetic_bars
 
         class Feed:
             provider = "court-synthetic"
@@ -257,7 +264,8 @@ class FunnelCourt:
         try:
             tw = TwinSources(provenance="SYNTHETIC_FIXTURE", clock=h.clock, bar_source=Feed(),
                              chain_fn=h.chain_fn, quote_fn=h.quotes, exit_quote_fn=h.exit_quotes,
-                             fee_schedule=fees, selection_policy=self.policy, sleep_fn=lambda s: None)
+                             fee_schedule=fees, selection_policy=self.policy, sleep_fn=lambda s: None,
+                             premarket_root=self.premarket_root)
         except Exception as e:
             self.log.emit(layer="SELECTION_POLICY", operation="TwinSources construction",
                           available=R.UNAVAILABLE, executed=R.NOT_EXECUTED, valid=R.NOT_ASSESSED,

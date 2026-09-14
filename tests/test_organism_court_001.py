@@ -260,6 +260,17 @@ class TestTheFullFunnelRoute:
         assert out["funnel_decision"] in ("TRADE", "WAIT")
         assert out["ledger_kinds"].get("pilot_funnel")
 
+    def test_full_funnel_trade_is_independently_reconstructed(self, funnel_ready):
+        assert funnel_ready["decision"] == "TRADE", "this fixed synthetic flight must exercise execution"
+        result = reconstruct(pathlib.Path("results/court") / funnel_ready["run_id"])
+        assert result["problems"] == [], result["problems"]
+        proof = result["execution_verification"]
+        assert proof["chain_verified"] and proof["funnel_link_verified"]
+        assert proof["selection_rule"].startswith("FULL_FUNNEL_V1")
+        assert proof["open_positions"] == 0
+        assert proof["pnl_recomputed"] == 19.91
+        assert result["pnl_agrees"] is True
+
     def test_insufficient_history_is_a_named_WAIT_not_a_crash_and_not_a_trade(self):
         out = FunnelCourt(run_id=rid("G-short"), n_bars=40).run()
         assert out["decision"] == "WAIT"

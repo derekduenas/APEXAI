@@ -56,11 +56,12 @@ class LiveWiring:
 
     def __init__(self, *, attach_market_data_http: bool = False, joint_engine=None, joint_context_fn=None,
                  joint_fit_status: dict | None = None, funnel_engine=None, fee_schedule=None, event_snapshot_fn=None,
-                 event_gate_authority: str = "SHADOW"):
+                 event_gate_authority: str = "SHADOW", premarket_root=None):
         self.attach_market_data_http = attach_market_data_http
         self.fee_schedule = fee_schedule                       # None -> UNVERIFIED_FEES (the live default); an explicit choice is reported
         self.event_snapshot_fn = event_snapshot_fn
         self.event_gate_authority = event_gate_authority
+        self.premarket_root = premarket_root
         self.joint_engine, self.joint_context_fn = joint_engine, joint_context_fn
         self.joint_fit_status = joint_fit_status or {"status": "NOT_SUPPLIED",
                                                      "why": "no R4 fit authorized (R4-FIT-001 not granted); no completed training sessions supplied"}
@@ -72,6 +73,8 @@ class LiveWiring:
                 "fee_schedule": (self.fee_schedule.describe() if self.fee_schedule is not None else "LIVE_DEFAULT (see provider.fee_schedule: the authorized schedule unless overridden)"),
                 "event_stream": ("wired: %s" % getattr(self.event_snapshot_fn, "__name__", "callable") if self.event_snapshot_fn is not None else "NOT_WIRED"),
                 "event_gate_authority": self.event_gate_authority,
+                "premarket_root": str(self.premarket_root) if self.premarket_root is not None else None,
+                "premarket_authority": "PRIOR_CONTEXT_ONLY",
                 "chain_quote_client": "apex.intraday.options_feed.option_expirations/option_chain_snapshot (gated; injectable)",
                 "joint_engine": (type(self.joint_engine).__name__ if self.joint_engine is not None else None),
                 "joint_context_fn": (getattr(self.joint_context_fn, "__name__", "callable") if self.joint_context_fn is not None else None),
@@ -107,7 +110,8 @@ class ProductionSources:
         self._twin = live_twin_sources(gate=gate, selection_policy=selection_policy, http_get=http_get, headers_fn=headers_fn,
                                        joint_engine=self.wiring.joint_engine, joint_context_fn=self.wiring.joint_context_fn,
                                        funnel_engine=self.wiring.funnel_engine, fee_schedule=self.wiring.fee_schedule,
-                                       event_snapshot_fn=self.wiring.event_snapshot_fn, event_gate_authority=self.wiring.event_gate_authority)
+                                       event_snapshot_fn=self.wiring.event_snapshot_fn, event_gate_authority=self.wiring.event_gate_authority,
+                                       premarket_root=self.wiring.premarket_root)
         self.selection_policy = selection_policy
         self.funnel_engine = self._twin.funnel_engine
         self.clock = self._twin.clock
