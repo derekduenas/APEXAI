@@ -1,0 +1,49 @@
+FAKE PREMARKET MORNING — 2026-08-26 (fixture FAKE_MORNING_FIXTURE_V1)
+REAL: seal(), PREMARKET_TIME_V1, run accounting, brief firewall, packet schema
+SUBSTITUTED: clock, provider transport, model transport (RECORDED_MODEL_RESPONSE), output root
+
+EXPECTED DISPOSITIONS, DECLARED BEFORE THE RUN:
+   broad_market           ACCEPTED
+   premarket_prices       ACCEPTED
+   macro_event            ACCEPTED
+   company_catalyst       ACCEPTED
+   syndicated_duplicate   CLUSTERED_AS_SYNDICATION
+   correction             APPLIED_AS_ADDITIVE_REVISION
+   unavailable_source     MARKED_UNAVAILABLE
+   stale_observation      EXCLUDED_AS_STALE
+   future_observation     REFUSED_AS_FUTURE
+   hostile_headline       RETAINED_AS_DATA_NO_AUTHORITY
+
+SOURCE                 EXPECTED                         ACTUAL                           PASS
+--------------------------------------------------------------------------------------------------------
+broad_market           ACCEPTED                         ACCEPTED                         PASS
+premarket_prices       ACCEPTED                         ACCEPTED                         PASS
+macro_event            ACCEPTED                         ACCEPTED                         PASS
+company_catalyst       ACCEPTED                         ACCEPTED                         PASS
+syndicated_duplicate   CLUSTERED_AS_SYNDICATION         CLUSTERED_AS_SYNDICATION         PASS
+correction             APPLIED_AS_ADDITIVE_REVISION     APPLIED_AS_ADDITIVE_REVISION     PASS
+unavailable_source     MARKED_UNAVAILABLE               MARKED_UNAVAILABLE               PASS
+stale_observation      EXCLUDED_AS_STALE                EXCLUDED_AS_STALE                PASS
+future_observation     REFUSED_AS_FUTURE                REFUSED_AS_FUTURE                PASS
+hostile_headline       RETAINED_AS_DATA_NO_AUTHORITY    RETAINED_AS_DATA_NO_AUTHORITY    PASS
+
+STAGED INVOCATIONS (each a separate bounded run record, no long sleep):
+   0815_ET_initial      scheduled=08:15 ET  record=2026-08-26_0815_ET_initial.json
+   0832_ET_post_macro   scheduled=08:32 ET  record=2026-08-26_0832_ET_post_macro.json
+   0905_ET_refresh      scheduled=09:05 ET  record=2026-08-26_0905_ET_refresh.json
+   0920_ET_final        scheduled=09:20 ET  record=2026-08-26_0920_ET_final.json
+
+TIME FIELDS (PREMARKET_TIME_V1):
+   packet_collection_started_at     1787746500.0
+   packet_data_cutoff               1787750280.0
+   ai_request_time                  1787750640.0
+   ai_response_time                 1787750680.0
+   packet_created_at                1787750690.0
+   packet_sealed_at                 1787750700.0
+   packet_known_from                1787750700.0
+   known_from >= sealed_at : True
+
+REAL seal() RESULT: sha=bfd4f4a2bddb4604 sealed=SEALED_BEFORE_OPEN
+BRIEF FIREWALL: PASSES_FIREWALL  (RECORDED_MODEL_RESPONSE -- not model generation)
+
+VERDICT source dispositions: ALL AS DECLARED

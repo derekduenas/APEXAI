@@ -1,0 +1,26 @@
+=== HOST STATE EVIDENCE  2026-09-14T00:20:30Z ===
+macOS: 12.7.6 build 21H1320
+
+--- uptime / boot ---
+17:20  up 2 days,  1:11, 1 user, load averages: 6.44 4.16 3.67
+{ sec = 1789168182, usec = 426507 } Fri Sep 11 16:09:42 2026
+
+--- plist install/modify times ---
+/Users/derekduenas/Library/LaunchAgents/com.apex.premarket.plist  created=Aug 16 22:17:34 2026  modified=Aug 16 22:17:34 2026  accessed=Aug 17 18:10:57 2026
+--- runner script times ---
+/Users/derekduenas/apex-equities/ops/premarket.sh  created=Aug 16 21:17:56 2026  modified=Aug 16 21:17:56 2026
+--- log last write ---
+/Users/derekduenas/apex-equities/logs/premarket.log  modified=Aug 25 06:27:15 2026
+
+--- current Aqua session ---
+console user: derekduenas
+Aqua
+
+--- other apex agents: do THEY show runs? (comparison) ---
+  com.apex.host-sentinel : 	runs=1
+  com.apex.crypto-daemon : 	runs=1
+  com.apex.nightly-pull : 	runs=2
+  com.apex.premarket : 	runs=0
+
+--- boot/wake history available? ---
+18

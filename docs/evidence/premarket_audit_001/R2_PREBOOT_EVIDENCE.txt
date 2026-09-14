@@ -1,0 +1,11 @@
+=== IS THERE ANY PRE-BOOT EVIDENCE FOR THE GAP? ===
+--- unified log retention for this predicate (last 14d) ---
+--- earliest entry the unified log still holds ---
+
+--- power/wake events retained ---
+2026-09-06 17:24:23 -0700 Assertions          	PID 153(Windo
+2026-09-13 17:21:09 -0700 : Showing all currently held IOKit
+
+=== SCHEDULED FIRES DUE SINCE BOOT (Fri Sep 11 16:09) ===
+  weekday 05:14 instants between boot and now: NONE
+  -> runs=0 is EXPECTED and explains itself. It is not evidence about 2026-08-26..09-11.

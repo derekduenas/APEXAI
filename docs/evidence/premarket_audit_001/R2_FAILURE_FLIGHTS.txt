@@ -1,0 +1,33 @@
+FAILURE FLIGHTS — each leaves its own non-overwriting evidence
+
+FLIGHT                             OUTCOME                        EVIDENCE
+--------------------------------------------------------------------------------------------------------
+keychain/startup failure           FAILED at STARTED              record F-keychain.json stage=STARTED
+provider timeout                   FAILED at SOURCES              partial record preserved
+malformed source payload           PARTIAL                        accepted=2 rejected=1 recorded
+Captain/model timeout              FAILED at AI                   packet may still seal as partial
+invalid Captain output             BRIEF REFUSED_BY_FIREWALL      hits=['buy ']
+missed 05:15 then late reconcile   LATE_START                     actual time recorded, not backdated
+wake after the stage window        MISSED_WINDOW                  no retrospective data fetched
+duplicate stage delivery           REFUSED duplicate              run records never overwritten
+interruption before seal           INCOMPLETE preserved           finished_epoch=None stage=SOURCES
+modification after seal            TAMPER DETECTED                recomputation disagrees with seal
+
+
+SHADOW HANDOFF (audit reader only -- NOT a production consumer)
+   packet identity verified : True
+   attached as              : PRIOR_CONTEXT
+   disposition              : RETRIEVED_UNUSED  (no production reader exists)
+   reader label             : CONSUMED_BY_TEST_READER (audit reader)
+   trading authority        : NONE -- decision_power=NONE_FRONTIER_SHADOW
+   BEHAVIORAL_EFFECT        : NOT MANUFACTURED
+
+
+INDEPENDENT RECONSTRUCTION (artifacts only, no runner summary)
+   stages found        : 4 -> ['0815_ET_initial', '0832_ET_post_macro', '0905_ET_refresh', '0920_ET_final']
+   packet_data_cutoff  : 1787750280.0
+   packet_known_from   : 1787750700.0
+   seal digest         : bfd4f4a2bddb4604
+   dispositions        : 10 recorded
+   missing sources     : ['MACRO_CALENDAR']
+   shadow handoff      : RETRIEVED_UNUSED
