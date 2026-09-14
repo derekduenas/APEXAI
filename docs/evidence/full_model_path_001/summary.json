@@ -1,0 +1,712 @@
+{
+  "schema": "FULL_MODEL_PATH_SYNTHETIC_EVIDENCE_V1",
+  "base_commit": "354eda01b52d7b3812f51fb741999001b90996df",
+  "scope": "Synthetic wiring and numerical checks; not model calibration or profitability",
+  "recipe": "2000 standardized t(6) returns, seed 3, sigma 0.00025; separate 65-bar synthetic intraday segment",
+  "test_source_sha256": "9603fb91600bcde8906ed8d59734391eb01599109ea6afca4c87d05f09e89154",
+  "vol_model_source_sha256": "1966bc955307e5502f86f15346942419da560595990a63ad47de8d968fae3a71",
+  "call_order": [
+    "LOCATION_FORECAST",
+    "GARCH_FIT",
+    "REGIME_FILTER",
+    "GARCH_FORECAST",
+    "IMPLIED_VOL",
+    "IMPLIED_VOL",
+    "MULTIVERSE",
+    "EXPRESSION_PRICING",
+    "MULTIVERSE",
+    "EXPRESSION_PRICING",
+    "MULTIVERSE",
+    "EXPRESSION_PRICING",
+    "PRIME"
+  ],
+  "fit": [
+    {
+      "n_rows": 2000,
+      "max_available": 1787702400.0,
+      "cutoff": 1787702400.0,
+      "parameters": {
+        "omega": 5.2046304287667694e-08,
+        "alpha": 0.03057608227461325,
+        "beta": 0.18406329594676638,
+        "gamma": 0.0,
+        "nu": 5.949550484131045,
+        "gjr": false,
+        "h_last": 6.618506088989228e-08,
+        "e_last": -0.00027801312170057114,
+        "n": 2000,
+        "nll": -13752.374053579053,
+        "convergence": {
+          "method": "L-BFGS-B",
+          "success": true,
+          "start_a": {
+            "success": true,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+            "nll": -13752.374053579053
+          },
+          "start_b": {
+            "success": true,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+            "nll": -13752.37222877568
+          },
+          "multi_start_nll_gap": 0.0018248033738927916,
+          "gap_tolerance": 1.3752374053579053,
+          "selected": "a",
+          "grad_inf_norm": 0.006222762750042301,
+          "rule": "unsuccessful termination refused unless a derivative-free polish converges; two starts must agree on the NLL within 1e-4 relative BEFORE the better is selected"
+        },
+        "unconditional_variance": 6.627058047524397e-08,
+        "persistence": 0.21463937822137963
+      }
+    }
+  ],
+  "variance_forecast": [
+    {
+      "parameters": {
+        "omega": 5.2046304287667694e-08,
+        "alpha": 0.03057608227461325,
+        "beta": 0.18406329594676638,
+        "gamma": 0.0,
+        "nu": 5.949550484131045,
+        "gjr": false,
+        "h_last": 6.618506088989228e-08,
+        "e_last": -0.00027801312170057114,
+        "n": 2000,
+        "nll": -13752.374053579053,
+        "convergence": {
+          "method": "L-BFGS-B",
+          "success": true,
+          "start_a": {
+            "success": true,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+            "nll": -13752.374053579053
+          },
+          "start_b": {
+            "success": true,
+            "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+            "nll": -13752.37222877568
+          },
+          "multi_start_nll_gap": 0.0018248033738927916,
+          "gap_tolerance": 1.3752374053579053,
+          "selected": "a",
+          "grad_inf_norm": 0.006222762750042301,
+          "rule": "unsuccessful termination refused unless a derivative-free polish converges; two starts must agree on the NLL within 1e-4 relative BEFORE the better is selected"
+        },
+        "unconditional_variance": 6.627058047524397e-08,
+        "persistence": 0.21463937822137963
+      },
+      "arguments": {
+        "cutoff_epoch": 1787751300.0,
+        "created_epoch": 1787751300.0,
+        "horizon_bars": 15,
+        "recent": [
+          0.0002665119819257877,
+          -5.1068223443614265e-05,
+          0.0001363308691951176,
+          -0.0002421896743863124,
+          0.0003586983775093811,
+          0.00046667234161372825,
+          -0.0001933247296962257,
+          0.00045031142145739454,
+          0.0003762380230581485,
+          0.00017740415122788155,
+          0.00031841404430145464,
+          0.00025654231301071583,
+          -0.00024078646318775505,
+          -8.434302963911822e-05,
+          -0.0001750422102615434,
+          0.0003775462013710123,
+          -2.6256784870433034e-05,
+          7.336281801138887e-05,
+          -0.00014101582852669425,
+          0.0004745557229127218,
+          0.00021149312371125024,
+          -0.00031802849772491286,
+          -0.00027380165426473446,
+          2.671942388757031e-05,
+          7.212343519788017e-05,
+          0.00016445904246398507,
+          0.0004222193004899796,
+          0.00014460964488190005,
+          -0.00019245735458336147,
+          2.8245860304862347e-05,
+          0.0004479683599082667,
+          -8.794213104887244e-05,
+          0.0003028278170875828,
+          -2.4062432759351735e-05,
+          -0.00010088342419850952,
+          0.00013420048461896408,
+          -0.00023262562081200435,
+          -9.272595729418632e-05,
+          2.6229821842357804e-06,
+          -0.00023702193165629635,
+          -0.0002880202134157825,
+          9.030465322867466e-05,
+          7.856613261940573e-05,
+          0.00028010208244966543,
+          0.0003869210849601531,
+          -2.8381466657471242e-05,
+          -0.00010119265424015919,
+          0.00010736260681800479,
+          -0.00014315270407199224,
+          -0.0002930024509578449,
+          -0.000180102557086681,
+          -7.732904554587189e-05,
+          8.50461869992624e-05,
+          0.0002820978095634447,
+          0.0002641244905656503,
+          0.0001560968630474818,
+          -0.0001958962064870506,
+          0.00010150062042853864,
+          0.00012447073924158793,
+          0.00033955512129265513,
+          -5.057129374004395e-05,
+          -8.156701810538853e-05,
+          0.00046680030212281897,
+          -1.2330098943133177e-05
+        ]
+      },
+      "output": {
+        "next_bar_variance": 6.502972156154554e-08,
+        "integrated_variance": 9.924787209679438e-07,
+        "horizon_bars": 15,
+        "aggregation": "sum of E[h_{t+k}] (zero-mean, uncorrelated innovations)",
+        "omega": 5.2046304287667694e-08,
+        "alpha": 0.03057608227461325,
+        "beta": 0.18406329594676638,
+        "gamma": 0.0,
+        "nu": 5.949550484131045,
+        "persistence": 0.21463937822137963
+      }
+    }
+  ],
+  "simulations": [
+    {
+      "inputs": {
+        "S0": 648.8148,
+        "variance_model": {
+          "kind": "GARCH",
+          "omega": 5.2046304287667694e-08,
+          "alpha": 0.03057608227461325,
+          "beta": 0.18406329594676638,
+          "gamma": 0.0,
+          "h_next": 6.502972156154554e-08
+        },
+        "nu": 5.949550484131045,
+        "innovations": {
+          "family": "TRUNCATED_T",
+          "nu": 5.949550484131045,
+          "tail_cap_sd": 8.0,
+          "truncated_mass": 6.768064676077046e-05,
+          "renormalization": 1.0033040875844614,
+          "finite_exponential_moments": true
+        },
+        "iv0": 0.026038234349646597,
+        "spread_bps0": 416.66666666666697,
+        "drift_per_bar": -5.815745315914122e-07,
+        "iv_process": "IV_FIXED",
+        "iv_param": 1.0,
+        "spread_process": "SPREAD_FIXED",
+        "spread_param": 1.0,
+        "regime": {
+          "probabilities": [
+            0.7214762178941744,
+            0.2785237821058257
+          ],
+          "variance_multipliers": [
+            0.5574085433612758,
+            2.14647017857403
+          ]
+        },
+        "cutoff_epoch": 1787751300.0,
+        "discretization": "1-minute steps, log-return recursion",
+        "state_convention": "h_next / h = conditional variance of the FIRST simulated bar (= next_bar_variance forecast); recurrence applied after each shock",
+        "jumps": "NOT_INCLUDED (no declared estimator)",
+        "parameter_hash": "a5466e6713927533",
+        "restrictions": [
+          "IV held fixed over the horizon: option repricing reflects underlying moves and time decay only",
+          "execution spread held fixed",
+          "no jumps",
+          "innovations: standardized Student-t TRUNCATED at +/-8.0 sd and renormalized (explicit choice: the untruncated t has no finite exponential moments)",
+          "declared constant drift per bar (from the location forecast)"
+        ]
+      },
+      "paths": {
+        "S": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "48d67090149b238bcd7d6bfb4695bc7891b5eda931a3b67c2cf9e1f12c5ab86b",
+          "finite": true
+        },
+        "h": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "56d72ee8795e89dbd445cf6527c368f34b0f37928d43d2219beca26e3700942e",
+          "finite": true
+        },
+        "iv": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "3227afc2c205c349386f7c88c5b03748f8a9b261d75cacb2cad83529a36ab6d6",
+          "finite": true
+        },
+        "spread_bps": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "de6df180342b1c381c4772f19d7940d8852a5a725160e7a6fa574c1714b431d0",
+          "finite": true
+        }
+      },
+      "moments": {
+        "mean_log_return": -1.9150745321199734e-05,
+        "var_log_return": 1.038828564925476e-06,
+        "kurtosis_excess": 1.84786077192953
+      },
+      "independent_math": {
+        "mean": -1.915074532120405e-05,
+        "variance": 1.0388285649254675e-06,
+        "max_recurrence_relative_error": 2.320125361217883e-13,
+        "iv_fixed": true,
+        "spread_fixed": true
+      }
+    },
+    {
+      "inputs": {
+        "S0": 648.8148,
+        "variance_model": {
+          "kind": "GARCH",
+          "omega": 5.2046304287667694e-08,
+          "alpha": 0.03057608227461325,
+          "beta": 0.18406329594676638,
+          "gamma": 0.0,
+          "h_next": 6.502972156154554e-08
+        },
+        "nu": 5.949550484131045,
+        "innovations": {
+          "family": "TRUNCATED_T",
+          "nu": 5.949550484131045,
+          "tail_cap_sd": 6.0,
+          "truncated_mass": 0.0003340035484458159,
+          "renormalization": 1.0093106685414002,
+          "finite_exponential_moments": true
+        },
+        "iv0": 0.026038234349646597,
+        "spread_bps0": 416.66666666666697,
+        "drift_per_bar": -5.815745315914122e-07,
+        "iv_process": "IV_FIXED",
+        "iv_param": 1.0,
+        "spread_process": "SPREAD_FIXED",
+        "spread_param": 1.0,
+        "regime": {
+          "probabilities": [
+            0.7214762178941744,
+            0.2785237821058257
+          ],
+          "variance_multipliers": [
+            0.5574085433612758,
+            2.14647017857403
+          ]
+        },
+        "cutoff_epoch": 1787751300.0,
+        "discretization": "1-minute steps, log-return recursion",
+        "state_convention": "h_next / h = conditional variance of the FIRST simulated bar (= next_bar_variance forecast); recurrence applied after each shock",
+        "jumps": "NOT_INCLUDED (no declared estimator)",
+        "parameter_hash": "7dd25e0130f5caa8",
+        "restrictions": [
+          "IV held fixed over the horizon: option repricing reflects underlying moves and time decay only",
+          "execution spread held fixed",
+          "no jumps",
+          "innovations: standardized Student-t TRUNCATED at +/-6.0 sd and renormalized (explicit choice: the untruncated t has no finite exponential moments)",
+          "declared constant drift per bar (from the location forecast)"
+        ]
+      },
+      "paths": {
+        "S": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "504e771a84f5ce8fa3a54891e9b7f8ab98f4c2470db92ae748d3d554e6c9419c",
+          "finite": true
+        },
+        "h": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "f49fcfc9e634d5acb5bcc650a8efa61800617c986151ddd9492d8b5d878268ba",
+          "finite": true
+        },
+        "iv": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "3227afc2c205c349386f7c88c5b03748f8a9b261d75cacb2cad83529a36ab6d6",
+          "finite": true
+        },
+        "spread_bps": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "de6df180342b1c381c4772f19d7940d8852a5a725160e7a6fa574c1714b431d0",
+          "finite": true
+        }
+      },
+      "moments": {
+        "mean_log_return": -2.8763005535159315e-05,
+        "var_log_return": 1.0165678450756594e-06,
+        "kurtosis_excess": 1.7403993656393073
+      },
+      "independent_math": {
+        "mean": -2.876300553516472e-05,
+        "variance": 1.0165678450756499e-06,
+        "max_recurrence_relative_error": 2.149423914877174e-13,
+        "iv_fixed": true,
+        "spread_fixed": true
+      }
+    },
+    {
+      "inputs": {
+        "S0": 648.8148,
+        "variance_model": {
+          "kind": "GARCH",
+          "omega": 5.2046304287667694e-08,
+          "alpha": 0.03057608227461325,
+          "beta": 0.18406329594676638,
+          "gamma": 0.0,
+          "h_next": 6.502972156154554e-08
+        },
+        "nu": 5.949550484131045,
+        "innovations": {
+          "family": "TRUNCATED_T",
+          "nu": 5.949550484131045,
+          "tail_cap_sd": 12.0,
+          "truncated_mass": 6.605625258115921e-06,
+          "renormalization": 1.0007196860972025,
+          "finite_exponential_moments": true
+        },
+        "iv0": 0.026038234349646597,
+        "spread_bps0": 416.66666666666697,
+        "drift_per_bar": -5.815745315914122e-07,
+        "iv_process": "IV_FIXED",
+        "iv_param": 1.0,
+        "spread_process": "SPREAD_FIXED",
+        "spread_param": 1.0,
+        "regime": {
+          "probabilities": [
+            0.7214762178941744,
+            0.2785237821058257
+          ],
+          "variance_multipliers": [
+            0.5574085433612758,
+            2.14647017857403
+          ]
+        },
+        "cutoff_epoch": 1787751300.0,
+        "discretization": "1-minute steps, log-return recursion",
+        "state_convention": "h_next / h = conditional variance of the FIRST simulated bar (= next_bar_variance forecast); recurrence applied after each shock",
+        "jumps": "NOT_INCLUDED (no declared estimator)",
+        "parameter_hash": "3b78b3a4b6ab83f0",
+        "restrictions": [
+          "IV held fixed over the horizon: option repricing reflects underlying moves and time decay only",
+          "execution spread held fixed",
+          "no jumps",
+          "innovations: standardized Student-t TRUNCATED at +/-12.0 sd and renormalized (explicit choice: the untruncated t has no finite exponential moments)",
+          "declared constant drift per bar (from the location forecast)"
+        ]
+      },
+      "paths": {
+        "S": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "24bc668a64028af3876951c26cd6f3b28abaf4833b63b37e8b122e1de5e9042d",
+          "finite": true
+        },
+        "h": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "96e422501a2a49a109d5dabd1271a6734f2776ee044657d8e620e96794c4ee9b",
+          "finite": true
+        },
+        "iv": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "3227afc2c205c349386f7c88c5b03748f8a9b261d75cacb2cad83529a36ab6d6",
+          "finite": true
+        },
+        "spread_bps": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "de6df180342b1c381c4772f19d7940d8852a5a725160e7a6fa574c1714b431d0",
+          "finite": true
+        }
+      },
+      "moments": {
+        "mean_log_return": -2.2954785671198507e-05,
+        "var_log_return": 1.0991160773587697e-06,
+        "kurtosis_excess": 2.6603439919601426
+      },
+      "independent_math": {
+        "mean": -2.2954785671201713e-05,
+        "variance": 1.0991160773587612e-06,
+        "max_recurrence_relative_error": 2.406025099207231e-13,
+        "iv_fixed": true,
+        "spread_fixed": true
+      }
+    }
+  ],
+  "pricing": [
+    {
+      "paths_received": {
+        "S": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "48d67090149b238bcd7d6bfb4695bc7891b5eda931a3b67c2cf9e1f12c5ab86b",
+          "finite": true
+        },
+        "h": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "56d72ee8795e89dbd445cf6527c368f34b0f37928d43d2219beca26e3700942e",
+          "finite": true
+        },
+        "iv": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "3227afc2c205c349386f7c88c5b03748f8a9b261d75cacb2cad83529a36ab6d6",
+          "finite": true
+        },
+        "spread_bps": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "de6df180342b1c381c4772f19d7940d8852a5a725160e7a6fa574c1714b431d0",
+          "finite": true
+        }
+      },
+      "independent_values": {
+        "SPY|2026-10-09|640.0|CALL": {
+          "mean": 633.8249842576874,
+          "p_loss": 0.0
+        },
+        "SPY|2026-10-09|640.0|PUT": {
+          "mean": -228.10721442546824,
+          "p_loss": 1.0
+        },
+        "SPY|2026-10-09|645.0|CALL": {
+          "mean": 217.91007349893144,
+          "p_loss": 0.0
+        },
+        "SPY|2026-10-09|645.0|PUT": {
+          "mean": -154.43879185089102,
+          "p_loss": 1.0
+        },
+        "SPY|2026-10-09|650.0|CALL": {
+          "mean": -67.54972427607275,
+          "p_loss": 0.9785
+        },
+        "SPY|2026-10-09|650.0|PUT": {
+          "mean": 49.68474370743794,
+          "p_loss": 0.0645
+        },
+        "SPY|2026-10-09|655.0|CALL": {
+          "mean": -200.32406689343014,
+          "p_loss": 1.0
+        },
+        "SPY|2026-10-09|655.0|PUT": {
+          "mean": 406.49373442341414,
+          "p_loss": 0.0
+        }
+      }
+    },
+    {
+      "paths_received": {
+        "S": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "504e771a84f5ce8fa3a54891e9b7f8ab98f4c2470db92ae748d3d554e6c9419c",
+          "finite": true
+        },
+        "h": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "f49fcfc9e634d5acb5bcc650a8efa61800617c986151ddd9492d8b5d878268ba",
+          "finite": true
+        },
+        "iv": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "3227afc2c205c349386f7c88c5b03748f8a9b261d75cacb2cad83529a36ab6d6",
+          "finite": true
+        },
+        "spread_bps": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "de6df180342b1c381c4772f19d7940d8852a5a725160e7a6fa574c1714b431d0",
+          "finite": true
+        }
+      },
+      "independent_values": {
+        "SPY|2026-10-09|640.0|CALL": {
+          "mean": 633.2436395334627,
+          "p_loss": 0.0
+        },
+        "SPY|2026-10-09|640.0|PUT": {
+          "mean": -228.07720183144778,
+          "p_loss": 1.0
+        },
+        "SPY|2026-10-09|645.0|CALL": {
+          "mean": 217.43109887622532,
+          "p_loss": 0.0
+        },
+        "SPY|2026-10-09|645.0|PUT": {
+          "mean": -154.30640915535184,
+          "p_loss": 1.0
+        },
+        "SPY|2026-10-09|650.0|CALL": {
+          "mean": -67.83721473632305,
+          "p_loss": 0.982
+        },
+        "SPY|2026-10-09|650.0|PUT": {
+          "mean": 50.008610565432974,
+          "p_loss": 0.0685
+        },
+        "SPY|2026-10-09|655.0|CALL": {
+          "mean": -200.43283075288642,
+          "p_loss": 1.0
+        },
+        "SPY|2026-10-09|655.0|PUT": {
+          "mean": 406.99632788220305,
+          "p_loss": 0.0
+        }
+      }
+    },
+    {
+      "paths_received": {
+        "S": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "24bc668a64028af3876951c26cd6f3b28abaf4833b63b37e8b122e1de5e9042d",
+          "finite": true
+        },
+        "h": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "96e422501a2a49a109d5dabd1271a6734f2776ee044657d8e620e96794c4ee9b",
+          "finite": true
+        },
+        "iv": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "3227afc2c205c349386f7c88c5b03748f8a9b261d75cacb2cad83529a36ab6d6",
+          "finite": true
+        },
+        "spread_bps": {
+          "shape": [
+            2000,
+            16
+          ],
+          "sha256": "de6df180342b1c381c4772f19d7940d8852a5a725160e7a6fa574c1714b431d0",
+          "finite": true
+        }
+      },
+      "independent_values": {
+        "SPY|2026-10-09|640.0|CALL": {
+          "mean": 633.6322099503167,
+          "p_loss": 0.0
+        },
+        "SPY|2026-10-09|640.0|PUT": {
+          "mean": -228.06023740133543,
+          "p_loss": 1.0
+        },
+        "SPY|2026-10-09|645.0|CALL": {
+          "mean": 217.80259745412246,
+          "p_loss": 0.0005
+        },
+        "SPY|2026-10-09|645.0|PUT": {
+          "mean": -154.306516564196,
+          "p_loss": 1.0
+        },
+        "SPY|2026-10-09|650.0|CALL": {
+          "mean": -67.57164268598424,
+          "p_loss": 0.9785
+        },
+        "SPY|2026-10-09|650.0|PUT": {
+          "mean": 49.90257662903037,
+          "p_loss": 0.0715
+        },
+        "SPY|2026-10-09|655.0|CALL": {
+          "mean": -200.31506729597297,
+          "p_loss": 1.0
+        },
+        "SPY|2026-10-09|655.0|PUT": {
+          "mean": 406.74248535237484,
+          "p_loss": 0.0
+        }
+      }
+    }
+  ],
+  "prime_decision": "ACT",
+  "selected": "SPY|2026-10-09|640.0|CALL",
+  "decision": "TRADE",
+  "layers_not_invoked": {
+    "svi_surface": "NOT_INVOKED: ATM implied vol only (no surface fit, no skew)",
+    "fusion": "NOT_INVOKED: no learned weights",
+    "enrichment": "NOT_INVOKED",
+    "jumps": "NOT_MODELLED"
+  },
+  "execution_proof": {
+    "problems": [],
+    "chain_verified": true,
+    "scope": "SINGLE_SCAN_LONG_OPTION_EXECUTION",
+    "fee_tariff_recomputed": false,
+    "model_correctness_verified": false,
+    "selection_rule": "FULL_FUNNEL_V1: artifact location + walk-forward GARCH-t variance + causal regime mixture + ATM implied vol -> joint simulation -> expression comparison (WAIT + nearest-ATM +/-k strikes, both rights) -> PRIME supervision; best expected net P&L > 0 buys one contract, else WAIT",
+    "funnel_link_verified": true,
+    "open_positions": 0,
+    "pnl_recomputed": 19.91,
+    "gross_recomputed": 20.0,
+    "entry_debit": 250.0
+  },
+  "premarket_status": "ATTACHED_CONTEXT",
+  "premarket_model_consumed": false
+}

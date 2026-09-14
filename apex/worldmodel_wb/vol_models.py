@@ -141,16 +141,27 @@ def _filter(x: np.ndarray, omega: float, alpha: float, beta: float, gamma: float
 
 
 def _nll(theta, x, gjr: bool):
-    omega, alpha, beta = math.exp(theta[0]), _sig(theta[1]), _sig(theta[2])
-    gamma = _sig(theta[3]) if gjr else 0.0
-    nu = 2.0 + math.exp(theta[4 if gjr else 3])
+    # Optimizers evaluate trial points outside the representable domain. They
+    # are infeasible points, not an exception that should escape the fit path.
+    # Keep the existing penalty and all convergence/stationarity gates intact.
+    if not np.all(np.isfinite(theta)):
+        return 1e12
+    try:
+        omega, alpha, beta = math.exp(theta[0]), _sig(theta[1]), _sig(theta[2])
+        gamma = _sig(theta[3]) if gjr else 0.0
+        nu = 2.0 + math.exp(theta[4 if gjr else 3])
+    except OverflowError:
+        return 1e12
+    if nu <= 2.0 or omega <= 0.0:
+        return 1e12
     if alpha + beta + gamma / 2 >= 0.9999:
         return 1e12
     h = _filter(x, omega, alpha, beta, gamma, float(np.var(x)))
     if np.any(h <= 0) or not np.all(np.isfinite(h)):
         return 1e12
     z = x / np.sqrt(h)
-    return float(-np.sum(std_t_logpdf(z, nu) - 0.5 * np.log(h)))
+    value = float(-np.sum(std_t_logpdf(z, nu) - 0.5 * np.log(h)))
+    return value if math.isfinite(value) else 1e12
 
 
 def _sig(u):
