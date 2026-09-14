@@ -1,0 +1,27 @@
+{
+  "connector_receipt_utc": "2026-09-14T13:04:17.757Z",
+  "connector_requested_utc": "2026-09-14T13:04:10.525Z",
+  "request": {
+    "params": {
+      "limit": 5000,
+      "order": "asc",
+      "sort": "timestamp",
+      "timestamp.gte": "2026-09-11T13:30:00Z",
+      "timestamp.lt": "2026-09-11T20:00:00Z"
+    },
+    "path": "/v3/quotes/O:SPY260918C00765000"
+  },
+  "response": {
+    "content": [
+      {
+        "text": "Warning [NOT_ENTITLED]: This data isn't included in your current plan. Upgrade at https://massive.com/pricing",
+        "type": "text"
+      }
+    ],
+    "isError": false,
+    "structuredContent": {
+      "result": "Warning [NOT_ENTITLED]: This data isn't included in your current plan. Upgrade at https://massive.com/pricing"
+    }
+  },
+  "selection_basis": "First ascending strike in preserved as_of candidates. Quote acquisition for admission testing only; not a trading selection."
+}

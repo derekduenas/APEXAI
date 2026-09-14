@@ -1,0 +1,33 @@
+{
+  "sessions": [
+    {
+      "market_date": "2026-09-11",
+      "exposure_status": "PREVIOUSLY_OBSERVED_SMOKE",
+      "inputs": {
+        "bars": {
+          "path": "../continuation-2b70ea1113aeecdba4138a0a45ebd06dc883ff0a56a1a0d4d66f16992d43c42f/bars.json",
+          "sha256": "44b89f115641dcdf2d418007e676a978e48b4440df52441584e99cff6cc4561c"
+        },
+        "chain": {
+          "path": "../continuation-2b70ea1113aeecdba4138a0a45ebd06dc883ff0a56a1a0d4d66f16992d43c42f/chain.json",
+          "sha256": "7eaa3a7f50eb88ed3a2207c2e03454b40ca0a9f9ac7a3cc618ea7c1c4a205fdd"
+        }
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "connector_capture.json",
+      "sha256": "eb629b9919ef73bcbd4fe2024ea43f50871836f50ac9ca8c757545d1b7219105"
+    },
+    {
+      "path": "connector_payload.txt",
+      "sha256": "e0b002ab8dbb8e43c5a167035d5ced176f97fca8c9a87ddb79c89449ad5b8f8a"
+    },
+    {
+      "path": "finding.json",
+      "sha256": "5ae6a909af059ce05d0a0858dcdbf15f3a8c5ad4331ba061ae27da4b347ef3d7"
+    }
+  ],
+  "evaluation_ready": false
+}
