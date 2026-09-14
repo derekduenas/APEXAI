@@ -311,8 +311,11 @@ def _regular_tick(now, gov, today) -> None:
             try:
                 from apex.hunter.forward_pass import enrichment_pass
                 t3 = _time.monotonic()
+                from apex.hunter.forward_pass import build_model_history
                 for r in enrichment_pass(now, today, decisions, universe,
-                                         bars_by_symbol=bars):
+                                         bars_by_symbol=bars,
+                                         model_history_by_symbol=build_model_history(
+                                             decisions, bars, now, gov)):
                     if r.get("kind") == "capital_decision":
                         # reasoning time from formation to capital verdict:
                         # the edge-decay clock (price at each stamp is

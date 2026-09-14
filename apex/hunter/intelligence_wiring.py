@@ -77,7 +77,7 @@ def ml_view(candidate: dict, ledger_rows: list, *, evidence_class,
 
 
 # ------------------------------------------------------------------ the variance + multiverse layer
-def _visible_simulation_bars(bars, *, cutoff_epoch: float):
+def _visible_simulation_bars(bars, *, cutoff_epoch: float, sessions: int = 1):
     """Use Hunter's completed-bar/session rule for BOTH returns and spot.
 
     Legacy normalized frames do not carry measured receipt times. Bar completion
@@ -91,7 +91,12 @@ def _visible_simulation_bars(bars, *, cutoff_epoch: float):
     cutoff = pd.Timestamp(cutoff_epoch, unit="s", tz="UTC")
     frame = visible_bars(bars, cutoff).copy()
     market_date = cutoff.tz_convert("America/New_York").date()
-    frame = frame[frame["event_time_utc"].dt.tz_convert("America/New_York").dt.date == market_date]
+    # `sessions` = how many market dates, ending at the decision's own, may contribute. 1 keeps the original
+    # today-only behaviour. More admits prior COMPLETED sessions so the variance model can reach MIN_OBS at the
+    # open; nothing from AFTER the decision's market date is ever admitted at any setting.
+    dates = frame["event_time_utc"].dt.tz_convert("America/New_York").dt.date
+    eligible = sorted({d for d in dates.unique() if d <= market_date})[-max(1, int(sessions)):]
+    frame = frame[dates.isin(eligible)]
     if "available_epoch" in frame:
         availability = pd.to_numeric(frame["available_epoch"], errors="coerce")
         frame = frame[np.isfinite(availability) & (availability <= cutoff_epoch)]
@@ -104,10 +109,14 @@ def _visible_simulation_bars(bars, *, cutoff_epoch: float):
     return frame
 
 
-def _return_rows(bars, *, cutoff_epoch: float) -> list:
-    """Adjacent completed one-minute returns; gaps are not one-minute returns."""
+def _return_rows(bars, *, cutoff_epoch: float, sessions: int = 1) -> list:
+    """Adjacent completed one-minute returns; gaps are not one-minute returns.
+
+    With `sessions` > 1 the market-date filter no longer separates the sessions, so the adjacency rule below is
+    the ONLY thing preventing an overnight junction from being recorded as a one-minute return. It is tested
+    directly, with the filter bypassed, for exactly that reason."""
     import math
-    frame = _visible_simulation_bars(bars, cutoff_epoch=cutoff_epoch)
+    frame = _visible_simulation_bars(bars, cutoff_epoch=cutoff_epoch, sessions=sessions)
     closes = [float(c) for c in frame["close"].tolist()]
     times = [float(t.timestamp()) for t in frame["event_time_utc"].tolist()]
     availability = (frame["available_epoch"].astype(float).tolist()
@@ -136,6 +145,7 @@ def _branch_frequencies(S, s0: float, sd: float) -> dict:
 
 
 def simulation_view(candidate: dict, bars, *, as_of_epoch: float,
+                    history=None, history_sessions: int = 1,
                     horizon_bars: int = DEFAULT_HORIZON_BARS,
                     n_paths: int = DEFAULT_N_PATHS, seed: int = 0,
                     prefer_garch: bool = True) -> SimulationView:
@@ -148,12 +158,30 @@ def simulation_view(candidate: dict, bars, *, as_of_epoch: float,
     try:
         if bars is None or not len(bars):
             return SimulationView("REFUSED", "NO_BARS", 0, {}, ("NO_BARS_FOR_SYMBOL",), prov)
-        visible = _visible_simulation_bars(bars, cutoff_epoch=as_of_epoch)
+        # THE MODEL'S SAMPLE AND THE SETUP'S FRAME ARE DIFFERENT INPUTS. `history` (prior completed sessions +
+        # today) feeds the variance model; `bars` alone would starve it until midday. Both derive from ONE
+        # filtered visible frame, so returns and spot can never come from different views of the tape.
+        import pandas as _pd
+        frame_source = history if history is not None and len(history) else bars
+        sessions = max(1, int(history_sessions)) if history is not None else 1
+        visible = _visible_simulation_bars(frame_source, cutoff_epoch=as_of_epoch, sessions=sessions)
         if visible.empty:
             return SimulationView("REFUSED", "NO_VISIBLE_BARS", 0, {},
                                   ("NO_COMPLETED_VISIBLE_BARS",), prov)
-        rows = _return_rows(visible, cutoff_epoch=as_of_epoch)
+        # SPOT MUST BELONG TO THE DECISION'S OWN SESSION. With history admitted, the newest completed bar could
+        # otherwise be a PRIOR session's close, and a simulation started from yesterday's price is not a
+        # simulation of today's decision.
+        decision_date = _pd.Timestamp(as_of_epoch, unit="s", tz="UTC").tz_convert("America/New_York").date()
+        last_date = visible["event_time_utc"].iloc[-1].tz_convert("America/New_York").date()
+        if last_date != decision_date:
+            prov["last_visible_date"] = str(last_date)
+            return SimulationView("REFUSED", "SPOT_NOT_FROM_DECISION_SESSION", 0, {},
+                                  ("newest completed bar is %s, decision session is %s"
+                                   % (last_date, decision_date),), prov)
+        rows = _return_rows(visible, cutoff_epoch=as_of_epoch, sessions=sessions)
         prov["return_rows"] = len(rows)
+        prov["sessions_used"] = sorted({str(d) for d in
+                                        visible["event_time_utc"].dt.tz_convert("America/New_York").dt.date})
         spot = float(visible["close"].iloc[-1])
         prov.update(spot=spot, last_bar_start=str(visible["event_time_utc"].iloc[-1]),
                     availability_basis=("BAR_COMPLETION_AND_SUPPLIED_AVAILABILITY"
