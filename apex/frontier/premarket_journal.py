@@ -53,7 +53,10 @@ TERMINAL = ("COMPLETED", "TOO_EARLY", "MISSED_WINDOW", "SOURCE_UNAVAILABLE", "RE
 #
 # R4's version of this test passed, but it passed on TIMING: the winner happened to finish before the losers
 # wrote their markers. It was never correct.
-DECISIVE = ("COMPLETED", "TOO_EARLY", "MISSED_WINDOW", "SOURCE_UNAVAILABLE", "REFUSED_INPUT", "FAILED")
+# TOO_EARLY ends this invocation, not the scheduled stage. Keeping it decisive
+# let an early seasonal trigger cancel the later on-time invocation for the day.
+# Preserve the receipt in TERMINAL; only completed/closed stages prevent retries.
+DECISIVE = ("COMPLETED", "MISSED_WINDOW", "SOURCE_UNAVAILABLE", "REFUSED_INPUT", "FAILED")
 DISPOSITIONS = ("ON_TIME", "LATE_START", "TOO_EARLY", "MISSED_WINDOW")
 
 # A rehearsal, recorded but NOT an outcome. It must never be decisive: a `--dry-run` at 08:15 that wrote a
