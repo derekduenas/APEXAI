@@ -312,7 +312,7 @@ def decision_pass(t_utc, universe: dict, bars_by_symbol: dict,
         # or lose a canonical observation or candidate record
         return scan_record, decisions
     return scan_record, decisions + enrichment_pass(t, date, decisions,
-                                                    universe)
+                                                    universe, bars_by_symbol=bars_by_symbol)
 
 
 def _uncertain_from_record(market_state: dict | None) -> bool:
