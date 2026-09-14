@@ -279,7 +279,8 @@ class TestARacerCannotPoisonTheWinner:
         j.append(stage="s", state="RECONCILED_DUPLICATE")
         assert j.stage_outcome("s") == "COMPLETED", "reading the LAST state would re-run a finished stage"
 
-    @pytest.mark.parametrize("state", ["COMPLETED", "TOO_EARLY", "MISSED_WINDOW", "SOURCE_UNAVAILABLE",
+    # TOO_EARLY is superseded: terminal for an invocation, pending for the stage.
+    @pytest.mark.parametrize("state", ["COMPLETED", "MISSED_WINDOW", "SOURCE_UNAVAILABLE",
                                        "REFUSED_INPUT", "FAILED"])
     def test_every_real_outcome_is_decisive(self, j, state):
         j.append(stage="s", state=state)
@@ -292,7 +293,7 @@ class TestARacerCannotPoisonTheWinner:
         j.append(stage="s", state="RECONCILED_DUPLICATE")
         assert j.claim("s", holder="recovery")["status"] == "TAKEOVER", \
             "a dead holder plus a racer's marker must still be recoverable"
-        assert PJ.DECISIVE == ("COMPLETED", "TOO_EARLY", "MISSED_WINDOW", "SOURCE_UNAVAILABLE",
+        assert PJ.DECISIVE == ("COMPLETED", "MISSED_WINDOW", "SOURCE_UNAVAILABLE",
                                "REFUSED_INPUT", "FAILED")
 
 
