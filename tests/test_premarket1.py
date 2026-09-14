@@ -60,14 +60,17 @@ def test_the_brief_firewall_refuses_trading_vocabulary():
     from premarket_run import FORBIDDEN_IN_BRIEF
     for bad in ("buy ", "sell ", "probability"):
         assert bad in FORBIDDEN_IN_BRIEF
-    src = open("scripts/premarket_run.py").read()
+    # R4: the firewall moved into apex.frontier.premarket_stages so the staged producer and the legacy runner
+    # cannot hold two copies of it. The property is unchanged; only its address is.
+    src = open("apex/frontier/premarket_stages.py").read()
     assert "BRIEF REFUSED BY FIREWALL" in src
-    assert "the tape gets the final vote" in src.lower() or \
-        "tape gets the final vote" in src
+    assert "tape gets the final vote" in src
+    assert "BRIEF REFUSED BY FIREWALL" not in open("scripts/premarket_run.py").read(), \
+        "a second copy of the firewall text is a second firewall waiting to drift"
 
 
 def test_anti_anchoring_is_written_into_the_brief_itself():
-    src = open("scripts/premarket_run.py").read()
+    src = open("apex/frontier/premarket_stages.py").read()      # R4: moved with the rest of the Captain path
     assert "PRIORS, NOT TRUTH" in src
     assert "THE BRIEF LOSES" in src
 

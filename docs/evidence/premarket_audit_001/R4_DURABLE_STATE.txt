@@ -1,0 +1,129 @@
+DURABLE STATE SCHEMA — PREMARKET_JOURNAL_V1, as actually written by the production CLI
+
+results/frontier/premarket/journal/<TRADING-DATE>/
+   events.jsonl         append-only, one JSON object per line, hash-chained (each event's `prev` is its
+                        predecessor's `digest`, and `digest` is recomputed from the event's own content)
+   blobs/<sha256>.json  content-addressed, write-once: captured source bytes, normalized observations,
+                        per-stage packets, the sealed packet, the Captain response
+   claims/<stage>.claim O_EXCL exactly-once gate for absorption; GRANTED / HELD / TAKEOVER
+   journal.lock         flock, held only across the read-tail + append of one event, so sequence numbers
+                        are allocated transactionally
+
+JSON only. No pickle, marshal or shelve anywhere in the staged entry point's import closure (asserted by
+test over the closure, not by grepping one file).
+
+THE 2026-08-26 SYNTHETIC MORNING, 23 events, one clean run:
+   SEQ  STAGE                STATE                  PAYLOAD KEYS
+   0    session              STARTED                code_identity,opened_at_et,realism,schedule,trading_date
+   1    0815_ET_initial      STARTED                actual_et,chain,delta_s,disposition,missing_predecessors,out_of_order,predecessors,tar
+   2    0815_ET_initial      CAPTURED               as_of,capture_blobs,capture_manifest_blob,replayed_from_capture,responses
+   3    0815_ET_initial      NORMALIZED             as_of,capture_blobs,capture_manifest_blob,dispositions,normalized_blob
+   4    0815_ET_initial      ABSORBED               as_of,capture_blobs,capture_manifest_blob,normalized_blob,packet_blob,summary
+   5    0815_ET_initial      COMPLETED              as_of,capture_blobs,capture_manifest_blob,disposition,normalized_blob,packet_blob,summ
+   6    0832_ET_post_macro   STARTED                actual_et,chain,delta_s,disposition,missing_predecessors,out_of_order,predecessors,tar
+   7    0832_ET_post_macro   CAPTURED               as_of,capture_blobs,capture_manifest_blob,replayed_from_capture,responses
+   8    0832_ET_post_macro   NORMALIZED             as_of,capture_blobs,capture_manifest_blob,dispositions,normalized_blob
+   9    0832_ET_post_macro   ABSORBED               as_of,capture_blobs,capture_manifest_blob,normalized_blob,packet_blob,summary
+   10   0832_ET_post_macro   COMPLETED              as_of,capture_blobs,capture_manifest_blob,disposition,normalized_blob,packet_blob,summ
+   11   0905_ET_refresh      STARTED                actual_et,chain,delta_s,disposition,missing_predecessors,out_of_order,predecessors,tar
+   12   0905_ET_refresh      CAPTURED               as_of,capture_blobs,capture_manifest_blob,replayed_from_capture,responses
+   13   0905_ET_refresh      NORMALIZED             as_of,capture_blobs,capture_manifest_blob,dispositions,normalized_blob
+   14   0905_ET_refresh      ABSORBED               as_of,capture_blobs,capture_manifest_blob,normalized_blob,packet_blob,summary
+   15   0905_ET_refresh      COMPLETED              as_of,capture_blobs,capture_manifest_blob,disposition,normalized_blob,packet_blob,summ
+   16   0920_ET_final        STARTED                actual_et,chain,delta_s,disposition,missing_predecessors,out_of_order,predecessors,tar
+   17   0920_ET_final        CAPTURED               as_of,capture_blobs,capture_manifest_blob,replayed_from_capture,responses
+   18   0920_ET_final        NORMALIZED             as_of,capture_blobs,capture_manifest_blob,dispositions,normalized_blob
+   19   0920_ET_final        ABSORBED               as_of,capture_blobs,capture_manifest_blob,normalized_blob,packet_blob,summary
+   20   0920_ET_final        COMPLETED              as_of,capture_blobs,capture_manifest_blob,disposition,normalized_blob,packet_blob,summ
+   21   seal                 STARTED                actual_et,chain,delta_s,disposition,missing_predecessors,predecessors,target_et
+   22   seal                 COMPLETED              captain,disposition,missing_stages,packet_sha256,provenance,rebuilt_from,sealed_blob,s
+
+ONE EVENT IN FULL (the 0920 COMPLETED record; 64-hex digests elided to 12):
+{
+ "schema": "PREMARKET_JOURNAL_V1",
+ "seq": 20,
+ "trading_date": "2026-08-26",
+ "stage": "0920_ET_final",
+ "state": "COMPLETED",
+ "at": 1789349487.638297,
+ "prev": "abf0ffce7661da9ce8c960d6189383d661635aaec005e7df840b50a999e6cbb5",
+ "pid": 34984,
+ "host": "Dereks-Air.home.local",
+ "substitutions": {
+  "APEX_PREMARKET_ROOT": "/private/tmp/claude-501/-Users-derekduenas/493f47ba-c471-4af0-9432-ba9bb8f8a672/scratchpad/r4/ev/staged",
+  "APEX_PREMARKET_CLOCK_FILE": "/private/tmp/claude-501/-Users-derekduenas/493f47ba-c471-4af0-9432-ba9bb8f8a672/scratchpad/r4/ev/clock.epoch",
+  "APEX_PREMARKET_TRANSPORT": "apex.audit.premarket_fixture:transport",
+  "APEX_PREMARKET_CAPTAIN": "apex.audit.premarket_fixture:captain"
+ },
+ "payload": {
+  "packet_blob": "ecb456e73f04...",
+  "normalized_blob": "8ab2cd544bc8...",
+  "capture_manifest_blob": "b7b9ec229571...",
+  "capture_blobs": [
+   "4739cddefbaf...",
+   "c4d7495fb661...",
+   "e9618ed879aa...",
+   "(+7 more)"
+  ],
+  "summary": {
+   "indices_ok": 3,
+   "movers": 6,
+   "unknown_catalyst": 2
+  },
+  "disposition": "ON_TIME",
+  "as_of": "2026-08-26 13:20:00+00:00"
+ },
+ "digest": "b438c621f49afd827380fdf55eda1d79852ea2695e537febdc137e896b485fa2"
+}
+
+SESSION-OPENING RECORD (code identity, so a packet is tied to an executable):
+{
+ "trading_date": "2026-08-26",
+ "opened_at_et": "2026-08-26 08:15:00-04:00",
+ "schedule": {
+  "0815_ET_initial": "08:15 ET",
+  "0832_ET_post_macro": "08:32 ET",
+  "0905_ET_refresh": "09:05 ET",
+  "0920_ET_final": "09:20 ET",
+  "seal": "09:25 ET"
+ },
+ "code_identity": {
+  "producer_digest": "c756c33ed1b2642327df8df1fc7e252081ffa67a15cd5d219a892f49c8262114",
+  "files": {
+   "scripts/premarket_stage.py": "0b4290d281583236",
+   "apex/frontier/premarket_stages.py": "62f41c5faaf11e75",
+   "apex/frontier/premarket_journal.py": "69e04425b84e17d7",
+   "apex/frontier/premarket_runtime.py": "6837079db317c845",
+   "apex/frontier/premarket.py": "04f27eda1fb76e0f",
+   "apex/frontier/run_record.py": "7e7a6c64fd6b17cd"
+  },
+  "git_head": "602d5a232be851890a23cdd3cd6d4e7b560ed3a0"
+ },
+ "realism": "SUBSTITUTED"
+}
+
+FINALIZATION RECORD:
+{
+ "packet_sha256": "c88a217675fb69029148bbcb6455ebc32ffc62078222f265ae22053e1c940b3f",
+ "sealed_blob": "8517f7659cb87890667335a4c9798aa644a708c4c9cdb71f81dc49f71d895da5",
+ "rebuilt_from": "0920_ET_final",
+ "source_packet_blob": "ecb456e73f049ceb9e7d55b5b2cad4f688f335d2667d47b3190f191c24863fad",
+ "provenance": [
+  "0815_ET_initial",
+  "0832_ET_post_macro",
+  "0905_ET_refresh",
+  "0920_ET_final"
+ ],
+ "missing_stages": [],
+ "captain": {
+  "status": "ACCEPTED",
+  "brief_path": "/private/tmp/claude-501/-Users-derekduenas/493f47ba-c471-4af0-9432-ba9bb8f8a672/scratchpad/r4/ev/staged/2026-08-26_morning_brief.md",
+  "response_blob": "759a5aabd76e77b813eb56a2a1b6a307d40695f1357635ae60f1f0ea2874377e",
+  "firewall_hits": [],
+  "missing_sections": [],
+  "transport": "apex.audit.premarket_fixture:captain"
+ },
+ "disposition": "ON_TIME"
+}
+
+BLOBS: 51 files, 1122973 bytes total

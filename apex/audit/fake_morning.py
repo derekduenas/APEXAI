@@ -88,14 +88,12 @@ def substituted_transport(rows_for):
 
 
 def firewall_verdict(text: str) -> dict:
-    """The REAL brief firewall, applied to the recorded response."""
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("pmrun", "scripts/premarket_run.py")
-    # the module imports pandas at import time; read the constant textually instead of executing it
-    src = pathlib.Path("scripts/premarket_run.py").read_text()
-    import re
-    m = re.search(r"FORBIDDEN_IN_BRIEF = \(([^)]*)\)", src, re.S)
-    forbidden = tuple(x.strip().strip('"\'') for x in m.group(1).split(",") if x.strip())
-    hits = [w for w in forbidden if w and w in text.lower()]
-    return {"forbidden_terms": list(forbidden), "hits": hits,
+    """The REAL brief firewall, applied to the recorded response.
+
+    R4: this used to REGEX the legacy runner's source for the forbidden-term tuple, because importing that module
+    pulled pandas. Reading a constant out of a file's text is precisely the 'inspect less than you claim' pattern
+    this audit keeps finding, so it now imports the one authoritative definition."""
+    from apex.frontier.premarket_stages import FORBIDDEN_IN_BRIEF
+    hits = [w for w in FORBIDDEN_IN_BRIEF if w and w in text.lower()]
+    return {"forbidden_terms": list(FORBIDDEN_IN_BRIEF), "hits": hits,
             "verdict": "REFUSED_BY_FIREWALL" if hits else "PASSES_FIREWALL"}

@@ -112,10 +112,15 @@ class TestTheSchedulerArtifacts:
         assert prior == installed, "rollback must restore exactly what is installed today"
 
     def test_the_corrected_plist_adds_the_missing_failure_surface(self):
-        new = (self.D / "com.apex.premarket.plist.NEW").read_text()
+        """R4 replaced the single prepared plist with one per stage. The property under test is unchanged --
+        a failure before the script's own log redirect must be visible -- and now has to hold for every one."""
         old = (self.D / "com.apex.premarket.plist.PRIOR").read_text()
-        assert "StandardErrorPath" in new and "StandardErrorPath" not in old
-        assert "StandardOutPath" in new and "StandardOutPath" not in old
+        assert "StandardErrorPath" not in old and "StandardOutPath" not in old
+        news = sorted(self.D.glob("com.apex.premarket.*.plist.NEW"))
+        assert len(news) == 6, [p.name for p in news]
+        for p in news:
+            body = p.read_text()
+            assert "StandardErrorPath" in body and "StandardOutPath" in body, p.name
 
     def test_the_corrected_script_redirects_BEFORE_reading_the_secret(self):
         new = (self.D / "premarket.sh.NEW").read_text().splitlines()

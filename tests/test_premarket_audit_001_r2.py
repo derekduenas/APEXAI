@@ -130,17 +130,23 @@ class TestNothingWasActivated:
 
 
 class TestTheProductionRunnerWasNotStagedUntilR3:
-    def test_the_prepared_plist_invokes_the_long_sleeping_runner(self):
-        """THE AMBIGUITY IN MY R2 REPORT, RESOLVED AGAINST ME. Only the audit harness was staged. The prepared
-        production plist -> ops/premarket.sh -> scripts/premarket_run.py, which still sleeps."""
+    def test_the_prepared_production_path_no_longer_reaches_the_long_sleeping_runner(self):
+        """THE AMBIGUITY IN MY R2 REPORT, RESOLVED AGAINST ME, AND THEN REPAIRED IN R4.
+
+        R3 found that only the audit harness had been staged: the prepared production plist ran ops/premarket.sh,
+        which ran scripts/premarket_run.py, which still slept. R4 repointed the prepared artifacts at the staged
+        CLI. The legacy runner KEEPS its two sleeps on purpose -- it is now the parity oracle, and an oracle
+        without the defect is no oracle -- so the assertion moved from 'production sleeps' to 'production cannot
+        reach the thing that sleeps'."""
         import ast
-        plist = pathlib.Path("ops/premarket_repair/com.apex.premarket.plist.NEW").read_text()
         sh = pathlib.Path("ops/premarket_repair/premarket.sh.NEW").read_text()
-        assert "ops/premarket.sh" in plist and "scripts/premarket_run.py" in sh
+        assert "scripts/premarket_stage.py --stage" in sh and "premarket_run.py" not in sh
+        assert not list(pathlib.Path("ops/premarket_repair").glob("com.apex.premarket.plist.NEW")), \
+            "the single long-lived agent was removed, not left lying next to its replacement"
         t = ast.parse(pathlib.Path("scripts/premarket_run.py").read_text())
         sleeps = [n for n in ast.walk(t) if isinstance(n, ast.Call)
                   and isinstance(n.func, ast.Attribute) and n.func.attr == "sleep"]
-        assert len(sleeps) == 2, "the production runner still long-sleeps"
+        assert len(sleeps) == 2, "the parity oracle must keep the defect it is the oracle for"
 
     def test_the_staged_entry_point_has_no_executable_sleep(self):
         import ast

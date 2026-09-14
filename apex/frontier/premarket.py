@@ -21,6 +21,17 @@ from apex.frontier import FRONTIER_POWER
 
 PACKETS = Path("results/frontier/premarket")
 
+
+def packets_dir() -> Path:
+    """The output root. Resolved through premarket_runtime so BOTH the legacy runner and the staged production
+    entry point honour exactly the same redirection -- if they did not, a parity comparison between them would be
+    comparing two different filesystems. With no root declared the module constant stands, so the existing
+    `monkeypatch.setattr(pm, "PACKETS", ...)` seam is unchanged."""
+    import os
+
+    from apex.frontier import premarket_runtime as RT
+    return RT.root() if os.environ.get(RT.ENV_ROOT) else PACKETS
+
 INDICES = ("SPY.US", "QQQ.US", "IWM.US", "DIA.US")
 
 # Source coverage, stated per section. Tonight's honest matrix: EODHD
@@ -42,13 +53,16 @@ class PremarketViolation(RuntimeError):
     pass
 
 
-def _premarket_state(symbol: str, gov, day: str, prior_day: str) -> dict:
+def _premarket_state(symbol: str, gov, day: str, prior_day: str, fetch=None) -> dict:
     """One symbol's overnight facts from EODHD extended-hours 1m bars.
     Absent fields stay absent — no fabricated VWAPs, no zero volumes."""
     import pandas as pd
 
     from apex.intraday.eodhd import fetch_intraday_chunk, normalize_rows
-    rows, _src = fetch_intraday_chunk(symbol, prior_day, day, gov)
+    # `fetch` is the ONE declared transport seam. None means the real network call. Passing it explicitly (rather
+    # than monkeypatching a module attribute) is what lets the staged producer wrap the transport to capture raw
+    # responses content-addressably without a second copy of this function existing anywhere.
+    rows, _src = (fetch or fetch_intraday_chunk)(symbol, prior_day, day, gov)
     if rows is None:
         return {"symbol": symbol, "status": "PAUSED_LAB_QUOTA"}
     f = normalize_rows(rows, symbol)
@@ -79,12 +93,12 @@ def _premarket_state(symbol: str, gov, day: str, prior_day: str) -> dict:
 
 
 def assemble(*, symbols: list, gov, as_of=None,
-             catalyst_lookup=None) -> dict:
+             catalyst_lookup=None, fetch=None) -> dict:
     """Build (not yet seal) the packet. `symbols` = indices + the bounded
     watch universe; `catalyst_lookup(sym)` = the Event Eyes."""
     import pandas as pd
-    now = pd.Timestamp(as_of) if as_of is not None else \
-        pd.Timestamp.now(tz="UTC")
+    from apex.frontier import premarket_runtime as RT
+    now = pd.Timestamp(as_of) if as_of is not None else RT.now_utc()
     et = now.tz_convert("America/New_York")
     day = str(et.date())
     import sys
@@ -97,7 +111,7 @@ def assemble(*, symbols: list, gov, as_of=None,
 
     market, names = {}, {}
     for s in symbols:
-        st = _premarket_state(s, gov, day, prior_day)
+        st = _premarket_state(s, gov, day, prior_day, fetch)
         (market if s in INDICES else names)[s] = st
 
     # gap/abnormality map — observational, ranked, bounded
@@ -141,7 +155,7 @@ def assemble(*, symbols: list, gov, as_of=None,
         "kind": "premarket_context_packet",
         "yesterday_memory": memory_section,
         "market_date": day, "prior_session": prior_day,
-        "as_of_time": str(now), "created_at": str(pd.Timestamp.now(tz="UTC")),
+        "as_of_time": str(now), "created_at": str(RT.now_utc()),
         "source_coverage": dict(SOURCES),
         "indices": market,
         "gap_map": abnormal,
@@ -158,6 +172,11 @@ def assemble(*, symbols: list, gov, as_of=None,
                         if v == "NOT_CONNECTED"],
         "decision_power": FRONTIER_POWER,
     }
+
+
+def _rt_now():
+    from apex.frontier import premarket_runtime as RT
+    return RT.now_utc()
 
 
 def seal(packet: dict) -> dict:
@@ -177,8 +196,9 @@ def seal(packet: dict) -> dict:
         json.dumps({k: v for k, v in body.items()
                     if k != "packet_sha256"},
                    sort_keys=True, default=str).encode()).hexdigest()
-    PACKETS.mkdir(parents=True, exist_ok=True)
-    canonical = PACKETS / f"{packet['market_date']}.json"
+    out_dir = packets_dir()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    canonical = out_dir / f"{packet['market_date']}.json"
     canonical.write_text(json.dumps(body, indent=2, default=str))
 
     # MANIFEST REGISTRATION (Phase 1.1, 2026-08-18). On 2026-08-18 the
@@ -198,7 +218,7 @@ def seal(packet: dict) -> dict:
                 "blind_spots": body.get("blind_spots"),
                 "packet_sha256": body["packet_sha256"],
             },
-            known_from=packet["as_of_time"], now=pd.Timestamp.now(tz="UTC"),
+            known_from=packet["as_of_time"], now=_rt_now(),
             runtime_version="premarket_seal_v1")
     except Exception as e:                                  # noqa: BLE001
         print(f"morning prior manifest registration FAILED "
@@ -208,7 +228,7 @@ def seal(packet: dict) -> dict:
 
 
 def load_sealed(day: str) -> dict | None:
-    p = PACKETS / f"{day}.json"
+    p = packets_dir() / f"{day}.json"
     if not p.exists():
         return None
     try:

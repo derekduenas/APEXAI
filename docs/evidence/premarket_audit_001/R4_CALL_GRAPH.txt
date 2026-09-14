@@ -1,0 +1,50 @@
+PRODUCTION CALL GRAPH, BEFORE AND AFTER (R4)
+
+BEFORE (base 602d5a2):
+   com.apex.premarket.plist  ->  ops/premarket.sh  ->  scripts/premarket_run.py
+       one process, StartCalendarInterval 05:14 local, then time.sleep(min(wait, 3600)) per stage
+       with no re-check of the target, then time.sleep(wait) to the 09:25 ET seal.
+
+AFTER (this candidate):
+   com.apex.premarket.0815_ET_initial     05:15 local Mon-Fri  ->  ops/premarket.sh 0815_ET_initial
+   com.apex.premarket.0832_ET_post_macro  05:32 local Mon-Fri  ->  ops/premarket.sh 0832_ET_post_macro
+   com.apex.premarket.0905_ET_refresh     06:05 local Mon-Fri  ->  ops/premarket.sh 0905_ET_refresh
+   com.apex.premarket.0920_ET_final       06:20 local Mon-Fri  ->  ops/premarket.sh 0920_ET_final
+   com.apex.premarket.reconcile           06:40 local Mon-Fri  ->  ops/premarket.sh reconcile
+   com.apex.premarket.seal                06:25 local Mon-Fri  ->  ops/premarket.sh seal
+       -> scripts/premarket_stage.py --stage <stage>
+       -> apex.frontier.premarket_stages.run_stage / .finalize   (THE authoritative stage operation)
+       -> apex.frontier.premarket_stages.absorb -> apex.frontier.premarket.assemble  (the real builder)
+       -> apex.frontier.premarket_journal        (durable append-only hash-chained state)
+       -> apex.frontier.premarket_stages.finalize -> apex.frontier.premarket.seal    (the real sealer)
+
+AST CLOSURE FROM THE STAGED ENTRY POINT (imports resolved transitively, module-level AND function-local):
+   modules reachable          23
+   reaches premarket_run.py   False
+   executable sleep() call sites in the closure:
+      apex/data/sharadar_api.py        line 139   time.sleep
+      apex/intraday/eodhd.py           line 200   time.sleep
+      apex/intraday/eodhd.py           line 341   time.sleep
+   Each is a provider rate-limit or retry backoff bounded by a request interval or a retry budget.
+   None takes a stage target as an argument. The test asserts this SET, so a new sleep anywhere in the
+   reachable closure fails it -- it is a closure, not a list that was eyeballed once.
+
+AST CLOSURE FROM THE LEGACY RUNNER (retained as the parity oracle, reachable from NO prepared artifact):
+      scripts/premarket_run.py         line 94    time.sleep   <- the defect, kept on purpose
+      scripts/premarket_run.py         line 84    time.sleep   <- the defect, kept on purpose
+
+PREPARED ARTIFACT HASHES (sha256):
+   com.apex.premarket.0815_ET_initial.plist.NEW         dd89369fafd99378809e58919cb48945
+   com.apex.premarket.0832_ET_post_macro.plist.NEW      d2865dd129ca9916e798027ce2962027
+   com.apex.premarket.0905_ET_refresh.plist.NEW         e10700df9fd82425d3ed5d973c57b6d1
+   com.apex.premarket.0920_ET_final.plist.NEW           346c58f8bb8c533e8bf63d1371e26578
+   com.apex.premarket.plist.PRIOR                       6a22ee77ee8e4af2994889826c13bf42
+   com.apex.premarket.reconcile.plist.NEW               a7c01fc62c75505fcba47f3d248e7e22
+   com.apex.premarket.seal.plist.NEW                    c75658f9cfa012435602790f758103ec
+   generate.py                                          0ff28de431dfbafeaf4e8ae24dd4adaa
+   install.sh                                           744e914be4571414ab01622a8472fd83
+   once.sh                                              a927d1cd805e3b3f00c96b8f34a175dd
+   premarket.sh.NEW                                     9f3306c46945adcf50c326c83e0369b7
+   premarket.sh.PRIOR                                   3508fe93467f7eb96c459389e9460491
+   rollback.sh                                          e9e97b14daabab0183bb8a21e18a9d1b
+   status.sh                                            4f36974514bf25f28a5b3c7511c63eb8

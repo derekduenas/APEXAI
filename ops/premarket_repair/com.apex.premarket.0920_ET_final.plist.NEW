@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.apex.premarket.0920_ET_final</string>
+  <!-- ONE AGENT PER STAGE. The single long-lived agent was the defect: one process started once and slept
+       through the whole morning, so an early start ran every stage hours early under the right-looking label,
+       and any interruption lost the morning. Each stage is now its own bounded process with its own trigger and
+       its own explicit stage argument -- nothing is inferred from the clock. -->
+  <key>ProgramArguments</key>
+  <array><string>/bin/zsh</string><string>/Users/derekduenas/apex-equities/ops/premarket.sh</string><string>0920_ET_final</string></array>
+  <!-- Without these, ANY failure before the script's own log redirect was invisible. That is the surface that
+       made a 19-day gap silent. -->
+  <key>StandardOutPath</key><string>/Users/derekduenas/apex-equities/logs/premarket.0920_ET_final.launchd.out</string>
+  <key>StandardErrorPath</key><string>/Users/derekduenas/apex-equities/logs/premarket.0920_ET_final.launchd.err</string>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>20</integer></dict>
+  </array>
+</dict></plist>

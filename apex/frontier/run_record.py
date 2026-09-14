@@ -16,6 +16,16 @@ import time
 
 SCHEMA = "PREMARKET_RUN_RECORD_V1"
 RUNS = pathlib.Path("results/frontier/premarket/runs")
+
+
+def runs_dir() -> pathlib.Path:
+    """Honours the same declared output root as the packet writer, so run accounting and packets can never end up
+    in two different places during one morning. When no root is declared the module constant stands, which keeps
+    the existing `monkeypatch.setattr(RR, "RUNS", ...)` seam working exactly as before."""
+    import os
+
+    from apex.frontier import premarket_runtime as RT
+    return (RT.root() / "runs") if os.environ.get(RT.ENV_ROOT) else RUNS
 STAGES = ("STARTED", "SOURCES", "AI", "PACKET", "SEALED", "FINISHED")
 
 
@@ -24,15 +34,28 @@ class LockHeld(RuntimeError):
 
 
 class RunLock:
-    """A bounded lock so two invocations cannot overwrite one another. A STALE lock is DIAGNOSED, never silently
-    stolen: the holder's pid and age are reported and recovery is a reviewed action."""
+    """A bounded lock so two invocations cannot overwrite one another.
 
-    def __init__(self, name="premarket", *, max_age_s: float = 3600.0, now=time.time):
-        self.path = RUNS / ("%s.lock" % name)
-        self.max_age_s, self.now = max_age_s, now
+    R4 REFINEMENT, and why it is not a retreat from R3's rule. R3 said a stale lock is DIAGNOSED, never silently
+    stolen, and keyed staleness on AGE. The failure flights showed what that costs once the morning is many
+    processes: a stage killed mid-run leaves its lock behind, every retry is refused, and the morning is lost
+    permanently by the very mechanism meant to protect it.
+
+    So the test is no longer age, which is a proxy, but LIVENESS, which is the fact:
+      * holder process ALIVE            -> refused, at any age. A living holder is never displaced.
+      * holder pid unknown/unreadable   -> refused. A lock being written right now looks like an abandoned one.
+      * holder process GONE             -> taken over, and the dead holder is RECORDED in the new lock body and
+                                           returned to the caller. Diagnosed, not silent -- which was always the
+                                           actual requirement.
+    `takeover_dead=False` restores the strict R3 behaviour for callers that want it."""
+
+    def __init__(self, name="premarket", *, max_age_s: float = 3600.0, now=time.time, takeover_dead=True):
+        self.path = runs_dir() / ("%s.lock" % name)
+        self.max_age_s, self.now, self.takeover_dead = max_age_s, now, takeover_dead
 
     def acquire(self, run_id: str) -> dict:
-        RUNS.mkdir(parents=True, exist_ok=True)
+        runs_dir().mkdir(parents=True, exist_ok=True)
+        took_over = None
         if self.path.exists():
             try:
                 held = json.loads(self.path.read_text())
@@ -40,11 +63,15 @@ class RunLock:
                 held = {"pid": None, "at": 0, "run_id": "UNREADABLE"}
             age = self.now() - float(held.get("at") or 0)
             alive = _pid_alive(held.get("pid"))
-            raise LockHeld("PREMARKET_RUN_LOCKED: held by run %r pid %r for %.0fs (holder alive: %s). %s"
-                           % (held.get("run_id"), held.get("pid"), age, alive,
-                              "STALE (older than %.0fs) -- recovery is a reviewed action, not automatic"
-                              % self.max_age_s if age > self.max_age_s else "ACTIVE"))
+            if alive or not self.takeover_dead or not held.get("pid"):
+                raise LockHeld("PREMARKET_RUN_LOCKED: held by run %r pid %r for %.0fs (holder alive: %s). %s"
+                               % (held.get("run_id"), held.get("pid"), age, alive,
+                                  "STALE (older than %.0fs) -- recovery is a reviewed action, not automatic"
+                                  % self.max_age_s if age > self.max_age_s else "ACTIVE"))
+            took_over = held
         body = {"run_id": run_id, "pid": os.getpid(), "at": self.now(), "host": socket.gethostname()}
+        if took_over is not None:
+            body["took_over_from"] = took_over
         self.path.write_text(json.dumps(body))
         return body
 
@@ -63,11 +90,28 @@ def _pid_alive(pid):
         return False
 
 
+def next_run_id(day: str, stage: str) -> str:
+    """A run record is PER INVOCATION, not per stage.
+
+    This was wrong in the first cut of the staged CLI and the failure flights caught it: the record was named
+    `<day>_<stage>`, so after a crash the retry found the file, reported DUPLICATE and exited -- a crashed stage
+    could never resume. Exactly-once absorption is the JOURNAL CLAIM's job (an O_EXCL create), not a filename's.
+    One mechanism, one job."""
+    runs_dir().mkdir(parents=True, exist_ok=True)
+    base = "%s_%s" % (day, stage)
+    if not (runs_dir() / ("%s.json" % base)).exists():
+        return base
+    n = 2
+    while (runs_dir() / ("%s_attempt%02d.json" % (base, n))).exists():
+        n += 1
+    return "%s_attempt%02d" % (base, n)
+
+
 class RunRecord:
     def __init__(self, *, run_id: str, scheduled_epoch=None, code_identity=None, now=time.time):
         self.now = now
-        RUNS.mkdir(parents=True, exist_ok=True)
-        self.path = RUNS / ("%s.json" % run_id)
+        runs_dir().mkdir(parents=True, exist_ok=True)
+        self.path = runs_dir() / ("%s.json" % run_id)
         if self.path.exists():
             raise FileExistsError("RUN_RECORD_EXISTS: %s -- run records are never overwritten" % self.path)
         self.body = {"schema": SCHEMA, "run_id": run_id, "scheduled_epoch": scheduled_epoch,
