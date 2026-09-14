@@ -17,15 +17,18 @@ def frame(n=90):
 
 
 def test_unclosed_and_future_prices_cannot_change_simulation():
-    f = frame()
-    cutoff = f.event_time_utc.iloc[65].timestamp()
+    # 420 bars, not the fixture default of 90: the variance contract requires MIN_OBS=200 ADJACENT one-minute
+    # returns, so a 90-bar frame cut in half could never reach SIMULATED_UNCALIBRATED. The original assertion was
+    # unreachable, and CI stopped at the synthetic smoke before this file ever ran.
+    f = frame(420)
+    cutoff = f.event_time_utc.iloc[300].timestamp()
     a = W.simulation_view({}, f, as_of_epoch=cutoff, prefer_garch=False, n_paths=100)
     changed = f.copy()
-    changed.loc[65:, "close"] = 100000
+    changed.loc[300:, "close"] = 100000
     b = W.simulation_view({}, changed, as_of_epoch=cutoff, prefer_garch=False, n_paths=100)
     assert a.calibration_status == "SIMULATED_UNCALIBRATED", a.reasons
     assert a == b
-    assert a.provenance["spot"] == f.close.iloc[64]
+    assert a.provenance["spot"] == f.close.iloc[299]
 
 
 def test_receipt_exclusion_also_applies_to_spot():
@@ -93,3 +96,42 @@ def test_real_decision_pass_hands_original_frames_to_enrichment(monkeypatch):
                    {"X": ctx("X", as_of_date="2026-08-17"),
                     "SPY.US": ctx("SPY", as_of_date="2026-08-17")})
     assert len(seen) == 1 and seen[0] is inputs
+
+
+def test_the_same_session_window_blinds_the_simulation_until_midday():
+    """A MEASURED property of this repair, pinned so it cannot be discovered in production.
+
+    `_visible_simulation_bars` restricts the fit to the cutoff's own market date, and the variance contract needs
+    MIN_OBS=200 adjacent one-minute returns. On real SPY live bars for 2026-09-14 the layer therefore REFUSES from
+    the open until roughly 13:05 ET:
+
+        09:35 ET   4 returns   REFUSED   10:30 ET  59 returns  REFUSED
+        11:30 ET 119 returns   REFUSED   12:50 ET 194 returns  REFUSED
+        14:00 ET 264 returns   SIMULATED_UNCALIBRATED
+
+    The open -- the most decision-relevant part of the session -- has no multiverse view at all. This test states
+    the behaviour rather than asserting it is correct; widening the window to prior completed sessions is a data
+    decision for the operator, and the adjacent-minute rule below already prevents an overnight gap from ever
+    being treated as a one-minute return."""
+    f = frame(420)
+    early = f.event_time_utc.iloc[60].timestamp()
+    v = W.simulation_view({}, f, as_of_epoch=early, prefer_garch=False, n_paths=50)
+    assert v.calibration_status == "REFUSED"
+    assert "TOO_FEW_OBSERVATIONS" in v.reasons[0], v.reasons
+    late = f.event_time_utc.iloc[300].timestamp()
+    assert W.simulation_view({}, f, as_of_epoch=late, prefer_garch=False,
+                             n_paths=50).calibration_status == "SIMULATED_UNCALIBRATED"
+
+
+def test_an_overnight_gap_is_never_a_one_minute_return():
+    """The session boundary is excluded by the ADJACENCY rule, not only by the market-date filter -- which is why
+    widening the history window would not admit a cross-session return."""
+    a = pd.date_range("2026-09-11 19:00", periods=30, freq="min", tz="UTC")
+    b = pd.date_range("2026-09-14 13:30", periods=30, freq="min", tz="UTC")
+    times = a.append(b)
+    px = 100 * np.exp(np.cumsum(np.random.default_rng(3).normal(0, .001, len(times))))
+    two = pd.DataFrame(dict(event_time_utc=times, close=px, open=px, high=px, low=px, volume=1000))
+    rows = W._return_rows(two, cutoff_epoch=times[-1].timestamp() + 60)
+    assert rows, "the same-session returns must survive"
+    spans = [r["event_time"] for r in rows]
+    assert all(s >= b[0].timestamp() for s in spans), "no return may span the overnight boundary"
