@@ -124,3 +124,50 @@ class TestNothingWasActivated:
         import subprocess
         out = subprocess.run(["launchctl", "list"], capture_output=True, text=True).stdout
         assert "com.apex.audit" not in out
+
+
+# ======================================================= R3: the production runner
+
+
+class TestTheProductionRunnerWasNotStagedUntilR3:
+    def test_the_prepared_plist_invokes_the_long_sleeping_runner(self):
+        """THE AMBIGUITY IN MY R2 REPORT, RESOLVED AGAINST ME. Only the audit harness was staged. The prepared
+        production plist -> ops/premarket.sh -> scripts/premarket_run.py, which still sleeps."""
+        import ast
+        plist = pathlib.Path("ops/premarket_repair/com.apex.premarket.plist.NEW").read_text()
+        sh = pathlib.Path("ops/premarket_repair/premarket.sh.NEW").read_text()
+        assert "ops/premarket.sh" in plist and "scripts/premarket_run.py" in sh
+        t = ast.parse(pathlib.Path("scripts/premarket_run.py").read_text())
+        sleeps = [n for n in ast.walk(t) if isinstance(n, ast.Call)
+                  and isinstance(n.func, ast.Attribute) and n.func.attr == "sleep"]
+        assert len(sleeps) == 2, "the production runner still long-sleeps"
+
+    def test_the_staged_entry_point_has_no_executable_sleep(self):
+        import ast
+        t = ast.parse(pathlib.Path("scripts/premarket_stage.py").read_text())
+        sleeps = [n for n in ast.walk(t) if isinstance(n, ast.Call)
+                  and isinstance(n.func, ast.Attribute) and n.func.attr == "sleep"]
+        assert sleeps == []
+
+    @pytest.mark.parametrize("hh,mm,expect", [(3, 0, "TOO_EARLY"), (8, 15, "ON_TIME"),
+                                              (8, 22, "LATE_START"), (10, 0, "MISSED_WINDOW")])
+    def test_an_out_of_window_invocation_is_refused_not_mislabelled(self, hh, mm, expect):
+        import sys as _s
+        _s.path.insert(0, "scripts")
+        import pandas as pd, premarket_stage as PS
+        now = pd.Timestamp("2026-08-26", tz="America/New_York").normalize() + pd.Timedelta(hours=hh, minutes=mm)
+        assert PS.disposition("0815_ET_initial", now)[0] == expect
+
+    def test_the_old_loop_fires_every_stage_early_from_a_coalesced_wake(self):
+        """The defect the simulation found, re-enacted: a 02:00 ET start runs 08:15 at 03:00."""
+        stages = [(8, 15), (8, 32), (9, 5), (9, 20)]
+        t = 2 * 3600
+        fired = []
+        for h, m in stages:
+            target = h * 3600 + m * 60
+            wait = target - t
+            if wait > 0:
+                t += min(wait, 3600)
+            fired.append((target, t))
+        assert all(actual < target for target, actual in fired), "every stage fires early"
+        assert fired[0][1] == 3 * 3600, "the 08:15 stage absorbs at 03:00 ET"

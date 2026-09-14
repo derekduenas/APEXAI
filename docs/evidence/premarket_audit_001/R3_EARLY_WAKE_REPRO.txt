@@ -1,0 +1,34 @@
+R3 — THE EARLY-WAKE DEFECT IN THE PRODUCTION RUNNER, REPRODUCED
+
+scripts/premarket_run.py lines 143-146, verbatim:
+   142 |         target = et().normalize() + pd.Timedelta(hours=h, minutes=m)
+   143 |         wait = (target - et()).total_seconds()
+   144 |         if wait > 0:
+   145 |             time.sleep(min(wait, 3600))
+   146 |         try:
+   147 |             last = absorb(label)
+   148 |         except Exception as e:                              # noqa: BLE001
+
+THE MECHANISM: sleep is capped at 3600s and the target is never re-checked.
+
+STAGE                TARGET       ABSORBED AT  VERDICT
+------------------------------------------------------------------------
+0815_ET_initial      08:15        08:15        on target
+0832_ET_post_macro   08:32        08:32        on target
+0905_ET_refresh      09:05        09:05        on target
+0920_ET_final        09:20        09:20        on target
+
+  stages fired EARLY with a normal 08:14 start: 0
+
+THE CAP BITES when the process starts well before the first stage (e.g. a coalesced wake at 02:00 ET):
+STAGE                TARGET       ABSORBED AT  VERDICT
+------------------------------------------------------------------------
+0815_ET_initial      08:15        03:00        *** EARLY by 18900s ***
+0832_ET_post_macro   08:32        04:00        *** EARLY by 16320s ***
+0905_ET_refresh      09:05        05:00        *** EARLY by 14700s ***
+0920_ET_final        09:20        06:00        *** EARLY by 12000s ***
+
+  stages fired EARLY: 4  -> the 08:15 absorption ran at 03:00, over four hours before its target.
+
+  CONSEQUENCE: the packet's absorption label says 0815_ET_initial while the data is from 03:00 ET.
+  Nothing in the packet records the discrepancy, because as_of_time is stamped at SEAL time.
