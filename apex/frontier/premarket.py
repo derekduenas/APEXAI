@@ -54,8 +54,18 @@ def _premarket_state(symbol: str, gov, day: str, prior_day: str) -> dict:
     f = normalize_rows(rows, symbol)
     if not len(f):
         return {"symbol": symbol, "status": "NO_BARS"}
-    prior = f[f["event_time_utc"].dt.date.astype(str) == prior_day]
-    today = f[f["event_time_utc"].dt.date.astype(str) == day]
+    # MARKET DATE, NOT UTC DATE. `day` and `prior_day` come from `assemble`, which computes them in
+    # America/New_York -- but this filter compared them against the UTC date, and the two disagree for every bar
+    # after 20:00 ET. The prior session's 20:00 ET closing bar carries UTC date == today, so it was classified as
+    # a premarket print of TODAY.
+    #
+    # That is why every packet from 2026-08-18 onward reported `premarket_bars = 1` with
+    # `last_bar_time = <today> 00:00:00+00:00`: a single bar from the previous evening's close, wearing today's
+    # date. `gap_frac` was then computed from the prior close against (effectively) the same prior close, which
+    # is why it was always ~0 and why `gap_map` has been EMPTY in every packet this producer has ever sealed.
+    et_date = f["event_time_utc"].dt.tz_convert("America/New_York").dt.date.astype(str)
+    prior = f[et_date == prior_day]
+    today = f[et_date == day]
     if not len(prior):
         return {"symbol": symbol, "status": "NO_PRIOR_SESSION"}
     prior_close = float(prior["close"].iloc[-1])

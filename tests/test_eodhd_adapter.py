@@ -107,7 +107,9 @@ def test_empty_valid_response_yields_empty_frame_not_error():
 def test_cache_hit_and_corruption_quarantine(tmp_path, monkeypatch):
     import apex.intraday.eodhd as E
     monkeypatch.setattr(E, "LAKE", tmp_path)
-    monkeypatch.setattr(E, "LEDGER", tmp_path / "manifests" / "ledger.jsonl")
+    # The ledger path is derived from LAKE at call time now, so patching LAKE redirects it. Patching a
+    # module-level LEDGER constant no longer does anything -- and never redirected production writes either,
+    # which is how a test run could append to the real lake.
     monkeypatch.setenv("EODHD_API_TOKEN", "sekret123.456")
     g = QuotaGovernor()
     calls = {"n": 0}
@@ -132,9 +134,10 @@ def test_cache_hit_and_corruption_quarantine(tmp_path, monkeypatch):
     assert src3 == "network" and calls["n"] == 2
     assert any((tmp_path / "quarantine").iterdir())
 
-    # the download ledger exists and is token-free
-    ledger_text = (tmp_path / "manifests" / "ledger.jsonl").read_text()
-    assert "sekret123.456" not in ledger_text
+    # the download ledger exists, sits under the patched lake, and is token-free
+    ledger = E.ledger_path()
+    assert ledger.is_relative_to(tmp_path), "a test must not write into the real lake: %s" % ledger
+    assert "sekret123.456" not in ledger.read_text()
 
 
 def test_malformed_response_is_refused_with_redaction(tmp_path, monkeypatch):

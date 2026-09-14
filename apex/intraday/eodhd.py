@@ -42,11 +42,31 @@ MAX_SPAN_DAYS = 120
 LAKE = Path("data/intraday/eodhd")
 LEDGER = LAKE / "manifests" / "eodhd_download_ledger.jsonl"
 
+
+def ledger_path():
+    """Resolved from LAKE at CALL time, not bound once at import.
+
+    As a module constant this could not be redirected: a test that monkeypatched LAKE to a tmp_path still had
+    every ledger write land in the real lake under the current working directory. That is how a test run
+    contaminates the repository it is testing -- the same shape that spoiled a full-suite regression run on
+    2026-09-13 and had to be discovered by comparing two runs of one commit."""
+    return LAKE / "manifests" / "eodhd_download_ledger.jsonl"
+
 # conservative local budget, deliberately far under the vendor daily cap
 # LAB-05b: quota accounting is in PROVIDER API-CALL UNITS, not HTTP
 # requests. EODHD's schedule is authoritative: an Intraday request costs
 # 5 units against the 100k/day plan limit (resets midnight GMT).
 INTRADAY_CALL_COST = 5
+
+# A chunk whose upper bound reaches into a session that is still producing bars is NOT a finished artifact, and
+# caching it forever is how a "refresh" stops refreshing.
+#
+# THE DEFECT THIS FIXES, observed in production on 2026-09-14. The cache key is (symbol, lo, hi). Every premarket
+# stage of one morning uses the SAME key -- (SPY.US, prior_session, today) -- so the 08:15 stage paid 145 units
+# and wrote the file, and the 08:32, 09:05 and 09:20 "refreshes" each read that same file and spent 0 units. Four
+# stages, one fetch. The same shape affects closing_run (five checkpoints on key (day, day)) and FastWatch's
+# last-resort fallback. A completed PAST range is legitimately immutable and is still cached forever.
+GROWING_CHUNK_TTL_S = 300.0
 DAILY_LIMIT_CALL_UNITS = 100_000
 # untouchable Monday reserve: measured clock worst case (~1.8k units on
 # a context-building first tick x 26 ticks + EOD resolver) + headroom
@@ -211,9 +231,10 @@ class QuotaGovernor:
 
 
 def _ledger_append(record: dict) -> None:
-    LEDGER.parent.mkdir(parents=True, exist_ok=True)
+    path = ledger_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
     clean = json.loads(redact(json.dumps(record, sort_keys=True, default=str)))
-    with LEDGER.open("a") as fh:
+    with path.open("a") as fh:
         fh.write(json.dumps(clean, sort_keys=True) + "\n")
 
 
@@ -280,19 +301,61 @@ def fetch_intraday_chunk(symbol: str, lo: str, hi: str,
                          governor: QuotaGovernor,
                          opener=None) -> tuple[list, str]:
     """Cache-first fetch of one <=120d 1-minute chunk. Returns (rows, source).
-    Corrupt cache -> quarantine + refetch. Every request lands in the
-    download ledger, token-free."""
+
+    Corrupt cache -> quarantine + refetch. Every request lands in the download ledger, token-free.
+
+    CACHE POLICY, and the reason it is not simply "cache-first":
+      * a chunk whose `hi` is a FINISHED trading date is immutable and is served from cache forever;
+      * a chunk whose `hi` reaches into a session still producing bars is served from cache only while it is
+        younger than GROWING_CHUNK_TTL_S, and is otherwise refetched;
+      * if that refetch fails, the stale rows are returned and LABELLED `cache_stale` rather than lost.
+
+    Sources returned: "cache" | "network" | "cache_stale"."""
     cp = cache_path(symbol, lo, hi)
+    cached = None
     if cp.exists():
         try:
-            rows = json.loads(gzip.decompress(cp.read_bytes()))
-            return rows, "cache"
+            cached = json.loads(gzip.decompress(cp.read_bytes()))
         except Exception:                                   # noqa: BLE001
             q = LAKE / "quarantine" / cp.name
             q.parent.mkdir(parents=True, exist_ok=True)
             cp.rename(q)
             _ledger_append({"event": "cache_quarantined", "file": cp.name})
+            cached = None
+        if cached is not None:
+            age = time.time() - cp.stat().st_mtime
+            if not chunk_is_growing(hi) or age <= GROWING_CHUNK_TTL_S:
+                return cached, "cache"
+            _ledger_append({"event": "cache_bypassed_growing_chunk",
+                            "symbol": symbol, "lo": lo, "hi": hi,
+                            "cache_age_s": round(age, 1),
+                            "why": "hi reaches a session still producing bars; a refresh must refresh"})
 
+    try:
+        return _fetch_over_network(symbol, lo, hi, governor, opener, cp)
+    except IntradayDataError:
+        # A REFRESH THAT FAILS MUST NOT LOSE WHAT WE ALREADY HAD. Before this fix a stale cache was always
+        # served, which was wrong; raising instead would be a different wrong -- a provider outage at 09:05
+        # would turn a stale-but-usable packet into a failed stage. The stale rows are returned and LABELLED.
+        if cached is not None:
+            _ledger_append({"event": "refresh_failed_serving_stale_cache",
+                            "symbol": symbol, "lo": lo, "hi": hi})
+            return cached, "cache_stale"
+        raise
+
+
+def chunk_is_growing(hi: str, now=None) -> bool:
+    """Does this chunk's upper bound reach into a session that is still producing bars?
+
+    Market time, not UTC: a chunk ending "today" is still growing until that trading date is over, and the
+    trading date is an America/New_York fact."""
+    n = now if now is not None else pd.Timestamp.now(tz="UTC")
+    if n.tzinfo is None:
+        n = n.tz_localize("UTC")
+    return pd.Timestamp(hi).date() >= n.tz_convert("America/New_York").date()
+
+
+def _fetch_over_network(symbol: str, lo: str, hi: str, governor, opener, cp):
     if not governor.acquire(INTRADAY_CALL_COST):
         raise IntradayDataError("PAUSE_DOWNLOAD: local call-unit budget "
                                 "exhausted; resume next run (progress is "
