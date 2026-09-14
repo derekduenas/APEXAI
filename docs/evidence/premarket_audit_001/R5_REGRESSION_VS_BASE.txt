@@ -1,0 +1,176 @@
+R5 REGRESSION — candidate b63f24a vs base 602d5a2, and vs R4 533dfbd
+
+FOUR FULL-SUITE RUNS EXIST. THREE AGREE. THE ONE THAT DOES NOT WAS CONTAMINATED BY ME.
+
+   run                              tree        failed  errors  passed  when
+   R4, uninstrumented (first)       apex-pm-r4-wt   59      ?     6032  18:18-19:02
+   base 602d5a2, instrumented       apex-pm-r3-wt   45     17     6003  19:02-
+   R4   533dfbd, instrumented       apex-pm-r4-wt   45     17     6046  19:02-
+   R5   b63f24a, instrumented       apex-pm-r5-wt   45     17     6114  solo, 49:10
+
+WHAT WENT WRONG WITH THE FIRST RUN, established from file timestamps rather than supposed. While that suite was
+executing in apex-pm-r4-wt (18:18 to about 19:02), I ran the synthetic-morning and failure-flight drivers IN THE
+SAME WORKTREE to generate R4's evidence. Their `install_world()` wrote fixture artifacts into that tree at 18:31,
+mid-run, and rewrote them repeatedly:
+
+   apex-pm-r4-wt/results/events/edgar_events.jsonl        written 18:31
+   apex-pm-r4-wt/results/events/capture_health.json       written 18:31
+   apex-pm-r4-wt/data/reference/sec_company_tickers.json  written 18:31
+   apex-pm-r4-wt/results/frontier/daily_memory/*.json     written 18:31
+
+tests/test_catalyst_eyes.py, tests/test_frontier1.py and tests/test_close1.py read exactly those artifacts.
+Tests that ran before 18:31 saw one world and tests that ran after saw another, while dozens of driver
+subprocesses competed for the machine.
+
+This is the R1 'dirty working tree' mistake in a new form. I had explicitly decided earlier in this session not
+to edit files under a running suite -- and then violated that decision through the evidence generators, which
+write files as a side effect. It was caught only because two runs of the SAME COMMIT disagreed.
+
+WHAT CANNOT BE RECOVERED: only the TAIL of the first run's output was preserved, so its 59 failures cannot be
+enumerated and the excess 14 cannot be named. That is a capture defect on my part. Of the 19 failure names the
+tail does preserve, all 19 also fail in the instrumented R4 run, so nothing visible in it is unique.
+
+WHY THE THREE INSTRUMENTED RUNS ARE THE SOUND BASIS: each ran against a tree that was stable for its whole
+duration; base ran WITHOUT the fixture artifacts and R4/R5 ran WITH them present and unchanging, and all three
+produced 45 failed / 17 errors / 26 skipped. The fixture artifacts' mere presence therefore does not move the
+result -- their MUTATION during a run, and the concurrent subprocess load, are what distinguished the first run.
+
+THE COMPARISONS THEMSELVES FOLLOW.
+
+BASE /private/tmp/claude-501/-Users-derekduenas/493f47ba-c471-4af0-9432-ba9bb8f8a672/scratchpad/base.xml   tests=6091
+CAND /private/tmp/claude-501/-Users-derekduenas/493f47ba-c471-4af0-9432-ba9bb8f8a672/scratchpad/cand_r5.xml   tests=6202
+   base outcomes: {'passed': 6003, 'failed': 45, 'skipped': 26, 'error': 17}
+   cand outcomes: {'passed': 6114, 'failed': 45, 'skipped': 26, 'error': 17}
+
+IDENTICAL FAILURES (same id, phase, exception and normalized traceback): 88
+NEW FAILURES introduced by the candidate:                                0
+FAILURES the candidate FIXED:                                            0
+FAILURES whose MECHANISM CHANGED:                                        0
+TESTS PRESENT ON ONLY ONE SIDE:                                          113
+
+ONLY ON ONE SIDE (expected for tests the candidate adds or renames):
+   ONLY_IN_BASE tests.test_premarket_audit_001_r2.TestTheProductionRunnerWasNotStagedUntilR3::test_the_prepared_plist_invokes_the_long_sleeping_runner
+   ONLY_IN_CAND tests.test_premarket_audit_001_r2.TestTheProductionRunnerWasNotStagedUntilR3::test_the_prepared_production_path_no_longer_reaches_the_long_sleeping_runner
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_an_altered_blob_that_kept_its_digest_is_detected
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_an_altered_event_is_detected
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_blobs_are_content_addressed_and_write_once
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_no_pickle_anywhere_in_the_durable_path
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_nothing_to_reconstruct_is_named_not_guessed
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_reconstruction_reads_evidence_and_never_a_caller_supplied_flag
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_sequence_numbers_are_dense_and_unique_under_concurrency
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_the_log_is_hash_chained_and_verifies
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestDurableState::test_the_state_vocabulary_covers_the_declared_transitions
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestExactlyOnceClaim::test_a_dead_holder_on_a_TERMINAL_stage_is_a_duplicate_not_a_recovery
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestExactlyOnceClaim::test_a_dead_holder_on_a_non_terminal_stage_is_taken_over_and_recorded
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestExactlyOnceClaim::test_a_live_holder_is_never_displaced
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestExactlyOnceClaim::test_an_unreadable_claim_is_treated_as_held
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestNothingWasActivated::test_no_disposable_launchagent_was_left_behind
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestNothingWasActivated::test_no_per_stage_agent_was_installed
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestNothingWasActivated::test_the_installed_production_files_are_byte_for_byte_unchanged
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestOneImplementation::test_assemble_is_reached_from_exactly_one_place_in_the_premarket_path
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestOneImplementation::test_the_brief_firewall_and_prompt_have_one_definition
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestOneImplementation::test_the_legacy_runner_calls_the_library_absorb_and_defines_no_second_one
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestOneImplementation::test_the_schedule_has_one_definition
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_every_prepared_plist_invokes_the_shell_with_an_explicit_stage
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_no_prepared_artifact_reaches_the_long_sleeping_runner
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_legacy_runner_still_has_its_two_scheduling_sleeps_because_it_is_the_oracle
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_only_sleeps_reachable_from_production_are_the_declared_provider_backoffs
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_prepared_artifacts_are_generated_from_the_schedule_and_have_not_drifted
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_prepared_shell_exports_no_runtime_substitution
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_prepared_shell_invokes_the_staged_cli
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestPreparedProductionPath::test_the_staged_entry_point_cannot_reach_the_legacy_runner
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestRunLockLiveness::test_a_dead_holder_is_taken_over_and_the_dead_holder_is_named
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestRunLockLiveness::test_a_live_holder_is_refused_at_any_age
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestRunLockLiveness::test_a_run_record_is_per_invocation_not_per_stage
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestRunLockLiveness::test_the_strict_R3_behaviour_is_still_available
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheCaptainPath::test_an_invalid_schema_is_named_separately_from_the_firewall
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheCaptainPath::test_the_captain_prompt_does_not_depend_on_which_producer_serialized_the_packet
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheCaptainPath::test_the_firewall_still_refuses_the_forbidden_terms
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheRuntimeSeam::test_a_clean_environment_is_fully_real
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheRuntimeSeam::test_every_substitution_is_reported
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheRuntimeSeam::test_the_crash_injector_is_a_declared_name
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[3-0-TOO_EARLY]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[8-14-ON_TIME]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[8-15-ON_TIME]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[8-22-LATE_START]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r4.TestTheWindow::test_an_out_of_window_invocation_is_refused_not_mislabelled[8-40-MISSED_WINDOW]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARacerCannotPoisonTheWinner::test_a_claim_is_not_handed_over_because_a_racer_left_a_marker
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARacerCannotPoisonTheWinner::test_a_duplicate_marker_after_completion_does_not_un_complete_a_stage
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARacerCannotPoisonTheWinner::test_a_duplicate_marker_is_not_an_outcome
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARacerCannotPoisonTheWinner::test_every_real_outcome_is_decisive[COMPLETED]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARacerCannotPoisonTheWinner::test_every_real_outcome_is_decisive[FAILED]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARacerCannotPoisonTheWinner::test_every_real_outcome_is_decisive[MISSED_WINDOW]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARacerCannotPoisonTheWinner::test_every_real_outcome_is_decisive[REFUSED_INPUT]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARacerCannotPoisonTheWinner::test_every_real_outcome_is_decisive[SOURCE_UNAVAILABLE]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARacerCannotPoisonTheWinner::test_every_real_outcome_is_decisive[TOO_EARLY]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARehearsalIsNotAnOutcome::test_a_dry_run_does_not_make_the_real_stage_look_like_a_duplicate
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARehearsalIsNotAnOutcome::test_a_dry_run_state_exists_and_is_not_decisive
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestARehearsalIsNotAnOutcome::test_verify_works_on_a_host_that_would_be_refused
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_holiday_and_a_weekend_are_not_market_sessions
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_host_that_does_not_track_the_market_needs_two_triggers[America/Los_Angeles-1]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_host_that_does_not_track_the_market_needs_two_triggers[America/New_York-1]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_host_that_does_not_track_the_market_needs_two_triggers[Asia/Tokyo-2]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_host_that_does_not_track_the_market_needs_two_triggers[UTC-2]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_la_host_needs_the_same_local_trigger_on_both_sides_of_a_transition
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_market_target_converts_to_each_host_zone[America/Los_Angeles-05:15]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_market_target_converts_to_each_host_zone[America/New_York-08:15]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_market_target_converts_to_each_host_zone[UTC-12:15]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_a_utc_host_needs_a_DIFFERENT_local_trigger_on_each_side
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_across_both_daylight_transitions_the_target_stays_0815_market_time[2026-03-08]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_across_both_daylight_transitions_the_target_stays_0815_market_time[2026-03-09]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_across_both_daylight_transitions_the_target_stays_0815_market_time[2026-11-01]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_across_both_daylight_transitions_the_target_stays_0815_market_time[2026-11-02]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_an_abbreviation_is_reported_unresolved_rather_than_guessed
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_the_host_timezone_comes_from_operating_system_evidence
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestMarketTimeIsAuthoritative::test_the_stage_decision_uses_the_market_instant_not_the_local_hour
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestNothingWasActivated::test_no_binding_was_installed_into_the_live_repo
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestNothingWasActivated::test_no_per_stage_or_disposable_agent_is_loaded
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestNothingWasActivated::test_the_installed_production_files_are_byte_for_byte_unchanged
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestPreparedProductionPath::test_every_prepared_plist_carries_every_local_trigger_the_host_needs
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestPreparedProductionPath::test_install_places_the_binding_and_rollback_removes_it
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestPreparedProductionPath::test_no_prepared_path_reaches_the_legacy_runner_the_harness_or_a_stage_sleep
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestPreparedProductionPath::test_no_production_premarket_module_builds_a_wall_clock_time_by_adding_elapsed_time
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestPreparedProductionPath::test_production_reaches_the_versioned_time_schema
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestPreparedProductionPath::test_the_legacy_oracle_still_carries_the_defect_it_is_the_oracle_for
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestPreparedProductionPath::test_the_prepared_artifacts_have_not_drifted_from_schedule_or_host_timezone
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_a_probe_cannot_make_a_silent_source_look_fresh
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_a_provider_declared_future_availability_is_recognised_as_future
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_a_source_with_no_content_at_all_reports_no_freshness_rather_than_zero
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_an_accepted_input_after_the_declared_cutoff_refuses
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_an_explicit_availability_is_recorded_as_provider_stated
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_as_of_time_carries_a_machine_readable_definition_in_v2
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_freshness_comes_only_from_source_times_and_never_from_the_seal
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_known_from_defaults_to_receipt_and_records_that_basis
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_packet_known_from_is_never_before_the_seal
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_sealing_later_does_not_make_a_source_fresher
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_the_packet_schema_is_versioned_and_legacy_bytes_keep_their_meaning
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_the_seal_binds_the_time_block
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_the_stage_time_block_names_every_declared_instant
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheProductionTimeModel::test_unavailable_times_stay_unavailable
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheTimezoneBinding::test_a_host_moved_after_generation_is_REFUSED_by_name
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheTimezoneBinding::test_a_matching_host_is_bound
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheTimezoneBinding::test_an_unresolvable_host_is_refused_rather_than_assumed_to_match
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheTimezoneBinding::test_no_binding_is_UNBOUND_and_says_why_that_is_still_safe
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheTimezoneBinding::test_the_cli_refuses_a_mismatched_binding
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestTheTimezoneBinding::test_the_generated_binding_matches_the_host_and_the_schedule
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestWindowDecisionsUnderCoalescingAndLateness::test_a_coalesced_event_arriving_hours_early_is_TOO_EARLY_not_absorbed
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestWindowDecisionsUnderCoalescingAndLateness::test_a_coalesced_older_event_arriving_hours_late_is_MISSED_not_absorbed
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestWindowDecisionsUnderCoalescingAndLateness::test_every_arrival_gets_the_market_time_answer[2-0-TOO_EARLY]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestWindowDecisionsUnderCoalescingAndLateness::test_every_arrival_gets_the_market_time_answer[7-15-TOO_EARLY]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestWindowDecisionsUnderCoalescingAndLateness::test_every_arrival_gets_the_market_time_answer[8-15-ON_TIME]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestWindowDecisionsUnderCoalescingAndLateness::test_every_arrival_gets_the_market_time_answer[8-20-LATE_START]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestWindowDecisionsUnderCoalescingAndLateness::test_every_arrival_gets_the_market_time_answer[8-25-LATE_START]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestWindowDecisionsUnderCoalescingAndLateness::test_every_arrival_gets_the_market_time_answer[8-26-MISSED_WINDOW]
+   ONLY_IN_CAND tests.test_premarket_audit_001_r5.TestWindowDecisionsUnderCoalescingAndLateness::test_every_arrival_gets_the_market_time_answer[9-30-MISSED_WINDOW]
+
+VERDICT: NO NEW FAILURE AND NO CHANGED FAILURE MECHANISM
+
+
+TESTS PRESENT ON ONLY ONE SIDE:
+   R5 vs base: 113 -- 112 added, and exactly 1 removed: the R4 rename
+      test_the_prepared_plist_invokes_the_long_sleeping_runner ->
+      test_the_prepared_production_path_no_longer_reaches_the_long_sleeping_runner
+   R5 vs R4:    68 -- 68 added, 0 removed.
+
+CONCLUSION: R5 introduces NO new failure and changes NO existing failure mechanism, measured against the base and
+against R4 independently.
