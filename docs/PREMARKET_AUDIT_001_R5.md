@@ -8,9 +8,42 @@ live repo.** No trade, paper unit, fee promotion, source connection or downstrea
 
 ---
 
-## 1. R4 regression reconciliation
+## 1. R4 regression reconciliation — **clean**
 
-*(filled in from `scripts/reconcile_regression.py` — see §11.)*
+Base `602d5a2` and candidate `533dfbd` each ran the full suite with `--junit-xml`, compared **per test ID** by
+phase, exception type, failing assertion and normalized traceback.
+
+```
+IDENTICAL FAILURES (same id, phase, exception, normalized traceback):  88
+NEW FAILURES introduced by the candidate:                               0
+FAILURES the candidate FIXED:                                           0
+FAILURES whose MECHANISM CHANGED:                                       0
+TESTS PRESENT ON ONLY ONE SIDE:                                        45
+```
+
+`base 6091 + 43 new = 6134`; `passed 6003 + 43 = 6046`; failed 45 = 45, errors 17 = 17, skipped 26 = 26.
+
+The single test present **only on the base side** is the R4 rename
+`test_the_prepared_plist_invokes_the_long_sleeping_runner` →
+`test_the_prepared_production_path_no_longer_reaches_the_long_sleeping_runner`, whose assertion was deliberately
+inverted when R4 repointed the prepared artifacts. Eight further `TestPreparedProductionPath` tests cover the
+same surface; no coverage was removed.
+
+**Two defects in the reconciler itself, found and fixed before any verdict was reported.** Its first run claimed
+**50 changed failure mechanisms**. Both causes were in the tool:
+
+1. the two sides live in different worktrees, so every absolute path in every traceback differed — it flagged
+   *skipped* tests, which is what gave it away;
+2. pytest's truncation notice counts hidden diff lines, and that count grows when the candidate adds files to a
+   corpus a test concatenates (93435 → 94815), which made one genuinely identical failure look changed.
+
+A comparator that reports a difference in the thing it failed to normalize is the same defect family this audit
+keeps finding — this time in the audit tool.
+
+**R4 introduced no new failure and changed no existing failure mechanism.**
+
+**R5's own full suite is running** against the same base and against R4, so this candidate is not judged by R4's
+result. Reported when it lands.
 
 ---
 
