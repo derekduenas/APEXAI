@@ -92,3 +92,23 @@ fee authorization or order was made in this change.
 premarket handoff, court execution reconstruction, organism court, funnel engine,
 and worldmodel suites. Eight new preflight checks. These are synthetic tests;
 not a full-repository regression or evidence of profitable historical trades.
+
+## Layer-by-layer audit command
+
+After a run has completed, inspect its persisted path with:
+
+```bash
+python scripts/audit_flow_run.py RUN_DIR audit.json --require-trade
+```
+
+The auditor verifies the ledger chain and checks, in order: premarket context,
+Digital Twin identity, location forecast, variance, regime, market-implied IV,
+Multiverse paths, Expression War, PRIME, risk certificate, intent, fill, exit and
+Book. A missing stage on a trade is `FAIL`; a deliberate WAIT is a stopping point,
+and later required stages are `BLOCKED`. Premarket context is optional and remains
+`PRIOR_CONTEXT_ONLY` unless an explicitly reviewed consumer proves otherwise.
+For a trade, the independent execution reconstruction must also pass.
+
+The audit reads persisted output. It does not claim that every model field was
+inspected, that a model is calibrated, or that the observed trade was profitable.
+Those require the chronological evaluation and untouched outcome data.

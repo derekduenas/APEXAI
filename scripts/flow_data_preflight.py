@@ -20,15 +20,25 @@ def inspect_manifest(manifest_path):
     manifest = json.loads(raw)
     sessions = manifest.get('sessions')
     if not isinstance(sessions, list) or not sessions:
-        raise ValueError('SESSIONS_REQUIRED')
+        # Accept the repository's existing preserve_inputs.py artifact. It
+        # names one collection without claiming a session date; keep that
+        # uncertainty explicit rather than manufacturing one.
+        inputs = manifest.get('inputs')
+        if isinstance(inputs, dict) and inputs:
+            sessions = [{'market_date': manifest.get('market_date', 'UNKNOWN'),
+                         'exposure_status': ((manifest.get('acquisition_history') or {}).get('collection') or {}).get('status', 'UNKNOWN'),
+                         'inputs': inputs}]
+        else:
+            raise ValueError('SESSIONS_REQUIRED')
     seen = set()
     results = []
     for session in sessions:
-        date = session['market_date']
-        from datetime import date as Date
-        if Date.fromisoformat(date).isoformat() != date or date in seen:
-            raise ValueError('INVALID_OR_DUPLICATE_SESSION')
-        seen.add(date)
+        date = session.get('market_date', 'UNKNOWN')
+        if date != 'UNKNOWN':
+            from datetime import date as Date
+            if Date.fromisoformat(date).isoformat() != date or date in seen:
+                raise ValueError('INVALID_OR_DUPLICATE_SESSION')
+            seen.add(date)
         inputs = session.get('inputs', {})
         rows = []
         for family in FAMILIES:

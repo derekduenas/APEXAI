@@ -1,0 +1,24 @@
+{
+  "sessions": [
+    {
+      "market_date": "2026-09-11",
+      "inputs": {}
+    }
+  ],
+  "files": [
+    {
+      "path": "connector_capture.json",
+      "sha256": "c183b75218922c97ede02031b596f863e3c635945ed56ab966db3e1aa64079e5"
+    },
+    {
+      "path": "connector_payload.txt",
+      "sha256": "ad2a01ad988fa2350e12d4088e949a1d9a1ff09810d5925fe4fcf015a0ca6076"
+    },
+    {
+      "path": "finding.json",
+      "sha256": "c550b4e7b08c3d728d34ec5f1b8df7fdc2ba195575430d280b138bb90da30e54"
+    }
+  ],
+  "evaluation_ready": false,
+  "limitations": "Raw connector CSV preserved; no normalized inputs admitted. Missing QQQ, NVDA, chain, NBBO, prior bars. No historical receipt or late-arrival evidence. No overwrite performed; files reopened read-only for hash verification."
+}

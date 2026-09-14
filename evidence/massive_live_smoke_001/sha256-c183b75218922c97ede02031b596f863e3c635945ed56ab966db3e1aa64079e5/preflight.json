@@ -1,0 +1,40 @@
+{
+  "schema": "FLOW_DATA_PREFLIGHT_V1",
+  "manifest_sha256": "1e9a1ee80cd4f1cbfd81d2dfe38803da8662e4c11fe17cdf2cdc4f7c8a4b20ec",
+  "sessions": [
+    {
+      "market_date": "2026-09-11",
+      "exposure_status_claim": "UNKNOWN",
+      "coverage_status": "NOT_INSPECTED",
+      "inputs": [
+        {
+          "family": "bars",
+          "status": "NOT_DECLARED"
+        },
+        {
+          "family": "chain",
+          "status": "NOT_DECLARED"
+        },
+        {
+          "family": "nbbo",
+          "status": "NOT_DECLARED"
+        },
+        {
+          "family": "prior_bars",
+          "status": "NOT_DECLARED"
+        }
+      ],
+      "input_bytes_match": false
+    }
+  ],
+  "all_input_bytes_match": false,
+  "evaluation_ready": false,
+  "remaining_checks": [
+    "record-level causal availability and coverage",
+    "dataset-use scope and prior exposure",
+    "chronological train/test split with overlapping labels purged",
+    "matched candidate universe and execution assumptions",
+    "recorded V2 arrival wiring and fee configuration"
+  ],
+  "limitations": "Byte inventory only. No authenticity, authority, clean-holdout or profitability claim."
+}

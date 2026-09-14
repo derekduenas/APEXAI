@@ -64,3 +64,16 @@ def test_duplicate_dates_refuse(tmp_path):
     path.write_text(json.dumps(body))
     with pytest.raises(ValueError, match='DUPLICATE'):
         inspect_manifest(path)
+
+
+def test_existing_preservation_manifest_format_is_supported(tmp_path):
+    path, _ = manifest(tmp_path)
+    body = json.loads(path.read_text())
+    preserved = {'kind': 'INPUTS_MANIFEST', 'destination': str(tmp_path),
+                 'inputs': body['sessions'][0]['inputs'],
+                 'acquisition_history': {'collection': {'status': 'BURNED'}}}
+    path.write_text(json.dumps(preserved))
+    result = inspect_manifest(path)
+    assert result['sessions'][0]['market_date'] == 'UNKNOWN'
+    assert result['sessions'][0]['exposure_status_claim'] == 'BURNED'
+    assert result['all_input_bytes_match']

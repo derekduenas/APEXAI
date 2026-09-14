@@ -1,0 +1,24 @@
+{
+  "schema": "MASSIVE_LIVE_SMOKE_001_INPUT_MANIFEST_V1",
+  "gate": "MASSIVE-LIVE-SMOKE-001",
+  "capture_id": "sha256-5f50147af01e29c19c340c0d7ec0e29cf32abd76bed25f52e33c0cfa8f58e978",
+  "status": "BLOCKED_NO_VENDOR_PAYLOADS",
+  "files": [
+    {
+      "path": "CAPABILITY_REPORT.json",
+      "sha256": "898b5ad35fc382e04ce3a6361591550fb33bf76d6ae81cce1ebfbf882ca723d7"
+    },
+    {
+      "path": "NO_VENDOR_PAYLOAD_RETURNED.txt",
+      "sha256": "8409cf3ef6ab89027e5d6e08d704082da19c0203067acfabec46e99f5e1648ba"
+    },
+    {
+      "path": "PROVENANCE_LIMITATIONS.md",
+      "sha256": "c934efc03f452a9a835397da7e2d253e2c80f01c8e320e1e4be58654c931899c"
+    }
+  ],
+  "vendor_inputs": [],
+  "evaluation_ready": false,
+  "note": "There are no declared bars, contracts, NBBO, prior bars, or normalized market inputs because the provider calls were blocked before execution."
+}
+

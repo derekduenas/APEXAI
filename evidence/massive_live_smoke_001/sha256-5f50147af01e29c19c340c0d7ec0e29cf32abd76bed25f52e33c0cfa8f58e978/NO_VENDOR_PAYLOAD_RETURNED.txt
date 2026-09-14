@@ -1,0 +1,6 @@
+MASSIVE-LIVE-SMOKE-001
+
+No vendor response payload was returned.
+All bounded data calls were blocked before provider execution by the connected session's automatic-approval usage limit.
+This marker is not a market-data payload and must not be treated as one.
+
