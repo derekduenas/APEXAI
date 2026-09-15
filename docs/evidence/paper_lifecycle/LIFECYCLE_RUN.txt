@@ -1,0 +1,50 @@
+HUNTER-PAPER-LIFECYCLE-001 — one complete paper lifecycle, EXPLICITLY SYNTHETIC
+==============================================================================
+Authorization below is SYNTHETIC_TEST. It is constructible only inside a pytest process
+(PYTEST_CURRENT_TEST guard) and no file under apex/ or scripts/ constructs one, so this
+route is unreachable in production. The capital gate is UNCHANGED: PAPER_ELIGIBLE remains
+unreachable and SIMULATED_UNCALIBRATED remains refused for production authorization.
+
+EXECUTED PATH — each line is a persisted, hash-chained ledger record
+------------------------------------------------------------------------------
+  AUTHORIZED     authorized_by=SYNTHETIC_TEST capital=PAPER_ELIGIBLE
+     prev=GENESIS digest=7bb2fdc2d74e
+  FILL_ASSESSED  grade=CERTAIN_FILL price=99.5
+     prev=7bb2fdc2d74e digest=22d551b4c9ca
+  POSITION_OPEN  shares=20 @ 99.50  entry_fees=0.0
+     prev=22d551b4c9ca digest=53215b35d179
+  MANAGED        actions=['EXIT'] state=EXITED
+     prev=53215b35d179 digest=edd836c82073
+  REALIZED       exit=104.00 (TARGET) gross=90.00 fees=0.0633 net=89.9367
+     prev=edd836c82073 digest=f70488b6d129
+
+COMPONENT FEES — each component names its basis and its side
+  entry BUY  principal=1990.00  total=0.0
+      commission   0.0         per_share, both sides
+      finra_taf    0.0         SELL side only: not applicable to a BUY
+      sec_fee      0.0         SELL side only: not applicable to a BUY
+  exit  SELL  principal=2080.00  total=0.06332
+      commission   0.0         per_share, both sides
+      finra_taf    0.00332     per share, capped per execution
+      sec_fee      0.06        rate x principal, rounded UP to the cent (the charged amount)
+
+SIZING — whole shares, residual reported not rounded away
+  entry_price          99.5
+  filled_notional      1990.0
+  nav_usd              100000.0
+  residual_notional    10.0
+  shares               20
+  target_notional      2000.0
+  weight               0.02
+
+INDEPENDENT RECONSTRUCTION — recomputed from the persisted records alone
+------------------------------------------------------------------------------
+  records          5
+  cash             89.93668
+  fees_paid        0.06332
+  realized_net     89.93668
+  reconciles       True
+  open_exposure    []
+  disagreements    []
+
+  cash identity: gross 90.00 - fees 0.0633 = 89.9367   reconstructed cash 89.9367
