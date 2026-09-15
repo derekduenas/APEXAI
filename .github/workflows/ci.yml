@@ -86,6 +86,7 @@ jobs:
         run: >-
           pytest tests/test_hunter_causal_handoff.py tests/test_model_history_integrity.py
           tests/test_intelligence_wiring.py tests/test_hunter_capital.py
+          tests/test_hunter_paper.py tests/test_hunter_spine.py
           -v --junitxml=/tmp/hunter-contracts.xml
 
       - name: Smoke-run harness self-test
