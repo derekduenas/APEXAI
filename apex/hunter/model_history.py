@@ -63,6 +63,11 @@ def build(symbol: str, today_bars, *, as_of_epoch: float, gov,
             rows, src = f(symbol if symbol.endswith(".US") else symbol + ".US",
                           dates[0], dates[-1], gov)
             prior = normalize_rows(rows or [], symbol)
+            # normalize_rows preserves source indices but omits optional timing.
+            # Restore supplied timing before tagging this input family.
+            if any("available_epoch" in row for row in (rows or [])):
+                prior["available_epoch"] = pd.Series(
+                    [row.get("available_epoch") for row in rows], dtype="object")
             if len(prior):
                 # Keep ONLY the completed prior sessions. Anything stamped on or after the decision's market date
                 # is today's business and must arrive through today's frame, which applies the visibility test.
@@ -70,21 +75,49 @@ def build(symbol: str, today_bars, *, as_of_epoch: float, gov,
                 keep = et.dt.date.astype(str).isin(dates)
                 prior = prior[keep]
                 if len(prior):
-                    frames.append(prior)
+                    frames.append(_with_availability(prior))
                     sources.append("adapter_cache:%s" % src)
             prov["prior_bars"] = int(sum(len(x) for x in frames))
         except Exception as e:                                       # noqa: BLE001
             prov["prior_history_unavailable"] = "%s: %s" % (type(e).__name__, str(e)[:160])
     if today_bars is not None and len(today_bars):
-        frames.append(today_bars)
+        frames.append(_with_availability(today_bars))
         sources.append("today_live")
     prov["sources"] = sources
     if not frames:
         return None, prov
     out = pd.concat(frames, ignore_index=True).sort_values("event_time_utc", kind="stable")
-    out = out.drop_duplicates(subset=["event_time_utc"], keep="last").reset_index(drop=True)
+    # Only exactly equivalent observations collapse. Conflicts exclude the whole
+    # timestamp, with evidence, rather than selecting a price by input order.
+    identical = out.drop_duplicates()
+    prov["identical_duplicates_collapsed"] = len(out) - len(identical)
+    conflict = identical["event_time_utc"].duplicated(keep=False)
+    prov["conflicting_bars"] = [
+        {"reason": "CONFLICTING_MODEL_HISTORY_BAR", "event_time_utc": str(t),
+         "observations": group.to_json(orient="records", date_format="iso")}
+        for t, group in identical[conflict].groupby("event_time_utc", sort=True)
+    ]
+    out = identical[~conflict].reset_index(drop=True)
     prov["total_bars"] = int(len(out))
-    prov["availability_basis"] = ("BAR_COMPLETION_ASSUMED_NOT_MEASURED_RECEIPT"
-                                 if "available_epoch" not in out else
-                                 "BAR_COMPLETION_AND_SUPPLIED_AVAILABILITY")
+    prov["availability_basis_counts"] = out["availability_basis"].value_counts().to_dict()
+    bases = sorted(prov["availability_basis_counts"])
+    prov["availability_basis"] = bases[0] if len(bases) == 1 else "MIXED_PER_ROW"
     return out, prov
+
+
+def _with_availability(frame):
+    """Apply the existing completion assumption only when the input omits timing.
+
+    A supplied null/invalid receipt stays unknown and is excluded downstream.
+    Tag BEFORE concat: a union of columns must not change either input's meaning.
+    """
+    import pandas as pd
+
+    out = frame.copy()
+    if "available_epoch" in out:
+        out["available_epoch"] = pd.to_numeric(out["available_epoch"], errors="coerce").astype(float)
+        out["availability_basis"] = "BAR_COMPLETION_AND_SUPPLIED_AVAILABILITY"
+    else:
+        out["available_epoch"] = out["event_time_utc"].map(lambda t: t.timestamp() + 60)
+        out["availability_basis"] = "BAR_COMPLETION_ASSUMED_NOT_MEASURED_RECEIPT"
+    return out
