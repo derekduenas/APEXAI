@@ -1,0 +1,100 @@
+HARNESS SELF-TEST ON SYNTHETIC DATA -- this is NOT the smoke run.
+The panel is a null world by construction, so a mean IC near zero is
+the correct answer and says nothing about the real experiment.
+
+==============================================================================
+APEX EXPERIMENT #001 -- IN-SAMPLE SMOKE RUN
+structural and unit validation only; NOT a performance judgement
+==============================================================================
+dataset fingerprint : synthetic-7bc3c1cdf9c961c1b8b1deb40745882e7a681909f4f1cf16
+period              : in_sample (2005-01-01 to 2017-12-31)
+
+--- 1. UNIVERSE COUNTS OVER TIME ----------------------------------------------
+            eligible  tradable  excluded_security_type  excluded_exchange  excluded_history  excluded_bars_in_prior_252  excluded_close  excluded_pit_market_cap  excluded_market_cap  excluded_addv  excluded_missing_feature
+2005-01-03       191       514                      92                 31                58                          14              10                        0                  161            128                        49
+2005-05-02       192       514                      92                 30                17                          13              11                        0                  167            130                        46
+2005-08-29       183       511                      92                 30                20                          20              11                        0                  176            130                        45
+2005-12-29       187       503                      90                 30                19                          13              18                        0                  167            126                        36
+2006-04-28       183       511                      90                 30                27                          22              14                        0                  168            128                        48
+2006-08-25       175       512                      91                 32                31                          29              16                        0                  169            120                        64
+2006-12-27       167       505                      90                 30                36                          25              16                        0                  173            122                        60
+2007-04-26       179       512                      93                 30                34                          26              15                        0                  170            131                        56
+2007-08-23       174       506                      94                 30                32                          28              17                        0                  177            126                        52
+2007-12-24       168       504                      94                 30                32                          24              22                        0                  178            134                        56
+2008-04-23       165       501                      94                 30                18                          12              20                        0                  187            126                        50
+2008-08-20       170       483                      88                 29                 8                           2              17                        0                  167            115                        37
+2008-12-19       167       471                      83                 29                 0                           0              21                        0                  167            119                        38
+
+  eligible: min=159  median=178  max=199  over 1004 dates
+
+--- 2. FEATURE DISTRIBUTIONS --------------------------------------------------
+           component  nan_rate     min     p50    max  xs_sd_p50  flat_dates
+          f1_mom_126       0.0 -0.9214 -0.0540 4.9933     0.3536           0
+           f1_mom_63       0.0 -0.7508 -0.0257 2.7153     0.2384           0
+f2_close_over_sma200       0.0 -0.7277  0.0127 2.0720     0.2305           0
+ f2_frac_above_sma50       0.0  0.0000  0.5238 1.0000     0.2878           0
+        f3_vol_ratio       0.0  0.4279  0.9891 1.6162     0.1449           0
+   f3_atr_over_close       0.0  0.0197  0.0718 0.2348     0.0328           0
+        f4_vs_sector       0.0 -0.8287 -0.0231 2.6509     0.2460           0
+        f4_vs_market       0.0 -0.7587 -0.0242 2.7138     0.2384           0
+
+--- 3. IC TIME SERIES ---------------------------------------------------------
+  observations   : 983
+  mean           : -0.01747
+  sd             : 0.07717
+  min / max      : -0.2271 / +0.1919
+  |IC| > 0.5     : 0 dates
+  autocorr lag 1 : +0.898   (overlap implies strongly positive)
+  by year:
+      count     mean      std
+2005    251 -0.01119  0.07036
+2006    250 -0.01572  0.06549
+2007    251 -0.02186  0.07555
+2008    231 -0.02143  0.09549
+
+--- 4. DECILE MEMBERSHIP ------------------------------------------------------
+  rebalance periods      : 50
+  top-decile size (median): 18
+  bottom-decile size      : 17
+  distinct names ever top : 222
+
+  most persistent top-decile members:
+ticker  top_decile_share
+  HR61              0.36
+  RV78              0.26
+  II22              0.26
+  MB38              0.26
+  KU45              0.24
+  CS82              0.24
+  RN64              0.24
+   UH8              0.22
+  BW88              0.22
+  ND91              0.22
+
+--- 5. LEAKAGE AUDITS (measured on this dataset) ------------------------------
+lookahead audit: 66 comparisons over 3 dates x 2 modes x 11 components
+  CLEAN -- nothing known at T changed when the future was destroyed
+
+cross-sectional audit: 18 comparisons over 3 probe dates x 6 components
+  CLEAN -- every scored value at T is independent of every other date, so winsorisation, z-scoring and ranking are strictly cross-sectional (ruling 5)
+
+--- STRUCTURAL CHECKS --------------------------------------------------------
+  [PASS] universe is never empty: smallest cross-section is 159 names
+  [PASS] universe is large enough to rank: median 178 names (a decile needs a workable count)
+  [PASS] universe does not collapse day to day: largest single-day contraction is x0.95
+  [PASS] no feature is constant within a cross-section: all eight vary across securities
+  [PASS] feature NaN rates are plausible: all components below 25% missing
+  [PASS] all feature values are finite: no infinities or overflow in the medians
+  [PASS] IC series is populated: 983 scored dates
+  [PASS] IC series is not flat: sd = 0.07717
+  [PASS] IC series is not exploding: max |IC| = 0.2271 (a correlation cannot exceed 1)
+  [PASS] IC autocorrelation matches the 20-day overlap: lag-1 autocorrelation +0.898
+  [PASS] both deciles are populated at every rebalance: smallest top decile 16, bottom 16
+  [PASS] no single security dominates the top decile: most persistent name appears in 36% of rebalances
+  [PASS] top-decile turnover is not zero: 222 distinct names appear in the top decile
+  [PASS] no lookahead on this dataset: protocol section 4, measured
+  [PASS] preprocessing is strictly cross-sectional: ruling 5, measured
+
+==============================================================================
+CLEAR TO PROCEED TO VALIDATION
+==============================================================================
