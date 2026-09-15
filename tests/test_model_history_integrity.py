@@ -66,3 +66,36 @@ def test_supplied_unknown_or_future_history_is_not_backdated(monkeypatch, bad):
     visible = W._visible_simulation_bars(out, cutoff_epoch=CUTOFF, sessions=2)
     assert len(visible) == 5
     assert set(visible.event_time_utc.dt.date.astype(str)) == {'2026-09-14'}
+
+
+def test_the_same_observation_from_two_sources_is_currently_excluded_as_a_conflict():
+    """A BOUNDED HAZARD, recorded rather than fixed, because it is not reachable today.
+
+    Conflict detection runs on the FULL row after `_with_availability` has tagged each input family. So one
+    identical observation -- same timestamp, same OHLCV -- arriving from both the adapter cache and the live
+    feed differs only in `availability_basis`, is therefore NOT "exactly equivalent", and the whole timestamp is
+    excluded as conflicting. That is over-exclusion: the two rows agree about the market.
+
+    It is unreachable through `build()` today because prior sessions are date-filtered to exclude the decision's
+    own market date, so the two families cannot overlap. It becomes reachable the moment history is widened to
+    include part of the current session from a second source. Stated here so it is found by a test rather than
+    by a silently shrinking sample."""
+    import pandas as pd
+    from apex.hunter.model_history import _with_availability
+
+    t = pd.Timestamp("2026-09-14 13:30", tz="UTC")
+    row = dict(event_time_utc=t, close=100.0, open=100.0, high=100.0, low=100.0, volume=1000)
+    historical = _with_availability(pd.DataFrame([row]))
+    live = pd.DataFrame([row])
+    live["available_epoch"] = t.timestamp() + 60
+    live = _with_availability(live)
+
+    merged = pd.concat([historical, live], ignore_index=True)
+    identical = merged.drop_duplicates()
+    assert len(identical) == 2, "the two rows differ only in availability_basis"
+    conflicting = identical["event_time_utc"].duplicated(keep=False)
+    assert conflicting.all(), "so the timestamp is currently excluded rather than collapsed"
+
+    # and the same two rows DO agree about every market fact
+    market_cols = ["event_time_utc", "open", "high", "low", "close", "volume"]
+    assert historical[market_cols].equals(live[market_cols])
