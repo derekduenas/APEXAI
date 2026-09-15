@@ -43,6 +43,11 @@ def main() -> int:
             alpha=0.0,
             overrides={
                 "panel.n_securities": 600,
+                # Smoke fixture follows the active small-cap universe, with tails
+                # on BOTH sides to exercise exclusion. Do not change the registered
+                # universe or rank-count assertion to fit an obsolete large-cap DGP.
+                "market_cap.initial_min_usd": float(config.get("universe.min_market_cap_usd")) / 2,
+                "market_cap.initial_max_usd": float(config.get("universe.max_market_cap_usd")) * 2,
                 "panel.start": "2004-01-01",
                 "panel.end": "2008-12-31",
             },

@@ -22,6 +22,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install
+        id: install
         run: |
           python -m pip install --upgrade pip
           pip install -e . pytest
@@ -77,16 +78,39 @@ jobs:
       # --- the suite --------------------------------------------------------
 
       - name: Leakage auditors (lookahead + cross-sectional)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pytest tests/test_lookahead_audit.py tests/test_cross_sectional_audit.py -v
 
+      - name: Hunter data, model and capital contracts
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: >-
+          pytest tests/test_hunter_causal_handoff.py tests/test_model_history_integrity.py
+          tests/test_intelligence_wiring.py tests/test_hunter_capital.py
+          -v --junitxml=/tmp/hunter-contracts.xml
+
       - name: Smoke-run harness self-test
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: python scripts/run_smoke.py --synthetic --out /tmp/smoke_synth.txt
 
       - name: Holdout protection and research governance
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pytest tests/test_registration.py tests/test_research_ledger.py tests/test_verdict.py -v
 
       - name: Point-in-time universe, timing and vendor adapters
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: pytest tests/test_universe_pit.py tests/test_returns_timing.py tests/test_sharadar.py tests/test_identity.py tests/test_crosscheck.py -v
 
       - name: Full suite including the slow null-rig merge gate
-        run: pytest -q -ra
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pytest -q -ra --junitxml=/tmp/full-suite.xml
+
+      - name: Preserve test and smoke evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: integrity-evidence
+          path: |
+            /tmp/*contracts.xml
+            /tmp/full-suite.xml
+            /tmp/smoke_synth.txt
+          if-no-files-found: warn
